@@ -1,0 +1,25 @@
+<!-- تنظیم‌های متنی -->
+<!-- 
+برخی از ماژولها به توصیف‌هایی نیاز دارن که با یک عنوان و یک متن ساده
+کارشون حله. اینجا یا صفحه ایجاد کردیم که این خصوصیت‌ها رو برای کاربران
+ویرایش کنه. خصوصیت‌هایی که توی این صفحه در نظر گرفته شده عبارتند از:
+
+- {Text} label 
+- {Text} description 
+-->
+<!-- که به ترتیب یک متن ساده و یک ابر متن هست. -->
+<div 
+	layout="column"
+	style="width:100%">
+	<md-input-container>
+	  <label translate>Lable</label>
+	  <input 
+	  	type="text" ng-model="mdeModel.label">
+	</md-input-container>
+	
+	<md-input-container>
+	  <label translate>Description</label>
+	  <input 
+	  	type="text" ng-model="mdeModel.description">
+	</md-input-container>
+</div>

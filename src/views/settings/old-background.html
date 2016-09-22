@@ -1,0 +1,73 @@
+<!-- 
+تنظیم‌های پس زمینه
+
+تمام خصوصیت‌هایی که در این صفحه تعیین می‌شود عبارتند از
+
+- background
+- backgroundMeta
+
+پس زمینه بر اساس خصوصیت همنامی تعیین می‌شود که در استاندارد CSS3 آمده. این مقدار با ویرایشگری ایجاد
+می‌شود که اینجا توسعه داده می‌شود. اما ویرایشگر برای ایجاد این خصوصیت از پارامترهایی استفاده می‌کند که
+بازیابی آن ممکن است پیچیده باشد. این خصوصیت‌ها در backgourndMeta ذخیره سازی می شود.
+ -->
+ <div 
+ 	ng-controller="BackgroundSettingCtrl"
+	layout="column"
+	style="width:100%">
+	<!-- 	انتخاب نوع -->
+	<div>
+		<md-radio-group ng-model="mdeModel.style.backgroundMeta.type">
+			<md-radio-button 
+				ng-repeat="type in types" 
+				value="{{type.value}}">
+					{{type.title}}
+				</md-radio-button>
+		</md-radio-group>
+	</div>
+
+
+	<div
+		ng-show="mdeModel.style.backgroundMeta.type!=='none'"
+		layout="row"
+		style="width:100%">
+		<div 
+			data-ng-show="mdeModel.style.backgroundMeta.type==='color'"
+			flex>
+			<!-- ناحیه کنترل -->
+			<md-container flex="">
+				<md-color-picker
+		            label="Color"
+		            icon="brush"
+		            ng-model="mdeModel.style.backgroundMeta.c">
+		          </md-color-picker>
+			</md-container>
+	    </div>
+	    <div 
+			data-ng-show="mdeModel.style.backgroundMeta.type==='pattern'"
+			flex></div>
+	    <div 
+			data-ng-show="mdeModel.style.backgroundMeta.type==='image'"
+			flex></div>
+	
+		<!-- ناحیه نمونه -->
+	    <div class="preview-box" flex="40">
+	        <div class="header">Preview</div>
+	        <div>
+	            <div class="preview-area"
+	            layout="row"
+				layout-align="center center">
+	                <div
+	                class="widget"
+					ng-style="{
+						 'background': mdeModel.style.background,
+						 'height': '50%',
+						 'width': '50%'
+					 }">
+					 <p>widget</p>
+				</div>
+	            </div>
+	        </div>
+		</div>
+	</div>
+</div>
+ 

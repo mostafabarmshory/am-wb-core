@@ -1,0 +1,138 @@
+<!-- 
+تنظیم‌های کادر
+
+بعضی از ویجت‌ها نیاز دارن که بردر تنظیم کنن. این صفحه تنظیم‌ها امکانات مورد نیاز برای تنظیم این
+خصوصیت رو فراهم کرده. خصوصیت‌هایی که برای این کار در نظر گرفته شده عبارتند از:
+
+- border
+- borderRadius
+- borderMeta
+
+اولین خصوصیت نوع بردر رو تعیین می‌کنه و دومین خصوصیت نحوه نمایش گوشه‌ها رو تعیین می‌کنه. اما خصوصیت
+سوم داده‌هایی است که صرفا توی ویرایشگر کاربرد داره و بر اساس اونها مقدار اصلی تعیین می‌شه.
+
+ -->
+ <div 
+ 	ng-controller="BorderSettingCtrl"
+	layout="column"
+	style="width:100%">
+	<!-- 	انتخاب نوع -->
+	<div>
+		<md-radio-group ng-model="mdeModel.style.borderMeta.type">
+			<md-radio-button value="none">None</md-radio-button>
+			<md-radio-button value="line">Line</md-radio-button>
+		</md-radio-group>
+	</div>
+
+
+	<div 
+		data-ng-show="mdeModel.style.borderMeta.type==='line'"
+		layout="row"
+		style="width:100%"
+		id="borderLine">
+		<!-- ناحیه کنترل -->
+		<md-container flex="">
+			<md-slider-container>
+				<span>All corners</span>
+				<md-slider flex 
+					min="0" max="200" 
+					ng-model="mdeModel.style.borderMeta.ca" 
+					aria-label="All corner" 
+					id="corner-all-slider">
+				</md-slider>
+			</md-slider-container>
+			<md-divider></md-divider>
+			<md-slider-container>
+				<span>Top left</span>
+				<md-slider flex 
+					min="0" max="100" 
+					ng-model="mdeModel.style.borderMeta.ctl" 
+					aria-label="top left corner" 
+					id="corner-all-slider">
+				</md-slider>
+			</md-slider-container>
+			<md-slider-container>
+				<span>Top right</span>
+				<md-slider flex 
+					min="0" max="100" 
+					ng-model="mdeModel.style.borderMeta.ctr" 
+					aria-label="top right corner" 
+					id="corner-all-slider">
+				</md-slider>
+			</md-slider-container>
+			<md-slider-container>
+				<span>Bottom left</span>
+				<md-slider flex 
+					min="0" max="100" 
+					ng-model="mdeModel.style.borderMeta.cbl" 
+					aria-label="bottom left corner" 
+					id="corner-all-slider">
+				</md-slider>
+			</md-slider-container>
+			<md-slider-container>
+				<span>Bottom right</span>
+				<md-slider flex 
+					min="0" max="100" 
+					ng-model="mdeModel.style.borderMeta.cbr" 
+					aria-label="bottom right corner" 
+					id="corner-all-slider">
+				</md-slider>
+			</md-slider-container>
+			<md-divider></md-divider>
+			<md-slider-container>
+				<span>Line width</span>
+				<md-slider flex 
+					min="0" max="20" 
+					ng-model="mdeModel.style.borderMeta.w" 
+					aria-label="line width" 
+					id="corner-all-slider">
+				</md-slider>
+			</md-slider-container>
+			<md-input-container>
+				<label>State</label>
+				<md-select ng-model="mdeModel.style.borderMeta.s">
+					<md-option ng-repeat="style in styles" 
+						value="{{style.value}}">
+					 	{{style.title}}
+					</md-option>
+				</md-select>
+			</md-input-container>
+			<md-color-picker
+	            label="Color"
+	            icon="brush"
+	            ng-model="mdeModel.style.borderMeta.c">
+	          </md-color-picker>
+		</md-container>
+
+		<!-- ناحیه نمونه -->
+		<div
+			>
+			
+		</div>
+		
+		
+    <!--Preview Box-->
+    <div class="preview-box"
+			flex="40">
+        <div class="header">Preview</div>
+        <div>
+            <div class="preview-area"
+            layout="row"
+			layout-align="center center">
+                <div
+                class="widget"
+				ng-style="{
+					 'background-color': 'red',
+					 'height': '50%',
+					 'width': '50%',
+					 'border-radius': mdeModel.style.borderRadius,
+					 'border': mdeModel.style.border
+				 }">
+				 <p>widget</p>
+			</div>
+            </div>
+        </div>
+    </div>
+	</div>
+</div>
+ 

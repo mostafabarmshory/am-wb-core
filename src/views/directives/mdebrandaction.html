@@ -1,0 +1,82 @@
+<div
+	ng-class="{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}">
+	<!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
+	<div ng-show="mdeEditable" 
+		layout="row"
+		class="mde-widget-header" 
+		ng-include="'views/partials/mdewidgetheaderactions.html'">
+	</div>
+
+	<div
+		ng-show="mdeModel"
+		ng-style="{ 'background-image': 'url('+mdeModel.style.backgroundImage+')', 'background-size': mdeModel.style.backgroundSize, 'color': mdeModel.style.color, 'width': mdeModel.style.width, 'height': mdeModel.style.height}"
+		layout="column"
+		layout-align="space-between center">
+
+        <div
+                ng-style="{'width': '100%'}"
+                layout="column"
+                layout-align="center center">
+            <h1
+                    class="md-display-3"
+                    ng-style="{'color': mdeModel.style.color}"
+                    ng-class="{'mde-rtl':mdeModel.style.rtl}">{{ mdeModel.title }}</h1>
+            <div
+                    ng-style="{'color': mdeModel.style.color}"
+                    ng-class="{'mde-rtl':mdeModel.style.rtl}"
+                    ng-bind-html="mdeModel.text | unsafe"
+                    hide show-gt-xs></div>
+
+            <div
+                layout="column"
+                layout-gt-xs="row"
+                layout-align-gt-xs="center center">
+                <md-button
+					ng-if="!mdeEditable"
+                    ng-repeat="action in mdeModel.actions"
+                    ng-style="{'color': mdeModel.style.color, 'font-size': '20px'}"
+                    class="md-raised"
+                    ng-class="{'md-primary': action.primary, 'md-accent': action.accent}"
+                    ng-click="runAction(action)">{{ action.label }}
+                </md-button>
+                <md-menu 
+					ng-if="mdeEditable"
+                    ng-repeat="action in mdeModel.actions">
+					<md-button 
+                   		ng-class="{'md-primary': action.primary, 'md-accent': action.accent}"
+                    	class="md-raised"
+						aria-label="Open phone interactions menu"
+						ng-click="openMenu($mdOpenMenu, $event)">
+						<md-icon
+					         ng-style="{ 'color': mdeModel.style.color }"
+					         class="md-48"
+					         md-font-set="social">
+					         {{action.icon}}
+						 </md-icon>
+						 {{ action.label }}
+					</md-button>
+					<md-menu-content width="4">
+						<md-menu-item>
+							<md-button ng-click="edit(action, $event)">
+								<md-icon>edit</md-icon>
+								{{ 'Edit' | translate }}
+							</md-button>
+						</md-menu-item>
+						<md-menu-item>
+							<md-button ng-click="remove(action, $event)">
+								<md-icon>delete</md-icon>
+								{{ 'Delete' | translate }}
+							</md-button>
+						</md-menu-item>
+					</md-menu-content>
+				</md-menu>
+                
+                <md-button
+                        ng-if="mdeEditable"
+                        ng-click="add()">
+                    <md-icon>add</md-icon>
+                </md-button>
+            </div>
+        </div>
+    </div>
+</div>

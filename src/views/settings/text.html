@@ -1,0 +1,18 @@
+<!--
+Text widget
+
+set text using html text editor.
+
+created by mgh.
+-->
+<div
+	ng-controller="TextSettingsCtrl"
+	layout="column">
+
+	<!-- using tinymce wysiwyg editor -->
+	<textarea
+		ui-tinymce="tinymceOptions"
+		ng-model="mdeModel.text"
+		style="width: 100%">
+	</textarea>
+</div>

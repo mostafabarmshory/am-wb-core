@@ -1,0 +1,20 @@
+# NodeJS
+/node_modules
+
+# bower
+/bower_components
+
+# Project
+/.tmp
+/.sass-cache
+#/dist
+
+# Eclipse
+.settings
+.project
+
+# KDE
+.directory
+
+# WebStorm and JetBrains Softwares
+.idea

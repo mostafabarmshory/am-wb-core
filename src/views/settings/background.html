@@ -1,0 +1,72 @@
+<!--
+background setting page
+
+a panel for background settings and opacity of a widget. these css-attributes are affected:
+- background-color
+- background-transparent
+- background-image
+- opacity
+
+Created by mgh.
+-->
+
+
+<div layout="column">
+
+	<!--Preview Box-->
+	<div class="preview-box mde-flex-item-stretch">
+		<div class="header">Preview</div>
+		<div class="preview-area"
+			 ng-class="[mdeParent.mdeModel.style.flexDirection,mdeModel.style.justifyContent, mdeModel.style.alignItems]"
+			 style="display: flex">
+			<div class="widget"
+				 style="width:100px; height:50px; margin: 20px"
+				 ng-style="{
+            'opacity':'calc('+mdeModel.style.opacity+'/100)',
+            'background-color':mdeModel.style.backgroundColor,
+            }"
+				 layout="row" layout-align="center center"
+			>
+				<p>item</p>
+			</div>
+
+		</div>
+	</div>
+
+	<div
+		 class="setting-panel"
+		 layout="column"
+		 layout-gt-sm="row">
+
+		<!-- transparent section -->
+		<md-list>
+			<md-subheader>Opacity</md-subheader>
+			<md-divider></md-divider>
+			<div layout="row" class="mde-flex-align-items-center">
+				<span>Percent</span>
+				<md-slider flex min="0" max="100" ng-model="mdeModel.style.opacity">
+				</md-slider>
+				<md-input-container>
+					<input style="width: 50px" flex type="number" ng-model="mdeModel.style.opacity">
+				</md-input-container>
+			</div>
+		</md-list>
+
+		<!-- color -->
+		<md-list>
+			<md-subheader>Color</md-subheader>
+			<md-divider></md-divider>
+			<div layout="row" class="mde-flex-align-items-start">
+				<md-color-picker
+						md-color-clear-button="false"
+						label="Color"
+						icon="brush"
+						ng-model="mdeModel.style.backgroundColor">
+				</md-color-picker>
+			</div>
+
+		</md-list>
+
+	</div>
+
+</div>

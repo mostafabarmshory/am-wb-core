@@ -1,0 +1,56 @@
+<md-dialog
+	aria-label="edit action dialog"
+	ng-controller="ContentSelectCtrl"
+	ng-cloak>
+
+	<!-- نوار ابزار بالای دریچه محاوره‌ای -->
+	<md-toolbar>
+		<div class="md-toolbar-tools">
+			<h2 translate>Widget list</h2>
+			<span flex></span>
+			<md-button
+				class="md-icon-button"
+				ng-click="cancel()"> 
+				<md-icon aria-label="Close dialog">close</md-icon> 
+			</md-button>
+		</div>
+	</md-toolbar>
+
+	<!-- محتوی صفحه را تعیین می‌کند -->
+	<!-- در این صفحه اطلاعات یک عمل نمایش داده می‌شود و امکان ویرایش آن برای -->
+	<!-- کاربران فراهم می‌کند. -->
+	<md-dialog-content>
+		<md-content 
+			class="md-padding md-dialog-content" 
+			layout-xs="column" 
+			layout="row" layout-wrap>
+			<!-- فهرست تمام المان‌هایی که در سیستم موجود است.  -->
+			<!-- هر گزینه امکان انتخاب توسط کاربر را دارد. با کلیک کردن به رو یان گزینه انتخاب شده و  -->
+			<!-- به عنوان نتیجه برگردانده می‌شود. -->
+			<md-card 
+				ng-repeat="widget in widgets.items"
+				flex-xs 
+				flex-gt-xs="45"
+				md-theme-watch>
+				<md-card-title>
+					<md-card-title-text>
+						<span class="md-headline">{{widget.label}}</span>
+						<span class="md-subhead">{{widget.description}}</span>
+					</md-card-title-text>
+					<md-card-title-media>
+						<img src="{{widget.image}}" />
+					</md-card-title-media>
+				</md-card-title>
+				<md-card-actions layout="row" layout-align="end center">
+					<md-button
+						ng-click="answerWidget(widget)">
+						<md-icon>add</md-icon>
+						{{ 'Add' | translate }}
+					</md-button>
+					<!-- <md-button>Read more</md-button> -->
+				</md-card-actions>
+			</md-card>
+			
+		</md-content>
+	</md-dialog-content>
+</md-dialog>

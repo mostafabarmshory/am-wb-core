@@ -1,0 +1,22 @@
+<div ng-class="{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}">
+	<!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
+	<div ng-show="mdeEditable" 
+		layout="row"
+		class="mde-widget-header" 
+		ng-include="'views/partials/mdewidgetheaderactions.html'">
+	</div>
+
+    <div 
+    	layout="column" layout-align="start center"
+        ng-style="{ 'color': mdeModel.style.color, 'background-color': mdeModel.style.backgroundColor,
+      'width': mdeModel.style.width, 'font-family': mdeModel.style.font, 'padding': mdeModel.style.padding }">
+        <div ng-style="{'width': '80%', 'margin-top': '3em', 'border-bottom': '1px solid #fff' }">
+        </div>
+        <div 
+        	layout="column" layout-align="start center"
+            ng-class="{'mde-rtl':mdeModel.style.rtl}">
+            <h3>{{mdeModel.title}}</h3>
+            <div ng-bind-html="mdeModel.text|unsafe"></div>
+        </div>
+    </div>
+</div>

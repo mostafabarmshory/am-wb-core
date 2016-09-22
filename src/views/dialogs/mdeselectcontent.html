@@ -1,0 +1,30 @@
+<!-- انتخاب محتوی -->
+<md-dialog 
+	aria-label="Select media"
+	ng-controller="MdeCmsCtrl"
+	ng-cloak>
+  <form ng-submit="answer(content)">
+<!--   	نوار ابزار بالای دیالوگ -->
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2 translate>Media select</h2>
+        <span flex></span>
+		<md-button
+			class="md-icon-button"
+			ng-click="answer(content)"> 
+			<md-icon aria-label="Close dialog">done</md-icon> 
+		</md-button>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <md-icon aria-label="Close dialog">close</md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+    
+    <md-dialog-content>
+      <div class="md-dialog-content" layout="column">
+        <!-- Submit form -->
+        <div ng-include="'views/partials/mdecontentexplorer.html'"></div>
+      </div>
+    </md-dialog-content>
+  </form>
+</md-dialog>

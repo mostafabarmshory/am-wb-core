@@ -1,0 +1,251 @@
+<!--
+border setting page
+
+a panel for setting a border for a widget. for each left/right/top/bottom properties. these css-attributes are affected:
+- border-style
+- border-width
+- border-color
+- border-radius
+
+
+Created by mgh.
+-->
+
+
+<div layout="column">
+
+    <!--Preview Box-->
+    <!--TODO: mgh, 1395: good candidate for a directive, like: ng-previewbox items={"1","2","3"} -->
+    <div class="preview-box mde-flex-item-stretch">
+        <div class="header">Preview</div>
+        <div class="preview-area"
+             ng-class="[mdeParent.mdeModel.style.flexDirection,mdeModel.style.justifyContent, mdeModel.style.alignItems]"
+             style="display: flex">
+            <div class="widget"
+                 style="width:100px; height:50px; margin: 20px"
+                 ng-style="{
+            'border-top-left-radius':(mdeModel.style.borderRadius.uniform) ? mdeModel.style.borderRadius.all : mdeModel.style.borderRadius.topLeft,
+            'border-top-right-radius':(mdeModel.style.borderRadius.uniform) ? mdeModel.style.borderRadius.all : mdeModel.style.borderRadius.topRight,
+            'border-bottom-left-radius':(mdeModel.style.borderRadius.uniform) ? mdeModel.style.borderRadius.all : mdeModel.style.borderRadius.bottomLeft,
+            'border-bottom-right-radius':(mdeModel.style.borderRadius.uniform) ? mdeModel.style.borderRadius.all : mdeModel.style.borderRadius.bottomRight,
+
+            'border-left-style':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderStyle.all : mdeModel.style.borderStyle.left,
+            'border-right-style':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderStyle.all : mdeModel.style.borderStyle.right,
+            'border-top-style':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderStyle.all : mdeModel.style.borderStyle.top,
+            'border-bottom-style':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderStyle.all : mdeModel.style.borderStyle.bottom,
+
+            'border-left-width':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderWidth.all : mdeModel.style.borderWidth.left,
+            'border-right-width':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderWidth.all : mdeModel.style.borderWidth.right,
+            'border-top-width':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderWidth.all : mdeModel.style.borderWidth.top,
+            'border-bottom-width':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderWidth.all : mdeModel.style.borderWidth.bottom,
+
+            'border-left-color':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderColor.all : mdeModel.style.borderColor.left,
+            'border-right-color':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderColor.all : mdeModel.style.borderColor.right,
+            'border-top-color':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderColor.all : mdeModel.style.borderColor.top,
+            'border-bottom-color':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderColor.all : mdeModel.style.borderColor.bottom,
+            }"
+                 layout="row" layout-align="center center"
+            >
+                <p>item</p>
+            </div>
+
+        </div>
+    </div>
+
+    <div ng-controller="BorderSettingCtrl"
+         class="setting-panel"
+         layout="column"
+         layout-gt-sm="row">
+
+        <!-- corner radius section -->
+        <md-list>
+            <md-subheader>Corner Radius</md-subheader>
+            <md-divider></md-divider>
+            <md-checkbox ng-model="mdeModel.style.borderRadius.uniform">All equal</md-checkbox>
+            <div layout="row" class="mde-flex-align-items-center" ng-show="mdeModel.style.borderRadius.uniform">
+                <span>Radius</span>
+                <md-slider flex min="0" max="100" ng-model="mdeModel.style.borderRadius.all">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="mdeModel.style.borderRadius.all">
+                </md-input-container>
+            </div>
+
+            <!--<div ng-repeat="radius in radiuses "  layout="row" class="mde-flex-align-items-center" ng-hide="mdeModel.style.borderRadius.uniform">-->
+                <!--<span>{{radius.title}}</span>-->
+                <!--<md-slider flex min="0" max="100" ng-model="radius.model" >-->
+                <!--</md-slider>-->
+                <!--<md-input-container>-->
+                    <!--<input style="width: 50px" flex type="number" ng-model="radius.model">-->
+                <!--</md-input-container>-->
+            <!--</div>-->
+
+            <div layout="row" class="mde-flex-align-items-center" ng-hide="mdeModel.style.borderRadius.uniform">
+                <span>Left</span>
+                <md-slider flex min="0" max="100" ng-model="mdeModel.style.borderRadius.topLeft">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="mdeModel.style.borderRadius.topLeft">
+                </md-input-container>
+            </div>
+            <div layout="row" class="mde-flex-align-items-center" ng-hide="mdeModel.style.borderRadius.uniform">
+                <span>Right</span>
+                <md-slider flex min="0" max="100" ng-model="mdeModel.style.borderRadius.topRight">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="mdeModel.style.borderRadius.topRight">
+                </md-input-container>
+            </div>
+            <div layout="row" class="mde-flex-align-items-center" ng-hide="mdeModel.style.borderRadius.uniform">
+                <span>Top</span>
+                <md-slider flex min="0" max="100" ng-model="mdeModel.style.borderRadius.bottomLeft">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="mdeModel.style.borderRadius.bottomLeft">
+                </md-input-container>
+            </div>
+            <div layout="row" class="mde-flex-align-items-center" ng-hide="mdeModel.style.borderRadius.uniform">
+                <span>Bottom</span>
+                <md-slider flex min="0" max="100" ng-model="mdeModel.style.borderRadius.bottomRight">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="mdeModel.style.borderRadius.bottomRight">
+                </md-input-container>
+            </div>
+        </md-list>
+
+        <!-- style and width and color -->
+        <md-list>
+            <md-subheader>Style/Color/Thickness</md-subheader>
+            <md-divider></md-divider>
+            <md-checkbox ng-model="mdeModel.style.borderStyleColorWidth.uniform">All equal</md-checkbox>
+            <div layout="row" class="mde-flex-align-items-start" ng-show="mdeModel.style.borderStyleColorWidth.uniform">
+                <md-input-container flex="1">
+                    <label>Style</label>
+                    <md-select ng-model="mdeModel.style.borderStyle.all">
+                        <md-option ng-repeat="style in styles"
+                                   value="{{style.value}}">
+                            {{style.title}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+                <md-input-container flex="0" style="min-width: 100px">
+                    <label>Thickness</label>
+                    <input flex type="number" ng-model="mdeModel.style.borderWidth.all">
+                </md-input-container>
+                <md-color-picker
+                        class="color-picker-hide-textbox"
+                        md-color-clear-button="false"
+                        label="Color"
+                        icon="brush"
+                        ng-model="mdeModel.style.borderColor.all">
+                </md-color-picker>
+            </div>
+            <!-- left side -->
+            <div layout="row" class="mde-flex-align-items-start" ng-hide="mdeModel.style.borderStyleColorWidth.uniform">
+                <span>Left: </span>
+                <md-input-container flex="1">
+                    <label>Style</label>
+                    <md-select ng-model="mdeModel.style.borderStyle.left">
+                        <md-option ng-repeat="style in styles"
+                                   value="{{style.value}}">
+                            {{style.title}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+                <md-input-container flex="0" style="min-width: 100px">
+                    <label>Thickness</label>
+                    <input flex type="number" ng-model="mdeModel.style.borderWidth.left">
+                </md-input-container>
+                <md-color-picker
+                        class="color-picker-hide-textbox"
+                        md-color-clear-button="false"
+                        label="Color"
+                        icon="brush"
+                        ng-model="mdeModel.style.borderColor.left">
+                </md-color-picker>
+            </div>
+            <!-- right side -->
+            <div layout="row" class="mde-flex-align-items-start" ng-hide="mdeModel.style.borderStyleColorWidth.uniform">
+                <span>Right: </span>
+                <md-input-container flex="1">
+                    <label>Style</label>
+                    <md-select ng-model="mdeModel.style.borderStyle.right">
+                        <md-option ng-repeat="style in styles"
+                                   value="{{style.value}}">
+                            {{style.title}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+                <md-input-container flex="0" style="min-width: 100px">
+                    <label>Thickness</label>
+                    <input flex type="number" ng-model="mdeModel.style.borderWidth.right">
+                </md-input-container>
+                <md-color-picker
+                        class="color-picker-hide-textbox"
+                        md-color-clear-button="false"
+                        label="Color"
+                        icon="brush"
+                        ng-model="mdeModel.style.borderColor.right">
+                </md-color-picker>
+            </div>
+            <!-- top side -->
+            <div layout="row" class="mde-flex-align-items-start" ng-hide="mdeModel.style.borderStyleColorWidth.uniform">
+                <span>Top: </span>
+                <md-input-container flex="1">
+                    <label>Style</label>
+                    <md-select ng-model="mdeModel.style.borderStyle.top">
+                        <md-option ng-repeat="style in styles"
+                                   value="{{style.value}}">
+                            {{style.title}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+                <md-input-container flex="0" style="min-width: 100px">
+                    <label>Thickness</label>
+                    <input flex type="number" ng-model="mdeModel.style.borderWidth.top">
+                </md-input-container>
+                <md-color-picker
+                        class="color-picker-hide-textbox"
+                        md-color-clear-button="false"
+                        label="Color"
+                        icon="brush"
+                        ng-model="mdeModel.style.borderColor.top">
+                </md-color-picker>
+            </div>
+            <!-- down side -->
+            <div layout="row" class="mde-flex-align-items-start" ng-hide="mdeModel.style.borderStyleColorWidth.uniform">
+                <span>Down: </span>
+                <md-input-container flex="1">
+                    <label>Style</label>
+                    <md-select ng-model="mdeModel.style.borderStyle.bottom">
+                        <md-option ng-repeat="style in styles"
+                                   value="{{style.value}}">
+                            {{style.title}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+                <md-input-container flex="0" style="min-width: 100px">
+                    <label>Thickness</label>
+                    <input flex type="number" ng-model="mdeModel.style.borderWidth.bottom">
+                </md-input-container>
+                <md-color-picker
+                        class="color-picker-hide-textbox"
+                        md-color-clear-button="false"
+                        label="Color"
+                        icon="brush"
+                        ng-model="mdeModel.style.borderColor.bottom">
+                </md-color-picker>
+            </div>
+
+
+        </md-list>
+
+    </div>
+
+</div>

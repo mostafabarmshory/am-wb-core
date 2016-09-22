@@ -1,0 +1,56 @@
+<md-dialog
+	aria-label="edit action dialog"
+	ng-cloak>
+	<form ng-submit="answer(mdeModel)">
+		<!-- نوار ابزار بالای دریچه محاوره‌ای -->
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2 translate>Social</h2>
+				<span flex></span>
+				<md-button
+					class="md-icon-button"
+					ng-click="cancel()"> 
+					<md-icon aria-label="Close dialog">close</md-icon> 
+				</md-button>
+			</div>
+		</md-toolbar>
+	
+		<!-- محتوی صفحه را تعیین می‌کند -->
+		<!-- در این صفحه اطلاعات یک عمل نمایش داده می‌شود و امکان ویرایش آن برای -->
+		<!-- کاربران فراهم می‌کند. -->
+		<md-dialog-content>
+			<div
+				ng-controller="ActionCtrl"
+				layout="column"
+				class="md-dialog-content">
+				<mde-iconfont-choise
+					mde-model="mdeModel.icon"
+					mde-list-url="styles/fonts/social-codepoints.json"
+					mde-font-set="mono-social-icons">
+				</mde-iconfont-choise>
+		
+				<!-- نوع عمل را تعیین می‌کند -->
+<!-- 				<md-input-container>  -->
+<!-- 					<label>Module type</label>  -->
+<!-- 					<md-select -->
+<!-- 						ng-model="mdeModel.action.type">  -->
+<!-- 						<md-option -->
+<!-- 							ng-repeat="type in types" -->
+<!-- 							value="{{type.key}}">  -->
+<!-- 							<md-icon>{{type.icon}}</md-icon> -->
+<!-- 							{{type.label}}  -->
+<!-- 						</md-option>  -->
+<!-- 					</md-select>  -->
+<!-- 				</md-input-container> -->
+		
+				<md-input-container> 
+					<label translate>Link</label>
+					<input ng-model="mdeModel.action.value"> 
+				</md-input-container>
+			</div>
+		</md-dialog-content>
+		<input
+			type="submit"
+			hidden="true" />
+	</form>
+</md-dialog>

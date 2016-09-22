@@ -1,0 +1,43 @@
+{
+  "name": "angular-material-extension",
+  "version": "0.1.6",
+  "authors": [
+    "Mostafa Barmshory <mostafa.barmshory@dpq.co.ir>",
+    "Hadi mansouri <mohammad.hadi.mansouri@dpq.co.ir>",
+    "Mohammad Ghorishi <m.ghoreshi@gmail.com>"
+  ],
+  "moduleType": [],
+  "keywords": [
+    "Material",
+    "Widget",
+    "AngularJS",
+    "Pluf"
+  ],
+  "license": "MIT",
+  "main": [
+    "dist/angular-material-extension.js",
+    "dist/angular-material-extension.css"
+  ],
+  "dependencies": {
+    "jquery": "^3.1.0",
+    "angular": "^1.5.0",
+    "angular-pluf": "*",
+    "angular-material": "^1.1.1",
+    "angular-animate": "^1.5.7",
+    "angular-aria": "^1.5.7",
+    "angular-messages": "^1.5.7",
+    "angular-xeditable": "^0.2.0",
+    "angular-translate": "^2.11.0",
+    "md-color-picker": "^0.2.6",
+    "angular-material-wysiwyg": "^0.1.1",
+    "angular-ui-tinymce": "latest"
+  },
+  "devDependencies": {
+    "angular-mocks": "^1.4.0"
+  },
+  "moduleName": "ngMaterialExtension",
+  "backend":{
+  	"host": "localhost",
+  	"port": 8080
+  }
+}

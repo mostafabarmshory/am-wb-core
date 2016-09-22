@@ -1,0 +1,73 @@
+<!-- Created by mgh on 8/10/2016. -->
+<!--
+خصوصیت طرح‌‌ریزی یک آیتم در صفحه
+
+این خصوصیت نشان می‌دهد یک آیتم چگونه در فضای پدر خود قرار بگیرد. سمت چپ، سمت راست، وسط و یا همه پدر را در برگیرد. خصوصیت زیر توسط این صفحه تنظیم می‌شود.
+
+- flexAlignItem
+- flexItemBasis
+ -->
+
+<div layout="column">
+
+    <!--Preview Box-->
+    <!--TODO: mgh, 1395: good candidate for a directive, like: ng-previewbox items={"1","2","3"} -->
+    <div class="preview-box mde-flex-item-stretch">
+        <div class="header">Preview</div>
+        <div class="preview-area"
+             ng-class="[mdeParent.mdeModel.style.flexDirection,mdeModel.style.justifyContent, mdeModel.style.alignItems]"
+             style="display: flex">
+            <div class="widget" layout="row" layout-align="center center"><p>before</p></div>
+            <div class="widget" ng-class="mdeModel.style.flexAlignItem"
+                 ng-style="{'flex-grow':mdeModel.style.flexItemGrow,'-webkit-flex-grow':mdeModel.style.flexItemGrow}" layout="row" layout-align="center center"
+                 style="border: 2px dotted"><p>
+                item</p></div>
+            <div class="widget" layout="row" layout-align="center center"><p>after</p></div>
+        </div>
+    </div>
+
+    <div class="setting-panel"
+         layout="column" layout-align="none none"
+         layout-gt-sm="row" layout-align-gt-sm="space-around none"
+         ng-controller="SelfLayoutSettingsCtrl">
+
+        <!-- Align setting -->
+        <md-list>
+            <md-subheader ng-show="mdeModel.style.flexDirection!='mde-flex-row'">Vertical Setting</md-subheader>
+            <md-subheader ng-show="mdeModel.style.flexDirection=='mde-flex-row'">Horizontal Setting</md-subheader>
+            <md-divider style="margin-bottom: 1em "></md-divider>
+            <md-radio-group
+                    ng-model="mdeModel.style.flexAlignItem"
+                    role="radiogroup">
+                <md-list-item ng-repeat="direction in flexAlignItem">
+                    <md-radio-button
+                            value="{{direction.value}}">
+                        <md-icon>{{direction.icon}}</md-icon>
+                        {{direction.title |translate}}
+                    </md-radio-button>
+                </md-list-item>
+            </md-radio-group>
+        </md-list>
+
+        <!-- Size Slider -->
+        <md-list>
+            <md-subheader>Fill Extra Space</md-subheader>
+            <md-divider style="margin-bottom: 1em "></md-divider>
+            <div layout="column" style="margin-left: 14px; margin-right: 14px; min-width: 200px">
+                <md-checkbox ng-model="mdeModel.style.flexItemGrowEnabled" style="margin-bottom: 2em ">Enabled</md-checkbox>
+
+                <div layout="row" class="mde-flex-align-items-center" ng-disabled="!mdeModel.style.flexItemGrowEnabled">
+                    <span>Weight</span>
+                    <md-slider ng-disabled="!mdeModel.style.flexItemGrowEnabled" flex min="0" max="10" step="1" ng-model="mdeModel.style.flexItemGrow">
+                    </md-slider>
+                    <md-input-container>
+                        <input ng-disabled="!mdeModel.style.flexItemGrowEnabled" style="width: 50px" flex type="number" ng-model="mdeModel.style.flexItemGrow">
+                    </md-input-container>
+                </div>
+
+            </div>
+        </md-list>
+
+    </div>
+
+</div>

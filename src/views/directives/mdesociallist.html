@@ -1,0 +1,59 @@
+<div
+        ng-class="{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}">
+    <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
+	<div ng-show="mdeEditable" 
+		layout="row"
+		class="mde-widget-header" 
+		ng-include="'views/partials/mdewidgetheaderactions.html'">
+	</div>
+
+    <div
+            layout="row" layout-align="start start"
+            layout-wrap
+            ng-class="{'mde-rtl':mdeModel.style.rtl}"
+            ng-style="{ 'color': mdeModel.style.color, 'background-color': mdeModel.style.backgroundColor, 'width': mdeModel.style.width, 'font-family': mdeModel.style.font, 'padding': mdeModel.style.padding }">
+
+        <!-- Socials -->
+		<!-- برای هر شبکه اجتمائی یه دکمه گذاشته می‌شه که کاربر با کلیک روی اون می‌تون وارد شبکه اجتمائی بشه -->
+		<md-button
+			ng-if="!mdeEditable"
+			ng-repeat="social in mdeModel.socials"
+		    ng-click="gotoSocial(social)">
+		    <md-icon
+		            ng-style="{ 'color': mdeModel.style.color }"
+		            class="md-48"
+		            md-font-set="social">{{social.icon}}
+		    </md-icon>
+		</md-button>
+		
+		<md-menu 
+			ng-if="mdeEditable"
+			ng-repeat="social in mdeModel.socials">
+			<md-button 
+				aria-label="Open phone interactions menu" 
+				class="md-icon-button" 
+				ng-click="openMenu($mdOpenMenu, $event)">
+				<md-icon
+				         ng-style="{ 'color': mdeModel.style.color }"
+				         class="md-48"
+				         md-font-set="social">
+				         {{social.icon}}
+				 </md-icon>
+			</md-button>
+			<md-menu-content width="4">
+				<md-menu-item>
+					<md-button ng-click="edit(social, $event)">
+						<md-icon>edit</md-icon>
+						{{ 'Edit' | translate }}
+					</md-button>
+				</md-menu-item>
+				<md-menu-item>
+					<md-button ng-click="delete(social, $event)">
+						<md-icon>delete</md-icon>
+						{{ 'Delete' | translate }}
+					</md-button>
+				</md-menu-item>
+			</md-menu-content>
+		</md-menu>
+	</div>
+</div>

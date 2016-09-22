@@ -1,0 +1,75 @@
+<!-- Set min and max for width and height css property
+
+Created by mgh.
+-->
+
+<div layout="column">
+
+    <!--Preview Box-->
+    <div class="preview-box mde-flex-item-stretch">
+        <div class="header">Preview</div>
+        <div class="mde-flex preview-area mde-flex-justify-content-center">
+        <div class="widget mde-flex-item-center"
+             ng-class="mdeModel.style.flexAlignItem"
+             ng-style="{
+                'min-width':mdeModel.style.minWidth,
+                'min-height':mdeModel.style.minHeight,
+                'max-width':(mdeModel.style.maxWidth==0) ? 'none' : mdeModel.style.maxWidth,
+                'max-height':(mdeModel.style.maxHeight==0)?'none':mdeModel.style.maxHeight}"
+             layout="row" layout-align="center center"
+             style="border: 2px dotted"><p>
+            item</p></div>
+    </div>
+</div>
+
+<div class="setting-panel"
+     layout="column"
+     layout-gt-sm="row">
+
+    <!-- Min panel -->
+    <md-list>
+        <md-subheader>MIN</md-subheader>
+        <md-divider style="margin-bottom: 1em "></md-divider>
+        <div layout="row" class="mde-flex-align-items-center">
+            <span>Width<md-tooltip>set value "0" for ignoring</md-tooltip></span>
+            <md-slider flex min="0" max="100" ng-model="mdeModel.style.minWidth">
+            </md-slider>
+            <md-input-container>
+                <input style="width: 50px" flex type="number" ng-model="mdeModel.style.minWidth">
+            </md-input-container>
+        </div>
+        <div layout="row" class="mde-flex-align-items-center">
+            <span>Height<md-tooltip>set value "0" for ignoring</md-tooltip></span>
+            <md-slider flex min="0" max="100" ng-model="mdeModel.style.minHeight">
+            </md-slider>
+            <md-input-container>
+                <input style="width: 50px" flex type="number" ng-model="mdeModel.style.minHeight">
+            </md-input-container>
+        </div>
+
+    </md-list>
+
+    <!-- max panel -->
+    <md-list>
+        <md-subheader>MAX</md-subheader>
+        <md-divider style="margin-bottom: 1em "></md-divider>
+        <div layout="row" class="mde-flex-align-items-center">
+            <span>Width<md-tooltip>set value "0" for ignoring</md-tooltip></span>
+            <md-slider flex min="0" max="100" ng-model="mdeModel.style.maxWidth">
+            </md-slider>
+            <md-input-container>
+                <input style="width: 50px" flex ng-model="mdeModel.style.maxWidth">
+            </md-input-container>
+        </div>
+        <div layout="row" class="mde-flex-align-items-center">
+            <span>Height<md-tooltip>set value "0" for ignoring</md-tooltip></span>
+            <md-slider flex min="0" max="100" ng-model="mdeModel.style.maxHeight">
+            </md-slider>
+            <md-input-container>
+                <input style="width: 50px" flex  ng-model="mdeModel.style.maxHeight">
+            </md-input-container>
+        </div>
+    </md-list>
+</div>
+
+</div>

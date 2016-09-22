@@ -1,0 +1,36 @@
+<!-- درچه محاوره‌ای تنظیم‌ها -->
+<md-dialog 
+	ng-controller="SettingsCtrl"
+	aria-label="Setting dialog" 
+	ng-cloak>
+  
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2 translate>Settings</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="answer()">
+          <md-icon aria-label="Close dialog">close</md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+    
+    
+    <md-dialog-content>
+		<md-content class="md-dialog-content">
+      		<md-tabs 
+				md-dynamic-height 
+				md-border-bottom>
+				<md-tab 
+					ng-repeat="setting in settings"
+					label="{{setting.label | translate}}">
+					<md-content 
+						layout="row"
+						flex
+						ng-include="setting.page"
+						class="md-padding">
+					</md-content>
+				</md-tab>
+			</md-tabs>
+		</md-content>
+    </md-dialog-content>
+</md-dialog>

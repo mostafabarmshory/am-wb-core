@@ -1,0 +1,53 @@
+<div ng-class="{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}">
+    <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
+    <div ng-show="mdeEditable"
+         layout="row"
+         class="mde-widget-header"
+         ng-include="'views/partials/mdewidgetheaderactions.html'">
+    </div>
+
+    <!-- متن اصلی صفحه اینجا ایجاد می‌شود. -->
+    <div
+            ng-bind-html="mdeModel.text | unsafe"
+            ng-style="{
+            'margin-left':mdeModel.style.marginLeft,
+            'margin-right':mdeModel.style.marginRight,
+            'margin-top':mdeModel.style.marginTop,
+            'margin-bottom':mdeModel.style.marginBottom,
+
+            'padding-left':mdeModel.style.paddingLeft,
+            'padding-right':mdeModel.style.paddingRight,
+            'padding-top':mdeModel.style.paddingTop,
+            'padding-bottom':mdeModel.style.paddingBottom,
+
+            'background-color': mdeModel.style.backgroundColor,
+            'color': mdeModel.style.color,
+
+            'min-width':mdeModel.style.minWidth,
+            'min-height':mdeModel.style.minHeight,
+            'max-width':(mdeModel.style.maxWidth==0) ? 'none' : mdeModel.style.maxWidth,
+            'max-height':(mdeModel.style.maxHeight==0)?'none':mdeModel.style.maxHeight,
+
+            'border-top-left-radius':(mdeModel.style.borderRadius.uniform) ? mdeModel.style.borderRadius.all : mdeModel.style.borderRadius.topLeft,
+            'border-top-right-radius':(mdeModel.style.borderRadius.uniform) ? mdeModel.style.borderRadius.all : mdeModel.style.borderRadius.topRight,
+            'border-bottom-left-radius':(mdeModel.style.borderRadius.uniform) ? mdeModel.style.borderRadius.all : mdeModel.style.borderRadius.bottomLeft,
+            'border-bottom-right-radius':(mdeModel.style.borderRadius.uniform) ? mdeModel.style.borderRadius.all : mdeModel.style.borderRadius.bottomRight,
+
+            'border-left-style':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderStyle.all : mdeModel.style.borderStyle.left,
+            'border-right-style':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderStyle.all : mdeModel.style.borderStyle.right,
+            'border-top-style':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderStyle.all : mdeModel.style.borderStyle.top,
+            'border-bottom-style':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderStyle.all : mdeModel.style.borderStyle.bottom,
+
+            'border-left-width':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderWidth.all : mdeModel.style.borderWidth.left,
+            'border-right-width':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderWidth.all : mdeModel.style.borderWidth.right,
+            'border-top-width':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderWidth.all : mdeModel.style.borderWidth.top,
+            'border-bottom-width':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderWidth.all : mdeModel.style.borderWidth.bottom,
+
+            'border-left-color':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderColor.all : mdeModel.style.borderColor.left,
+            'border-right-color':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderColor.all : mdeModel.style.borderColor.right,
+            'border-top-color':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderColor.all : mdeModel.style.borderColor.top,
+            'border-bottom-color':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderColor.all : mdeModel.style.borderColor.bottom,
+            }"
+    >
+    </div>
+</div>

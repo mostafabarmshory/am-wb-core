@@ -1,0 +1,51 @@
+<!-- ورود کاربران -->
+<!-- از این دریچه محاوره‌ای بریا دریافت اطلاعات کاربری در فرآیند ورود به سیستم استفاده
+می‌شود. دو پارامتر نام کاربری و گذرواژه دریافت شده و به صورت یک ساختار داده‌ای
+به عنوان نتیجه ارسال می‌شود. -->
+<md-dialog aria-label="Submit for DigiDoci News" ng-cloak>
+  <form ng-submit="answer(credentioal)">
+  
+  
+  
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2 translate>user login</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <md-icon aria-label="Close dialog">close</md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+    
+    
+    <md-dialog-content>
+      <div class="md-dialog-content" layout="column">
+      
+      
+        <!-- Submit form -->
+        <md-input-container>
+          <label translate>user name</label>
+          <input ng-model="credentioal.login">
+        </md-input-container>
+        <md-input-container>
+          <label translate>password</label>
+          <input type="password" ng-model="credentioal.password">
+        </md-input-container>
+        <input type="submit" hidden="true" />
+        
+        
+        <div layout="row">
+          <md-button
+            ng-click="answer(credentioal)"
+            class="md-raised md-primary">
+            {{ 'ok' | translate }}
+          </md-button>
+          <md-button
+            ng-click="cancel()">
+            {{ 'cancel' | translate }}
+          </md-button>
+        </div>
+      </div>
+    </md-dialog-content>
+  </form>
+</md-dialog>

@@ -1,0 +1,77 @@
+{
+  "type": "Page",
+  "label": "دونیت - حمایت مالی پروژه‌ها",
+  "description": "دونیت شمارا در جمع کردن کمک‌های مالی یاری می‌کند.",
+  "style": {
+    "layout": "column",
+    "borderMeta": {
+      "type": "none"
+    },
+    "border": "none",
+    "borderRadius": "none",
+    "backgroundMeta": {
+      "type": "none"
+    },
+    "background": "none",
+    "flexDirection": "mde-flex-column",
+    "justifyContent": "mde-flex-justify-content-center",
+    "backgroundColor": "hsl(0, 100%, 45%)",
+    "opacity": 100
+  },
+  "mdesubmit": {
+    "title": "در حال ساخت",
+    "message": "این سامانه در حال ساخت است در صورتی که تمایل به دنبال کردن وضعیت آن را دارید، رایانامه یا شماره تماس خود را وارد کنید.",
+    "style": {
+      "direction": "column",
+      "rtl": true
+    }
+  },
+  "contents": [
+    {
+      "type": "HtmlText",
+      "title": "what we do for u",
+      "text": "<p>&nbsp;&nbsp;</p>\n<p>&nbsp;</p>\n<p>&nbsp;&nbsp;&nbsp;</p>\n<h1 style=\"text-align: center;\"><span style=\"font-family: 'arial black', sans-serif; font-size: 36pt;\"><strong>&nbsp;<span style=\"color: #ffffff;\"><span style=\"background-color: #ffcc00;\"><img src=\"https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png\" alt=\"\" width=\"536\" height=\"165\" /><span style=\"background-color: #339966;\">G</span><span style=\"background-color: #339966; color: #ffffff;\">ood</span><span style=\"background-color: #3366ff;\">bye</span></span></span></strong></span></h1>",
+      "style": {
+        "flexAlignItem": "mde-flex-item-center",
+        "backgroundColor": "rgb(250, 250, 250)",
+        "borderStyle": {
+          "top": "none",
+          "left": "dashed",
+          "right": "dashed",
+          "all": "none"
+        },
+        "borderWidth": {
+          "top": 41,
+          "left": 40,
+          "right": 40,
+          "all": 25
+        },
+        "borderColor": {
+          "top": "#010000",
+          "left": "hsl(60, 20%, 99%)",
+          "right": "#fdfdfc",
+          "all": "rgb(250, 250, 250)"
+        },
+        "minHeight": 500,
+        "flexItemGrowEnabled": true,
+        "flexItemGrow": 0,
+        "minWidth": 500,
+        "borderRadius": {
+          "uniform": false,
+          "all": 250
+        },
+        "borderStyleColorWidth": {
+          "uniform": true
+        },
+        "paddingLeft": 0,
+        "paddingRight": 0,
+        "paddingTop": 0,
+        "paddingBottom": 0,
+        "marginBottom": 0,
+        "marginTop": 0,
+        "marginRight": 0,
+        "marginLeft": 0
+      }
+    }
+  ]
+}

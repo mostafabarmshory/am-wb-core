@@ -1,0 +1,19 @@
+<span translate> widget</span> 
+<span flex></span>
+<md-button 
+	ng-if="add"
+	ng-click="add()" 
+	class="md-icon-button md-mini">
+<md-icon class="mde-icon-mini">add_circle</md-icon> 
+</md-button>
+<md-button 
+	ng-click="settings()"
+	 class="md-icon-button md-mini">
+<md-icon class="mde-icon-mini">settings</md-icon> 
+</md-button>
+<md-button 
+	class="md-icon-button md-mini" 
+	ng-click="removeWidget()"
+	ng-show="mdeParent&&removeWidget"> 
+	<md-icon class="mde-icon-mini">delete</md-icon>
+</md-button>

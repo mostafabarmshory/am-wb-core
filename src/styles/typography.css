@@ -1,0 +1,10 @@
+/*
+Rules for align
+*/
+.mde-rtl {
+	direction: rtl;
+}
+
+.mde-ltr {
+	direction: ltr;
+}
