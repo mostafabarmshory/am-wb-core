@@ -11,14 +11,14 @@ angular.module('ngMaterialWeburger')
  * @description # MdeCollapsibleItemList
  */
 
-.directive('mdeCollapsibleItemList', function() {
-	return {
-		templateUrl : 'views/directives/mdecollapsibleitemlist.html',
-		restrict : 'E',
-		replase : true,
-		scope : {
-			mdeEditable : '=?',
-			mdeModel : '=?'
-		}
-	};
+.directive('wbCollapsibleItemList', function() {
+    return {
+	templateUrl : 'views/directives/wb-collapsibleitemlist.html',
+	restrict : 'E',
+	replase : true,
+	scope : {
+	    mdeEditable : '=?',
+	    mdeModel : '=?'
+	}
+    };
 });

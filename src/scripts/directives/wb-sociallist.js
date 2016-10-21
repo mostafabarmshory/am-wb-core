@@ -13,11 +13,11 @@ angular.module('ngMaterialWeburger')
  * یک فهرست از شبکه‌های اجتمائی نمایش داده می‌شود تا بتونیم به سادگی لیک
  * شبکه‌های رو بین کاربران به اشتراک بزاریم.
  */
-.directive('mdeSocialList', function() {
+.directive('wbSocialList', function() {
 	return {
 		restrict : 'E',
 		replace : true,
-		templateUrl : 'views/directives/mdesociallist.html',
+		templateUrl : 'views/directives/wb-sociallist.html',
 		scope : {
 			mdeEditable: '=?',
 			mdeModel: '=?',
@@ -31,8 +31,8 @@ angular.module('ngMaterialWeburger')
 			/**
 			 * یک شبکه اجتمائی جدید به فهرست اضافه می‌کند
 			 * 
-			 * برای این کار یک درچه محاوره‌ای باز می‌شود و اطلاعات مورد نیاز از
-			 * کاربر دریافت می‌شود.
+			 * برای این کار یک درچه محاوره‌ای باز می‌شود و اطلاعات
+			 * مورد نیاز از کاربر دریافت می‌شود.
 			 */
 			function addSocial(){
 				return editSocial({}).then(function(model) {
@@ -47,14 +47,14 @@ angular.module('ngMaterialWeburger')
 			/**
 			 * شبکه اجتمائی تعیین شده ویرایش می‌شود
 			 * 
-			 * شبکه اجمائی با یک دریچه محاوره‌ای به کاربر نمایش داده می‌شود تا
-			 * اطلاعات جدید را در آن وارد کند. تغییرات بعد از تایید کاربر اعمال
-			 * خواهد شد.
+			 * شبکه اجمائی با یک دریچه محاوره‌ای به کاربر نمایش داده
+			 * می‌شود تا اطلاعات جدید را در آن وارد کند. تغییرات بعد
+			 * از تایید کاربر اعمال خواهد شد.
 			 */
 			function editSocial(social){
 				return $mdDialog.show({
 					controller : 'DialogsCtrl',
-					templateUrl : 'views/dialogs/mdesocial.html',
+					templateUrl : 'views/dialogs/wb-social.html',
 					parent : angular.element(document.body),
 					clickOutsideToClose : true,
 					locals : {
@@ -80,7 +80,8 @@ angular.module('ngMaterialWeburger')
 			/**
 			 * عمل لود کردن شبکه اجتمائی
 			 * 
-			 * این فراخوانی عمل تعیین شده برای شبکه اجتمائی را اجرا می‌کند.
+			 * این فراخوانی عمل تعیین شده برای شبکه اجتمائی را اجرا
+			 * می‌کند.
 			 */
 			function gotoSocial(social){
 				if(scope.mdeEditable){
@@ -103,7 +104,7 @@ angular.module('ngMaterialWeburger')
 			function settings (){
 				return $mdDialog.show({
 					controller : 'DialogsCtrl',
-					templateUrl : 'views/dialogs/mdesettings.html',
+					templateUrl : 'views/dialogs/wb-settings.html',
 					parent : angular.element(document.body),
 					clickOutsideToClose : true,
 					locals : {
