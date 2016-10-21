@@ -1,6 +1,6 @@
 {
-  "name": "angular-material-extension",
-  "version": "0.1.6",
+  "name": "angular-material-weburger",
+  "version": "0.1.1",
   "authors": [
     "Mostafa Barmshory <mostafa.barmshory@dpq.co.ir>",
     "Hadi mansouri <mohammad.hadi.mansouri@dpq.co.ir>",
@@ -15,12 +15,11 @@
   ],
   "license": "MIT",
   "main": [
-    "dist/angular-material-extension.js",
-    "dist/angular-material-extension.css"
+    "dist/angular-material-weburger.js",
+    "dist/angular-material-weburger.css"
   ],
   "dependencies": {
     "jquery": "^3.1.0",
-    "angular": "^1.5.0",
     "angular-pluf": "*",
     "angular-material": "^1.1.1",
     "angular-animate": "^1.5.7",
@@ -33,9 +32,9 @@
     "angular-ui-tinymce": "latest"
   },
   "devDependencies": {
-    "angular-mocks": "^1.4.0"
+    "angular-mocks": "^1.5.0"
   },
-  "moduleName": "ngMaterialExtension",
+  "moduleName": "ngMaterialWeburger",
   "backend":{
   	"host": "localhost",
   	"port": 8080

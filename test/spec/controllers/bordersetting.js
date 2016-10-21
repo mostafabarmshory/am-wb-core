@@ -3,7 +3,7 @@
 //describe('Controller: BordersettingCtrl', function () {
 //
 //  // load the controller's module
-//  beforeEach(module('ngMaterialExtension'));
+//  beforeEach(module('ngMaterialWeburger'));
 //
 //  var BordersettingCtrl,
 //    scope;

@@ -3,7 +3,7 @@
 //describe('Controller: CmsCtrl', function () {
 //
 //  // load the controller's module
-//  beforeEach(module('ngMaterialExtension'));
+//  beforeEach(module('ngMaterialWeburger'));
 //
 //  var CmsCtrl,
 //    scope;

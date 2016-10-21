@@ -3,9 +3,9 @@
 /* jshint -W100 */
 'use strict';
 
-angular.module('ngMaterialExtension')
+angular.module('ngMaterialWeburger')
 /**
- * @memberof ngMaterialExtension
+ * @memberof ngMaterialWeburger
  * @ngdoc controller
  * @name MdeCmsCtrl
  * @description # MdeCmsCtrl Controller of the donateMainApp

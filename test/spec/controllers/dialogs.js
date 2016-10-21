@@ -3,7 +3,7 @@
 describe('Controller: DialogsCtrl', function () {
 
   // load the controller's module
-  beforeEach(module('ngMaterialExtension'));
+  beforeEach(module('ngMaterialWeburger'));
 
   var DialogsCtrl;
   var scope;

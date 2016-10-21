@@ -3,12 +3,12 @@
 /* jshint -W100 */
 'use strict';
 
-angular.module('ngMaterialExtension')
+angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc controller
  * @name ActionCtrl
- * @memberof ngMaterialExtension
+ * @memberof ngMaterialWeburger
  * @description کنترلر یک عمل برای مدیریت و ویرایش آن ایجاد شده است. این کنترل
  *              در دیالوگ و یا نمایش‌های دیگر کاربرد دارد.
  * 

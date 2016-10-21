@@ -3,12 +3,12 @@
 /* jshint -W100 */
 'use strict';
 
-angular.module('ngMaterialExtension')
+angular.module('ngMaterialWeburger')
 
 
 /**
  * @ngdoc directive
- * @name ngMaterialExtension.directive:mdeIconfontChoise
+ * @name ngMaterialWeburger.directive:mdeIconfontChoise
  * @description # mdeIconfontChoise
  */
 .directive(
