@@ -3,7 +3,7 @@
 /* jshint -W100 */
 'use strict';
 
-angular.module('ngMaterialExtension')
+angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc filter

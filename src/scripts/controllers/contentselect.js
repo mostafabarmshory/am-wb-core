@@ -3,12 +3,12 @@
 /* jshint -W100 */
 'use strict';
 
-angular.module('ngMaterialExtension')
+angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc controller
  * @name ContentCtrl
- * @memberof ngMaterialExtension
+ * @memberof ngMaterialWeburger
  * @description مدیریتی برای انتخاب ویجت‌های جدید
  * 
  * در این کنترل امکاناتی فراهم شده که کاربر بتواند از میان ویجت‌های موجودی یکی

@@ -3,7 +3,7 @@
 //describe('Directive: mdeIconfontChoise', function () {
 //
 //  // load the directive's module
-//  beforeEach(module('ngMaterialExtension'));
+//  beforeEach(module('ngMaterialWeburger'));
 //
 //  var element,
 //    scope;

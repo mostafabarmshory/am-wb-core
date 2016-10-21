@@ -8,7 +8,7 @@
 /* jshint -W100 */
 
 'use strict';
-angular.module('ngMaterialExtension')
+angular.module('ngMaterialWeburger')
 
     .controller('TextSettingsCtrl', function($scope) {
         var scope = $scope;

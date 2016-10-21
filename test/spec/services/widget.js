@@ -3,7 +3,7 @@
 //describe('Service: $widget', function () {
 //
 //  // load the service's module
-//  beforeEach(module('ngMaterialExtension'));
+//  beforeEach(module('ngMaterialWeburger'));
 //
 //  // instantiate service
 //  var widget;

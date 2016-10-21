@@ -3,12 +3,12 @@
 /* jshint -W100 */
 'use strict';
 
-angular.module('ngMaterialExtension')
+angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc service
  * @name $widget
- * @memberof ngMaterialExtension
+ * @memberof ngMaterialWeburger
  * @description مدیریت ویجت‌های سیستم
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.

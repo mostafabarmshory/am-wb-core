@@ -10,7 +10,7 @@
  *
  */
 angular
-    .module('ngMaterialExtension', [
+    .module('ngMaterialWeburger', [
         'ngMessages',//
         'ngAnimate',//
         'ngAria',//

@@ -1,10 +1,10 @@
 'use strict';
 
-angular.module('ngMaterialExtension')
+angular.module('ngMaterialWeburger')
 /**
  * @ngdoc function
- * @name ngMaterialExtension.controller:BordersettingCtrl
- * @description # BordersettingCtrl Controller of the ngMaterialExtension
+ * @name ngMaterialWeburger.controller:BordersettingCtrl
+ * @description # BordersettingCtrl Controller of the ngMaterialWeburger
  */
 .controller(
 		'BorderSettingCtrl',
