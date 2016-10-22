@@ -16,7 +16,6 @@ angular
         'ngAria',//
         'ngMaterial',//
         'pascalprecht.translate',//
-        'xeditable',//
         'pluf',//
         'ngMaterialWysiwyg',
         'ui.tinymce'

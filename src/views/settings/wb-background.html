@@ -14,16 +14,16 @@ Created by mgh.
 <div layout="column">
 
 	<!--Preview Box-->
-	<div class="preview-box mde-flex-item-stretch">
+	<div class="preview-box wb-flex-item-stretch">
 		<div class="header">Preview</div>
 		<div class="preview-area"
-			 ng-class="[mdeParent.mdeModel.style.flexDirection,mdeModel.style.justifyContent, mdeModel.style.alignItems]"
+			 ng-class="[wbParent.wbModel.style.flexDirection,wbModel.style.justifyContent, wbModel.style.alignItems]"
 			 style="display: flex">
 			<div class="widget"
 				 style="width:100px; height:50px; margin: 20px"
 				 ng-style="{
-            'opacity':'calc('+mdeModel.style.opacity+'/100)',
-            'background-color':mdeModel.style.backgroundColor,
+            'opacity':'calc('+wbModel.style.opacity+'/100)',
+            'background-color':wbModel.style.backgroundColor,
             }"
 				 layout="row" layout-align="center center"
 			>
@@ -42,12 +42,12 @@ Created by mgh.
 		<md-list>
 			<md-subheader>Opacity</md-subheader>
 			<md-divider></md-divider>
-			<div layout="row" class="mde-flex-align-items-center">
+			<div layout="row" class="wb-flex-align-items-center">
 				<span>Percent</span>
-				<md-slider flex min="0" max="100" ng-model="mdeModel.style.opacity">
+				<md-slider flex min="0" max="100" ng-model="wbModel.style.opacity">
 				</md-slider>
 				<md-input-container>
-					<input style="width: 50px" flex type="number" ng-model="mdeModel.style.opacity">
+					<input style="width: 50px" flex type="number" ng-model="wbModel.style.opacity">
 				</md-input-container>
 			</div>
 		</md-list>
@@ -56,12 +56,12 @@ Created by mgh.
 		<md-list>
 			<md-subheader>Color</md-subheader>
 			<md-divider></md-divider>
-			<div layout="row" class="mde-flex-align-items-start">
+			<div layout="row" class="wb-flex-align-items-start">
 				<md-color-picker
 						md-color-clear-button="false"
 						label="Color"
 						icon="brush"
-						ng-model="mdeModel.style.backgroundColor">
+						ng-model="wbModel.style.backgroundColor">
 				</md-color-picker>
 			</div>
 

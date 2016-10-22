@@ -91,7 +91,6 @@
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
-    <link rel="stylesheet" href="bower_components/angular-xeditable/dist/css/xeditable.css" />
     <link rel="stylesheet" href="bower_components/md-color-picker/dist/mdColorPicker.min.css" />
     <link rel="stylesheet" href="bower_components/angular-material-wysiwyg/dist/angular-material-wysiwyg.css" />
     <!-- endbower -->
@@ -120,10 +119,10 @@
 		</div>
 		<textarea ng-show="showContent">{{model}}</textarea>
 		<md-content flex>
-			<mde-content
-				mde-editable="editable" 
-				mde-model="model">
-			</mde-content>
+			<wb-content
+				wb-editable="editable" 
+				wb-model="model">
+			</wb-content>
 		</md-content>
 	</div>
 
@@ -136,7 +135,6 @@
     <script src="bower_components/angular-aria/angular-aria.js"></script>
     <script src="bower_components/angular-messages/angular-messages.js"></script>
     <script src="bower_components/angular-material/angular-material.js"></script>
-    <script src="bower_components/angular-xeditable/dist/js/xeditable.js"></script>
     <script src="bower_components/angular-translate/angular-translate.js"></script>
     <script src="bower_components/tinycolor/tinycolor.js"></script>
     <script src="bower_components/md-color-picker/dist/mdColorPicker.min.js"></script>
@@ -150,7 +148,6 @@
     <script src="scripts/app.js"></script>
     <script src="scripts/configs/lang.js"></script>
     <script src="scripts/controllers/dialogs.js"></script>
-    <script src="scripts/controllers/cms.js"></script>
     <script src="scripts/controllers/action.js"></script>
     <script src="scripts/controllers/contentselect.js"></script>
     <script src="scripts/controllers/settings.js"></script>
@@ -160,18 +157,18 @@
     <script src="scripts/controllers/bordersetting.js"></script>
     <script src="scripts/controllers/backgroundsetting.js"></script>
     <script src="scripts/controllers/textsetting.js"></script>
-    <script src="scripts/directives/mdenotfoundelement.js"></script>
-    <script src="scripts/directives/mdecopyright.js"></script>
-    <script src="scripts/directives/mdebrandaction.js"></script>
-    <script src="scripts/directives/mdelinklist.js"></script>
-    <script src="scripts/directives/mdesociallist.js"></script>
-    <script src="scripts/directives/mdefeaturelist.js"></script>
-    <script src="scripts/directives/mdecontent.js"></script>
-    <script src="scripts/directives/mdecollapsibleitemlist.js"></script>
-    <script src="scripts/directives/mdehtml.js"></script>
-    <script src="scripts/directives/mdeiconfontchoise.js"></script>
+    <script src="scripts/directives/wb-notfoundelement.js"></script>
+    <script src="scripts/directives/wb-copyright.js"></script>
+    <script src="scripts/directives/wb-brandaction.js"></script>
+    <script src="scripts/directives/wb-linklist.js"></script>
+    <script src="scripts/directives/wb-sociallist.js"></script>
+    <script src="scripts/directives/wb-featurelist.js"></script>
+    <script src="scripts/directives/wb-content.js"></script>
+    <script src="scripts/directives/wb-collapsibleitemlist.js"></script>
+    <script src="scripts/directives/wb-html.js"></script>
+    <script src="scripts/directives/wb-iconfontchoise.js"></script>
+    <script src="scripts/directives/wb-members.js"></script>
     <script src="scripts/filters/unsafe.js"></script>
-    <script src="scripts/runs/editable.js"></script>
     <script src="scripts/services/widget.js"></script>
     <script src="scripts/services/settings.js"></script>
     <!-- endbuild -->

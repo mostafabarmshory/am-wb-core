@@ -17,10 +17,10 @@ angular.module('ngMaterialWeburger')
 
 	var contentElementAsso = {
 		Page : {
-			dom : '<mde-content></mde-content>',
+			dom : '<wb-content></wb-content>',
 			label : 'Panel',
 			description : 'Panel contains list of widgets.',
-			image : 'images/mde/mdecontent.svg',
+			image : 'images/wb/content.svg',
 			link : 'http://dpq.co.ir/more-information-link',
 			data : {
 				type : 'Page',
@@ -31,10 +31,10 @@ angular.module('ngMaterialWeburger')
 			}
 		},
 		BrandAction : {
-			dom : '<mde-brand-action></mde-brand-action>',
+			dom : '<wb-brand-action></wb-brand-action>',
 			label : 'Brand with action',
 			description : 'A brand image with action list',
-			image : 'images/mde/mdebrandaction.svg',
+			image : 'images/wb/brandaction.svg',
 			link : 'http://dpq.co.ir',
 			data : {
 				type : 'BrandAction',
@@ -42,10 +42,10 @@ angular.module('ngMaterialWeburger')
 			}
 		},
 		Copyright : {
-			dom : '<mde-copyright></mde-copyright>',
+			dom : '<wb-copyright></wb-copyright>',
 			label : 'Copyright',
 			description : 'Copyright text',
-			image : 'images/mde/mdecopyright.svg',
+			image : 'images/wb/copyright.svg',
 			link : 'http://dpq.co.ir',
 			data : {
 				type : 'Copyright',
@@ -59,10 +59,10 @@ angular.module('ngMaterialWeburger')
 			}
 		},
 		FeatureList : {
-			dom : '<mde-feature-list></mde-feature-list>',
+			dom : '<wb-feature-list></wb-feature-list>',
 			label : 'Features list',
 			description : 'List of features',
-			image : 'images/mde/mdefeaturelist.svg',
+			image : 'images/wb/featurelist.svg',
 			link : 'http://dpq.co.ir',
 			data : {
 				type : 'FeatureList',
@@ -70,10 +70,10 @@ angular.module('ngMaterialWeburger')
 			}
 		},
 		SocialList : {
-			dom : '<mde-social-list></mde-social-list>',
+			dom : '<wb-social-list></wb-social-list>',
 			label : 'Socials link',
 			description : 'Social link list',
-			image : 'images/mde/mdesociallist.svg',
+			image : 'images/wb/sociallist.svg',
 			link : 'http://dpq.co.ir',
 			data : {
 				type : 'SocialList',
@@ -81,10 +81,10 @@ angular.module('ngMaterialWeburger')
 			}
 		},
 		LinkList : {
-			dom : '<mde-link-list></mde-link-list>',
+			dom : '<wb-link-list></wb-link-list>',
 			label : 'Link list',
 			description : 'List of links and ticktes',
-			image : 'images/mde/mdelinklist.svg',
+			image : 'images/wb/linklist.svg',
 			link : 'link',
 			data : {
 				type : 'LinkList',
@@ -92,16 +92,16 @@ angular.module('ngMaterialWeburger')
 			}
 		},
 		NotfoundElement : {
-			dom : '<mde-notfound-element></mde-notfound-element>',
+			dom : '<wb-notfound-element></wb-notfound-element>',
 			label : 'Not found',
-			image : 'images/mde/mdenotfoundelement.svg',
+			image : 'images/wb/notfoundelement.svg',
 			link : 'link',
 		},
 		HtmlText : {
-			dom : '<mde-html ng-class="[mdeModel.style.flexAlignItem]" ></mde-html>',
+			dom : '<wb-html ng-class="[mdeModel.style.flexAlignItem]" ></wb-html>',
 			label : 'HTML text',
 			description : 'An HTML block text.',
-			image : 'images/mde/mdehtml.svg',
+			image : 'images/wb/html.svg',
 			link : 'http://dpq.co.ir',
 			data : {
 				type : 'HtmlText',
@@ -113,14 +113,26 @@ angular.module('ngMaterialWeburger')
 			}
 		},
 		CollapsibleItemList : {
-			dom : '<mde-collapsible-item-list></mde-collapsible-item-list>',
+			dom : '<wb-collapsible-item-list></wb-collapsible-item-list>',
 			label : 'Collapsible item list',
 			description : 'List of item with a collapsiblity',
-			image : 'images/mde/mdenotfoundelement.svg',
+			image : 'images/wb/notfoundelement.svg',
 			link : 'http://dpq.co.ir',
 			data : {
 				type : 'CollapsibleItemList',
 				style : {},
+			}
+		},
+		Members : {
+			dom : '<wb-members></wb-members>',
+			label : 'Members list',
+			description : 'List of members',
+			image : 'images/wb/notfoundelement.svg',
+			link : 'http://dpq.co.ir',
+			data : {
+				type : 'Members',
+				style : {},
+				template: {}
 			}
 		}
 	};
@@ -165,6 +177,7 @@ angular.module('ngMaterialWeburger')
 			widgets.items.push(contentElementAsso.LinkList);
 			widgets.items.push(contentElementAsso.HtmlText);
 //			widgets.items.push(contentElementAsso.CollapsibleItemList);
+			widgets.items.push(contentElementAsso.Members);
 			deferred.resolve(widgets);
 		}, 1);
 		return deferred.promise;

@@ -1,12 +1,12 @@
-.mde-panel {
+.wb-panel {
 	margin:2px; border:1px dashed #039BE5;
 }
 
-.mde-panel-body{
+.wb-panel-body{
 	position: relative;
 }
 
-.mde-panel-header {
+.wb-panel-header {
 	background-color:  rgba(3,155,229,0.2);
 	background-image: repeating-linear-gradient(315deg, transparent, transparent 16px, rgba(255,255,255,.5) 16px, rgba(255,255,255,.5) 32px);
 	color:black;
@@ -15,11 +15,11 @@
 	border-bottom:1px dashed rgb(3,155,229);
 }
 
-.mde-widget {
+.wb-widget {
 	margin:2px; border:1px dashed #8f9494;
 }
 
-.mde-widget-header {
+.wb-widget-header {
 	background-color: rgba(120,120,120,0.2);
 	background-image: repeating-linear-gradient(315deg, transparent, transparent 12px, rgba(255,255,255,.5) 12px, rgba(255,255,255,.5) 24px);
 	color:black;
@@ -37,7 +37,7 @@
 	padding:0px;
 	margin-left: 4px;
 }
-.mde-icon-mini{
+.wb-icon-mini{
 	padding: 0px;
 	margin:0px;
 	font-size: 1.25rem;

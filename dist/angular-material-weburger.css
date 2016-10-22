@@ -1,128 +1,130 @@
 /*
 	in fullscreen mode in dialog, this css class in large screen, makes dialog width about 60% of screen.
 */
-@media (min-width: 959px) {
+@media ( min-width : 959px) {
 	md-dialog.md-dialog-fullscreen {
 		min-height: 80%;
 		min-width: 60%;
-		border-radius: 0; } }
+		border-radius: 0;
+	}
+}
 /**
  * Flex css utility (cross browser)
  *
  * Created by mgh on 8/4/16.
  */
 
-.mde-flex, .mde-flex-row, .mde-flex-column{
+.wb-flex, .wb-flex-row, .wb-flex-column{
     display: -ms-flexbox;
     display: -webkit-flex;
     display: flex;
 }
 
-.mde-flex-row{
+.wb-flex-row{
     -webkit-flex-direction: row;
     -ms-flex-direction: row;
     flex-direction: row;
 }
 
-.mde-flex-column{
+.wb-flex-column{
     -webkit-flex-direction: column;
     -ms-flex-direction: column;
     flex-direction: column;
 }
 
-.mde-flex-wrap{
+.wb-flex-wrap{
     -webkit-flex-wrap: wrap;
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
 }
 
-.mde-flex-nowrap{
+.wb-flex-nowrap{
     -webkit-flex-wrap: nowrap;
     -ms-flex-wrap: nowrap;
     flex-wrap: nowrap;
 }
 
 /* justify-content */
-.mde-flex-justify-content-start{
+.wb-flex-justify-content-start{
     -webkit-justify-content: flex-start;
     -ms-flex-pack: start;
     justify-content: flex-start;
 }
 
-.mde-flex-justify-content-end{
+.wb-flex-justify-content-end{
     -webkit-justify-content: flex-end;
     -ms-flex-pack: end;
     justify-content: flex-end;
 }
 
-.mde-flex-justify-content-center{
+.wb-flex-justify-content-center{
     -webkit-justify-content: center;
     -ms-flex-pack: center;
     justify-content: center;
 }
 
-.mde-flex-justify-content-space-between{
+.wb-flex-justify-content-space-between{
     -webkit-justify-content: space-between;
     -ms-flex-pack: justify;
     justify-content: space-between;
 }
 
-.mde-flex-justify-content-space-around{
+.wb-flex-justify-content-space-around{
     -webkit-justify-content: space-around;
     -ms-flex-pack: distribute;
     justify-content: space-around;
 }
 
 /* align-items */
-.mde-flex-align-items-start{
+.wb-flex-align-items-start{
     -webkit-align-items: flex-start;
     -ms-flex-align: start;
     align-items: flex-start;
 }
 
-.mde-flex-align-items-end{
+.wb-flex-align-items-end{
     -webkit-align-items: flex-end;
     -ms-flex-align: end;
     align-items: flex-end;
 }
 
-.mde-flex-align-items-center{
+.wb-flex-align-items-center{
     -webkit-align-items: center;
     -ms-flex-align: center;
     align-items: center;
 }
 
-.mde-flex-align-items-stretch{
+.wb-flex-align-items-stretch{
     -webkit-align-items: stretch;
     -ms-flex-align: stretch;
     align-items: stretch;
 }
 
-.mde-flex-item-auto{
+.wb-flex-item-auto{
     -webkit-align-self: auto;
     -ms-flex-item-align: auto;
     align-self: auto;
 }
 
-.mde-flex-item-start{
+.wb-flex-item-start{
     -webkit-align-self: flex-start;
     -ms-flex-item-align: start;
     align-self: flex-start;
 }
 
-.mde-flex-item-end{
+.wb-flex-item-end{
     -webkit-align-self: flex-end;
     -ms-flex-item-align: end;
     align-self: flex-end;
 }
 
-.mde-flex-item-stretch{
+.wb-flex-item-stretch{
     -webkit-align-self: stretch;
     -ms-flex-item-align: stretch;
     align-self: stretch;
 }
 
-.mde-flex-item-center{
+.wb-flex-item-center{
       -webkit-align-self: center;
       -ms-flex-item-align: center;
       align-self: center;
@@ -130,52 +132,52 @@
 /*
 Rules for sizing the icon.
 */
-.mde-18 {
+.wb-18 {
 	font-size: 18px;
 }
 
-.mde-24 {
+.wb-24 {
 	font-size: 24px;
 }
 
-.mde-36 {
+.wb-36 {
 	font-size: 36px;
 }
 
-.mde-48 {
+.wb-48 {
 	font-size: 48px;
 }
 
-.mde-64 {
+.wb-64 {
 	font-size: 64px;
 }
 
-.mde-128 {
+.wb-128 {
 	font-size: 128px;
 }
 
 
-.mde-s24 {
+.wb-s24 {
 	width: 24px;
 	height: 24px;
 }
 
-.mde-s36 {
+.wb-s36 {
 	width: 36px;
 	height: 36px;
 }
 
-.mde-s48 {
+.wb-s48 {
 	width: 48px;
 	height: 48px;
 }
 
-.mde-s64 {
+.wb-s64 {
 	width: 64px;
 	height: 64px;
 }
 
-.mde-s128 {
+.wb-s128 {
 	width: 128px;
 	height: 128px;
 }
@@ -210,15 +212,15 @@ md-input-container.editable-controls [ng-message] {
 	border-radius: 4px;
 }*/
 
-.mde-panel {
+.wb-panel {
 	margin:2px; border:1px dashed #039BE5;
 }
 
-.mde-panel-body{
+.wb-panel-body{
 	position: relative;
 }
 
-.mde-panel-header {
+.wb-panel-header {
 	background-color:  rgba(3,155,229,0.2);
 	background-image: repeating-linear-gradient(315deg, transparent, transparent 16px, rgba(255,255,255,.5) 16px, rgba(255,255,255,.5) 32px);
 	color:black;
@@ -227,11 +229,11 @@ md-input-container.editable-controls [ng-message] {
 	border-bottom:1px dashed rgb(3,155,229);
 }
 
-.mde-widget {
+.wb-widget {
 	margin:2px; border:1px dashed #8f9494;
 }
 
-.mde-widget-header {
+.wb-widget-header {
 	background-color: rgba(120,120,120,0.2);
 	background-image: repeating-linear-gradient(315deg, transparent, transparent 12px, rgba(255,255,255,.5) 12px, rgba(255,255,255,.5) 24px);
 	color:black;
@@ -249,7 +251,7 @@ md-input-container.editable-controls [ng-message] {
 	padding:0px;
 	margin-left: 4px;
 }
-.mde-icon-mini{
+.wb-icon-mini{
 	padding: 0px;
 	margin:0px;
 	font-size: 1.25rem;
@@ -360,10 +362,10 @@ md-input-container.editable-controls [ng-message] {
 /*
 Rules for align
 */
-.mde-rtl {
+.wb-rtl {
 	direction: rtl;
 }
 
-.mde-ltr {
+.wb-ltr {
 	direction: ltr;
 }

@@ -18,4 +18,4 @@
 
 # WebStorm and JetBrains Softwares
 .idea
-/dist/
+#/dist/

@@ -14,12 +14,12 @@ the following items can be set for customizing container layout:
 
     <!--Preview Box-->
     <!--TODO: mgh, 1395: good candidate for a directive, like: ng-previewbox items={"1","2","3"} -->
-    <div class="preview-box mde-flex-item-stretch">
+    <div class="preview-box wb-flex-item-stretch">
         <div class="header">Preview</div>
 
-            <div class="preview-area mde-flex"
+            <div class="preview-area wb-flex"
 
-                 ng-class="[mdeModel.style.flexDirection,mdeModel.style.justifyContent, mdeModel.style.alignItems]"
+                 ng-class="[wbModel.style.flexDirection,wbModel.style.justifyContent, wbModel.style.alignItems]"
                  >
                 <div class="widget" layout="row" layout-align="center center"><p>1</p></div>
                 <div class="widget" layout="row" layout-align="center center"><p>2</p></div>
@@ -37,7 +37,7 @@ the following items can be set for customizing container layout:
             <md-subheader>Direction</md-subheader>
             <md-divider style="margin-bottom: 1em "></md-divider>
             <md-radio-group
-                    ng-model="mdeModel.style.flexDirection"
+                    ng-model="wbModel.style.flexDirection"
                     role="radiogroup" >
                 <md-list-item ng-repeat="direction in flexDirection">
                     <md-radio-button
@@ -51,11 +51,11 @@ the following items can be set for customizing container layout:
 
         <!-- Align Items -->
         <md-list>
-            <md-subheader ng-show="mdeModel.style.flexDirection=='mde-flex-row'">Vertical Setting</md-subheader>
-            <md-subheader ng-show="mdeModel.style.flexDirection!='mde-flex-row'">Horizontal Setting</md-subheader>
+            <md-subheader ng-show="wbModel.style.flexDirection=='wb-flex-row'">Vertical Setting</md-subheader>
+            <md-subheader ng-show="wbModel.style.flexDirection!='wb-flex-row'">Horizontal Setting</md-subheader>
             <md-divider style="margin-bottom: 1em "></md-divider>
             <md-radio-group
-                    ng-model="mdeModel.style.alignItems"
+                    ng-model="wbModel.style.alignItems"
                     role="radiogroup">
                 <md-list-item ng-repeat="align in alignItems">
                     <md-radio-button
@@ -69,11 +69,11 @@ the following items can be set for customizing container layout:
 
         <!-- Justify Content -->
         <md-list>
-            <md-subheader ng-show="mdeModel.style.flexDirection!='mde-flex-row'">Vertical Setting</md-subheader>
-            <md-subheader ng-show="mdeModel.style.flexDirection=='mde-flex-row'">Horizontal Setting</md-subheader>
+            <md-subheader ng-show="wbModel.style.flexDirection!='wb-flex-row'">Vertical Setting</md-subheader>
+            <md-subheader ng-show="wbModel.style.flexDirection=='wb-flex-row'">Horizontal Setting</md-subheader>
             <md-divider style="margin-bottom: 1em "></md-divider>
             <md-radio-group
-                    ng-model="mdeModel.style.justifyContent"
+                    ng-model="wbModel.style.justifyContent"
                     role="radiogroup">
                 <md-list-item ng-repeat="align in justifyContent">
                     <md-radio-button
