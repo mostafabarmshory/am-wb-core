@@ -20,7 +20,7 @@ angular.module('ngMaterialWeburger')
 			dom : '<wb-content></wb-content>',
 			label : 'Panel',
 			description : 'Panel contains list of widgets.',
-			image : 'images/mde/mdecontent.svg',
+			image : 'images/wb/content.svg',
 			link : 'http://dpq.co.ir/more-information-link',
 			data : {
 				type : 'Page',
@@ -34,7 +34,7 @@ angular.module('ngMaterialWeburger')
 			dom : '<wb-brand-action></wb-brand-action>',
 			label : 'Brand with action',
 			description : 'A brand image with action list',
-			image : 'images/mde/mdebrandaction.svg',
+			image : 'images/wb/brandaction.svg',
 			link : 'http://dpq.co.ir',
 			data : {
 				type : 'BrandAction',
@@ -45,7 +45,7 @@ angular.module('ngMaterialWeburger')
 			dom : '<wb-copyright></wb-copyright>',
 			label : 'Copyright',
 			description : 'Copyright text',
-			image : 'images/mde/mdecopyright.svg',
+			image : 'images/wb/copyright.svg',
 			link : 'http://dpq.co.ir',
 			data : {
 				type : 'Copyright',
@@ -62,7 +62,7 @@ angular.module('ngMaterialWeburger')
 			dom : '<wb-feature-list></wb-feature-list>',
 			label : 'Features list',
 			description : 'List of features',
-			image : 'images/mde/mdefeaturelist.svg',
+			image : 'images/wb/featurelist.svg',
 			link : 'http://dpq.co.ir',
 			data : {
 				type : 'FeatureList',
@@ -73,7 +73,7 @@ angular.module('ngMaterialWeburger')
 			dom : '<wb-social-list></wb-social-list>',
 			label : 'Socials link',
 			description : 'Social link list',
-			image : 'images/mde/mdesociallist.svg',
+			image : 'images/wb/sociallist.svg',
 			link : 'http://dpq.co.ir',
 			data : {
 				type : 'SocialList',
@@ -84,7 +84,7 @@ angular.module('ngMaterialWeburger')
 			dom : '<wb-link-list></wb-link-list>',
 			label : 'Link list',
 			description : 'List of links and ticktes',
-			image : 'images/mde/mdelinklist.svg',
+			image : 'images/wb/linklist.svg',
 			link : 'link',
 			data : {
 				type : 'LinkList',
@@ -94,14 +94,14 @@ angular.module('ngMaterialWeburger')
 		NotfoundElement : {
 			dom : '<wb-notfound-element></wb-notfound-element>',
 			label : 'Not found',
-			image : 'images/mde/mdenotfoundelement.svg',
+			image : 'images/wb/notfoundelement.svg',
 			link : 'link',
 		},
 		HtmlText : {
 			dom : '<wb-html ng-class="[mdeModel.style.flexAlignItem]" ></wb-html>',
 			label : 'HTML text',
 			description : 'An HTML block text.',
-			image : 'images/mde/mdehtml.svg',
+			image : 'images/wb/html.svg',
 			link : 'http://dpq.co.ir',
 			data : {
 				type : 'HtmlText',
@@ -116,7 +116,7 @@ angular.module('ngMaterialWeburger')
 			dom : '<wb-collapsible-item-list></wb-collapsible-item-list>',
 			label : 'Collapsible item list',
 			description : 'List of item with a collapsiblity',
-			image : 'images/mde/mdenotfoundelement.svg',
+			image : 'images/wb/notfoundelement.svg',
 			link : 'http://dpq.co.ir',
 			data : {
 				type : 'CollapsibleItemList',
