@@ -4,8 +4,8 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc directive
- * @name donateMainApp.directive:MdeHtml
- * @description # MdeHtml
+ * @name donateMainApp.directive:wbHtml
+ * @description # wbHtml
  */
 .directive(
 	'wbHtml',
@@ -15,29 +15,29 @@ angular.module('ngMaterialWeburger')
 		restrict : 'E',
 		replase : true,
 		scope : {
-		    mdeEditable : '=?',
-		    mdeModel : '=?',
-		    mdeParent : '=?'
+		    wbEditable : '=?',
+		    wbModel : '=?',
+		    wbParent : '=?'
 		},
 		link : function(scope, elem, attrs) {
-		    scope.$watch('mdeModel.style.flexAlignItem', function(
+		    scope.$watch('wbModel.style.flexAlignItem', function(
 			    newValue, oldValue) {
 			elem.removeClass(oldValue);
 			elem.addClass(newValue);
 		    });
-		    scope.$watch('mdeModel.style.flexItemGrow', function(
+		    scope.$watch('wbModel.style.flexItemGrow', function(
 			    newValue, oldValue) {
 			elem.css('flex-grow', newValue);
 		    });
 		},
 		controller : function($scope, $element, $mdDialog) {
 		    var scope = $scope;
-		    var model = $scope.mdeModel;
-		    var parentModel = $scope.mdeParent;
+		    var model = $scope.wbModel;
+		    var parentModel = $scope.wbParent;
 
 		    function removeWidget() {
-			if (scope.mdeParent) {
-			    scope.mdeParent.removeWidget(scope.mdeModel);
+			if (scope.wbParent) {
+			    scope.wbParent.removeWidget(scope.wbModel);
 			}
 		    }
 
@@ -49,8 +49,8 @@ angular.module('ngMaterialWeburger')
 			    clickOutsideToClose : true,
 			    fullscreen : true,
 			    locals : {
-				mdeModel : model,
-				mdeParent : parentModel,
+				wbModel : model,
+				wbParent : parentModel,
 				style : {
 				    pages : [ 'text', 'selfLayout', 'border',
 					    'background', 'marginPadding',

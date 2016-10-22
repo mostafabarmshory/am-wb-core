@@ -1,52 +1,52 @@
-<div ng-class="{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}">
+<div ng-class="{'wb-widget': wbEditable, 'fill':wbModel.style.fill}">
     <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
-    <div ng-show="mdeEditable"
+    <div ng-show="wbEditable"
          layout="row"
-         class="mde-widget-header"
-         ng-include="'views/partials/mdewidgetheaderactions.html'">
+         class="wb-widget-header"
+         ng-include="'views/partials/wb-widgetheaderactions.html'">
     </div>
 
     <!-- متن اصلی صفحه اینجا ایجاد می‌شود. -->
     <div
-            ng-bind-html="mdeModel.text | unsafe"
+            ng-bind-html="wbModel.text | unsafe"
             ng-style="{
-            'margin-left':mdeModel.style.marginLeft,
-            'margin-right':mdeModel.style.marginRight,
-            'margin-top':mdeModel.style.marginTop,
-            'margin-bottom':mdeModel.style.marginBottom,
+            'margin-left':wbModel.style.marginLeft,
+            'margin-right':wbModel.style.marginRight,
+            'margin-top':wbModel.style.marginTop,
+            'margin-bottom':wbModel.style.marginBottom,
 
-            'padding-left':mdeModel.style.paddingLeft,
-            'padding-right':mdeModel.style.paddingRight,
-            'padding-top':mdeModel.style.paddingTop,
-            'padding-bottom':mdeModel.style.paddingBottom,
+            'padding-left':wbModel.style.paddingLeft,
+            'padding-right':wbModel.style.paddingRight,
+            'padding-top':wbModel.style.paddingTop,
+            'padding-bottom':wbModel.style.paddingBottom,
 
-            'background-color': mdeModel.style.backgroundColor,
-            'color': mdeModel.style.color,
+            'background-color': wbModel.style.backgroundColor,
+            'color': wbModel.style.color,
 
-            'min-width':mdeModel.style.minWidth,
-            'min-height':mdeModel.style.minHeight,
-            'max-width':(mdeModel.style.maxWidth==0) ? 'none' : mdeModel.style.maxWidth,
-            'max-height':(mdeModel.style.maxHeight==0)?'none':mdeModel.style.maxHeight,
+            'min-width':wbModel.style.minWidth,
+            'min-height':wbModel.style.minHeight,
+            'max-width':(wbModel.style.maxWidth==0) ? 'none' : wbModel.style.maxWidth,
+            'max-height':(wbModel.style.maxHeight==0)?'none':wbModel.style.maxHeight,
 
-            'border-top-left-radius':(mdeModel.style.borderRadius.uniform) ? mdeModel.style.borderRadius.all : mdeModel.style.borderRadius.topLeft,
-            'border-top-right-radius':(mdeModel.style.borderRadius.uniform) ? mdeModel.style.borderRadius.all : mdeModel.style.borderRadius.topRight,
-            'border-bottom-left-radius':(mdeModel.style.borderRadius.uniform) ? mdeModel.style.borderRadius.all : mdeModel.style.borderRadius.bottomLeft,
-            'border-bottom-right-radius':(mdeModel.style.borderRadius.uniform) ? mdeModel.style.borderRadius.all : mdeModel.style.borderRadius.bottomRight,
+            'border-top-left-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.topLeft,
+            'border-top-right-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.topRight,
+            'border-bottom-left-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.bottomLeft,
+            'border-bottom-right-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.bottomRight,
 
-            'border-left-style':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderStyle.all : mdeModel.style.borderStyle.left,
-            'border-right-style':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderStyle.all : mdeModel.style.borderStyle.right,
-            'border-top-style':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderStyle.all : mdeModel.style.borderStyle.top,
-            'border-bottom-style':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderStyle.all : mdeModel.style.borderStyle.bottom,
+            'border-left-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.left,
+            'border-right-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.right,
+            'border-top-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.top,
+            'border-bottom-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.bottom,
 
-            'border-left-width':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderWidth.all : mdeModel.style.borderWidth.left,
-            'border-right-width':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderWidth.all : mdeModel.style.borderWidth.right,
-            'border-top-width':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderWidth.all : mdeModel.style.borderWidth.top,
-            'border-bottom-width':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderWidth.all : mdeModel.style.borderWidth.bottom,
+            'border-left-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.left,
+            'border-right-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.right,
+            'border-top-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.top,
+            'border-bottom-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.bottom,
 
-            'border-left-color':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderColor.all : mdeModel.style.borderColor.left,
-            'border-right-color':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderColor.all : mdeModel.style.borderColor.right,
-            'border-top-color':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderColor.all : mdeModel.style.borderColor.top,
-            'border-bottom-color':(mdeModel.style.borderStyleColorWidth.uniform) ? mdeModel.style.borderColor.all : mdeModel.style.borderColor.bottom,
+            'border-left-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.left,
+            'border-right-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.right,
+            'border-top-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.top,
+            'border-bottom-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.bottom,
             }"
     >
     </div>
