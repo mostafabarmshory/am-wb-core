@@ -6,16 +6,16 @@ Created by mgh.
 <div layout="column">
 
     <!--Preview Box-->
-    <div class="preview-box mde-flex-item-stretch">
+    <div class="preview-box wb-flex-item-stretch">
         <div class="header">Preview</div>
-        <div class="mde-flex preview-area mde-flex-justify-content-center">
-        <div class="widget mde-flex-item-center"
-             ng-class="mdeModel.style.flexAlignItem"
+        <div class="wb-flex preview-area wb-flex-justify-content-center">
+        <div class="widget wb-flex-item-center"
+             ng-class="wbModel.style.flexAlignItem"
              ng-style="{
-                'min-width':mdeModel.style.minWidth,
-                'min-height':mdeModel.style.minHeight,
-                'max-width':(mdeModel.style.maxWidth==0) ? 'none' : mdeModel.style.maxWidth,
-                'max-height':(mdeModel.style.maxHeight==0)?'none':mdeModel.style.maxHeight}"
+                'min-width':wbModel.style.minWidth,
+                'min-height':wbModel.style.minHeight,
+                'max-width':(wbModel.style.maxWidth==0) ? 'none' : wbModel.style.maxWidth,
+                'max-height':(wbModel.style.maxHeight==0)?'none':wbModel.style.maxHeight}"
              layout="row" layout-align="center center"
              style="border: 2px dotted"><p>
             item</p></div>
@@ -30,20 +30,20 @@ Created by mgh.
     <md-list>
         <md-subheader>MIN</md-subheader>
         <md-divider style="margin-bottom: 1em "></md-divider>
-        <div layout="row" class="mde-flex-align-items-center">
+        <div layout="row" class="wb-flex-align-items-center">
             <span>Width<md-tooltip>set value "0" for ignoring</md-tooltip></span>
-            <md-slider flex min="0" max="100" ng-model="mdeModel.style.minWidth">
+            <md-slider flex min="0" max="100" ng-model="wbModel.style.minWidth">
             </md-slider>
             <md-input-container>
-                <input style="width: 50px" flex type="number" ng-model="mdeModel.style.minWidth">
+                <input style="width: 50px" flex type="number" ng-model="wbModel.style.minWidth">
             </md-input-container>
         </div>
-        <div layout="row" class="mde-flex-align-items-center">
+        <div layout="row" class="wb-flex-align-items-center">
             <span>Height<md-tooltip>set value "0" for ignoring</md-tooltip></span>
-            <md-slider flex min="0" max="100" ng-model="mdeModel.style.minHeight">
+            <md-slider flex min="0" max="100" ng-model="wbModel.style.minHeight">
             </md-slider>
             <md-input-container>
-                <input style="width: 50px" flex type="number" ng-model="mdeModel.style.minHeight">
+                <input style="width: 50px" flex type="number" ng-model="wbModel.style.minHeight">
             </md-input-container>
         </div>
 
@@ -53,20 +53,20 @@ Created by mgh.
     <md-list>
         <md-subheader>MAX</md-subheader>
         <md-divider style="margin-bottom: 1em "></md-divider>
-        <div layout="row" class="mde-flex-align-items-center">
+        <div layout="row" class="wb-flex-align-items-center">
             <span>Width<md-tooltip>set value "0" for ignoring</md-tooltip></span>
-            <md-slider flex min="0" max="100" ng-model="mdeModel.style.maxWidth">
+            <md-slider flex min="0" max="100" ng-model="wbModel.style.maxWidth">
             </md-slider>
             <md-input-container>
-                <input style="width: 50px" flex ng-model="mdeModel.style.maxWidth">
+                <input style="width: 50px" flex ng-model="wbModel.style.maxWidth">
             </md-input-container>
         </div>
-        <div layout="row" class="mde-flex-align-items-center">
+        <div layout="row" class="wb-flex-align-items-center">
             <span>Height<md-tooltip>set value "0" for ignoring</md-tooltip></span>
-            <md-slider flex min="0" max="100" ng-model="mdeModel.style.maxHeight">
+            <md-slider flex min="0" max="100" ng-model="wbModel.style.maxHeight">
             </md-slider>
             <md-input-container>
-                <input style="width: 50px" flex  ng-model="mdeModel.style.maxHeight">
+                <input style="width: 50px" flex  ng-model="wbModel.style.maxHeight">
             </md-input-container>
         </div>
     </md-list>

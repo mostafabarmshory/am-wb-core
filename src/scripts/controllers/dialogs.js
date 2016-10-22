@@ -10,7 +10,7 @@ angular.module('ngMaterialWeburger')
  * @name donateMainApp.controller:DialogsCtrl
  * @description # DialogsCtrl Controller of the donateMainApp
  */
-    .controller('DialogsCtrl', function ($scope, $mdDialog, mdeModel, style) {
+    .controller('DialogsCtrl', function ($scope, $mdDialog, wbModel, style) {
         function hide() {
             $mdDialog.hide();
         }
@@ -23,7 +23,7 @@ angular.module('ngMaterialWeburger')
             $mdDialog.hide(response);
         }
 
-        $scope.mdeModel = mdeModel;
+        $scope.wbModel = wbModel;
         $scope.style = style;
         $scope.hide = hide;
         $scope.cancel = cancel;
@@ -34,7 +34,7 @@ angular.module('ngMaterialWeburger')
      * @name donateMainApp.controller:DialogsCtrl
      * @description # DialogsCtrl Controller of the donateMainApp
      */
-    .controller('SettingDialogsCtrl', function ($scope, $mdDialog, mdeModel, mdeParent, style) {
+    .controller('SettingDialogsCtrl', function ($scope, $mdDialog, wbModel, wbParent, style) {
         function hide() {
             $mdDialog.hide();
         }
@@ -47,8 +47,8 @@ angular.module('ngMaterialWeburger')
             $mdDialog.hide(response);
         }
 
-        $scope.mdeModel = mdeModel;
-        $scope.mdeParent = mdeParent;
+        $scope.wbModel = wbModel;
+        $scope.wbParent = wbParent;
         $scope.style = style;
         $scope.hide = hide;
         $scope.cancel = cancel;

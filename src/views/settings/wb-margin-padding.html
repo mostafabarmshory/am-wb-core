@@ -1,0 +1,117 @@
+<!-- Created by mgh on 8/10/2016. -->
+<!--
+Margin and padding setting
+ -->
+
+<div layout="column">
+
+    <!--Preview Box-->
+    <!--TODO: mgh, 1395: good candidate for a directive, like: ng-previewbox items={"1","2","3"} -->
+    <div class="preview-box wb-flex-item-stretch">
+        <div class="header">Preview</div>
+        <div class="preview-area"
+             ng-class="[wbParent.wbModel.style.flexDirection,wbModel.style.justifyContent, wbModel.style.alignItems]"
+             style="display: flex">
+            <div class="widget" layout="row" layout-align="center center"><p>before</p></div>
+            <div class="widget"
+                 ng-class="wbModel.style.flexAlignItem"
+                 ng-style="{
+                'margin-left':wbModel.style.marginLeft,
+                'margin-right':wbModel.style.marginRight,
+                'margin-top':wbModel.style.marginTop,
+                'margin-bottom':wbModel.style.marginBottom,
+
+                'padding-left':wbModel.style.paddingLeft,
+                'padding-right':wbModel.style.paddingRight,
+                'padding-top':wbModel.style.paddingTop,
+                'padding-bottom':wbModel.style.paddingBottom,
+
+                 'flex-grow':wbModel.style.flexItemGrow,
+                 '-webkit-flex-grow':wbModel.style.flexItemGrow}"
+                 layout="row" layout-align="center center"
+                 style="border: 2px dotted"><p>
+                item</p></div>
+            <div class="widget" layout="row" layout-align="center center"><p>after</p></div>
+        </div>
+    </div>
+
+    <div class="setting-panel"
+         layout="column"
+         layout-gt-sm="row">
+
+        <md-list>
+            <md-subheader>Margin</md-subheader>
+            <md-divider style="margin-bottom: 1em "></md-divider>
+            <div layout="row" class="wb-flex-align-items-center">
+                <span>Left</span>
+                <md-slider flex min="0" max="100" ng-model="wbModel.style.marginLeft">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="wbModel.style.marginLeft">
+                </md-input-container>
+            </div>
+            <div layout="row" class="wb-flex-align-items-center">
+                <span>Right</span>
+                <md-slider flex min="0" max="100" ng-model="wbModel.style.marginRight">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="wbModel.style.marginRight">
+                </md-input-container>
+            </div>
+            <div layout="row" class="wb-flex-align-items-center">
+                <span>Top</span>
+                <md-slider flex min="0" max="100" ng-model="wbModel.style.marginTop">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="wbModel.style.marginTop">
+                </md-input-container>
+            </div>
+            <div layout="row" class="wb-flex-align-items-center">
+                <span>Bottom</span>
+                <md-slider flex min="0" max="100" ng-model="wbModel.style.marginBottom">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="wbModel.style.marginBottom">
+                </md-input-container>
+            </div>
+        </md-list>
+
+        <md-list>
+            <md-subheader>Padding</md-subheader>
+            <md-divider style="margin-bottom: 1em "></md-divider>
+            <div layout="row" class="wb-flex-align-items-center">
+                <span>Left</span>
+                <md-slider flex min="0" max="100" ng-model="wbModel.style.paddingLeft">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="wbModel.style.paddingLeft">
+                </md-input-container>
+            </div>
+            <div layout="row" class="wb-flex-align-items-center">
+                <span>Right</span>
+                <md-slider flex min="0" max="100" ng-model="wbModel.style.paddingRight">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="wbModel.style.paddingRight">
+                </md-input-container>
+            </div>
+            <div layout="row" class="wb-flex-align-items-center">
+                <span>Top</span>
+                <md-slider flex min="0" max="100" ng-model="wbModel.style.paddingTop">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="wbModel.style.paddingTop">
+                </md-input-container>
+            </div>
+            <div layout="row" class="wb-flex-align-items-center">
+                <span>Bottom</span>
+                <md-slider flex min="0" max="100" ng-model="wbModel.style.paddingBottom">
+                </md-slider>
+                <md-input-container>
+                    <input style="width: 50px" flex type="number" ng-model="wbModel.style.paddingBottom">
+                </md-input-container>
+            </div>
+        </md-list>
+    </div>
+
+</div>

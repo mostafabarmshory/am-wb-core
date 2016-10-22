@@ -38,7 +38,7 @@ angular.module('ngMaterialWeburger')
 		    wbParent : '=?'
 		},
 
-		controller : function($scope, $element, $mdDialog) {
+		controller : function($scope, $element, $settings, $mdDialog) {
 		    var scope = $scope;
 
 		    function isEditable() {
@@ -92,6 +92,7 @@ angular.module('ngMaterialWeburger')
 		     * مدل داده‌ای و نمایش اضافه خواهد شد.‌
 		     */
 		    function newWidget(wbModel) {
+			// TODO: maso, 1394: just prepare data for view
 			$mdDialog.show({
 			    controller : 'DialogsCtrl',
 			    templateUrl : 'views/dialogs/wb-selectwidget.html',
@@ -124,20 +125,13 @@ angular.module('ngMaterialWeburger')
 		     * متفاوت مربوط به این صفحه را انجام دهد.
 		     */
 		    function settings() {
-			return $mdDialog.show({
-			    controller : 'SettingDialogsCtrl',
-			    templateUrl : 'views/dialogs/wb-settings.html',
-			    parent : angular.element(document.body),
-			    clickOutsideToClose : true,
-			    fullscreen : true,
-			    locals : {
-				wbModel : scope.wbModel,
-				wbParent : scope.wbParent,
-				style : {
-				    pages : [ 'description', 'border',
-					    'background', 'pageLayout',
-					    'selfLayout' ]
-				}
+			return $settings.load({
+			    wbModel : scope.wbModel,
+			    wbParent : scope.wbParent,
+			    style : {
+				pages : [ 'description', 'border',
+					'background', 'pageLayout',
+					'selfLayout' ]
 			    }
 			});
 		    }

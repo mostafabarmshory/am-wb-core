@@ -17,8 +17,8 @@
     <div class="preview-box">
         <div class="header">Preview</div>
             <div class="preview-area"
-                 layout="{{mdeModel.style.direction}}"
-                 layout-align="{{mdeModel.style.directionAlignment}} {{mdeModel.style.perpendicularAlignment}}">
+                 layout="{{wbModel.style.direction}}"
+                 layout-align="{{wbModel.style.directionAlignment}} {{wbModel.style.perpendicularAlignment}}">
                 <div class="widget" layout="row" layout-align="center center"><p>1</p></div>
                 <div class="widget" layout="row" layout-align="center center"><p>2</p></div>
                 <div class="widget" layout="row" layout-align="center center"><p>3</p></div>
@@ -33,7 +33,7 @@
         <div>
             <div>Layout Direction</div>
             <md-radio-group
-                    ng-model="mdeModel.style.direction"
+                    ng-model="wbModel.style.direction"
                     role="radiogroup">
                 <md-radio-button
                         ng-repeat="direction in directions"
@@ -47,7 +47,7 @@
         <div>
             <div>Alignment in Layout Direction</div>
             <md-radio-group
-                    ng-model="mdeModel.style.directionAlignment"
+                    ng-model="wbModel.style.directionAlignment"
                     role="radiogroup">
                 <md-radio-button
                         ng-repeat="align in directionAlignments"
@@ -59,7 +59,7 @@
         <div>
             <div>Alignment in Perpendicular Direction</div>
             <md-radio-group
-                    ng-model="mdeModel.style.perpendicularAlignment"
+                    ng-model="wbModel.style.perpendicularAlignment"
                     role="radiogroup">
                 <md-radio-button
                         ng-repeat="align in perpendicularAlignments"
