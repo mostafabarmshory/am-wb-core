@@ -28,7 +28,6 @@ module.exports = function(config) {
       'bower_components/angular-aria/angular-aria.js',
       'bower_components/angular-messages/angular-messages.js',
       'bower_components/angular-material/angular-material.js',
-      'bower_components/angular-xeditable/dist/js/xeditable.js',
       'bower_components/angular-translate/angular-translate.js',
       'bower_components/tinycolor/tinycolor.js',
       'bower_components/md-color-picker/dist/mdColorPicker.min.js',

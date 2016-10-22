@@ -1,39 +1,39 @@
-<div ng-class="{'mde-panel': mdeEditable}">
+<div ng-class="{'wb-panel': wbEditable}">
     <!-- a header is added through edit-mode -->
-    <div ng-show="mdeEditable" class="mde-panel-header" layout="row">
+    <div ng-show="wbEditable" class="wb-panel-header" layout="row">
         <span translate> Panel</span>
         <span flex></span>
         <md-button
-                ng-click="newWidget(mdeModel)"
+                ng-click="newWidget(wbModel)"
                 class="md-icon-button md-mini">
-            <md-icon class="mde-icon-mini">add_circle</md-icon>
+            <md-icon class="wb-icon-mini">add_circle</md-icon>
         </md-button>
         <md-button
                 ng-click="settings()"
                 class="md-icon-button md-mini">
-            <md-icon class="mde-icon-mini">settings</md-icon>
+            <md-icon class="wb-icon-mini">settings</md-icon>
         </md-button>
         <md-button
                 class="md-icon-button md-mini"
                 ng-mouseenter="hoveringDelBtn=true"
                 ng-mouseleave="hoveringDelBtn=false"
-                ng-click="removeWidget(mdeModel)"
-                ng-show="mdeParent">
-            <md-icon class="mde-icon-mini">delete</md-icon>
+                ng-click="removeWidget(wbModel)"
+                ng-show="wbParent">
+            <md-icon class="wb-icon-mini">delete</md-icon>
         </md-button>
     </div>
 
     <!-- body section (in non-edit mode, this area just shown -->
-    <div class="mde-panel-body" id="mde-content-body">
+    <div class="wb-panel-body" id="wb-content-body">
 
         <div ng-show="hoveringDelBtn" class="overlay"></div>
 
         <!-- تمام بچه‌ها در این قسمت اضافه می‌شن. -->
         <div class="flex"
-             ng-class="[mdeModel.style.flexDirection,mdeModel.style.justifyContent, mdeModel.style.alignItems]"
-             id="mde-content-placeholder"
-             ng-style="{ 'background': mdeModel.style.background,'border-radius': mdeModel.style.borderRadius, 'border': mdeModel.style.border }">
+             ng-class="[wbModel.style.flexDirection,wbModel.style.justifyContent, wbModel.style.alignItems]"
+             id="wb-content-placeholder"
+             ng-style="{ 'background': wbModel.style.background,'border-radius': wbModel.style.borderRadius, 'border': wbModel.style.border }">
         </div>
-        <!--<div ng-include src="'views/partials/mde-edit-hint-panel.html'"></div>-->
+        <!--<div ng-include src="'views/partials/wb-edit-hint-panel.html'"></div>-->
     </div>
 </div>
