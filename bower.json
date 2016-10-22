@@ -36,6 +36,6 @@
   "moduleName": "ngMaterialWeburger",
   "backend":{
   	"host": "localhost",
-  	"port": 8080
+  	"port": 9091
   }
 }

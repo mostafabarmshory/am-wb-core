@@ -1,0 +1,82 @@
+<!-- 
+Show members linst based on user template
+
+Wedget presents members list based on a template. Mebmers list is get from
+server based on Seen Protocol.
+
+See: https://gitlab.com/phoenix-scholars/seen
+See: https://github.com/phoenix-scholars/angular-pluf
+ -->
+
+<div ng-class="{'wb-widget': wbEditable, 'fill':wbModel.style.fill}">
+    <!-- Adds a title in edit mode -->
+    <div ng-show="wbEditable"
+         layout="row"
+         class="wb-widget-header"
+         ng-include="'views/partials/wb-widgetheaderactions.html'">
+    </div>
+
+    <!-- Main widget body -->
+    <div class="wb-panel-body" id="wb-members-body">
+	    <div>
+			<md-select 
+				ng-show="wbEditable"
+				placeholder="User list role" 
+				ng-model="wbModel.role" 
+				md-on-open="loadRoles()" 
+				style="min-width: 200px;">
+				<md-option 
+					ng-value="role.id" 
+					ng-repeat="role in roles.items">
+					{{role.name}}
+				</md-option>
+			</md-select>
+	    </div>
+		<wb-content
+			ng-show="wbEditable"
+			wb-editable="wbEditable" 
+			wb-model="wbModel.template">
+		</wb-content>
+	    <div id="wb-members-placeholder"
+	    	ng-style="{
+	         'margin-left':wbModel.style.marginLeft,
+	         'margin-right':wbModel.style.marginRight,
+	         'margin-top':wbModel.style.marginTop,
+	         'margin-bottom':wbModel.style.marginBottom,
+	
+	         'padding-left':wbModel.style.paddingLeft,
+	         'padding-right':wbModel.style.paddingRight,
+	         'padding-top':wbModel.style.paddingTop,
+	         'padding-bottom':wbModel.style.paddingBottom,
+	
+	         'background-color': wbModel.style.backgroundColor,
+	         'color': wbModel.style.color,
+	
+	         'min-width':wbModel.style.minWidth,
+	         'min-height':wbModel.style.minHeight,
+	         'max-width':(wbModel.style.maxWidth==0) ? 'none' : wbModel.style.maxWidth,
+	         'max-height':(wbModel.style.maxHeight==0)?'none':wbModel.style.maxHeight,
+	
+	         'border-top-left-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.topLeft,
+	         'border-top-right-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.topRight,
+	         'border-bottom-left-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.bottomLeft,
+	         'border-bottom-right-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.bottomRight,
+	
+	         'border-left-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.left,
+	         'border-right-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.right,
+	         'border-top-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.top,
+	         'border-bottom-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.bottom,
+	
+	         'border-left-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.left,
+	         'border-right-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.right,
+	         'border-top-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.top,
+	         'border-bottom-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.bottom,
+	
+	         'border-left-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.left,
+	         'border-right-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.right,
+	         'border-top-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.top,
+	         'border-bottom-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.bottom,
+	         }">
+	    </div>
+    </div>
+</div>
