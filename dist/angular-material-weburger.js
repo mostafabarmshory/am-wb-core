@@ -173,6 +173,7 @@ angular.module('ngMaterialWeburger')
  */
 .controller('WbCmsCtrl',
 	function($scope, $rootScope, $http, $cms, PaginatorParameter) {
+
 	    /*
 	     * از این متغیر برای صفحه بندی و جستجوی محتوی‌ها استفاده می‌شود.‌
 	     */
@@ -245,7 +246,8 @@ angular.module('ngMaterialWeburger')
 		    // 2- upload file
 		    content = newContent;
 		    return content.upload(file);
-		}).then(function() {
+		})//
+		.then(function() {
 		    // 3- push in current result
 		    $scope.contents.push(content);
 		    return content;
