@@ -7,7 +7,7 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc controller
- * @name ActionCtrl
+ * @name LayoutSettingsCtrl
  * @memberof ngMaterialWeburger
  * @description کنترلر یک عمل برای مدیریت و ویرایش آن ایجاد شده است. این کنترل
  *              در دیالوگ و یا نمایش‌های دیگر کاربرد دارد.
@@ -16,52 +16,52 @@ angular.module('ngMaterialWeburger')
  * می‌کند.
  */
 .controller('LayoutSettingsCtrl', function($scope, $settings) {
-	var scope = $scope;
+    var scope = $scope;
 
-	scope.directions = [ {
-		title : 'row',
-		icon : 'view_column',
-		value : 'row'
-	}, {
-		title : 'column',
-		icon : 'view_agenda',
-		value : 'column'
-	} ];
+    scope.directions = [ {
+	title : 'row',
+	icon : 'view_column',
+	value : 'row'
+    }, {
+	title : 'column',
+	icon : 'view_agenda',
+	value : 'column'
+    } ];
 
-	scope.directionAlignments = [ {
-		title : 'none',
-		value : 'none'
-	}, {
-		title : 'start',
-		value : 'start'
-	}, {
-		title : 'center',
-		value : 'center'
-	}, {
-		title : 'end',
-		value : 'end'
-	}, {
-		title : 'space-around',
-		value : 'space-around'
-	}, {
-		title : 'space-between',
-		value : 'space-between'
-	} ];
+    scope.directionAlignments = [ {
+	title : 'none',
+	value : 'none'
+    }, {
+	title : 'start',
+	value : 'start'
+    }, {
+	title : 'center',
+	value : 'center'
+    }, {
+	title : 'end',
+	value : 'end'
+    }, {
+	title : 'space-around',
+	value : 'space-around'
+    }, {
+	title : 'space-between',
+	value : 'space-between'
+    } ];
 
-	scope.perpendicularAlignments = [ {
-		title : 'none',
-		value : 'none'
-	}, {
-		title : 'start',
-		value : 'start'
-	}, {
-		title : 'center',
-		value : 'center'
-	}, {
-		title : 'end',
-		value : 'end'
-	}, {
-		title : 'stretch',
-		value : 'stretch'
-	}, ]
+    scope.perpendicularAlignments = [ {
+	title : 'none',
+	value : 'none'
+    }, {
+	title : 'start',
+	value : 'start'
+    }, {
+	title : 'center',
+	value : 'center'
+    }, {
+	title : 'end',
+	value : 'end'
+    }, {
+	title : 'stretch',
+	value : 'stretch'
+    }, ]
 });

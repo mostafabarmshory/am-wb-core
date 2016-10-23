@@ -7,7 +7,7 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc controller
- * @name ActionCtrl
+ * @name SettingsCtrl
  * @memberof ngMaterialWeburger
  * @description کنترلر یک عمل برای مدیریت و ویرایش آن ایجاد شده است. این کنترل
  *              در دیالوگ و یا نمایش‌های دیگر کاربرد دارد.
