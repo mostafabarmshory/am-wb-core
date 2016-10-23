@@ -156,7 +156,7 @@
     <script src="scripts/controllers/pagelayoutsetting.js"></script>
     <script src="scripts/controllers/selflayoutsetting.js"></script>
     <script src="scripts/controllers/bordersetting.js"></script>
-    <script src="scripts/controllers/backgroundsetting.js"></script>
+<!--     <script src="scripts/controllers/backgroundsetting.js"></script> -->
     <script src="scripts/controllers/textsetting.js"></script>
     <script src="scripts/directives/wb-notfoundelement.js"></script>
     <script src="scripts/directives/wb-copyright.js"></script>
@@ -178,25 +178,27 @@
     <script type="text/javascript">
     // Test controller
     angular.module('ngMaterialWeburger')
-    .controller('MyTestCtrl', function($scope, $http, $mdDialog){
+    .controller('MyTestCtrl', function($scope, $http, $mdDialog, $usr){
     	$http.get('temp.json').then(function (res){
     		$scope.model = res.data;
     	});
     	
     	$scope.cs = function(){
-    		$mdDialog.show({
-				controller : 'DialogsCtrl',
-				templateUrl : 'views/dialogs/mdeselectcontent.html',
-				parent : angular.element(document.body),
-				clickOutsideToClose : true,
-				fullscreen: true,
-				locals : {
-					mdeModel : {},
-					style : {}
-				}
-			}).then(function(content){
-				alert(content.id);
-			});
+    	    $usr.login({login: 'admin', password: 'admin'})//
+    	    .then(function(){
+	    		$mdDialog.show({
+					controller : 'DialogsCtrl',
+					templateUrl : 'views/dialogs/wb-selectcontent.html',
+					parent : angular.element(document.body),
+					fullscreen: true,
+					locals : {
+						wbModel : {},
+						style : {}
+					}
+				}).then(function(content){
+					alert(content.id);
+				});
+    	    });
     	};
     })
 

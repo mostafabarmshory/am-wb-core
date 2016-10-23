@@ -72,7 +72,7 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc controller
- * @name ActionCtrl
+ * @name WbActionCtrl
  * @memberof ngMaterialWeburger
  * @description کنترلر یک عمل برای مدیریت و ویرایش آن ایجاد شده است. این کنترل
  *              در دیالوگ و یا نمایش‌های دیگر کاربرد دارد.
@@ -80,17 +80,17 @@ angular.module('ngMaterialWeburger')
  * این کنترل علاوه بر امکانات ویرایشی، داده‌های اولیه هم برای نمایش فراهم
  * می‌کند.
  */
-.controller('ActionCtrl', function($scope) {
-	var types = [ {
-		icon : 'link',
-		label : 'Link internal or external',
-		key : 'link'
-	}, {
-		icon : 'action',
-		label : 'State change',
-		key : 'state'
-	} ];
-	$scope.types = types;
+.controller('WbActionCtrl', function($scope) {
+    var types = [ {
+	icon : 'link',
+	label : 'Link internal or external',
+	key : 'link'
+    }, {
+	icon : 'action',
+	label : 'State change',
+	key : 'state'
+    } ];
+    $scope.types = types;
 });
 
 'use strict';
@@ -98,10 +98,10 @@ angular.module('ngMaterialWeburger')
 angular.module('ngMaterialWeburger')
 /**
  * @ngdoc function
- * @name ngMaterialWeburger.controller:BordersettingCtrl
- * @description # BordersettingCtrl Controller of the ngMaterialWeburger
+ * @name WbBorderSettingCtrl
+ * @description # WbBorderSettingCtrl Controller of the ngMaterialWeburger
  */
-.controller('BorderSettingCtrl', function($scope) {
+.controller('WbBorderSettingCtrl', function($scope) {
     var scope = $scope;
     var model = $scope.mdeModel;
 
@@ -156,72 +156,166 @@ angular.module('ngMaterialWeburger')
 
 });
 
+/* jslint todo: true */
+/* jslint xxx: true */
+/* jshint -W100 */
 'use strict';
 
 angular.module('ngMaterialWeburger')
+
 /**
- * @ngdoc function
- * @name ngMaterialWeburger.controller:BordersettingCtrl
- * @description # BordersettingCtrl Controller of the ngMaterialWeburger
+ * @ngdoc controller
+ * @name WbCmsCtrl
+ * @memberof ngMaterialWeburger
+ * @description # WbCmsCtrl
+ * 
+ * 
  */
-.controller(
-		'BorderSettingCtrl',
-		function($scope) {
-			var scope = $scope;
-			var model = $scope.mdeModel;
+.controller('WbCmsCtrl',
+	function($scope, $rootScope, $http, $cms, PaginatorParameter) {
+	    /*
+	     * از این متغیر برای صفحه بندی و جستجوی محتوی‌ها استفاده می‌شود.‌
+	     */
+	    var paginatorParameter = new PaginatorParameter();
 
+	    /*
+	     * آخرین نتیچه‌ها در این متغیر نگهداری می‌شود.
+	     */
+	    var requests = null;
 
-			scope.styles = [ {
-				title : 'No Border',
-				value : 'none'
-			}, {
-				title : 'Solid',
-				value : 'solid'
-			}, {
-				title : 'Dotted',
-				value : 'dotted'
-			}, {
-				title : 'Dashed',
-				value : 'dashed'
-			}, {
-				title : 'Double',
-				value : 'double'
-			}, {
-				title : 'Groove',
-				value : 'groove'
-			}, {
-				title : 'Ridge',
-				value : 'ridge'
-			}, {
-				title : 'Inset',
-				value : 'inset'
-			}, {
-				title : 'Outset',
-				value : 'outset'
-			}
-			];
+	    /*
+	     * حالت اجرا را تعیین می‌کند. در صورتی که در حال بارگزاری باشیم این
+	     * مقدار درستی است.
+	     */
+	    var status = {
+		working : false
+	    };
 
-            //
-			//scope.radiuses=[
-			//	{
-			//		title:'Top-Left: ',
-			//		model:$scope.mdeModel.style.borderRadius.topLeft
-			//	},
-			//	{
-			//		title:'Top-Left: ',
-			//		model:$scope.mdeModel.style.borderRadius.topRight
-			//	},
-			//	{
-			//		title:'Top-Left: ',
-			//		model:$scope.mdeModel.style.borderRadius.bottomLeft
-			//	},
-			//	{
-			//		title:'Top-Left: ',
-			//		model:$scope.mdeModel.style.borderRadius.bottomRight
-			//	}
-			//];
-
+	    /*
+	     * جستجوی درخواست‌ها
+	     */
+	    function find() {
+		status.working = true;
+		$cms.contents(paginatorParameter)//
+		.then(function(items) {
+		    requests = items;
+		    $scope.contents = $scope.contents.concat(requests.items);
+		    status.working = false;
+		}, function() {
+		    status.working = false;
 		});
+	    }
+
+	    function clear() {
+		$scope.concats.length = 0;
+	    }
+
+	    function search(text) {
+		paginatorParameter//
+		.setQuery(text)//
+		.setPage(0);
+		clear();
+		find();
+	    }
+
+	    function date(dateTiem) {
+		clear();
+		find();
+	    }
+
+	    function mimetype(type) {
+		clear();
+		find();
+	    }
+
+	    /**
+	     * یک فایل جدید به عنوان محتوی به سرور لود می‌شود.
+	     * 
+	     * @param file
+	     * @returns
+	     */
+	    function upload(file) {
+		var content = null;
+		// 1- create new content
+		return $cms.newContent({
+		    title : 'no name',
+		    description : ''
+		})//
+		.then(function(newContent) {
+		    // 2- upload file
+		    content = newContent;
+		    return content.upload(file);
+		}).then(function() {
+		    // 3- push in current result
+		    $scope.contents.push(content);
+		    return content;
+		});
+	    }
+
+	    /**
+	     * محتوی را به روز می‌کند.
+	     * 
+	     * @param content
+	     * @returns
+	     */
+	    function update(content) {
+		return content.update();
+	    }
+
+	    /**
+	     * انتخاب یک محتوی
+	     * 
+	     * @param content
+	     * @returns
+	     */
+	    function select(content) {
+		$scope.content = content;
+	    }
+
+	    /**
+	     * حذف محتوی
+	     * 
+	     * @param content
+	     * @returns
+	     */
+	    function remove(content) {
+		return content.remove()//
+		.then(function() {
+		    var index = $scope.contents.indexOf(request);
+		    if (index > -1) {
+			$scope.contents.splice(index, 1);
+		    }
+		});
+	    }
+
+	    /**
+	     * صفحه بعد را بار گزاری می‌کند.
+	     */
+	    function next() {
+		// XXX: maso, 1395: check end page
+		if (status.working || !requests.hasMore()) {
+		    return;
+		}
+		paginatorParameter.setPage(requests.next());
+		find();
+	    }
+
+	    // Parameters
+	    $scope.status = status; // loading state
+	    $scope.contents = []; // contents
+	    // functions
+	    $scope.search = search;
+	    $scope.date = date;
+	    $scope.mimetype = mimetype;
+	    $scope.upload = upload;
+	    $scope.select = select;
+	    $scope.remove = remove;
+	    $scope.next = next;
+
+	    // init
+	    find();
+
+	});
 
 /* jslint todo: true */
 /* jslint xxx: true */
@@ -356,7 +450,7 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc controller
- * @name ActionCtrl
+ * @name LayoutSettingsCtrl
  * @memberof ngMaterialWeburger
  * @description کنترلر یک عمل برای مدیریت و ویرایش آن ایجاد شده است. این کنترل
  *              در دیالوگ و یا نمایش‌های دیگر کاربرد دارد.
@@ -365,139 +459,55 @@ angular.module('ngMaterialWeburger')
  * می‌کند.
  */
 .controller('LayoutSettingsCtrl', function($scope, $settings) {
-	var scope = $scope;
+    var scope = $scope;
 
-	scope.directions = [ {
-		title : 'row',
-		icon : 'view_column',
-		value : 'row'
-	}, {
-		title : 'column',
-		icon : 'view_agenda',
-		value : 'column'
-	} ];
+    scope.directions = [ {
+	title : 'row',
+	icon : 'view_column',
+	value : 'row'
+    }, {
+	title : 'column',
+	icon : 'view_agenda',
+	value : 'column'
+    } ];
 
-	scope.directionAlignments = [ {
-		title : 'none',
-		value : 'none'
-	}, {
-		title : 'start',
-		value : 'start'
-	}, {
-		title : 'center',
-		value : 'center'
-	}, {
-		title : 'end',
-		value : 'end'
-	}, {
-		title : 'space-around',
-		value : 'space-around'
-	}, {
-		title : 'space-between',
-		value : 'space-between'
-	} ];
+    scope.directionAlignments = [ {
+	title : 'none',
+	value : 'none'
+    }, {
+	title : 'start',
+	value : 'start'
+    }, {
+	title : 'center',
+	value : 'center'
+    }, {
+	title : 'end',
+	value : 'end'
+    }, {
+	title : 'space-around',
+	value : 'space-around'
+    }, {
+	title : 'space-between',
+	value : 'space-between'
+    } ];
 
-	scope.perpendicularAlignments = [ {
-		title : 'none',
-		value : 'none'
-	}, {
-		title : 'start',
-		value : 'start'
-	}, {
-		title : 'center',
-		value : 'center'
-	}, {
-		title : 'end',
-		value : 'end'
-	}, {
-		title : 'stretch',
-		value : 'stretch'
-	}, ]
+    scope.perpendicularAlignments = [ {
+	title : 'none',
+	value : 'none'
+    }, {
+	title : 'start',
+	value : 'start'
+    }, {
+	title : 'center',
+	value : 'center'
+    }, {
+	title : 'end',
+	value : 'end'
+    }, {
+	title : 'stretch',
+	value : 'stretch'
+    }, ]
 });
-
-'use strict';
-
-angular.module('ngMaterialWeburger')
-/**
- * @ngdoc function
- * @name ngMaterialWeburger.controller:BordersettingCtrl
- * @description # BordersettingCtrl Controller of the ngMaterialWeburger
- */
-.controller(
-		'OldBackgroundSettingCtrl',
-		function($scope) {
-			var scope = $scope;
-			var model = $scope.mdeModel;
-
-
-			scope.types = [ {
-				title : 'None',
-				value : 'none'
-			}, {
-				title : 'Color',
-				value : 'color'
-			}];
-
-		});
-
-'use strict';
-
-angular.module('ngMaterialWeburger')
-/**
- * @ngdoc function
- * @name ngMaterialWeburger.controller:BordersettingCtrl
- * @description # BordersettingCtrl Controller of the ngMaterialWeburger
- */
-.controller(
-		'OldBorderSettingCtrl',
-		function($scope) {
-			var scope = $scope;
-			var model = $scope.mdeModel;
-
-			function update() {
-				var style = scope.mdeModel.style;
-				var meta = scope.mdeModel.style.borderMeta;
-				if (meta.type === 'line') {
-					style.borderRadius = meta.ctl + '% ' + meta.ctr + '% '
-							+ meta.cbl + '% ' + meta.cbr + '%';
-					style.border = meta.w + 'px ' + meta.s + ' ' + meta.c;
-					return;
-				}
-				// none
-				meta.type = style.borderRadius = style.border = 'none';
-			}
-
-			scope.$watch('mdeModel.style.borderMeta', function(newValue,
-					oldValue) {
-				var meta = model.style.borderMeta;
-				if (oldValue.ca && oldValue.ca !== newValue.ca) {
-					meta.ctl = meta.ca;
-					meta.ctr = meta.ca;
-					meta.cbl = meta.ca;
-					meta.cbr = meta.ca;
-				}
-				update();
-			}, true);
-
-			scope.styles = [ {
-				title : 'Solid',
-				value : 'solid'
-			}, {
-				title : 'Dotted',
-				value : 'dotted'
-			}, {
-				title : 'Dashed',
-				value : 'dashed'
-			} ];
-
-			if (!scope.mdeModel.style) {
-				scope.mdeModel.style = {};
-			}
-			if (!scope.mdeModel.style.borderMeta) {
-				scope.mdeModel.style.borderMeta = {};
-			}
-			update();
-		});
 
 /**
  * Created by mgh on 8/4/16.
@@ -600,7 +610,7 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc controller
- * @name ActionCtrl
+ * @name SettingsCtrl
  * @memberof ngMaterialWeburger
  * @description کنترلر یک عمل برای مدیریت و ویرایش آن ایجاد شده است. این کنترل
  *              در دیالوگ و یا نمایش‌های دیگر کاربرد دارد.
@@ -1298,6 +1308,38 @@ angular.module('ngMaterialWeburger')
 'use strict';
 
 angular.module('ngMaterialWeburger')
+
+/**
+ * @ngdoc directive
+ * @name wbInfinateScroll
+ * @description
+ * 
+ *  # wbInfinateScroll
+ */
+.directive('wbInfinateScroll', function() {
+    return {
+	restrict : 'A',
+	// require : '^ddScroll',
+	scope : {
+	    loadPage : '=wbInfinateScroll'
+	},
+	link : function(scope, elem, attrs) {
+	    elem.on('scroll', function(evt) {
+		var raw = elem[0];
+		if (raw.scrollTop + raw.offsetHeight == raw.scrollHeight) {
+		    scope.loadPage();
+		}
+	    });
+	}
+    };
+});
+
+/* jslint todo: true */
+/* jslint xxx: true */
+/* jshint -W100 */
+'use strict';
+
+angular.module('ngMaterialWeburger')
 /**
  * @ngdoc directive
  * @name donateMainApp.directive:mdeLinkList
@@ -1927,7 +1969,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   'use strict';
 
   $templateCache.put('views/dialogs/wb-action.html',
-    "<md-dialog ng-controller=ActionCtrl aria-label=\"edit action dialog\" ng-cloak>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Action</h2> <span flex></span> <md-button class=md-icon-button ng-click=answer(mdeModel)> <md-icon aria-label=\"Close dialog\">done</md-icon> </md-button> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar>    <md-dialog-content> <div layout=column class=md-dialog-content> <mde-iconfont-choise mde-model=model.icon mde-list-url=styles/fonts/codepoints.json mde-font-set=material-icons> </mde-iconfont-choise> <md-input-container> <label translate>Label</label> <input ng-model=mdeModel.label> </md-input-container> <md-input-container> <label translate>Text</label> <input ng-model=mdeModel.text> </md-input-container>  <md-input-container> <label>Module type</label> <md-select ng-model=mdeModel.type> <md-option ng-repeat=\"type in types\" value={{type.key}}> <md-icon>{{type.icon}}</md-icon> {{type.label}} </md-option> </md-select> </md-input-container> <md-input-container> <label translate>Value</label> <input ng-model=mdeModel.value> </md-input-container> <md-checkbox ng-model=mdeModel.primary aria-label=primary> Primary action </md-checkbox> <md-checkbox ng-model=mdeModel.accent aria-label=accent> Accent action </md-checkbox> </div> </md-dialog-content> </md-dialog>"
+    "<md-dialog ng-controller=WbActionCtrl aria-label=\"edit action dialog\" ng-cloak>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Action</h2> <span flex></span> <md-button class=md-icon-button ng-click=answer(mdeModel)> <md-icon aria-label=\"Close dialog\">done</md-icon> </md-button> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar>    <md-dialog-content> <div layout=column class=md-dialog-content> <mde-iconfont-choise mde-model=model.icon mde-list-url=styles/fonts/codepoints.json mde-font-set=material-icons> </mde-iconfont-choise> <md-input-container> <label translate>Label</label> <input ng-model=mdeModel.label> </md-input-container> <md-input-container> <label translate>Text</label> <input ng-model=mdeModel.text> </md-input-container>  <md-input-container> <label>Module type</label> <md-select ng-model=mdeModel.type> <md-option ng-repeat=\"type in types\" value={{type.key}}> <md-icon>{{type.icon}}</md-icon> {{type.label}} </md-option> </md-select> </md-input-container> <md-input-container> <label translate>Value</label> <input ng-model=mdeModel.value> </md-input-container> <md-checkbox ng-model=mdeModel.primary aria-label=primary> Primary action </md-checkbox> <md-checkbox ng-model=mdeModel.accent aria-label=accent> Accent action </md-checkbox> </div> </md-dialog-content> </md-dialog>"
   );
 
 
@@ -1950,7 +1992,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/dialogs/wb-selectcontent.html',
-    " <md-dialog aria-label=\"Select media\" ng-controller=MdeCmsCtrl ng-cloak> <form ng-submit=answer(content)>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Media select</h2> <span flex></span> <md-button class=md-icon-button ng-click=answer(content)> <md-icon aria-label=\"Close dialog\">done</md-icon> </md-button> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <div class=md-dialog-content layout=column>  <div ng-include=\"'views/partials/mdecontentexplorer.html'\"></div> </div> </md-dialog-content> </form> </md-dialog>"
+    " <md-dialog aria-label=\"Select media\" ng-controller=WbCmsCtrl ng-cloak> <form ng-submit=answer(content)>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Media select</h2> <span flex></span> <md-button class=md-icon-button ng-click=answer(content)> <md-icon aria-label=\"Close dialog\">done</md-icon> </md-button> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <div class=md-dialog-content layout=column>  <div layout=row> <div layout=column flex> <div ng-repeat=\"content in contents\" ng-click=select(content) layout-padding> {{content.id}}: {{content.title}} </div> </div> <div flex=40> <div> {{content.id}}:{{content.title}} <img alt=\"No priview\" src={{content.link}} width=500> </div> </div> <div> <input onchange=angular.element(this).scope().upload(this.files[0]) type=\"file\"> </div> </div> </div> </md-dialog-content> </form> </md-dialog>"
   );
 
 
@@ -1965,7 +2007,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/dialogs/wb-social.html',
-    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <form ng-submit=answer(mdeModel)>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Social</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar>    <md-dialog-content> <div ng-controller=ActionCtrl layout=column class=md-dialog-content> <mde-iconfont-choise mde-model=mdeModel.icon mde-list-url=styles/fonts/social-codepoints.json mde-font-set=mono-social-icons> </mde-iconfont-choise>              <md-input-container> <label translate>Link</label> <input ng-model=mdeModel.action.value> </md-input-container> </div> </md-dialog-content> <input type=submit hidden> </form> </md-dialog>"
+    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <form ng-submit=answer(mdeModel)>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Social</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar>    <md-dialog-content> <div ng-controller=WbActionCtrl layout=column class=md-dialog-content> <mde-iconfont-choise mde-model=mdeModel.icon mde-list-url=styles/fonts/social-codepoints.json mde-font-set=mono-social-icons> </mde-iconfont-choise>              <md-input-container> <label translate>Link</label> <input ng-model=mdeModel.action.value> </md-input-container> </div> </md-dialog-content> <input type=submit hidden> </form> </md-dialog>"
   );
 
 
@@ -2115,11 +2157,6 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   );
 
 
-  $templateCache.put('views/partials/wb-contentexplorer.html',
-    "<div layout=row> <div layout=column flex> <div ng-repeat=\"content in contents\" ng-click=select(content) layout-padding> {{content.id}}: {{content.title}} </div> </div> <div flex=40> <div> {{content.id}}:{{content.title}} <img alt=\"No priview\" src={{content.link}} width=500> </div> </div> <div> <input onchange=angular.element(this).scope().upload(this.files[0]) type=\"file\"> </div> </div>"
-  );
-
-
   $templateCache.put('views/partials/wb-widgetheaderactions.html',
     "<span translate> widget</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=removeWidget() ng-show=mdeParent&&removeWidget> <md-icon class=mde-icon-mini>delete</md-icon> </md-button>"
   );
@@ -2154,7 +2191,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
     "            'border-right-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.right,\n" +
     "            'border-top-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.top,\n" +
     "            'border-bottom-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.bottom,\n" +
-    "            }\" layout=row layout-align=\"center center\"> <p>item</p> </div> </div> </div> <div ng-controller=BorderSettingCtrl class=setting-panel layout=column layout-gt-sm=row>  <md-list> <md-subheader>Corner Radius</md-subheader> <md-divider></md-divider> <md-checkbox ng-model=wbModel.style.borderRadius.uniform>All equal</md-checkbox> <div layout=row class=wb-flex-align-items-center ng-show=wbModel.style.borderRadius.uniform> <span>Radius</span> <md-slider flex min=0 max=100 ng-model=wbModel.style.borderRadius.all> </md-slider> <md-input-container> <input style=\"width: 50px\" flex type=number ng-model=wbModel.style.borderRadius.all> </md-input-container> </div>         <div layout=row class=wb-flex-align-items-center ng-hide=wbModel.style.borderRadius.uniform> <span>Left</span> <md-slider flex min=0 max=100 ng-model=wbModel.style.borderRadius.topLeft> </md-slider> <md-input-container> <input style=\"width: 50px\" flex type=number ng-model=wbModel.style.borderRadius.topLeft> </md-input-container> </div> <div layout=row class=wb-flex-align-items-center ng-hide=wbModel.style.borderRadius.uniform> <span>Right</span> <md-slider flex min=0 max=100 ng-model=wbModel.style.borderRadius.topRight> </md-slider> <md-input-container> <input style=\"width: 50px\" flex type=number ng-model=wbModel.style.borderRadius.topRight> </md-input-container> </div> <div layout=row class=wb-flex-align-items-center ng-hide=wbModel.style.borderRadius.uniform> <span>Top</span> <md-slider flex min=0 max=100 ng-model=wbModel.style.borderRadius.bottomLeft> </md-slider> <md-input-container> <input style=\"width: 50px\" flex type=number ng-model=wbModel.style.borderRadius.bottomLeft> </md-input-container> </div> <div layout=row class=wb-flex-align-items-center ng-hide=wbModel.style.borderRadius.uniform> <span>Bottom</span> <md-slider flex min=0 max=100 ng-model=wbModel.style.borderRadius.bottomRight> </md-slider> <md-input-container> <input style=\"width: 50px\" flex type=number ng-model=wbModel.style.borderRadius.bottomRight> </md-input-container> </div> </md-list>  <md-list> <md-subheader>Style/Color/Thickness</md-subheader> <md-divider></md-divider> <md-checkbox ng-model=wbModel.style.borderStyleColorWidth.uniform>All equal</md-checkbox> <div layout=row class=wb-flex-align-items-start ng-show=wbModel.style.borderStyleColorWidth.uniform> <md-input-container flex=1> <label>Style</label> <md-select ng-model=wbModel.style.borderStyle.all> <md-option ng-repeat=\"style in styles\" value={{style.value}}> {{style.title}} </md-option> </md-select> </md-input-container> <md-input-container flex=0 style=\"min-width: 100px\"> <label>Thickness</label> <input flex type=number ng-model=wbModel.style.borderWidth.all> </md-input-container> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false label=Color icon=brush ng-model=wbModel.style.borderColor.all> </md-color-picker> </div>  <div layout=row class=wb-flex-align-items-start ng-hide=wbModel.style.borderStyleColorWidth.uniform> <span>Left: </span> <md-input-container flex=1> <label>Style</label> <md-select ng-model=wbModel.style.borderStyle.left> <md-option ng-repeat=\"style in styles\" value={{style.value}}> {{style.title}} </md-option> </md-select> </md-input-container> <md-input-container flex=0 style=\"min-width: 100px\"> <label>Thickness</label> <input flex type=number ng-model=wbModel.style.borderWidth.left> </md-input-container> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false label=Color icon=brush ng-model=wbModel.style.borderColor.left> </md-color-picker> </div>  <div layout=row class=wb-flex-align-items-start ng-hide=wbModel.style.borderStyleColorWidth.uniform> <span>Right: </span> <md-input-container flex=1> <label>Style</label> <md-select ng-model=wbModel.style.borderStyle.right> <md-option ng-repeat=\"style in styles\" value={{style.value}}> {{style.title}} </md-option> </md-select> </md-input-container> <md-input-container flex=0 style=\"min-width: 100px\"> <label>Thickness</label> <input flex type=number ng-model=wbModel.style.borderWidth.right> </md-input-container> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false label=Color icon=brush ng-model=wbModel.style.borderColor.right> </md-color-picker> </div>  <div layout=row class=wb-flex-align-items-start ng-hide=wbModel.style.borderStyleColorWidth.uniform> <span>Top: </span> <md-input-container flex=1> <label>Style</label> <md-select ng-model=wbModel.style.borderStyle.top> <md-option ng-repeat=\"style in styles\" value={{style.value}}> {{style.title}} </md-option> </md-select> </md-input-container> <md-input-container flex=0 style=\"min-width: 100px\"> <label>Thickness</label> <input flex type=number ng-model=wbModel.style.borderWidth.top> </md-input-container> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false label=Color icon=brush ng-model=wbModel.style.borderColor.top> </md-color-picker> </div>  <div layout=row class=wb-flex-align-items-start ng-hide=wbModel.style.borderStyleColorWidth.uniform> <span>Down: </span> <md-input-container flex=1> <label>Style</label> <md-select ng-model=wbModel.style.borderStyle.bottom> <md-option ng-repeat=\"style in styles\" value={{style.value}}> {{style.title}} </md-option> </md-select> </md-input-container> <md-input-container flex=0 style=\"min-width: 100px\"> <label>Thickness</label> <input flex type=number ng-model=wbModel.style.borderWidth.bottom> </md-input-container> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false label=Color icon=brush ng-model=wbModel.style.borderColor.bottom> </md-color-picker> </div> </md-list> </div> </div>"
+    "            }\" layout=row layout-align=\"center center\"> <p>item</p> </div> </div> </div> <div ng-controller=WbBorderSettingCtrl class=setting-panel layout=column layout-gt-sm=row>  <md-list> <md-subheader>Corner Radius</md-subheader> <md-divider></md-divider> <md-checkbox ng-model=wbModel.style.borderRadius.uniform>All equal</md-checkbox> <div layout=row class=wb-flex-align-items-center ng-show=wbModel.style.borderRadius.uniform> <span>Radius</span> <md-slider flex min=0 max=100 ng-model=wbModel.style.borderRadius.all> </md-slider> <md-input-container> <input style=\"width: 50px\" flex type=number ng-model=wbModel.style.borderRadius.all> </md-input-container> </div>         <div layout=row class=wb-flex-align-items-center ng-hide=wbModel.style.borderRadius.uniform> <span>Left</span> <md-slider flex min=0 max=100 ng-model=wbModel.style.borderRadius.topLeft> </md-slider> <md-input-container> <input style=\"width: 50px\" flex type=number ng-model=wbModel.style.borderRadius.topLeft> </md-input-container> </div> <div layout=row class=wb-flex-align-items-center ng-hide=wbModel.style.borderRadius.uniform> <span>Right</span> <md-slider flex min=0 max=100 ng-model=wbModel.style.borderRadius.topRight> </md-slider> <md-input-container> <input style=\"width: 50px\" flex type=number ng-model=wbModel.style.borderRadius.topRight> </md-input-container> </div> <div layout=row class=wb-flex-align-items-center ng-hide=wbModel.style.borderRadius.uniform> <span>Top</span> <md-slider flex min=0 max=100 ng-model=wbModel.style.borderRadius.bottomLeft> </md-slider> <md-input-container> <input style=\"width: 50px\" flex type=number ng-model=wbModel.style.borderRadius.bottomLeft> </md-input-container> </div> <div layout=row class=wb-flex-align-items-center ng-hide=wbModel.style.borderRadius.uniform> <span>Bottom</span> <md-slider flex min=0 max=100 ng-model=wbModel.style.borderRadius.bottomRight> </md-slider> <md-input-container> <input style=\"width: 50px\" flex type=number ng-model=wbModel.style.borderRadius.bottomRight> </md-input-container> </div> </md-list>  <md-list> <md-subheader>Style/Color/Thickness</md-subheader> <md-divider></md-divider> <md-checkbox ng-model=wbModel.style.borderStyleColorWidth.uniform>All equal</md-checkbox> <div layout=row class=wb-flex-align-items-start ng-show=wbModel.style.borderStyleColorWidth.uniform> <md-input-container flex=1> <label>Style</label> <md-select ng-model=wbModel.style.borderStyle.all> <md-option ng-repeat=\"style in styles\" value={{style.value}}> {{style.title}} </md-option> </md-select> </md-input-container> <md-input-container flex=0 style=\"min-width: 100px\"> <label>Thickness</label> <input flex type=number ng-model=wbModel.style.borderWidth.all> </md-input-container> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false label=Color icon=brush ng-model=wbModel.style.borderColor.all> </md-color-picker> </div>  <div layout=row class=wb-flex-align-items-start ng-hide=wbModel.style.borderStyleColorWidth.uniform> <span>Left: </span> <md-input-container flex=1> <label>Style</label> <md-select ng-model=wbModel.style.borderStyle.left> <md-option ng-repeat=\"style in styles\" value={{style.value}}> {{style.title}} </md-option> </md-select> </md-input-container> <md-input-container flex=0 style=\"min-width: 100px\"> <label>Thickness</label> <input flex type=number ng-model=wbModel.style.borderWidth.left> </md-input-container> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false label=Color icon=brush ng-model=wbModel.style.borderColor.left> </md-color-picker> </div>  <div layout=row class=wb-flex-align-items-start ng-hide=wbModel.style.borderStyleColorWidth.uniform> <span>Right: </span> <md-input-container flex=1> <label>Style</label> <md-select ng-model=wbModel.style.borderStyle.right> <md-option ng-repeat=\"style in styles\" value={{style.value}}> {{style.title}} </md-option> </md-select> </md-input-container> <md-input-container flex=0 style=\"min-width: 100px\"> <label>Thickness</label> <input flex type=number ng-model=wbModel.style.borderWidth.right> </md-input-container> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false label=Color icon=brush ng-model=wbModel.style.borderColor.right> </md-color-picker> </div>  <div layout=row class=wb-flex-align-items-start ng-hide=wbModel.style.borderStyleColorWidth.uniform> <span>Top: </span> <md-input-container flex=1> <label>Style</label> <md-select ng-model=wbModel.style.borderStyle.top> <md-option ng-repeat=\"style in styles\" value={{style.value}}> {{style.title}} </md-option> </md-select> </md-input-container> <md-input-container flex=0 style=\"min-width: 100px\"> <label>Thickness</label> <input flex type=number ng-model=wbModel.style.borderWidth.top> </md-input-container> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false label=Color icon=brush ng-model=wbModel.style.borderColor.top> </md-color-picker> </div>  <div layout=row class=wb-flex-align-items-start ng-hide=wbModel.style.borderStyleColorWidth.uniform> <span>Down: </span> <md-input-container flex=1> <label>Style</label> <md-select ng-model=wbModel.style.borderStyle.bottom> <md-option ng-repeat=\"style in styles\" value={{style.value}}> {{style.title}} </md-option> </md-select> </md-input-container> <md-input-container flex=0 style=\"min-width: 100px\"> <label>Thickness</label> <input flex type=number ng-model=wbModel.style.borderWidth.bottom> </md-input-container> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false label=Color icon=brush ng-model=wbModel.style.borderColor.bottom> </md-color-picker> </div> </md-list> </div> </div>"
   );
 
 
