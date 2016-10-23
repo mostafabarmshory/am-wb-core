@@ -15,7 +15,7 @@
 		<h1 style="text-align: center;">{{mdeModel.title}}</h1>
 		<div 
 			ng-style="{'width': '100%'}"
-			ng-bind-html="mdeModel.text | unsafe">
+			ng-bind-html="mdeModel.text | wbunsafe">
 		</div>
 		<div ng-class="{'mde-rtl':mdeModel.style.rtl}" 
 			layout="column" layout-align="center center" 
@@ -43,7 +43,7 @@
 				</h3>
 				<div ng-style="{'color': mdeModel.style.color}"
 					ng-class="{'mde-rtl':mdeModel.style.rtl}"
-					ng-bind-html="feature.text | unsafe"></div>
+					ng-bind-html="feature.text | wbunsafe"></div>
 			</div>
 		</div>
 	</div>

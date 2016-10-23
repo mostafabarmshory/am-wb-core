@@ -7,11 +7,11 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc filter
- * @name digidociMainApp.filter:unsafe
+ * @name wbunsafe
  * @function
  * @description # unsafe Filter in the digidociMainApp.
  */
-.filter('unsafe', function($sce) {
+.filter('wbunsafe', function($sce) {
 	return function(val) {
 		return $sce.trustAsHtml(val);
 	};

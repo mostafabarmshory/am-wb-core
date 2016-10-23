@@ -16,7 +16,7 @@
         	layout="column" layout-align="start center"
             ng-class="{'mde-rtl':mdeModel.style.rtl}">
             <h3>{{mdeModel.title}}</h3>
-            <div ng-bind-html="mdeModel.text|unsafe"></div>
+            <div ng-bind-html="mdeModel.text|wbunsafe"></div>
         </div>
     </div>
 </div>

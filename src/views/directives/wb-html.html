@@ -8,7 +8,7 @@
 
     <!-- متن اصلی صفحه اینجا ایجاد می‌شود. -->
     <div
-            ng-bind-html="wbModel.text | unsafe"
+            ng-bind-html="wbModel.text | wbunsafe"
             ng-style="{
             'margin-left':wbModel.style.marginLeft,
             'margin-right':wbModel.style.marginRight,
