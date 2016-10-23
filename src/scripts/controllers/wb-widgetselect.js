@@ -7,14 +7,14 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc controller
- * @name ContentCtrl
+ * @name WbWidgetSelectCtrl
  * @memberof ngMaterialWeburger
  * @description مدیریتی برای انتخاب ویجت‌های جدید
  * 
  * در این کنترل امکاناتی فراهم شده که کاربر بتواند از میان ویجت‌های موجودی یکی
  * را انتخاب کند.
  */
-.controller('ContentSelectCtrl', function($scope, $widget, PaginatorParameter) {
+.controller('WbWidgetSelectCtrl', function($scope, $widget, PaginatorParameter) {
 	var scope = $scope;
 	var paginatorParameter = new PaginatorParameter();
 
@@ -37,7 +37,7 @@ angular.module('ngMaterialWeburger')
 	 * با انتخاب یک ویجت به عنوان ویجت پیش فرض می‌توان نمایش خاصی از آن را در
 	 * سیستم ایجاد کرد.
 	 * 
-	 * @memberof ContentSelectCtrl
+	 * @memberof WbWidgetSelectCtrl
 	 * @param {Widget}
 	 *            widget ویجت پیش فرض را تعیین می‌کند
 	 * @returns
@@ -50,7 +50,7 @@ angular.module('ngMaterialWeburger')
 	/**
 	 * ویجت را به عنوان ویجت انتخاب شده تعیین می‌کندs 
 	 * 
-	 * @memberof ContentSelectCtrl
+	 * @memberof WbWidgetSelectCtrl
 	 * @param widget
 	 * @returns
 	 */

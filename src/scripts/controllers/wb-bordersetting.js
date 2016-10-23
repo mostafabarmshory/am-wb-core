@@ -3,10 +3,10 @@
 angular.module('ngMaterialWeburger')
 /**
  * @ngdoc function
- * @name ngMaterialWeburger.controller:BordersettingCtrl
- * @description # BordersettingCtrl Controller of the ngMaterialWeburger
+ * @name WbBorderSettingCtrl
+ * @description # WbBorderSettingCtrl Controller of the ngMaterialWeburger
  */
-.controller('BorderSettingCtrl', function($scope) {
+.controller('WbBorderSettingCtrl', function($scope) {
     var scope = $scope;
     var model = $scope.mdeModel;
 

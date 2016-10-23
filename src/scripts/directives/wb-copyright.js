@@ -32,7 +32,7 @@ angular.module('ngMaterialWeburger')
 
 	    function settings() {
 		return $mdDialog.show({
-		    controller : 'DialogsCtrl',
+		    controller : 'WbDialogsCtrl',
 		    templateUrl : 'views/dialogs/wb-settings.html',
 		    parent : angular.element(document.body),
 		    clickOutsideToClose : true,

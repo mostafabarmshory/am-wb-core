@@ -11,13 +11,13 @@
     'color': mdeModel.style.color,
     'width': mdeModel.style.width,
     'height': mdeModel.style.height}"
-         ng-html-bind="mdeModel.body|unsafe"
+         ng-html-bind="mdeModel.body|wbunsafe"
          ng-class="{'mde-rtl':mdeModel.style.rtl}">
         <ul>
             <li ng-repeat="item in mdeModel.list">
                 <md-icon>{{item.icon}}</md-icon>
                 {{item.title}}
-                <p ng-bind-html="item.text | unsafe"></p>
+                <p ng-bind-html="item.text | wbunsafe"></p>
             </li>
         </ul>
     </div>

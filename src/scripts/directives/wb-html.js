@@ -30,7 +30,7 @@ angular.module('ngMaterialWeburger')
 			elem.css('flex-grow', newValue);
 		    });
 		},
-		controller : function($scope, $element, $mdDialog) {
+		controller : function($scope, $element, $settings) {
 		    var scope = $scope;
 		    var model = $scope.wbModel;
 		    var parentModel = $scope.wbParent;
@@ -42,20 +42,13 @@ angular.module('ngMaterialWeburger')
 		    }
 
 		    function settings() {
-			return $mdDialog.show({
-			    controller : 'SettingDialogsCtrl',
-			    templateUrl : 'views/dialogs/wb-settings.html',
-			    parent : angular.element(document.body),
-			    clickOutsideToClose : true,
-			    fullscreen : true,
-			    locals : {
-				wbModel : model,
-				wbParent : parentModel,
-				style : {
-				    pages : [ 'text', 'selfLayout', 'border',
-					    'background', 'marginPadding',
-					    'minMaxSize' ]
-				}
+			return $settings.load({
+			    wbModel : model,
+			    wbParent : parentModel,
+			    style : {
+				pages : [ 'text', 'selfLayout', 'border',
+					'background', 'marginPadding',
+					'minMaxSize' ]
 			    }
 			});
 		    }
