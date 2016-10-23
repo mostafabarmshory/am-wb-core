@@ -7,7 +7,7 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc controller
- * @name SettingsCtrl
+ * @name WbSettingsCtrl
  * @memberof ngMaterialWeburger
  * @description کنترلر یک عمل برای مدیریت و ویرایش آن ایجاد شده است. این کنترل
  *              در دیالوگ و یا نمایش‌های دیگر کاربرد دارد.
@@ -15,7 +15,7 @@ angular.module('ngMaterialWeburger')
  * این کنترل علاوه بر امکانات ویرایشی، داده‌های اولیه هم برای نمایش فراهم
  * می‌کند.
  */
-.controller('SettingsCtrl', function($scope, $settings) {
+.controller('WbSettingsCtrl', function($scope, $settings) {
 	var scope = $scope;
 
 	function loadPages() {

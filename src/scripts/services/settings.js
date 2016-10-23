@@ -95,7 +95,7 @@ angular.module('ngMaterialWeburger')
      */
     function loadSetting(locals) {
 	return $mdDialog.show({
-	    controller : 'SettingDialogsCtrl',
+	    controller : 'WbSettingDialogsCtrl',
 	    templateUrl : 'views/dialogs/wb-settings.html',
 	    parent : angular.element(document.body),
 	    clickOutsideToClose : true,
