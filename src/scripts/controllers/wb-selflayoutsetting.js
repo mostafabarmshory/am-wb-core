@@ -14,18 +14,18 @@ angular.module('ngMaterialWeburger')
 
     scope.flexAlignItem = [ {
 	title : 'auto',
-	value : 'mde-flex-item-auto'
+	value : 'wb-flex-item-auto'
     }, {
 	title : 'Start',
-	value : 'mde-flex-item-start'
+	value : 'wb-flex-item-start'
     }, {
 	title : 'End',
-	value : 'mde-flex-item-end'
+	value : 'wb-flex-item-end'
     }, {
 	title : 'Center',
-	value : 'mde-flex-item-center'
+	value : 'wb-flex-item-center'
     }, {
 	title : 'stretch',
-	value : 'mde-flex-item-stretch'
+	value : 'wb-flex-item-stretch'
     } ];
 });

@@ -15,41 +15,41 @@ angular.module('ngMaterialWeburger')
     scope.flexDirection = [ {
 	title : 'row',
 	icon : 'column',
-	value : 'mde-flex-row'
+	value : 'wb-flex-row'
     }, {
 	title : 'column',
 	icon : 'view_agenda',
-	value : 'mde-flex-column'
+	value : 'wb-flex-column'
     } ];
 
     scope.justifyContent = [ {
 	title : 'Start',
-	value : 'mde-flex-justify-content-start'
+	value : 'wb-flex-justify-content-start'
     }, {
 	title : 'End',
-	value : 'mde-flex-justify-content-end'
+	value : 'wb-flex-justify-content-end'
     }, {
 	title : 'Center',
-	value : 'mde-flex-justify-content-center'
+	value : 'wb-flex-justify-content-center'
     }, {
 	title : 'Space Around',
-	value : 'mde-flex-justify-content-space-around'
+	value : 'wb-flex-justify-content-space-around'
     }, {
 	title : 'Space Between',
-	value : 'mde-flex-justify-content-space-between'
+	value : 'wb-flex-justify-content-space-between'
     } ];
 
     scope.alignItems = [ {
 	title : 'Stretch',
-	value : 'mde-flex-align-items-stretch'
+	value : 'wb-flex-align-items-stretch'
     }, {
 	title : 'Start',
-	value : 'mde-flex-align-items-start'
+	value : 'wb-flex-align-items-start'
     }, {
 	title : 'End',
-	value : 'mde-flex-align-items-end'
+	value : 'wb-flex-align-items-end'
     }, {
 	title : 'Center',
-	value : 'mde-flex-align-items-center'
+	value : 'wb-flex-align-items-center'
     } ]
 });
