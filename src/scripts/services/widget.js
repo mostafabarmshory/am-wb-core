@@ -98,7 +98,7 @@ angular.module('ngMaterialWeburger')
 			link : 'link',
 		},
 		HtmlText : {
-			dom : '<wb-html ng-class="[mdeModel.style.flexAlignItem]" ></wb-html>',
+			dom : '<wb-html ng-class="[wbModel.style.flexAlignItem]" ></wb-html>',
 			label : 'HTML text',
 			description : 'An HTML block text.',
 			image : 'images/wb/html.svg',
