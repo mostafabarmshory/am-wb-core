@@ -18,5 +18,5 @@ angular
         'pascalprecht.translate',//
         'pluf',//
         'ngMaterialWysiwyg',
-        'ui.tinymce'
+//        'ui.tinymce'
     ]);

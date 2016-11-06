@@ -18,7 +18,7 @@ angular
         'pascalprecht.translate',//
         'pluf',//
         'ngMaterialWysiwyg',
-        'ui.tinymce'
+//        'ui.tinymce'
     ]);
 
 /* jslint todo: true */
@@ -2221,8 +2221,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/settings/wb-text.html',
-    " <div ng-controller=WbTextSettingsCtrl layout=column>  <textarea ui-tinymce=tinymceOptions ng-model=wbModel.text style=\"width: 100%\">\n" +
-    "\t</textarea> </div>"
+    " <md-wysiwyg flex textarea-id=question textarea-class=form-control textarea-height=80px textarea-name=textareaQuestion textarea-required ng-model=wbModel.text enable-bootstrap-title=true textarea-menu=yourModel.customMenu> </md-wysiwyg>"
   );
 
 }]);
