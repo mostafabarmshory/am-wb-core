@@ -17,7 +17,7 @@ angular
         'ngMaterial',//
         'pascalprecht.translate',//
         'pluf',//
-        'ngMaterialWysiwyg',
+//        'ngMaterialWysiwyg',
         'ui.tinymce'
     ]);
 
@@ -2221,8 +2221,8 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/settings/wb-text.html',
-    " <div ng-controller=WbTextSettingsCtrl layout=column>  <textarea ui-tinymce=tinymceOptions ng-model=wbModel.text style=\"width: 100%\">\n" +
-    "\t</textarea> </div>"
+    " <textarea ng-controller=WbTextSettingsCtrl ui-tinymce=tinymceOptions ng-model=wbModel.text flex>\n" +
+    "</textarea>            "
   );
 
 }]);

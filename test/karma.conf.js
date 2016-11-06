@@ -31,7 +31,6 @@ module.exports = function(config) {
       'bower_components/angular-translate/angular-translate.js',
       'bower_components/tinycolor/tinycolor.js',
       'bower_components/md-color-picker/dist/mdColorPicker.min.js',
-      'bower_components/angular-material-wysiwyg/dist/angular-material-wysiwyg.js',
       'bower_components/tinymce/tinymce.js',
       'bower_components/angular-ui-tinymce/src/tinymce.js',
       'bower_components/angular-mocks/angular-mocks.js',
