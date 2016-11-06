@@ -6,25 +6,22 @@ set text using html text editor.
 created by mgh.
 -->
 <!-- using tinymce wysiwyg editor -->
-<!-- <div -->
-<!-- 	ng-controller="WbTextSettingsCtrl" -->
-<!-- 	layout="column"> -->
-<!-- 	<textarea -->
-<!-- 		ui-tinymce="tinymceOptions" -->
-<!-- 		ng-model="wbModel.text" -->
-<!-- 		style="width: 100%"> -->
-<!-- 	</textarea> -->
-<!-- </div> -->
+<textarea
+	ng-controller="WbTextSettingsCtrl"
+	ui-tinymce="tinymceOptions"
+	ng-model="wbModel.text"
+	flex>
+</textarea>
 
 <!-- using angular material wysiwyg editor -->
-<md-wysiwyg
-	flex
-	textarea-id="question"
-	textarea-class="form-control"
-	textarea-height="80px"
-	textarea-name="textareaQuestion"
-	textarea-required
-	ng-model="wbModel.text"
-	enable-bootstrap-title="true"
-	textarea-menu="yourModel.customMenu">
-</md-wysiwyg>
+<!-- <md-wysiwyg -->
+<!-- 	flex -->
+<!-- 	textarea-id="question" -->
+<!-- 	textarea-class="form-control" -->
+<!-- 	textarea-height="80px" -->
+<!-- 	textarea-name="textareaQuestion" -->
+<!-- 	textarea-required -->
+<!-- 	ng-model="wbModel.text" -->
+<!-- 	enable-bootstrap-title="true" -->
+<!-- 	textarea-menu="yourModel.customMenu"> -->
+<!-- </md-wysiwyg> -->

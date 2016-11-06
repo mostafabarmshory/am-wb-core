@@ -17,8 +17,8 @@ angular
         'ngMaterial',//
         'pascalprecht.translate',//
         'pluf',//
-        'ngMaterialWysiwyg',
-//        'ui.tinymce'
+//        'ngMaterialWysiwyg',
+        'ui.tinymce'
     ]);
 
 /* jslint todo: true */
@@ -2221,7 +2221,8 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/settings/wb-text.html',
-    " <md-wysiwyg flex textarea-id=question textarea-class=form-control textarea-height=80px textarea-name=textareaQuestion textarea-required ng-model=wbModel.text enable-bootstrap-title=true textarea-menu=yourModel.customMenu> </md-wysiwyg>"
+    " <textarea ng-controller=WbTextSettingsCtrl ui-tinymce=tinymceOptions ng-model=wbModel.text flex>\n" +
+    "</textarea>            "
   );
 
 }]);

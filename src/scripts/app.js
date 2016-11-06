@@ -17,6 +17,6 @@ angular
         'ngMaterial',//
         'pascalprecht.translate',//
         'pluf',//
-        'ngMaterialWysiwyg',
-//        'ui.tinymce'
+//        'ngMaterialWysiwyg',
+        'ui.tinymce'
     ]);

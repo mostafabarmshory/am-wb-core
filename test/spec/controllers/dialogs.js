@@ -22,7 +22,7 @@ describe('Controller: WbDialogsCtrl', function() {
 	});
     }));
 
-    it('should attach a list of awesomeThings to the scope', function() {
-	expect(WbDialogsCtrl).not.toBe(null);
+    it('should not be null', function() {
+	expect(!!WbDialogsCtrl).toBe(true);
     });
 });
