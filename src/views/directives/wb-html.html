@@ -1,30 +1,21 @@
-<!-- <wb-widget> -->
-<!-- 	<div -->
-<!-- 		wb-margin="wbModel.style" -->
-<!-- 		wb-padding="wbModel.style" -->
-<!-- 		wb-size="wbModel.style" -->
-<!-- 		wb-background="wbModel.style" -->
-<!-- 		wb-border="wbModel.style" -->
-<!-- 	    ng-bind-html="wbModel.text | wbunsafe"> -->
-<!-- 	</div> -->
-<!-- </wb-widget> -->
+<wb-widget>
+	<div
+		wb-margin="wbModel.style"
+		wb-padding="wbModel.style"
+		wb-size="wbModel.style"
+		wb-background="wbModel.style"
+		wb-border="wbModel.style"
+	    ng-bind-html="wbModel.text | wbunsafe">
+	</div>
+</wb-widget>
 
 
-<div ng-class="{'wb-widget': wbEditable, 'fill':wbModel.style.fill}">
-    <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
-    <div ng-show="wbEditable"
-         layout="row"
-         class="wb-widget-header"
-         ng-include="'views/partials/wb-widgetheaderactions.html'">
-    </div>
 
-    <!-- متن اصلی صفحه اینجا ایجاد می‌شود. -->
-<div
-	wb-margin="wbModel.style"
-	wb-padding="wbModel.style"
-	wb-size="wbModel.style"
-	wb-background="wbModel.style"
-	wb-border="wbModel.style"
-	ng-bind-html="wbModel.text | wbunsafe">
-</div>
-</div>
+<!-- <div -->
+<!-- 	wb-margin="wbModel.style" -->
+<!-- 	wb-padding="wbModel.style" -->
+<!-- 	wb-size="wbModel.style" -->
+<!-- 	wb-background="wbModel.style" -->
+<!-- 	wb-border="wbModel.style" -->
+<!-- 	ng-bind-html="wbModel.text | wbunsafe"> -->
+<!-- </div> -->

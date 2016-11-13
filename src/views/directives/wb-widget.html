@@ -1,0 +1,10 @@
+<div ng-class="{'wb-widget': wbEditable, 'fill':wbModel.style.fill}">
+    <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
+    <div ng-show="wbEditable"
+         layout="row"
+         class="wb-widget-header"
+         ng-include="'views/partials/wb-widgetheaderactions.html'">
+    </div>
+
+    <ng-transclude></ng-transclude>
+</div>

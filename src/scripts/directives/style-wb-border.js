@@ -6,6 +6,7 @@ angular.module('ngMaterialWeburger')
  */
 .directive("wbBorder", function() {
     return {
+	restrict : 'A',
 	link : function(scope, element, attributes) {
 	    return scope.$watch(attributes.wbMargin, function(style) {
 		if(!style){
