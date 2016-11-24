@@ -22,7 +22,7 @@ angular.module('ngMaterialWeburger')
 	link : function(scope, elem, attrs) {
 	    elem.on('scroll', function(evt) {
 		var raw = elem[0];
-		if (raw.scrollTop + raw.offsetHeight == raw.scrollHeight) {
+		if (raw.scrollTop + raw.offsetHeight  + 5 >= raw.scrollHeight) {
 		    scope.loadPage();
 		}
 	    });

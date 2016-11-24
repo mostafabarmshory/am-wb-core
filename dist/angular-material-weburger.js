@@ -661,7 +661,7 @@ angular.module('ngMaterialWeburger')
     return {
 	restrict : 'A',
 	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbMargin, function(style) {
+	    return scope.$watch(attributes.wbSize, function(style) {
 		if (!style) {
 		    return;
 		}
@@ -683,9 +683,24 @@ angular.module('ngMaterialWeburger')
     return {
 	restrict : 'A',
 	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbMargin, function(style) {
+	    return scope.$watch(attributes.wbBorder, function(style) {
 		if(!style){
 		    return;
+		}
+		if(!style.borderRadius){
+		    style.borderRadius={};
+		}
+		if(!style.borderStyleColorWidth){
+		    style.borderStyleColorWidth={};
+		}
+		if(!style.borderStyle){
+		    style.borderStyle = {};
+		}
+		if(!style.borderWidth){
+		    style.borderWidth = {};
+		}
+		if(!style.borderColor){
+		    style.borderColor = {};
 		}
 		element.css({
 	            'border-top-left-radius':(style.borderRadius.uniform) ? style.borderRadius.all : style.borderRadius.topLeft,
@@ -707,8 +722,34 @@ angular.module('ngMaterialWeburger')
 	            'border-right-color':(style.borderStyleColorWidth.uniform) ? style.borderColor.all : style.borderColor.right,
 	            'border-top-color':(style.borderStyleColorWidth.uniform) ? style.borderColor.all : style.borderColor.top,
 	            'border-bottom-color':(style.borderStyleColorWidth.uniform) ? style.borderColor.all : style.borderColor.bottom,
-	            
 	            });
+	    }, true);
+	}
+    };
+});
+'use strict';
+
+angular.module('ngMaterialWeburger')
+/**
+ * @description Apply margin into the element
+ */
+.directive("wbLayout", function() {
+    return {
+	restrict : 'A',
+	link : function(scope, element, attributes) {
+	    return scope.$watch(attributes.wbLayout, function(newValue, oldValue) {
+		if(oldValue){
+		    // Remove old class
+		    element.removeClass(oldValue.flexDirection);
+		    element.removeClass(oldValue.justifyContent);
+		    element.removeClass(oldValue.alignItems);
+		}
+		if(newValue){
+		    // Add new class
+		    element.addClass(newValue.flexDirection);
+		    element.addClass(newValue.justifyContent);
+		    element.addClass(newValue.alignItems);
+		}
 	    }, true);
 	}
     };
@@ -747,7 +788,7 @@ angular.module('ngMaterialWeburger')
     return {
 	restrict : 'A',
 	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbMargin, function(style) {
+	    return scope.$watch(attributes.wbPadding, function(style) {
 		if(!style){
 		    return;
 		}
@@ -1417,7 +1458,7 @@ angular.module('ngMaterialWeburger')
 	link : function(scope, elem, attrs) {
 	    elem.on('scroll', function(evt) {
 		var raw = elem[0];
-		if (raw.scrollTop + raw.offsetHeight == raw.scrollHeight) {
+		if (raw.scrollTop + raw.offsetHeight  + 5 >= raw.scrollHeight) {
 		    scope.loadPage();
 		}
 	    });
@@ -1439,13 +1480,90 @@ angular.module('ngMaterialWeburger')
 .directive('wbLinkList', function() {
     return {
 	restrict : 'E',
-	replace : 'true',
 	templateUrl : 'views/directives/wb-linklist.html',
-	require : '^mdeModel',
+	replase : true,
 	scope : {
-	    mdeEditable : '=?',
-	    mdeModel : '=?'
+	    wbEditable : '=?',
+	    wbModel : '=?',
+	    wbParent : '=?'
 	},
+	link : function(scope, elem, attrs) {
+//	    scope.$watch('wbModel.style.flexAlignItem', function(
+//		    newValue, oldValue) {
+//		elem.removeClass(oldValue);
+//		elem.addClass(newValue);
+//	    });
+//	    scope.$watch('wbModel.style.flexItemGrow', function(
+//		    newValue, oldValue) {
+//		elem.css('flex-grow', newValue);
+//	    });
+	},
+	controller : function($scope, $element, $settings) {
+	    var scope = $scope;
+	    var model = $scope.wbModel;
+	    var parentModel = $scope.wbParent;
+	    var ctrl = {
+		    hoveringDelBtn: false
+	    }
+
+	    function removeWidget() {
+		if (parentModel) {
+		    parentModel.removeWidget(model);
+		}
+	    }
+
+	    function settings() {
+		return $settings.load({
+		    wbModel : model,
+		    wbParent : parentModel,
+		    style : {
+			pages : [ 'text', 'pageLayout', 'selfLayout', 'border',
+				'background', 'marginPadding',
+				'minMaxSize' ]
+		    }
+		});
+	    }
+
+	    /**
+	     * Adds new empty link
+	     * 
+	     * Adds new empty link into the list.
+	     */
+	    function addLink(){
+		if(!scope.wbModel.links){
+		    clearAll();
+		}
+		var link = {
+		    title: 'New link',
+		    description: 'Link description',
+		    image: 'images/wb/linklist.svg',
+		    href: 'http://dpq.co.ir'
+		};
+		scope.wbModel.links.push(link);
+	    }
+	    
+	    /**
+	     * 
+	     */
+	    function clearAll(){
+		scope.wbModel.links = [];
+	    }
+	    
+	    scope.removeWidget = removeWidget;
+	    scope.settings = settings;
+	    scope.ctrl = ctrl;
+	    scope.extraActions = [
+		{
+		    title: 'New link',
+		    icon: 'add',
+		    action: addLink
+		},{
+		    title: 'Clear all',
+		    icon: 'clear_all',
+		    action: clearAll
+		}
+	    ];
+	}
     };
 });
 
@@ -1470,16 +1588,27 @@ angular.module('ngMaterialWeburger')
 
 	    return {
 		restrict : 'E',
-		replace : 'true',
 		templateUrl : 'views/directives/wb-members.html',
 		require : '^wbModel',
 		scope : {
 		    wbEditable : '=?',
-		    wbModel : '=?'
+		    wbModel : '=?',
+		    wbParent : '=?'
 		},
 		controller : function($scope, $usr, $element, $widget,
 			$compile, $settings) {
 		    var scope = $scope;
+		    var model = $scope.wbModel;
+		    var parentModel = $scope.wbParent;
+		    
+
+
+		    function removeWidget() {
+			if (parentModel) {
+			    parentModel.removeWidget(model);
+			}
+		    }
+		    
 		    function isEditable() {
 			if (scope.wbParent) {
 			    return scope.wbParent.isEditable();
@@ -1572,7 +1701,8 @@ angular.module('ngMaterialWeburger')
 
 		    scope.loadRoles = loadRoles;
 		    scope.settings = settings;
-		    scope.isEditable = isEditable
+		    scope.isEditable = isEditable;
+		    scope.removeWidget = removeWidget;
 
 		    scope.$watch('wbEditable', function() {
 			if (!scope.wbEditable) {
@@ -1889,7 +2019,8 @@ angular.module('ngMaterialWeburger')
 /* jshint -W100 */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular
+.module('ngMaterialWeburger')
 
 /**
  * @ngdoc service
@@ -1899,192 +2030,205 @@ angular.module('ngMaterialWeburger')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$widget', function($q, $timeout, $mdDialog, PaginatorPage) {
+.service(
+	'$widget',
+	function($q, $timeout, $mdDialog, PaginatorPage) {
 
-	var contentElementAsso = {
-		Page : {
+	    var contentElementAsso = {
+		    Page : {
 			dom : '<wb-content></wb-content>',
 			label : 'Panel',
 			description : 'Panel contains list of widgets.',
 			image : 'images/wb/content.svg',
 			link : 'http://dpq.co.ir/more-information-link',
 			data : {
-				type : 'Page',
-				style : {
-					direction : 'column',
-				},
-				contents : []
+			    type : 'Page',
+			    style : {
+				direction : 'column',
+			    },
+			    contents : []
 			}
-		},
-		BrandAction : {
-			dom : '<wb-brand-action></wb-brand-action>',
-			label : 'Brand with action',
-			description : 'A brand image with action list',
-			image : 'images/wb/brandaction.svg',
-			link : 'http://dpq.co.ir',
-			data : {
-				type : 'BrandAction',
-				style : {},
-			}
-		},
-		Copyright : {
-			dom : '<wb-copyright></wb-copyright>',
-			label : 'Copyright',
-			description : 'Copyright text',
-			image : 'images/wb/copyright.svg',
-			link : 'http://dpq.co.ir',
-			data : {
-				type : 'Copyright',
-				title : 'copyright example',
-				text : 'This is a simple copy right text.',
-				style : {
-					width : '100%',
-					color : '#000000',
-					backgroundColor : '#00000000'
-				}
-			}
-		},
-		FeatureList : {
-			dom : '<wb-feature-list></wb-feature-list>',
-			label : 'Features list',
-			description : 'List of features',
-			image : 'images/wb/featurelist.svg',
-			link : 'http://dpq.co.ir',
-			data : {
-				type : 'FeatureList',
-				style : {},
-			}
-		},
-		SocialList : {
-			dom : '<wb-social-list></wb-social-list>',
-			label : 'Socials link',
-			description : 'Social link list',
-			image : 'images/wb/sociallist.svg',
-			link : 'http://dpq.co.ir',
-			data : {
-				type : 'SocialList',
-				style : {},
-			}
-		},
-		LinkList : {
+		    },
+		    NotfoundElement : {
+			dom : '<wb-notfound-element></wb-notfound-element>',
+			label : 'Not found',
+			image : 'images/wb/notfoundelement.svg',
+			link : 'link',
+		    },
+//		    BrandAction : {
+//			dom : '<wb-brand-action></wb-brand-action>',
+//			label : 'Brand with action',
+//			description : 'A brand image with action list',
+//			image : 'images/wb/brandaction.svg',
+//			link : 'http://dpq.co.ir',
+//			data : {
+//			    type : 'BrandAction',
+//			    style : {},
+//			}
+//		    },
+//		    Copyright : {
+//			dom : '<wb-copyright></wb-copyright>',
+//			label : 'Copyright',
+//			description : 'Copyright text',
+//			image : 'images/wb/copyright.svg',
+//			link : 'http://dpq.co.ir',
+//			data : {
+//			    type : 'Copyright',
+//			    title : 'copyright example',
+//			    text : 'This is a simple copy right text.',
+//			    style : {
+//				width : '100%',
+//				color : '#000000',
+//				backgroundColor : '#00000000'
+//			    }
+//			}
+//		    },
+//		    FeatureList : {
+//			dom : '<wb-feature-list></wb-feature-list>',
+//			label : 'Features list',
+//			description : 'List of features',
+//			image : 'images/wb/featurelist.svg',
+//			link : 'http://dpq.co.ir',
+//			data : {
+//			    type : 'FeatureList',
+//			    style : {},
+//			}
+//		    },
+//		    SocialList : {
+//			dom : '<wb-social-list></wb-social-list>',
+//			label : 'Socials link',
+//			description : 'Social link list',
+//			image : 'images/wb/sociallist.svg',
+//			link : 'http://dpq.co.ir',
+//			data : {
+//			    type : 'SocialList',
+//			    style : {},
+//			}
+//		    },
+		    LinkList : {
 			dom : '<wb-link-list></wb-link-list>',
 			label : 'Link list',
 			description : 'List of links and ticktes',
 			image : 'images/wb/linklist.svg',
 			link : 'link',
 			data : {
-				type : 'LinkList',
-				style : {},
+			    type : 'LinkList',
+			    style : {},
 			}
-		},
-		NotfoundElement : {
-			dom : '<wb-notfound-element></wb-notfound-element>',
-			label : 'Not found',
-			image : 'images/wb/notfoundelement.svg',
-			link : 'link',
-		},
-		HtmlText : {
+		    },
+		    HtmlText : {
 			dom : '<wb-html ng-class="[wbModel.style.flexAlignItem]" ></wb-html>',
 			label : 'HTML text',
 			description : 'An HTML block text.',
 			image : 'images/wb/html.svg',
 			link : 'http://dpq.co.ir',
 			data : {
-				type : 'HtmlText',
-				body : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-				style : {
-					marginLeft:1,marginRight:1,marginTop:1,marginBottom:1,
-					paddingLeft:1,paddingRight:1,paddingTop:1,paddingBottom:1,
-					minWidth:0,maxWidth:0,minHeight:0,maxHeight:0}
+			    type : 'HtmlText',
+			    body : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+			    style : {
+				marginLeft : 1,
+				marginRight : 1,
+				marginTop : 1,
+				marginBottom : 1,
+				paddingLeft : 1,
+				paddingRight : 1,
+				paddingTop : 1,
+				paddingBottom : 1,
+				minWidth : 0,
+				maxWidth : 0,
+				minHeight : 0,
+				maxHeight : 0
+			    }
 			}
-		},
-		CollapsibleItemList : {
-			dom : '<wb-collapsible-item-list></wb-collapsible-item-list>',
-			label : 'Collapsible item list',
-			description : 'List of item with a collapsiblity',
-			image : 'images/wb/notfoundelement.svg',
-			link : 'http://dpq.co.ir',
-			data : {
-				type : 'CollapsibleItemList',
-				style : {},
-			}
-		},
-		Members : {
+		    },
+//		    CollapsibleItemList : {
+//			dom : '<wb-collapsible-item-list></wb-collapsible-item-list>',
+//			label : 'Collapsible item list',
+//			description : 'List of item with a collapsiblity',
+//			image : 'images/wb/notfoundelement.svg',
+//			link : 'http://dpq.co.ir',
+//			data : {
+//			    type : 'CollapsibleItemList',
+//			    style : {},
+//			}
+//		    },
+		    Members : {
 			dom : '<wb-members></wb-members>',
 			label : 'Members list',
 			description : 'List of members',
-			image : 'images/wb/notfoundelement.svg',
+			image : 'images/wb/user.svg',
 			link : 'http://dpq.co.ir',
 			data : {
-				type : 'Members',
-				style : {},
-				template: {}
+			    type : 'Members',
+			    style : {},
+			    template : {}
 			}
-		}
-	};
+		    }
+	    };
 
-	/**
-	 * توصیف ویجت معادل با مدل داده‌ای را تعیین می‌کند
-	 * 
-	 * این کار بر اساس خصوصیت نوع در مدل داده‌ای تعیین می‌شود و در صورتیکه ویجتی
-	 * برای آو موجود نباشد، ویجت پیشفرض به عنوان نتیجه برگردانده می‌وشد.
-	 * 
-	 * @param model
-	 * @returns
-	 */
-	function widget(model) {
+	    /**
+	     * توصیف ویجت معادل با مدل داده‌ای را تعیین می‌کند
+	     * 
+	     * این کار بر اساس خصوصیت نوع در مدل داده‌ای تعیین می‌شود و
+	     * در صورتیکه ویجتی برای آو موجود نباشد، ویجت پیشفرض به
+	     * عنوان نتیجه برگردانده می‌وشد.
+	     * 
+	     * @param model
+	     * @returns
+	     */
+	    function widget(model) {
 		var deferred = $q.defer();
 		$timeout(function() {
-			var widget = contentElementAsso.mdeNotfoundElement;
-			if (model.type in contentElementAsso) {
-				widget = contentElementAsso[model.type];
-			}
-			deferred.resolve(widget);
+		    var widget = contentElementAsso.mdeNotfoundElement;
+		    if (model.type in contentElementAsso) {
+			widget = contentElementAsso[model.type];
+		    }
+		    deferred.resolve(widget);
 		}, 1);
 		return deferred.promise;
-	}
+	    }
 
-	/**
-	 * فهرست تمام ویجت‌ها را تعیین می‌کند.
-	 * 
-	 * @returns
-	 */
-	function widgets() {
+	    /**
+	     * فهرست تمام ویجت‌ها را تعیین می‌کند.
+	     * 
+	     * @returns
+	     */
+	    function widgets() {
 		var deferred = $q.defer();
 		$timeout(function() {
-			var widgets = new PaginatorPage({});
-			// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-			widgets.items = [];
-			widgets.items.push(contentElementAsso.Page);
-			widgets.items.push(contentElementAsso.BrandAction);
-			widgets.items.push(contentElementAsso.Copyright);
-			widgets.items.push(contentElementAsso.FeatureList);
-			widgets.items.push(contentElementAsso.SocialList);
-			widgets.items.push(contentElementAsso.LinkList);
-			widgets.items.push(contentElementAsso.HtmlText);
-//			widgets.items.push(contentElementAsso.CollapsibleItemList);
-			widgets.items.push(contentElementAsso.Members);
-			deferred.resolve(widgets);
+		    var widgets = new PaginatorPage({});
+		    // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+		    widgets.items = [];
+		    widgets.items.push(contentElementAsso.Page);
+//		    widgets.items.push(contentElementAsso.BrandAction);
+//		    widgets.items.push(contentElementAsso.Copyright);
+//		    widgets.items.push(contentElementAsso.FeatureList);
+//		    widgets.items.push(contentElementAsso.SocialList);
+		    widgets.items.push(contentElementAsso.LinkList);
+		    widgets.items.push(contentElementAsso.HtmlText);
+		    // widgets.items.push(contentElementAsso.CollapsibleItemList);
+		    widgets.items.push(contentElementAsso.Members);
+		    deferred.resolve(widgets);
 		}, 1);
 		return deferred.promise;
-	}
-	
-	function select(locals){
-	 // TODO: maso, 1394: just prepare data for view
-	    return $mdDialog.show({
-		controller : 'WbDialogsCtrl',
-		templateUrl : 'views/dialogs/wb-selectwidget.html',
-		parent : angular.element(document.body),
-		clickOutsideToClose : true,
-		fullscreen : true,
-		locals : locals,
-	    });
-	}
-	// تعیین سرویس‌ها
-	this.widget = widget;
-	this.widgets = widgets;
-	this.select = select;
-});
+	    }
+
+	    function select(locals) {
+		// TODO: maso, 1394: just prepare data for view
+		return $mdDialog.show({
+		    controller : 'WbDialogsCtrl',
+		    templateUrl : 'views/dialogs/wb-selectwidget.html',
+		    parent : angular.element(document.body),
+		    clickOutsideToClose : true,
+		    fullscreen : true,
+		    locals : locals,
+		});
+	    }
+	    // تعیین سرویس‌ها
+	    this.widget = widget;
+	    this.widgets = widgets;
+	    this.select = select;
+	});
 
 angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCache) {
   'use strict';
@@ -2156,13 +2300,12 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-content.html',
-    "<div ng-class=\"{'wb-panel': wbEditable}\">  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> Panel</span> <span flex></span> <md-button ng-click=newWidget(wbModel) class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=removeWidget(wbModel) ng-show=wbParent> <md-icon class=wb-icon-mini>delete</md-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=overlay></div>  <div class=wb-flex ng-class=\"[wbModel.style.flexDirection,wbModel.style.justifyContent, wbModel.style.alignItems]\" id=wb-content-placeholder ng-style=\"{ 'background': wbModel.style.background,'border-radius': wbModel.style.borderRadius, 'border': wbModel.style.border }\"> </div>  </div> </div>"
+    "<div ng-class=\"{'wb-panel': wbEditable}\">  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> Panel</span> <span flex></span> <md-button ng-click=newWidget(wbModel) class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=removeWidget(wbModel) ng-show=wbParent> <md-icon class=wb-icon-mini>delete</md-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=overlay></div>  <div class=wb-flex wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder> </div>  </div> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-copyright.html',
-    "<div ng-class=\"{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}\">  <div ng-show=mdeEditable layout=row class=mde-widget-header ng-include=\"'views/partials/mdewidgetheaderactions.html'\"> </div> <div layout=column layout-align=\"start center\" ng-style=\"{ 'color': mdeModel.style.color, 'background-color': mdeModel.style.backgroundColor,\n" +
-    "      'width': mdeModel.style.width, 'font-family': mdeModel.style.font, 'padding': mdeModel.style.padding }\"> <div ng-style=\"{'width': '80%', 'margin-top': '3em', 'border-bottom': '1px solid #fff' }\"> </div> <div layout=column layout-align=\"start center\" ng-class=\"{'mde-rtl':mdeModel.style.rtl}\"> <h3>{{mdeModel.title}}</h3> <div ng-bind-html=mdeModel.text|wbunsafe></div> </div> </div> </div>"
+    "<wb-widget> <div wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style layout-align=\"start center\"> <div ng-style=\"{'width': '80%', 'margin-top': '3em', 'border-bottom': '1px solid #fff' }\"> </div> <div layout=column layout-align=\"start center\" ng-class=\"{'mde-rtl':mdeModel.style.rtl}\"> <h3>{{mdeModel.title}}</h3> <div ng-bind-html=mdeModel.text|wbunsafe></div> </div> </div> </wb-widget>"
   );
 
 
@@ -2172,7 +2315,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-html.html',
-    "<wb-widget> <div wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style ng-bind-html=\"wbModel.text | wbunsafe\"> </div> </wb-widget>"
+    "<wb-widget> <div ng-bind-html=\"wbModel.text | wbunsafe\"> </div> </wb-widget>"
   );
 
 
@@ -2182,13 +2325,12 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-linklist.html',
-    "<div ng-class=\"{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}\">  <div ng-show=mdeEditable layout=row class=mde-widget-header ng-include=\"'views/partials/mdewidgetheaderactions.html'\"> </div> <div layout=column ng-class=\"{'mde-rtl':mdeModel.style.rtl}\" ng-style=\"{'color': mdeModel.style.color,'background-color': mdeModel.style.backgroundColor,\n" +
-    "\t   'width': mdeModel.style.width,'font-family': mdeModel.style.font,'padding': mdeModel.style.padding }\"> <div ng-if=mdeEditable> <md-button aria-label=settings ng-click=settings(mdeModel)> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\">settings</md-icon> </md-button> <md-button ng-if=ngContent aria-label=save ng-click=save()> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\">save</md-icon> </md-button> </div> <div layout-gt-sm=row layout=column layout-padding>  <div layout=column flex=none flex-gt-sm=30> <div ng-repeat=\"link in mdeModel.links\"> <md-button class=md-primary ng-click=runAction(link.action)> <md-icon ng-if=link.action.icon>{{link.action.icon}}</md-icon> {{link.title}} </md-button> <md-button ng-if=mdeEditable class=md-icon-button ng-click=editLink(link)> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\">edit</md-icon> </md-button> <md-button ng-if=mdeEditable class=md-icon-button ng-click=deleteLink(link)> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\">delete</md-icon> </md-button> </div> <div> <md-button ng-if=mdeEditable aria-label=\"add social\" ng-click=addLink(mdeModel)> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\">add</md-icon> </md-button> </div> </div>  <div layout=row flex=none flex-gt-sm=70 layout-wrap layout-padding> <div layout=column layout-align=\"center start\" flex=100 flex-gt-md=50 ng-repeat=\"tile in mdeModel.tiles\"> <h3>{{tile.title}}</h3> <div ng-if=mdeEditable> <md-button class=md-icon-button ng-click=editTicket(tile)> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\">edit</md-icon> </md-button> <md-button class=md-icon-button ng-click=deleteTicket(tile)> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\">delete</md-icon> </md-button> </div> <p class=md-body-1>{{tile.description}}</p> <md-button class=md-primary ng-click=runAction(tile.action)> <md-icon ng-if=tile.action.icon>{{tile.action.icon}}</md-icon> {{tile.action.title}} </md-button> </div> <md-button ng-if=mdeEditable aria-label=\"add social\" ng-click=addTicket(mdeModel)> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\">add</md-icon> </md-button> </div> </div> </div> </div>"
+    "<wb-widget> <a ng-repeat=\"link in wbModel.links\" ng-href={{link.href}}> <img src={{link.image}} style=\"min-width: 80px\">   </a> </wb-widget>"
   );
 
 
   $templateCache.put('views/directives/wb-members.html',
-    "<div ng-class=\"{'wb-widget': wbEditable, 'fill':wbModel.style.fill}\">   <div ng-show=wbEditable layout=row class=wb-widget-header ng-include=\"'views/partials/wb-widgetheaderactions.html'\"> </div>  <div class=wb-panel-body id=wb-members-body> <div> <md-select ng-show=wbEditable placeholder=\"User list role\" ng-model=wbModel.role md-on-open=loadRoles() style=\"min-width: 200px\"> <md-option ng-value=role.id ng-repeat=\"role in roles.items\"> {{role.name}} </md-option> </md-select> </div> <wb-content ng-show=wbEditable wb-editable=wbEditable wb-model=wbModel.template> </wb-content> <div id=wb-members-placeholder wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style> </div> </div> </div>"
+    "<wb-widget>   <div class=wb-panel-body id=wb-members-body> <div> <md-select ng-show=wbEditable placeholder=\"User list role\" ng-model=wbModel.role md-on-open=loadRoles() style=\"min-width: 200px\"> <md-option ng-value=role.id ng-repeat=\"role in roles.items\"> {{role.name}} </md-option> </md-select> </div> <wb-content ng-show=wbEditable wb-editable=wbEditable wb-model=wbModel.template> </wb-content> <div id=wb-members-placeholder wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style> </div> </div> </wb-widget>"
   );
 
 
@@ -2203,7 +2345,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-widget.html',
-    "<div ng-class=\"{'wb-widget': wbEditable, 'fill':wbModel.style.fill}\">  <div ng-show=wbEditable layout=row class=wb-widget-header ng-include=\"'views/partials/wb-widgetheaderactions.html'\"> </div> <ng-transclude></ng-transclude> </div>"
+    "<div ng-class=\"{'wb-widget': wbEditable}\" layout=column>  <div ng-show=wbEditable layout=row class=wb-widget-header> <span translate> widget</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=removeWidget() ng-show=removeWidget ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <md-icon class=mde-icon-mini>delete</md-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <md-icon class=mde-icon-mini>{{item.icon}}</md-icon> </md-button> </div>  <div wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style class=wb-panel-body> <div ng-show=ctrl.hoveringDelBtn class=overlay></div> <ng-transclude wb-layout=wbModel.style></ng-transclude> </div> </div>"
   );
 
 
