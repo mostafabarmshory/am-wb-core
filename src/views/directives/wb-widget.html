@@ -24,11 +24,30 @@
             ng-mouseleave="ctrl.hoveringDelBtn=false"> 
 			<md-icon class="mde-icon-mini">delete</md-icon>
 		</md-button>
+		<md-divider></md-divider>
+		<!-- 
+			Extra Actions:
+			Widgets can contributes customized action with extraActions in
+			scope.
+		 -->
+		<md-button 
+			class="md-icon-button md-mini" 
+			ng-repeat="item in extraActions"
+			ng-click="item.action()"> 
+			<md-icon class="mde-icon-mini">{{item.icon}}</md-icon>
+		</md-button>
     </div>
 	
     <!-- body section (in non-edit mode, this area just shown -->
-    <div class="wb-panel-body">
+    <div
+		wb-margin="wbModel.style"
+		wb-padding="wbModel.style"
+		wb-size="wbModel.style"
+		wb-background="wbModel.style"
+		wb-border="wbModel.style"
+    	class="wb-panel-body">
 		<div ng-show="ctrl.hoveringDelBtn" class="overlay"></div>
-	    <ng-transclude></ng-transclude>
+	    <ng-transclude
+    		wb-layout="wbModel.style"></ng-transclude>
     </div>
 </div>

@@ -8,7 +8,7 @@ angular.module('ngMaterialWeburger')
     return {
 	restrict : 'A',
 	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbMargin, function(style) {
+	    return scope.$watch(attributes.wbPadding, function(style) {
 		if(!style){
 		    return;
 		}

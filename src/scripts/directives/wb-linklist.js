@@ -49,16 +49,52 @@ angular.module('ngMaterialWeburger')
 		    wbModel : model,
 		    wbParent : parentModel,
 		    style : {
-			pages : [ 'text', 'selfLayout', 'border',
+			pages : [ 'text', 'pageLayout', 'selfLayout', 'border',
 				'background', 'marginPadding',
 				'minMaxSize' ]
 		    }
 		});
 	    }
 
+	    /**
+	     * Adds new empty link
+	     * 
+	     * Adds new empty link into the list.
+	     */
+	    function addLink(){
+		if(!scope.wbModel.links){
+		    clearAll();
+		}
+		var link = {
+		    title: 'New link',
+		    description: 'Link description',
+		    image: 'images/wb/linklist.svg',
+		    href: 'http://dpq.co.ir'
+		};
+		scope.wbModel.links.push(link);
+	    }
+	    
+	    /**
+	     * 
+	     */
+	    function clearAll(){
+		scope.wbModel.links = [];
+	    }
+	    
 	    scope.removeWidget = removeWidget;
 	    scope.settings = settings;
 	    scope.ctrl = ctrl;
+	    scope.extraActions = [
+		{
+		    title: 'New link',
+		    icon: 'add',
+		    action: addLink
+		},{
+		    title: 'Clear all',
+		    icon: 'clear_all',
+		    action: clearAll
+		}
+	    ];
 	}
     };
 });
