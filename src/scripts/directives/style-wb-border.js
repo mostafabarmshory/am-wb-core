@@ -12,6 +12,21 @@ angular.module('ngMaterialWeburger')
 		if(!style){
 		    return;
 		}
+		if(!style.borderRadius){
+		    style.borderRadius={};
+		}
+		if(!style.borderStyleColorWidth){
+		    style.borderStyleColorWidth={};
+		}
+		if(!style.borderStyle){
+		    style.borderStyle = {};
+		}
+		if(!style.borderWidth){
+		    style.borderWidth = {};
+		}
+		if(!style.borderColor){
+		    style.borderColor = {};
+		}
 		element.css({
 	            'border-top-left-radius':(style.borderRadius.uniform) ? style.borderRadius.all : style.borderRadius.topLeft,
 	            'border-top-right-radius':(style.borderRadius.uniform) ? style.borderRadius.all : style.borderRadius.topRight,
@@ -32,7 +47,6 @@ angular.module('ngMaterialWeburger')
 	            'border-right-color':(style.borderStyleColorWidth.uniform) ? style.borderColor.all : style.borderColor.right,
 	            'border-top-color':(style.borderStyleColorWidth.uniform) ? style.borderColor.all : style.borderColor.top,
 	            'border-bottom-color':(style.borderStyleColorWidth.uniform) ? style.borderColor.all : style.borderColor.bottom,
-	            
 	            });
 	    }, true);
 	}

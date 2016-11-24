@@ -12,12 +12,53 @@ angular.module('ngMaterialWeburger')
 .directive('wbLinkList', function() {
     return {
 	restrict : 'E',
-	replace : 'true',
 	templateUrl : 'views/directives/wb-linklist.html',
-	require : '^mdeModel',
+	replase : true,
 	scope : {
-	    mdeEditable : '=?',
-	    mdeModel : '=?'
+	    wbEditable : '=?',
+	    wbModel : '=?',
+	    wbParent : '=?'
 	},
+	link : function(scope, elem, attrs) {
+//	    scope.$watch('wbModel.style.flexAlignItem', function(
+//		    newValue, oldValue) {
+//		elem.removeClass(oldValue);
+//		elem.addClass(newValue);
+//	    });
+//	    scope.$watch('wbModel.style.flexItemGrow', function(
+//		    newValue, oldValue) {
+//		elem.css('flex-grow', newValue);
+//	    });
+	},
+	controller : function($scope, $element, $settings) {
+	    var scope = $scope;
+	    var model = $scope.wbModel;
+	    var parentModel = $scope.wbParent;
+	    var ctrl = {
+		    hoveringDelBtn: false
+	    }
+
+	    function removeWidget() {
+		if (parentModel) {
+		    parentModel.removeWidget(model);
+		}
+	    }
+
+	    function settings() {
+		return $settings.load({
+		    wbModel : model,
+		    wbParent : parentModel,
+		    style : {
+			pages : [ 'text', 'selfLayout', 'border',
+				'background', 'marginPadding',
+				'minMaxSize' ]
+		    }
+		});
+	    }
+
+	    scope.removeWidget = removeWidget;
+	    scope.settings = settings;
+	    scope.ctrl = ctrl;
+	}
     };
 });

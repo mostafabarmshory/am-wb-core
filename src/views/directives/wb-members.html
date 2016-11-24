@@ -1,4 +1,4 @@
-<div ng-class="{'wb-widget': wbEditable, 'fill':wbModel.style.fill}">
+<wb-widget>
 <!-- 
 Show members linst based on user template
 
@@ -8,12 +8,6 @@ server based on Seen Protocol.
 See: https://gitlab.com/phoenix-scholars/seen
 See: https://github.com/phoenix-scholars/angular-pluf
  -->
-    <!-- Adds a title in edit mode -->
-    <div ng-show="wbEditable"
-         layout="row"
-         class="wb-widget-header"
-         ng-include="'views/partials/wb-widgetheaderactions.html'">
-    </div>
 
     <!-- Main widget body -->
     <div class="wb-panel-body" id="wb-members-body">
@@ -44,4 +38,5 @@ See: https://github.com/phoenix-scholars/angular-pluf
 			wb-border="wbModel.style">
 	    </div>
     </div>
-</div>
+</wb-widget>
+

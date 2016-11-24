@@ -19,16 +19,27 @@ angular.module('ngMaterialWeburger')
 
 	    return {
 		restrict : 'E',
-		replace : 'true',
 		templateUrl : 'views/directives/wb-members.html',
 		require : '^wbModel',
 		scope : {
 		    wbEditable : '=?',
-		    wbModel : '=?'
+		    wbModel : '=?',
+		    wbParent : '=?'
 		},
 		controller : function($scope, $usr, $element, $widget,
 			$compile, $settings) {
 		    var scope = $scope;
+		    var model = $scope.wbModel;
+		    var parentModel = $scope.wbParent;
+		    
+
+
+		    function removeWidget() {
+			if (parentModel) {
+			    parentModel.removeWidget(model);
+			}
+		    }
+		    
 		    function isEditable() {
 			if (scope.wbParent) {
 			    return scope.wbParent.isEditable();
@@ -121,7 +132,8 @@ angular.module('ngMaterialWeburger')
 
 		    scope.loadRoles = loadRoles;
 		    scope.settings = settings;
-		    scope.isEditable = isEditable
+		    scope.isEditable = isEditable;
+		    scope.removeWidget = removeWidget;
 
 		    scope.$watch('wbEditable', function() {
 			if (!scope.wbEditable) {

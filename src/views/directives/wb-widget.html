@@ -1,10 +1,34 @@
-<div ng-class="{'wb-widget': wbEditable, 'fill':wbModel.style.fill}">
+<div ng-class="{'wb-widget': wbEditable}" layout="column">
     <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
     <div ng-show="wbEditable"
          layout="row"
-         class="wb-widget-header"
-         ng-include="'views/partials/wb-widgetheaderactions.html'">
+         class="wb-widget-header">
+		<span translate> widget</span> 
+		<span flex></span>
+		<md-button 
+			ng-if="add"
+			ng-click="add()" 
+			class="md-icon-button md-mini">
+		<md-icon class="mde-icon-mini">add_circle</md-icon> 
+		</md-button>
+		<md-button 
+			ng-click="settings()"
+			 class="md-icon-button md-mini">
+		<md-icon class="mde-icon-mini">settings</md-icon> 
+		</md-button>
+		<md-button 
+			class="md-icon-button md-mini" 
+			ng-click="removeWidget()"
+			ng-show="removeWidget"
+            ng-mouseenter="ctrl.hoveringDelBtn=true"
+            ng-mouseleave="ctrl.hoveringDelBtn=false"> 
+			<md-icon class="mde-icon-mini">delete</md-icon>
+		</md-button>
     </div>
-
-    <ng-transclude></ng-transclude>
+	
+    <!-- body section (in non-edit mode, this area just shown -->
+    <div class="wb-panel-body">
+		<div ng-show="ctrl.hoveringDelBtn" class="overlay"></div>
+	    <ng-transclude></ng-transclude>
+    </div>
 </div>
