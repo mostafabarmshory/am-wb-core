@@ -48,7 +48,7 @@ module.exports = function (grunt) {
      * آن باید پردازش‌هایی انجام شود. برای نمونه زمانی که یک نمایش به روز می‌شود
      * کاوشگر باید به روز شود تا این به روز رسانی مشاهد شود. این وظیفه پرونده‌ها
      * را مشاهده و کارهای لازم را انجام می‌دهد.
-     */ 
+     */
     watch: {
       bower: {
         files: ['bower.json'],
@@ -89,7 +89,7 @@ module.exports = function (grunt) {
     /*
      * تنظیم‌های سرور اصلی گرانت را ایجاد می‌کند. این سرور در تست و راه اندازی اولیه
      * پروژه کاربرد دارد.
-     */ 
+     */
     connect: {
       options: {
         port: 9001,
@@ -177,7 +177,7 @@ module.exports = function (grunt) {
         }
       }
     },
-    
+
     /*
      * اجرای تست ایستا روی تمام سروس‌های ایجاد شده . با این کار مطمئن می‌شیم که خطای نحوی
      * در برنامه‌ها وجود نداره. برای این کار از تست‌های ایستای jshint استفاده می‌کنیم. این برنامه
@@ -341,7 +341,7 @@ module.exports = function (grunt) {
 	       '<%= yeoman.dist %>/<%= yeoman.pkg.name %>.min.css': [
 	          '.tmp/styles/{,*/}*.css'
 	       ]
-	     }	
+	     }
 	   }
 	 },
     uglify: {
@@ -407,8 +407,8 @@ module.exports = function (grunt) {
     },
 
     /*
-     * 
-     * 
+     *
+     *
      */
     htmlmin: {
       dist: {
@@ -418,7 +418,7 @@ module.exports = function (grunt) {
           collapseBooleanAttributes:      true,
           collapseWhitespace:             true,
           removeAttributeQuotes:          true,
-          removeComments:                 true, // Only if you don't use comment directives! 
+          removeComments:                 true, // Only if you don't use comment directives!
           removeEmptyAttributes:          true,
           removeRedundantAttributes:      true,
           removeScriptTypeAttributes:     true,
@@ -507,7 +507,7 @@ module.exports = function (grunt) {
         src: '{,*/}*.css'
       }
     },
-    
+
 
     // Add vendor prefixed styles
     postcss: {
@@ -579,7 +579,7 @@ module.exports = function (grunt) {
     },
   });
 
-  
+
   grunt.registerTask('demo', 'Compile then start a connect web server', function (target) {
 	    if (target === 'dist') {
 	      return grunt.task.run([

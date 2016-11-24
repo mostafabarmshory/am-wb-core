@@ -17,6 +17,7 @@ angular
         'ngMaterial',//
         'pascalprecht.translate',//
         'pluf',//
+        'mdColorPicker',//
 //        'ngMaterialWysiwyg',
         'ui.tinymce'
     ]);
@@ -650,6 +651,140 @@ angular.module('ngMaterialWeburger')
 	loadWidgets();
 });
 
+'use strict';
+
+angular.module('ngMaterialWeburger')
+/**
+ * @description Apply margin into the element
+ */
+.directive("wbSize", function() {
+    return {
+	restrict : 'A',
+	link : function(scope, element, attributes) {
+	    return scope.$watch(attributes.wbMargin, function(style) {
+		if (!style) {
+		    return;
+		}
+		element.css({
+		    'background-color' : style.backgroundColor,
+		    'color' : style.color,
+		});
+	    }, true);
+	}
+    };
+});
+'use strict';
+
+angular.module('ngMaterialWeburger')
+/**
+ * @description Apply margin into the element
+ */
+.directive("wbBorder", function() {
+    return {
+	restrict : 'A',
+	link : function(scope, element, attributes) {
+	    return scope.$watch(attributes.wbMargin, function(style) {
+		if(!style){
+		    return;
+		}
+		element.css({
+	            'border-top-left-radius':(style.borderRadius.uniform) ? style.borderRadius.all : style.borderRadius.topLeft,
+	            'border-top-right-radius':(style.borderRadius.uniform) ? style.borderRadius.all : style.borderRadius.topRight,
+	            'border-bottom-left-radius':(style.borderRadius.uniform) ? style.borderRadius.all : style.borderRadius.bottomLeft,
+	            'border-bottom-right-radius':(style.borderRadius.uniform) ? style.borderRadius.all : style.borderRadius.bottomRight,
+
+	            'border-left-style':(style.borderStyleColorWidth.uniform) ? style.borderStyle.all : style.borderStyle.left,
+	            'border-right-style':(style.borderStyleColorWidth.uniform) ? style.borderStyle.all : style.borderStyle.right,
+	            'border-top-style':(style.borderStyleColorWidth.uniform) ? style.borderStyle.all : style.borderStyle.top,
+	            'border-bottom-style':(style.borderStyleColorWidth.uniform) ? style.borderStyle.all : style.borderStyle.bottom,
+
+	            'border-left-width':(style.borderStyleColorWidth.uniform) ? style.borderWidth.all : style.borderWidth.left,
+	            'border-right-width':(style.borderStyleColorWidth.uniform) ? style.borderWidth.all : style.borderWidth.right,
+	            'border-top-width':(style.borderStyleColorWidth.uniform) ? style.borderWidth.all : style.borderWidth.top,
+	            'border-bottom-width':(style.borderStyleColorWidth.uniform) ? style.borderWidth.all : style.borderWidth.bottom,
+
+	            'border-left-color':(style.borderStyleColorWidth.uniform) ? style.borderColor.all : style.borderColor.left,
+	            'border-right-color':(style.borderStyleColorWidth.uniform) ? style.borderColor.all : style.borderColor.right,
+	            'border-top-color':(style.borderStyleColorWidth.uniform) ? style.borderColor.all : style.borderColor.top,
+	            'border-bottom-color':(style.borderStyleColorWidth.uniform) ? style.borderColor.all : style.borderColor.bottom,
+	            
+	            });
+	    }, true);
+	}
+    };
+});
+'use strict';
+
+angular.module('ngMaterialWeburger')
+/**
+ * @description Apply margin into the element
+ */
+.directive("wbMargin", function() {
+    return {
+	restrict : 'A',
+	link : function(scope, element, attributes) {
+	    return scope.$watch(attributes.wbMargin, function(style) {
+		if(!style){
+		    return;
+		}
+		element.css({
+	            'margin-left':style.marginLeft,
+	            'margin-right':style.marginRight,
+	            'margin-top':style.marginTop,
+	            'margin-bottom':style.marginBottom
+	            });
+	    }, true);
+	}
+    };
+});
+'use strict';
+
+angular.module('ngMaterialWeburger')
+/**
+ * @description Apply margin into the element
+ */
+.directive("wbPadding", function() {
+    return {
+	restrict : 'A',
+	link : function(scope, element, attributes) {
+	    return scope.$watch(attributes.wbMargin, function(style) {
+		if(!style){
+		    return;
+		}
+		element.css({
+	            'padding-left':style.paddingLeft,
+	            'padding-right':style.paddingRight,
+	            'padding-top':style.paddingTop,
+	            'padding-bottom':style.paddingBottom,
+	            });
+	    }, true);
+	}
+    };
+});
+'use strict';
+
+angular.module('ngMaterialWeburger')
+/**
+ * @description Apply margin into the element
+ */
+.directive("wbSize", function() {
+    return {
+	restrict : 'A',
+	link : function(scope, element, attributes) {
+	    return scope.$watch(attributes.wbMargin, function(style) {
+		if(!style){
+		    return;
+		}
+		element.css({
+	            'min-width':style.minWidth,
+	            'min-height':style.minHeight,
+	            'max-width':(style.maxWidth==0) ? 'none' : style.maxWidth,
+	            'max-height':(style.maxHeight==0)?'none':style.maxHeight,
+	            });
+	    }, true);
+	}
+    };
+});
 /* jslint todo: true */
 /* jslint xxx: true */
 /* jshint -W100 */
@@ -1602,6 +1737,23 @@ angular.module('ngMaterialWeburger')
 	};
 });
 
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * @ngdoc directive
+ * @name donateMainApp.directive:wbHtml
+ * @description # wbHtml
+ */
+.directive('wbWidget', function() {
+    return {
+	templateUrl : 'views/directives/wb-widget.html',
+	restrict : 'E',
+	transclude : true,
+    };
+});
+
 /* jslint todo: true */
 /* jslint xxx: true */
 /* jshint -W100 */
@@ -2020,45 +2172,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-html.html',
-    "<div ng-class=\"{'wb-widget': wbEditable, 'fill':wbModel.style.fill}\">  <div ng-show=wbEditable layout=row class=wb-widget-header ng-include=\"'views/partials/wb-widgetheaderactions.html'\"> </div>  <div ng-bind-html=\"wbModel.text | wbunsafe\" ng-style=\"{\n" +
-    "            'margin-left':wbModel.style.marginLeft,\n" +
-    "            'margin-right':wbModel.style.marginRight,\n" +
-    "            'margin-top':wbModel.style.marginTop,\n" +
-    "            'margin-bottom':wbModel.style.marginBottom,\n" +
-    "\n" +
-    "            'padding-left':wbModel.style.paddingLeft,\n" +
-    "            'padding-right':wbModel.style.paddingRight,\n" +
-    "            'padding-top':wbModel.style.paddingTop,\n" +
-    "            'padding-bottom':wbModel.style.paddingBottom,\n" +
-    "\n" +
-    "            'background-color': wbModel.style.backgroundColor,\n" +
-    "            'color': wbModel.style.color,\n" +
-    "\n" +
-    "            'min-width':wbModel.style.minWidth,\n" +
-    "            'min-height':wbModel.style.minHeight,\n" +
-    "            'max-width':(wbModel.style.maxWidth==0) ? 'none' : wbModel.style.maxWidth,\n" +
-    "            'max-height':(wbModel.style.maxHeight==0)?'none':wbModel.style.maxHeight,\n" +
-    "\n" +
-    "            'border-top-left-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.topLeft,\n" +
-    "            'border-top-right-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.topRight,\n" +
-    "            'border-bottom-left-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.bottomLeft,\n" +
-    "            'border-bottom-right-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.bottomRight,\n" +
-    "\n" +
-    "            'border-left-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.left,\n" +
-    "            'border-right-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.right,\n" +
-    "            'border-top-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.top,\n" +
-    "            'border-bottom-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.bottom,\n" +
-    "\n" +
-    "            'border-left-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.left,\n" +
-    "            'border-right-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.right,\n" +
-    "            'border-top-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.top,\n" +
-    "            'border-bottom-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.bottom,\n" +
-    "\n" +
-    "            'border-left-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.left,\n" +
-    "            'border-right-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.right,\n" +
-    "            'border-top-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.top,\n" +
-    "            'border-bottom-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.bottom,\n" +
-    "            }\"> </div> </div>"
+    "<wb-widget> <div wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style ng-bind-html=\"wbModel.text | wbunsafe\"> </div> </wb-widget>"
   );
 
 
@@ -2074,45 +2188,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-members.html',
-    " <div ng-class=\"{'wb-widget': wbEditable, 'fill':wbModel.style.fill}\">  <div ng-show=wbEditable layout=row class=wb-widget-header ng-include=\"'views/partials/wb-widgetheaderactions.html'\"> </div>  <div class=wb-panel-body id=wb-members-body> <div> <md-select ng-show=wbEditable placeholder=\"User list role\" ng-model=wbModel.role md-on-open=loadRoles() style=\"min-width: 200px\"> <md-option ng-value=role.id ng-repeat=\"role in roles.items\"> {{role.name}} </md-option> </md-select> </div> <wb-content ng-show=wbEditable wb-editable=wbEditable wb-model=wbModel.template> </wb-content> <div id=wb-members-placeholder ng-style=\"{\n" +
-    "\t         'margin-left':wbModel.style.marginLeft,\n" +
-    "\t         'margin-right':wbModel.style.marginRight,\n" +
-    "\t         'margin-top':wbModel.style.marginTop,\n" +
-    "\t         'margin-bottom':wbModel.style.marginBottom,\n" +
-    "\t\n" +
-    "\t         'padding-left':wbModel.style.paddingLeft,\n" +
-    "\t         'padding-right':wbModel.style.paddingRight,\n" +
-    "\t         'padding-top':wbModel.style.paddingTop,\n" +
-    "\t         'padding-bottom':wbModel.style.paddingBottom,\n" +
-    "\t\n" +
-    "\t         'background-color': wbModel.style.backgroundColor,\n" +
-    "\t         'color': wbModel.style.color,\n" +
-    "\t\n" +
-    "\t         'min-width':wbModel.style.minWidth,\n" +
-    "\t         'min-height':wbModel.style.minHeight,\n" +
-    "\t         'max-width':(wbModel.style.maxWidth==0) ? 'none' : wbModel.style.maxWidth,\n" +
-    "\t         'max-height':(wbModel.style.maxHeight==0)?'none':wbModel.style.maxHeight,\n" +
-    "\t\n" +
-    "\t         'border-top-left-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.topLeft,\n" +
-    "\t         'border-top-right-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.topRight,\n" +
-    "\t         'border-bottom-left-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.bottomLeft,\n" +
-    "\t         'border-bottom-right-radius':(wbModel.style.borderRadius.uniform) ? wbModel.style.borderRadius.all : wbModel.style.borderRadius.bottomRight,\n" +
-    "\t\n" +
-    "\t         'border-left-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.left,\n" +
-    "\t         'border-right-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.right,\n" +
-    "\t         'border-top-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.top,\n" +
-    "\t         'border-bottom-style':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderStyle.all : wbModel.style.borderStyle.bottom,\n" +
-    "\t\n" +
-    "\t         'border-left-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.left,\n" +
-    "\t         'border-right-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.right,\n" +
-    "\t         'border-top-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.top,\n" +
-    "\t         'border-bottom-width':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderWidth.all : wbModel.style.borderWidth.bottom,\n" +
-    "\t\n" +
-    "\t         'border-left-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.left,\n" +
-    "\t         'border-right-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.right,\n" +
-    "\t         'border-top-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.top,\n" +
-    "\t         'border-bottom-color':(wbModel.style.borderStyleColorWidth.uniform) ? wbModel.style.borderColor.all : wbModel.style.borderColor.bottom,\n" +
-    "\t         }\"> </div> </div> </div>"
+    "<div ng-class=\"{'wb-widget': wbEditable, 'fill':wbModel.style.fill}\">   <div ng-show=wbEditable layout=row class=wb-widget-header ng-include=\"'views/partials/wb-widgetheaderactions.html'\"> </div>  <div class=wb-panel-body id=wb-members-body> <div> <md-select ng-show=wbEditable placeholder=\"User list role\" ng-model=wbModel.role md-on-open=loadRoles() style=\"min-width: 200px\"> <md-option ng-value=role.id ng-repeat=\"role in roles.items\"> {{role.name}} </md-option> </md-select> </div> <wb-content ng-show=wbEditable wb-editable=wbEditable wb-model=wbModel.template> </wb-content> <div id=wb-members-placeholder wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style> </div> </div> </div>"
   );
 
 
@@ -2123,6 +2199,11 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
   $templateCache.put('views/directives/wb-sociallist.html',
     "<div ng-class=\"{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}\">  <div ng-show=mdeEditable layout=row class=mde-widget-header ng-include=\"'views/partials/mdewidgetheaderactions.html'\"> </div> <div layout=row layout-align=\"start start\" layout-wrap ng-class=\"{'mde-rtl':mdeModel.style.rtl}\" ng-style=\"{ 'color': mdeModel.style.color, 'background-color': mdeModel.style.backgroundColor, 'width': mdeModel.style.width, 'font-family': mdeModel.style.font, 'padding': mdeModel.style.padding }\">   <md-button ng-if=!mdeEditable ng-repeat=\"social in mdeModel.socials\" ng-click=gotoSocial(social)> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\" class=md-48 md-font-set=social>{{social.icon}} </md-icon> </md-button> <md-menu ng-if=mdeEditable ng-repeat=\"social in mdeModel.socials\"> <md-button aria-label=\"Open phone interactions menu\" class=md-icon-button ng-click=\"openMenu($mdOpenMenu, $event)\"> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\" class=md-48 md-font-set=social> {{social.icon}} </md-icon> </md-button> <md-menu-content width=4> <md-menu-item> <md-button ng-click=\"edit(social, $event)\"> <md-icon>edit</md-icon> {{ 'Edit' | translate }} </md-button> </md-menu-item> <md-menu-item> <md-button ng-click=\"delete(social, $event)\"> <md-icon>delete</md-icon> {{ 'Delete' | translate }} </md-button> </md-menu-item> </md-menu-content> </md-menu> </div> </div>"
+  );
+
+
+  $templateCache.put('views/directives/wb-widget.html',
+    "<div ng-class=\"{'wb-widget': wbEditable, 'fill':wbModel.style.fill}\">  <div ng-show=wbEditable layout=row class=wb-widget-header ng-include=\"'views/partials/wb-widgetheaderactions.html'\"> </div> <ng-transclude></ng-transclude> </div>"
   );
 
 

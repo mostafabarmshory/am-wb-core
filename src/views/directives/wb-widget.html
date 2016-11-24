@@ -1,0 +1,53 @@
+<div ng-class="{'wb-widget': wbEditable}" layout="column">
+    <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
+    <div ng-show="wbEditable"
+         layout="row"
+         class="wb-widget-header">
+		<span translate> widget</span> 
+		<span flex></span>
+		<md-button 
+			ng-if="add"
+			ng-click="add()" 
+			class="md-icon-button md-mini">
+		<md-icon class="mde-icon-mini">add_circle</md-icon> 
+		</md-button>
+		<md-button 
+			ng-click="settings()"
+			 class="md-icon-button md-mini">
+		<md-icon class="mde-icon-mini">settings</md-icon> 
+		</md-button>
+		<md-button 
+			class="md-icon-button md-mini" 
+			ng-click="removeWidget()"
+			ng-show="removeWidget"
+            ng-mouseenter="ctrl.hoveringDelBtn=true"
+            ng-mouseleave="ctrl.hoveringDelBtn=false"> 
+			<md-icon class="mde-icon-mini">delete</md-icon>
+		</md-button>
+		<md-divider></md-divider>
+		<!-- 
+			Extra Actions:
+			Widgets can contributes customized action with extraActions in
+			scope.
+		 -->
+		<md-button 
+			class="md-icon-button md-mini" 
+			ng-repeat="item in extraActions"
+			ng-click="item.action()"> 
+			<md-icon class="mde-icon-mini">{{item.icon}}</md-icon>
+		</md-button>
+    </div>
+	
+    <!-- body section (in non-edit mode, this area just shown -->
+    <div
+		wb-margin="wbModel.style"
+		wb-padding="wbModel.style"
+		wb-size="wbModel.style"
+		wb-background="wbModel.style"
+		wb-border="wbModel.style"
+    	class="wb-panel-body">
+		<div ng-show="ctrl.hoveringDelBtn" class="overlay"></div>
+	    <ng-transclude
+    		wb-layout="wbModel.style"></ng-transclude>
+    </div>
+</div>
