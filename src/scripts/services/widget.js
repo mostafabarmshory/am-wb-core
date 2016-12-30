@@ -19,6 +19,12 @@ angular
 	function($q, $timeout, $mdDialog, PaginatorPage) {
 
 	    var contentElementAsso = {
+		    NotfoundElement : {
+			dom : '<wb-notfound-element></wb-notfound-element>',
+			label : 'Not found',
+			image : 'images/wb/notfoundelement.svg',
+			link : 'link',
+		    },
 		    Page : {
 			dom : '<wb-content></wb-content>',
 			label : 'Panel',
@@ -31,73 +37,6 @@ angular
 				direction : 'column',
 			    },
 			    contents : []
-			}
-		    },
-		    NotfoundElement : {
-			dom : '<wb-notfound-element></wb-notfound-element>',
-			label : 'Not found',
-			image : 'images/wb/notfoundelement.svg',
-			link : 'link',
-		    },
-//		    BrandAction : {
-//			dom : '<wb-brand-action></wb-brand-action>',
-//			label : 'Brand with action',
-//			description : 'A brand image with action list',
-//			image : 'images/wb/brandaction.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'BrandAction',
-//			    style : {},
-//			}
-//		    },
-//		    Copyright : {
-//			dom : '<wb-copyright></wb-copyright>',
-//			label : 'Copyright',
-//			description : 'Copyright text',
-//			image : 'images/wb/copyright.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'Copyright',
-//			    title : 'copyright example',
-//			    text : 'This is a simple copy right text.',
-//			    style : {
-//				width : '100%',
-//				color : '#000000',
-//				backgroundColor : '#00000000'
-//			    }
-//			}
-//		    },
-//		    FeatureList : {
-//			dom : '<wb-feature-list></wb-feature-list>',
-//			label : 'Features list',
-//			description : 'List of features',
-//			image : 'images/wb/featurelist.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'FeatureList',
-//			    style : {},
-//			}
-//		    },
-//		    SocialList : {
-//			dom : '<wb-social-list></wb-social-list>',
-//			label : 'Socials link',
-//			description : 'Social link list',
-//			image : 'images/wb/sociallist.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'SocialList',
-//			    style : {},
-//			}
-//		    },
-		    LinkList : {
-			dom : '<wb-link-list></wb-link-list>',
-			label : 'Link list',
-			description : 'List of links and ticktes',
-			image : 'images/wb/linklist.svg',
-			link : 'link',
-			data : {
-			    type : 'LinkList',
-			    style : {},
 			}
 		    },
 		    HtmlText : {
@@ -125,29 +64,6 @@ angular
 			    }
 			}
 		    },
-//		    CollapsibleItemList : {
-//			dom : '<wb-collapsible-item-list></wb-collapsible-item-list>',
-//			label : 'Collapsible item list',
-//			description : 'List of item with a collapsiblity',
-//			image : 'images/wb/notfoundelement.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'CollapsibleItemList',
-//			    style : {},
-//			}
-//		    },
-		    Members : {
-			dom : '<wb-members></wb-members>',
-			label : 'Members list',
-			description : 'List of members',
-			image : 'images/wb/user.svg',
-			link : 'http://dpq.co.ir',
-			data : {
-			    type : 'Members',
-			    style : {},
-			    template : {}
-			}
-		    }
 	    };
 
 	    /**
@@ -184,14 +100,7 @@ angular
 		    // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
 		    widgets.items = [];
 		    widgets.items.push(contentElementAsso.Page);
-//		    widgets.items.push(contentElementAsso.BrandAction);
-//		    widgets.items.push(contentElementAsso.Copyright);
-//		    widgets.items.push(contentElementAsso.FeatureList);
-//		    widgets.items.push(contentElementAsso.SocialList);
-		    widgets.items.push(contentElementAsso.LinkList);
 		    widgets.items.push(contentElementAsso.HtmlText);
-		    // widgets.items.push(contentElementAsso.CollapsibleItemList);
-		    widgets.items.push(contentElementAsso.Members);
 		    deferred.resolve(widgets);
 		}, 1);
 		return deferred.promise;

@@ -11,32 +11,5 @@
     "borderColor": {},
     "flexDirection": "wb-flex-column"
   },
-  "contents": [
-    {
-      "type": "LinkList",
-      "style": {
-        "borderRadius": {},
-        "borderStyleColorWidth": {},
-        "borderStyle": {},
-        "borderWidth": {},
-        "borderColor": {},
-        "flexDirection": "wb-flex-row",
-        "justifyContent": "wb-flex-justify-content-space-around"
-      },
-      "links": [
-        {
-          "image": "images/wb/linklist.svg",
-          "href": "http://dpq.co.ir"
-        },
-        {
-          "image": "images/wb/linklist.svg",
-          "href": "http://dpq.co.ir"
-        },
-        {
-          "image": "images/wb/linklist.svg",
-          "href": "http://dpq.co.ir"
-        }
-      ]
-    }
-  ]
+  "contents": []
 }
