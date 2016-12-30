@@ -131,45 +131,6 @@ angular.module('ngMaterialWeburger')
 	});
     }
 
-    newWidget('Page', {
-	dom : '<wb-content></wb-content>',
-	label : 'Panel',
-	description : 'Panel contains list of widgets.',
-	image : 'images/wb/content.svg',
-	link : 'http://dpq.co.ir/more-information-link',
-	data : {
-	    type : 'Page',
-	    style : {
-		direction : 'column',
-	    },
-	    contents : []
-	}
-    });
-    newWidget('HtmlText', {
-	dom : '<wb-html></wb-html>',
-	label : 'HTML text',
-	description : 'An HTML block text.',
-	image : 'images/wb/html.svg',
-	link : 'http://dpq.co.ir',
-	data : {
-	    type : 'HtmlText',
-	    body : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-	    style : {
-		marginLeft : 1,
-		marginRight : 1,
-		marginTop : 1,
-		marginBottom : 1,
-		paddingLeft : 1,
-		paddingRight : 1,
-		paddingTop : 1,
-		paddingBottom : 1,
-		minWidth : 0,
-		maxWidth : 0,
-		minHeight : 0,
-		maxHeight : 0
-	    }
-	}
-    });
     // تعیین سرویس‌ها
     this.newWidget = newWidget;
     this.widget = widget;

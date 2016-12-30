@@ -26,54 +26,52 @@
 angular.module('ngMaterialWeburger')
 
 /**
- * @ngdoc directive
- * @name wbWidget
- * @memberof ngMaterialWeburger
- * @description Widgets container
- * 
- * This is widget containers.
- * 
- * All primary widgets are supported by default (such as remove and setting).
+ * Load widgets
  */
-.directive('wbWidget', function() {
-    return {
-	templateUrl : 'views/directives/wb-widget.html',
-	restrict : 'E',
-	transclude : true,
-	scope : false,
-	controller : function($scope, $settings, $widget) {
-
-	    /**
-	     * Remove widget from parent
-	     */
-	    function removeWidget() {
-		if ($scope.wbParent) {
-		    $scope.wbParent.removeWidget($scope.wbModel);
+.run(
+	function($widget) {
+	    // Page
+	    $widget.newWidget('Page', {
+		dom : '<wb-content></wb-content>',
+		label : 'Panel',
+		description : 'Panel contains list of widgets.',
+		image : 'images/wb/content.svg',
+		link : 'http://dpq.co.ir/more-information-link',
+		data : {
+		    type : 'Page',
+		    style : {
+			direction : 'column',
+		    },
+		    contents : []
 		}
-	    }
-
-	    /**
-	     * Load widget settings
-	     * 
-	     */
-	    function settings() {
-		return $widget.widget($scope.wbModel)//
-		.then(function(widget) {
-		    return $settings.load({
-			wbModel : $scope.wbModel,
-			wbParent : $scope.wbParent,
-			style : {
-			    pages : widget.setting
-			}
-		    });
-		});
-	    }
-
-	    /*
-	     * Add to scope
-	     */
-	    $scope.removeWidget = removeWidget;
-	    $scope.settings = settings;
-	}
-    };
-});
+	    });
+	    // HTML text
+	    $widget.newWidget('HtmlText', {
+		dom : '<wb-html></wb-html>',
+		label : 'HTML text',
+		description : 'An HTML block text.',
+		image : 'images/wb/html.svg',
+		link : 'http://dpq.co.ir',
+		setting:['text', 'selfLayout', 'border',
+			'background', 'marginPadding',
+			'minMaxSize'],
+		data : {
+		    type : 'HtmlText',
+		    body : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+		    style : {
+			marginLeft : 1,
+			marginRight : 1,
+			marginTop : 1,
+			marginBottom : 1,
+			paddingLeft : 1,
+			paddingRight : 1,
+			paddingTop : 1,
+			paddingBottom : 1,
+			minWidth : 0,
+			maxWidth : 0,
+			minHeight : 0,
+			maxHeight : 0
+		    }
+		}
+	    });
+	});
