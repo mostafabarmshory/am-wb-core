@@ -41,6 +41,9 @@ angular.module('ngMaterialWeburger')
 	restrict : 'E',
 	transclude : true,
 	scope : false,
+	link: function(scope, element, attrs){
+//	    element.attr('draggable', 'true');
+	},
 	controller : function($scope, $settings, $widget) {
 
 	    /**

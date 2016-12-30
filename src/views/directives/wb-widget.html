@@ -1,4 +1,7 @@
-<div ng-class="{'wb-widget': wbEditable}" layout="column">
+<div 
+	draggable="{{wbEditable}}"
+	ng-class="{'wb-widget': wbEditable}" 
+	layout="column">
     <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
     <div ng-show="wbEditable"
          layout="row"
