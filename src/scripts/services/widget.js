@@ -35,54 +35,14 @@ angular.module('ngMaterialWeburger')
  */
 .service('$widget', function($q, $timeout, $mdDialog, PaginatorPage) {
 
-    var contentElementAsso = {
-	NotfoundElement : {
-	    dom : '<wb-notfound-element></wb-notfound-element>',
-	    label : 'Not found',
-	    image : 'images/wb/notfoundelement.svg',
-	    link : 'link',
-	},
-	Page : {
-	    dom : '<wb-content></wb-content>',
-	    label : 'Panel',
-	    description : 'Panel contains list of widgets.',
-	    image : 'images/wb/content.svg',
-	    link : 'http://dpq.co.ir/more-information-link',
-	    data : {
-		type : 'Page',
-		style : {
-		    direction : 'column',
-		},
-		contents : []
-	    }
-	},
-	HtmlText : {
-	    dom : '<wb-html></wb-html>',
-	    label : 'HTML text',
-	    description : 'An HTML block text.',
-	    image : 'images/wb/html.svg',
-	    link : 'http://dpq.co.ir',
-	    data : {
-		type : 'HtmlText',
-		body : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-		style : {
-		    marginLeft : 1,
-		    marginRight : 1,
-		    marginTop : 1,
-		    marginBottom : 1,
-		    paddingLeft : 1,
-		    paddingRight : 1,
-		    paddingTop : 1,
-		    paddingBottom : 1,
-		    minWidth : 0,
-		    maxWidth : 0,
-		    minHeight : 0,
-		    maxHeight : 0
-		}
-	    }
-	},
+    var contentElementAsso = [];
+    var elementKey = [];
+    var notFoundWidget = {
+	dom : '<wb-notfound-element></wb-notfound-element>',
+	label : 'Not found',
+	image : 'images/wb/notfoundelement.svg',
+	link : 'link',
     };
-
     /**
      * Finds a widget related to the input model.
      * 
@@ -97,7 +57,7 @@ angular.module('ngMaterialWeburger')
     function widget(model) {
 	var deferred = $q.defer();
 	$timeout(function() {
-	    var widget = contentElementAsso.mdeNotfoundElement;
+	    var widget = notFoundWidget;
 	    if (model.type in contentElementAsso) {
 		widget = contentElementAsso[model.type];
 	    }
@@ -117,8 +77,9 @@ angular.module('ngMaterialWeburger')
 	    var widgets = new PaginatorPage({});
 	    // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
 	    widgets.items = [];
-	    widgets.items.push(contentElementAsso.Page);
-	    widgets.items.push(contentElementAsso.HtmlText);
+	    elementKey.forEach(function(type) {
+		widgets.items.push(contentElementAsso[type]);
+	    });
 	    deferred.resolve(widgets);
 	}, 1);
 	return deferred.promise;
@@ -144,6 +105,7 @@ angular.module('ngMaterialWeburger')
 		return;
 	    }
 	    contentElementAsso[type] = model;
+	    elementKey.push(type);
 	    deferred.resolve(model);
 	}, 1);
 	return deferred.promise;
@@ -169,6 +131,45 @@ angular.module('ngMaterialWeburger')
 	});
     }
 
+    newWidget('Page', {
+	dom : '<wb-content></wb-content>',
+	label : 'Panel',
+	description : 'Panel contains list of widgets.',
+	image : 'images/wb/content.svg',
+	link : 'http://dpq.co.ir/more-information-link',
+	data : {
+	    type : 'Page',
+	    style : {
+		direction : 'column',
+	    },
+	    contents : []
+	}
+    });
+    newWidget('HtmlText', {
+	dom : '<wb-html></wb-html>',
+	label : 'HTML text',
+	description : 'An HTML block text.',
+	image : 'images/wb/html.svg',
+	link : 'http://dpq.co.ir',
+	data : {
+	    type : 'HtmlText',
+	    body : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+	    style : {
+		marginLeft : 1,
+		marginRight : 1,
+		marginTop : 1,
+		marginBottom : 1,
+		paddingLeft : 1,
+		paddingRight : 1,
+		paddingTop : 1,
+		paddingBottom : 1,
+		minWidth : 0,
+		maxWidth : 0,
+		minHeight : 0,
+		maxHeight : 0
+	    }
+	}
+    });
     // تعیین سرویس‌ها
     this.newWidget = newWidget;
     this.widget = widget;
