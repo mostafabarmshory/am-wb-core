@@ -35,5 +35,40 @@ angular.module('ngMaterialWeburger')
 	templateUrl : 'views/directives/wb-widget.html',
 	restrict : 'E',
 	transclude : true,
+	scope : false,
+	controller : function($scope, $settings, $widget) {
+
+	    /**
+	     * Remove widget from parent
+	     */
+	    function removeWidget() {
+		if ($scope.wbParent) {
+		    $scope.wbParent.removeWidget($scope.wbModel);
+		}
+	    }
+
+	    /**
+	     * Load widget settings
+	     * 
+	     */
+	    function settings() {
+		return $widget.widget($scope.wbModel)//
+		.then(function(widget) {
+		    return $settings.load({
+			wbModel : model,
+			wbParent : parentModel,
+			style : {
+			    pages : widget.setting
+			}
+		    });
+		});
+	    }
+
+	    /*
+	     * Add to scope
+	     */
+	    $scope.removeWidget = removeWidget;
+	    $scope.settings = settings;
+	}
     };
 });
