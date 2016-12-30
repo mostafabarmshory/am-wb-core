@@ -123,169 +123,6 @@ angular.module('ngMaterialWeburger')
 angular.module('ngMaterialWeburger')
 
 /**
- * @ngdoc controller
- * @name WbCmsCtrl
- * @memberof ngMaterialWeburger
- * @description # WbCmsCtrl
- * 
- * 
- */
-.controller('WbCmsCtrl',
-	function($scope, $rootScope, $http, $cms, PaginatorParameter) {
-
-	    /*
-	     * از این متغیر برای صفحه بندی و جستجوی محتوی‌ها استفاده می‌شود.‌
-	     */
-	    var paginatorParameter = new PaginatorParameter();
-
-	    /*
-	     * آخرین نتیچه‌ها در این متغیر نگهداری می‌شود.
-	     */
-	    var requests = null;
-
-	    /*
-	     * حالت اجرا را تعیین می‌کند. در صورتی که در حال بارگزاری باشیم این
-	     * مقدار درستی است.
-	     */
-	    var status = {
-		working : false
-	    };
-
-	    /*
-	     * جستجوی درخواست‌ها
-	     */
-	    function find() {
-		status.working = true;
-		$cms.contents(paginatorParameter)//
-		.then(function(items) {
-		    requests = items;
-		    $scope.contents = $scope.contents.concat(requests.items);
-		    status.working = false;
-		}, function() {
-		    status.working = false;
-		});
-	    }
-
-	    function clear() {
-		$scope.concats.length = 0;
-	    }
-
-	    function search(text) {
-		paginatorParameter//
-		.setQuery(text)//
-		.setPage(0);
-		clear();
-		find();
-	    }
-
-	    function date(dateTiem) {
-		clear();
-		find();
-	    }
-
-	    function mimetype(type) {
-		clear();
-		find();
-	    }
-
-	    /**
-	     * یک فایل جدید به عنوان محتوی به سرور لود می‌شود.
-	     * 
-	     * @param file
-	     * @returns
-	     */
-	    function upload(file) {
-		var content = null;
-		// 1- create new content
-		return $cms.newContent({
-		    title : 'no name',
-		    description : ''
-		})//
-		.then(function(newContent) {
-		    // 2- upload file
-		    content = newContent;
-		    return content.upload(file);
-		})//
-		.then(function() {
-		    // 3- push in current result
-		    $scope.contents.push(content);
-		    return content;
-		});
-	    }
-
-	    /**
-	     * محتوی را به روز می‌کند.
-	     * 
-	     * @param content
-	     * @returns
-	     */
-	    function update(content) {
-		return content.update();
-	    }
-
-	    /**
-	     * انتخاب یک محتوی
-	     * 
-	     * @param content
-	     * @returns
-	     */
-	    function select(content) {
-		$scope.content = content;
-	    }
-
-	    /**
-	     * حذف محتوی
-	     * 
-	     * @param content
-	     * @returns
-	     */
-	    function remove(content) {
-		return content.remove()//
-		.then(function() {
-		    var index = $scope.contents.indexOf(request);
-		    if (index > -1) {
-			$scope.contents.splice(index, 1);
-		    }
-		});
-	    }
-
-	    /**
-	     * صفحه بعد را بار گزاری می‌کند.
-	     */
-	    function next() {
-		// XXX: maso, 1395: check end page
-		if (status.working || !requests.hasMore()) {
-		    return;
-		}
-		paginatorParameter.setPage(requests.next());
-		find();
-	    }
-
-	    // Parameters
-	    $scope.status = status; // loading state
-	    $scope.contents = []; // contents
-	    // functions
-	    $scope.search = search;
-	    $scope.date = date;
-	    $scope.mimetype = mimetype;
-	    $scope.upload = upload;
-	    $scope.select = select;
-	    $scope.remove = remove;
-	    $scope.next = next;
-
-	    // init
-	    find();
-
-	});
-
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
-'use strict';
-
-angular.module('ngMaterialWeburger')
-
-/**
  * @ngdoc function
  * @name WbWbDialogsCtrl
  * @description # WbWbDialogsCtrl Controller of the donateMainApp
@@ -584,9 +421,29 @@ angular
 
 		});
 
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 'use strict';
 
 angular.module('ngMaterialWeburger')
@@ -600,56 +457,58 @@ angular.module('ngMaterialWeburger')
  * در این کنترل امکاناتی فراهم شده که کاربر بتواند از میان ویجت‌های موجودی یکی
  * را انتخاب کند.
  */
-.controller('WbWidgetSelectCtrl', function($scope, $widget, PaginatorParameter) {
-	var scope = $scope;
-	var paginatorParameter = new PaginatorParameter();
+.controller('WbWidgetSelectCtrl',
+	function($scope, $widget, PaginatorParameter) {
+	    var scope = $scope;
+	    var paginatorParameter = new PaginatorParameter();
 
-	/**
-	 * ویجت‌های موجود را لود می‌کند
-	 * 
-	 * تمام ویجت‌های لود شده در متغیری به نام widgets توی اسکپ بار می‌شود.
-	 * 
-	 */
-	function loadWidgets() {
+	    /**
+	     * ویجت‌های موجود را لود می‌کند
+	     * 
+	     * تمام ویجت‌های لود شده در متغیری به نام widgets توی اسکپ بار
+	     * می‌شود.
+	     * 
+	     */
+	    function loadWidgets() {
 		$widget.widgets(paginatorParameter).then(function(widgets) {
-			scope.widgets = widgets;
-			selectWidget(widgets.items[0]);
+		    scope.widgets = widgets;
+		    selectWidget(widgets.items[0]);
 		});
-	}
+	    }
 
-	/**
-	 * ویجت پیش فرض را تعیین می‌کند
-	 * 
-	 * با انتخاب یک ویجت به عنوان ویجت پیش فرض می‌توان نمایش خاصی از آن را در
-	 * سیستم ایجاد کرد.
-	 * 
-	 * @memberof WbWidgetSelectCtrl
-	 * @param {Widget}
-	 *            widget ویجت پیش فرض را تعیین می‌کند
-	 * @returns
-	 */
-	function selectWidget(widget) {
+	    /**
+	     * ویجت پیش فرض را تعیین می‌کند
+	     * 
+	     * با انتخاب یک ویجت به عنوان ویجت پیش فرض می‌توان نمایش خاصی از آن
+	     * را در سیستم ایجاد کرد.
+	     * 
+	     * @memberof WbWidgetSelectCtrl
+	     * @param {Widget}
+	     *                widget ویجت پیش فرض را تعیین می‌کند
+	     * @returns
+	     */
+	    function selectWidget(widget) {
 		scope.cwidget = widget;
 		// TODO: bind the widget
-	}
+	    }
 
-	/**
-	 * ویجت را به عنوان ویجت انتخاب شده تعیین می‌کندs 
-	 * 
-	 * @memberof WbWidgetSelectCtrl
-	 * @param widget
-	 * @returns
-	 */
-	function answerWidget(widget) {
+	    /**
+	     * ویجت را به عنوان ویجت انتخاب شده تعیین می‌کندs
+	     * 
+	     * @memberof WbWidgetSelectCtrl
+	     * @param widget
+	     * @returns
+	     */
+	    function answerWidget(widget) {
 		var element = angular.copy(widget.data);
 		$scope.answer(element);
-	}
+	    }
 
-	// تعیین خصوصیت‌های اسکوپ
-	scope.selectWidget = selectWidget;
-	scope.answerWidget = answerWidget;
-	loadWidgets();
-});
+	    // تعیین خصوصیت‌های اسکوپ
+	    scope.selectWidget = selectWidget;
+	    scope.answerWidget = answerWidget;
+	    loadWidgets();
+	});
 
 'use strict';
 
@@ -832,169 +691,6 @@ angular.module('ngMaterialWeburger')
 'use strict';
 
 angular.module('ngMaterialWeburger')
-
-/**
- * @ngdoc directive
- * @name donateMainApp.directive:mdeBrandAction
- * @description
- * 
- * نمایش یک برند به همراه عملیات کاربر
- * 
- * در بسیاری از سایت‌ها نیاز داریم که یک صفحه ساده نشون بدیم که یک متن ساده روش
- * نوشته شده و گاهی هم یه فهرست از عمل‌ها توش وجود داره و کاربر می‌تونه آنها را
- * تعیین کند.
- * 
- * محتوی ورودی به این موجودیت توسط خودش قابل ویرایش هست ولی قابلیت ویرایش اون
- * باید توسط کنتر تعیین بشه.
- * 
- * داده‌های ورودی هم باید توی یه ساختار داده‌ای ارائه بشه و ذخیره بازیابیش باید
- * تو خود کنترلی باشه که داره این ساختار رو استفاده می‌کنه.
- * 
- */
-.directive('wbBrandAction', function() {
-    return {
-	restrict : 'E',
-	replace : 'true',
-	templateUrl : 'views/directives/wb-brandaction.html',
-	scope : {
-	    mdeModel : '=?',
-	    mdeEditable : '=?',
-	    mdeParent : '=?'
-	},
-	controller : function($scope, $mdDialog, $act) {
-	    var scope = $scope;
-	    var model = $scope.mdeModel;
-	    var originatorEv;
-
-	    /**
-	     * یک عمل جدید به برند اضافه می‌کنیم
-	     * 
-	     * تعداد عمل‌هایی که روی برند وجود داره، متغییر هست و کاربر می‌تونه
-	     * با استفاده از این فراخوانی یک عمل جدید رو به فهرست عمل‌ها اضافه
-	     * کنه
-	     */
-	    function newAction() {
-		return editAction({}).then(function(newModel) {
-		    if (!model.actions) {
-			model.actions = [];
-		    }
-		    model.actions.push(newModel);
-		});
-	    }
-
-	    /**
-	     * یک عمل را ویرایش می‌کند
-	     * 
-	     * هر عملی که به نمایش اضافه می‌شود، به صورت مستقل قابل ویرایش است.
-	     * این فراخوانی برای ویرایش عمل در نظر گرفته شده است.
-	     */
-	    function editAction(action) {
-		return $mdDialog.show({
-		    controller : 'WbDialogsCtrl',
-		    templateUrl : 'views/dialogs/wb-action.html',
-		    parent : angular.element(document.body),
-		    clickOutsideToClose : true,
-		    fullscreen : true,
-		    locals : {
-			mdeModel : action,
-			style : {
-			    title : 'service'
-			}
-		    }
-		});
-	    }
-
-	    /**
-	     * عمل تعیین شده را از فهرست عمل‌ها حذف می‌کند
-	     * 
-	     * از این فراخوانی برای حذف عمل‌ها استفاده می‌شود. این تغییرها به
-	     * صورت مستقیم در مدل داده‌ای اعمال می‌شود.
-	     */
-	    function removeAction(action) {
-		var index = model.actions.indexOf(action);
-		if (index > -1) {
-		    model.actions.splice(index, 1);
-		}
-	    }
-
-	    /**
-	     * یک عمل را اجرا می‌کند
-	     * 
-	     */
-	    function runAction(action) {
-		$act.execute(action);
-	    }
-
-	    function removeWidget() {
-		if (scope.mdeParent) {
-		    scope.mdeParent.removeWidget(scope.mdeModel);
-		}
-	    }
-
-	    function settings() {
-		return $mdDialog.show({
-		    controller : 'WbDialogsCtrl',
-		    templateUrl : 'views/dialogs/wb-settings.html',
-		    parent : angular.element(document.body),
-		    clickOutsideToClose : true,
-		    fullscreen : true,
-		    locals : {
-			mdeModel : model,
-			style : {
-			    pages : [ 'text' ]
-			}
-		    }
-		});
-	    }
-
-	    function openMenu($mdOpenMenu, ev) {
-		originatorEv = ev;
-		$mdOpenMenu(ev);
-	    }
-
-	    scope.add = newAction;
-	    scope.edit = editAction;
-	    scope.remove = removeAction;
-	    scope.runAction = runAction;
-
-	    scope.removeWidget = removeWidget;
-	    scope.settings = settings;
-	    scope.openMenu = openMenu;
-	}
-    };
-});
-
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
-'use strict';
-
-angular.module('ngMaterialWeburger')
-
-/**
- * @ngdoc directive
- * @name donateMainApp.directive:MdeCollapsibleItemList
- * @description # MdeCollapsibleItemList
- */
-
-.directive('wbCollapsibleItemList', function() {
-    return {
-	templateUrl : 'views/directives/wb-collapsibleitemlist.html',
-	restrict : 'E',
-	replase : true,
-	scope : {
-	    mdeEditable : '=?',
-	    mdeModel : '=?'
-	}
-    };
-});
-
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
-'use strict';
-
-angular.module('ngMaterialWeburger')
 /**
  * @ngdoc directive
  * @name donateMainApp.directive:wbContent
@@ -1146,152 +842,6 @@ angular.module('ngMaterialWeburger')
 	    };
 	});
 
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
-'use strict';
-
-angular.module('ngMaterialWeburger')
-
-/**
- * @ngdoc directive
- * @name donateMainApp.directive:mdeCopyright
- * @description # mdeCopyright
- */
-.directive('wbCopyright', function() {
-    return {
-	restrict : 'E',
-	replace : true,
-	templateUrl : 'views/directives/wb-copyright.html',
-	scope : {
-	    mdeEditable : '=?',
-	    mdeModel : '=?',
-	    mdeParent : '=?'
-	},
-	controller : function($scope, $mdDialog, $act) {
-	    var scope = $scope;
-	    var model = $scope.mdeModel;
-
-	    function removeWidget() {
-		if (scope.mdeParent) {
-		    scope.mdeParent.removeWidget(model);
-		}
-	    }
-
-	    function settings() {
-		return $mdDialog.show({
-		    controller : 'WbDialogsCtrl',
-		    templateUrl : 'views/dialogs/wb-settings.html',
-		    parent : angular.element(document.body),
-		    clickOutsideToClose : true,
-		    fullscreen : true,
-		    locals : {
-			mdeModel : model,
-			style : {
-			    pages : [ 'text' ]
-			}
-		    }
-		});
-	    }
-
-	    scope.removeWidget = removeWidget;
-	    scope.settings = settings;
-	}
-    };
-});
-
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
-'use strict';
-
-angular.module('ngMaterialWeburger')
-/**
- * @ngdoc directive
- * @name donateMainApp.directive:mdeFeatureList
- * @description # mdeFeatureList
- */
-.directive('wbFeatureList', function() {
-    return {
-	restrict : 'E',
-	replace : true,
-	templateUrl : 'views/directives/wb-featurelist.html',
-	scope : {
-	    mdeEditable : '=?',
-	    mdeModel : '=?',
-	    mdeParent : '=?'
-	},
-	controller : function($scope, $mdDialog) {
-	    var scope = $scope;
-	    var model = $scope.mdeModel;
-	    var originatorEv;
-
-	    function addFeature() {
-		return editFeature({}).then(function(feature) {
-		    if (!model.features) {
-			model.features = [];
-		    }
-		    model.features.push(feature);
-		    return feature;
-		});
-	    }
-
-	    function editFeature(feature) {
-		return $mdDialog.show({
-		    controller : 'WbDialogsCtrl',
-		    templateUrl : 'views/dialogs/wb-ticket.html',
-		    parent : angular.element(document.body),
-		    clickOutsideToClose : true,
-		    fullscreen : true,
-		    locals : {
-			mdeModel : feature,
-			style : {}
-		    }
-		});
-	    }
-
-	    function removeFeature(feature) {
-		var index = model.features.indexOf(feature);
-		if (index > -1) {
-		    model.features.splice(index, 1);
-		}
-	    }
-
-	    function removeWidget() {
-		if (scope.mdeParent) {
-		    scope.mdeParent.removeWidget(scope.mdeModel);
-		}
-	    }
-
-	    function settings() {
-		return $mdDialog.show({
-		    controller : 'WbDialogsCtrl',
-		    templateUrl : 'views/dialogs/wb-settings.html',
-		    parent : angular.element(document.body),
-		    clickOutsideToClose : true,
-		    fullscreen : true,
-		    locals : {
-			mdeModel : model,
-			style : {
-			    pages : [ 'text', 'background' ]
-			}
-		    }
-		});
-	    }
-
-	    scope.add = addFeature;
-	    scope.remove = removeFeature;
-	    scope.edit = editFeature;
-	    scope.removeWidget = removeWidget;
-	    scope.settings = settings;
-	    // $scope.update();
-	    // $scope.$watch('mdeModel', function() {
-	    // $scope.update();
-	    // });
-	}
-    };
-});
-
 'use strict';
 
 angular.module('ngMaterialWeburger')
@@ -1362,87 +912,6 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc directive
- * @name ngMaterialWeburger.directive:mdeIconfontChoise
- * @description # mdeIconfontChoise
- */
-.directive(
-	'wbIconfontChoise',
-	function() {
-	    return {
-		restrict : 'E',
-		replace : 'true',
-		templateUrl : 'views/directives/wb-iconfontchoise.html',
-		require : '^mdeModel',
-		scope : {
-		    mdeModel : '=',
-		    mdeFontSet : '@?',
-		    mdeListUrl : '@?'
-		},
-		controller : function($scope, $http, $q, $timeout, $log) {
-		    var self = $scope;
-		    self.mdeList = [];
-		    /**
-		     * Search for icon... use $timeout to simulate remote
-		     * dataservice call.
-		     */
-		    function querySearch(query) {
-			var deferred = $q.defer();
-			$timeout(function() {
-			    var results = query ? self.mdeList
-				    .filter(createFilterFor(query))
-				    : self.mdeList;
-			    deferred.resolve(results);
-			}, Math.random() * 100, false);
-			return deferred.promise;
-		    }
-
-		    function searchTextChange(text) {
-			$log.info('Text changed to ' + text);
-		    }
-
-		    function selectedItemChange(item) {
-			$log.info('Item changed to ' + JSON.stringify(item));
-			$scope.mdeModel = item;
-		    }
-
-		    /**
-		     * Build `states` list of key/value pairs
-		     */
-		    function loadAll() {
-			$scope.state = 'loading';
-			return $http.get($scope.mdeListUrl).then(function(res) {
-			    $scope.mdeList = res.data;
-			    $scope.state = 'normal';
-			});
-		    }
-		    /**
-		     * Create filter function for a query string
-		     */
-		    function createFilterFor(query) {
-			var lowercaseQuery = angular.lowercase(query);
-			return function filterFn(state) {
-			    return (state.indexOf(lowercaseQuery) === 0);
-			};
-		    }
-
-		    // list of `state` value/display objects
-		    loadAll();
-		    self.querySearch = querySearch;
-		    self.selectedItemChange = selectedItemChange;
-		    self.searchTextChange = searchTextChange;
-		}
-	    };
-	});
-
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
-'use strict';
-
-angular.module('ngMaterialWeburger')
-
-/**
- * @ngdoc directive
  * @name wbInfinateScroll
  * @description
  * 
@@ -1474,255 +943,6 @@ angular.module('ngMaterialWeburger')
 angular.module('ngMaterialWeburger')
 /**
  * @ngdoc directive
- * @name donateMainApp.directive:mdeLinkList
- * @description # mdeLinkList
- */
-.directive('wbLinkList', function() {
-    return {
-	restrict : 'E',
-	templateUrl : 'views/directives/wb-linklist.html',
-	replase : true,
-	scope : {
-	    wbEditable : '=?',
-	    wbModel : '=?',
-	    wbParent : '=?'
-	},
-	link : function(scope, elem, attrs) {
-//	    scope.$watch('wbModel.style.flexAlignItem', function(
-//		    newValue, oldValue) {
-//		elem.removeClass(oldValue);
-//		elem.addClass(newValue);
-//	    });
-//	    scope.$watch('wbModel.style.flexItemGrow', function(
-//		    newValue, oldValue) {
-//		elem.css('flex-grow', newValue);
-//	    });
-	},
-	controller : function($scope, $element, $settings) {
-	    var scope = $scope;
-	    var model = $scope.wbModel;
-	    var parentModel = $scope.wbParent;
-	    var ctrl = {
-		    hoveringDelBtn: false
-	    }
-
-	    function removeWidget() {
-		if (parentModel) {
-		    parentModel.removeWidget(model);
-		}
-	    }
-
-	    function settings() {
-		return $settings.load({
-		    wbModel : model,
-		    wbParent : parentModel,
-		    style : {
-			pages : [ 'text', 'pageLayout', 'selfLayout', 'border',
-				'background', 'marginPadding',
-				'minMaxSize' ]
-		    }
-		});
-	    }
-
-	    /**
-	     * Adds new empty link
-	     * 
-	     * Adds new empty link into the list.
-	     */
-	    function addLink(){
-		if(!scope.wbModel.links){
-		    clearAll();
-		}
-		var link = {
-		    title: 'New link',
-		    description: 'Link description',
-		    image: 'images/wb/linklist.svg',
-		    href: 'http://dpq.co.ir'
-		};
-		scope.wbModel.links.push(link);
-	    }
-	    
-	    /**
-	     * 
-	     */
-	    function clearAll(){
-		scope.wbModel.links = [];
-	    }
-	    
-	    scope.removeWidget = removeWidget;
-	    scope.settings = settings;
-	    scope.ctrl = ctrl;
-	    scope.extraActions = [
-		{
-		    title: 'New link',
-		    icon: 'add',
-		    action: addLink
-		},{
-		    title: 'Clear all',
-		    icon: 'clear_all',
-		    action: clearAll
-		}
-	    ];
-	}
-    };
-});
-
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
-'use strict';
-
-angular.module('ngMaterialWeburger')
-
-/**
- * @ngdoc directive
- * @name digidociMainApp.directive:ddDeviceList
- * @description # ddDeviceList
- */
-.directive(
-	'wbMembers',
-	function() {
-
-	    var bodyElementSelector = 'div#wb-members-body';
-	    var placeholderElementSelector = 'div#wb-members-placeholder';
-
-	    return {
-		restrict : 'E',
-		templateUrl : 'views/directives/wb-members.html',
-		require : '^wbModel',
-		scope : {
-		    wbEditable : '=?',
-		    wbModel : '=?',
-		    wbParent : '=?'
-		},
-		controller : function($scope, $usr, $element, $widget,
-			$compile, $settings) {
-		    var scope = $scope;
-		    var model = $scope.wbModel;
-		    var parentModel = $scope.wbParent;
-		    
-
-
-		    function removeWidget() {
-			if (parentModel) {
-			    parentModel.removeWidget(model);
-			}
-		    }
-		    
-		    function isEditable() {
-			if (scope.wbParent) {
-			    return scope.wbParent.isEditable();
-			}
-			return scope.wbEditable;
-		    }
-
-		    /**
-		     * تنظیم‌های کلی صفحه را انجام می‌دهد
-		     * 
-		     * یک دریچه محاوره‌ای باز می‌شود تا کاربر بتواند تنظیم‌های
-		     * متفاوت مربوط به این صفحه را انجام دهد.
-		     */
-		    function settings() {
-			return $settings.load({
-			    wbModel : scope.wbModel,
-			    wbParent : scope.wbParent,
-			    style : {
-				pages : [ 'description', 'border',
-					'background', 'pageLayout',
-					'selfLayout' ]
-			    }
-			});
-		    }
-
-		    function removeWidgets() {
-			$element//
-			.children(bodyElementSelector)//
-			.children(placeholderElementSelector)//
-			.empty();
-		    }
-
-		    function createWidget(widget, parentScope, model) {
-			var element = angular.element(widget);
-			element.attr('wb-model', 'model');
-			element.attr('wb-editable', 'wbEditable()');
-			element.attr('wb-parent', 'wbParent');
-			var childScope = parentScope.$new(true, parentScope);
-			childScope.model = model;
-			childScope.wbEditable = scope.isEditable;
-			childScope.wbParent = parentScope;
-			// TODO: maso, 1395: این موجودیت باید ایجاد شود
-			return $compile(element)(childScope);
-		    }
-
-		    function loadUsers(widget, users) {
-			var template = JSON.stringify(scope.wbModel.template);
-			var root = $element//
-			.children(bodyElementSelector)//
-			.children(placeholderElementSelector);
-			for (var i = 0; i < users.items.length; i++) {
-			    var user = users.items[i];
-			    var ft = template.replace(/{{user.id}}/g, user.id);
-			    ft = ft.replace(/{{user.login}}/g, user.login);
-			    ft = ft.replace(/{{user.first_name}}/g,
-				    user.first_name);
-			    ft = ft.replace(/{{user.last_name}}/g,
-				    user.last_name);
-			    var item = JSON.parse(ft);
-			    var w = createWidget(widget.dom, $scope, item);
-			    root.append(w);
-			}
-		    }
-
-		    function reload() {
-			removeWidgets();
-			// TODO: maso, 1395: get user list
-			var users = {}
-			$usr.role(scope.wbModel.role)//
-			.then(function(role) {
-			    return role.users();
-			})//
-			.then(function(ul) {
-			    users = ul;
-			    return $widget.widget(scope.wbModel.template);
-			})//
-			.then(function(widget) {
-			    loadUsers(widget, users);
-			});
-		    }
-
-		    function loadRoles() {
-			return $usr.roles()//
-			.then(function(roles) {
-			    scope.roles = roles;
-			}, function(error) {
-			    alert(error);
-			});
-		    }
-
-		    scope.loadRoles = loadRoles;
-		    scope.settings = settings;
-		    scope.isEditable = isEditable;
-		    scope.removeWidget = removeWidget;
-
-		    scope.$watch('wbEditable', function() {
-			if (!scope.wbEditable) {
-			    reload();
-			} else {
-			    removeWidgets();
-			}
-		    });
-		}
-	    };
-	});
-
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
-'use strict';
-
-angular.module('ngMaterialWeburger')
-/**
- * @ngdoc directive
  * @name donateMainApp.directive:mdeNotfoundElement
  * @description # mdeNotfoundElement
  */
@@ -1734,137 +954,6 @@ angular.module('ngMaterialWeburger')
 	    // element.text('this is the mdeNotfoundElement directive');
 	}
     };
-});
-
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
-'use strict';
-
-angular.module('ngMaterialWeburger')
-
-/**
- * @ngdoc directive
- * @name donateMainApp.directive:mdeSocialList
- * @description فهرستی از شبکه‌های اجتمائی
- * 
- * یک فهرست از شبکه‌های اجتمائی نمایش داده می‌شود تا بتونیم به سادگی لیک
- * شبکه‌های رو بین کاربران به اشتراک بزاریم.
- */
-.directive('wbSocialList', function() {
-	return {
-		restrict : 'E',
-		replace : true,
-		templateUrl : 'views/directives/wb-sociallist.html',
-		scope : {
-			mdeEditable: '=?',
-			mdeModel: '=?',
-			mdeParent: '=?'
-		},
-		controller : function($scope, $mdDialog, $act) {
-
-			var scope = $scope;
-		    var originatorEv;
-			
-			/**
-			 * یک شبکه اجتمائی جدید به فهرست اضافه می‌کند
-			 * 
-			 * برای این کار یک درچه محاوره‌ای باز می‌شود و اطلاعات
-			 * مورد نیاز از کاربر دریافت می‌شود.
-			 */
-			function addSocial(){
-				return editSocial({}).then(function(model) {
-					if (!scope.mdeModel.socials) {
-						scope.mdeModel.socials = [];
-					}
-					scope.mdeModel.socials.push(model);
-					return model;
-				});
-			}
-			
-			/**
-			 * شبکه اجتمائی تعیین شده ویرایش می‌شود
-			 * 
-			 * شبکه اجمائی با یک دریچه محاوره‌ای به کاربر نمایش داده
-			 * می‌شود تا اطلاعات جدید را در آن وارد کند. تغییرات بعد
-			 * از تایید کاربر اعمال خواهد شد.
-			 */
-			function editSocial(social){
-				return $mdDialog.show({
-					controller : 'WbDialogsCtrl',
-					templateUrl : 'views/dialogs/wb-social.html',
-					parent : angular.element(document.body),
-					clickOutsideToClose : true,
-					locals : {
-						mdeModel : social,
-						style : {
-							title : 'social'
-						}
-					}
-				});
-			}
-			
-			/**
-			 * شبکه تعیین شده حذف خواهد شد.
-			 * 
-			 */
-			function removeSocial(social) {
-				var index = scope.mdeModel.socials.indexOf(social);
-				if (index > -1) {
-					scope.mdeModel.socials.splice(social, 1);
-				}
-			}
-			
-			/**
-			 * عمل لود کردن شبکه اجتمائی
-			 * 
-			 * این فراخوانی عمل تعیین شده برای شبکه اجتمائی را اجرا
-			 * می‌کند.
-			 */
-			function gotoSocial(social){
-				if(scope.mdeEditable){
-					return editSocial(social);
-				}
-				$act.execute(social.action);
-			}
-			
-			function removeWidget() {
-				if (scope.mdeParent) {
-					scope.mdeParent.removeWidget(scope.mdeModel);
-				}
-			}
-			
-			function openMenu($mdOpenMenu, ev) {
-				originatorEv = ev;
-				$mdOpenMenu(ev);
-			}
-			
-			function settings (){
-				return $mdDialog.show({
-					controller : 'WbDialogsCtrl',
-					templateUrl : 'views/dialogs/wb-settings.html',
-					parent : angular.element(document.body),
-					clickOutsideToClose : true,
-					locals : {
-						mdeModel : scope.mdeModel,
-						style : {
-							pages : ['general', 'background']
-						}
-					}
-				});
-			}
-			// مقداردهی اسکوپ
-			scope.add = addSocial;
-			scope.edit = editSocial;
-			scope.delete = removeSocial;
-			scope.gotoSocial = gotoSocial;
-			scope.removeWidget = removeWidget;
-			
-			scope.settings = settings;
-			scope.openMenu = openMenu;
-			
-		}
-	};
 });
 
 'use strict';
@@ -2035,6 +1124,12 @@ angular
 	function($q, $timeout, $mdDialog, PaginatorPage) {
 
 	    var contentElementAsso = {
+		    NotfoundElement : {
+			dom : '<wb-notfound-element></wb-notfound-element>',
+			label : 'Not found',
+			image : 'images/wb/notfoundelement.svg',
+			link : 'link',
+		    },
 		    Page : {
 			dom : '<wb-content></wb-content>',
 			label : 'Panel',
@@ -2047,73 +1142,6 @@ angular
 				direction : 'column',
 			    },
 			    contents : []
-			}
-		    },
-		    NotfoundElement : {
-			dom : '<wb-notfound-element></wb-notfound-element>',
-			label : 'Not found',
-			image : 'images/wb/notfoundelement.svg',
-			link : 'link',
-		    },
-//		    BrandAction : {
-//			dom : '<wb-brand-action></wb-brand-action>',
-//			label : 'Brand with action',
-//			description : 'A brand image with action list',
-//			image : 'images/wb/brandaction.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'BrandAction',
-//			    style : {},
-//			}
-//		    },
-//		    Copyright : {
-//			dom : '<wb-copyright></wb-copyright>',
-//			label : 'Copyright',
-//			description : 'Copyright text',
-//			image : 'images/wb/copyright.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'Copyright',
-//			    title : 'copyright example',
-//			    text : 'This is a simple copy right text.',
-//			    style : {
-//				width : '100%',
-//				color : '#000000',
-//				backgroundColor : '#00000000'
-//			    }
-//			}
-//		    },
-//		    FeatureList : {
-//			dom : '<wb-feature-list></wb-feature-list>',
-//			label : 'Features list',
-//			description : 'List of features',
-//			image : 'images/wb/featurelist.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'FeatureList',
-//			    style : {},
-//			}
-//		    },
-//		    SocialList : {
-//			dom : '<wb-social-list></wb-social-list>',
-//			label : 'Socials link',
-//			description : 'Social link list',
-//			image : 'images/wb/sociallist.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'SocialList',
-//			    style : {},
-//			}
-//		    },
-		    LinkList : {
-			dom : '<wb-link-list></wb-link-list>',
-			label : 'Link list',
-			description : 'List of links and ticktes',
-			image : 'images/wb/linklist.svg',
-			link : 'link',
-			data : {
-			    type : 'LinkList',
-			    style : {},
 			}
 		    },
 		    HtmlText : {
@@ -2141,29 +1169,6 @@ angular
 			    }
 			}
 		    },
-//		    CollapsibleItemList : {
-//			dom : '<wb-collapsible-item-list></wb-collapsible-item-list>',
-//			label : 'Collapsible item list',
-//			description : 'List of item with a collapsiblity',
-//			image : 'images/wb/notfoundelement.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'CollapsibleItemList',
-//			    style : {},
-//			}
-//		    },
-		    Members : {
-			dom : '<wb-members></wb-members>',
-			label : 'Members list',
-			description : 'List of members',
-			image : 'images/wb/user.svg',
-			link : 'http://dpq.co.ir',
-			data : {
-			    type : 'Members',
-			    style : {},
-			    template : {}
-			}
-		    }
 	    };
 
 	    /**
@@ -2200,14 +1205,7 @@ angular
 		    // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
 		    widgets.items = [];
 		    widgets.items.push(contentElementAsso.Page);
-//		    widgets.items.push(contentElementAsso.BrandAction);
-//		    widgets.items.push(contentElementAsso.Copyright);
-//		    widgets.items.push(contentElementAsso.FeatureList);
-//		    widgets.items.push(contentElementAsso.SocialList);
-		    widgets.items.push(contentElementAsso.LinkList);
 		    widgets.items.push(contentElementAsso.HtmlText);
-		    // widgets.items.push(contentElementAsso.CollapsibleItemList);
-		    widgets.items.push(contentElementAsso.Members);
 		    deferred.resolve(widgets);
 		}, 1);
 		return deferred.promise;
@@ -2286,31 +1284,8 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   );
 
 
-  $templateCache.put('views/directives/wb-brandaction.html',
-    "<div ng-class=\"{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}\">  <div ng-show=mdeEditable layout=row class=mde-widget-header ng-include=\"'views/partials/mdewidgetheaderactions.html'\"> </div> <div ng-show=mdeModel ng-style=\"{ 'background-image': 'url('+mdeModel.style.backgroundImage+')', 'background-size': mdeModel.style.backgroundSize, 'color': mdeModel.style.color, 'width': mdeModel.style.width, 'height': mdeModel.style.height}\" layout=column layout-align=\"space-between center\"> <div ng-style=\"{'width': '100%'}\" layout=column layout-align=\"center center\"> <h1 class=md-display-3 ng-style=\"{'color': mdeModel.style.color}\" ng-class=\"{'mde-rtl':mdeModel.style.rtl}\">{{ mdeModel.title }}</h1> <div ng-style=\"{'color': mdeModel.style.color}\" ng-class=\"{'mde-rtl':mdeModel.style.rtl}\" ng-bind-html=\"mdeModel.text | wbunsafe\" hide show-gt-xs></div> <div layout=column layout-gt-xs=row layout-align-gt-xs=\"center center\"> <md-button ng-if=!mdeEditable ng-repeat=\"action in mdeModel.actions\" ng-style=\"{'color': mdeModel.style.color, 'font-size': '20px'}\" class=md-raised ng-class=\"{'md-primary': action.primary, 'md-accent': action.accent}\" ng-click=runAction(action)>{{ action.label }} </md-button> <md-menu ng-if=mdeEditable ng-repeat=\"action in mdeModel.actions\"> <md-button ng-class=\"{'md-primary': action.primary, 'md-accent': action.accent}\" class=md-raised aria-label=\"Open phone interactions menu\" ng-click=\"openMenu($mdOpenMenu, $event)\"> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\" class=md-48 md-font-set=social> {{action.icon}} </md-icon> {{ action.label }} </md-button> <md-menu-content width=4> <md-menu-item> <md-button ng-click=\"edit(action, $event)\"> <md-icon>edit</md-icon> {{ 'Edit' | translate }} </md-button> </md-menu-item> <md-menu-item> <md-button ng-click=\"remove(action, $event)\"> <md-icon>delete</md-icon> {{ 'Delete' | translate }} </md-button> </md-menu-item> </md-menu-content> </md-menu> <md-button ng-if=mdeEditable ng-click=add()> <md-icon>add</md-icon> </md-button> </div> </div> </div> </div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-collapsibleitemlist.html',
-    "<div ng-class=\"{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}\">  <div ng-show=mdeEditable layout=row class=mde-widget-header ng-include=\"'views/partials/mdewidgetheaderactions.html'\"> </div> <div ng-style=\"{'background-color': mdeModel.style.backgroundColor,\n" +
-    "    'color': mdeModel.style.color,\n" +
-    "    'width': mdeModel.style.width,\n" +
-    "    'height': mdeModel.style.height}\" ng-html-bind=mdeModel.body|wbunsafe ng-class=\"{'mde-rtl':mdeModel.style.rtl}\"> <ul> <li ng-repeat=\"item in mdeModel.list\"> <md-icon>{{item.icon}}</md-icon> {{item.title}} <p ng-bind-html=\"item.text | wbunsafe\"></p> </li> </ul> </div> </div>"
-  );
-
-
   $templateCache.put('views/directives/wb-content.html',
     "<div ng-class=\"{'wb-panel': wbEditable}\">  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> Panel</span> <span flex></span> <md-button ng-click=newWidget(wbModel) class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=removeWidget(wbModel) ng-show=wbParent> <md-icon class=wb-icon-mini>delete</md-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=overlay></div>  <div class=wb-flex wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder> </div>  </div> </div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-copyright.html',
-    "<wb-widget> <div wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style layout-align=\"start center\"> <div ng-style=\"{'width': '80%', 'margin-top': '3em', 'border-bottom': '1px solid #fff' }\"> </div> <div layout=column layout-align=\"start center\" ng-class=\"{'mde-rtl':mdeModel.style.rtl}\"> <h3>{{mdeModel.title}}</h3> <div ng-bind-html=mdeModel.text|wbunsafe></div> </div> </div> </wb-widget>"
-  );
-
-
-  $templateCache.put('views/directives/wb-featurelist.html',
-    "<div ng-class=\"{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}\">  <div ng-show=mdeEditable layout=row class=mde-widget-header ng-include=\"'views/partials/mdewidgetheaderactions.html'\"> </div> <div ng-style=\"{ 'background': mdeModel.style.background,'border-radius': mdeModel.style.borderRadius, 'border': mdeModel.style.border }\" layout=column>  <h1 style=\"text-align: center\">{{mdeModel.title}}</h1> <div ng-style=\"{'width': '100%'}\" ng-bind-html=\"mdeModel.text | wbunsafe\"> </div> <div ng-class=\"{'mde-rtl':mdeModel.style.rtl}\" layout=column layout-align=\"center center\" layout-gt-sm=row layout-align-gt-sm=\"space-around center\" ng-style=\"{'width': '100%'}\"> <div layout=column flex=100 flex-gt-sm=none layout-align=\"center center\" layout-padding ng-repeat=\"feature in mdeModel.features\"> <md-icon ng-style=\"{ 'font-size': '64px', 'color': mdeModel.style.color}\">{{feature.icon}}</md-icon> <h3 ng-style=\"{'color': mdeModel.style.color}\" ng-class=\"{'mde-rtl':mdeModel.style.rtl}\"> {{feature.title}} <div ng-if=mdeEditable> <md-button class=md-icon-button ng-click=edit(feature)> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\">edit</md-icon> </md-button> <md-button class=md-icon-button ng-click=remove(feature)> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\">delete</md-icon> </md-button> </div> </h3> <div ng-style=\"{'color': mdeModel.style.color}\" ng-class=\"{'mde-rtl':mdeModel.style.rtl}\" ng-bind-html=\"feature.text | wbunsafe\"></div> </div> </div> </div> </div>"
   );
 
 
@@ -2319,28 +1294,13 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   );
 
 
-  $templateCache.put('views/directives/wb-iconfontchoise.html',
-    "<div> <md-autocomplete ng-disabled=false md-no-cache=false md-selected-item=mdeModel md-search-text-change=searchTextChange(searchText) md-search-text=searchText md-selected-item-change=selectedItemChange(item) md-items=\"item in querySearch(searchText)\" md-item-text=item md-min-length=0 placeholder=\"What is your iconfont symbol?\"> <md-item-template> <md-icon md-font-set={{mdeFontSet}}>{{item}}</md-icon> <span md-highlight-text=searchText md-highlight-flags=^i>{{item}}</span> </md-item-template> <md-not-found> No iconfont matching \"{{searchText}}\" were found. </md-not-found> </md-autocomplete> </div>"
-  );
-
-
   $templateCache.put('views/directives/wb-linklist.html',
     "<wb-widget> <a ng-repeat=\"link in wbModel.links\" ng-href={{link.href}}> <img src={{link.image}} style=\"min-width: 80px\">   </a> </wb-widget>"
   );
 
 
-  $templateCache.put('views/directives/wb-members.html',
-    "<wb-widget>   <div class=wb-panel-body id=wb-members-body> <div> <md-select ng-show=wbEditable placeholder=\"User list role\" ng-model=wbModel.role md-on-open=loadRoles() style=\"min-width: 200px\"> <md-option ng-value=role.id ng-repeat=\"role in roles.items\"> {{role.name}} </md-option> </md-select> </div> <wb-content ng-show=wbEditable wb-editable=wbEditable wb-model=wbModel.template> </wb-content> <div id=wb-members-placeholder wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style> </div> </div> </wb-widget>"
-  );
-
-
   $templateCache.put('views/directives/wb-notfoundelement.html',
     "<div ng-class=\"{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}\">  <div ng-show=mdeEditable layout=row class=mde-widget-header ng-include=\"'views/partials/mdewidgetheaderactions.html'\"> </div> <div ng-show=mdeEditable> Unsuported widget?! </div> </div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-sociallist.html',
-    "<div ng-class=\"{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}\">  <div ng-show=mdeEditable layout=row class=mde-widget-header ng-include=\"'views/partials/mdewidgetheaderactions.html'\"> </div> <div layout=row layout-align=\"start start\" layout-wrap ng-class=\"{'mde-rtl':mdeModel.style.rtl}\" ng-style=\"{ 'color': mdeModel.style.color, 'background-color': mdeModel.style.backgroundColor, 'width': mdeModel.style.width, 'font-family': mdeModel.style.font, 'padding': mdeModel.style.padding }\">   <md-button ng-if=!mdeEditable ng-repeat=\"social in mdeModel.socials\" ng-click=gotoSocial(social)> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\" class=md-48 md-font-set=social>{{social.icon}} </md-icon> </md-button> <md-menu ng-if=mdeEditable ng-repeat=\"social in mdeModel.socials\"> <md-button aria-label=\"Open phone interactions menu\" class=md-icon-button ng-click=\"openMenu($mdOpenMenu, $event)\"> <md-icon ng-style=\"{ 'color': mdeModel.style.color }\" class=md-48 md-font-set=social> {{social.icon}} </md-icon> </md-button> <md-menu-content width=4> <md-menu-item> <md-button ng-click=\"edit(social, $event)\"> <md-icon>edit</md-icon> {{ 'Edit' | translate }} </md-button> </md-menu-item> <md-menu-item> <md-button ng-click=\"delete(social, $event)\"> <md-icon>delete</md-icon> {{ 'Delete' | translate }} </md-button> </md-menu-item> </md-menu-content> </md-menu> </div> </div>"
   );
 
 
