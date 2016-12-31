@@ -177,10 +177,6 @@ angular.module('ngMaterialWeburger')
 			});
 		    }
 
-		    function isArray(model) {
-			return (model && model.constructor === Array);
-		    }
-
 		    scope.settings = settings;
 		    scope.removeWidgets = removeWidgets;
 		    scope.removeWidget = removeWidget;
@@ -194,7 +190,7 @@ angular.module('ngMaterialWeburger')
 			    // XXX: maso, 1395: هنوز مدل تعیین نشده
 			    return;
 			}
-			if (!isArray(scope.wbModel.contents)) {
+			if (!angular.isArray(scope.wbModel.contents)) {
 			    scope.wbModel.contents = [];
 			}
 			scope.wbModel.type = 'Page';
