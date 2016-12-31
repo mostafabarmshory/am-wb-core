@@ -39,7 +39,8 @@ angular
         'pluf',//
         'mdColorPicker',//
 //        'ngMaterialWysiwyg',
-        'ui.tinymce'
+        'ui.tinymce', //
+        'dndLists',//
     ]);
 
 /* 
@@ -1071,6 +1072,7 @@ angular.module('ngMaterialWeburger')
 	'wbContent',
 	function($compile, $widget) {
 
+	    var dragClass = 'wb-content-dragenter';
 	    var bodyElementSelector = 'div#wb-content-body';
 	    var placeholderElementSelector = 'div#wb-content-placeholder';
 
@@ -1085,8 +1087,13 @@ angular.module('ngMaterialWeburger')
 		    wbParent : '=?'
 		},
 
+		link : function(scope, element, attrs) {
+		    // TODO:
+		},
+
 		controller : function($scope, $element, $settings, $widget) {
 		    var scope = $scope;
+		    var element = $element;
 
 		    function isEditable() {
 			if (scope.wbParent) {
@@ -1159,6 +1166,28 @@ angular.module('ngMaterialWeburger')
 		    }
 
 		    /**
+		     * Adds dragged widget
+		     */
+		    function addDraggedWidget(event, index, item, external,
+			    type) {
+			// insert in model
+			scope.wbModel.contents.splice(index, 0, item);
+			// add widget
+			$widget.widget(item).then(function(widget) {
+			    var list = $element//
+			    .children(bodyElementSelector)//
+			    .children(placeholderElementSelector);
+			    var w = createWidget(widget.dom, $scope, item);
+			    if(index < list[0].childNodes.length){
+				w.insertBefore(list[0].childNodes[index]);
+			    } else {
+				list.append(w);
+			    }
+			});
+			return true;
+		    }
+
+		    /**
 		     * تنظیم‌های کلی صفحه را انجام می‌دهد
 		     * 
 		     * یک دریچه محاوره‌ای باز می‌شود تا کاربر بتواند تنظیم‌های
@@ -1185,6 +1214,7 @@ angular.module('ngMaterialWeburger')
 		    scope.removeWidget = removeWidget;
 		    scope.newWidget = newWidget;
 		    scope.isEditable = isEditable
+		    scope.addDraggedWidget = addDraggedWidget;
 
 		    scope.$watch('wbModel', function() {
 			removeWidgets();
@@ -1257,32 +1287,6 @@ angular.module('ngMaterialWeburger')
 			elem.css('flex-grow', newValue);
 		    });
 		},
-		controller : function($scope, $element, $settings) {
-		    var scope = $scope;
-		    var model = $scope.wbModel;
-		    var parentModel = $scope.wbParent;
-
-		    function removeWidget() {
-			if (scope.wbParent) {
-			    scope.wbParent.removeWidget(scope.wbModel);
-			}
-		    }
-
-		    function settings() {
-			return $settings.load({
-			    wbModel : model,
-			    wbParent : parentModel,
-			    style : {
-				pages : [ 'text', 'selfLayout', 'border',
-					'background', 'marginPadding',
-					'minMaxSize' ]
-			    }
-			});
-		    }
-
-		    scope.removeWidget = removeWidget;
-		    scope.settings = settings;
-		}
 	    };
 	});
 
@@ -1408,14 +1412,57 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc directive
- * @name donateMainApp.directive:wbHtml
- * @description # wbHtml
+ * @name wbWidget
+ * @memberof ngMaterialWeburger
+ * @description Widgets container
+ * 
+ * This is widget containers.
+ * 
+ * All primary widgets are supported by default (such as remove and setting).
  */
 .directive('wbWidget', function() {
     return {
 	templateUrl : 'views/directives/wb-widget.html',
 	restrict : 'E',
 	transclude : true,
+	scope : false,
+	link: function(scope, element, attrs){
+	    // TODO:
+	},
+	controller : function($scope, $element, $settings, $widget) {
+	    var element = $element;
+	    /**
+	     * Remove widget from parent
+	     */
+	    function removeWidget() {
+		if ($scope.wbParent) {
+		    $scope.wbParent.removeWidget($scope.wbModel);
+		}
+	    }
+
+	    /**
+	     * Load widget settings
+	     * 
+	     */
+	    function settings() {
+		return $widget.widget($scope.wbModel)//
+		.then(function(widget) {
+		    return $settings.load({
+			wbModel : $scope.wbModel,
+			wbParent : $scope.wbParent,
+			style : {
+			    pages : widget.setting
+			}
+		    });
+		});
+	    }
+
+	    /*
+	     * Add to scope
+	     */
+	    $scope.removeWidget = removeWidget;
+	    $scope.settings = settings;
+	}
     };
 });
 
@@ -1457,6 +1504,84 @@ angular.module('ngMaterialWeburger')
 		return $sce.trustAsHtml(val);
 	};
 });
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * Load widgets
+ */
+.run(
+	function($widget) {
+	    // Page
+	    $widget.newWidget('Page', {
+		dom : '<wb-content></wb-content>',
+		label : 'Panel',
+		description : 'Panel contains list of widgets.',
+		image : 'images/wb/content.svg',
+		link : 'http://dpq.co.ir/more-information-link',
+		data : {
+		    type : 'Page',
+		    style : {
+			direction : 'column',
+		    },
+		    contents : []
+		}
+	    });
+	    // HTML text
+	    $widget.newWidget('HtmlText', {
+		dom : '<wb-html></wb-html>',
+		label : 'HTML text',
+		description : 'An HTML block text.',
+		image : 'images/wb/html.svg',
+		link : 'http://dpq.co.ir',
+		setting:['text', 'selfLayout', 'border',
+			'background', 'marginPadding',
+			'minMaxSize'],
+		data : {
+		    type : 'HtmlText',
+		    body : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+		    style : {
+			marginLeft : 1,
+			marginRight : 1,
+			marginTop : 1,
+			marginBottom : 1,
+			paddingLeft : 1,
+			paddingRight : 1,
+			paddingTop : 1,
+			paddingBottom : 1,
+			minWidth : 0,
+			maxWidth : 0,
+			minHeight : 0,
+			maxHeight : 0
+		    }
+		}
+	    });
+	});
 
 /* 
  * The MIT License (MIT)
@@ -1722,45 +1847,6 @@ angular.module('ngMaterialWeburger')
 	});
     }
 
-    newWidget('Page', {
-	dom : '<wb-content></wb-content>',
-	label : 'Panel',
-	description : 'Panel contains list of widgets.',
-	image : 'images/wb/content.svg',
-	link : 'http://dpq.co.ir/more-information-link',
-	data : {
-	    type : 'Page',
-	    style : {
-		direction : 'column',
-	    },
-	    contents : []
-	}
-    });
-    newWidget('HtmlText', {
-	dom : '<wb-html></wb-html>',
-	label : 'HTML text',
-	description : 'An HTML block text.',
-	image : 'images/wb/html.svg',
-	link : 'http://dpq.co.ir',
-	data : {
-	    type : 'HtmlText',
-	    body : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-	    style : {
-		marginLeft : 1,
-		marginRight : 1,
-		marginTop : 1,
-		marginBottom : 1,
-		paddingLeft : 1,
-		paddingRight : 1,
-		paddingTop : 1,
-		paddingBottom : 1,
-		minWidth : 0,
-		maxWidth : 0,
-		minHeight : 0,
-		maxHeight : 0
-	    }
-	}
-    });
     // تعیین سرویس‌ها
     this.newWidget = newWidget;
     this.widget = widget;
@@ -1825,7 +1911,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-content.html',
-    "<div ng-class=\"{'wb-panel': wbEditable}\">  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> Panel</span> <span flex></span> <md-button ng-click=newWidget(wbModel) class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=removeWidget(wbModel) ng-show=wbParent> <md-icon class=wb-icon-mini>delete</md-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=overlay></div>  <div class=wb-flex wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder> </div>  </div> </div>"
+    "<div ng-class=\"{'wb-panel': wbEditable}\">  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> Panel</span> <span flex></span> <md-button ng-click=newWidget(wbModel) class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=removeWidget(wbModel) ng-show=wbParent> <md-icon class=wb-icon-mini>delete</md-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=overlay></div>  <div class=wb-flex wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"addDraggedWidget(event, index, item, external, type)\"> </div>  </div> </div>"
   );
 
 
@@ -1845,7 +1931,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-widget.html',
-    "<div ng-class=\"{'wb-widget': wbEditable}\" layout=column>  <div ng-show=wbEditable layout=row class=wb-widget-header> <span translate> widget</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=removeWidget() ng-show=removeWidget ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <md-icon class=mde-icon-mini>delete</md-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <md-icon class=mde-icon-mini>{{item.icon}}</md-icon> </md-button> </div>  <div wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style class=wb-panel-body> <div ng-show=ctrl.hoveringDelBtn class=overlay></div> <ng-transclude wb-layout=wbModel.style></ng-transclude> </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=removeWidget() ng-class=\"{'wb-widget': wbEditable}\" layout=column>  <div ng-show=wbEditable layout=row class=wb-widget-header> <span translate> widget</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=removeWidget() ng-show=removeWidget ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <md-icon class=mde-icon-mini>delete</md-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <md-icon class=mde-icon-mini>{{item.icon}}</md-icon> </md-button> </div>  <div wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style class=wb-panel-body> <div ng-show=ctrl.hoveringDelBtn class=overlay></div> <ng-transclude wb-layout=wbModel.style></ng-transclude> </div> </div>"
   );
 
 
