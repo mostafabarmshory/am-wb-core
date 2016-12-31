@@ -34,65 +34,24 @@ angular.module('ngMaterialWeburger')
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$settings', function($mdDialog) {
-
-    var settingPages = {
-	notFound : {
-	    label : 'Settings not found',
-	    page : 'views/settings/wb-notfound.html'
-	},
-	general : {
-	    label : 'general',
-	    page : 'views/settings/wb-general.html'
-	},
-	background : {
-	    label : 'background',
-	    page : 'views/settings/wb-background.html'
-	},
-	text : {
-	    label : 'Frontend text',
-	    page : 'views/settings/wb-text.html'
-	},
-	description : {
-	    label : 'Description',
-	    page : 'views/settings/wb-description.html'
-	},
-	layout : {
-	    label : 'Layout',
-	    page : 'views/settings/wb-layout.html'
-	},
-	border : {
-	    label : 'Border',
-	    page : 'views/settings/wb-border.html'
-	},
-	pageLayout : {
-	    label : 'Page Layout',
-	    page : 'views/settings/wb-layout-page.html'
-	},
-	selfLayout : {
-	    label : 'Self Layout',
-	    page : 'views/settings/wb-layout-self.html'
-	},
-	marginPadding : {
-	    label : 'Margin/Padding',
-	    page : 'views/settings/wb-margin-padding.html'
-	},
-	minMaxSize : {
-	    label : 'Min/Max',
-	    page : 'views/settings/wb-min-max-size.html'
-	}
+    /**
+     * Setting page storage
+     * 
+     */
+    var settingPages = {};
+    var notFound = {
+	label : 'Settings not found',
+	page : 'views/settings/wb-notfound.html'
     };
 
     /**
-     * توصیف ویجت معادل با مدل داده‌ای را تعیین می‌کند
-     * 
-     * این کار بر اساس خصوصیت نوع در مدل داده‌ای تعیین می‌شود و در صورتیکه ویجتی
-     * برای آو موجود نباشد، ویجت پیشفرض به عنوان نتیجه برگردانده می‌وشد.
+     * Fetchs a setting page.
      * 
      * @param model
      * @returns
      */
     function page(settingId) {
-	var widget = settingPages.notFound;
+	var widget = notFound;
 	if (settingId in settingPages) {
 	    widget = settingPages[settingId];
 	}
@@ -100,12 +59,21 @@ angular.module('ngMaterialWeburger')
     }
 
     /**
-     * فهرست تمام ویجت‌ها را تعیین می‌کند.
+     * Adds new setting page.
      * 
      * @returns
      */
-    function addPage(settingId, page) {
+    function newPage(settingId, page) {
 	settingPages[settingId] = page;
+    }
+
+    /**
+     * Finds and lists all setting pages.
+     * 
+     * @returns
+     */
+    function pages() {
+	// TODO: maso, 1395:
     }
 
     /**
@@ -126,5 +94,5 @@ angular.module('ngMaterialWeburger')
     // تعیین سرویس‌ها
     this.page = page;
     this.load = loadSetting;
-    this.newPage = addPage;
+    this.newPage = newPage;
 });
