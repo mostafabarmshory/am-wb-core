@@ -1,4 +1,5 @@
-<div ng-class="{'wb-panel': wbEditable}">
+<div 
+	ng-class="{'wb-panel': wbEditable}">
     <!-- a header is added through edit-mode -->
     <div ng-show="wbEditable" class="wb-panel-header" layout="row">
         <span translate> Panel</span>
@@ -36,7 +37,10 @@
 			wb-size="wbModel.style"
 			wb-background="wbModel.style"
 			wb-border="wbModel.style"
-            id="wb-content-placeholder">
+            id="wb-content-placeholder"
+            dnd-list="wbModel.contents"
+    		dnd-allowed-types="['wb.widget']"
+    		dnd-drop="addDraggedWidget(event, index, item, external, type)">
         </div>
         <!--<div ng-include src="'views/partials/wb-edit-hint-panel.html'"></div>-->
     </div>

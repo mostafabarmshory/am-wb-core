@@ -39,5 +39,6 @@ angular
         'pluf',//
         'mdColorPicker',//
 //        'ngMaterialWysiwyg',
-        'ui.tinymce'
+        'ui.tinymce', //
+        'dndLists',//
     ]);

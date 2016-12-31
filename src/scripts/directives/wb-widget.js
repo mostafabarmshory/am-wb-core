@@ -42,10 +42,10 @@ angular.module('ngMaterialWeburger')
 	transclude : true,
 	scope : false,
 	link: function(scope, element, attrs){
-//	    element.attr('draggable', 'true');
+	    // TODO:
 	},
-	controller : function($scope, $settings, $widget) {
-
+	controller : function($scope, $element, $settings, $widget) {
+	    var element = $element;
 	    /**
 	     * Remove widget from parent
 	     */

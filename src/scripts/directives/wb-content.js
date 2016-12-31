@@ -44,6 +44,7 @@ angular.module('ngMaterialWeburger')
 	'wbContent',
 	function($compile, $widget) {
 
+	    var dragClass = 'wb-content-dragenter';
 	    var bodyElementSelector = 'div#wb-content-body';
 	    var placeholderElementSelector = 'div#wb-content-placeholder';
 
@@ -58,8 +59,13 @@ angular.module('ngMaterialWeburger')
 		    wbParent : '=?'
 		},
 
+		link : function(scope, element, attrs) {
+		    // TODO:
+		},
+
 		controller : function($scope, $element, $settings, $widget) {
 		    var scope = $scope;
+		    var element = $element;
 
 		    function isEditable() {
 			if (scope.wbParent) {
@@ -132,6 +138,28 @@ angular.module('ngMaterialWeburger')
 		    }
 
 		    /**
+		     * Adds dragged widget
+		     */
+		    function addDraggedWidget(event, index, item, external,
+			    type) {
+			// insert in model
+			scope.wbModel.contents.splice(index, 0, item);
+			// add widget
+			$widget.widget(item).then(function(widget) {
+			    var list = $element//
+			    .children(bodyElementSelector)//
+			    .children(placeholderElementSelector);
+			    var w = createWidget(widget.dom, $scope, item);
+			    if(index < list[0].childNodes.length){
+				w.insertBefore(list[0].childNodes[index]);
+			    } else {
+				list.append(w);
+			    }
+			});
+			return true;
+		    }
+
+		    /**
 		     * تنظیم‌های کلی صفحه را انجام می‌دهد
 		     * 
 		     * یک دریچه محاوره‌ای باز می‌شود تا کاربر بتواند تنظیم‌های
@@ -158,6 +186,7 @@ angular.module('ngMaterialWeburger')
 		    scope.removeWidget = removeWidget;
 		    scope.newWidget = newWidget;
 		    scope.isEditable = isEditable
+		    scope.addDraggedWidget = addDraggedWidget;
 
 		    scope.$watch('wbModel', function() {
 			removeWidgets();

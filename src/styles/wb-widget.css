@@ -1,0 +1,25 @@
+
+
+/**************************************************************************************
+Drag and drap 
+
+See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
+***************************************************************************************/
+/*
+ * This class will be added to the element while the element is being dragged. 
+ * It will affect both the element you see while dragging and the source 
+ * element that stays at it's position. Do not try to hide the source element
+ * with this class, because that will abort the drag operation.
+*/
+.dndDragging {
+	
+}
+
+/*
+ * This class will be added to the element after the drag operation was started, 
+ * meaning it only affects the original element that is still at it's source 
+ * position, and not the "element" that the user is dragging with his mouse pointer
+ */
+.dndDraggingSource {
+	
+}

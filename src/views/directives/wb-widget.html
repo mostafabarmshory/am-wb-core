@@ -1,5 +1,8 @@
 <div 
-	draggable="{{wbEditable}}"
+	dnd-disable-if="!wbEditable"
+	dnd-draggable="wbModel"
+	dnd-type="'wb.widget'"
+	dnd-moved="removeWidget()"
 	ng-class="{'wb-widget': wbEditable}" 
 	layout="column">
     <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
