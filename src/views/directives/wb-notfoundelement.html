@@ -1,12 +1,5 @@
-<div ng-class="{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}">
-	<!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
-	<div ng-show="mdeEditable" 
-		layout="row"
-		class="mde-widget-header" 
-		ng-include="'views/partials/mdewidgetheaderactions.html'">
-	</div>
-
-    <div ng-show="mdeEditable">
+<wb-widget>
+	<div ng-show="wbEditable">
     	Unsuported widget?!
     </div>
-</div>
+</wb-widget>

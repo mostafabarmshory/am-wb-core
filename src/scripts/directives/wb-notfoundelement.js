@@ -33,8 +33,11 @@ angular.module('ngMaterialWeburger')
     return {
 	templateUrl : 'views/directives/wb-notfoundelement.html',
 	restrict : 'E',
-	link : function postLink(/* scope, element, attrs */) {
-	    // element.text('this is the mdeNotfoundElement directive');
-	}
+	replase : true,
+	scope : {
+	    wbEditable : '=?',
+	    wbModel : '=?',
+	    wbParent : '=?'
+	},
     };
 });
