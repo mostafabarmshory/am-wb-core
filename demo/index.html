@@ -7,88 +7,6 @@
     <meta content='IE=edge' http-equiv='X-UA-Compatible'>
     <meta property="viewport" content="width=device-width">
 
-      <!--TODO: mgh, 1395: move following to distinct style file like font-style.css -->
-    <style type="text/css">
-    @font-face {
-		font-family: 'Material Icons';
-		font-style: normal;
-		font-weight: 400;
-		src: url(styles/fonts/MaterialIcons-Regular.eot);
-		/* For IE6-8 */
-		src: local('Material Icons'), local('MaterialIcons-Regular'),
-			url(styles/fonts/MaterialIcons-Regular.woff2) format('woff2'),
-			url(styles/fonts/MaterialIcons-Regular.woff) format('woff'),
-			url(styles/fonts/MaterialIcons-Regular.ttf) format('truetype');
-	}
-	@font-face {
-		font-family: 'Mono Social Icons Font';
-		src: url('styles/fonts/MonoSocialIconsFont-1.10.eot');
-		src: url('styles/fonts/MonoSocialIconsFont-1.10.eot?#iefix')
-			format('embedded-opentype'),
-			url('styles/styles/fonts/MonoSocialIconsFont-1.10.woff') format('woff'),
-			url('styles/fonts/MonoSocialIconsFont-1.10.ttf') format('truetype'),
-			url('styles/fonts/MonoSocialIconsFont-1.10.svg#MonoSocialIconsFont')
-			format('svg');
-		src: url('styles/fonts/MonoSocialIconsFont-1.10.ttf') format('truetype');
-		font-weight: normal;
-		font-style: normal;
-	}
-	
-	.mono-social-icons {
-		font-family: 'Mono Social Icons Font';
-		font-weight: normal;
-		font-style: normal;
-		font-size: 24px; /* Preferred icon size */
-		display: inline-block;
-		width: 1em;
-		height: 1em;
-		line-height: 1;
-		text-transform: none;
-		letter-spacing: normal;
-		word-wrap: normal;
-		white-space: nowrap;
-		direction: ltr;
-		-webkit-text-rendering: optimizeLegibility;
-		-moz-text-rendering: optimizeLegibility;
-		-ms-text-rendering: optimizeLegibility;
-		-o-text-rendering: optimizeLegibility;
-		text-rendering: optimizeLegibility;
-		/* Support for all WebKit browsers. */
-		-webkit-font-smoothing: antialiased;
-		/* Support for Firefox. */
-		-moz-font-smoothing: antialiased;
-		-ms-font-smoothing: antialiased;
-		-o-font-smoothing: antialiased;
-		font-smoothing: antialiased;
-		/* Support for IE. */
-		font-feature-settings: 'liga';
-	}
-	
-	.material-icons {
-		font-family: 'Material Icons';
-		font-weight: normal;
-		font-style: normal;
-		font-size: 24px; /* Preferred icon size */
-		display: inline-block;
-		width: 1em;
-		height: 1em;
-		line-height: 1;
-		text-transform: none;
-		letter-spacing: normal;
-		word-wrap: normal;
-		white-space: nowrap;
-		direction: ltr;
-		/* Support for all WebKit browsers. */
-		-webkit-font-smoothing: antialiased;
-		/* Support for Safari and Chrome. */
-		text-rendering: optimizeLegibility;
-		/* Support for Firefox. */
-		-moz-osx-font-smoothing: grayscale;
-		/* Support for IE. */
-		font-feature-settings: 'liga';
-	}
-    </style>
-    
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
@@ -152,6 +70,8 @@
     <!-- endbuild -->
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="scripts/demo.js"></script>
+    
     <script src="scripts/app.js"></script>
     <script src="scripts/runs/widgets.js"></script>
     <script src="scripts/runs/settings.js"></script>
@@ -185,39 +105,5 @@
     <script src="scripts/services/resource.js"></script>
     <!-- endbuild -->
     
-    <script type="text/javascript">
-    // Test controller
-    angular.module('ngMaterialWeburgerTest', ['ngMaterialWeburger'])
-    .controller('MyTestCtrl', function($scope, $http, $mdDialog, $usr){
-    	$http.get('temp.json').then(function (res){
-    		$scope.model = res.data;
-    	});
-    	
-    	$scope.cs = function(){
-    	    $usr.login({login: 'admin', password: 'admin'})//
-    	    .then(function(){
-	    		$mdDialog.show({
-					controller : 'WbDialogsCtrl',
-					templateUrl : 'views/dialogs/wb-selectcontent.html',
-					parent : angular.element(document.body),
-					fullscreen: true,
-					locals : {
-						wbModel : {},
-						style : {}
-					}
-				}).then(function(content){
-					alert(content.id);
-				});
-    	    });
-    	};
-    })
-
-	 // تنظیم ایکون
-	 .config(function($mdIconProvider, $mdThemingProvider) {
-	 	$mdIconProvider//
-	 	.fontSet('social', 'mono-social-icons')//
-	 	.fontSet('material', 'material-icons');//
-	 })
-    </script>
 </body>
 </html>
