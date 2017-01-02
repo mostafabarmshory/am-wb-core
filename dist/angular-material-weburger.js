@@ -740,7 +740,7 @@ angular.module('ngMaterialWeburger')
 
 angular.module('ngMaterialWeburger')
 /**
- * @description Apply margin into the element
+ * @description Apply background into the element
  */
 .directive("wbSize", function() {
     return {
@@ -785,12 +785,13 @@ angular.module('ngMaterialWeburger')
 
 angular.module('ngMaterialWeburger')
 /**
- * @description Apply margin into the element
+ * @description Apply border into the element
  */
 .directive("wbBorder", function() {
     return {
 	restrict : 'A',
 	link : function(scope, element, attributes) {
+		//TODO: mgh, 1395: for efficiency, don't use ternary-operation in css. use if-condition on "uniform" and assign proper css-attributes.
 	    return scope.$watch(attributes.wbBorder, function(style) {
 		if(!style){
 		    return;
@@ -862,7 +863,7 @@ angular.module('ngMaterialWeburger')
 
 angular.module('ngMaterialWeburger')
 /**
- * @description Apply margin into the element
+ * @description Apply layout into the element
  */
 .directive("wbLayout", function() {
     return {
@@ -959,7 +960,7 @@ angular.module('ngMaterialWeburger')
 
 angular.module('ngMaterialWeburger')
 /**
- * @description Apply margin into the element
+ * @description Apply padding into the element
  */
 .directive("wbPadding", function() {
     return {
@@ -1057,10 +1058,12 @@ angular.module('ngMaterialWeburger')
  * @name donateMainApp.directive:wbContent
  * @description
  * 
- * نمایش یک محتوی
+ * A container widget
  * 
- * از این ساختار برای ایجاد یک محتوی استفاده می‌شود. هر محتوی معال با یک صفحه
- * معادل است که تمام موجودیت‌های خود را به صورت سطری و یا سطونی نمایش می‌دهد.
+ * This is an container widget to list and manage widgets. This is equal to a
+ * group or a page of widgets.
+ * 
+ * Widget data is bind into the wbModel automatically.
  * 
  * هر صفحه یک ساختار داده‌ای را به عنوان ورودی دریافت می‌کند و در صورتی که کاربر
  * مجاز به ویرایش آن باشد، آن را ویرایش و ساختار داده‌ای جدید ایجاد می‌کند.
@@ -1100,19 +1103,6 @@ angular.module('ngMaterialWeburger')
 			    return scope.wbParent.isEditable();
 			}
 			return scope.wbEditable;
-		    }
-
-		    function createWidget(widget, parentScope, model) {
-			var element = angular.element(widget);
-			element.attr('wb-model', 'model');
-			element.attr('wb-editable', 'wbEditable()');
-			element.attr('wb-parent', 'wbParent');
-			var childScope = parentScope.$new(true, parentScope);
-			childScope.model = model;
-			childScope.wbEditable = scope.isEditable;
-			childScope.wbParent = parentScope;
-			// TODO: maso, 1395: این موجودیت باید ایجاد شود
-			return $compile(element)(childScope);
 		    }
 
 		    function removeWidgets() {
@@ -1156,12 +1146,63 @@ angular.module('ngMaterialWeburger')
 			});
 		    }
 
+		    function createWidget(item) {
+			var widget = null;
+			var childScope = null;
+			var element = null;
+
+			// 0- get widget
+			return $widget.widget(item)//
+			.then(function(w) {
+			    widget = w;
+			})
+
+			// 1- create scope
+			.then(function() {
+			    childScope = $scope.$new(true, $scope);
+			    childScope.model = item;
+			    childScope.editable = $scope.isEditable;
+			    childScope.parent = $scope;
+			})
+
+			// 2- create element
+			.then(function() {
+			    return $widget.getTemplateFor(widget);
+			})//
+			.then(function(template) {
+			    if (item.type != 'Page') {
+				template = '<wb-widget>' + template + '</wb-widget>';
+			    }
+			    element = angular.element(template);
+			    element.attr('wb-model', 'model');
+			    element.attr('wb-editable', 'editable()');
+			    element.attr('wb-parent', 'parent');
+			})
+
+			// 3- bind controller
+			.then(function() {
+			    if (angular.isDefined(widget.controller)) {
+				$controller(widget.controller, {
+				    $scope : childScope,
+				    $element : element,
+				    // TODO: maso, 2017: bind wbModel, wbParent, and wbEditable
+				});
+			    }
+			    $compile(element)(childScope);
+			})//
+			
+			// Return value
+			.then(function(){
+			    return element;
+			});
+		    }
 		    function addWidget(item) {
-			$widget.widget(item).then(function(widget) {
+			createWidget(item)//
+			.then(function(element) {
 			    $element//
 			    .children(bodyElementSelector)//
 			    .children(placeholderElementSelector)//
-			    .append(createWidget(widget.dom, $scope, item));
+			    .append(element);
 			});
 		    }
 
@@ -1172,16 +1213,18 @@ angular.module('ngMaterialWeburger')
 			    type) {
 			// insert in model
 			scope.wbModel.contents.splice(index, 0, item);
+
+			createWidget(item)//
 			// add widget
-			$widget.widget(item).then(function(widget) {
+			createWidget(item)//
+			.then(function(element) {
 			    var list = $element//
 			    .children(bodyElementSelector)//
 			    .children(placeholderElementSelector);
-			    var w = createWidget(widget.dom, $scope, item);
-			    if(index < list[0].childNodes.length){
-				w.insertBefore(list[0].childNodes[index]);
+			    if (index < list[0].childNodes.length) {
+				element.insertBefore(list[0].childNodes[index]);
 			    } else {
-				list.append(w);
+				list.append(element);
 			    }
 			});
 			return true;
@@ -1205,10 +1248,6 @@ angular.module('ngMaterialWeburger')
 			});
 		    }
 
-		    function isArray(model) {
-			return (model && model.constructor === Array);
-		    }
-
 		    scope.settings = settings;
 		    scope.removeWidgets = removeWidgets;
 		    scope.removeWidget = removeWidget;
@@ -1222,71 +1261,13 @@ angular.module('ngMaterialWeburger')
 			    // XXX: maso, 1395: هنوز مدل تعیین نشده
 			    return;
 			}
-			if (!isArray(scope.wbModel.contents)) {
+			if (!angular.isArray(scope.wbModel.contents)) {
 			    scope.wbModel.contents = [];
 			}
 			scope.wbModel.type = 'Page';
 			scope.wbModel.contents.forEach(addWidget);
 		    });
 		}
-	    };
-	});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('ngMaterialWeburger')
-
-/**
- * @ngdoc directive
- * @name donateMainApp.directive:wbHtml
- * @description # wbHtml
- */
-.directive(
-	'wbHtml',
-	function() {
-	    return {
-		templateUrl : 'views/directives/wb-html.html',
-		restrict : 'E',
-		replase : true,
-		scope : {
-		    wbEditable : '=?',
-		    wbModel : '=?',
-		    wbParent : '=?'
-		},
-		link : function(scope, elem, attrs) {
-		    scope.$watch('wbModel.style.flexAlignItem', function(
-			    newValue, oldValue) {
-			elem.removeClass(oldValue);
-			elem.addClass(newValue);
-		    });
-		    scope.$watch('wbModel.style.flexItemGrow', function(
-			    newValue, oldValue) {
-			elem.css('flex-grow', newValue);
-		    });
-		},
 	    };
 	});
 
@@ -1368,47 +1349,6 @@ angular.module('ngMaterialWeburger')
 'use strict';
 
 angular.module('ngMaterialWeburger')
-/**
- * @ngdoc directive
- * @name donateMainApp.directive:mdeNotfoundElement
- * @description # mdeNotfoundElement
- */
-.directive('wbNotfoundElement', function() {
-    return {
-	templateUrl : 'views/directives/wb-notfoundelement.html',
-	restrict : 'E',
-	link : function postLink(/* scope, element, attrs */) {
-	    // element.text('this is the mdeNotfoundElement directive');
-	}
-    };
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc directive
@@ -1418,16 +1358,27 @@ angular.module('ngMaterialWeburger')
  * 
  * This is widget containers.
  * 
- * All primary widgets are supported by default (such as remove and setting).
+ * All primary actions of a widget are supported (such as remove and setting).
  */
 .directive('wbWidget', function() {
     return {
 	templateUrl : 'views/directives/wb-widget.html',
 	restrict : 'E',
 	transclude : true,
-	scope : false,
-	link: function(scope, element, attrs){
-	    // TODO:
+	scope : {
+	    wbEditable : '=?',
+	    wbModel : '=?',
+	    wbParent : '=?'
+	},
+	link: function(scope, element, attrs, ctrl, transclude) {
+	    // Modify angular transclude function
+	    // see: http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
+	    // FIXME: maso, 2017: use regular dom insted of ng-transclude
+	    transclude(scope, function(clone, scope) {
+		var node = element//
+		.find('ng-transclude')//
+		.append(clone);
+	    });
 	},
 	controller : function($scope, $element, $settings, $widget) {
 	    var element = $element;
@@ -1535,15 +1486,89 @@ angular.module('ngMaterialWeburger')
 /**
  * Load widgets
  */
+.run(function($settings) {
+    $settings.newPage('general', {
+	label : 'general',
+	page : 'views/settings/wb-general.html'
+    });
+    $settings.newPage('background', {
+	label : 'background',
+	page : 'views/settings/wb-background.html'
+    });
+    $settings.newPage('text', {
+	label : 'Frontend text',
+	page : 'views/settings/wb-text.html'
+    });
+    $settings.newPage('description', {
+	label : 'Description',
+	page : 'views/settings/wb-description.html'
+    });
+    $settings.newPage('layout', {
+	label : 'Layout',
+	page : 'views/settings/wb-layout.html'
+    });
+    $settings.newPage('border', {
+	label : 'Border',
+	page : 'views/settings/wb-border.html'
+    });
+    $settings.newPage('pageLayout', {
+	label : 'Page Layout',
+	page : 'views/settings/wb-layout-page.html'
+    });
+    $settings.newPage('selfLayout', {
+	label : 'Self Layout',
+	page : 'views/settings/wb-layout-self.html'
+    });
+    $settings.newPage('marginPadding', {
+	label : 'Margin/Padding',
+	page : 'views/settings/wb-margin-padding.html'
+    });
+    $settings.newPage('minMaxSize', {
+	label : 'Min/Max',
+	page : 'views/settings/wb-min-max-size.html'
+    });
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * Load widgets
+ */
 .run(
 	function($widget) {
 	    // Page
-	    $widget.newWidget('Page', {
-		dom : '<wb-content></wb-content>',
+	    $widget.newWidget({
+		type: 'Page',
+		template : '<wb-content></wb-content>',
 		label : 'Panel',
 		description : 'Panel contains list of widgets.',
 		image : 'images/wb/content.svg',
-		link : 'http://dpq.co.ir/more-information-link',
+		help : 'http://dpq.co.ir/more-information-link',
 		data : {
 		    type : 'Page',
 		    style : {
@@ -1553,12 +1578,13 @@ angular.module('ngMaterialWeburger')
 		}
 	    });
 	    // HTML text
-	    $widget.newWidget('HtmlText', {
-		dom : '<wb-html></wb-html>',
+	    $widget.newWidget({
+		type: 'HtmlText',
+		templateUrl : 'views/widgets/wb-html.html',
 		label : 'HTML text',
 		description : 'An HTML block text.',
 		image : 'images/wb/html.svg',
-		link : 'http://dpq.co.ir',
+		help : 'http://dpq.co.ir',
 		setting:['text', 'selfLayout', 'border',
 			'background', 'marginPadding',
 			'minMaxSize'],
@@ -1614,104 +1640,11 @@ angular.module('ngMaterialWeburger')
  * @ngdoc service
  * @name $widget
  * @memberof ngMaterialWeburger
- * @description مدیریت ویجت‌های سیستم
+ * @description Resource managment
  * 
- * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$settings', function($mdDialog) {
-
-    var settingPages = {
-	notFound : {
-	    label : 'Settings not found',
-	    page : 'views/settings/wb-notfound.html'
-	},
-	general : {
-	    label : 'general',
-	    page : 'views/settings/wb-general.html'
-	},
-	background : {
-	    label : 'background',
-	    page : 'views/settings/wb-background.html'
-	},
-	text : {
-	    label : 'Frontend text',
-	    page : 'views/settings/wb-text.html'
-	},
-	description : {
-	    label : 'Description',
-	    page : 'views/settings/wb-description.html'
-	},
-	layout : {
-	    label : 'Layout',
-	    page : 'views/settings/wb-layout.html'
-	},
-	border : {
-	    label : 'Border',
-	    page : 'views/settings/wb-border.html'
-	},
-	pageLayout : {
-	    label : 'Page Layout',
-	    page : 'views/settings/wb-layout-page.html'
-	},
-	selfLayout : {
-	    label : 'Self Layout',
-	    page : 'views/settings/wb-layout-self.html'
-	},
-	marginPadding : {
-	    label : 'Margin/Padding',
-	    page : 'views/settings/wb-margin-padding.html'
-	},
-	minMaxSize : {
-	    label : 'Min/Max',
-	    page : 'views/settings/wb-min-max-size.html'
-	}
-    };
-
-    /**
-     * توصیف ویجت معادل با مدل داده‌ای را تعیین می‌کند
-     * 
-     * این کار بر اساس خصوصیت نوع در مدل داده‌ای تعیین می‌شود و در صورتیکه ویجتی
-     * برای آو موجود نباشد، ویجت پیشفرض به عنوان نتیجه برگردانده می‌وشد.
-     * 
-     * @param model
-     * @returns
-     */
-    function page(settingId) {
-	var widget = settingPages.notFound;
-	if (settingId in settingPages) {
-	    widget = settingPages[settingId];
-	}
-	return widget;
-    }
-
-    /**
-     * فهرست تمام ویجت‌ها را تعیین می‌کند.
-     * 
-     * @returns
-     */
-    function addPage(settingId, page) {
-	settingPages[settingId] = page;
-    }
-
-    /**
-     * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-     * 
-     * @returns
-     */
-    function loadSetting(locals) {
-	return $mdDialog.show({
-	    controller : 'WbSettingDialogsCtrl',
-	    templateUrl : 'views/dialogs/wb-settings.html',
-	    parent : angular.element(document.body),
-	    clickOutsideToClose : true,
-	    fullscreen : true,
-	    locals : locals
-	});
-    }
-    // تعیین سرویس‌ها
-    this.page = page;
-    this.load = loadSetting;
-    this.newPage = addPage;
+.service('$resource', function() {
+    // TODO: maso, 1395:
 });
 
 /* 
@@ -1749,15 +1682,170 @@ angular.module('ngMaterialWeburger')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$widget', function($q, $timeout, $mdDialog, PaginatorPage) {
+.service('$settings', function($rootScope, $q, $sce, $compile, $document, $templateRequest) {
+    /**
+     * Setting page storage
+     * 
+     */
+    var settingPages = {};
+    var notFound = {
+	label : 'Settings not found',
+	templateUrl : 'views/settings/wb-notfound.html'
+    };
+
+    /**
+     * Fetchs a setting page.
+     * 
+     * @param model
+     * @returns
+     */
+    function page(settingId) {
+	var widget = notFound;
+	if (settingId in settingPages) {
+	    widget = settingPages[settingId];
+	}
+	return widget;
+    }
+
+    /**
+     * Adds new setting page.
+     * 
+     * @returns
+     */
+    function newPage(settingId, page) {
+	settingPages[settingId] = page;
+    }
+
+    /**
+     * Finds and lists all setting pages.
+     * 
+     * @returns
+     */
+    function pages() {
+	// TODO: maso, 1395:
+    }
+
+    /*
+     * get setting page template
+     */
+    function getTemplateFor(page) {
+	var template, templateUrl;
+	if (angular.isDefined(template = page.template)) {
+	    if (angular.isFunction(template)) {
+		template = template(page.params);
+	    }
+	} else if (angular.isDefined(templateUrl = page.templateUrl)) {
+	    if (angular.isFunction(templateUrl)) {
+		templateUrl = templateUrl(page.params);
+	    }
+	    if (angular.isDefined(templateUrl)) {
+		page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+		template = $templateRequest(templateUrl);
+	    }
+	}
+	return template;
+    }
+    
+    /**
+     * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+     * 
+     * @returns
+     */
+    function loadSetting(locals) {
+	// 1- Find element
+	var target = $document.find('#wb-setting-panel');
+	// 2- Clear childrens
+	target.empty();
+	// 3- load pages
+	
+	var page = notFound;
+	var lp;
+	var loads;
+	if (page) {
+	    var locals = [];
+//		angular.extend({}, 
+//		    route.resolve
+//		    );
+//	    angular.forEach(locals, function(value, key) {
+//		locals[key] = angular.isString(value) ?
+//			$injector.get(value) :
+//			    $injector.invoke(value, null, null, key);
+//	    });
+	    var template = getTemplateFor({templateUrl: 'views/wb-settings.html'});
+	    if (angular.isDefined(template)) {
+		locals.push( template//
+		.then(function(value){
+		    lp = value;
+		}));
+	    }
+	}
+	loads =  $q.all(locals);
+
+	loads.then(function(){
+	    var element = angular.element(lp);
+	    target.append($compile(element)($rootScope));
+	});
+	
+	
+	
+//	return $mdDialog.show({
+//	    controller : 'WbSettingDialogsCtrl',
+//	    templateUrl : 'views/dialogs/wb-settings.html',
+//	    parent : angular.element(document.body),
+//	    clickOutsideToClose : true,
+//	    fullscreen : true,
+//	    locals : locals
+//	});
+    }
+    // تعیین سرویس‌ها
+    this.page = page;
+    this.load = loadSetting;
+    this.newPage = newPage;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * @ngdoc service
+ * @name $widget
+ * @memberof ngMaterialWeburger
+ * @description مدیریت ویجت‌های سیستم
+ * 
+ * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
+ */
+.service('$widget', function($q, $sce, $templateRequest, $timeout, $mdDialog, PaginatorPage) {
 
     var contentElementAsso = [];
     var elementKey = [];
     var notFoundWidget = {
-	dom : '<wb-notfound-element></wb-notfound-element>',
+	templateUrl : 'views/widgets/wb-notfound.html',
 	label : 'Not found',
-	image : 'images/wb/notfoundelement.svg',
-	link : 'link',
+	description : 'Element not found',
     };
     /**
      * Finds a widget related to the input model.
@@ -1804,15 +1892,18 @@ angular.module('ngMaterialWeburger')
     /**
      * Registers new widget
      * 
+     * @See the following page for more information:
+     * 
+     *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
      * 
      * @param type
      * @param model
      * @returns
      */
-    function newWidget(type, model) {
+    function newWidget(widget) {
 	var deferred = $q.defer();
 	$timeout(function() {
-	    if (type in contentElementAsso) {
+	    if (widget.type in contentElementAsso) {
 		deferred.reject({
 		    data : {
 			message : 'Widget with the same type registerd before'
@@ -1820,9 +1911,9 @@ angular.module('ngMaterialWeburger')
 		});
 		return;
 	    }
-	    contentElementAsso[type] = model;
-	    elementKey.push(type);
-	    deferred.resolve(model);
+	    contentElementAsso[widget.type] = widget;
+	    elementKey.push(widget.type);
+	    deferred.resolve(widget);
 	}, 1);
 	return deferred.promise;
     }
@@ -1846,37 +1937,45 @@ angular.module('ngMaterialWeburger')
 	    locals : locals,
 	});
     }
+    
+
+    /*
+     * get setting page template
+     */
+    function getTemplateFor(widget) {
+	var template, templateUrl;
+	if (angular.isDefined(template = widget.template)) {
+	    if (angular.isFunction(template)) {
+		template = template(widget.params);
+	    }
+	} else if (angular.isDefined(templateUrl = widget.templateUrl)) {
+	    if (angular.isFunction(templateUrl)) {
+		templateUrl = templateUrl(widget.params);
+	    }
+	    if (angular.isDefined(templateUrl)) {
+		widget.loadedTemplateUrl = $sce.valueOf(templateUrl);
+		template = $templateRequest(templateUrl);
+	    }
+	}
+	return template;
+    }
 
     // تعیین سرویس‌ها
     this.newWidget = newWidget;
     this.widget = widget;
     this.widgets = widgets;
     this.select = select;
+    this.getTemplateFor = getTemplateFor;
 });
 
 angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCache) {
   'use strict';
-
-  $templateCache.put('views/dialogs/wb-action.html',
-    "<md-dialog ng-controller=WbActionCtrl aria-label=\"edit action dialog\" ng-cloak>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Action</h2> <span class=wb-flex></span> <md-button class=md-icon-button ng-click=answer(mdeModel)> <md-icon aria-label=\"Close dialog\">done</md-icon> </md-button> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar>    <md-dialog-content> <div layout=column class=md-dialog-content> <mde-iconfont-choise mde-model=model.icon mde-list-url=styles/fonts/codepoints.json mde-font-set=material-icons> </mde-iconfont-choise> <md-input-container> <label translate>Label</label> <input ng-model=mdeModel.label> </md-input-container> <md-input-container> <label translate>Text</label> <input ng-model=mdeModel.text> </md-input-container>  <md-input-container> <label>Module type</label> <md-select ng-model=mdeModel.type> <md-option ng-repeat=\"type in types\" value={{type.key}}> <md-icon>{{type.icon}}</md-icon> {{type.label}} </md-option> </md-select> </md-input-container> <md-input-container> <label translate>Value</label> <input ng-model=mdeModel.value> </md-input-container> <md-checkbox ng-model=mdeModel.primary aria-label=primary> Primary action </md-checkbox> <md-checkbox ng-model=mdeModel.accent aria-label=accent> Accent action </md-checkbox> </div> </md-dialog-content> </md-dialog>"
-  );
-
 
   $templateCache.put('views/dialogs/wb-alert.html',
     "<md-dialog ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <md-icon ng-if=style.icon>{{mdeModel.style.icon}}</md-icon> <h2 translate>{{mdeModel.title}}</h2> <span class=flex></span> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar> <md-dialog-content ng-style=\"{\n" +
     "      'direction' : style.direction,\n" +
     "      'text-align': style.textAlign\n" +
     "    }\"> <div class=md-dialog-content> <md-dialog-content translate>{{mdeModel.text}}</md-dialog-content> </div> <div layout=row> <md-button ng-click=cancel()> {{mdeModel.label | translate}} </md-button> </div> </md-dialog-content> </md-dialog>"
-  );
-
-
-  $templateCache.put('views/dialogs/wb-directivesettings.html',
-    "<md-dialog ng-cloak>  <md-toolbar> <div class=md-toolbar-tools> <md-icon ng-if=style.icon>{{style.icon}}</md-icon> <h2 translate>{{mdeModel.title}}</h2> <span class=wb-flex></span> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar>  <md-dialog-content>  <md-tabs md-dynamic-height md-border-bottom> <md-tab label=Context> <md-content layout=column layout-padding> <md-input-container> <label translate>title</label> <input ng-model=model.title> </md-input-container> <md-input-container> <label translate>text</label> <input ng-model=model.text> </md-input-container> </md-content> </md-tab> <md-tab label=Style> <md-content layout=column layout-padding> <md-color-picker label=\"Background color\" icon=brush ng-model=model.style.backgroundColor> </md-color-picker> <md-color-picker label=Color icon=brush ng-model=model.style.color> </md-color-picker> <md-input-container> <label translate>Font</label> <input ng-model=model.style.font> </md-input-container> <md-input-container> <label translate>Padding</label> <input ng-model=model.style.padding> </md-input-container> <md-input-container> <label translate>Width</label> <input ng-model=model.style.width> </md-input-container> <md-input-container> <label translate>Height</label> <input ng-model=model.style.height> </md-input-container> <md-checkbox ng-model=model.style.rtl aria-label=\"Right to left\"> Right to left </md-checkbox> </md-content> </md-tab> </md-tabs> </md-dialog-content> </md-dialog>"
-  );
-
-
-  $templateCache.put('views/dialogs/wb-login.html',
-    " <md-dialog aria-label=\"Submit for DigiDoci News\" ng-cloak> <form ng-submit=answer(credentioal)> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>user login</h2> <span class=wb-flex></span> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <div class=md-dialog-content layout=column>  <md-input-container> <label translate>user name</label> <input ng-model=credentioal.login> </md-input-container> <md-input-container> <label translate>password</label> <input type=password ng-model=credentioal.password> </md-input-container> <input type=submit hidden> <div layout=row> <md-button ng-click=answer(credentioal) class=\"md-raised md-primary\"> {{ 'ok' | translate }} </md-button> <md-button ng-click=cancel()> {{ 'cancel' | translate }} </md-button> </div> </div> </md-dialog-content> </form> </md-dialog>"
   );
 
 
@@ -1895,48 +1994,13 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   );
 
 
-  $templateCache.put('views/dialogs/wb-social.html',
-    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <form ng-submit=answer(mdeModel)>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Social</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar>    <md-dialog-content> <div ng-controller=WbActionCtrl layout=column class=md-dialog-content> <mde-iconfont-choise mde-model=mdeModel.icon mde-list-url=styles/fonts/social-codepoints.json mde-font-set=mono-social-icons> </mde-iconfont-choise>              <md-input-container> <label translate>Link</label> <input ng-model=mdeModel.action.value> </md-input-container> </div> </md-dialog-content> <input type=submit hidden> </form> </md-dialog>"
-  );
-
-
-  $templateCache.put('views/dialogs/wb-submit.html',
-    " <md-dialog ng-class=\"{'mde-rtl':mdeModel.style.rtl}\" aria-label=\"Submit for Donate News\" ng-cloak> <form ng-submit=answer(address)> <md-toolbar> <div class=md-toolbar-tools>  <img src=images/logo.svg width=64> <h2>{{mdeModel.title}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <div class=md-dialog-content layout=column>  <p>{{mdeModel.message}}</p>  <md-input-container> <label translate>email</label> <input ng-model=address> </md-input-container> <div layout=row> <md-button class=\"md-raised md-primary\" ng-click=answer(address)> {{'submit'|translate}} </md-button> <md-button ng-click=cancel()> {{'cancel'|translate}} </md-button> </div> </div> </md-dialog-content> </form> </md-dialog>"
-  );
-
-
-  $templateCache.put('views/dialogs/wb-ticket.html',
-    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <form ng-submit=answer(mdeModel)>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Ticket</h2> <span flex></span> <md-button class=md-icon-button ng-click=answer(mdeModel)> <md-icon aria-label=\"Close dialog\">done</md-icon> </md-button> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar>  <md-dialog-content> <div layout=column class=md-dialog-content> <mde-iconfont-choise mde-model=mdeModel.icon mde-list-url=styles/fonts/codepoints.json mde-font-set=material-icons> </mde-iconfont-choise> <md-input-container> <label translate>Title</label> <input ng-model=mdeModel.title> </md-input-container> <md-wysiwyg textarea-id=question textarea-class=form-control textarea-height=100px textarea-name=textareaQuestion textarea-required ng-model=mdeModel.text enable-bootstrap-title=true textarea-menu=yourModel.customMenu></md-wysiwyg> </div> </md-dialog-content> <input type=submit hidden> </form> </md-dialog>"
-  );
-
-
   $templateCache.put('views/directives/wb-content.html',
-    "<div ng-class=\"{'wb-panel': wbEditable}\">  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> Panel</span> <span flex></span> <md-button ng-click=newWidget(wbModel) class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=removeWidget(wbModel) ng-show=wbParent> <md-icon class=wb-icon-mini>delete</md-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=overlay></div>  <div class=wb-flex wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"addDraggedWidget(event, index, item, external, type)\"> </div>  </div> </div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-html.html',
-    "<wb-widget> <div ng-bind-html=\"wbModel.text | wbunsafe\"> </div> </wb-widget>"
-  );
-
-
-  $templateCache.put('views/directives/wb-linklist.html',
-    "<wb-widget> <a ng-repeat=\"link in wbModel.links\" ng-href={{link.href}}> <img src={{link.image}} style=\"min-width: 80px\">   </a> </wb-widget>"
-  );
-
-
-  $templateCache.put('views/directives/wb-notfoundelement.html',
-    "<div ng-class=\"{'mde-widget': mdeEditable, 'fill':mdeModel.style.fill}\">  <div ng-show=mdeEditable layout=row class=mde-widget-header ng-include=\"'views/partials/mdewidgetheaderactions.html'\"> </div> <div ng-show=mdeEditable> Unsuported widget?! </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=removeWidget(wbModel) ng-class=\"{'wb-panel': wbEditable}\">  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> Panel</span> <span flex></span> <md-button ng-click=newWidget(wbModel) class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=removeWidget(wbModel) ng-show=wbParent> <md-icon class=wb-icon-mini>delete</md-icon> </md-button> </div>  <div layout=row class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=overlay></div>  <div class=wb-flex wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"addDraggedWidget(event, index, item, external, type)\"> </div>  </div> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-widget.html',
     "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=removeWidget() ng-class=\"{'wb-widget': wbEditable}\" layout=column>  <div ng-show=wbEditable layout=row class=wb-widget-header> <span translate> widget</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=removeWidget() ng-show=removeWidget ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <md-icon class=mde-icon-mini>delete</md-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <md-icon class=mde-icon-mini>{{item.icon}}</md-icon> </md-button> </div>  <div wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style class=wb-panel-body> <div ng-show=ctrl.hoveringDelBtn class=overlay></div> <ng-transclude wb-layout=wbModel.style></ng-transclude> </div> </div>"
-  );
-
-
-  $templateCache.put('views/partials/wb-widgetheaderactions.html',
-    "<span translate> widget</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=removeWidget() ng-show=mdeParent&&removeWidget> <md-icon class=mde-icon-mini>delete</md-icon> </md-button>"
   );
 
 
@@ -2032,6 +2096,21 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   $templateCache.put('views/settings/wb-text.html',
     " <textarea ng-controller=WbTextSettingsCtrl ui-tinymce=tinymceOptions ng-model=wbModel.text flex>\n" +
     "</textarea>            "
+  );
+
+
+  $templateCache.put('views/wb-settings.html',
+    " <md-toolbar> <div class=md-toolbar-tools> <md-icon ng-if=style.icon>{{style.icon}}</md-icon> <h2 translate>{{mdeModel.title}}</h2> <span class=wb-flex></span>    </div> </md-toolbar>  <md-tabs md-dynamic-height md-border-bottom> <md-tab label=Context> <md-content layout=column layout-padding> <md-input-container> <label translate>title</label> <input ng-model=model.title> </md-input-container> <md-input-container> <label translate>text</label> <input ng-model=model.text> </md-input-container> </md-content> </md-tab> <md-tab label=Style> <md-content layout=column layout-padding> <md-color-picker label=\"Background color\" icon=brush ng-model=model.style.backgroundColor> </md-color-picker> <md-color-picker label=Color icon=brush ng-model=model.style.color> </md-color-picker> <md-input-container> <label translate>Font</label> <input ng-model=model.style.font> </md-input-container> <md-input-container> <label translate>Padding</label> <input ng-model=model.style.padding> </md-input-container> <md-input-container> <label translate>Width</label> <input ng-model=model.style.width> </md-input-container> <md-input-container> <label translate>Height</label> <input ng-model=model.style.height> </md-input-container> <md-checkbox ng-model=model.style.rtl aria-label=\"Right to left\"> Right to left </md-checkbox> </md-content> </md-tab> </md-tabs>"
+  );
+
+
+  $templateCache.put('views/widgets/wb-html.html',
+    " <div ng-bind-html=\"wbModel.text | wbunsafe\"> </div>"
+  );
+
+
+  $templateCache.put('views/widgets/wb-notfound.html',
+    "<div ng-show=wbEditable> Unsuported widget?! </div>"
   );
 
 }]);

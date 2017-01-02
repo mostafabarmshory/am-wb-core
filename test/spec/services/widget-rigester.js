@@ -39,14 +39,15 @@ describe('Service $widget', function() {
     }));
 
     it('sould add a new widget', function(done) {
-	var model = {
-	    dom : '<wb-notfound-element></wb-notfound-element>',
-	    label : 'Not found',
-	    image : 'images/wb/notfoundelement.svg',
-	    link : 'link',
-	};
 	var key = 'example-key';
-	$widget.newWidget(key, model)//
+	var model = {
+		type: key,
+		template : '<wb-notfound-element></wb-notfound-element>',
+		label : 'Not found',
+		image : 'images/wb/notfoundelement.svg',
+		link : 'link',
+	};
+	$widget.newWidget(model)//
 	.then(function(widget) {
 	    expect(!!widget).toBe(true);
 	    expect(widget.dom).toBe(model.dom);
