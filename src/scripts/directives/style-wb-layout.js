@@ -25,7 +25,7 @@
 
 angular.module('ngMaterialWeburger')
 /**
- * @description Apply margin into the element
+ * @description Apply layout into the element
  */
 .directive("wbLayout", function() {
     return {

@@ -25,7 +25,7 @@
 
 angular.module('ngMaterialWeburger')
 /**
- * @description Apply margin into the element
+ * @description Apply background into the element
  */
 .directive("wbSize", function() {
     return {
