@@ -25,12 +25,13 @@
 
 angular.module('ngMaterialWeburger')
 /**
- * @description Apply margin into the element
+ * @description Apply border into the element
  */
 .directive("wbBorder", function() {
     return {
 	restrict : 'A',
 	link : function(scope, element, attributes) {
+		//TODO: mgh, 1395: for efficiency, don't use ternary-operation in css. use if-condition on "uniform" and assign proper css-attributes.
 	    return scope.$watch(attributes.wbBorder, function(style) {
 		if(!style){
 		    return;

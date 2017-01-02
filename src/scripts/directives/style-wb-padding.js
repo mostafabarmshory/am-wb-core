@@ -25,7 +25,7 @@
 
 angular.module('ngMaterialWeburger')
 /**
- * @description Apply margin into the element
+ * @description Apply padding into the element
  */
 .directive("wbPadding", function() {
     return {
