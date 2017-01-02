@@ -31,12 +31,13 @@ angular.module('ngMaterialWeburger')
 .run(
 	function($widget) {
 	    // Page
-	    $widget.newWidget('Page', {
-		dom : '<wb-content></wb-content>',
+	    $widget.newWidget({
+		type: 'Page',
+		template : '<wb-content></wb-content>',
 		label : 'Panel',
 		description : 'Panel contains list of widgets.',
 		image : 'images/wb/content.svg',
-		link : 'http://dpq.co.ir/more-information-link',
+		help : 'http://dpq.co.ir/more-information-link',
 		data : {
 		    type : 'Page',
 		    style : {
@@ -46,12 +47,13 @@ angular.module('ngMaterialWeburger')
 		}
 	    });
 	    // HTML text
-	    $widget.newWidget('HtmlText', {
-		dom : '<wb-html></wb-html>',
+	    $widget.newWidget({
+		type: 'HtmlText',
+		templateUrl : 'views/widgets/wb-html.html',
 		label : 'HTML text',
 		description : 'An HTML block text.',
 		image : 'images/wb/html.svg',
-		link : 'http://dpq.co.ir',
+		help : 'http://dpq.co.ir',
 		setting:['text', 'selfLayout', 'border',
 			'background', 'marginPadding',
 			'minMaxSize'],

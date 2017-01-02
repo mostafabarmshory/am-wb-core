@@ -33,15 +33,14 @@ angular.module('ngMaterialWeburger')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$widget', function($q, $timeout, $mdDialog, PaginatorPage) {
+.service('$widget', function($q, $sce, $templateRequest, $timeout, $mdDialog, PaginatorPage) {
 
     var contentElementAsso = [];
     var elementKey = [];
     var notFoundWidget = {
-	dom : '<wb-notfound-element></wb-notfound-element>',
+	templateUrl : 'views/widgets/wb-notfound.html',
 	label : 'Not found',
-	image : 'images/wb/notfoundelement.svg',
-	link : 'link',
+	description : 'Element not found',
     };
     /**
      * Finds a widget related to the input model.
@@ -88,15 +87,18 @@ angular.module('ngMaterialWeburger')
     /**
      * Registers new widget
      * 
+     * @See the following page for more information:
+     * 
+     *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
      * 
      * @param type
      * @param model
      * @returns
      */
-    function newWidget(type, model) {
+    function newWidget(widget) {
 	var deferred = $q.defer();
 	$timeout(function() {
-	    if (type in contentElementAsso) {
+	    if (widget.type in contentElementAsso) {
 		deferred.reject({
 		    data : {
 			message : 'Widget with the same type registerd before'
@@ -104,9 +106,9 @@ angular.module('ngMaterialWeburger')
 		});
 		return;
 	    }
-	    contentElementAsso[type] = model;
-	    elementKey.push(type);
-	    deferred.resolve(model);
+	    contentElementAsso[widget.type] = widget;
+	    elementKey.push(widget.type);
+	    deferred.resolve(widget);
 	}, 1);
 	return deferred.promise;
     }
@@ -130,10 +132,33 @@ angular.module('ngMaterialWeburger')
 	    locals : locals,
 	});
     }
+    
+
+    /*
+     * get setting page template
+     */
+    function getTemplateFor(widget) {
+	var template, templateUrl;
+	if (angular.isDefined(template = widget.template)) {
+	    if (angular.isFunction(template)) {
+		template = template(widget.params);
+	    }
+	} else if (angular.isDefined(templateUrl = widget.templateUrl)) {
+	    if (angular.isFunction(templateUrl)) {
+		templateUrl = templateUrl(widget.params);
+	    }
+	    if (angular.isDefined(templateUrl)) {
+		widget.loadedTemplateUrl = $sce.valueOf(templateUrl);
+		template = $templateRequest(templateUrl);
+	    }
+	}
+	return template;
+    }
 
     // تعیین سرویس‌ها
     this.newWidget = newWidget;
     this.widget = widget;
     this.widgets = widgets;
     this.select = select;
+    this.getTemplateFor = getTemplateFor;
 });

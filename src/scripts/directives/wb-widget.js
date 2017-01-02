@@ -33,16 +33,27 @@ angular.module('ngMaterialWeburger')
  * 
  * This is widget containers.
  * 
- * All primary widgets are supported by default (such as remove and setting).
+ * All primary actions of a widget are supported (such as remove and setting).
  */
 .directive('wbWidget', function() {
     return {
 	templateUrl : 'views/directives/wb-widget.html',
 	restrict : 'E',
 	transclude : true,
-	scope : false,
-	link: function(scope, element, attrs){
-	    // TODO:
+	scope : {
+	    wbEditable : '=?',
+	    wbModel : '=?',
+	    wbParent : '=?'
+	},
+	link: function(scope, element, attrs, ctrl, transclude) {
+	    // Modify angular transclude function
+	    // see: http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
+	    // FIXME: maso, 2017: use regular dom insted of ng-transclude
+	    transclude(scope, function(clone, scope) {
+		var node = element//
+		.find('ng-transclude')//
+		.append(clone);
+	    });
 	},
 	controller : function($scope, $element, $settings, $widget) {
 	    var element = $element;

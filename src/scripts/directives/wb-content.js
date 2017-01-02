@@ -29,10 +29,12 @@ angular.module('ngMaterialWeburger')
  * @name donateMainApp.directive:wbContent
  * @description
  * 
- * نمایش یک محتوی
+ * A container widget
  * 
- * از این ساختار برای ایجاد یک محتوی استفاده می‌شود. هر محتوی معال با یک صفحه
- * معادل است که تمام موجودیت‌های خود را به صورت سطری و یا سطونی نمایش می‌دهد.
+ * This is an container widget to list and manage widgets. This is equal to a
+ * group or a page of widgets.
+ * 
+ * Widget data is bind into the wbModel automatically.
  * 
  * هر صفحه یک ساختار داده‌ای را به عنوان ورودی دریافت می‌کند و در صورتی که کاربر
  * مجاز به ویرایش آن باشد، آن را ویرایش و ساختار داده‌ای جدید ایجاد می‌کند.
@@ -72,19 +74,6 @@ angular.module('ngMaterialWeburger')
 			    return scope.wbParent.isEditable();
 			}
 			return scope.wbEditable;
-		    }
-
-		    function createWidget(widget, parentScope, model) {
-			var element = angular.element(widget);
-			element.attr('wb-model', 'model');
-			element.attr('wb-editable', 'wbEditable()');
-			element.attr('wb-parent', 'wbParent');
-			var childScope = parentScope.$new(true, parentScope);
-			childScope.model = model;
-			childScope.wbEditable = scope.isEditable;
-			childScope.wbParent = parentScope;
-			// TODO: maso, 1395: این موجودیت باید ایجاد شود
-			return $compile(element)(childScope);
 		    }
 
 		    function removeWidgets() {
@@ -128,12 +117,63 @@ angular.module('ngMaterialWeburger')
 			});
 		    }
 
+		    function createWidget(item) {
+			var widget = null;
+			var childScope = null;
+			var element = null;
+
+			// 0- get widget
+			return $widget.widget(item)//
+			.then(function(w) {
+			    widget = w;
+			})
+
+			// 1- create scope
+			.then(function() {
+			    childScope = $scope.$new(true, $scope);
+			    childScope.model = item;
+			    childScope.editable = $scope.isEditable;
+			    childScope.parent = $scope;
+			})
+
+			// 2- create element
+			.then(function() {
+			    return $widget.getTemplateFor(widget);
+			})//
+			.then(function(template) {
+			    if (item.type != 'Page') {
+				template = '<wb-widget>' + template + '</wb-widget>';
+			    }
+			    element = angular.element(template);
+			    element.attr('wb-model', 'model');
+			    element.attr('wb-editable', 'editable()');
+			    element.attr('wb-parent', 'parent');
+			})
+
+			// 3- bind controller
+			.then(function() {
+			    if (angular.isDefined(widget.controller)) {
+				$controller(widget.controller, {
+				    $scope : childScope,
+				    $element : element,
+				    // TODO: maso, 2017: bind wbModel, wbParent, and wbEditable
+				});
+			    }
+			    $compile(element)(childScope);
+			})//
+			
+			// Return value
+			.then(function(){
+			    return element;
+			});
+		    }
 		    function addWidget(item) {
-			$widget.widget(item).then(function(widget) {
+			createWidget(item)//
+			.then(function(element) {
 			    $element//
 			    .children(bodyElementSelector)//
 			    .children(placeholderElementSelector)//
-			    .append(createWidget(widget.dom, $scope, item));
+			    .append(element);
 			});
 		    }
 
@@ -144,16 +184,18 @@ angular.module('ngMaterialWeburger')
 			    type) {
 			// insert in model
 			scope.wbModel.contents.splice(index, 0, item);
+
+			createWidget(item)//
 			// add widget
-			$widget.widget(item).then(function(widget) {
+			createWidget(item)//
+			.then(function(element) {
 			    var list = $element//
 			    .children(bodyElementSelector)//
 			    .children(placeholderElementSelector);
-			    var w = createWidget(widget.dom, $scope, item);
-			    if(index < list[0].childNodes.length){
-				w.insertBefore(list[0].childNodes[index]);
+			    if (index < list[0].childNodes.length) {
+				element.insertBefore(list[0].childNodes[index]);
 			    } else {
-				list.append(w);
+				list.append(element);
 			    }
 			});
 			return true;

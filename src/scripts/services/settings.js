@@ -33,7 +33,7 @@ angular.module('ngMaterialWeburger')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$settings', function($mdDialog) {
+.service('$settings', function($rootScope, $q, $sce, $compile, $document, $templateRequest) {
     /**
      * Setting page storage
      * 
@@ -41,7 +41,7 @@ angular.module('ngMaterialWeburger')
     var settingPages = {};
     var notFound = {
 	label : 'Settings not found',
-	page : 'views/settings/wb-notfound.html'
+	templateUrl : 'views/settings/wb-notfound.html'
     };
 
     /**
@@ -76,20 +76,77 @@ angular.module('ngMaterialWeburger')
 	// TODO: maso, 1395:
     }
 
+    /*
+     * get setting page template
+     */
+    function getTemplateFor(page) {
+	var template, templateUrl;
+	if (angular.isDefined(template = page.template)) {
+	    if (angular.isFunction(template)) {
+		template = template(page.params);
+	    }
+	} else if (angular.isDefined(templateUrl = page.templateUrl)) {
+	    if (angular.isFunction(templateUrl)) {
+		templateUrl = templateUrl(page.params);
+	    }
+	    if (angular.isDefined(templateUrl)) {
+		page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+		template = $templateRequest(templateUrl);
+	    }
+	}
+	return template;
+    }
+    
     /**
      * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
      * 
      * @returns
      */
     function loadSetting(locals) {
-	return $mdDialog.show({
-	    controller : 'WbSettingDialogsCtrl',
-	    templateUrl : 'views/dialogs/wb-settings.html',
-	    parent : angular.element(document.body),
-	    clickOutsideToClose : true,
-	    fullscreen : true,
-	    locals : locals
+	// 1- Find element
+	var target = $document.find('#wb-setting-panel');
+	// 2- Clear childrens
+	target.empty();
+	// 3- load pages
+	
+	var page = notFound;
+	var lp;
+	var loads;
+	if (page) {
+	    var locals = [];
+//		angular.extend({}, 
+//		    route.resolve
+//		    );
+//	    angular.forEach(locals, function(value, key) {
+//		locals[key] = angular.isString(value) ?
+//			$injector.get(value) :
+//			    $injector.invoke(value, null, null, key);
+//	    });
+	    var template = getTemplateFor({templateUrl: 'views/wb-settings.html'});
+	    if (angular.isDefined(template)) {
+		locals.push( template//
+		.then(function(value){
+		    lp = value;
+		}));
+	    }
+	}
+	loads =  $q.all(locals);
+
+	loads.then(function(){
+	    var element = angular.element(lp);
+	    target.append($compile(element)($rootScope));
 	});
+	
+	
+	
+//	return $mdDialog.show({
+//	    controller : 'WbSettingDialogsCtrl',
+//	    templateUrl : 'views/dialogs/wb-settings.html',
+//	    parent : angular.element(document.body),
+//	    clickOutsideToClose : true,
+//	    fullscreen : true,
+//	    locals : locals
+//	});
     }
     // تعیین سرویس‌ها
     this.page = page;
