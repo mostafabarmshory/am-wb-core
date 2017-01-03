@@ -94,8 +94,12 @@ angular.module('ngMaterialWeburger')
 			}
 			// TODO: maso, 1395: بهتره که المان معادل را پیدا و حذف
 			// کنیم.
-			removeWidgets();
-			scope.wbModel.contents.forEach(addWidget);
+			var a = $element//
+			.children(bodyElementSelector)//
+			.children(placeholderElementSelector);
+			a[0].childNodes[index].remove();;
+//			removeWidgets();
+//			scope.wbModel.contents.forEach(addWidget);
 		    }
 
 		    /**
