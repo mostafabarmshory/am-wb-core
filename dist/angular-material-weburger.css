@@ -379,7 +379,7 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
  * with this class, because that will abort the drag operation.
 */
 .dndDragging {
-	
+	background: gray !important;
 }
 
 /*
@@ -388,5 +388,5 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
  * position, and not the "element" that the user is dragging with his mouse pointer
  */
 .dndDraggingSource {
-	
+    pointer-events: none;
 }
