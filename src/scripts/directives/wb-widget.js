@@ -71,15 +71,9 @@ angular.module('ngMaterialWeburger')
 	     * 
 	     */
 	    function settings() {
-		return $widget.widget($scope.wbModel)//
-		.then(function(widget) {
-		    return $settings.load({
-			wbModel : $scope.wbModel,
-			wbParent : $scope.wbParent,
-			style : {
-			    pages : widget.setting
-			}
-		    });
+		return $settings.load({
+		    wbModel : $scope.wbModel,
+		    wbParent : $scope.wbParent,
 		});
 	    }
 

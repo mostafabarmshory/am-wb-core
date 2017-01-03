@@ -38,6 +38,9 @@ angular.module('ngMaterialWeburger')
 		description : 'Panel contains list of widgets.',
 		image : 'images/wb/content.svg',
 		help : 'http://dpq.co.ir/more-information-link',
+		setting: [ 'description', 'border',
+			'background', 'pageLayout',
+			'selfLayout' ],
 		data : {
 		    type : 'Page',
 		    style : {

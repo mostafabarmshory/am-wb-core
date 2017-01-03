@@ -39,12 +39,14 @@
 			layout="row"
 			flex>
 			<div 
-				id="wb-setting-panel">
-				Setting panl
+				ng-show="editable" 
+				id="wb-setting-panel"
+				flex="30">
 			</div>
 			<wb-content
 				wb-editable="editable" 
-				wb-model="model">
+				wb-model="model"
+				flex>
 			</wb-content>
 		</md-content>
 	</div>

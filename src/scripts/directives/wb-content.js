@@ -210,12 +210,7 @@ angular.module('ngMaterialWeburger')
 		    function settings() {
 			return $settings.load({
 			    wbModel : scope.wbModel,
-			    wbParent : scope.wbParent,
-			    style : {
-				pages : [ 'description', 'border',
-					'background', 'pageLayout',
-					'selfLayout' ]
-			    }
+			    wbParent : scope.wbParent
 			});
 		    }
 

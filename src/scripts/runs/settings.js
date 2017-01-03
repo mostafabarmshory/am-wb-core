@@ -31,42 +31,42 @@ angular.module('ngMaterialWeburger')
 .run(function($settings) {
     $settings.newPage('general', {
 	label : 'general',
-	page : 'views/settings/wb-general.html'
+	templateUrl : 'views/settings/wb-general.html'
     });
     $settings.newPage('background', {
 	label : 'background',
-	page : 'views/settings/wb-background.html'
+	templateUrl : 'views/settings/wb-background.html'
     });
     $settings.newPage('text', {
 	label : 'Frontend text',
-	page : 'views/settings/wb-text.html'
+	templateUrl : 'views/settings/wb-text.html'
     });
     $settings.newPage('description', {
 	label : 'Description',
-	page : 'views/settings/wb-description.html'
+	templateUrl : 'views/settings/wb-description.html'
     });
     $settings.newPage('layout', {
 	label : 'Layout',
-	page : 'views/settings/wb-layout.html'
+	templateUrl : 'views/settings/wb-layout.html'
     });
     $settings.newPage('border', {
 	label : 'Border',
-	page : 'views/settings/wb-border.html'
+	templateUrl : 'views/settings/wb-border.html'
     });
     $settings.newPage('pageLayout', {
 	label : 'Page Layout',
-	page : 'views/settings/wb-layout-page.html'
+	templateUrl : 'views/settings/wb-layout-page.html'
     });
     $settings.newPage('selfLayout', {
 	label : 'Self Layout',
-	page : 'views/settings/wb-layout-self.html'
+	templateUrl : 'views/settings/wb-layout-self.html'
     });
     $settings.newPage('marginPadding', {
 	label : 'Margin/Padding',
-	page : 'views/settings/wb-margin-padding.html'
+	templateUrl : 'views/settings/wb-margin-padding.html'
     });
     $settings.newPage('minMaxSize', {
 	label : 'Min/Max',
-	page : 'views/settings/wb-min-max-size.html'
+	templateUrl : 'views/settings/wb-min-max-size.html'
     });
 });

@@ -33,16 +33,18 @@ angular.module('ngMaterialWeburger')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$settings', function($rootScope, $q, $sce, $compile, $document, $templateRequest) {
+.service('$settings', function($rootScope,$widget, $q, $sce, $compile, $document, $templateRequest) {
     /**
      * Setting page storage
      * 
      */
     var settingPages = {};
     var notFound = {
-	label : 'Settings not found',
-	templateUrl : 'views/settings/wb-notfound.html'
+	    label : 'Settings not found',
+	    templateUrl : 'views/settings/wb-notfound.html'
     };
+
+    var oldScope;
 
     /**
      * Fetchs a setting page.
@@ -96,57 +98,72 @@ angular.module('ngMaterialWeburger')
 	}
 	return template;
     }
-    
+
     /**
      * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
      * 
      * @returns
      */
-    function loadSetting(locals) {
+    function loadSetting(models) {
+	var widget = null;
+	var jobs = [];
+	var pages = [];
+
+	// 0- destroy old resource
+	if(angular.isDefined(oldScope)){
+	    oldScope.$destroy();
+	}
+	var scope = $rootScope.$new(true, $rootScope);
+	scope.wbModel = models.wbModel;
+	scope.wbParent = models.wbParent;
+	oldScope = scope;
+
+
 	// 1- Find element
 	var target = $document.find('#wb-setting-panel');
+
 	// 2- Clear childrens
 	target.empty();
-	// 3- load pages
-	
-	var page = notFound;
-	var lp;
-	var loads;
-	if (page) {
-	    var locals = [];
-//		angular.extend({}, 
-//		    route.resolve
-//		    );
-//	    angular.forEach(locals, function(value, key) {
-//		locals[key] = angular.isString(value) ?
-//			$injector.get(value) :
-//			    $injector.invoke(value, null, null, key);
-//	    });
-	    var template = getTemplateFor({templateUrl: 'views/wb-settings.html'});
-	    if (angular.isDefined(template)) {
-		locals.push( template//
-		.then(function(value){
-		    lp = value;
-		}));
-	    }
-	}
-	loads =  $q.all(locals);
 
-	loads.then(function(){
-	    var element = angular.element(lp);
-	    target.append($compile(element)($rootScope));
+	// 3- load pages
+	$widget.widget(models.wbModel)//
+	.then(function(w){
+	    widget = w;
+	    if(angular.isArray(widget.setting)){
+		angular.forEach(widget.setting, function(type) {
+		    var page = notFound;
+		    if(type in settingPages){
+			page = settingPages[type];
+		    }
+		    var template = getTemplateFor(page);
+		    if (angular.isDefined(template)) {
+			var job = template//
+			.then(function(templateSrc){
+			    var element = angular.element(templateSrc);
+			    if (angular.isDefined(page.controller)) {
+				$controller(page.controller, {
+				    $scope : scope,
+				    $element : element,
+				});
+			    }
+			    $compile(element)(scope);			    
+			    pages.push(element);
+			});
+			jobs.push(job);
+		    }
+		});
+	    } else {
+		// TODO: maso, 2017: not setting page founnd
+	    }
+	})//
+	.then(function(){
+	    $q.all(jobs)//
+	    .then(function(){
+		angular.forEach(pages, function(element){
+		    target.append(element);
+		});
+	    });
 	});
-	
-	
-	
-//	return $mdDialog.show({
-//	    controller : 'WbSettingDialogsCtrl',
-//	    templateUrl : 'views/dialogs/wb-settings.html',
-//	    parent : angular.element(document.body),
-//	    clickOutsideToClose : true,
-//	    fullscreen : true,
-//	    locals : locals
-//	});
     }
     // تعیین سرویس‌ها
     this.page = page;
