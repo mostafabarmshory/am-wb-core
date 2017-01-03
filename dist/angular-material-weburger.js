@@ -1239,12 +1239,7 @@ angular.module('ngMaterialWeburger')
 		    function settings() {
 			return $settings.load({
 			    wbModel : scope.wbModel,
-			    wbParent : scope.wbParent,
-			    style : {
-				pages : [ 'description', 'border',
-					'background', 'pageLayout',
-					'selfLayout' ]
-			    }
+			    wbParent : scope.wbParent
 			});
 		    }
 
@@ -1396,15 +1391,9 @@ angular.module('ngMaterialWeburger')
 	     * 
 	     */
 	    function settings() {
-		return $widget.widget($scope.wbModel)//
-		.then(function(widget) {
-		    return $settings.load({
-			wbModel : $scope.wbModel,
-			wbParent : $scope.wbParent,
-			style : {
-			    pages : widget.setting
-			}
-		    });
+		return $settings.load({
+		    wbModel : $scope.wbModel,
+		    wbParent : $scope.wbParent,
 		});
 	    }
 
@@ -1489,43 +1478,43 @@ angular.module('ngMaterialWeburger')
 .run(function($settings) {
     $settings.newPage('general', {
 	label : 'general',
-	page : 'views/settings/wb-general.html'
+	templateUrl : 'views/settings/wb-general.html'
     });
     $settings.newPage('background', {
 	label : 'background',
-	page : 'views/settings/wb-background.html'
+	templateUrl : 'views/settings/wb-background.html'
     });
     $settings.newPage('text', {
 	label : 'Frontend text',
-	page : 'views/settings/wb-text.html'
+	templateUrl : 'views/settings/wb-text.html'
     });
     $settings.newPage('description', {
 	label : 'Description',
-	page : 'views/settings/wb-description.html'
+	templateUrl : 'views/settings/wb-description.html'
     });
     $settings.newPage('layout', {
 	label : 'Layout',
-	page : 'views/settings/wb-layout.html'
+	templateUrl : 'views/settings/wb-layout.html'
     });
     $settings.newPage('border', {
 	label : 'Border',
-	page : 'views/settings/wb-border.html'
+	templateUrl : 'views/settings/wb-border.html'
     });
     $settings.newPage('pageLayout', {
 	label : 'Page Layout',
-	page : 'views/settings/wb-layout-page.html'
+	templateUrl : 'views/settings/wb-layout-page.html'
     });
     $settings.newPage('selfLayout', {
 	label : 'Self Layout',
-	page : 'views/settings/wb-layout-self.html'
+	templateUrl : 'views/settings/wb-layout-self.html'
     });
     $settings.newPage('marginPadding', {
 	label : 'Margin/Padding',
-	page : 'views/settings/wb-margin-padding.html'
+	templateUrl : 'views/settings/wb-margin-padding.html'
     });
     $settings.newPage('minMaxSize', {
 	label : 'Min/Max',
-	page : 'views/settings/wb-min-max-size.html'
+	templateUrl : 'views/settings/wb-min-max-size.html'
     });
 });
 
@@ -1569,6 +1558,9 @@ angular.module('ngMaterialWeburger')
 		description : 'Panel contains list of widgets.',
 		image : 'images/wb/content.svg',
 		help : 'http://dpq.co.ir/more-information-link',
+		setting: [ 'description', 'border',
+			'background', 'pageLayout',
+			'selfLayout' ],
 		data : {
 		    type : 'Page',
 		    style : {
@@ -1682,16 +1674,18 @@ angular.module('ngMaterialWeburger')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$settings', function($rootScope, $q, $sce, $compile, $document, $templateRequest) {
+.service('$settings', function($rootScope,$widget, $q, $sce, $compile, $document, $templateRequest) {
     /**
      * Setting page storage
      * 
      */
     var settingPages = {};
     var notFound = {
-	label : 'Settings not found',
-	templateUrl : 'views/settings/wb-notfound.html'
+	    label : 'Settings not found',
+	    templateUrl : 'views/settings/wb-notfound.html'
     };
+
+    var oldScope;
 
     /**
      * Fetchs a setting page.
@@ -1745,57 +1739,72 @@ angular.module('ngMaterialWeburger')
 	}
 	return template;
     }
-    
+
     /**
      * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
      * 
      * @returns
      */
-    function loadSetting(locals) {
+    function loadSetting(models) {
+	var widget = null;
+	var jobs = [];
+	var pages = [];
+
+	// 0- destroy old resource
+	if(angular.isDefined(oldScope)){
+	    oldScope.$destroy();
+	}
+	var scope = $rootScope.$new(true, $rootScope);
+	scope.wbModel = models.wbModel;
+	scope.wbParent = models.wbParent;
+	oldScope = scope;
+
+
 	// 1- Find element
 	var target = $document.find('#wb-setting-panel');
+
 	// 2- Clear childrens
 	target.empty();
-	// 3- load pages
-	
-	var page = notFound;
-	var lp;
-	var loads;
-	if (page) {
-	    var locals = [];
-//		angular.extend({}, 
-//		    route.resolve
-//		    );
-//	    angular.forEach(locals, function(value, key) {
-//		locals[key] = angular.isString(value) ?
-//			$injector.get(value) :
-//			    $injector.invoke(value, null, null, key);
-//	    });
-	    var template = getTemplateFor({templateUrl: 'views/wb-settings.html'});
-	    if (angular.isDefined(template)) {
-		locals.push( template//
-		.then(function(value){
-		    lp = value;
-		}));
-	    }
-	}
-	loads =  $q.all(locals);
 
-	loads.then(function(){
-	    var element = angular.element(lp);
-	    target.append($compile(element)($rootScope));
+	// 3- load pages
+	$widget.widget(models.wbModel)//
+	.then(function(w){
+	    widget = w;
+	    if(angular.isArray(widget.setting)){
+		angular.forEach(widget.setting, function(type) {
+		    var page = notFound;
+		    if(type in settingPages){
+			page = settingPages[type];
+		    }
+		    var template = getTemplateFor(page);
+		    if (angular.isDefined(template)) {
+			var job = template//
+			.then(function(templateSrc){
+			    var element = angular.element(templateSrc);
+			    if (angular.isDefined(page.controller)) {
+				$controller(page.controller, {
+				    $scope : scope,
+				    $element : element,
+				});
+			    }
+			    $compile(element)(scope);			    
+			    pages.push(element);
+			});
+			jobs.push(job);
+		    }
+		});
+	    } else {
+		// TODO: maso, 2017: not setting page founnd
+	    }
+	})//
+	.then(function(){
+	    $q.all(jobs)//
+	    .then(function(){
+		angular.forEach(pages, function(element){
+		    target.append(element);
+		});
+	    });
 	});
-	
-	
-	
-//	return $mdDialog.show({
-//	    controller : 'WbSettingDialogsCtrl',
-//	    templateUrl : 'views/dialogs/wb-settings.html',
-//	    parent : angular.element(document.body),
-//	    clickOutsideToClose : true,
-//	    fullscreen : true,
-//	    locals : locals
-//	});
     }
     // تعیین سرویس‌ها
     this.page = page;
@@ -1971,26 +1980,8 @@ angular.module('ngMaterialWeburger')
 angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCache) {
   'use strict';
 
-  $templateCache.put('views/dialogs/wb-alert.html',
-    "<md-dialog ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <md-icon ng-if=style.icon>{{mdeModel.style.icon}}</md-icon> <h2 translate>{{mdeModel.title}}</h2> <span class=flex></span> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar> <md-dialog-content ng-style=\"{\n" +
-    "      'direction' : style.direction,\n" +
-    "      'text-align': style.textAlign\n" +
-    "    }\"> <div class=md-dialog-content> <md-dialog-content translate>{{mdeModel.text}}</md-dialog-content> </div> <div layout=row> <md-button ng-click=cancel()> {{mdeModel.label | translate}} </md-button> </div> </md-dialog-content> </md-dialog>"
-  );
-
-
-  $templateCache.put('views/dialogs/wb-selectcontent.html',
-    " <md-dialog aria-label=\"Select media\" ng-controller=WbCmsCtrl ng-cloak> <form ng-submit=answer(content)>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Media select</h2> <span flex></span> <md-button class=md-icon-button ng-click=answer(content)> <md-icon aria-label=\"Close dialog\">done</md-icon> </md-button> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <div class=md-dialog-content layout=column>  <div layout=row> <div layout=column flex> <div ng-repeat=\"content in contents\" ng-click=select(content) layout-padding> {{content.id}}: {{content.title}} </div> </div> <div flex=40> <div> {{content.id}}:{{content.title}} <img alt=\"No priview\" src={{content.link}} width=500> </div> </div> <div> <input onchange=angular.element(this).scope().upload(this.files[0]) type=\"file\"> </div> </div> </div> </md-dialog-content> </form> </md-dialog>"
-  );
-
-
   $templateCache.put('views/dialogs/wb-selectwidget.html',
     "<md-dialog aria-label=\"edit action dialog\" ng-controller=WbWidgetSelectCtrl ng-cloak>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Widget list</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar>    <md-dialog-content> <md-content class=\"md-padding md-dialog-content\" layout-xs=column layout=row layout-wrap>    <md-card ng-repeat=\"widget in widgets.items\" flex-xs flex-gt-xs=45 md-theme-watch> <md-card-title> <md-card-title-text> <span class=md-headline>{{widget.label}}</span> <span class=md-subhead>{{widget.description}}</span> </md-card-title-text> <md-card-title-media> <img src=\"{{widget.image}}\"> </md-card-title-media> </md-card-title> <md-card-actions layout=row layout-align=\"end center\"> <md-button ng-click=answerWidget(widget)> <md-icon>add</md-icon> {{ 'Add' | translate }} </md-button>  </md-card-actions> </md-card> </md-content> </md-dialog-content> </md-dialog>"
-  );
-
-
-  $templateCache.put('views/dialogs/wb-settings.html',
-    " <md-dialog ng-controller=WbSettingsCtrl aria-label=\"Setting dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Settings</h2> <span flex></span> <md-button class=md-icon-button ng-click=answer()> <md-icon aria-label=\"Close dialog\">close</md-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <md-content class=md-dialog-content> <md-tabs md-dynamic-height md-border-bottom> <md-tab ng-repeat=\"setting in settings\" label=\"{{setting.label | translate}}\"> <md-content layout=row flex ng-include=setting.page class=md-padding> </md-content> </md-tab> </md-tabs> </md-content> </md-dialog-content> </md-dialog>"
   );
 
 
@@ -2096,11 +2087,6 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   $templateCache.put('views/settings/wb-text.html',
     " <textarea ng-controller=WbTextSettingsCtrl ui-tinymce=tinymceOptions ng-model=wbModel.text flex>\n" +
     "</textarea>            "
-  );
-
-
-  $templateCache.put('views/wb-settings.html',
-    " <md-toolbar> <div class=md-toolbar-tools> <md-icon ng-if=style.icon>{{style.icon}}</md-icon> <h2 translate>{{mdeModel.title}}</h2> <span class=wb-flex></span>    </div> </md-toolbar>  <md-tabs md-dynamic-height md-border-bottom> <md-tab label=Context> <md-content layout=column layout-padding> <md-input-container> <label translate>title</label> <input ng-model=model.title> </md-input-container> <md-input-container> <label translate>text</label> <input ng-model=model.text> </md-input-container> </md-content> </md-tab> <md-tab label=Style> <md-content layout=column layout-padding> <md-color-picker label=\"Background color\" icon=brush ng-model=model.style.backgroundColor> </md-color-picker> <md-color-picker label=Color icon=brush ng-model=model.style.color> </md-color-picker> <md-input-container> <label translate>Font</label> <input ng-model=model.style.font> </md-input-container> <md-input-container> <label translate>Padding</label> <input ng-model=model.style.padding> </md-input-container> <md-input-container> <label translate>Width</label> <input ng-model=model.style.width> </md-input-container> <md-input-container> <label translate>Height</label> <input ng-model=model.style.height> </md-input-container> <md-checkbox ng-model=model.style.rtl aria-label=\"Right to left\"> Right to left </md-checkbox> </md-content> </md-tab> </md-tabs>"
   );
 
 

@@ -181,37 +181,6 @@ Rules for sizing the icon.
 	width: 128px;
 	height: 128px;
 }
-/*
-.container {
-	padding: 2% 0;
-	width: 100%;
-	color: white;
-	background: -webkit-linear-gradient(rgba(0, 0, 0, 0.5), #000);
-	background: linear-gradient(rgba(0, 0, 0, 0.5), #000);
-	-webkit-box-align: center;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-}
-
-md-input-container.editable-controls {
-	padding: 0;
-}
-
-md-input-container.editable-controls [ng-message] {
-	position: static;
-}
-
-.selection {
-	border: 2px solid gray;
-	border-radius: 4px;
-}
-
-.selection:not ([disabled] ):hover {
-	border: 2px solid blue;
-	border-radius: 4px;
-}*/
-
 .preview-box {
     position: relative;
     height: 280px;
