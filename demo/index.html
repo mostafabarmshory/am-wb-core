@@ -27,29 +27,36 @@
     <!-- endbuild -->
   </head>
   <body>
-
-	<div layout="column" class="wb-flex">
-		<div>
-			<md-button ng-click="editable=!editable">editable</md-button>
-			<md-button ng-click="showContent=!showContent">shwo content</md-button>
-			<md-button ng-click="cs()">select content</md-button>
-		</div>
-		<textarea ng-show="showContent">{{model}}</textarea>
-		<md-content
-			layout="row"
-			flex>
-			<div 
-				ng-show="editable" 
-				id="wb-setting-panel"
-				flex="30">
+  
+  
+    <div 
+    	layout="row" 
+    	layout-fill>
+		<div layout="column" flex>
+			<div>
+				<md-button ng-click="editable=!editable">editable</md-button>
+				<md-button ng-click="showContent=!showContent">shwo content</md-button>
+				<md-button ng-click="cs()">select content</md-button>
 			</div>
-			<wb-content
-				wb-editable="editable" 
-				wb-model="model"
+			<textarea ng-show="showContent">{{model}}</textarea>
+			<div
+				layout="row"
 				flex>
-			</wb-content>
-		</md-content>
-	</div>
+				<wb-content 
+					ng-show="editable" 
+					id="wb-setting-panel"
+					flex="30"
+					style="overflow: auto;">
+				</wb-content>
+				<wb-content
+					wb-editable="editable" 
+					wb-model="model"
+					flex
+					style="overflow: auto;">
+				</wb-content>
+			</div>
+		</div>
+    </div>
 
 	<!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
