@@ -33,7 +33,7 @@ angular.module('ngMaterialWeburger')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$settings', function($rootScope,$widget, $q, $sce, $compile, $document, $templateRequest) {
+.service('$settings', function($rootScope, $controller, $widget, $q, $sce, $compile, $document, $templateRequest) {
     /**
      * Setting page storage
      * 
@@ -52,10 +52,10 @@ angular.module('ngMaterialWeburger')
      * @param model
      * @returns
      */
-    function page(settingId) {
+    function page(type) {
 	var widget = notFound;
-	if (settingId in settingPages) {
-	    widget = settingPages[settingId];
+	if (type in settingPages) {
+	    widget = settingPages[type];
 	}
 	return widget;
     }
@@ -65,8 +65,8 @@ angular.module('ngMaterialWeburger')
      * 
      * @returns
      */
-    function newPage(settingId, page) {
-	settingPages[settingId] = page;
+    function newPage(page) {
+	settingPages[page.type] = page;
     }
 
     /**

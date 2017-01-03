@@ -29,43 +29,58 @@ angular.module('ngMaterialWeburger')
  * Load widgets
  */
 .run(function($settings) {
-    $settings.newPage('general', {
+    $settings.newPage({
+	type: 'general',
 	label : 'general',
 	templateUrl : 'views/settings/wb-general.html'
     });
-    $settings.newPage('background', {
+    $settings.newPage({
+	type: 'background',
 	label : 'background',
 	templateUrl : 'views/settings/wb-background.html'
     });
-    $settings.newPage('text', {
+    $settings.newPage({
+	type: 'text',
 	label : 'Frontend text',
+	controller: 'WbTextSettingsCtrl',
 	templateUrl : 'views/settings/wb-text.html'
     });
-    $settings.newPage('description', {
+    $settings.newPage({
+	type: 'description',
 	label : 'Description',
 	templateUrl : 'views/settings/wb-description.html'
     });
-    $settings.newPage('layout', {
+    $settings.newPage({
+	type: 'layout',
 	label : 'Layout',
+	controller: 'WbLayoutWbSettingsCtrl',
 	templateUrl : 'views/settings/wb-layout.html'
     });
-    $settings.newPage('border', {
+    $settings.newPage({
+	type: 'border',
 	label : 'Border',
+	controller: 'WbBorderSettingCtrl',
 	templateUrl : 'views/settings/wb-border.html'
     });
-    $settings.newPage('pageLayout', {
+    $settings.newPage({
+	type: 'pageLayout',
 	label : 'Page Layout',
+	controller: 'WbPageLayoutWbSettingsCtrl',
 	templateUrl : 'views/settings/wb-layout-page.html'
     });
-    $settings.newPage('selfLayout', {
+    $settings.newPage({
+	type: 'selfLayout',
 	label : 'Self Layout',
+	controller: 'WbSelfLayoutWbSettingsCtrl',
 	templateUrl : 'views/settings/wb-layout-self.html'
     });
-    $settings.newPage('marginPadding', {
+    $settings.newPage({
+	type: 'marginPadding',
 	label : 'Margin/Padding',
 	templateUrl : 'views/settings/wb-margin-padding.html'
     });
-    $settings.newPage('minMaxSize', {
+    $settings.newPage({
+	type: 'minMaxSize',
 	label : 'Min/Max',
 	templateUrl : 'views/settings/wb-min-max-size.html'
     });

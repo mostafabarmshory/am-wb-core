@@ -61,25 +61,4 @@ angular.module('ngMaterialWeburger')
 	title : 'Outset',
 	value : 'outset'
     } ];
-
-    //
-    // scope.radiuses=[
-    // {
-    // title:'Top-Left: ',
-    // model:$scope.mdeModel.style.borderRadius.topLeft
-    // },
-    // {
-    // title:'Top-Left: ',
-    // model:$scope.mdeModel.style.borderRadius.topRight
-    // },
-    // {
-    // title:'Top-Left: ',
-    // model:$scope.mdeModel.style.borderRadius.bottomLeft
-    // },
-    // {
-    // title:'Top-Left: ',
-    // model:$scope.mdeModel.style.borderRadius.bottomRight
-    // }
-    // ];
-
 });
