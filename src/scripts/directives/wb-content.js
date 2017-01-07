@@ -83,24 +83,27 @@ angular.module('ngMaterialWeburger')
 			.empty();
 		    }
 
+		    /*
+		     * Removes a widget
+		     * 
+		     * Data model and visual element related to the input model
+		     * will be removed.
+		     */
 		    function removeWidget(model) {
 			if (model == scope.wbModel) {
 			    // باید از پدر بخواهیم که این کار رو انجام بده
-			    scope.wbParent.removeWidget(model);
+			    return scope.wbParent.removeWidget(model);
 			}
 			var index = scope.wbModel.contents.indexOf(model);
 			if (index > -1) {
 			    scope.wbModel.contents.splice(index, 1);
+			    var a = $element//
+			    .children(bodyElementSelector)//
+			    .children(placeholderElementSelector);
+			    a[0].childNodes[index].remove();
+			    return true;
 			}
-			// FIXME: mgh, there is a bug here, dosent work in some situation
-				// TODO: maso, 1395: بهتره که المان معادل را پیدا و حذف
-			// کنیم.
-			var a = $element//
-			.children(bodyElementSelector)//
-			.children(placeholderElementSelector);
-			a[0].childNodes[index].remove();;
-//			removeWidgets();
-//			scope.wbModel.contents.forEach(addWidget);
+			return false;
 		    }
 
 		    /**
