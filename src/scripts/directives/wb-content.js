@@ -92,7 +92,8 @@ angular.module('ngMaterialWeburger')
 			if (index > -1) {
 			    scope.wbModel.contents.splice(index, 1);
 			}
-			// TODO: maso, 1395: بهتره که المان معادل را پیدا و حذف
+			// FIXME: mgh, there is a bug here, dosent work in some situation
+				// TODO: maso, 1395: بهتره که المان معادل را پیدا و حذف
 			// کنیم.
 			var a = $element//
 			.children(bodyElementSelector)//
