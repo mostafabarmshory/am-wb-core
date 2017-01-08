@@ -921,6 +921,11 @@ angular.module('ngMaterialWeburger')
 		    var scope = $scope;
 		    var element = $element;
 
+		    /*
+		     * Check editable mode
+		     * 
+		     * Returns true if the model is in editable mode.
+		     */
 		    function isEditable() {
 			if (scope.wbParent) {
 			    return scope.wbParent.isEditable();
@@ -928,50 +933,39 @@ angular.module('ngMaterialWeburger')
 			return scope.wbEditable;
 		    }
 
-		    function removeWidgets() {
-			$element//
-			.children(bodyElementSelector)//
-			.children(placeholderElementSelector)//
-			.empty();
-		    }
-
-		    function removeWidget(model) {
-			if (model == scope.wbModel) {
-			    // باید از پدر بخواهیم که این کار رو انجام بده
-			    scope.wbParent.removeWidget(model);
-			}
+		    /*
+		     * Removes a widget
+		     * 
+		     * Data model and visual element related to the input model
+		     * will be removed.
+		     */
+		    function removeChild(model) {
 			var index = scope.wbModel.contents.indexOf(model);
 			if (index > -1) {
+			    var a = $element//
+			    .children(bodyElementSelector)//
+			    .children(placeholderElementSelector);
+			    
+			    if(scope.wbModel.contents.length !== a[0].childNodes){
+				// Need referesh
+				scope.wbModel.contents.splice(index, 1);
+				removeWidgets();
+				scope.wbModel.contents.forEach(addWidget);
+				return;
+			    }
+			    
 			    scope.wbModel.contents.splice(index, 1);
+			    a[0].childNodes[index].remove();
 			}
-			// TODO: maso, 1395: بهتره که المان معادل را پیدا و حذف
-			// کنیم.
-			var a = $element//
-			.children(bodyElementSelector)//
-			.children(placeholderElementSelector);
-			a[0].childNodes[index].remove();;
-//			removeWidgets();
-//			scope.wbModel.contents.forEach(addWidget);
 		    }
 
-		    /**
-		     * یک دریجه محاوره‌ای برای انتخاب و اضافه کردن ویجت باز
-		     * می‌کند
-		     * 
-		     * کاربر با استفاده از دریچه محاوره‌ای ویجت را انتخاب می‌کند
-		     * و بعد از آن این ویجت به صورت یک ساختار داده‌ای جدید به
-		     * مدل داده‌ای و نمایش اضافه خواهد شد.‌
+		    /*
+		     * Remove the node
 		     */
-		    function newWidget(wbModel) {
-			return $widget.select({
-			    wbModel : {},
-			    style : {}
-			})//
-			.then(function(model) {
-			    wbModel.contents.push(model);
-			    addWidget(model);
-			});
+		    function remove(){
+			return scope.wbParent.removeChild($scope.wbModel);
 		    }
+
 
 		    function createWidget(item) {
 			var widget = null;
@@ -1012,17 +1006,25 @@ angular.module('ngMaterialWeburger')
 				$controller(widget.controller, {
 				    $scope : childScope,
 				    $element : element,
-				    // TODO: maso, 2017: bind wbModel, wbParent, and wbEditable
+				    // TODO: maso, 2017: bind wbModel, wbParent,
+				    // and wbEditable
 				});
 			    }
 			    $compile(element)(childScope);
 			})//
-			
+
 			// Return value
 			.then(function(){
 			    return element;
 			});
 		    }
+
+
+		    /*
+		     * Creates and add a widget
+		     * 
+		     * @see createWidget
+		     */
 		    function addWidget(item) {
 			createWidget(item)//
 			.then(function(element) {
@@ -1033,15 +1035,12 @@ angular.module('ngMaterialWeburger')
 			});
 		    }
 
+
 		    /**
 		     * Adds dragged widget
 		     */
-		    function addDraggedWidget(event, index, item, external,
+		    function dropCallback(event, index, item, external,
 			    type) {
-			// insert in model
-			scope.wbModel.contents.splice(index, 0, item);
-
-			createWidget(item)//
 			// add widget
 			createWidget(item)//
 			.then(function(element) {
@@ -1053,8 +1052,37 @@ angular.module('ngMaterialWeburger')
 			    } else {
 				list.append(element);
 			    }
+			})//
+			.then(function(){
+			    console.log('widget add to list');
+			    scope.wbModel.contents.splice(index, 0, item);
 			});
 			return true;
+		    }
+
+
+		    /**
+		     * @deprecated
+		     */
+		    function removeWidgets() {
+			$element//
+			.children(bodyElementSelector)//
+			.children(placeholderElementSelector)//
+			.empty();
+		    }
+
+		    /**
+		     * @deprecated
+		     */
+		    function newWidget(wbModel) {
+			return $widget.select({
+			    wbModel : {},
+			    style : {}
+			})//
+			.then(function(model) {
+			    wbModel.contents.push(model);
+			    addWidget(model);
+			});
 		    }
 
 		    /**
@@ -1070,12 +1098,16 @@ angular.module('ngMaterialWeburger')
 			});
 		    }
 
-		    scope.settings = settings;
-		    scope.removeWidgets = removeWidgets;
-		    scope.removeWidget = removeWidget;
-		    scope.newWidget = newWidget;
 		    scope.isEditable = isEditable
-		    scope.addDraggedWidget = addDraggedWidget;
+		    scope.settings = settings;
+		    scope.remove = remove;
+		    scope.removeChild = removeChild;
+
+		    scope.dropCallback = dropCallback;
+		    scope.movedCallback = remove;
+		    
+//		    scope.removeWidgets = removeWidgets;
+		    scope.newWidget = newWidget;
 
 		    scope.$watch('wbModel', function() {
 			removeWidgets();
@@ -1192,9 +1224,10 @@ angular.module('ngMaterialWeburger')
 	    wbModel : '=?',
 	    wbParent : '=?'
 	},
-	link: function(scope, element, attrs, ctrl, transclude) {
+	link : function(scope, element, attrs, ctrl, transclude) {
 	    // Modify angular transclude function
-	    // see: http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
+	    // see:
+	    // http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
 	    // FIXME: maso, 2017: use regular dom insted of ng-transclude
 	    transclude(scope, function(clone, scope) {
 		var node = element//
@@ -1207,10 +1240,9 @@ angular.module('ngMaterialWeburger')
 	    /**
 	     * Remove widget from parent
 	     */
-	    function removeWidget() {
-		if ($scope.wbParent) {
-		    $scope.wbParent.removeWidget($scope.wbModel);
-		}
+	    function remove() {
+		console.log('widget removed');
+		return $scope.wbParent.removeChild($scope.wbModel);
 	    }
 
 	    /**
@@ -1227,7 +1259,8 @@ angular.module('ngMaterialWeburger')
 	    /*
 	     * Add to scope
 	     */
-	    $scope.removeWidget = removeWidget;
+	    $scope.remove = remove;
+	    $scope.movedCallback = remove;
 	    $scope.settings = settings;
 	}
     };
@@ -1828,12 +1861,12 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-content.html',
-    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=removeWidget(wbModel) ng-class=\"{'wb-panel': wbEditable}\">  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> Panel</span> <span flex></span> <md-button ng-click=newWidget(wbModel) class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=removeWidget(wbModel) ng-show=wbParent> <md-icon class=wb-icon-mini>delete</md-icon> </md-button> </div>  <div layout=row class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=overlay></div>  <div class=wb-flex wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"addDraggedWidget(event, index, item, external, type)\"> </div>  </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=movedCallback() ng-class=\"{'wb-panel': wbEditable}\">  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> Panel</span> <span flex></span> <md-button ng-click=newWidget(wbModel) class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=wb-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=remove() ng-show=wbParent> <md-icon class=wb-icon-mini>delete</md-icon> </md-button> </div>  <div layout=row class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=overlay></div>  <div class=wb-flex wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div>  </div> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-widget.html',
-    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=removeWidget() ng-class=\"{'wb-widget': wbEditable}\" layout=column>  <div ng-show=wbEditable layout=row class=wb-widget-header> <span translate> widget</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=removeWidget() ng-show=removeWidget ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <md-icon class=mde-icon-mini>delete</md-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <md-icon class=mde-icon-mini>{{item.icon}}</md-icon> </md-button> </div>  <div wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style class=wb-panel-body> <div ng-show=ctrl.hoveringDelBtn class=overlay></div> <ng-transclude wb-layout=wbModel.style></ng-transclude> </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=movedCallback() ng-class=\"{'wb-widget': wbEditable}\" layout=column>  <div ng-show=wbEditable layout=row class=wb-widget-header> <span translate> widget</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>add_circle</md-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-icon class=mde-icon-mini>settings</md-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=remove() ng-show=remove ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <md-icon class=mde-icon-mini>delete</md-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <md-icon class=mde-icon-mini>{{item.icon}}</md-icon> </md-button> </div>  <div wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style class=wb-panel-body> <div ng-show=ctrl.hoveringDelBtn class=overlay></div> <ng-transclude wb-layout=wbModel.style></ng-transclude> </div> </div>"
   );
 
 
