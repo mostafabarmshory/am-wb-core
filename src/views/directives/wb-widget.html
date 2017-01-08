@@ -2,7 +2,7 @@
 	dnd-disable-if="!wbEditable"
 	dnd-draggable="wbModel"
 	dnd-type="'wb.widget'"
-	dnd-moved="removeWidget()"
+	dnd-moved="movedCallback()"
 	ng-class="{'wb-widget': wbEditable}" 
 	layout="column">
     <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
@@ -24,8 +24,8 @@
 		</md-button>
 		<md-button 
 			class="md-icon-button md-mini" 
-			ng-click="removeWidget()"
-			ng-show="removeWidget"
+			ng-click="remove()"
+			ng-show="remove"
             ng-mouseenter="ctrl.hoveringDelBtn=true"
             ng-mouseleave="ctrl.hoveringDelBtn=false"> 
 			<md-icon class="mde-icon-mini">delete</md-icon>

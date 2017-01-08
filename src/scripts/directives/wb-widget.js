@@ -45,9 +45,10 @@ angular.module('ngMaterialWeburger')
 	    wbModel : '=?',
 	    wbParent : '=?'
 	},
-	link: function(scope, element, attrs, ctrl, transclude) {
+	link : function(scope, element, attrs, ctrl, transclude) {
 	    // Modify angular transclude function
-	    // see: http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
+	    // see:
+	    // http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
 	    // FIXME: maso, 2017: use regular dom insted of ng-transclude
 	    transclude(scope, function(clone, scope) {
 		var node = element//
@@ -60,10 +61,9 @@ angular.module('ngMaterialWeburger')
 	    /**
 	     * Remove widget from parent
 	     */
-	    function removeWidget() {
-		if ($scope.wbParent) {
-		    $scope.wbParent.removeWidget($scope.wbModel);
-		}
+	    function remove() {
+		console.log('widget removed');
+		return $scope.wbParent.removeChild($scope.wbModel);
 	    }
 
 	    /**
@@ -80,7 +80,8 @@ angular.module('ngMaterialWeburger')
 	    /*
 	     * Add to scope
 	     */
-	    $scope.removeWidget = removeWidget;
+	    $scope.remove = remove;
+	    $scope.movedCallback = remove;
 	    $scope.settings = settings;
 	}
     };

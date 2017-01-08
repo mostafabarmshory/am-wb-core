@@ -2,7 +2,7 @@
 	dnd-disable-if="!wbEditable"
 	dnd-draggable="wbModel"
 	dnd-type="'wb.widget'"
-	dnd-moved="removeWidget(wbModel)"
+	dnd-moved="movedCallback()"
 	ng-class="{'wb-panel': wbEditable}">
     <!-- a header is added through edit-mode -->
     <div ng-show="wbEditable" class="wb-panel-header" layout="row">
@@ -22,7 +22,7 @@
                 class="md-icon-button md-mini"
                 ng-mouseenter="hoveringDelBtn=true"
                 ng-mouseleave="hoveringDelBtn=false"
-                ng-click="removeWidget(wbModel)"
+                ng-click="remove()"
                 ng-show="wbParent">
             <md-icon class="wb-icon-mini">delete</md-icon>
         </md-button>
@@ -43,9 +43,10 @@
 			wb-background="wbModel.style"
 			wb-border="wbModel.style"
             id="wb-content-placeholder"
+			dnd-external-sources="true"
             dnd-list="wbModel.contents"
     		dnd-allowed-types="['wb.widget']"
-    		dnd-drop="addDraggedWidget(event, index, item, external, type)">
+    		dnd-drop="dropCallback(event, index, item, external, type)">
         </div>
         <!-- <div ng-include src="'views/partials/wb-edit-hint-panel.html'"></div> -->
     </div>
