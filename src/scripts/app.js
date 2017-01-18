@@ -38,7 +38,8 @@ angular
         'pascalprecht.translate',//
         'pluf',//
         'mdColorPicker',//
-//        'ngMaterialWysiwyg',
+        //'ngMaterialWysiwyg',
         'ui.tinymce', //
         'dndLists',//
+            'material.components.expansionPanels'
     ]);
