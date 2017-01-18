@@ -2,8 +2,25 @@
 
 Created by mgh.
 -->
+<md-expansion-panel md-component-id="panelOne">
 
-<div layout="column">
+    <md-expansion-panel-collapsed>
+        <div class="md-title">Min-Max</div>
+        <div class="md-summary"> [not set]</div>
+
+    </md-expansion-panel-collapsed>
+
+    <md-expansion-panel-expanded>
+
+        <md-expansion-panel-header>
+            <div class="md-title">Min-Max</div>
+            <div class="md-summary"></div>
+            <md-expansion-panel-icon ng-click="$panel.collapse()"></md-expansion-panel-icon>
+        </md-expansion-panel-header>
+
+        <md-expansion-panel-content>
+            <!-- main contain of setting panel -->
+            <div layout="column">
 
     <!--Preview Box-->
     <div class="preview-box wb-flex-item-stretch" ng-hide="true">
@@ -25,6 +42,31 @@ Created by mgh.
 <div class="setting-panel"
      layout="column"
      layout-gt-sm="row">
+
+
+<!--
+
+        <md-expansion-panel-expanded>
+
+            <md-expansion-panel-header>
+                <div class="md-title">Expanded Title</div>
+                <div class="md-summary">Expanded Summary</div>
+                <md-expansion-panel-icon></md-expansion-panel-icon>
+            </md-expansion-panel-header>
+
+            <md-expansion-panel-content>
+                <h4>Content</h4>
+                <p>Put content in here</p>
+            </md-expansion-panel-content>
+
+            <md-expansion-panel-footer>
+                <div flex></div>
+                <md-button class="md-warn" ng-click="$panel.collapse()">Collapse</md-button>
+            </md-expansion-panel-footer>
+
+        </md-expansion-panel-expanded>
+-->
+
 
     <!-- Min panel -->
     <md-list>
@@ -73,3 +115,18 @@ Created by mgh.
 </div>
 
 </div>
+
+            <!-- end of main content of setting panel -->
+
+        </md-expansion-panel-content>
+
+<!--       <md-expansion-panel-footer>
+            <div flex></div>
+            <md-button class="md-warn" ng-click="$panel.collapse()">Collapse</md-button>
+        </md-expansion-panel-footer>-->
+
+    </md-expansion-panel-expanded>
+
+
+
+</md-expansion-panel>
