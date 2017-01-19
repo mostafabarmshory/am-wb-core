@@ -43,12 +43,11 @@
 			<div
 				layout="row"
 				flex>
-				<div
+				<wb-setting-panel-group
 					ng-show="editable" 
-					id="wb-setting-panel"
 					flex="30"
 					style="overflow: auto;">
-				</div>
+				</wb-setting-panel-group>
 				<wb-content
 					wb-editable="editable" 
 					wb-model="model"
@@ -98,6 +97,8 @@
     <script src="scripts/directives/wb-content.js"></script>
     <script src="scripts/directives/wb-widget.js"></script>
     <script src="scripts/directives/wb-infinateScroll.js"></script>
+    <script src="scripts/directives/wb-setting-panel-group.js"></script>
+    <script src="scripts/directives/wb-setting-panel.js"></script>
     
     <script src="scripts/directives/style-wb-margin.js"></script>
     <script src="scripts/directives/style-wb-padding.js"></script>

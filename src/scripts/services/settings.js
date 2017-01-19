@@ -33,7 +33,9 @@ angular.module('ngMaterialWeburger')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$settings', function($rootScope, $controller, $widget, $q, $sce, $compile, $document, $templateRequest) {
+.service('$settings', function($rootScope, $controller, $widget, $q, $sce,
+	$compile, $document, $templateRequest) {
+    var WB_SETTING_PANEL_ID = 'wb-setting-panel';
     /**
      * Setting page storage
      * 
@@ -98,6 +100,20 @@ angular.module('ngMaterialWeburger')
 	}
 	return template;
     }
+    
+    /**
+     * encapsulate template srce with panel widget template.
+     * 
+     * @param page setting page config
+     * @param tempateSrc setting page html template
+     * @returns encapsulate html template
+     */
+    function _encapsulateSettingPanel(page, templateSrc) {
+	// TODO: maso, 2017: pass all paramter to the setting panel.
+	return '<wb-setting-panel>'+
+	templateSrc+
+	'</wb-setting-panel>';
+    }
 
     /**
      * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
@@ -120,11 +136,11 @@ angular.module('ngMaterialWeburger')
 
 
 	// 1- Find element
-	var target = $document.find('#wb-setting-panel');
+	var target = $document.find('#'+WB_SETTING_PANEL_ID);
 
 	// 2- Clear childrens
 	target.empty();
-
+	
 	// 3- load pages
 	$widget.widget(models.wbModel)//
 	.then(function(w){
@@ -139,6 +155,7 @@ angular.module('ngMaterialWeburger')
 		    if (angular.isDefined(template)) {
 			var job = template//
 			.then(function(templateSrc){
+			    templateSrc = _encapsulateSettingPanel(page, templateSrc);
 			    var element = angular.element(templateSrc);
 			    if (angular.isDefined(page.controller)) {
 				$controller(page.controller, {
@@ -165,7 +182,9 @@ angular.module('ngMaterialWeburger')
 	    });
 	});
     }
+
     // تعیین سرویس‌ها
+    this.WB_SETTING_PANEL_ID = WB_SETTING_PANEL_ID;
     this.page = page;
     this.load = loadSetting;
     this.newPage = newPage;
