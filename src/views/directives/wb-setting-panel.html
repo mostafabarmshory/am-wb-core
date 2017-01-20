@@ -7,15 +7,15 @@
 <md-expansion-panel>
 
     <md-expansion-panel-collapsed>
-        <div class="md-title">Setting</div>
-        <div class="md-summary"> [not set]</div>
+        <div class="md-title">{{label}}</div>
+        <div class="md-summary"></div>
         <md-expansion-panel-icon></md-expansion-panel-icon>
     </md-expansion-panel-collapsed>
 
     <md-expansion-panel-expanded>
 
         <md-expansion-panel-header>
-            <div class="md-title">Setting</div>
+            <div class="md-title">{{label}}</div>
             <div class="md-summary"></div>
             <md-expansion-panel-icon ng-click="$panel.collapse()"></md-expansion-panel-icon>
         </md-expansion-panel-header>
