@@ -7,8 +7,9 @@
 <md-expansion-panel>
 
     <md-expansion-panel-collapsed>
+    	<md-icon ng-show="icon">{{icon}}</md-icon>
         <div class="md-title">{{label}}</div>
-        <div class="md-summary"></div>
+        <div class="md-summary" ng-show="description">{{description}}</div>
         <md-expansion-panel-icon></md-expansion-panel-icon>
     </md-expansion-panel-collapsed>
 

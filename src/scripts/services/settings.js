@@ -110,9 +110,18 @@ angular.module('ngMaterialWeburger')
      */
     function _encapsulateSettingPanel(page, templateSrc) {
 	// TODO: maso, 2017: pass all paramter to the setting panel.
-	return '<wb-setting-panel label=\''+page.label+'\'>'+
-	templateSrc+
-	'</wb-setting-panel>';
+	var attr = ' ';
+	if (page.label) {
+	    attr += ' label=\"' + page.label + '\"';
+	}
+	if (page.icon) {
+	    attr += ' icon=\"' + page.icon + '\"';
+	}
+	if (page.description) {
+	    attr += ' description=\"' + page.description + '\"';
+	}
+	return '<wb-setting-panel ' + attr + '>' + templateSrc
+	+ '</wb-setting-panel>';
     }
 
     /**

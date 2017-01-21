@@ -40,8 +40,11 @@ angular.module('ngMaterialWeburger')
 	restrict : 'E',
 	transclude : true,
 	templateUrl : '/views/directives/wb-setting-panel.html',
-		scope:{label:'@label'},
-	link : function(scope, element, attrs, ctrl, transclude) {
+	// This create an isolated scope
+	scope : {
+	    label : '@label',
+	    description : '@?',
+	    icon : '@?',
 	},
     };
 });

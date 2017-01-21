@@ -36,7 +36,9 @@ angular.module('ngMaterialWeburger')
     });
     $settings.newPage({
 	type: 'background',
-	label : 'background',
+	label : 'Background',
+	icon : 'image',
+	description : 'manage',
 	templateUrl : 'views/settings/wb-background.html'
     });
     $settings.newPage({
@@ -53,18 +55,21 @@ angular.module('ngMaterialWeburger')
     $settings.newPage({
 	type: 'layout',
 	label : 'Layout',
+	icon: 'dashboard',
 	controller: 'WbLayoutWbSettingsCtrl',
 	templateUrl : 'views/settings/wb-layout.html'
     });
     $settings.newPage({
 	type: 'border',
 	label : 'Border',
+	icon: 'border_all',
 	controller: 'WbBorderSettingCtrl',
 	templateUrl : 'views/settings/wb-border.html'
     });
     $settings.newPage({
 	type: 'pageLayout',
 	label : 'Page Layout',
+	icon: 'dashboard',
 	controller: 'WbPageLayoutWbSettingsCtrl',
 	templateUrl : 'views/settings/wb-layout-page.html'
     });
