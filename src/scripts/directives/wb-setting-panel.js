@@ -39,7 +39,7 @@ angular.module('ngMaterialWeburger')
     return {
 	restrict : 'E',
 	transclude : true,
-	templateUrl : '/views/directives/wb-setting-panel.html',
+	templateUrl : 'views/directives/wb-setting-panel.html',
 	// This create an isolated scope
 	scope : {
 	    label : '@label',

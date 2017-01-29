@@ -356,14 +356,25 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
  * child element with dndPlaceholder class.
  */
 .dndPlaceholder {
+    /*
 	background: red;
+    */
+	list-style: none;
+	min-width: 36px;
+	min-height: 36px;
+margin: 5px;
+	font-size: 1.25rem;
+	background-color: #c8dadf;
+	padding: 10px 10px;
+
+	outline: 2px dashed #92b0b3;
+	outline-offset: -10px;
 }
 
 /*
  * This class will be added to the list while an element is being dragged over the list.
  */
 .dndDragover {
-	
 }
 
 
@@ -379,7 +390,7 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
  * with this class, because that will abort the drag operation.
 */
 .dndDragging {
-	background: gray !important;
+	background: #c8dadf !important;
 }
 
 /*
@@ -388,5 +399,5 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
  * position, and not the "element" that the user is dragging with his mouse pointer
  */
 .dndDraggingSource {
-    pointer-events: none;
+    display: none;
 }
