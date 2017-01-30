@@ -30,12 +30,14 @@
 
     <!-- body section (in non-edit mode, this area just shown -->
     <div 
-    	layout="row"
     	class="wb-panel-body" 
     	id="wb-content-body">
-        <div ng-show="hoveringDelBtn" class="overlay"></div>
+        <div 
+	        ng-show="hoveringDelBtn" 
+	        class="wb-panel-overlay">
+	    </div>
         <!-- تمام بچه‌ها در این قسمت اضافه می‌شن. -->
-        <div class="wb-flex"
+        <div class="wb-panel-container"
             wb-layout="wbModel.style"
 			wb-margin="wbModel.style"
 			wb-padding="wbModel.style"

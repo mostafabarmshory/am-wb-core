@@ -51,9 +51,11 @@
 		wb-size="wbModel.style"
 		wb-background="wbModel.style"
 		wb-border="wbModel.style"
-    	class="wb-panel-body">
-		<div ng-show="ctrl.hoveringDelBtn" class="overlay"></div>
+    	class="wb-widget-body">
+		<div ng-show="ctrl.hoveringDelBtn" class="wb-widget-overlay"></div>
 	    <ng-transclude
-    		wb-layout="wbModel.style"></ng-transclude>
+	    	class="wb-widget-container"
+    		wb-layout="wbModel.style">
+    	</ng-transclude>
     </div>
 </div>

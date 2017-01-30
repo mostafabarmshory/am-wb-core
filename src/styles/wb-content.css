@@ -1,37 +1,3 @@
-.wb-panel {
-	margin: 2px;
-	border: 1px dashed #039BE5;
-}
-
-.wb-panel-body {
-	position: relative;
-}
-
-.wb-panel-header {
-	background-color: rgba(3, 155, 229, 0.2);
-	background-image: repeating-linear-gradient(315deg, transparent, transparent 16px, rgba(255
-		, 255, 255, .5) 16px, rgba(255, 255, 255, .5) 32px);
-	color: black;
-	padding: 0px;
-	border: none;
-	border-bottom: 1px dashed rgb(3, 155, 229);
-}
-
-.wb-widget {
-	margin: 2px;
-	border: 1px dashed #8f9494;
-}
-
-.wb-widget-header {
-	background-color: rgba(120, 120, 120, 0.2);
-	background-image: repeating-linear-gradient(315deg, transparent, transparent 12px, rgba(255
-		, 255, 255, .5) 12px, rgba(255, 255, 255, .5) 24px);
-	color: black;
-	padding: 0px;
-	border: none;
-	border-bottom: 1px dashed #8f9494;
-}
-
 .md-button.md-icon-button.md-mini {
 	line-height: 1rem;
 	width: 1.5rem;
@@ -50,7 +16,48 @@
 	min-height: 1rem;
 }
 
-.overlay {
+/**************************************************************************************
+Hierarchical structure
+
+Panel contains serveral children to show a good view. Here is the structure:
+
+-> wb-panel 
+  -> wb-panel-body 
+     -> overlay
+     -> wb-panel-container
+***************************************************************************************/
+.wb-panel {
+	margin: 2px;
+	border: 1px dashed #039BE5;
+}
+
+.wb-panel-body {
+	position: relative;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.wb-panel-container {
+	position: relative;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.wb-panel-header {
+	background-color: rgba(3, 155, 229, 0.2);
+	background-image: repeating-linear-gradient(315deg, transparent, transparent 16px, rgba(255
+		, 255, 255, .5) 16px, rgba(255, 255, 255, .5) 32px);
+	color: black;
+	padding: 0px;
+	border: none;
+	border-bottom: 1px dashed rgb(3, 155, 229);
+}
+
+.wb-panel-overlay {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -79,17 +86,16 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
  * child element with dndPlaceholder class.
  */
 .dndPlaceholder {
-    /*
+	/*
 	background: red;
     */
 	list-style: none;
 	min-width: 36px;
 	min-height: 36px;
-margin: 5px;
+	margin: 5px;
 	font-size: 1.25rem;
 	background-color: #c8dadf;
 	padding: 10px 10px;
-
 	outline: 2px dashed #92b0b3;
 	outline-offset: -10px;
 }
@@ -98,4 +104,5 @@ margin: 5px;
  * This class will be added to the list while an element is being dragged over the list.
  */
 .dndDragover {
+	
 }
