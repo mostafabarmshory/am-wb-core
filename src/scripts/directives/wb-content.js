@@ -44,7 +44,7 @@ angular.module('ngMaterialWeburger')
  */
 .directive(
 	'wbContent',
-	function($compile, $widget) {
+	function($compile, $widget, $controller) {
 
 	    var dragClass = 'wb-content-dragenter';
 	    var bodyElementSelector = 'div#wb-content-body';

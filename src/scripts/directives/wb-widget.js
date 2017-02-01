@@ -52,7 +52,7 @@ angular.module('ngMaterialWeburger')
 	    // FIXME: maso, 2017: use regular dom insted of ng-transclude
 	    transclude(scope, function(clone, scope) {
 		var node = element//
-		.find('ng-transclude')//
+		.find('wb-transclude')//
 		.append(clone);
 	    });
 	},
