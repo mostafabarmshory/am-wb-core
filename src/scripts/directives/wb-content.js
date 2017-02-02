@@ -23,6 +23,10 @@
  */
 'use strict';
 
+var dragClass = 'wb-content-dragenter';
+var bodyElementSelector = 'div#wb-content-body';
+var placeholderElementSelector = 'div#wb-content-placeholder';
+
 angular.module('ngMaterialWeburger')
 /**
  * @ngdoc directive
@@ -42,233 +46,260 @@ angular.module('ngMaterialWeburger')
  * شود که این ساختار را فراهم کرده‌اند.
  * 
  */
-.directive(
-	'wbContent',
-	function($compile, $widget, $controller) {
+.directive('wbContent', function($compile, $widget, $controller, $settings) {
+    return {
+	templateUrl : 'views/directives/wb-content.html',
+	transclude : true,
+	restrict : 'E',
+	replace : true,
+	scope : {
+	    wbModel : '=?',
+	    wbEditable : '=?'
+	},
+	link : function(scope, element, attrs) {
+	    //
+	    function empty() {
+		element//
+		.children(bodyElementSelector)//
+		.children(placeholderElementSelector)//
+		.empty();
+	    }
 
-	    var dragClass = 'wb-content-dragenter';
-	    var bodyElementSelector = 'div#wb-content-body';
-	    var placeholderElementSelector = 'div#wb-content-placeholder';
+	    function getAnchor() {
+		return element//
+		.children(bodyElementSelector)//
+		.children(placeholderElementSelector);
+	    }
 
-	    return {
-		templateUrl : 'views/directives/wb-content.html',
-		transclude : true,
-		restrict : 'E',
-		replace : true,
-		scope : {
-		    wbModel : '=?',
-		    wbEditable : '=?',
-		    wbParent : '=?'
-		},
-
-		link : function(scope, element, attrs) {
-		    // TODO:
-		},
-
-		controller : function($scope, $element, $settings, $widget) {
-		    var scope = $scope;
-		    var element = $element;
-
-		    /*
-		     * Check editable mode
-		     * 
-		     * Returns true if the model is in editable mode.
-		     */
-		    function isEditable() {
-			if (scope.wbParent) {
-			    return scope.wbParent.isEditable();
-			}
-			return scope.wbEditable;
+	    function addWidget(anchor, item) {
+		$widget.compile(item, scope)//
+		.then(function(element) {
+		    anchor.append(element);
+		});
+	    }
+	    /**
+	     * Adds dragged widget
+	     */
+	    function dropCallback(event, index, item, external, type) {
+		// add widget
+		$widget.compile(item, scope)//
+		.then(function(newElement) {
+		    var list = element//
+		    .children(bodyElementSelector)//
+		    .children(placeholderElementSelector);
+		    if (index < list[0].childNodes.length) {
+			newElement.insertBefore(list[0].childNodes[index]);
+		    } else {
+			list.append(newElement);
 		    }
-
-		    /*
-		     * Removes a widget
-		     * 
-		     * Data model and visual element related to the input model
-		     * will be removed.
-		     */
-		    function removeChild(model) {
-			var index = scope.wbModel.contents.indexOf(model);
-			if (index > -1) {
-			    var a = $element//
-			    .children(bodyElementSelector)//
-			    .children(placeholderElementSelector);
-			    
-			    if(scope.wbModel.contents.length !== a[0].childNodes){
-				// Need referesh
-				scope.wbModel.contents.splice(index, 1);
-				removeWidgets();
-				scope.wbModel.contents.forEach(addWidget);
-				return;
-			    }
-			    
-			    scope.wbModel.contents.splice(index, 1);
-			    a[0].childNodes[index].remove();
-			}
-		    }
-
-		    /*
-		     * Remove the node
-		     */
-		    function remove(){
-			return scope.wbParent.removeChild($scope.wbModel);
-		    }
+		})//
+		.then(function(){
+		    console.log('widget add to list');
+		    scope.wbModel.contents.splice(index, 0, item);
+		});
+		return true;
+	    }
 
 
-		    function createWidget(item) {
-			var widget = null;
-			var childScope = null;
-			var element = null;
-
-			// 0- get widget
-			return $widget.widget(item)//
-			.then(function(w) {
-			    widget = w;
-			})
-
-			// 1- create scope
-			.then(function() {
-			    childScope = $scope.$new(true, $scope);
-			    childScope.model = item;
-			    childScope.editable = $scope.isEditable;
-			    childScope.parent = $scope;
-			})
-
-			// 2- create element
-			.then(function() {
-			    return $widget.getTemplateFor(widget);
-			})//
-			.then(function(template) {
-			    if (item.type != 'Page') {
-				template = '<wb-widget>' + template + '</wb-widget>';
-			    }
-			    element = angular.element(template);
-			    element.attr('wb-model', 'model');
-			    element.attr('wb-editable', 'editable()');
-			    element.attr('wb-parent', 'parent');
-			})
-
-			// 3- bind controller
-			.then(function() {
-			    if (angular.isDefined(widget.controller)) {
-				$controller(widget.controller, {
-				    $scope : childScope,
-				    $element : element,
-				    // TODO: maso, 2017: bind wbModel, wbParent,
-				    // and wbEditable
-				});
-			    }
-			    $compile(element)(childScope);
-			})//
-
-			// Return value
-			.then(function(){
-			    return element;
+	    /*
+	     * Removes a widget
+	     *
+	     * Data model and visual element related to the input model
+	     * will be removed.
+	     */
+	    function removeChild(model) {
+		var index = scope.wbModel.contents.indexOf(model);
+		if (index > -1) {
+		    var a = element//
+		    .children(bodyElementSelector)//
+		    .children(placeholderElementSelector);
+		    if(scope.wbModel.contents.length !== a[0].childNodes){
+			// Need referesh
+			scope.wbModel.contents.splice(index, 1);
+			empty();
+			var anchor = getAnchor();
+			scope.wbModel.contents.forEach(function(item){
+			    addWidget(anchor, item);
 			});
+			return;
 		    }
-
-
-		    /*
-		     * Creates and add a widget
-		     * 
-		     * @see createWidget
-		     */
-		    function addWidget(item) {
-			createWidget(item)//
-			.then(function(element) {
-			    $element//
-			    .children(bodyElementSelector)//
-			    .children(placeholderElementSelector)//
-			    .append(element);
-			});
-		    }
-
-
-		    /**
-		     * Adds dragged widget
-		     */
-		    function dropCallback(event, index, item, external,
-			    type) {
-			// add widget
-			createWidget(item)//
-			.then(function(element) {
-			    var list = $element//
-			    .children(bodyElementSelector)//
-			    .children(placeholderElementSelector);
-			    if (index < list[0].childNodes.length) {
-				element.insertBefore(list[0].childNodes[index]);
-			    } else {
-				list.append(element);
-			    }
-			})//
-			.then(function(){
-			    console.log('widget add to list');
-			    scope.wbModel.contents.splice(index, 0, item);
-			});
-			return true;
-		    }
-
-
-		    /**
-		     * @deprecated
-		     */
-		    function removeWidgets() {
-			$element//
-			.children(bodyElementSelector)//
-			.children(placeholderElementSelector)//
-			.empty();
-		    }
-
-		    /**
-		     * @deprecated
-		     */
-		    function newWidget(wbModel) {
-			return $widget.select({
-			    wbModel : {},
-			    style : {}
-			})//
-			.then(function(model) {
-			    wbModel.contents.push(model);
-			    addWidget(model);
-			});
-		    }
-
-		    /**
-		     * تنظیم‌های کلی صفحه را انجام می‌دهد
-		     * 
-		     * یک دریچه محاوره‌ای باز می‌شود تا کاربر بتواند تنظیم‌های
-		     * متفاوت مربوط به این صفحه را انجام دهد.
-		     */
-		    function settings() {
-			return $settings.load({
-			    wbModel : scope.wbModel,
-			    wbParent : scope.wbParent
-			});
-		    }
-
-		    scope.isEditable = isEditable
-		    scope.settings = settings;
-		    scope.remove = remove;
-		    scope.removeChild = removeChild;
-
-		    scope.dropCallback = dropCallback;
-		    scope.movedCallback = remove;
-		    
-//		    scope.removeWidgets = removeWidgets;
-		    scope.newWidget = newWidget;
-
-		    scope.$watch('wbModel', function() {
-			removeWidgets();
-			if (!scope.wbModel) {
-			    // XXX: maso, 1395: هنوز مدل تعیین نشده
-			    return;
-			}
-			if (!angular.isArray(scope.wbModel.contents)) {
-			    scope.wbModel.contents = [];
-			}
-			scope.wbModel.type = 'Page';
-			scope.wbModel.contents.forEach(addWidget);
-		    });
+		    scope.wbModel.contents.splice(index, 1);
+		    a[0].childNodes[index].remove();
 		}
-	    };
-	});
+	    }
+
+	    /**
+	     * @deprecated
+	     */
+	    function newWidget() {
+		return $widget.select({
+		    wbModel : {},
+		    style : {}
+		})//
+		.then(function(model) {
+		    scope.wbModel.contents.push(model);
+		    addWidget(getAnchor(), model);
+		});
+	    }
+	    
+	    // TODO:
+	    scope.$watch('wbModel', function() {
+		empty();
+		if (!scope.wbModel) {
+		    // XXX: maso, 1395: هنوز مدل تعیین نشده
+		    return;
+		}
+		if (!angular.isArray(scope.wbModel.contents)) {
+		    scope.wbModel.contents = [];
+		    return;
+		}
+		var anchor = getAnchor();
+		scope.wbModel.contents.forEach(function(item){
+		    addWidget(anchor, item);
+		});
+	    });
+
+
+	    /**
+	     * تنظیم‌های کلی صفحه را انجام می‌دهد
+	     *
+	     * یک دریچه محاوره‌ای باز می‌شود تا کاربر بتواند تنظیم‌های
+	     * متفاوت مربوط به این صفحه را انجام دهد.
+	     */
+	    function settings() {
+		return $settings.load({
+		    wbModel : scope.wbModel,
+		    wbParent : scope.wbParent
+		});
+	    }
+
+	    scope.removeChild = removeChild;
+	    scope.settings = settings;
+	    scope.dropCallback = dropCallback;
+	    scope.newWidget = newWidget;
+	}
+    };
+})
+/**
+ * 
+ */
+.directive('wbPanel', function($compile, $widget, $controller, $settings) {
+    return {
+	templateUrl : 'views/directives/wb-panel.html',
+	restrict : 'E',
+	replace : true,
+	link : function(scope, element, attrs) {
+	    //
+	    function empty() {
+		element//
+		.children(bodyElementSelector)//
+		.children(placeholderElementSelector)//
+		.empty();
+	    }
+
+	    function getAnchor() {
+		return element//
+		.children(bodyElementSelector)//
+		.children(placeholderElementSelector);
+	    }
+
+	    function addWidget(anchor, item) {
+		$widget.compile(item, scope)//
+		.then(function(element) {
+		    anchor.append(element);
+		});
+	    }
+	    /**
+	     * Adds dragged widget
+	     */
+	    function dropCallback(event, index, item, external, type) {
+		// add widget
+		$widget.compile(item, scope)//
+		.then(function(newElement) {
+		    var list = element//
+		    .children(bodyElementSelector)//
+		    .children(placeholderElementSelector);
+		    if (index < list[0].childNodes.length) {
+			newElement.insertBefore(list[0].childNodes[index]);
+		    } else {
+			list.append(newElement);
+		    }
+		})//
+		.then(function(){
+		    console.log('widget add to list');
+		    scope.wbModel.contents.splice(index, 0, item);
+		});
+		return true;
+	    }
+
+
+	    /*
+	     * Removes a widget
+	     *
+	     * Data model and visual element related to the input model
+	     * will be removed.
+	     */
+	    function removeChild(model) {
+		var index = scope.wbModel.contents.indexOf(model);
+		if (index > -1) {
+		    var a = element//
+		    .children(bodyElementSelector)//
+		    .children(placeholderElementSelector);
+		    if(scope.wbModel.contents.length !== a[0].childNodes){
+			// Need referesh
+			scope.wbModel.contents.splice(index, 1);
+			empty();
+			var anchor = getAnchor();
+			scope.wbModel.contents.forEach(function(item){
+			    addWidget(anchor, item);
+			});
+			return;
+		    }
+		    scope.wbModel.contents.splice(index, 1);
+		    a[0].childNodes[index].remove();
+		}
+	    }
+
+	    /**
+	     * تنظیم‌های کلی صفحه را انجام می‌دهد
+	     *
+	     * یک دریچه محاوره‌ای باز می‌شود تا کاربر بتواند تنظیم‌های
+	     * متفاوت مربوط به این صفحه را انجام دهد.
+	     */
+	    function settings() {
+		return $settings.load({
+		    wbModel : scope.wbModel,
+		    wbParent : scope.$parent
+		});
+	    }
+	    /**
+	     * @deprecated
+	     */
+	    function newWidget() {
+		return $widget.select({
+		    wbModel : {},
+		    style : {}
+		})//
+		.then(function(model) {
+		    scope.wbModel.contents.push(model);
+		    addWidget(getAnchor(), model);
+		});
+	    }
+
+	    scope.removeChild = removeChild;
+	    scope.settings = settings;
+	    scope.dropCallback = dropCallback;
+	    scope.newWidget = newWidget;
+	    
+	    if (!angular.isArray(scope.wbModel.contents)) {
+		scope.wbModel.contents = [];
+		return;
+	    }
+	    var anchor = getAnchor();
+	    scope.wbModel.contents.forEach(function(item){
+		addWidget(anchor, item);
+	    });
+	}
+    };
+});//
+

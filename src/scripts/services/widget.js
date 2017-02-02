@@ -33,15 +33,24 @@ angular.module('ngMaterialWeburger')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$widget', function($q, $sce, $templateRequest, $timeout, $mdDialog, PaginatorPage) {
+.service('$widget', function(
+	$q, $sce, $templateRequest, $compile, $controller, $rootScope,
+	$timeout, $mdDialog, PaginatorPage) {
 
     var contentElementAsso = [];
     var elementKey = [];
     var notFoundWidget = {
-	templateUrl : 'views/widgets/wb-notfound.html',
-	label : 'Not found',
-	description : 'Element not found',
+	    templateUrl : 'views/widgets/wb-notfound.html',
+	    label : 'Not found',
+	    description : 'Element not found',
     };
+
+    function _widget(model){
+	if (model.type in contentElementAsso) {
+	    return contentElementAsso[model.type];
+	}
+	return notFoundWidget;
+    }
     /**
      * Finds a widget related to the input model.
      * 
@@ -56,11 +65,7 @@ angular.module('ngMaterialWeburger')
     function widget(model) {
 	var deferred = $q.defer();
 	$timeout(function() {
-	    var widget = notFoundWidget;
-	    if (model.type in contentElementAsso) {
-		widget = contentElementAsso[model.type];
-	    }
-	    deferred.resolve(widget);
+	    deferred.resolve(_widget(model));
 	}, 1);
 	return deferred.promise;
     }
@@ -96,21 +101,12 @@ angular.module('ngMaterialWeburger')
      * @returns
      */
     function newWidget(widget) {
-	var deferred = $q.defer();
-	$timeout(function() {
-	    if (widget.type in contentElementAsso) {
-		deferred.reject({
-		    data : {
-			message : 'Widget with the same type registerd before'
-		    }
-		});
-		return;
-	    }
-	    contentElementAsso[widget.type] = widget;
-	    elementKey.push(widget.type);
-	    deferred.resolve(widget);
-	}, 1);
-	return deferred.promise;
+	if (widget.type in contentElementAsso) {
+	    // XXX: maso, throw exception
+	    return;
+	}
+	contentElementAsso[widget.type] = widget;
+	elementKey.push(widget.type);
     }
 
     /**
@@ -132,7 +128,7 @@ angular.module('ngMaterialWeburger')
 	    locals : locals,
 	});
     }
-    
+
 
     /*
      * get setting page template
@@ -155,10 +151,48 @@ angular.module('ngMaterialWeburger')
 	return template;
     }
 
+    function compile(model, parenScope){
+	var widget = _widget(model);
+	var childScope = null;
+	var element = null;
+
+	// 1- create scope
+	childScope = parenScope.$new(false, parenScope);
+	childScope.wbModel = model;
+
+	// 2- create element
+	return $q.when(getTemplateFor(widget))//
+	.then(function(template) {
+	    if (model.type != 'Page') {
+		template = '<wb-widget>' + template + '</wb-widget>';
+	    }
+	    element = angular.element(template);
+
+	    // 3- bind controller
+	    var link = $compile(element);
+	    if (angular.isDefined(widget.controller)) {
+		var locals = {
+			$scope : childScope,
+			$element : element,
+			// TODO: maso, 2017: bind wbModel, wbParent,
+			// and wbEditable
+		};
+		var controller = $controller(widget.controller, locals);
+		if (widget.controllerAs) {
+		    childScope[widget.controllerAs] = controller;
+		}
+		element.data('$ngControllerController', controller);
+	    }
+	    link(childScope);
+	    return element;
+	});
+    }
+
     // تعیین سرویس‌ها
     this.newWidget = newWidget;
     this.widget = widget;
     this.widgets = widgets;
     this.select = select;
     this.getTemplateFor = getTemplateFor;
+    this.compile = compile;
 });

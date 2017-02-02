@@ -1,9 +1,12 @@
 <div 
 	dnd-disable-if="!wbEditable"
+	dnd-draggable="wbModel"
+	dnd-type="'wb.widget'"
+	dnd-moved="movedCallback()"
 	ng-class="{'wb-panel': wbEditable}">
     <!-- a header is added through edit-mode -->
     <div ng-show="wbEditable" class="wb-panel-header" layout="row">
-        <span translate> Content</span>
+        <span translate> Panel</span>
         <span flex></span>
         <md-button
                 ng-click="newWidget(wbModel)"
@@ -14,6 +17,13 @@
                 ng-click="settings()"
                 class="md-icon-button md-mini">
             <md-icon class="wb-icon-mini">settings</md-icon>
+        </md-button>
+        <md-button
+                class="md-icon-button md-mini"
+                ng-mouseenter="hoveringDelBtn=true"
+                ng-mouseleave="hoveringDelBtn=false"
+                ng-click="remove()">
+            <md-icon class="wb-icon-mini">delete</md-icon>
         </md-button>
     </div>
 

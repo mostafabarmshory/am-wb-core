@@ -40,11 +40,11 @@ angular.module('ngMaterialWeburger')
 	templateUrl : 'views/directives/wb-widget.html',
 	restrict : 'E',
 	transclude : true,
-	scope : {
-	    wbEditable : '=?',
-	    wbModel : '=?',
-	    wbParent : '=?'
-	},
+//	scope : {
+//	    wbEditable : '=?',
+//	    wbModel : '=?',
+//	    wbParent : '=?'
+//	},
 	link : function(scope, element, attrs, ctrl, transclude) {
 	    // Modify angular transclude function
 	    // see:
@@ -63,7 +63,7 @@ angular.module('ngMaterialWeburger')
 	     */
 	    function remove() {
 		console.log('widget removed');
-		return $scope.wbParent.removeChild($scope.wbModel);
+		return $scope.$parent.removeChild($scope.wbModel);
 	    }
 
 	    /**
@@ -73,7 +73,7 @@ angular.module('ngMaterialWeburger')
 	    function settings() {
 		return $settings.load({
 		    wbModel : $scope.wbModel,
-		    wbParent : $scope.wbParent,
+		    wbParent : $scope.$parent,
 		});
 	    }
 
