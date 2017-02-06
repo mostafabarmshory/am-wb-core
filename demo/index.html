@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="styles/typography.css">
     <link rel="stylesheet" href="styles/setting-layout.css">
     <link rel="stylesheet" href="styles/flex-util.css">
+    <link rel="stylesheet" href="styles/wb-group-button.css">
     <!-- endbuild -->
   </head>
   <body>
@@ -34,11 +35,27 @@
     	layout="row" 
     	layout-fill>
 		<div layout="column" flex>
-			<div>
-				<md-button ng-click="editable=!editable">editable</md-button>
-				<md-button ng-click="showContent=!showContent">shwo content</md-button>
-				<md-button ng-click="cs()">select content</md-button>
-			</div>
+<!-- 			Custom button group -->
+<!-- 			See: https://material.angularjs.org/latest/CSS/button#grouping-with-css-overrides -->
+			<section layout="row" layout-align="center center">
+				<md-button 
+					ng-class="{'md-primary' : editable}"
+					class="wb-group-button left" 
+					ng-click="editable=!editable">
+					<md-icon>edit</md-icon>
+				</md-button>
+				<md-button 
+					ng-class="{'md-primary' : showContent}"
+					class="wb-group-button middle" 
+					ng-click="showContent=!showContent">
+					<md-icon>content_copy</md-icon>
+				</md-button>
+				<md-button 
+					class="wb-group-button right" 
+					ng-click="cs()">
+					<md-icon>insert_photo</md-icon>
+				</md-button>
+			</section>
 			<textarea ng-show="showContent">{{model}}</textarea>
 			<div
 				layout="row"
