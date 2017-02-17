@@ -9,25 +9,58 @@ the following items can be set for customizing container layout:
 - justifyContent
 
  -->
+<md-list class="wb-setting-panel">
 
+    <!-- corner radius section -->
+    <md-subheader class="md-no-sticky">Direction</md-subheader>
+    <md-list-item >
+        <md-icon>border_all</md-icon>
+        <p>Direction</p>
+
+        <md-tabs flex>
+            <md-tab ng-repeat="dir in flexDirection" "><md-tab-label><md-icon >user</md-icon></md-tab-label></md-tab>
+        </md-tabs>
+
+        <!--<md-tabs flex md-selected="wbModel.style.flexDirection" md-border-bottom md-autoselect>-->
+
+            <!--<md-tab ng-repeat="direction in flexDirection"-->
+                    <!--label="{{direction.title}}">-->
+            <!--</md-tab>-->
+        <!--</md-tabs>-->
+        <!--
+        <md-button
+                ng-class="{'md-primary' : editable}"
+                class="wb-group-button left"
+                ng-click="editable=!editable">
+            <md-icon>edit</md-icon>
+        </md-button>
+        <md-button
+                ng-class="{'md-primary' : showContent}"
+                class="wb-group-button middle"
+                ng-click="showContent=!showContent">
+            <md-icon>content_copy</md-icon>
+        </md-button>
+        <md-button
+                class="wb-group-button right"
+                ng-click="cs()">
+            <md-icon>insert_photo</md-icon>
+        </md-button>
+!-->
+    </md-list-item>
+
+    <!-- a slider for uniform situation -->
+    <md-list-item ng-show="wbModel.style.borderRadius.uniform">
+        <md-icon>rounded_corner</md-icon>
+        <p>Radius</p>
+        <md-input-container class="wb-input-container-without-label">
+            <input  flex style="width: 40px" type="number" ng-model="wbModel.style.borderRadius.all">
+        </md-input-container>
+    </md-list-item>
+
+
+    </md-list>
 <div layout="column">
 
-    <!--Preview Box-->
-    <!--TODO: mgh, 1395: good candidate for a directive, like: ng-previewbox items={"1","2","3"} -->
-    <!-- 
-    <div class="preview-box wb-flex-item-stretch" ng-hide="true">
-        <div class="header">Preview</div>
-
-            <div class="preview-area wb-flex"
-
-                 ng-class="[wbModel.style.flexDirection,wbModel.style.justifyContent, wbModel.style.alignItems]"
-                 >
-                <div class="widget" layout="row" layout-align="center center"><p>1</p></div>
-                <div class="widget" layout="row" layout-align="center center"><p>2</p></div>
-                <div class="widget" layout="row" layout-align="center center"><p>3</p></div>
-            </div>
-    </div>
-     -->
 
     <div
     	class="setting-panel"
