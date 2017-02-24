@@ -31,9 +31,11 @@ angular.module('ngMaterialWeburger')
  */
 .controller('WbBorderSettingCtrl', function($scope) {
     var scope = $scope;
-    var model = $scope.wbModel;
 
-    scope.styles = [ {
+	if($scope.wbModel.style.borderColor.bottom==null || $scope.wbModel.style.borderColor.bottom==undefined)
+		$scope.wbModel.style.borderColor.bottom='none';
+
+	scope.styles = [ {
 	title : 'No Border',
 	value : 'none'
     }, {
