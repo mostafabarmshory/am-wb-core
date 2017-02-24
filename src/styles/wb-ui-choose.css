@@ -4,10 +4,10 @@
  * Created by mgh on 2/24/17.
  */
 
-.wb-tab-as-choose-button{
-    flex-grow: 3;
-    -webkit-flex-grow: 3;
-}
+/*.wb-tab-as-choose-button{*/
+    /*flex-grow: 10;*/
+    /*-webkit-flex-grow: 10;*/
+/*}*/
 .wb-tab-as-choose-button .md-tab {
     float: right;
 }
@@ -17,11 +17,25 @@
     height: initial;
     right: 0;
 }
+
 .wb-tab-as-choose-button md-tab-item{
     padding: 6px;
     margin-left: 4px;
     margin-bottom: 1px;
 }
+
 .wb-tab-as-choose-button md-icon {
  margin-right: 0px !important;
+}
+
+.wb-tab-as-choose-button md-next-button{
+    display: none;
+}
+
+.wb-tab-as-choose-button md-prev-button{
+    display: none;
+}
+
+.wb-tab-as-choose-button md-tabs-canvas{
+    margin: 0px;
 }
