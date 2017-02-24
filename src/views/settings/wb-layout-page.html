@@ -8,113 +8,34 @@ the following items can be set for customizing container layout:
 - alignItems
 - justifyContent
 
- -->
+Completely rewrite by mgh on 2/24/17.
+-->
+
 <md-list class="wb-setting-panel">
-    <!-- corner radius section -->
-    <md-subheader class="md-no-sticky">Direction</md-subheader>
+
+    <!-- direction -->
     <md-list-item>
         <md-icon>border_all</md-icon>
         <p>Direction</p>
-        <md-tabs flex>
-            <md-tab ng-repeat="dir in flexDirection">
-            	<md-tab-label>
-            		<md-icon >user</md-icon>
-            	</md-tab-label>
-            </md-tab>
-        </md-tabs>
-
-        <!--<md-tabs flex md-selected="wbModel.style.flexDirection" md-border-bottom md-autoselect>-->
-
-            <!--<md-tab ng-repeat="direction in flexDirection"-->
-                    <!--label="{{direction.title}}">-->
-            <!--</md-tab>-->
-        <!--</md-tabs>-->
-        <!--
-        <md-button
-                ng-class="{'md-primary' : editable}"
-                class="wb-group-button left"
-                ng-click="editable=!editable">
-            <md-icon>edit</md-icon>
-        </md-button>
-        <md-button
-                ng-class="{'md-primary' : showContent}"
-                class="wb-group-button middle"
-                ng-click="showContent=!showContent">
-            <md-icon>content_copy</md-icon>
-        </md-button>
-        <md-button
-                class="wb-group-button right"
-                ng-click="cs()">
-            <md-icon>insert_photo</md-icon>
-        </md-button>
-!-->
+        <wb-ui-choose flex="100" items="flexDirection" selected="wbModel.style.flexDirection"></wb-ui-choose>
     </md-list-item>
 
-    <!-- a slider for uniform situation -->
-    <md-list-item ng-show="wbModel.style.borderRadius.uniform">
-        <md-icon>rounded_corner</md-icon>
-        <p>Radius</p>
-        <md-input-container class="wb-input-container-without-label">
-            <input  flex style="width: 40px" type="number" ng-model="wbModel.style.borderRadius.all">
-        </md-input-container>
+    <!-- Align Items -->
+    <md-list-item>
+        <md-icon ng-show="wbModel.style.flexDirection=='wb-flex-row'">swap_vert</md-icon>
+        <md-icon ng-show="wbModel.style.flexDirection!='wb-flex-row'">swap_horiz</md-icon>
+        <p ng-show="wbModel.style.flexDirection=='wb-flex-row'">Vert.</p>
+        <p ng-show="wbModel.style.flexDirection!='wb-flex-row'">Horiz.</p>
+        <wb-ui-choose flex="100" items="alignItems" selected="wbModel.style.alignItems"></wb-ui-choose>
     </md-list-item>
+
+    <!-- Justify Content -->
+    <md-list-item>
+        <md-icon ng-show="wbModel.style.flexDirection!='wb-flex-row'">swap_vert</md-icon>
+        <md-icon ng-show="wbModel.style.flexDirection=='wb-flex-row'">swap_horiz</md-icon>
+        <p ng-show="wbModel.style.flexDirection!='wb-flex-row'">Vert.</p>
+        <p ng-show="wbModel.style.flexDirection=='wb-flex-row'">Horiz.</p>
+        <wb-ui-choose flex="100" items="justifyContent" selected="wbModel.style.justifyContent"></wb-ui-choose>
+    </md-list-item>
+
 </md-list>
-<div layout="column">
-    <div
-    	class="setting-panel"
-    	layout="column">
-
-        <!-- Direction -->
-        <md-list>
-            <md-subheader>Direction</md-subheader>
-            <md-divider style="margin-bottom: 1em "></md-divider>
-            <md-radio-group
-                    ng-model="wbModel.style.flexDirection"
-                    role="radiogroup" >
-                <md-list-item ng-repeat="direction in flexDirection">
-                    <md-radio-button
-                            value="{{direction.value}}">
-                        <md-icon>{{direction.icon}}</md-icon>
-                        {{direction.title |translate}}
-                    </md-radio-button>
-                </md-list-item>
-            </md-radio-group>
-        </md-list>
-
-        <!-- Align Items -->
-        <md-list>
-            <md-subheader ng-show="wbModel.style.flexDirection=='wb-flex-row'">Vertical Setting</md-subheader>
-            <md-subheader ng-show="wbModel.style.flexDirection!='wb-flex-row'">Horizontal Setting</md-subheader>
-            <md-divider style="margin-bottom: 1em "></md-divider>
-            <md-radio-group
-                    ng-model="wbModel.style.alignItems"
-                    role="radiogroup">
-                <md-list-item ng-repeat="align in alignItems">
-                    <md-radio-button
-                            value="{{align.value}}">
-                        <md-icon>{{direction.icon}}</md-icon>
-                        {{align.title |translate}}
-                    </md-radio-button>
-                </md-list-item>
-            </md-radio-group>
-        </md-list>
-
-        <!-- Justify Content -->
-        <md-list>
-            <md-subheader ng-show="wbModel.style.flexDirection!='wb-flex-row'">Vertical Setting</md-subheader>
-            <md-subheader ng-show="wbModel.style.flexDirection=='wb-flex-row'">Horizontal Setting</md-subheader>
-            <md-divider style="margin-bottom: 1em "></md-divider>
-            <md-radio-group
-                    ng-model="wbModel.style.justifyContent"
-                    role="radiogroup">
-                <md-list-item ng-repeat="align in justifyContent">
-                    <md-radio-button
-                            value="{{align.value}}">
-                        <md-icon>{{direction.icon}}</md-icon>
-                        {{align.title |translate}}
-                    </md-radio-button>
-                </md-list-item>
-            </md-radio-group>
-        </md-list>
-    </div>
-</div>
