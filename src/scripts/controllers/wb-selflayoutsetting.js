@@ -34,18 +34,23 @@ angular
 
     scope.flexAlignItem = [ {
 	title : 'auto',
+	icon: 'looks_one',
 	value : 'wb-flex-item-auto'
     }, {
 	title : 'Start',
+	icon: 'looks_two',
 	value : 'wb-flex-item-start'
     }, {
 	title : 'End',
+		icon: 'looks_3',
 	value : 'wb-flex-item-end'
     }, {
 	title : 'Center',
+		icon: 'looks_4',
 	value : 'wb-flex-item-center'
     }, {
 	title : 'stretch',
+		icon: 'looks_5',
 	value : 'wb-flex-item-stretch'
     } ];
 });
