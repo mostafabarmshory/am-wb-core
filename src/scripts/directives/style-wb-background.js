@@ -38,6 +38,7 @@ angular.module('ngMaterialWeburger')
 		element.css({
 		    'background-color' : style.backgroundColor,
 		    'color' : style.color,
+			'opacity':(style.isTransparent) ? style.opacity/100 : 1,
 		});
 	    }, true);
 	}
