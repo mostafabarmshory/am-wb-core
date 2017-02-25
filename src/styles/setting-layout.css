@@ -32,6 +32,5 @@
 
 .wb-sub-divider{
     margin-left: 48px;
-    border-top-style: dashed;
-    border-top-color: rgb(240,240,240);
+    border-top-style: dotted;
 }
