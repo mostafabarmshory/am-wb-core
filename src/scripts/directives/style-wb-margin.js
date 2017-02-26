@@ -36,10 +36,10 @@ angular.module('ngMaterialWeburger')
 		    return;
 		}
 		element.css({
-	            'margin-left':style.marginLeft,
-	            'margin-right':style.marginRight,
-	            'margin-top':style.marginTop,
-	            'margin-bottom':style.marginBottom
+	            'margin-left':(style.margin.isUniform) ? style.margin.uniform : style.margin.left,
+	            'margin-right':(style.margin.isUniform) ? style.margin.uniform : style.margin.right,
+	            'margin-top':(style.margin.isUniform) ? style.margin.uniform : style.margin.top,
+	            'margin-bottom':(style.margin.isUniform) ? style.margin.uniform : style.margin.bottom
 	            });
 	    }, true);
 	}
