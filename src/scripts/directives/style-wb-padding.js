@@ -36,10 +36,10 @@ angular.module('ngMaterialWeburger')
 		    return;
 		}
 		element.css({
-	            'padding-left':style.paddingLeft,
-	            'padding-right':style.paddingRight,
-	            'padding-top':style.paddingTop,
-	            'padding-bottom':style.paddingBottom,
+	            'padding-left':(style.padding.isUniform) ? style.padding.uniform : style.padding.left,
+	            'padding-right':(style.padding.isUniform) ? style.padding.uniform : style.padding.right,
+	            'padding-top':(style.padding.isUniform) ? style.padding.uniform : style.padding.top,
+	            'padding-bottom':(style.padding.isUniform) ? style.padding.uniform : style.padding.bottom
 	            });
 	    }, true);
 	}
