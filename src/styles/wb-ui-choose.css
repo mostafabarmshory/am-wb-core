@@ -4,10 +4,6 @@
  * Created by mgh on 2/24/17.
  */
 
-/*.wb-tab-as-choose-button{*/
-    /*flex-grow: 10;*/
-    /*-webkit-flex-grow: 10;*/
-/*}*/
 .wb-tab-as-choose-button .md-tab {
     float: right;
 }
