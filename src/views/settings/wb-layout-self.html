@@ -11,36 +11,17 @@ Completely rewrite by mgh on 2/25/17.
 <md-list class="wb-setting-panel">
 
     <!-- Align Items -->
-    <md-list-item>
-        <md-icon ng-show="wbModel.style.flexDirection!='wb-flex-row'">swap_vert</md-icon>
-        <md-icon ng-show="wbModel.style.flexDirection=='wb-flex-row'">swap_horiz</md-icon>
-        <p ng-show="wbModel.style.flexDirection!='wb-flex-row'">Vert.</p>
-        <p ng-show="wbModel.style.flexDirection=='wb-flex-row'">Horiz.</p>
-        <wb-ui-choose flex="100" items="flexAlignItem" selected="wbModel.style.flexAlignItem"></wb-ui-choose>
-    </md-list-item>
+    <wb-ui-setting-choose title="{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}"
+                          icon="{{(wbModel.style.flexDirection!='wb-flex-row')?'swap_vert':'swap_horiz'}}"
+                          items="flexAlignItem" value="wbModel.style.flexAlignItem"></wb-ui-setting-choose>
 
-    <!-- weight -->
+    <!-- Weight -->
     <!-- enable/disable weight checkbox -->
-    <md-list-item>
-        <md-icon>border_all</md-icon>
-        <p>Fill Space?</p>
-        <md-switch
-                class="md-secondary"
-                ng-model="wbModel.style.flexItemGrowEnabled">
-        </md-switch>
-    </md-list-item>
+    <wb-ui-setting-on-off-switch title="Fill Space?" icon="border_all"
+                                 value="wbModel.style.flexItemGrowEnabled"></wb-ui-setting-on-off-switch>
 
     <!-- weight number -->
-    <md-list-item ng-show="wbModel.style.flexItemGrowEnabled">
-        <md-icon>border_right</md-icon>
-        <p>How Fill Space?</p>
-        <md-input-container
-                class="wb-input-container-without-label">
-            <input
-                    style="width: 40px"
-                    type="number"
-                    ng-model="wbModel.style.flexItemGrow"
-                    flex>
-        </md-input-container>
-    </md-list-item>
+    <wb-ui-setting-number ng-show="wbModel.style.flexItemGrowEnabled" title="Weight" icon="face"
+                          value="wbModel.style.flexItemGrow"></wb-ui-setting-number>
+
 </md-list>
