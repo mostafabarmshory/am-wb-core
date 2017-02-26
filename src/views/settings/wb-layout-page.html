@@ -14,28 +14,17 @@ Completely rewrite by mgh on 2/24/17.
 <md-list class="wb-setting-panel">
 
     <!-- direction -->
-    <md-list-item>
-        <md-icon>border_all</md-icon>
-        <p>Direction</p>
-        <wb-ui-choose flex="100" items="flexDirection" selected="wbModel.style.flexDirection"></wb-ui-choose>
-    </md-list-item>
+    <wb-ui-setting-choose title="Direction" icon="border_all" items="flexDirection"
+                          value="wbModel.style.flexDirection"></wb-ui-setting-choose>
 
     <!-- Align Items -->
-    <md-list-item>
-        <md-icon ng-show="wbModel.style.flexDirection=='wb-flex-row'">swap_vert</md-icon>
-        <md-icon ng-show="wbModel.style.flexDirection!='wb-flex-row'">swap_horiz</md-icon>
-        <p ng-show="wbModel.style.flexDirection=='wb-flex-row'">Vert.</p>
-        <p ng-show="wbModel.style.flexDirection!='wb-flex-row'">Horiz.</p>
-        <wb-ui-choose flex="100" items="alignItems" selected="wbModel.style.alignItems"></wb-ui-choose>
-    </md-list-item>
+    <wb-ui-setting-choose title="{{(wbModel.style.flexDirection=='wb-flex-row')?'Vert.':'Horz.'}}"
+                          icon="{{(wbModel.style.flexDirection=='wb-flex-row')?'swap_vert':'swap_horiz'}}"
+                          items="alignItems" value="wbModel.style.alignItems"></wb-ui-setting-choose>
 
     <!-- Justify Content -->
-    <md-list-item>
-        <md-icon ng-show="wbModel.style.flexDirection!='wb-flex-row'">swap_vert</md-icon>
-        <md-icon ng-show="wbModel.style.flexDirection=='wb-flex-row'">swap_horiz</md-icon>
-        <p ng-show="wbModel.style.flexDirection!='wb-flex-row'">Vert.</p>
-        <p ng-show="wbModel.style.flexDirection=='wb-flex-row'">Horiz.</p>
-        <wb-ui-choose flex="100" items="justifyContent" selected="wbModel.style.justifyContent"></wb-ui-choose>
-    </md-list-item>
+    <wb-ui-setting-choose title="{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}"
+                          icon="{{(wbModel.style.flexDirection!='wb-flex-row')?'swap_vert':'swap_horiz'}}"
+                          items="justifyContent" value="wbModel.style.justifyContent"></wb-ui-setting-choose>
 
 </md-list>
