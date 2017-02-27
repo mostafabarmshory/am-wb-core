@@ -11,356 +11,101 @@ a panel for setting a border for a widget. for each left/right/top/bottom proper
 Created by mgh.
 -->
 <md-list class="wb-setting-panel"> <!-- corner radius section -->
-	<md-subheader class="md-no-sticky">Corner Radius</md-subheader> 
-	<md-list-item>
-		<md-icon>border_all</md-icon>
-		<p>All Equal?</p>
-		<md-switch 
-			class="md-secondary"
-			ng-model="wbModel.style.borderRadius.uniform">
-		</md-switch> 
-	</md-list-item> 
+
+	<!-- SECTION: uniform corner radius section-->
+	<md-subheader class="md-no-sticky">Corner Radius</md-subheader>
+
+	<!-- are all corners have equal border? -->
+	<wb-ui-setting-on-off-switch title="All Equal?" icon="rounded_corner" value="wbModel.style.borderRadius.uniform"></wb-ui-setting-on-off-switch>
+
+	<!-- uniform corner radius as a text-box -->
+	<wb-ui-setting-number ng-show="wbModel.style.borderRadius.uniform" title="Radius" icon="rounded_corner"  value="wbModel.style.borderRadius.all"></wb-ui-setting-number>
+
+	<!-- uniform corner radius as a slider -->
+	<wb-ui-setting-number ng-show="wbModel.style.borderRadius.uniform" slider="" icon="no-icon"  value="wbModel.style.borderRadius.all"></wb-ui-setting-number>
 	
-	<!-- a slider for uniform -->
-	<md-list-item ng-show="wbModel.style.borderRadius.uniform">
-		<md-icon>rounded_corner</md-icon>
-		<p>Radius</p>
-		<md-input-container 
-			class="wb-input-container-without-label">
-			<input 
-				style="width: 40px" 
-				type="number"
-				ng-model="wbModel.style.borderRadius.all" 
-				flex> 
-		</md-input-container> 
-	</md-list-item> 
+	<!-- 4 sliders for left-right-bottom-up corner radius -->
+	<!-- top-left radius -->
+	<wb-ui-setting-number ng-show="!wbModel.style.borderRadius.uniform" title="Top-Left" icon="face"  value="wbModel.style.borderRadius.topLeft"></wb-ui-setting-number>
+
+	<!-- top-right radius -->
+	<wb-ui-setting-number ng-show="!wbModel.style.borderRadius.uniform" title="Top-Right" icon="face"  value="wbModel.style.borderRadius.topRight"></wb-ui-setting-number>
+
+	<!-- bottom-left radius -->
+	<wb-ui-setting-number ng-show="!wbModel.style.borderRadius.uniform" title="Bottom-left" icon="face"  value="wbModel.style.borderRadius.bottomLeft"></wb-ui-setting-number>
 	
-	<md-list-item
-		ng-show="wbModel.style.borderRadius.uniform"> 
-		<md-icon></md-icon>
-		<md-slider 
-			min="0" 
-			max="100"
-			ng-model="wbModel.style.borderRadius.all"
-			flex>
-	</md-list-item> 
-	
-	<!-- 4 sliders for left-right-bottom-up situation -->
-	<!-- top-left --> 
-	<md-list-item
-		ng-show="!wbModel.style.borderRadius.uniform"> 
-		<md-icon>border_left</md-icon>
-		<p>Top-Left</p>
-		<md-input-container class="wb-input-container-without-label">
-			<input flex style="width: 40px" type="number"
-				ng-model="wbModel.style.borderRadius.topLeft"> 
-		</md-input-container> 
-	</md-list-item> 
-	
-<!--	<md-list-item
-		ng-show="!wbModel.style.borderRadius.uniform">
-		<md-icon></md-icon>
-		<md-slider
-			min="0"
-			max="100"
-			ng-model="wbModel.style.borderRadius.topLeft"
-			flex>
-	</md-list-item> -->
-	
-	<!-- top-right -->
-	<md-list-item 
-		ng-show="!wbModel.style.borderRadius.uniform">
-		<md-icon>border_right</md-icon>
-		<p>Top-Right</p>
-		<md-input-container 
-			class="wb-input-container-without-label">
-			<input 
-				style="width: 40px" 
-				type="number"
-				ng-model="wbModel.style.borderRadius.topRight"
-				flex> 
-		</md-input-container> 
-	</md-list-item> 
-	
-<!--	<md-list-item
-		ng-show="!wbModel.style.borderRadius.uniform"> 
-		<md-icon></md-icon>
-		<md-slider flex min="0" max="100"
-			ng-model="wbModel.style.borderRadius.topRight">
-	</md-list-item> -->
-	
-	<!-- bottom-left -->
-	<md-list-item 
-		ng-show="!wbModel.style.borderRadius.uniform">
-		<md-icon>border_right</md-icon>
-		<p>Top-Bottom</p>
-		<md-input-container 
-			class="wb-input-container-without-label">
-			<input 
-				style="width: 40px" 
-				type="number"
-				ng-model="wbModel.style.borderRadius.bottomLeft"
-				flex> 
-		</md-input-container> 
-	</md-list-item> 
-	
-<!--	<md-list-item
-		ng-show="!wbModel.style.borderRadius.uniform"> 
-		<md-icon></md-icon>
-		<md-slider min="0" max="100"
-			ng-model="wbModel.style.borderRadius.bottomLeft"
-			flex>
-	</md-list-item> -->
-	
-	<!-- bottom-right -->
-	<md-list-item 
-		ng-show="!wbModel.style.borderRadius.uniform">
-		<md-icon>border_right</md-icon>
-		<p>Top-Bottom</p>
-		<md-input-container 
-			class="wb-input-container-without-label">
-			<input 
-				style="width: 40px" 
-				type="number"
-				ng-model="wbModel.style.borderRadius.bottomRight"
-				flex> 
-		</md-input-container> 
-	</md-list-item> 
-	
-<!--	<md-list-item
-		ng-show="!wbModel.style.borderRadius.uniform"> 
-		<md-icon></md-icon>
-		<md-slider 
-			min="0" 
-			max="100"
-			ng-model="wbModel.style.borderRadius.bottomRight"
-			flex>
-	</md-list-item> -->
-	
-	<!-- style and width and color -->
-	<md-divider></md-divider> 
+	<!-- bottom-right radius -->
+	<wb-ui-setting-number ng-show="!wbModel.style.borderRadius.uniform" title="Bottom-Right" icon="face"  value="wbModel.style.borderRadius.bottomRight"></wb-ui-setting-number>
+
+
+
+	<!-- SECTION: style and width and color -->
+	<md-divider></md-divider>
 	<md-subheader>Style/Color/Thickness</md-subheader>
-	
-	<md-list-item> 
-		<md-icon>border_all</md-icon>
-		<p>All Equal?</p>
-		<md-switch class="md-secondary"
-			ng-model="wbModel.style.borderStyleColorWidth.uniform">
-		</md-switch> 
-	</md-list-item> 
+
+	<!-- are all side have a same border? -->
+	<wb-ui-setting-on-off-switch title="All Equal?" title="All Eaual?" icon="border_all" value="wbModel.style.borderStyleColorWidth.uniform"></wb-ui-setting-on-off-switch>
 	
 	<!-- border style for all situation -->
-	<md-list-item ng-show="wbModel.style.borderStyleColorWidth.uniform">
-		<md-icon>style</md-icon>
-		<p>Border</p>
-		<md-select 
-			class="wb-input-container-without-label"
-			ng-model="wbModel.style.borderStyle.all"> 
-			<md-option
-				ng-repeat="style in styles" 
-				value="{{style.value}}">
-				{{style.title}}
-			</md-option>
-		</md-select>
-	</md-list-item>
+	<wb-ui-setting-dropdown ng-show="wbModel.style.borderStyleColorWidth.uniform"
+							title="Border" icon="style" items="styles" value="wbModel.style.borderStyle.all"></wb-ui-setting-dropdown>
 	
-	<!-- border thickness for all situation --> 
-	<md-list-item
-		ng-show="wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'">
-		<md-icon>thickness</md-icon>
-		<p>Border Thickness</p>
-		<md-input-container class="wb-input-container-without-label">
-		<input 
-			style="width: 40px" 
-			type="number"
-			ng-model="wbModel.style.borderWidth.all"
-			flex> 
-		</md-input-container> 
-	</md-list-item> 
-		
+	<!-- border thickness for all situation -->
+	<wb-ui-setting-number ng-show="wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'"
+						  title="Thickness" icon="thickness"  value="wbModel.style.borderWidth.all"></wb-ui-setting-number>
+
 	<!-- border color for all situation -->
-	<md-list-item
-		ng-show="wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'">
-		<md-icon>color</md-icon>
-		<p>Border Color</p>
-		<md-color-picker 
-			class="color-picker-hide-textbox"
-			md-color-clear-button="false" 
-			label="Color" 
-			icon="brush"
-			ng-model="wbModel.style.borderColor.all"> 
-		</md-color-picker> 
-	</md-list-item>
+	<wb-ui-setting-color ng-show="wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'"
+						 title="Color" icon="format_color_fill" value="wbModel.style.borderColor.all"></wb-ui-setting-color>
+
 
 	<!-- for left/right/top/bottom border -->
-
 	<!-- left -->
-	<md-list-item ng-show="!wbModel.style.borderStyleColorWidth.uniform">
-		<md-icon>border_left</md-icon>
-		<p>Left-Border</p>
-		<md-select
-				class="wb-input-container-without-label"
-				ng-model="wbModel.style.borderStyle.left">
-			<md-option
-					ng-repeat="style in styles"
-					value="{{style.value}}">
-				{{style.title}}
-			</md-option>
-		</md-select>
-	</md-list-item>
+	<wb-ui-setting-dropdown ng-show="!wbModel.style.borderStyleColorWidth.uniform" title="Left-Border" icon="border_left"
+						  items="styles" value="wbModel.style.borderStyle.left"></wb-ui-setting-dropdown>
 
-	<md-list-item
-			ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'">
-		<md-icon>thickness</md-icon>
-		<p>Border Thickness</p>
-		<md-input-container class="wb-input-container-without-label">
-			<input
-					style="width: 40px"
-					type="number"
-					ng-model="wbModel.style.borderWidth.left"
-					flex>
-		</md-input-container>
-	</md-list-item>
+	<wb-ui-setting-number ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'"
+						  title="Thickness" icon="thickness"  value="wbModel.style.borderWidth.left"></wb-ui-setting-number>
 
-	<md-list-item
-			ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'">
-		<md-icon>color</md-icon>
-		<p>Border Color</p>
-		<md-color-picker
-				class="color-picker-hide-textbox"
-				md-color-clear-button="false"
-				label="Color"
-				icon="brush"
-				ng-model="wbModel.style.borderColor.left">
-		</md-color-picker>
-	</md-list-item>
+	<wb-ui-setting-color ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'"
+						  title="Color" icon="format_color_fill"  value="wbModel.style.borderColor.left"></wb-ui-setting-color>
 
 	<!-- Right -->
 	<md-divider class="wb-sub-divider" ng-show="!wbModel.style.borderStyleColorWidth.uniform"></md-divider>
-	<md-list-item ng-show="!wbModel.style.borderStyleColorWidth.uniform">
-		<md-icon>border_right</md-icon>
-		<p>Right-Border</p>
-		<md-select
-				class="wb-input-container-without-label"
-				ng-model="wbModel.style.borderStyle.right">
-			<md-option
-					ng-repeat="style in styles"
-					value="{{style.value}}">
-				{{style.title}}
-			</md-option>
-		</md-select>
-	</md-list-item>
 
-	<md-list-item
-			ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'">
-		<md-icon>thickness</md-icon>
-		<p>Border Thickness</p>
-		<md-input-container class="wb-input-container-without-label">
-			<input
-					style="width: 40px"
-					type="number"
-					ng-model="wbModel.style.borderWidth.right"
-					flex>
-		</md-input-container>
-	</md-list-item>
+	<wb-ui-setting-dropdown ng-show="!wbModel.style.borderStyleColorWidth.uniform" title="Right-Border" icon="border_right"
+							items="styles" value="wbModel.style.borderStyle.right"></wb-ui-setting-dropdown>
 
-	<md-list-item
-			ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'">
-		<md-icon>color</md-icon>
-		<p>Border Color</p>
-		<md-color-picker
-				class="color-picker-hide-textbox"
-				md-color-clear-button="false"
-				label="Color"
-				icon="brush"
-				ng-model="wbModel.style.borderColor.right">
-		</md-color-picker>
-	</md-list-item>
+	<wb-ui-setting-number ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'"
+						  title="Thickness" icon="thickness"  value="wbModel.style.borderWidth.right"></wb-ui-setting-number>
+
+	<wb-ui-setting-color ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'"
+						 title="Color" icon="format_color_fill"  value="wbModel.style.borderColor.right"></wb-ui-setting-color>
 
 
 	<!-- Top -->
 	<md-divider class="wb-sub-divider" ng-show="!wbModel.style.borderStyleColorWidth.uniform"></md-divider>
-	<md-list-item ng-show="!wbModel.style.borderStyleColorWidth.uniform">
-		<md-icon>border_top</md-icon>
-		<p>Top-Border</p>
-		<md-select
-				class="wb-input-container-without-label"
-				ng-model="wbModel.style.borderStyle.top">
-			<md-option
-					ng-repeat="style in styles"
-					value="{{style.value}}">
-				{{style.title}}
-			</md-option>
-		</md-select>
-	</md-list-item>
 
-	<md-list-item
-			ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'">
-		<md-icon>thickness</md-icon>
-		<p>Border Thickness</p>
-		<md-input-container class="wb-input-container-without-label">
-			<input
-					style="width: 40px"
-					type="number"
-					ng-model="wbModel.style.borderWidth.top"
-					flex>
-		</md-input-container>
-	</md-list-item>
+	<wb-ui-setting-dropdown ng-show="!wbModel.style.borderStyleColorWidth.uniform" title="Top-Border" icon="border_top"
+							items="styles" value="wbModel.style.borderStyle.top"></wb-ui-setting-dropdown>
 
-	<md-list-item
-			ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'">
-		<md-icon>color</md-icon>
-		<p>Border Color</p>
-		<md-color-picker
-				class="color-picker-hide-textbox"
-				md-color-clear-button="false"
-				label="Color"
-				icon="brush"
-				ng-model="wbModel.style.borderColor.top">
-		</md-color-picker>
-	</md-list-item>
+	<wb-ui-setting-number ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'"
+						  title="Thickness" icon="thickness"  value="wbModel.style.borderWidth.top"></wb-ui-setting-number>
+
+	<wb-ui-setting-color ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'"
+						 title="Color" icon="format_color_fill"  value="wbModel.style.borderColor.top"></wb-ui-setting-color>
 
 
-	<!-- Top -->
+	<!-- Bottom -->
 	<md-divider class="wb-sub-divider" ng-show="!wbModel.style.borderStyleColorWidth.uniform"></md-divider>
-	<md-list-item ng-show="!wbModel.style.borderStyleColorWidth.uniform">
-		<md-icon>border_bottom</md-icon>
-		<p>Bottom-Border</p>
-		<md-select
-				class="wb-input-container-without-label"
-				ng-model="wbModel.style.borderStyle.bottom">
-			<md-option
-					ng-repeat="style in styles"
-					value="{{style.value}}">
-				{{style.title}}
-			</md-option>
-		</md-select>
-	</md-list-item>
 
-	<md-list-item
-			ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'">
-		<md-icon>thickness</md-icon>
-		<p>Border Thickness</p>
-		<md-input-container class="wb-input-container-without-label">
-			<input
-					style="width: 40px"
-					type="number"
-					ng-model="wbModel.style.borderWidth.bottom"
-					flex>
-		</md-input-container>
-	</md-list-item>
+	<wb-ui-setting-dropdown ng-show="!wbModel.style.borderStyleColorWidth.uniform" title="Bottom-Border" icon="border_bottom"
+							items="styles" value="wbModel.style.borderStyle.bottom"></wb-ui-setting-dropdown>
 
-	<md-list-item
-			ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'">
-		<md-icon>color</md-icon>
-		<p>Border Color</p>
-		<md-color-picker
-				class="color-picker-hide-textbox"
-				md-color-clear-button="false"
-				label="Color"
-				icon="brush"
-				ng-model="wbModel.style.borderColor.bottom">
-		</md-color-picker>
-	</md-list-item>
+	<wb-ui-setting-number ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'"
+						  title="Thickness" icon="thickness"  value="wbModel.style.borderWidth.bottom"></wb-ui-setting-number>
+
+	<wb-ui-setting-color ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'"
+						 title="Color" icon="format_color_fill"  value="wbModel.style.borderColor.bottom"></wb-ui-setting-color>
 
 </md-list>
