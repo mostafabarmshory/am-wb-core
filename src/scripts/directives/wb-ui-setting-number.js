@@ -17,7 +17,8 @@ angular.module('ngMaterialWeburger')
             scope: {
                 title: '@title',
                 value: '=value',
-                icon: '@icon'
+                icon: '@icon',
+                slider:'@slider'
             }
         };
     });
