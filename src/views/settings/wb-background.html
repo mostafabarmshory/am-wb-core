@@ -9,55 +9,18 @@ a panel for background settings and opacity of a widget. these css-attributes ar
 
 Created by mgh.
 -->
-<md-list class="wb-setting-panel"> <!-- corner radius section -->
+<md-list class="wb-setting-panel">
 
-    <!-- a slider for transparency -->
-    <md-list-item>
-        <md-icon>blur_on</md-icon>
-        <p>Transparent?</p>
-        <md-switch
-                class="md-secondary"
-                ng-model="wbModel.style.isTransparent">
-        </md-switch>
-    </md-list-item>
+    <!-- is transparent? -->
+    <wb-ui-setting-on-off-switch title="Transparent?" icon="blur_on" value="wbModel.style.isTransparent"></wb-ui-setting-on-off-switch>
 
-    <!-- a slider for uniform -->
-    <md-list-item ng-show="wbModel.style.isTransparent">
-        <md-icon>opacity</md-icon>
-        <p>Opacity</p>
-        <md-input-container
-                class="wb-input-container-without-label">
-            <input
-                    style="width: 40px"
-                    type="number"
-                    ng-model="wbModel.style.opacity"
-                    flex>
-        </md-input-container>
-    </md-list-item>
+    <!-- opacity text-box -->
+    <wb-ui-setting-number ng-show="wbModel.style.isTransparent" title="Opacity" icon="opacity" value="wbModel.style.opacity"></wb-ui-setting-number>
 
-    <md-list-item
-            ng-show="wbModel.style.isTransparent">
-        <md-icon></md-icon>
-        <md-slider
-                md-discrete
-                step="1"
-                min="0"
-                max="100"
-                ng-model="wbModel.style.opacity"
-                flex>
-    </md-list-item>
+    <!-- opacity slider -->
+    <wb-ui-setting-number ng-show="wbModel.style.isTransparent" slider="" icon="icon"  value="wbModel.style.opacity"></wb-ui-setting-number>
 
-    <!-- color -->
-    <md-list-item>
-        <md-icon>format_color_fill</md-icon>
-        <p>Background Color</p>
-        <md-color-picker
-                class="color-picker-hide-textbox"
-                md-color-clear-button="false"
-                label="Color"
-                icon="brush"
-                ng-model="wbModel.style.backgroundColor">
-        </md-color-picker>
-    </md-list-item>
+    <!-- background color -->
+    <wb-ui-setting-color title="Background Color" icon="format_color_fill" value="wbModel.style.backgroundColor"></wb-ui-setting-color>
 
 </md-list>
