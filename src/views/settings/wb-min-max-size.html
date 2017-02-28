@@ -2,89 +2,70 @@
 
 Created by mgh.
 -->
-<!--Preview Box
-<div class="preview-box wb-flex-item-stretch" ng-hide="true">
-	<div class="header">Preview</div>
-	<div class="wb-flex preview-area wb-flex-justify-content-center">
-		<div class="widget wb-flex-item-center"
-			ng-class="wbModel.style.flexAlignItem"
-			ng-style="{
-                'min-width':wbModel.style.minWidth,
-                'min-height':wbModel.style.minHeight,
-                'max-width':(wbModel.style.maxWidth==0) ? 'none' : wbModel.style.maxWidth,
-                'max-height':(wbModel.style.maxHeight==0)?'none':wbModel.style.maxHeight}"
-			layout="row" layout-align="center center" style="border: 2px dotted">
-			<p>item</p>
-		</div>
-	</div>
-</div>
--->
+<md-list class="wb-setting-panel">
 
-<div class="setting-panel"
-     layout="column">
-<!--
-        <md-expansion-panel-expanded>
-            <md-expansion-panel-header>
-                <div class="md-title">Expanded Title</div>
-                <div class="md-summary">Expanded Summary</div>
-                <md-expansion-panel-icon></md-expansion-panel-icon>
-            </md-expansion-panel-header>
-            <md-expansion-panel-content>
-                <h4>Content</h4>
-                <p>Put content in here</p>
-            </md-expansion-panel-content>
-            <md-expansion-panel-footer>
-                <div flex></div>
-                <md-button class="md-warn" ng-click="$panel.collapse()">Collapse</md-button>
-            </md-expansion-panel-footer>
-        </md-expansion-panel-expanded>
--->
+    <!-- MIN Section -->
+    <md-subheader class="md-no-sticky">Min</md-subheader>
+
+    <!-- min width -->
+    <md-list-item>
+        <md-icon>rounded_corner</md-icon>
+        <p>Min Width</p>
+        <md-input-container
+                class="wb-input-container-without-label">
+            <input
+                    style="width: 40px"
+                    type="number"
+                    ng-model="wbModel.style.minWidth"
+                    flex>
+        </md-input-container>
+    </md-list-item>
+
+    <!-- min height -->
+    <md-list-item>
+        <md-icon>rounded_corner</md-icon>
+        <p>Min Height</p>
+        <md-input-container
+                class="wb-input-container-without-label">
+            <input
+                    style="width: 40px"
+                    type="number"
+                    ng-model="wbModel.style.minHeight"
+                    flex>
+        </md-input-container>
+    </md-list-item>
 
 
-    <!-- Min panel -->
-    <md-list>
-        <md-subheader>MIN</md-subheader>
-        <md-divider style="margin-bottom: 1em "></md-divider>
-        <div layout="row" class="wb-flex-align-items-center">
-            <span>Width<md-tooltip>set value "0" for ignoring</md-tooltip></span>
-            <md-slider flex min="0" max="100" ng-model="wbModel.style.minWidth">
-            </md-slider>
-            <md-input-container>
-                <input style="width: 50px" flex type="number" ng-model="wbModel.style.minWidth">
-            </md-input-container>
-        </div>
-        <div layout="row" class="wb-flex-align-items-center">
-            <span>Height<md-tooltip>set value "0" for ignoring</md-tooltip></span>
-            <md-slider flex min="0" max="100" ng-model="wbModel.style.minHeight">
-            </md-slider>
-            <md-input-container>
-                <input style="width: 50px" flex type="number" ng-model="wbModel.style.minHeight">
-            </md-input-container>
-        </div>
+    <!-- MAX Section -->
+    <md-subheader class="md-no-sticky">Max</md-subheader>
 
-    </md-list>
+    <!-- max width -->
+    <md-list-item>
+        <md-icon>rounded_corner</md-icon>
+        <p>Max Width</p>
+        <md-input-container
+                class="wb-input-container-without-label">
+            <input
+                    style="width: 40px"
+                    type="number"
+                    ng-model="wbModel.style.maxWidth"
+                    flex>
+        </md-input-container>
+    </md-list-item>
 
-    <!-- max panel -->
-    <md-list>
-        <md-subheader>MAX</md-subheader>
-        <md-divider style="margin-bottom: 1em "></md-divider>
-        <div layout="row" class="wb-flex-align-items-center">
-            <span>Width<md-tooltip>set value "0" for ignoring</md-tooltip></span>
-            <md-slider flex min="0" max="100" ng-model="wbModel.style.maxWidth">
-            </md-slider>
-            <md-input-container>
-                <input style="width: 50px" flex ng-model="wbModel.style.maxWidth">
-            </md-input-container>
-        </div>
-        <div layout="row" class="wb-flex-align-items-center">
-            <span>Height<md-tooltip>set value "0" for ignoring</md-tooltip></span>
-            <md-slider flex min="0" max="100" ng-model="wbModel.style.maxHeight">
-            </md-slider>
-            <md-input-container>
-                <input style="width: 50px" flex  ng-model="wbModel.style.maxHeight">
-            </md-input-container>
-        </div>
-    </md-list>
-</div>
+    <!-- max height -->
+    <md-list-item>
+        <md-icon>rounded_corner</md-icon>
+        <p>Max Height</p>
+        <md-input-container
+                class="wb-input-container-without-label">
+            <input
+                    style="width: 40px"
+                    type="number"
+                    ng-model="wbModel.style.maxHeight"
+                    flex>
+        </md-input-container>
+    </md-list-item>
+</md-list>
 
 </div>

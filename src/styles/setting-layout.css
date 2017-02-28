@@ -19,17 +19,6 @@
     margin: 0px;
 }
 
-.color-picker-hide-textbox{
-    direction: rtl;
-    margin: 0px;
-    padding: 0px;
-}
-.color-picker-hide-textbox md-input-container {
-    visibility: hidden;
-    width: 10px !important;
-    height: 32px;
-}
-
 .wb-sub-divider{
     margin-left: 48px;
     border-top-style: dotted;
