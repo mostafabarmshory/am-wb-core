@@ -4,68 +4,23 @@ Created by mgh.
 -->
 <md-list class="wb-setting-panel">
 
-    <!-- MIN Section -->
+    <!-- SECTION: Min -->
     <md-subheader class="md-no-sticky">Min</md-subheader>
 
     <!-- min width -->
-    <md-list-item>
-        <md-icon>rounded_corner</md-icon>
-        <p>Min Width</p>
-        <md-input-container
-                class="wb-input-container-without-label">
-            <input
-                    style="width: 40px"
-                    type="number"
-                    ng-model="wbModel.style.minWidth"
-                    flex>
-        </md-input-container>
-    </md-list-item>
+    <wb-ui-setting-number title="Min Width" icon="face" value="wbModel.style.minWidth"></wb-ui-setting-number>
 
     <!-- min height -->
-    <md-list-item>
-        <md-icon>rounded_corner</md-icon>
-        <p>Min Height</p>
-        <md-input-container
-                class="wb-input-container-without-label">
-            <input
-                    style="width: 40px"
-                    type="number"
-                    ng-model="wbModel.style.minHeight"
-                    flex>
-        </md-input-container>
-    </md-list-item>
+    <wb-ui-setting-number title="Max Height" icon="face" value="wbModel.style.minHeight"></wb-ui-setting-number>
 
 
-    <!-- MAX Section -->
+    <!-- SECTION: Max -->
     <md-subheader class="md-no-sticky">Max</md-subheader>
 
     <!-- max width -->
-    <md-list-item>
-        <md-icon>rounded_corner</md-icon>
-        <p>Max Width</p>
-        <md-input-container
-                class="wb-input-container-without-label">
-            <input
-                    style="width: 40px"
-                    type="number"
-                    ng-model="wbModel.style.maxWidth"
-                    flex>
-        </md-input-container>
-    </md-list-item>
+    <wb-ui-setting-number title="Max Width" icon="face" value="wbModel.style.maxWidth"></wb-ui-setting-number>
 
     <!-- max height -->
-    <md-list-item>
-        <md-icon>rounded_corner</md-icon>
-        <p>Max Height</p>
-        <md-input-container
-                class="wb-input-container-without-label">
-            <input
-                    style="width: 40px"
-                    type="number"
-                    ng-model="wbModel.style.maxHeight"
-                    flex>
-        </md-input-container>
-    </md-list-item>
-</md-list>
+    <wb-ui-setting-number title="Max Height" icon="face" value="wbModel.style.maxHeight"></wb-ui-setting-number>
 
-</div>
+</md-list>
