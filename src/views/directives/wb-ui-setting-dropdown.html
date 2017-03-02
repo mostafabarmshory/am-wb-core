@@ -1,6 +1,6 @@
 <md-list-item>
-    <md-icon ng-hide="icon==undefined || icon==null">{{icon}}</md-icon>
-    <p ng-hide="title==undefined || title==null">{{title}}</p>
+    <md-icon ng-hide="icon==undefined || icon==null || icon==''">{{icon}}</md-icon>
+    <p ng-hide="title==undefined || title==null || title==''">{{title}}</p>
     <md-select
             style="margin: 0px"
             ng-model="value">
