@@ -44,10 +44,21 @@ angular.module('ngMaterialWeburger')
 	    label : 'Not found',
 	    description : 'Element not found',
     };
+    var container = {
+	    type : 'Container',
+	    label : 'Panel',
+	    description : 'Panel contains list of widgets.',
+	    image : 'images/wb/content.svg',
+	    setting : [ 'description', 'border', 'background',
+		'pageLayout', 'selfLayout' ],
+    };
 
     function _widget(model){
 	if (model.type in contentElementAsso) {
 	    return contentElementAsso[model.type];
+	}
+	if (model.type === 'Container') {
+	    return container;
 	}
 	return notFoundWidget;
     }

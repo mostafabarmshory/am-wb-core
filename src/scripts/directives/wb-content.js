@@ -204,7 +204,7 @@ angular.module('ngMaterialWeburger')
 		if (!angular.isArray(scope.wbModel.contents)) {
 		    scope.wbModel.contents = [];
 		}
-		scope.wbModel.type = 'container';
+		scope.wbModel.type = 'Container';
 		reloadView();
 	    });
 

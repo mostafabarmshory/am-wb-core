@@ -48,14 +48,6 @@ angular
 		    label : 'Settings not found',
 		    templateUrl : 'views/settings/wb-notfound.html'
 	    };
-	    var container = {
-		    type : 'Container',
-		    label : 'Panel',
-		    description : 'Panel contains list of widgets.',
-		    image : 'images/wb/content.svg',
-		    setting : [ 'description', 'border', 'background',
-			'pageLayout', 'selfLayout' ],
-	    };
 
 	    var oldScope;
 
@@ -69,9 +61,6 @@ angular
 		var widget = notFound;
 		if (type in settingPages) {
 		    widget = settingPages[type];
-		}
-		if (type === 'Container') {
-		    widget = container;
 		}
 		return widget;
 	    }
