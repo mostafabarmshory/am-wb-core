@@ -2,11 +2,12 @@
 	dnd-disable-if="!wbEditable"
 	dnd-draggable="wbModel"
 	dnd-type="'wb.widget'"
-	dnd-moved="movedCallback()"
-	ng-class="{'wb-panel': wbEditable}">
+	dnd-moved="remove()"
+	ng-class="{'wb-panel': wbEditable}"
+	name="{{wbModel.name}}">
     <!-- a header is added through edit-mode -->
     <div ng-show="wbEditable" class="wb-panel-header" layout="row">
-        <span translate> Panel</span>
+        <span translate> {{wbModel.name}}</span>
         <span flex></span>
         <md-button
                 ng-click="newWidget(wbModel)"
