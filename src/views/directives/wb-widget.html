@@ -15,21 +15,21 @@
 		<md-button 
 			ng-if="add"
 			ng-click="add()" 
-			class="md-icon-button md-mini">
-		<md-icon class="mde-icon-mini">add_circle</md-icon> 
+			class="wb-icon-button md-mini">
+		<wb-icon class="mde-icon-mini">add_circle</wb-icon> 
 		</md-button>
 		<md-button 
 			ng-click="settings()"
-			 class="md-icon-button md-mini">
-		<md-icon class="mde-icon-mini">settings</md-icon> 
+			 class="wb-icon-button md-mini">
+		<wb-icon class="mde-icon-mini">settings</wb-icon> 
 		</md-button>
 		<md-button 
-			class="md-icon-button md-mini" 
+			class="wb-icon-button md-mini" 
 			ng-click="remove()"
 			ng-show="remove"
             ng-mouseenter="ctrl.hoveringDelBtn=true"
             ng-mouseleave="ctrl.hoveringDelBtn=false"> 
-			<md-icon class="mde-icon-mini">delete</md-icon>
+			<wb-icon class="mde-icon-mini">delete</wb-icon>
 		</md-button>
 		<md-divider></md-divider>
 		<!-- 
@@ -38,10 +38,10 @@
 			scope.
 		 -->
 		<md-button 
-			class="md-icon-button md-mini" 
+			class="wb-icon-button md-mini" 
 			ng-repeat="item in extraActions"
 			ng-click="item.action()"> 
-			<md-icon class="mde-icon-mini">{{item.icon}}</md-icon>
+			<wb-icon class="mde-icon-mini">{{item.icon}}</wb-icon>
 		</md-button>
     </div>
 	
