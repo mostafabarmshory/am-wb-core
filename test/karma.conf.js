@@ -37,6 +37,7 @@ module.exports = function(config) {
       'bower_components/angular-ui-tinymce/src/tinymce.js',
       'bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js',
       'bower_components/angular-material-expansion-panel/dist/md-expansion-panel.js',
+      'bower_components/angular-material-icons/angular-material-icons.min.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       'src/**/*.js',

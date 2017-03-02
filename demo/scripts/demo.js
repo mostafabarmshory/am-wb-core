@@ -29,7 +29,7 @@
  * @description
  * 
  */
-angular.module('ngMaterialWeburgerTest', [ 'ngMaterialWeburger' ])//
+angular.module('ngMaterialWeburgerTest', [ 'ngMaterialWeburger','ngMdIcons' ])//
 .controller('MyTestCtrl', function($scope, $http, $mdDialog, $usr) {
     $http.get('temp.json').then(function(res) {
 	$scope.model = res.data;

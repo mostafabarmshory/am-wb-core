@@ -13,15 +13,16 @@
     <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
     <link rel="stylesheet" href="bower_components/md-color-picker/dist/mdColorPicker.min.css" />
     <link rel="stylesheet" href="bower_components/angular-material-expansion-panel/dist/md-expansion-panel.css" />
+    <link rel="stylesheet" href="bower_components/angular-material-icons/angular-material-icons.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
-    <link rel="stylesheet" href="styles/main.css">
+    <!--<link rel="stylesheet" href="styles/main.css">-->
     <link rel="stylesheet" href="styles/wb-content.css">
     <link rel="stylesheet" href="styles/wb-widget.css">
     <link rel="stylesheet" href="styles/dialogs.css">
-    <link rel="stylesheet" href="styles/font-icon.css">
-    <link rel="stylesheet" href="styles/font-svg.css">
+<!--    <link rel="stylesheet" href="styles/font-icon.css">-->
+<!--    <link rel="stylesheet" href="styles/font-svg.css">-->
     <link rel="stylesheet" href="styles/typography.css">
     <link rel="stylesheet" href="styles/setting-layout.css">
     <link rel="stylesheet" href="styles/flex-util.css">
@@ -31,7 +32,7 @@
     <!-- endbuild -->
 </head>
 <body>
-
+<ng-md-icon icon="send"></ng-md-icon>
 
 <div
         layout="row"
@@ -50,7 +51,7 @@
                     ng-class="{'md-primary' : showContent}"
                     class="wb-group-button middle"
                     ng-click="showContent=!showContent">
-                <md-icon>content_copy</md-icon>
+                <ng-md-icon>content_copy</ng-md-icon>
             </md-button>
             <md-button
                     class="wb-group-button right"
@@ -95,6 +96,7 @@
 <script src="bower_components/angular-ui-tinymce/src/tinymce.js"></script>
 <script src="bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
 <script src="bower_components/angular-material-expansion-panel/dist/md-expansion-panel.js"></script>
+<script src="bower_components/angular-material-icons/angular-material-icons.min.js"></script>
 <!-- endbower -->
 <!-- endbuild -->
 
