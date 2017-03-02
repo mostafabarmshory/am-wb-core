@@ -4,12 +4,13 @@
 	dnd-type="'wb.widget'"
 	dnd-moved="movedCallback()"
 	ng-class="{'wb-widget': wbEditable}" 
-	layout="column">
+	layout="column"
+	name="{{wbModel.name}}">
     <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
     <div ng-show="wbEditable"
          layout="row"
          class="wb-widget-header">
-		<span translate> widget</span> 
+		<span translate> {{wbModel.name}}</span> 
 		<span flex></span>
 		<md-button 
 			ng-if="add"

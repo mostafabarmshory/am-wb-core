@@ -40,13 +40,8 @@ angular.module('ngMaterialWeburger')
  * 
  * Widget data is bind into the wbModel automatically.
  * 
- * هر صفحه یک ساختار داده‌ای را به عنوان ورودی دریافت می‌کند و در صورتی که کاربر
- * مجاز به ویرایش آن باشد، آن را ویرایش و ساختار داده‌ای جدید ایجاد می‌کند.
- * فرآیند ذخیره سازی این ساختار داده‌ای باید به صورت مستقل در کنترل‌هایی انجام
- * شود که این ساختار را فراهم کرده‌اند.
- * 
  */
-.directive('wbContent', function($compile, $widget, $controller, $settings) {
+.directive('wbContent', function($compile, $widget, $controller, $settings, $q) {
     return {
 	templateUrl : 'views/directives/wb-content.html',
 	transclude : true,
@@ -57,47 +52,93 @@ angular.module('ngMaterialWeburger')
 	    wbEditable : '=?'
 	},
 	link : function(scope, element, attrs) {
-	    //
-	    function empty() {
-		element//
-		.children(bodyElementSelector)//
-		.children(placeholderElementSelector)//
-		.empty();
+	    // Note that object must be an object or array,
+	    // NOT a primitive value like string, number, etc.
+	    var objIdMap=new WeakMap();
+	    var objectCount = 0;
+	    function objectId(object){
+		if (!objIdMap.has(object)) 
+		    objIdMap.set(object,++objectCount);
+		return objIdMap.get(object);
 	    }
 
+	    /**
+	     * Find the aunchor
+	     * 
+	     * The anchor is an element where widgets are added into.
+	     * 
+	     * @returns element anchor
+	     */
 	    function getAnchor() {
 		return element//
 		.children(bodyElementSelector)//
 		.children(placeholderElementSelector);
 	    }
 
-	    function addWidget(anchor, item) {
-		$widget.compile(item, scope)//
-		.then(function(element) {
-		    anchor.append(element);
+	    /**
+	     * Reload view
+	     * 
+	     * Removes all widgets and load the view agin.
+	     */
+	    function reloadView() {
+		cleanView();
+		var anchor = getAnchor();
+		var compilesJob = [];
+		var elements = [];
+		scope.wbModel.contents.forEach(function(item, index) {
+		    compilesJob.push($widget.compile(item, scope)//
+			    .then(function(elem) {
+				elem.attr('index', index);
+				elem.attr('id', objectId(item));
+				elements.push(elem);
+			    }));
+		});
+		return $q.all(compilesJob)//
+		.then(function() {
+		    elements.sort(function(a, b) {
+			if (a.attr('index') < b.attr('index'))
+			    return -1;
+			if (a.attr('index') > b.attr('index'))
+			    return 1;
+			return 0;
+		    });
+		    var anchor = getAnchor();
+		    elements.forEach(function(item){
+			anchor.append(item);
+		    });
 		});
 	    }
+
 	    /**
-	     * Adds dragged widget
+	     * New widget
 	     */
-	    function dropCallback(event, index, item, external, type) {
-		// add widget
-		$widget.compile(item, scope)//
-		.then(function(newElement) {
-		    var list = element//
-		    .children(bodyElementSelector)//
-		    .children(placeholderElementSelector);
-		    if (index < list[0].childNodes.length) {
-			newElement.insertBefore(list[0].childNodes[index]);
-		    } else {
-			list.append(newElement);
-		    }
+	    function newWidget() {
+		return $widget.select({
+		    wbModel : {},
+		    style : {}
 		})//
-		.then(function() {
-		    console.log('widget add to list');
-		    scope.wbModel.contents.splice(index, 0, item);
+		.then(function(model) {
+		    $widget.compile(model, scope)//
+		    .then(function(element) {
+			element.attr('index', scope.wbModel.contents.length);
+			element.attr('id', objectId(model));
+			scope.wbModel.contents.push(model);
+			getAnchor().append(element);
+		    });
 		});
-		return true;
+	    }
+
+	    /**
+	     * Clean view
+	     * 
+	     * Remove all widgets from the veiw and clean the tmeplate.
+	     * 
+	     */
+	    function cleanView() {
+		element//
+		.children(bodyElementSelector)//
+		.children(placeholderElementSelector)//
+		.empty();
 	    }
 
 	    /*
@@ -111,58 +152,17 @@ angular.module('ngMaterialWeburger')
 		if (index > -1) {
 		    var a = element//
 		    .children(bodyElementSelector)//
-		    .children(placeholderElementSelector);
-		    if (scope.wbModel.contents.length !== a[0].childNodes) {
-			// Need referesh
-			scope.wbModel.contents.splice(index, 1);
-			empty();
-			var anchor = getAnchor();
-			scope.wbModel.contents.forEach(function(item) {
-			    addWidget(anchor, item);
-			});
-			return;
-		    }
+		    .children(placeholderElementSelector)
+		    .children('#'+objectId(model));
+		    a.remove();
 		    scope.wbModel.contents.splice(index, 1);
-		    a[0].childNodes[index].remove();
 		}
 	    }
 
 	    /**
-	     * @deprecated
-	     */
-	    function newWidget() {
-		return $widget.select({
-		    wbModel : {},
-		    style : {}
-		})//
-		.then(function(model) {
-		    scope.wbModel.contents.push(model);
-		    addWidget(getAnchor(), model);
-		});
-	    }
-
-	    // TODO:
-	    scope.$watch('wbModel', function() {
-		empty();
-		if (!scope.wbModel) {
-		    // XXX: maso, 1395: هنوز مدل تعیین نشده
-		    return;
-		}
-		if (!angular.isArray(scope.wbModel.contents)) {
-		    scope.wbModel.contents = [];
-		    return;
-		}
-		var anchor = getAnchor();
-		scope.wbModel.contents.forEach(function(item) {
-		    addWidget(anchor, item);
-		});
-	    });
-
-	    /**
-	     * تنظیم‌های کلی صفحه را انجام می‌دهد
+	     * Load container settings
 	     * 
-	     * یک دریچه محاوره‌ای باز می‌شود تا کاربر بتواند تنظیم‌های متفاوت
-	     * مربوط به این صفحه را انجام دهد.
+	     * Loads settings of the current container.
 	     */
 	    function settings() {
 		return $settings.load({
@@ -171,10 +171,48 @@ angular.module('ngMaterialWeburger')
 		});
 	    }
 
+	    /**
+	     * Adds dragged widget
+	     */
+	    function dropCallback(event, index, item, external, type) {
+		// add widget
+		$widget.compile(item, scope)//
+		.then(function(newElement) {
+		    var list = element//
+		    .children(bodyElementSelector)//
+		    .children(placeholderElementSelector);
+		    newElement.attr('id', objectId(item));
+		    if (index < list[0].childNodes.length) {
+			newElement.insertBefore(list[0].childNodes[index]);
+		    } else {
+			list.append(newElement);
+		    }
+		    scope.wbModel.contents.splice(index, 0, item);
+		    console.log('widget add to list');
+		});
+		return true;
+	    }
+
+	    /*
+	     * Watch the model for modification.
+	     */
+	    scope.$watch('wbModel', function() {
+		if (!scope.wbModel) {
+		    // XXX: maso, 1395: هنوز مدل تعیین نشده
+		    return;
+		}
+		if (!angular.isArray(scope.wbModel.contents)) {
+		    scope.wbModel.contents = [];
+		}
+		scope.wbModel.type = 'container';
+		reloadView();
+	    });
+
 	    scope.removeChild = removeChild;
 	    scope.settings = settings;
 	    scope.dropCallback = dropCallback;
 	    scope.newWidget = newWidget;
+	    scope.objectId = objectId;
 	}
     };
 });//

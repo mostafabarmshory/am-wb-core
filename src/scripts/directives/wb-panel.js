@@ -31,40 +31,77 @@ angular.module('ngMaterialWeburger')
 /**
  * 
  */
-.directive('wbPanel', function($compile, $widget, $controller, $settings) {
+.directive('wbPanel', function($compile, $widget, $controller, $settings, $q) {
     return {
 	templateUrl : 'views/directives/wb-panel.html',
 	restrict : 'E',
 	replace : true,
+	transclude : true,
 	link : function(scope, element, attrs) {
 	    /**
 	     * Remove panel from parent
 	     */
 	    function remove() {
-		console.log('panel removed');
+		console.log('panel removed:' + element.attr('id'));
 		return scope.$parent.removeChild(scope.wbModel);
 	    }
-	    
-	    //
-	    function empty() {
+
+	    /**
+	     * Empty view
+	     * 
+	     * Remove all widgets from the view.
+	     */
+	    function cleanView() {
+		console.log('remove all widgets:' + element.attr('id'));
 		element//
 		.children(bodyElementSelector)//
 		.children(placeholderElementSelector)//
 		.empty();
 	    }
 
+	    /**
+	     * Find aunchor
+	     * 
+	     * Find and return anchor element.
+	     */
 	    function getAnchor() {
 		return element//
 		.children(bodyElementSelector)//
 		.children(placeholderElementSelector);
 	    }
 
-	    function addWidget(anchor, item) {
-		$widget.compile(item, scope)//
-		.then(function(element) {
-		    anchor.append(element);
+	    /**
+	     * Relaod view
+	     */
+	    function reloadView() {
+		cleanView();
+		var anchor = getAnchor();
+		var compilesJob = [];
+		var elements = [];
+		scope.wbModel.contents.forEach(function(item, index) {
+		    compilesJob.push($widget.compile(item, scope)//
+			    .then(function(element) {
+				element.attr('index', index);
+				element.attr('id', scope.objectId(item));
+				elements.push(element);
+			    }));
+		});
+		return $q.all(compilesJob)//
+		.then(function() {
+		    elements.sort(function(a, b) {
+			if (a.attr('index') < b.attr('index'))
+			    return -1;
+			if (a.attr('index') > b.attr('index'))
+			    return 1;
+			return 0;
+		    });
+		    var anchor = getAnchor();
+		    elements.forEach(function(item) {
+			anchor.append(item);
+		    });
 		});
 	    }
+
 	    /**
 	     * Adds dragged widget
 	     */
@@ -75,20 +112,19 @@ angular.module('ngMaterialWeburger')
 		    var list = element//
 		    .children(bodyElementSelector)//
 		    .children(placeholderElementSelector);
+		    newElement.attr('id', scope.objectId(item));
 		    if (index < list[0].childNodes.length) {
 			newElement.insertBefore(list[0].childNodes[index]);
 		    } else {
 			list.append(newElement);
 		    }
-		})//
-		.then(function() {
-		    console.log('widget add to list');
 		    scope.wbModel.contents.splice(index, 0, item);
+		    console.log('widget add to list');
 		});
 		return true;
 	    }
 
-	    /*
+	    /**
 	     * Removes a widget
 	     * 
 	     * Data model and visual element related to the input model will be
@@ -99,35 +135,23 @@ angular.module('ngMaterialWeburger')
 		if (index > -1) {
 		    var a = element//
 		    .children(bodyElementSelector)//
-		    .children(placeholderElementSelector);
-		    if (scope.wbModel.contents.length !== a[0].childNodes) {
-			// Need referesh
-			scope.wbModel.contents.splice(index, 1);
-			empty();
-			var anchor = getAnchor();
-			scope.wbModel.contents.forEach(function(item) {
-			    addWidget(anchor, item);
-			});
-			return;
-		    }
+		    .children(placeholderElementSelector)
+		    .children('#'+scope.objectId(model));
+		    a.remove();
 		    scope.wbModel.contents.splice(index, 1);
-		    a[0].childNodes[index].remove();
 		}
 	    }
 
-	    /**
-	     * تنظیم‌های کلی صفحه را انجام می‌دهد
-	     * 
-	     * یک دریچه محاوره‌ای باز می‌شود تا کاربر بتواند تنظیم‌های متفاوت
-	     * مربوط به این صفحه را انجام دهد.
-	     */
 	    function settings() {
 		return $settings.load({
 		    wbModel : scope.wbModel,
 		    wbParent : scope.$parent
 		});
 	    }
+
 	    /**
+	     * Select and add a widget
+	     * 
 	     * @deprecated
 	     */
 	    function newWidget() {
@@ -136,11 +160,17 @@ angular.module('ngMaterialWeburger')
 		    style : {}
 		})//
 		.then(function(model) {
-		    scope.wbModel.contents.push(model);
-		    addWidget(getAnchor(), model);
+		    $widget.compile(model, scope)//
+		    .then(function(elem) {
+			elem.attr('index', scope.wbModel.contents.length);
+			elem.attr('id', scope.objectId(model));
+			scope.wbModel.contents.push(model);
+			getAnchor().append(elem);
+		    });
 		});
 	    }
 
+	    element.attr('id', scope.objectId(scope.wbModel));
 	    scope.removeChild = removeChild;
 	    scope.remove = remove;
 	    scope.settings = settings;
@@ -151,10 +181,11 @@ angular.module('ngMaterialWeburger')
 		scope.wbModel.contents = [];
 		return;
 	    }
-	    var anchor = getAnchor();
-	    scope.wbModel.contents.forEach(function(item) {
-		addWidget(anchor, item);
-	    });
+	    if(!angular.isDefined(scope.wbModel.name)){
+		scope.wbModel.name = 'Panel';
+	    }
+	    reloadView();
+
 	}
     };
 });//
