@@ -35,7 +35,7 @@ angular.module('ngMaterialWeburger')
  */
 .service('$settings', function($rootScope, $controller, $widget, $q, $sce,
 	$compile, $document, $templateRequest) {
-    var WB_SETTING_PANEL_ID = 'wb-setting-panel';
+    var WB_SETTING_PANEL_ID = 'WB-SETTING-PANEL';
     /**
      * Setting page storage
      * 

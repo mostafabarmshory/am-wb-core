@@ -38,8 +38,9 @@ angular.module('ngMaterialWeburger')
 .directive('wbSettingPanelGroup', function($settings) {
     return {
 	restrict : 'E',
-	link : function(scope, element, attrs, ctrl, transclude) {
-	    element.attr('id', $settings.WB_SETTING_PANEL_ID);
-	},
+	templateUrl: 'views/directives/wb-setting-panel-group.html',
+//	link : function(scope, element, attrs, ctrl, transclude) {
+//	    element.attr('id', $settings.WB_SETTING_PANEL_ID);
+//	},
     };
 });
