@@ -29,34 +29,22 @@ var placeholderElementSelector = 'div#wb-content-placeholder';
 
 angular.module('ngMaterialWeburger')
 /**
- * @ngdoc directive
- * @name donateMainApp.directive:wbContent
- * @description
- * 
- * A container widget
- * 
- * This is an container widget to list and manage widgets. This is equal to a
- * group or a page of widgets.
- * 
- * Widget data is bind into the wbModel automatically.
- * 
- * هر صفحه یک ساختار داده‌ای را به عنوان ورودی دریافت می‌کند و در صورتی که کاربر
- * مجاز به ویرایش آن باشد، آن را ویرایش و ساختار داده‌ای جدید ایجاد می‌کند.
- * فرآیند ذخیره سازی این ساختار داده‌ای باید به صورت مستقل در کنترل‌هایی انجام
- * شود که این ساختار را فراهم کرده‌اند.
  * 
  */
-.directive('wbContent', function($compile, $widget, $controller, $settings) {
+.directive('wbPanel', function($compile, $widget, $controller, $settings) {
     return {
-	templateUrl : 'views/directives/wb-content.html',
-	transclude : true,
+	templateUrl : 'views/directives/wb-panel.html',
 	restrict : 'E',
 	replace : true,
-	scope : {
-	    wbModel : '=?',
-	    wbEditable : '=?'
-	},
 	link : function(scope, element, attrs) {
+	    /**
+	     * Remove panel from parent
+	     */
+	    function remove() {
+		console.log('panel removed');
+		return scope.$parent.removeChild(scope.wbModel);
+	    }
+	    
 	    //
 	    function empty() {
 		element//
@@ -128,6 +116,18 @@ angular.module('ngMaterialWeburger')
 	    }
 
 	    /**
+	     * تنظیم‌های کلی صفحه را انجام می‌دهد
+	     * 
+	     * یک دریچه محاوره‌ای باز می‌شود تا کاربر بتواند تنظیم‌های متفاوت
+	     * مربوط به این صفحه را انجام دهد.
+	     */
+	    function settings() {
+		return $settings.load({
+		    wbModel : scope.wbModel,
+		    wbParent : scope.$parent
+		});
+	    }
+	    /**
 	     * @deprecated
 	     */
 	    function newWidget() {
@@ -141,40 +141,20 @@ angular.module('ngMaterialWeburger')
 		});
 	    }
 
-	    // TODO:
-	    scope.$watch('wbModel', function() {
-		empty();
-		if (!scope.wbModel) {
-		    // XXX: maso, 1395: هنوز مدل تعیین نشده
-		    return;
-		}
-		if (!angular.isArray(scope.wbModel.contents)) {
-		    scope.wbModel.contents = [];
-		    return;
-		}
-		var anchor = getAnchor();
-		scope.wbModel.contents.forEach(function(item) {
-		    addWidget(anchor, item);
-		});
-	    });
-
-	    /**
-	     * تنظیم‌های کلی صفحه را انجام می‌دهد
-	     * 
-	     * یک دریچه محاوره‌ای باز می‌شود تا کاربر بتواند تنظیم‌های متفاوت
-	     * مربوط به این صفحه را انجام دهد.
-	     */
-	    function settings() {
-		return $settings.load({
-		    wbModel : scope.wbModel,
-		    wbParent : scope.wbParent
-		});
-	    }
-
 	    scope.removeChild = removeChild;
+	    scope.remove = remove;
 	    scope.settings = settings;
 	    scope.dropCallback = dropCallback;
 	    scope.newWidget = newWidget;
+
+	    if (!angular.isArray(scope.wbModel.contents)) {
+		scope.wbModel.contents = [];
+		return;
+	    }
+	    var anchor = getAnchor();
+	    scope.wbModel.contents.forEach(function(item) {
+		addWidget(anchor, item);
+	    });
 	}
     };
 });//

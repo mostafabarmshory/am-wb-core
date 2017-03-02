@@ -35,6 +35,9 @@ angular.module('ngMaterialWeburger')
 		if(!style){
 		    return;
 		}
+		if(!style.margin){
+		    style.margin ={};
+		}
 		element.css({
 	            'margin-left':(style.margin.isUniform) ? style.margin.uniform : style.margin.left,
 	            'margin-right':(style.margin.isUniform) ? style.margin.uniform : style.margin.right,

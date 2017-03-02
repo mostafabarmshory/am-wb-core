@@ -35,6 +35,9 @@ angular.module('ngMaterialWeburger')
 		if(!style){
 		    return;
 		}
+		if(!style.padding){
+		    style.padding ={};
+		}
 		element.css({
 	            'padding-left':(style.padding.isUniform) ? style.padding.uniform : style.padding.left,
 	            'padding-right':(style.padding.isUniform) ? style.padding.uniform : style.padding.right,
