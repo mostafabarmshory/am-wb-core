@@ -32,8 +32,6 @@
     <!-- endbuild -->
 </head>
 <body>
-<ng-md-icon icon="send"></ng-md-icon>
-
 <div
         layout="row"
         layout-fill>
@@ -45,18 +43,18 @@
                     ng-class="{'md-primary' : editable}"
                     class="wb-group-button left"
                     ng-click="editable=!editable">
-                <md-icon>edit</md-icon>
+                <wb-icon>edit</wb-icon>
             </md-button>
             <md-button
                     ng-class="{'md-primary' : showContent}"
                     class="wb-group-button middle"
                     ng-click="showContent=!showContent">
-                <ng-md-icon>content_copy</ng-md-icon>
+                <wb-icon>content_copy</wb-icon>
             </md-button>
             <md-button
                     class="wb-group-button right"
                     ng-click="cs()">
-                <md-icon>insert_photo</md-icon>
+                <wb-icon>insert_photo</wb-icon>
             </md-button>
         </section>
         <textarea ng-show="showContent">{{model}}</textarea>
@@ -118,9 +116,13 @@
 <script src="scripts/directives/wb-content.js"></script>
 <script src="scripts/directives/wb-panel.js"></script>
 <script src="scripts/directives/wb-widget.js"></script>
+
 <script src="scripts/directives/wb-infinateScroll.js"></script>
+<script src="scripts/directives/wb-icon.js"></script>
+
 <script src="scripts/directives/wb-setting-panel-group.js"></script>
 <script src="scripts/directives/wb-setting-panel.js"></script>
+
 <script src="scripts/directives/wb-ui-choose.js"></script>
 <script src="scripts/directives/wb-ui-setting-choose.js"></script>
 <script src="scripts/directives/wb-ui-setting-on-off-switch.js"></script>
