@@ -27,17 +27,17 @@ angular.module('ngMaterialWeburger')
 
 /**
  */
-.directive('wbIcon', function() {
+.directive('wbIcon', function($interpolate) {
     return {
 	restrict : 'E',
-	template : '<ng-md-icon icon="{{transcluded_content}}"></ng-md-icon>',
+	template : '<ng-md-icon icon="{{transcludedContent}}"></ng-md-icon>',
 	replace : true,
 	transclude : true,
 	compile : function compile(tElement, tAttrs, transclude) {
 	    return {
 		pre : function(scope) {
 		    transclude(scope, function(clone) {
-			scope.transcluded_content = clone[0].textContent;
+			scope.transcludedContent = $interpolate(clone[0].nodeValue)(scope);
 		    });
 		}
 	    }
