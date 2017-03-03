@@ -41,5 +41,6 @@ angular
         //'ngMaterialWysiwyg',
         'ui.tinymce', //
         'dndLists',//
-            'material.components.expansionPanels'
+        'material.components.expansionPanels',//
+        'ngMdIcons' // Material icons
     ]);

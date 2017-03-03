@@ -41,7 +41,8 @@ angular
         //'ngMaterialWysiwyg',
         'ui.tinymce', //
         'dndLists',//
-            'material.components.expansionPanels'
+        'material.components.expansionPanels',//
+        'ngMdIcons' // Material icons
     ]);
 
 /* 
@@ -2524,7 +2525,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-panel.html',
-    "cd <div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=remove() ng-class=\"{'wb-panel': wbEditable}\" name={{wbModel.name}}>  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> {{wbModel.name}}</span> <span flex></span> <md-button ng-click=newWidget(wbModel) class=\"wb-icon-button md-mini\"> <wb-icon class=wb-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=settings() class=\"wb-icon-button md-mini\"> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button class=\"wb-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=remove()> <wb-icon class=wb-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=wb-panel-overlay> </div>  <div class=wb-panel-container wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div>  </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=remove() ng-class=\"{'wb-panel': wbEditable}\" name={{wbModel.name}}>  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> {{wbModel.name}}</span> <span flex></span> <md-button ng-click=newWidget(wbModel) class=\"wb-icon-button md-mini\"> <wb-icon class=wb-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=settings() class=\"wb-icon-button md-mini\"> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button class=\"wb-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=remove()> <wb-icon class=wb-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=wb-panel-overlay> </div>  <div class=wb-panel-container wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div>  </div> </div>"
   );
 
 
