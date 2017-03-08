@@ -1,7 +1,7 @@
 .wb-setting-panel{
     padding: 0px;
 }
-.wb-setting-panel md-icon{
+.wb-setting-panel wb-icon{
     margin-right: 8px !important;
     margin-top: 0px;
     margin-bottom:0px ;
