@@ -15,16 +15,16 @@
 		<md-button 
 			ng-if="add"
 			ng-click="add()" 
-			class="wb-icon-button md-mini">
+			class="md-icon-button md-mini">
 		<wb-icon class="mde-icon-mini">add_circle</wb-icon> 
 		</md-button>
 		<md-button 
 			ng-click="settings()"
-			 class="wb-icon-button md-mini">
-		<wb-icon class="mde-icon-mini">settings</wb-icon> 
+			 class="md-icon-button md-mini">
+			<wb-icon class="mde-icon-mini">settings</wb-icon> 
 		</md-button>
 		<md-button 
-			class="wb-icon-button md-mini" 
+			class="md-icon-button md-mini" 
 			ng-click="remove()"
 			ng-show="remove"
             ng-mouseenter="ctrl.hoveringDelBtn=true"
@@ -38,7 +38,7 @@
 			scope.
 		 -->
 		<md-button 
-			class="wb-icon-button md-mini" 
+			class="md-icon-button md-mini" 
 			ng-repeat="item in extraActions"
 			ng-click="item.action()"> 
 			<wb-icon class="mde-icon-mini">{{item.icon}}</wb-icon>
