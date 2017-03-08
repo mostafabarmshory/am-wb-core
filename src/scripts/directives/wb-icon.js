@@ -31,7 +31,7 @@ angular.module('ngMaterialWeburger')
     return {
 	restrict : 'E',
 	template : '<ng-md-icon icon="{{transcludedContent}}"></ng-md-icon>',
-	replace : true,
+	replace : false,
 	transclude : true,
 	compile : function compile(tElement, tAttrs, transclude) {
 	    return {
