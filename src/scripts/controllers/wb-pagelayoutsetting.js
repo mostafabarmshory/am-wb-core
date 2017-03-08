@@ -36,11 +36,11 @@ angular
 
         scope.flexDirection = [{
             title: 'row',
-            icon: 'view_column',
+            icon: 'wb-vertical-boxes',
             value: 'wb-flex-row'
         }, {
             title: 'column',
-            icon: 'view_stream',
+            icon: 'wb-horizontal-boxes',
             value: 'wb-flex-column'
         }];
 
