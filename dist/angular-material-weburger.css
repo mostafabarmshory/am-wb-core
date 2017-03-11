@@ -184,7 +184,7 @@ Rules for sizing the icon.
 .wb-setting-panel{
     padding: 0px;
 }
-.wb-setting-panel md-icon{
+.wb-setting-panel wb-icon{
     margin-right: 8px !important;
     margin-top: 0px;
     margin-bottom:0px ;
@@ -229,7 +229,7 @@ Rules for align
 .wb-icon-mini {
 	padding: 0px;
 	margin: 0px;
-	font-size: 1.25rem;
+	font-size: 1rem;
 	line-height: 1rem;
 	min-height: 1rem;
 }
@@ -377,7 +377,7 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
     margin-bottom: 1px;
 }
 
-.wb-tab-as-choose-button md-icon {
+.wb-tab-as-choose-button wb-icon {
  margin-right: 0px !important;
 }
 
