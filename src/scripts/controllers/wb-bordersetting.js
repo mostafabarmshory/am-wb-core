@@ -29,38 +29,51 @@ angular.module('ngMaterialWeburger')
  * @name WbBorderSettingCtrl
  * @description # WbBorderSettingCtrl Controller of the ngMaterialWeburger
  */
-.controller('WbBorderSettingCtrl', function($scope) {
-    var scope = $scope;
+.controller(
+	'WbBorderSettingCtrl',
+	function($scope) {
+	    var scope = $scope;
+	    if (!$scope.wbModel.style) {
+		$scope.wbModel.style = {
 
-	if($scope.wbModel.style.borderColor.bottom==null || $scope.wbModel.style.borderColor.bottom==undefined)
-		$scope.wbModel.style.borderColor.bottom='none';
+		};
+	    }
+	    if (!$scope.wbModel.style.borderColor) {
+		$scope.wbModel.style.borderColor = {
+		    bottom : 'none'
+		};
+	    }
+	    if ($scope.wbModel.style.borderColor.bottom == null
+		    || $scope.wbModel.style.borderColor.bottom == undefined) {
+		$scope.wbModel.style.borderColor.bottom = 'none';
+	    }
 
-	scope.styles = [ {
-	title : 'No Border',
-	value : 'none'
-    }, {
-	title : 'Solid',
-	value : 'solid'
-    }, {
-	title : 'Dotted',
-	value : 'dotted'
-    }, {
-	title : 'Dashed',
-	value : 'dashed'
-    }, {
-	title : 'Double',
-	value : 'double'
-    }, {
-	title : 'Groove',
-	value : 'groove'
-    }, {
-	title : 'Ridge',
-	value : 'ridge'
-    }, {
-	title : 'Inset',
-	value : 'inset'
-    }, {
-	title : 'Outset',
-	value : 'outset'
-    } ];
-});
+	    scope.styles = [ {
+		title : 'No Border',
+		value : 'none'
+	    }, {
+		title : 'Solid',
+		value : 'solid'
+	    }, {
+		title : 'Dotted',
+		value : 'dotted'
+	    }, {
+		title : 'Dashed',
+		value : 'dashed'
+	    }, {
+		title : 'Double',
+		value : 'double'
+	    }, {
+		title : 'Groove',
+		value : 'groove'
+	    }, {
+		title : 'Ridge',
+		value : 'ridge'
+	    }, {
+		title : 'Inset',
+		value : 'inset'
+	    }, {
+		title : 'Outset',
+		value : 'outset'
+	    } ];
+	});

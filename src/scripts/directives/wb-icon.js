@@ -33,14 +33,32 @@ angular.module('ngMaterialWeburger')
 	template : '<ng-md-icon icon="{{transcludedContent}}"></ng-md-icon>',
 	replace : false,
 	transclude : true,
-	compile : function compile(tElement, tAttrs, transclude) {
-	    return {
-		pre : function(scope) {
-		    transclude(scope, function(clone) {
-			scope.transcludedContent = $interpolate(clone[0].nodeValue)(scope);
-		    });
-		}
-	    }
-	}
+//	'compile' : compile,
+	'link': link
     };
+
+    function link(scope, element, attr) {
+	//Looking for icon
+	if ( attr['icon'] ){
+	    attr.$observe('icon', iconChange);
+	}
+	
+	function iconChange(){
+	    scope.transcludedContent = attr['icon'];
+	}
+    }
+
+    function compile(tElement, tAttrs, transclude) {
+//	return {
+//	    pre : function(scope) {
+//		transclude(scope, function(clone) {
+//		    if(clone[0]){
+////			console.log(tAttrs);
+//			scope.transcludedContent = $interpolate(clone[0].nodeValue)(scope);
+//		    }
+//		});
+//	    }
+//	}
+	var txt = tElement.text();
+    }
 });
