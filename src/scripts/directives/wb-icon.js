@@ -30,35 +30,35 @@ angular.module('ngMaterialWeburger')
 .directive('wbIcon', function($interpolate) {
     return {
 	restrict : 'E',
-	template : '<ng-md-icon icon="{{transcludedContent}}"></ng-md-icon>',
-	replace : false,
+	template : '<ng-md-icon icon="{{iconValue}}"></ng-md-icon>',
+	replace : true,
 	transclude : true,
-//	'compile' : compile,
-	'link': link
+	link : postLink
     };
 
-    function link(scope, element, attr) {
-	//Looking for icon
-	if ( attr['icon'] ){
-	    attr.$observe('icon', iconChange);
+    function postLink(scope, element, attr, ctrl, transclude) {
+	// Looking for icon
+	var attrName = attr.$normalize(attr.$attr.wbIconName || '');
+	var contentValue = null;
+
+	transclude(scope, function(clone) {
+	    var text = clone.text();
+	    if (text && text.trim()) {
+		contentValue = $interpolate(text.trim())(scope);
+		scope.iconValue = contentValue;
+	    }
+	});
+
+	if (attrName) {
+	    attr.$observe('wbIconName', iconChange);
 	}
-	
-	function iconChange(){
-	    scope.transcludedContent = attr['icon'];
+
+	/*
+	 * change icon
+	 */
+	function iconChange() {
+	    scope.iconValue = scope.contentValue || attr.wbIconName || '';
 	}
     }
 
-    function compile(tElement, tAttrs, transclude) {
-//	return {
-//	    pre : function(scope) {
-//		transclude(scope, function(clone) {
-//		    if(clone[0]){
-////			console.log(tAttrs);
-//			scope.transcludedContent = $interpolate(clone[0].nodeValue)(scope);
-//		    }
-//		});
-//	    }
-//	}
-	var txt = tElement.text();
-    }
 });
