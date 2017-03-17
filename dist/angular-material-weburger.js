@@ -95,41 +95,54 @@ angular.module('ngMaterialWeburger')
  * @name WbBorderSettingCtrl
  * @description # WbBorderSettingCtrl Controller of the ngMaterialWeburger
  */
-.controller('WbBorderSettingCtrl', function($scope) {
-    var scope = $scope;
+.controller(
+	'WbBorderSettingCtrl',
+	function($scope) {
+	    var scope = $scope;
+	    if (!$scope.wbModel.style) {
+		$scope.wbModel.style = {
 
-	if($scope.wbModel.style.borderColor.bottom==null || $scope.wbModel.style.borderColor.bottom==undefined)
-		$scope.wbModel.style.borderColor.bottom='none';
+		};
+	    }
+	    if (!$scope.wbModel.style.borderColor) {
+		$scope.wbModel.style.borderColor = {
+		    bottom : 'none'
+		};
+	    }
+	    if ($scope.wbModel.style.borderColor.bottom == null
+		    || $scope.wbModel.style.borderColor.bottom == undefined) {
+		$scope.wbModel.style.borderColor.bottom = 'none';
+	    }
 
-	scope.styles = [ {
-	title : 'No Border',
-	value : 'none'
-    }, {
-	title : 'Solid',
-	value : 'solid'
-    }, {
-	title : 'Dotted',
-	value : 'dotted'
-    }, {
-	title : 'Dashed',
-	value : 'dashed'
-    }, {
-	title : 'Double',
-	value : 'double'
-    }, {
-	title : 'Groove',
-	value : 'groove'
-    }, {
-	title : 'Ridge',
-	value : 'ridge'
-    }, {
-	title : 'Inset',
-	value : 'inset'
-    }, {
-	title : 'Outset',
-	value : 'outset'
-    } ];
-});
+	    scope.styles = [ {
+		title : 'No Border',
+		value : 'none'
+	    }, {
+		title : 'Solid',
+		value : 'solid'
+	    }, {
+		title : 'Dotted',
+		value : 'dotted'
+	    }, {
+		title : 'Dashed',
+		value : 'dashed'
+	    }, {
+		title : 'Double',
+		value : 'double'
+	    }, {
+		title : 'Groove',
+		value : 'groove'
+	    }, {
+		title : 'Ridge',
+		value : 'ridge'
+	    }, {
+		title : 'Inset',
+		value : 'inset'
+	    }, {
+		title : 'Outset',
+		value : 'outset'
+	    } ];
+	});
 
 /* 
  * The MIT License (MIT)
@@ -1146,19 +1159,37 @@ angular.module('ngMaterialWeburger')
 .directive('wbIcon', function($interpolate) {
     return {
 	restrict : 'E',
-	template : '<ng-md-icon icon="{{transcludedContent}}"></ng-md-icon>',
-	replace : false,
+	template : '<ng-md-icon icon="{{iconValue}}"></ng-md-icon>',
+	replace : true,
 	transclude : true,
-	compile : function compile(tElement, tAttrs, transclude) {
-	    return {
-		pre : function(scope) {
-		    transclude(scope, function(clone) {
-			scope.transcludedContent = $interpolate(clone[0].nodeValue)(scope);
-		    });
-		}
-	    }
-	}
+	link : postLink
     };
+
+    function postLink(scope, element, attr, ctrl, transclude) {
+	// Looking for icon
+	var attrName = attr.$normalize(attr.$attr.wbIconName || '');
+	var contentValue = null;
+
+	transclude(scope, function(clone) {
+	    var text = clone.text();
+	    if (text && text.trim()) {
+		contentValue = $interpolate(text.trim())(scope);
+		scope.iconValue = contentValue;
+	    }
+	});
+
+	if (attrName) {
+	    attr.$observe('wbIconName', iconChange);
+	}
+
+	/*
+	 * change icon
+	 */
+	function iconChange() {
+	    scope.iconValue = scope.contentValue || attr.wbIconName || '';
+	}
+    }
+
 });
 
 /* 
@@ -2244,73 +2275,53 @@ angular
 		target.empty();
 
 		// 3- load pages
-		$widget
-		.widget(models.wbModel)
-		//
-		.then(
-			function(w) {
-			    widget = w;
-			    if (angular.isArray(widget.setting)) {
-				angular
-				.forEach(
-					widget.setting,
-					function(type) {
-					    var page = notFound;
-					    if (type in settingPages) {
-						page = settingPages[type];
-					    }
-					    var template = getTemplateFor(page);
-					    if (angular
-						    .isDefined(template)) {
-						var job = template
-						//
-						.then(function(
-							templateSrc) {
-						    templateSrc = _encapsulateSettingPanel(
-							    page,
-							    templateSrc);
-						    var element = angular
-						    .element(templateSrc);
-						    if (angular
-							    .isDefined(page.controller)) {
-							$controller(
-								page.controller,
-								{
-								    $scope : scope,
-								    $element : element,
-								});
-						    }
-						    $compile(
-							    element)
-							    (
-								    scope);
-						    pages
-						    .push(element);
-						});
-						jobs
-						.push(job);
-					    }
-					});
-			    } else {
-				// TODO: maso, 2017: not setting
-				// page founnd
+		$widget.widget(models.wbModel)//
+		.then(function(w) {
+		    widget = w;
+		    if (angular.isArray(widget.setting)) {
+			angular
+			.forEach(widget.setting, function(type) {
+			    var page = notFound;
+			    if (type in settingPages) {
+				page = settingPages[type];
 			    }
-			})
-			//
-			.then(
-				function() {
-				    $q.all(jobs).then(
-					    function() {
-						angular
-						.forEach(
-							pages,
-							function(
-								element) {
-							    target
-							    .append(element);
-							});
-					    });
+			    var template = getTemplateFor(page);
+			    if (angular.isDefined(template)) {
+				var job = template.then(function(templateSrc) {
+				    templateSrc = _encapsulateSettingPanel(page, templateSrc);
+				    var element = angular.element(templateSrc);
+				    if (angular.isDefined(page.controller)) {
+					$controller(page.controller,{
+					    $scope : scope,
+					    $element : element,
+					});
+				    }
+				    $compile(element)(scope);
+				    element.attr('label', page.lable);
+				    pages.push(element);
 				});
+				jobs.push(job);
+			    }
+			});
+		    } else {
+			// TODO: maso, 2017: not setting
+			// page founnd
+		    }
+		})//
+		.then(function() {
+		    $q.all(jobs).then(function() {
+			pages.sort(function(a, b) {
+			    if (a.attr('label') < b.attr('label'))
+				return -1;
+			    if (a.attr('label') > b.attr('label'))
+				return 1;
+			    return 0;
+			});
+			angular.forEach(pages, function(element) {
+			    target.append(element);
+			});
+		    });
+		});
 	    }
 
 	    // تعیین سرویس‌ها
@@ -2564,7 +2575,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-ui-setting-choose.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\" icon=icon></wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <wb-ui-choose flex=100 items=items selected></wb-ui-choose> </md-list-item>"
+    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\" wb-icon-name={{icon}}> </wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <wb-ui-choose flex=100 items=items selected> </wb-ui-choose> </md-list-item>"
   );
 
 

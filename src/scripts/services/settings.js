@@ -158,73 +158,53 @@ angular
 		target.empty();
 
 		// 3- load pages
-		$widget
-		.widget(models.wbModel)
-		//
-		.then(
-			function(w) {
-			    widget = w;
-			    if (angular.isArray(widget.setting)) {
-				angular
-				.forEach(
-					widget.setting,
-					function(type) {
-					    var page = notFound;
-					    if (type in settingPages) {
-						page = settingPages[type];
-					    }
-					    var template = getTemplateFor(page);
-					    if (angular
-						    .isDefined(template)) {
-						var job = template
-						//
-						.then(function(
-							templateSrc) {
-						    templateSrc = _encapsulateSettingPanel(
-							    page,
-							    templateSrc);
-						    var element = angular
-						    .element(templateSrc);
-						    if (angular
-							    .isDefined(page.controller)) {
-							$controller(
-								page.controller,
-								{
-								    $scope : scope,
-								    $element : element,
-								});
-						    }
-						    $compile(
-							    element)
-							    (
-								    scope);
-						    pages
-						    .push(element);
-						});
-						jobs
-						.push(job);
-					    }
-					});
-			    } else {
-				// TODO: maso, 2017: not setting
-				// page founnd
+		$widget.widget(models.wbModel)//
+		.then(function(w) {
+		    widget = w;
+		    if (angular.isArray(widget.setting)) {
+			angular
+			.forEach(widget.setting, function(type) {
+			    var page = notFound;
+			    if (type in settingPages) {
+				page = settingPages[type];
 			    }
-			})
-			//
-			.then(
-				function() {
-				    $q.all(jobs).then(
-					    function() {
-						angular
-						.forEach(
-							pages,
-							function(
-								element) {
-							    target
-							    .append(element);
-							});
-					    });
+			    var template = getTemplateFor(page);
+			    if (angular.isDefined(template)) {
+				var job = template.then(function(templateSrc) {
+				    templateSrc = _encapsulateSettingPanel(page, templateSrc);
+				    var element = angular.element(templateSrc);
+				    if (angular.isDefined(page.controller)) {
+					$controller(page.controller,{
+					    $scope : scope,
+					    $element : element,
+					});
+				    }
+				    $compile(element)(scope);
+				    element.attr('label', page.lable);
+				    pages.push(element);
 				});
+				jobs.push(job);
+			    }
+			});
+		    } else {
+			// TODO: maso, 2017: not setting
+			// page founnd
+		    }
+		})//
+		.then(function() {
+		    $q.all(jobs).then(function() {
+			pages.sort(function(a, b) {
+			    if (a.attr('label') < b.attr('label'))
+				return -1;
+			    if (a.attr('label') > b.attr('label'))
+				return 1;
+			    return 0;
+			});
+			angular.forEach(pages, function(element) {
+			    target.append(element);
+			});
+		    });
+		});
 	    }
 
 	    // تعیین سرویس‌ها
