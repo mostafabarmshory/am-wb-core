@@ -1,0 +1,33 @@
+<!--<div -->
+<!--class="wb-widget" -->
+<!--layout="column">-->
+<!--<ng-transclude></ng-transclude>-->
+<!--</div>-->
+
+<md-expansion-panel>
+
+    <md-expansion-panel-collapsed>
+<!--    	<md-icon ng-show="icon">{{icon}}</md-icon>
+        <div class="md-title">{{label}}</div>
+        <div class="md-summary" ng-show="description">{{description}}</div>-->
+        <div class="md-title">{{label}}</div>
+        <div class="md-summary"></div>
+        <md-expansion-panel-icon></md-expansion-panel-icon>
+    </md-expansion-panel-collapsed>
+
+    <md-expansion-panel-expanded>
+
+        <md-expansion-panel-header>
+            <div class="md-title">{{label}}</div>
+            <div class="md-summary"></div>
+            <md-expansion-panel-icon ng-click="$panel.collapse()"></md-expansion-panel-icon>
+        </md-expansion-panel-header>
+
+        <md-expansion-panel-content style="padding: 0px;">
+
+            <ng-transclude></ng-transclude>
+
+        </md-expansion-panel-content>
+    </md-expansion-panel-expanded>
+
+</md-expansion-panel>

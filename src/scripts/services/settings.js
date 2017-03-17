@@ -1,9 +1,30 @@
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular
+.module('ngMaterialWeburger')
 
 /**
  * @ngdoc service
@@ -13,98 +34,182 @@ angular.module('ngMaterialWeburger')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$settings', function($mdDialog) {
+.service(
+	'$settings',
+	function($rootScope, $controller, $widget, $q, $sce, $compile,
+		$document, $templateRequest) {
+	    var WB_SETTING_PANEL_ID = 'WB-SETTING-PANEL';
+	    /**
+	     * Setting page storage
+	     * 
+	     */
+	    var settingPages = {};
+	    var notFound = {
+		    label : 'Settings not found',
+		    templateUrl : 'views/settings/wb-notfound.html'
+	    };
 
-    var settingPages = {
-	notFound : {
-	    label : 'Settings not found',
-	    page : 'views/settings/wb-notfound.html'
-	},
-	general : {
-	    label : 'general',
-	    page : 'views/settings/wb-general.html'
-	},
-	background : {
-	    label : 'background',
-	    page : 'views/settings/wb-background.html'
-	},
-	text : {
-	    label : 'Frontend text',
-	    page : 'views/settings/wb-text.html'
-	},
-	description : {
-	    label : 'Description',
-	    page : 'views/settings/wb-description.html'
-	},
-	layout : {
-	    label : 'Layout',
-	    page : 'views/settings/wb-layout.html'
-	},
-	border : {
-	    label : 'Border',
-	    page : 'views/settings/wb-border.html'
-	},
-	pageLayout : {
-	    label : 'Page Layout',
-	    page : 'views/settings/wb-layout-page.html'
-	},
-	selfLayout : {
-	    label : 'Self Layout',
-	    page : 'views/settings/wb-layout-self.html'
-	},
-	marginPadding : {
-	    label : 'Margin/Padding',
-	    page : 'views/settings/wb-margin-padding.html'
-	},
-	minMaxSize : {
-	    label : 'Min/Max',
-	    page : 'views/settings/wb-min-max-size.html'
-	}
-    };
+	    var oldScope;
 
-    /**
-     * توصیف ویجت معادل با مدل داده‌ای را تعیین می‌کند
-     * 
-     * این کار بر اساس خصوصیت نوع در مدل داده‌ای تعیین می‌شود و در صورتیکه ویجتی
-     * برای آو موجود نباشد، ویجت پیشفرض به عنوان نتیجه برگردانده می‌وشد.
-     * 
-     * @param model
-     * @returns
-     */
-    function page(settingId) {
-	var widget = settingPages.notFound;
-	if (settingId in settingPages) {
-	    widget = settingPages[settingId];
-	}
-	return widget;
-    }
+	    /**
+	     * Fetchs a setting page.
+	     * 
+	     * @param model
+	     * @returns
+	     */
+	    function page(type) {
+		var widget = notFound;
+		if (type in settingPages) {
+		    widget = settingPages[type];
+		}
+		return widget;
+	    }
 
-    /**
-     * فهرست تمام ویجت‌ها را تعیین می‌کند.
-     * 
-     * @returns
-     */
-    function addPage(settingId, page) {
-	settingPages[settingId] = page;
-    }
+	    /**
+	     * Adds new setting page.
+	     * 
+	     * @returns
+	     */
+	    function newPage(page) {
+		settingPages[page.type] = page;
+	    }
 
-    /**
-     * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-     * 
-     * @returns
-     */
-    function loadSetting(locals) {
-	return $mdDialog.show({
-	    controller : 'WbSettingDialogsCtrl',
-	    templateUrl : 'views/dialogs/wb-settings.html',
-	    parent : angular.element(document.body),
-	    clickOutsideToClose : true,
-	    fullscreen : true,
-	    locals : locals
+	    /**
+	     * Finds and lists all setting pages.
+	     * 
+	     * @returns
+	     */
+	    function pages() {
+		// TODO: maso, 1395:
+	    }
+
+	    /*
+	     * get setting page template
+	     */
+	    function getTemplateFor(page) {
+		var template, templateUrl;
+		if (angular.isDefined(template = page.template)) {
+		    if (angular.isFunction(template)) {
+			template = template(page.params);
+		    }
+		} else if (angular
+			.isDefined(templateUrl = page.templateUrl)) {
+		    if (angular.isFunction(templateUrl)) {
+			templateUrl = templateUrl(page.params);
+		    }
+		    if (angular.isDefined(templateUrl)) {
+			page.loadedTemplateUrl = $sce
+			.valueOf(templateUrl);
+			template = $templateRequest(templateUrl);
+		    }
+		}
+		return template;
+	    }
+
+	    /**
+	     * encapsulate template srce with panel widget template.
+	     * 
+	     * @param page
+	     *                setting page config
+	     * @param tempateSrc
+	     *                setting page html template
+	     * @returns encapsulate html template
+	     */
+	    function _encapsulateSettingPanel(page, templateSrc) {
+		// TODO: maso, 2017: pass all paramter to the setting
+		// panel.
+		var attr = ' ';
+		if (page.label) {
+		    attr += ' label=\"' + page.label + '\"';
+		}
+		if (page.icon) {
+		    attr += ' icon=\"' + page.icon + '\"';
+		}
+		if (page.description) {
+		    attr += ' description=\"' + page.description + '\"';
+		}
+		return '<wb-setting-panel ' + attr + '>' + templateSrc
+		+ '</wb-setting-panel>';
+	    }
+
+	    /**
+	     * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+	     * 
+	     * @returns
+	     */
+	    function loadSetting(models) {
+		var widget = null;
+		var jobs = [];
+		var pages = [];
+
+		// 0- destroy old resource
+		if (angular.isDefined(oldScope)) {
+		    oldScope.$destroy();
+		}
+		var scope = $rootScope.$new(true, $rootScope);
+		scope.wbModel = models.wbModel;
+		scope.wbParent = models.wbParent;
+		oldScope = scope;
+
+		// 1- Find element
+		var target = $document.find('#' + WB_SETTING_PANEL_ID);
+
+		// 2- Clear childrens
+		target.empty();
+
+		// 3- load pages
+		$widget.widget(models.wbModel)//
+		.then(function(w) {
+		    widget = w;
+		    if (angular.isArray(widget.setting)) {
+			angular
+			.forEach(widget.setting, function(type) {
+			    var page = notFound;
+			    if (type in settingPages) {
+				page = settingPages[type];
+			    }
+			    var template = getTemplateFor(page);
+			    if (angular.isDefined(template)) {
+				var job = template.then(function(templateSrc) {
+				    templateSrc = _encapsulateSettingPanel(page, templateSrc);
+				    var element = angular.element(templateSrc);
+				    if (angular.isDefined(page.controller)) {
+					$controller(page.controller,{
+					    $scope : scope,
+					    $element : element,
+					});
+				    }
+				    $compile(element)(scope);
+				    element.attr('label', page.lable);
+				    pages.push(element);
+				});
+				jobs.push(job);
+			    }
+			});
+		    } else {
+			// TODO: maso, 2017: not setting
+			// page founnd
+		    }
+		})//
+		.then(function() {
+		    $q.all(jobs).then(function() {
+			pages.sort(function(a, b) {
+			    if (a.attr('label') < b.attr('label'))
+				return -1;
+			    if (a.attr('label') > b.attr('label'))
+				return 1;
+			    return 0;
+			});
+			angular.forEach(pages, function(element) {
+			    target.append(element);
+			});
+		    });
+		});
+	    }
+
+	    // تعیین سرویس‌ها
+	    this.WB_SETTING_PANEL_ID = WB_SETTING_PANEL_ID;
+	    this.page = page;
+	    this.load = loadSetting;
+	    this.newPage = newPage;
 	});
-    }
-    // تعیین سرویس‌ها
-    this.page = page;
-    this.load = loadSetting;
-    this.newPage = addPage;
-});

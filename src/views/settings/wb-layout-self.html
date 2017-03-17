@@ -1,73 +1,27 @@
 <!-- Created by mgh on 8/10/2016. -->
 <!--
-خصوصیت طرح‌‌ریزی یک آیتم در صفحه
-
-این خصوصیت نشان می‌دهد یک آیتم چگونه در فضای پدر خود قرار بگیرد. سمت چپ، سمت راست، وسط و یا همه پدر را در برگیرد. خصوصیت زیر توسط این صفحه تنظیم می‌شود.
+override flex option for a specific item
 
 - flexAlignItem
 - flexItemBasis
- -->
 
-<div layout="column">
+Completely rewrite by mgh on 2/25/17.
+-->
 
-    <!--Preview Box-->
-    <!--TODO: mgh, 1395: good candidate for a directive, like: ng-previewbox items={"1","2","3"} -->
-    <div class="preview-box wb-flex-item-stretch">
-        <div class="header">Preview</div>
-        <div class="preview-area"
-             ng-class="[wbParent.wbModel.style.flexDirection,wbParent.wbModel.style.justifyContent, wbParent.wbModel.style.alignItems]"
-             style="display: flex">
-            <div class="widget" layout="row" layout-align="center center"><p>before</p></div>
-            <div class="widget" ng-class="wbModel.style.flexAlignItem"
-                 ng-style="{'flex-grow':wbModel.style.flexItemGrow,'-webkit-flex-grow':wbModel.style.flexItemGrow}" layout="row" layout-align="center center"
-                 style="border: 2px dotted"><p>
-                item</p></div>
-            <div class="widget" layout="row" layout-align="center center"><p>after</p></div>
-        </div>
-    </div>
+<md-list class="wb-setting-panel">
 
-    <div class="setting-panel"
-         layout="column" layout-align="none none"
-         layout-gt-sm="row" layout-align-gt-sm="space-around none"
-         ng-controller="WbSelfLayoutWbSettingsCtrl">
+    <!-- Align Items -->
+    <wb-ui-setting-choose title="{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}"
+                          icon="{{(wbModel.style.flexDirection!='wb-flex-row')?'swap_vert':'swap_horiz'}}"
+                          items="flexAlignItem" value="wbModel.style.flexAlignItem"></wb-ui-setting-choose>
 
-        <!-- Align setting -->
-        <md-list>
-            <md-subheader ng-show="wbModel.style.flexDirection!='wb-flex-row'">Vertical Setting</md-subheader>
-            <md-subheader ng-show="wbModel.style.flexDirection=='wb-flex-row'">Horizontal Setting</md-subheader>
-            <md-divider style="margin-bottom: 1em "></md-divider>
-            <md-radio-group
-                    ng-model="wbModel.style.flexAlignItem"
-                    role="radiogroup">
-                <md-list-item ng-repeat="direction in flexAlignItem">
-                    <md-radio-button
-                            value="{{direction.value}}">
-                        <md-icon>{{direction.icon}}</md-icon>
-                        {{direction.title |translate}}
-                    </md-radio-button>
-                </md-list-item>
-            </md-radio-group>
-        </md-list>
+    <!-- Weight -->
+    <!-- enable/disable weight checkbox -->
+    <wb-ui-setting-on-off-switch title="Fill Space?" icon="border_all"
+                                 value="wbModel.style.flexItemGrowEnabled"></wb-ui-setting-on-off-switch>
 
-        <!-- Size Slider -->
-        <md-list>
-            <md-subheader>Fill Extra Space</md-subheader>
-            <md-divider style="margin-bottom: 1em "></md-divider>
-            <div layout="column" style="margin-left: 14px; margin-right: 14px; min-width: 200px">
-                <md-checkbox ng-model="wbModel.style.flexItemGrowEnabled" style="margin-bottom: 2em ">Enabled</md-checkbox>
+    <!-- weight number -->
+    <wb-ui-setting-number slider=""  ng-show="wbModel.style.flexItemGrowEnabled" title="Weight" icon="face"
+                          value="wbModel.style.flexItemGrow"></wb-ui-setting-number>
 
-                <div layout="row" class="wb-flex-align-items-center" ng-disabled="!wbModel.style.flexItemGrowEnabled">
-                    <span>Weight</span>
-                    <md-slider ng-disabled="!wbModel.style.flexItemGrowEnabled" flex min="0" max="10" step="1" ng-model="wbModel.style.flexItemGrow">
-                    </md-slider>
-                    <md-input-container>
-                        <input ng-disabled="!wbModel.style.flexItemGrowEnabled" style="width: 50px" flex type="number" ng-model="wbModel.style.flexItemGrow">
-                    </md-input-container>
-                </div>
-
-            </div>
-        </md-list>
-
-    </div>
-
-</div>
+</md-list>

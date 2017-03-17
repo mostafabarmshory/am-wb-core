@@ -1,0 +1,84 @@
+
+/**************************************************************************************
+Hierarchical structure
+
+A widget is wraped in several dive to instruct a view. Here is the hierarchial structure
+of a widget:
+
+-> widget
+  -> widget header
+  -> widget body
+    -> widget overlay
+    -> widget container
+***************************************************************************************/
+.wb-widget {
+	margin: 2px;
+	border: 1px dashed #8f9494;
+}
+
+.wb-widget-header {
+	background-color: rgba(120, 120, 120, 0.2);
+	background-image: repeating-linear-gradient(315deg, transparent, transparent 12px, rgba(255
+		, 255, 255, .5) 12px, rgba(255, 255, 255, .5) 24px);
+	color: black;
+	padding: 0px;
+	border: none;
+	border-bottom: 1px dashed #8f9494;
+}
+
+.wb-widget-body {
+	position: relative;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.wb-widget-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 9999;
+	color: white;
+	background: radial-gradient(black 15%, transparent 16%) 0 0,
+		radial-gradient(black 15%, transparent 16%) 8px 8px,
+		radial-gradient(rgba(255, 255, 255, .1) 15%, transparent 20%) 0 1px,
+		radial-gradient(rgba(255, 255, 255, .1) 15%, transparent 20%) 8px 9px;
+	background-color: #282828;
+	background-size: 12px 12px;
+}
+
+.wb-widget-container {
+	position: relative;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+
+/**************************************************************************************
+Drag and drap 
+
+See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
+***************************************************************************************/
+/*
+ * This class will be added to the element while the element is being dragged. 
+ * It will affect both the element you see while dragging and the source 
+ * element that stays at it's position. Do not try to hide the source element
+ * with this class, because that will abort the drag operation.
+*/
+.dndDragging {
+	background: #c8dadf !important;
+}
+
+/*
+ * This class will be added to the element after the drag operation was started, 
+ * meaning it only affects the original element that is still at it's source 
+ * position, and not the "element" that the user is dragging with his mouse pointer
+ */
+.dndDraggingSource {
+    display: none;
+}

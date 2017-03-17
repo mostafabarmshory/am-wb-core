@@ -8,81 +8,23 @@ the following items can be set for customizing container layout:
 - alignItems
 - justifyContent
 
- -->
+Completely rewrite by mgh on 2/24/17.
+-->
 
-<div layout="column">
+<md-list class="wb-setting-panel">
 
-    <!--Preview Box-->
-    <!--TODO: mgh, 1395: good candidate for a directive, like: ng-previewbox items={"1","2","3"} -->
-    <div class="preview-box wb-flex-item-stretch">
-        <div class="header">Preview</div>
+    <!-- direction -->
+    <wb-ui-setting-choose title="Direction" icon="wb-direction" items="flexDirection"
+                          value="wbModel.style.flexDirection"></wb-ui-setting-choose>
 
-            <div class="preview-area wb-flex"
+    <!-- Align Items -->
+    <wb-ui-setting-choose title="{{(wbModel.style.flexDirection=='wb-flex-row')?'Vert.':'Horz.'}}"
+                          icon="{{(wbModel.style.flexDirection=='wb-flex-row')?'face':'wb-horizontal-arrows'}}"
+                          items="alignItems" value="wbModel.style.alignItems"></wb-ui-setting-choose>
 
-                 ng-class="[wbModel.style.flexDirection,wbModel.style.justifyContent, wbModel.style.alignItems]"
-                 >
-                <div class="widget" layout="row" layout-align="center center"><p>1</p></div>
-                <div class="widget" layout="row" layout-align="center center"><p>2</p></div>
-                <div class="widget" layout="row" layout-align="center center"><p>3</p></div>
-            </div>
-    </div>
+    <!-- Justify Content -->
+    <wb-ui-setting-choose title="{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}"
+                          icon="{{(wbModel.style.flexDirection!='wb-flex-row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}"
+                          items="justifyContent" value="wbModel.style.justifyContent"></wb-ui-setting-choose>
 
-    <div    class="setting-panel"
-            layout="column"
-            layout-gt-sm="row"
-            ng-controller="WbPageLayoutWbSettingsCtrl">
-
-        <!-- Direction -->
-        <md-list>
-            <md-subheader>Direction</md-subheader>
-            <md-divider style="margin-bottom: 1em "></md-divider>
-            <md-radio-group
-                    ng-model="wbModel.style.flexDirection"
-                    role="radiogroup" >
-                <md-list-item ng-repeat="direction in flexDirection">
-                    <md-radio-button
-                            value="{{direction.value}}">
-                        <md-icon>{{direction.icon}}</md-icon>
-                        {{direction.title |translate}}
-                    </md-radio-button>
-                </md-list-item>
-            </md-radio-group>
-        </md-list>
-
-        <!-- Align Items -->
-        <md-list>
-            <md-subheader ng-show="wbModel.style.flexDirection=='wb-flex-row'">Vertical Setting</md-subheader>
-            <md-subheader ng-show="wbModel.style.flexDirection!='wb-flex-row'">Horizontal Setting</md-subheader>
-            <md-divider style="margin-bottom: 1em "></md-divider>
-            <md-radio-group
-                    ng-model="wbModel.style.alignItems"
-                    role="radiogroup">
-                <md-list-item ng-repeat="align in alignItems">
-                    <md-radio-button
-                            value="{{align.value}}">
-                        <md-icon>{{direction.icon}}</md-icon>
-                        {{align.title |translate}}
-                    </md-radio-button>
-                </md-list-item>
-            </md-radio-group>
-        </md-list>
-
-        <!-- Justify Content -->
-        <md-list>
-            <md-subheader ng-show="wbModel.style.flexDirection!='wb-flex-row'">Vertical Setting</md-subheader>
-            <md-subheader ng-show="wbModel.style.flexDirection=='wb-flex-row'">Horizontal Setting</md-subheader>
-            <md-divider style="margin-bottom: 1em "></md-divider>
-            <md-radio-group
-                    ng-model="wbModel.style.justifyContent"
-                    role="radiogroup">
-                <md-list-item ng-repeat="align in justifyContent">
-                    <md-radio-button
-                            value="{{align.value}}">
-                        <md-icon>{{direction.icon}}</md-icon>
-                        {{align.title |translate}}
-                    </md-radio-button>
-                </md-list-item>
-            </md-radio-group>
-        </md-list>
-    </div>
-</div>
+</md-list>

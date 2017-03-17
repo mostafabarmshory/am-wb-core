@@ -1,7 +1,31 @@
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 'use strict';
+
+var dragClass = 'wb-content-dragenter';
+var bodyElementSelector = 'div#wb-content-body';
+var placeholderElementSelector = 'div#wb-content-placeholder';
 
 angular.module('ngMaterialWeburger')
 /**
@@ -9,148 +33,187 @@ angular.module('ngMaterialWeburger')
  * @name donateMainApp.directive:wbContent
  * @description
  * 
- * نمایش یک محتوی
+ * A container widget
  * 
- * از این ساختار برای ایجاد یک محتوی استفاده می‌شود. هر محتوی معال با یک صفحه
- * معادل است که تمام موجودیت‌های خود را به صورت سطری و یا سطونی نمایش می‌دهد.
+ * This is an container widget to list and manage widgets. This is equal to a
+ * group or a page of widgets.
  * 
- * هر صفحه یک ساختار داده‌ای را به عنوان ورودی دریافت می‌کند و در صورتی که کاربر
- * مجاز به ویرایش آن باشد، آن را ویرایش و ساختار داده‌ای جدید ایجاد می‌کند.
- * فرآیند ذخیره سازی این ساختار داده‌ای باید به صورت مستقل در کنترل‌هایی انجام
- * شود که این ساختار را فراهم کرده‌اند.
+ * Widget data is bind into the wbModel automatically.
  * 
  */
-.directive(
-	'wbContent',
-	function($compile, $widget) {
+.directive('wbContent', function($compile, $widget, $controller, $settings, $q) {
+    return {
+	templateUrl : 'views/directives/wb-content.html',
+	transclude : true,
+	restrict : 'E',
+	replace : true,
+	scope : {
+	    wbModel : '=?',
+	    wbEditable : '=?'
+	},
+	link : function(scope, element, attrs) {
+	    // Note that object must be an object or array,
+	    // NOT a primitive value like string, number, etc.
+	    var objIdMap=new WeakMap();
+	    var objectCount = 0;
+	    function objectId(object){
+		if (!objIdMap.has(object)) 
+		    objIdMap.set(object,++objectCount);
+		return objIdMap.get(object);
+	    }
 
-	    var bodyElementSelector = 'div#wb-content-body';
-	    var placeholderElementSelector = 'div#wb-content-placeholder';
+	    /**
+	     * Find the aunchor
+	     * 
+	     * The anchor is an element where widgets are added into.
+	     * 
+	     * @returns element anchor
+	     */
+	    function getAnchor() {
+		return element//
+		.children(bodyElementSelector)//
+		.children(placeholderElementSelector);
+	    }
 
-	    return {
-		templateUrl : 'views/directives/wb-content.html',
-		transclude : true,
-		restrict : 'E',
-		replace : true,
-		scope : {
-		    wbModel : '=?',
-		    wbEditable : '=?',
-		    wbParent : '=?'
-		},
-
-		controller : function($scope, $element, $settings, $widget) {
-		    var scope = $scope;
-
-		    function isEditable() {
-			if (scope.wbParent) {
-			    return scope.wbParent.isEditable();
-			}
-			return scope.wbEditable;
-		    }
-
-		    function createWidget(widget, parentScope, model) {
-			var element = angular.element(widget);
-			element.attr('wb-model', 'model');
-			element.attr('wb-editable', 'wbEditable()');
-			element.attr('wb-parent', 'wbParent');
-			var childScope = parentScope.$new(true, parentScope);
-			childScope.model = model;
-			childScope.wbEditable = scope.isEditable;
-			childScope.wbParent = parentScope;
-			// TODO: maso, 1395: این موجودیت باید ایجاد شود
-			return $compile(element)(childScope);
-		    }
-
-		    function removeWidgets() {
-			$element//
-			.children(bodyElementSelector)//
-			.children(placeholderElementSelector)//
-			.empty();
-		    }
-
-		    function removeWidget(model) {
-			if (model == scope.wbModel) {
-			    // باید از پدر بخواهیم که این کار رو انجام بده
-			    scope.wbParent.removeWidget(model);
-			}
-			var index = scope.wbModel.contents.indexOf(model);
-			if (index > -1) {
-			    scope.wbModel.contents.splice(index, 1);
-			}
-			// TODO: maso, 1395: بهتره که المان معادل را پیدا و حذف
-			// کنیم.
-			removeWidgets();
-			scope.wbModel.contents.forEach(addWidget);
-		    }
-
-		    /**
-		     * یک دریجه محاوره‌ای برای انتخاب و اضافه کردن ویجت باز
-		     * می‌کند
-		     * 
-		     * کاربر با استفاده از دریچه محاوره‌ای ویجت را انتخاب می‌کند
-		     * و بعد از آن این ویجت به صورت یک ساختار داده‌ای جدید به
-		     * مدل داده‌ای و نمایش اضافه خواهد شد.‌
-		     */
-		    function newWidget(wbModel) {
-			return $widget.select({
-			    wbModel : {},
-			    style : {}
-			})//
-			.then(function(model) {
-			    wbModel.contents.push(model);
-			    addWidget(model);
-			});
-		    }
-
-		    function addWidget(item) {
-			$widget.widget(item).then(function(widget) {
-			    $element//
-			    .children(bodyElementSelector)//
-			    .children(placeholderElementSelector)//
-			    .append(createWidget(widget.dom, $scope, item));
-			});
-		    }
-
-		    /**
-		     * تنظیم‌های کلی صفحه را انجام می‌دهد
-		     * 
-		     * یک دریچه محاوره‌ای باز می‌شود تا کاربر بتواند تنظیم‌های
-		     * متفاوت مربوط به این صفحه را انجام دهد.
-		     */
-		    function settings() {
-			return $settings.load({
-			    wbModel : scope.wbModel,
-			    wbParent : scope.wbParent,
-			    style : {
-				pages : [ 'description', 'border',
-					'background', 'pageLayout',
-					'selfLayout' ]
-			    }
-			});
-		    }
-
-		    function isArray(model) {
-			return (model && model.constructor === Array);
-		    }
-
-		    scope.settings = settings;
-		    scope.removeWidgets = removeWidgets;
-		    scope.removeWidget = removeWidget;
-		    scope.newWidget = newWidget;
-		    scope.isEditable = isEditable
-
-		    scope.$watch('wbModel', function() {
-			removeWidgets();
-			if (!scope.wbModel) {
-			    // XXX: maso, 1395: هنوز مدل تعیین نشده
-			    return;
-			}
-			if (!isArray(scope.wbModel.contents)) {
-			    scope.wbModel.contents = [];
-			}
-			scope.wbModel.type = 'Page';
-			scope.wbModel.contents.forEach(addWidget);
+	    /**
+	     * Reload view
+	     * 
+	     * Removes all widgets and load the view agin.
+	     */
+	    function reloadView() {
+		cleanView();
+		var anchor = getAnchor();
+		var compilesJob = [];
+		var elements = [];
+		scope.wbModel.contents.forEach(function(item, index) {
+		    compilesJob.push($widget.compile(item, scope)//
+			    .then(function(elem) {
+				elem.attr('index', index);
+				elem.attr('id', objectId(item));
+				elements.push(elem);
+			    }));
+		});
+		return $q.all(compilesJob)//
+		.then(function() {
+		    elements.sort(function(a, b) {
+			if (a.attr('index') < b.attr('index'))
+			    return -1;
+			if (a.attr('index') > b.attr('index'))
+			    return 1;
+			return 0;
 		    });
+		    var anchor = getAnchor();
+		    elements.forEach(function(item){
+			anchor.append(item);
+		    });
+		});
+	    }
+
+	    /**
+	     * New widget
+	     */
+	    function newWidget() {
+		return $widget.select({
+		    wbModel : {},
+		    style : {}
+		})//
+		.then(function(model) {
+		    $widget.compile(model, scope)//
+		    .then(function(element) {
+			element.attr('index', scope.wbModel.contents.length);
+			element.attr('id', objectId(model));
+			scope.wbModel.contents.push(model);
+			getAnchor().append(element);
+		    });
+		});
+	    }
+
+	    /**
+	     * Clean view
+	     * 
+	     * Remove all widgets from the veiw and clean the tmeplate.
+	     * 
+	     */
+	    function cleanView() {
+		element//
+		.children(bodyElementSelector)//
+		.children(placeholderElementSelector)//
+		.empty();
+	    }
+
+	    /*
+	     * Removes a widget
+	     * 
+	     * Data model and visual element related to the input model will be
+	     * removed.
+	     */
+	    function removeChild(model) {
+		var index = scope.wbModel.contents.indexOf(model);
+		if (index > -1) {
+		    var a = element//
+		    .children(bodyElementSelector)//
+		    .children(placeholderElementSelector)
+		    .children('#'+objectId(model));
+		    a.remove();
+		    scope.wbModel.contents.splice(index, 1);
 		}
-	    };
-	});
+	    }
+
+	    /**
+	     * Load container settings
+	     * 
+	     * Loads settings of the current container.
+	     */
+	    function settings() {
+		return $settings.load({
+		    wbModel : scope.wbModel,
+		    wbParent : scope.wbParent
+		});
+	    }
+
+	    /**
+	     * Adds dragged widget
+	     */
+	    function dropCallback(event, index, item, external, type) {
+		// add widget
+		$widget.compile(item, scope)//
+		.then(function(newElement) {
+		    var list = element//
+		    .children(bodyElementSelector)//
+		    .children(placeholderElementSelector);
+		    newElement.attr('id', objectId(item));
+		    if (index < list[0].childNodes.length) {
+			newElement.insertBefore(list[0].childNodes[index]);
+		    } else {
+			list.append(newElement);
+		    }
+		    scope.wbModel.contents.splice(index, 0, item);
+		    console.log('widget add to list');
+		});
+		return true;
+	    }
+
+	    /*
+	     * Watch the model for modification.
+	     */
+	    scope.$watch('wbModel', function() {
+		if (!scope.wbModel) {
+		    // XXX: maso, 1395: هنوز مدل تعیین نشده
+		    return;
+		}
+		if (!angular.isArray(scope.wbModel.contents)) {
+		    scope.wbModel.contents = [];
+		}
+		scope.wbModel.type = 'Container';
+		reloadView();
+	    });
+
+	    scope.removeChild = removeChild;
+	    scope.settings = settings;
+	    scope.dropCallback = dropCallback;
+	    scope.newWidget = newWidget;
+	    scope.objectId = objectId;
+	}
+    };
+});//
+

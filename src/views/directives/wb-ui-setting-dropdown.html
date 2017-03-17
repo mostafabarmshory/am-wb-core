@@ -1,0 +1,13 @@
+<md-list-item>
+    <wb-icon ng-hide="icon==undefined || icon==null || icon==''">{{icon}}</wb-icon>
+    <p ng-hide="title==undefined || title==null || title==''">{{title}}</p>
+    <md-select
+            style="margin: 0px"
+            ng-model="value">
+        <md-option
+                ng-repeat="item in items"
+                value="{{item.value}}">
+            {{item.title}}
+        </md-option>
+    </md-select>
+</md-list-item>

@@ -2,74 +2,25 @@
 
 Created by mgh.
 -->
+<md-list class="wb-setting-panel">
 
-<div layout="column">
+    <!-- SECTION: Min -->
+    <md-subheader class="md-no-sticky">Min</md-subheader>
 
-    <!--Preview Box-->
-    <div class="preview-box wb-flex-item-stretch">
-        <div class="header">Preview</div>
-        <div class="wb-flex preview-area wb-flex-justify-content-center">
-        <div class="widget wb-flex-item-center"
-             ng-class="wbModel.style.flexAlignItem"
-             ng-style="{
-                'min-width':wbModel.style.minWidth,
-                'min-height':wbModel.style.minHeight,
-                'max-width':(wbModel.style.maxWidth==0) ? 'none' : wbModel.style.maxWidth,
-                'max-height':(wbModel.style.maxHeight==0)?'none':wbModel.style.maxHeight}"
-             layout="row" layout-align="center center"
-             style="border: 2px dotted"><p>
-            item</p></div>
-    </div>
-</div>
+    <!-- min width -->
+    <wb-ui-setting-number title="Min Width" icon="face" value="wbModel.style.minWidth"></wb-ui-setting-number>
 
-<div class="setting-panel"
-     layout="column"
-     layout-gt-sm="row">
+    <!-- min height -->
+    <wb-ui-setting-number title="Max Height" icon="face" value="wbModel.style.minHeight"></wb-ui-setting-number>
 
-    <!-- Min panel -->
-    <md-list>
-        <md-subheader>MIN</md-subheader>
-        <md-divider style="margin-bottom: 1em "></md-divider>
-        <div layout="row" class="wb-flex-align-items-center">
-            <span>Width<md-tooltip>set value "0" for ignoring</md-tooltip></span>
-            <md-slider flex min="0" max="100" ng-model="wbModel.style.minWidth">
-            </md-slider>
-            <md-input-container>
-                <input style="width: 50px" flex type="number" ng-model="wbModel.style.minWidth">
-            </md-input-container>
-        </div>
-        <div layout="row" class="wb-flex-align-items-center">
-            <span>Height<md-tooltip>set value "0" for ignoring</md-tooltip></span>
-            <md-slider flex min="0" max="100" ng-model="wbModel.style.minHeight">
-            </md-slider>
-            <md-input-container>
-                <input style="width: 50px" flex type="number" ng-model="wbModel.style.minHeight">
-            </md-input-container>
-        </div>
 
-    </md-list>
+    <!-- SECTION: Max -->
+    <md-subheader class="md-no-sticky">Max</md-subheader>
 
-    <!-- max panel -->
-    <md-list>
-        <md-subheader>MAX</md-subheader>
-        <md-divider style="margin-bottom: 1em "></md-divider>
-        <div layout="row" class="wb-flex-align-items-center">
-            <span>Width<md-tooltip>set value "0" for ignoring</md-tooltip></span>
-            <md-slider flex min="0" max="100" ng-model="wbModel.style.maxWidth">
-            </md-slider>
-            <md-input-container>
-                <input style="width: 50px" flex ng-model="wbModel.style.maxWidth">
-            </md-input-container>
-        </div>
-        <div layout="row" class="wb-flex-align-items-center">
-            <span>Height<md-tooltip>set value "0" for ignoring</md-tooltip></span>
-            <md-slider flex min="0" max="100" ng-model="wbModel.style.maxHeight">
-            </md-slider>
-            <md-input-container>
-                <input style="width: 50px" flex  ng-model="wbModel.style.maxHeight">
-            </md-input-container>
-        </div>
-    </md-list>
-</div>
+    <!-- max width -->
+    <wb-ui-setting-number title="Max Width" icon="face" value="wbModel.style.maxWidth"></wb-ui-setting-number>
 
-</div>
+    <!-- max height -->
+    <wb-ui-setting-number title="Max Height" icon="face" value="wbModel.style.maxHeight"></wb-ui-setting-number>
+
+</md-list>

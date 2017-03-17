@@ -1,0 +1,12 @@
+<md-list-item>
+    <wb-icon 
+    	ng-hide="icon==undefined || icon==null || icon==''" 
+    	wb-icon-name="{{icon}}">
+    </wb-icon>
+    <p ng-hide="title==undefined || title==null || title==''">{{title}}</p>
+    <wb-ui-choose 
+    	flex="100" 
+    	items="items" 
+    	selected="value">
+    </wb-ui-choose>
+</md-list-item>

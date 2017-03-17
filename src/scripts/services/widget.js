@@ -1,10 +1,29 @@
-/* jslint todo: true */
-/* jslint xxx: true */
-/* jshint -W100 */
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 'use strict';
 
-angular
-.module('ngMaterialWeburger')
+angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc service
@@ -14,202 +33,177 @@ angular
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service(
-	'$widget',
-	function($q, $timeout, $mdDialog, PaginatorPage) {
+.service('$widget', function(
+	$q, $sce, $templateRequest, $compile, $controller, $rootScope,
+	$timeout, $mdDialog, PaginatorPage) {
 
-	    var contentElementAsso = {
-		    Page : {
-			dom : '<wb-content></wb-content>',
-			label : 'Panel',
-			description : 'Panel contains list of widgets.',
-			image : 'images/wb/content.svg',
-			link : 'http://dpq.co.ir/more-information-link',
-			data : {
-			    type : 'Page',
-			    style : {
-				direction : 'column',
-			    },
-			    contents : []
-			}
-		    },
-		    NotfoundElement : {
-			dom : '<wb-notfound-element></wb-notfound-element>',
-			label : 'Not found',
-			image : 'images/wb/notfoundelement.svg',
-			link : 'link',
-		    },
-//		    BrandAction : {
-//			dom : '<wb-brand-action></wb-brand-action>',
-//			label : 'Brand with action',
-//			description : 'A brand image with action list',
-//			image : 'images/wb/brandaction.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'BrandAction',
-//			    style : {},
-//			}
-//		    },
-//		    Copyright : {
-//			dom : '<wb-copyright></wb-copyright>',
-//			label : 'Copyright',
-//			description : 'Copyright text',
-//			image : 'images/wb/copyright.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'Copyright',
-//			    title : 'copyright example',
-//			    text : 'This is a simple copy right text.',
-//			    style : {
-//				width : '100%',
-//				color : '#000000',
-//				backgroundColor : '#00000000'
-//			    }
-//			}
-//		    },
-//		    FeatureList : {
-//			dom : '<wb-feature-list></wb-feature-list>',
-//			label : 'Features list',
-//			description : 'List of features',
-//			image : 'images/wb/featurelist.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'FeatureList',
-//			    style : {},
-//			}
-//		    },
-//		    SocialList : {
-//			dom : '<wb-social-list></wb-social-list>',
-//			label : 'Socials link',
-//			description : 'Social link list',
-//			image : 'images/wb/sociallist.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'SocialList',
-//			    style : {},
-//			}
-//		    },
-		    LinkList : {
-			dom : '<wb-link-list></wb-link-list>',
-			label : 'Link list',
-			description : 'List of links and ticktes',
-			image : 'images/wb/linklist.svg',
-			link : 'link',
-			data : {
-			    type : 'LinkList',
-			    style : {},
-			}
-		    },
-		    HtmlText : {
-			dom : '<wb-html ng-class="[wbModel.style.flexAlignItem]" ></wb-html>',
-			label : 'HTML text',
-			description : 'An HTML block text.',
-			image : 'images/wb/html.svg',
-			link : 'http://dpq.co.ir',
-			data : {
-			    type : 'HtmlText',
-			    body : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-			    style : {
-				marginLeft : 1,
-				marginRight : 1,
-				marginTop : 1,
-				marginBottom : 1,
-				paddingLeft : 1,
-				paddingRight : 1,
-				paddingTop : 1,
-				paddingBottom : 1,
-				minWidth : 0,
-				maxWidth : 0,
-				minHeight : 0,
-				maxHeight : 0
-			    }
-			}
-		    },
-//		    CollapsibleItemList : {
-//			dom : '<wb-collapsible-item-list></wb-collapsible-item-list>',
-//			label : 'Collapsible item list',
-//			description : 'List of item with a collapsiblity',
-//			image : 'images/wb/notfoundelement.svg',
-//			link : 'http://dpq.co.ir',
-//			data : {
-//			    type : 'CollapsibleItemList',
-//			    style : {},
-//			}
-//		    },
-		    Members : {
-			dom : '<wb-members></wb-members>',
-			label : 'Members list',
-			description : 'List of members',
-			image : 'images/wb/user.svg',
-			link : 'http://dpq.co.ir',
-			data : {
-			    type : 'Members',
-			    style : {},
-			    template : {}
-			}
-		    }
-	    };
+    var contentElementAsso = [];
+    var elementKey = [];
+    var notFoundWidget = {
+	    templateUrl : 'views/widgets/wb-notfound.html',
+	    label : 'Not found',
+	    description : 'Element not found',
+    };
+    var container = {
+	    type : 'Container',
+	    label : 'Panel',
+	    description : 'Panel contains list of widgets.',
+	    image : 'images/wb/content.svg',
+	    setting : [ 'description', 'border', 'background',
+		'pageLayout', 'selfLayout' ],
+    };
 
-	    /**
-	     * توصیف ویجت معادل با مدل داده‌ای را تعیین می‌کند
-	     * 
-	     * این کار بر اساس خصوصیت نوع در مدل داده‌ای تعیین می‌شود و
-	     * در صورتیکه ویجتی برای آو موجود نباشد، ویجت پیشفرض به
-	     * عنوان نتیجه برگردانده می‌وشد.
-	     * 
-	     * @param model
-	     * @returns
-	     */
-	    function widget(model) {
-		var deferred = $q.defer();
-		$timeout(function() {
-		    var widget = contentElementAsso.mdeNotfoundElement;
-		    if (model.type in contentElementAsso) {
-			widget = contentElementAsso[model.type];
-		    }
-		    deferred.resolve(widget);
-		}, 1);
-		return deferred.promise;
-	    }
+    function _widget(model){
+	if (model.type in contentElementAsso) {
+	    return contentElementAsso[model.type];
+	}
+	if (model.type === 'Container') {
+	    return container;
+	}
+	return notFoundWidget;
+    }
+    /**
+     * Finds a widget related to the input model.
+     * 
+     * Widget type is stored in the widget data model. This function get the
+     * model type from the input data type and return related widget.
+     * 
+     * NotFoundElement widget is returned if the widget type is not found.
+     * 
+     * @param model
+     * @returns
+     */
+    function widget(model) {
+	var deferred = $q.defer();
+	$timeout(function() {
+	    deferred.resolve(_widget(model));
+	}, 1);
+	return deferred.promise;
+    }
 
-	    /**
-	     * فهرست تمام ویجت‌ها را تعیین می‌کند.
-	     * 
-	     * @returns
-	     */
-	    function widgets() {
-		var deferred = $q.defer();
-		$timeout(function() {
-		    var widgets = new PaginatorPage({});
-		    // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-		    widgets.items = [];
-		    widgets.items.push(contentElementAsso.Page);
-//		    widgets.items.push(contentElementAsso.BrandAction);
-//		    widgets.items.push(contentElementAsso.Copyright);
-//		    widgets.items.push(contentElementAsso.FeatureList);
-//		    widgets.items.push(contentElementAsso.SocialList);
-		    widgets.items.push(contentElementAsso.LinkList);
-		    widgets.items.push(contentElementAsso.HtmlText);
-		    // widgets.items.push(contentElementAsso.CollapsibleItemList);
-		    widgets.items.push(contentElementAsso.Members);
-		    deferred.resolve(widgets);
-		}, 1);
-		return deferred.promise;
-	    }
+    /**
+     * Returns list of all registerd widgets.
+     * 
+     * @returns
+     */
+    function widgets() {
+	var deferred = $q.defer();
+	$timeout(function() {
+	    var widgets = new PaginatorPage({});
+	    // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+	    widgets.items = [];
+	    elementKey.forEach(function(type) {
+		widgets.items.push(contentElementAsso[type]);
+	    });
+	    deferred.resolve(widgets);
+	}, 1);
+	return deferred.promise;
+    }
 
-	    function select(locals) {
-		// TODO: maso, 1394: just prepare data for view
-		return $mdDialog.show({
-		    controller : 'WbDialogsCtrl',
-		    templateUrl : 'views/dialogs/wb-selectwidget.html',
-		    parent : angular.element(document.body),
-		    clickOutsideToClose : true,
-		    fullscreen : true,
-		    locals : locals,
-		});
-	    }
-	    // تعیین سرویس‌ها
-	    this.widget = widget;
-	    this.widgets = widgets;
-	    this.select = select;
+    /**
+     * Registers new widget
+     * 
+     * @See the following page for more information:
+     * 
+     *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
+     * 
+     * @param type
+     * @param model
+     * @returns
+     */
+    function newWidget(widget) {
+	if (widget.type in contentElementAsso) {
+	    // XXX: maso, throw exception
+	    return;
+	}
+	contentElementAsso[widget.type] = widget;
+	elementKey.push(widget.type);
+    }
+
+    /**
+     * Selects a widgetd
+     * 
+     * This is an utility method to help a user to select a widget.
+     * 
+     * @param locals
+     * @returns
+     */
+    function select(locals) {
+	// TODO: maso, 1394: just prepare data for view
+	return $mdDialog.show({
+	    controller : 'WbDialogsCtrl',
+	    templateUrl : 'views/dialogs/wb-selectwidget.html',
+	    parent : angular.element(document.body),
+	    clickOutsideToClose : true,
+	    fullscreen : true,
+	    locals : locals,
 	});
+    }
+
+
+    /*
+     * get setting page template
+     */
+    function getTemplateFor(widget) {
+	var template, templateUrl;
+	if (angular.isDefined(template = widget.template)) {
+	    if (angular.isFunction(template)) {
+		template = template(widget.params);
+	    }
+	} else if (angular.isDefined(templateUrl = widget.templateUrl)) {
+	    if (angular.isFunction(templateUrl)) {
+		templateUrl = templateUrl(widget.params);
+	    }
+	    if (angular.isDefined(templateUrl)) {
+		widget.loadedTemplateUrl = $sce.valueOf(templateUrl);
+		template = $templateRequest(templateUrl);
+	    }
+	}
+	return template;
+    }
+
+    function compile(model, parenScope){
+	var widget = _widget(model);
+	var childScope = null;
+	var element = null;
+
+	// 1- create scope
+	childScope = parenScope.$new(false, parenScope);
+	childScope.wbModel = model;
+
+	// 2- create element
+	return $q.when(getTemplateFor(widget))//
+	.then(function(template) {
+	    if (model.type != 'Page') {
+		template = '<wb-widget>' + template + '</wb-widget>';
+	    }
+	    element = angular.element(template);
+
+	    // 3- bind controller
+	    var link = $compile(element);
+	    if (angular.isDefined(widget.controller)) {
+		var locals = {
+			$scope : childScope,
+			$element : element,
+			// TODO: maso, 2017: bind wbModel, wbParent,
+			// and wbEditable
+		};
+		var controller = $controller(widget.controller, locals);
+		if (widget.controllerAs) {
+		    childScope[widget.controllerAs] = controller;
+		}
+		element.data('$ngControllerController', controller);
+	    }
+	    link(childScope);
+	    return element;
+	});
+    }
+
+    // تعیین سرویس‌ها
+    this.newWidget = newWidget;
+    this.widget = widget;
+    this.widgets = widgets;
+    this.select = select;
+    this.getTemplateFor = getTemplateFor;
+    this.compile = compile;
+});

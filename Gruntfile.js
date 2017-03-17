@@ -120,6 +120,7 @@ module.exports = function (grunt) {
                 '/app/styles',
                 connect.static('./app/styles')
               ),
+              connect.static('demo'),
               connect.static(appConfig.app)];
 
             if (!Array.isArray(options.base)) {
@@ -310,7 +311,7 @@ module.exports = function (grunt) {
      */
     wiredep: {
        app: {
-         src: ['<%= yeoman.app %>/index.html'],
+         src: ['demo/index.html'],
          ignorePath:  /\.\.\//
        },
       test: {
