@@ -25,62 +25,64 @@
 angular
 
 /**
- *
+ * 
  * @date 2016
  * @author mgh
  */
-    .module('ngMaterialWeburger')
+.module('ngMaterialWeburger')
 
-    .controller('WbPageLayoutWbSettingsCtrl', function ($scope, $settings) {
-        var scope = $scope;
+.controller('WbPageLayoutWbSettingsCtrl', function($scope, $settings) {
+    var wbModel = $scope.wbModel;
+    if (!wbModel.style) {
+	wbModel.style = {};
+    }
+    $scope.flexDirection = [ {
+	title : 'row',
+	icon : 'wb-vertical-boxes',
+	value : 'wb-flex-row'
+    }, {
+	title : 'column',
+	icon : 'wb-horizontal-boxes',
+	value : 'wb-flex-column'
+    } ];
 
-        scope.flexDirection = [{
-            title: 'row',
-            icon: 'wb-vertical-boxes',
-            value: 'wb-flex-row'
-        }, {
-            title: 'column',
-            icon: 'wb-horizontal-boxes',
-            value: 'wb-flex-column'
-        }];
+    $scope.justifyContent = [ {
+	title : 'Start',
+	icon : 'looks_one',
+	value : 'wb-flex-justify-content-start'
+    }, {
+	title : 'End',
+	icon : 'looks_two',
+	value : 'wb-flex-justify-content-end'
+    }, {
+	title : 'Center',
+	icon : 'looks_3',
+	value : 'wb-flex-justify-content-center'
+    }, {
+	title : 'Space Around',
+	icon : 'looks_4',
+	value : 'wb-flex-justify-content-space-around'
+    }, {
+	title : 'Space Between',
+	icon : 'looks_5',
+	value : 'wb-flex-justify-content-space-between'
+    } ];
 
-        scope.justifyContent = [{
-            title: 'Start',
-            icon: 'looks_one',
-            value: 'wb-flex-justify-content-start'
-        }, {
-            title: 'End',
-            icon:'looks_two',
-            value: 'wb-flex-justify-content-end'
-        }, {
-            title: 'Center',
-            icon:'looks_3',
-            value: 'wb-flex-justify-content-center'
-        }, {
-            title: 'Space Around',
-            icon:'looks_4',
-            value: 'wb-flex-justify-content-space-around'
-        }, {
-            title: 'Space Between',
-            icon:'looks_5',
-            value: 'wb-flex-justify-content-space-between'
-        }];
-
-        scope.alignItems = [{
-            title: 'Stretch',
-            icon: 'looks_one',
-            value: 'wb-flex-align-items-stretch'
-        }, {
-            title: 'Start',
-            icon: 'looks_two',
-            value: 'wb-flex-align-items-start'
-        }, {
-            title: 'End',
-            icon: 'looks_3',
-            value: 'wb-flex-align-items-end'
-        }, {
-            title: 'Center',
-            icon: 'looks_4',
-            value: 'wb-flex-align-items-center'
-        }]
-    });
+    $scope.alignItems = [ {
+	title : 'Stretch',
+	icon : 'looks_one',
+	value : 'wb-flex-align-items-stretch'
+    }, {
+	title : 'Start',
+	icon : 'looks_two',
+	value : 'wb-flex-align-items-start'
+    }, {
+	title : 'End',
+	icon : 'looks_3',
+	value : 'wb-flex-align-items-end'
+    }, {
+	title : 'Center',
+	icon : 'looks_4',
+	value : 'wb-flex-align-items-center'
+    } ];
+});

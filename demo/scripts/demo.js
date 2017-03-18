@@ -56,10 +56,10 @@ angular.module('ngMaterialWeburgerTest', [ 'ngMaterialWeburger' ])//
 	});
     };
 })
-
-// تنظیم ایکون
-.config(function($mdIconProvider, $mdThemingProvider) {
-    $mdIconProvider//
-    .fontSet('social', 'mono-social-icons')//
-    .fontSet('material', 'material-icons');//
-})
+//
+//// تنظیم ایکون
+//.config(function($mdIconProvider, $mdThemingProvider) {
+//    $mdIconProvider//
+//    .fontSet('social', 'mono-social-icons')//
+//    .fontSet('material', 'material-icons');//
+//})

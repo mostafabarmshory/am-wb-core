@@ -25,22 +25,61 @@
 
 angular.module('ngMaterialWeburger')
 
-    /**
-     * @ngdoc directive
-     * @name wbUiSettingChoose
-     * @memberof ngMaterialWeburger
-     * @description a setting section for choosing values.
-     *
+/**
+ * @ngdoc directive
+ * @name wbUiSettingChoose
+ * @memberof ngMaterialWeburger
+ * @description a setting section for choosing values.
+ *
+ */
+.directive('wbUiSettingChoose', function ($mdTheming, $mdUtil) {
+
+    // **********************************************************
+    // Private Methods
+    // **********************************************************
+    function postLink(scope, element, attr, ctrls) {
+	scope.xitems = scope.$eval(attr.items);
+	attr.$observe('title', function(title){
+	    scope.title = title;
+	});
+	attr.$observe('icon', function(icon){
+	    scope.icon = icon;
+	});
+	var ngModelCtrl = ctrls[0] || $mdUtil.fakeNgModel();
+	$mdTheming(element);
+
+	scope.$watch('selectedIndex', function () {
+	    if(!angular.isDefined(scope.selectedIndex) || 
+		    (scope.selectedIndex < 0 || scope.selectedIndex >= scope.xitems.length)){
+		scope.selectedIndex = 0;
+	    }
+	    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+	});
+
+	ngModelCtrl.$render = render;
+
+	function render() {
+	    for (var item in scope.xitems) {
+		if (item.value == ngModelCtrl.$modelValue){
+		    scope.selectedIndex = scope.xitems.indexOf(item);
+		    return;
+		}
+	    }
+	    // TODO: maso, 2017: update default value.
+	    scope.selectedIndex = 0;
+	    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+	}
+    }
+
+    /*
+     * Directive info
      */
-    .directive('wbUiSettingChoose', function () {
-        return {
-            templateUrl: 'views/directives/wb-ui-setting-choose.html',
-            restrict: 'E',
-            scope: {
-                title: '@title',
-                value: '=value',
-                icon: '@icon',
-                items:'=items'
-            }
-        };
-    });
+    return {
+	templateUrl: 'views/directives/wb-ui-setting-choose.html',
+	restrict: 'E',
+	scope: true,
+	require: ['?ngModel'],
+	priority: 210, // Run before ngAria
+	link: postLink
+    };
+});

@@ -311,65 +311,67 @@ angular.module('ngMaterialWeburger')
 angular
 
 /**
- *
+ * 
  * @date 2016
  * @author mgh
  */
-    .module('ngMaterialWeburger')
+.module('ngMaterialWeburger')
 
-    .controller('WbPageLayoutWbSettingsCtrl', function ($scope, $settings) {
-        var scope = $scope;
+.controller('WbPageLayoutWbSettingsCtrl', function($scope, $settings) {
+    var wbModel = $scope.wbModel;
+    if (!wbModel.style) {
+	wbModel.style = {};
+    }
+    $scope.flexDirection = [ {
+	title : 'row',
+	icon : 'wb-vertical-boxes',
+	value : 'wb-flex-row'
+    }, {
+	title : 'column',
+	icon : 'wb-horizontal-boxes',
+	value : 'wb-flex-column'
+    } ];
 
-        scope.flexDirection = [{
-            title: 'row',
-            icon: 'wb-vertical-boxes',
-            value: 'wb-flex-row'
-        }, {
-            title: 'column',
-            icon: 'wb-horizontal-boxes',
-            value: 'wb-flex-column'
-        }];
+    $scope.justifyContent = [ {
+	title : 'Start',
+	icon : 'looks_one',
+	value : 'wb-flex-justify-content-start'
+    }, {
+	title : 'End',
+	icon : 'looks_two',
+	value : 'wb-flex-justify-content-end'
+    }, {
+	title : 'Center',
+	icon : 'looks_3',
+	value : 'wb-flex-justify-content-center'
+    }, {
+	title : 'Space Around',
+	icon : 'looks_4',
+	value : 'wb-flex-justify-content-space-around'
+    }, {
+	title : 'Space Between',
+	icon : 'looks_5',
+	value : 'wb-flex-justify-content-space-between'
+    } ];
 
-        scope.justifyContent = [{
-            title: 'Start',
-            icon: 'looks_one',
-            value: 'wb-flex-justify-content-start'
-        }, {
-            title: 'End',
-            icon:'looks_two',
-            value: 'wb-flex-justify-content-end'
-        }, {
-            title: 'Center',
-            icon:'looks_3',
-            value: 'wb-flex-justify-content-center'
-        }, {
-            title: 'Space Around',
-            icon:'looks_4',
-            value: 'wb-flex-justify-content-space-around'
-        }, {
-            title: 'Space Between',
-            icon:'looks_5',
-            value: 'wb-flex-justify-content-space-between'
-        }];
-
-        scope.alignItems = [{
-            title: 'Stretch',
-            icon: 'looks_one',
-            value: 'wb-flex-align-items-stretch'
-        }, {
-            title: 'Start',
-            icon: 'looks_two',
-            value: 'wb-flex-align-items-start'
-        }, {
-            title: 'End',
-            icon: 'looks_3',
-            value: 'wb-flex-align-items-end'
-        }, {
-            title: 'Center',
-            icon: 'looks_4',
-            value: 'wb-flex-align-items-center'
-        }]
-    });
+    $scope.alignItems = [ {
+	title : 'Stretch',
+	icon : 'looks_one',
+	value : 'wb-flex-align-items-stretch'
+    }, {
+	title : 'Start',
+	icon : 'looks_two',
+	value : 'wb-flex-align-items-start'
+    }, {
+	title : 'End',
+	icon : 'looks_3',
+	value : 'wb-flex-align-items-end'
+    }, {
+	title : 'Center',
+	icon : 'looks_4',
+	value : 'wb-flex-align-items-center'
+    } ];
+});
 
 /* 
  * The MIT License (MIT)
@@ -1628,25 +1630,166 @@ angular.module('ngMaterialWeburger')
 
 angular.module('ngMaterialWeburger')
 
-    /**
-     * @ngdoc directive
-     * @name wbUiSettingChoose
-     * @memberof ngMaterialWeburger
-     * @description a setting section for choosing values.
-     *
-     */
-    .directive('wbUiSettingChoose', function () {
-        return {
-            templateUrl: 'views/directives/wb-ui-setting-choose.html',
-            restrict: 'E',
-            scope: {
-                title: '@title',
-                value: '=value',
-                icon: '@icon',
-                items:'=items'
-            }
-        };
-    });
+/**
+ * @ngdoc directive
+ * @name wbUiSettingChoose
+ * @memberof ngMaterialWeburger
+ * @description a setting section for choosing values.
+ *
+ */
+.directive('wbUiSettingChoose', function (inputDirective, $mdAria, $mdConstant, $mdTheming, $mdUtil, $timeout, $parse) {
+
+    // **********************************************************
+    // Private Methods
+    // **********************************************************
+    function postLink(scope, element, attr, ctrls) {
+	scope.xitems = scope.$eval(attr.items);
+	attr.$observe('title', function(title){
+	    scope.title = title;
+	});
+	attr.$observe('icon', function(icon){
+	    scope.icon = icon;
+	});
+	var ngModelCtrl = ctrls[0] || $mdUtil.fakeNgModel();
+	$mdTheming(element);
+
+//	// Redirect focus events to the root element, because IE11 is
+//	// always focusing the container element instead
+//	// of the md-checkbox element. This causes issues when using
+//	// ngModelOptions: `updateOnBlur`
+//	element.children().on('focus', function() {
+//	element.focus();
+//	});
+
+//	if ($mdUtil.parseAttributeBoolean(attr.mdIndeterminate)) {
+//	setIndeterminateState();
+//	scope.$watch(attr.mdIndeterminate, setIndeterminateState);
+//	}
+
+//	if (attr.ngChecked) {
+//	scope.$watch(scope.$eval.bind(scope, attr.ngChecked), function(value) {
+//	ngModelCtrl.$setViewValue(value);
+//	ngModelCtrl.$render();
+//	});
+//	}
+
+
+	scope.$watch('selectedIndex', function () {
+	    if(!angular.isDefined(scope.selectedIndex) || 
+		    (scope.selectedIndex < 0 || scope.selectedIndex >= scope.xitems.length)){
+		scope.selectedIndex = 0;
+	    }
+	    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+	});
+
+
+//	$$watchExpr('ngDisabled', 'tabindex', {
+//	true: '-1',
+//	false: attr.tabindex
+//	});
+
+//	$mdAria.expectWithText(element, 'aria-label');
+
+//	// Reuse the original input[type=checkbox] directive from
+//	// Angular core.
+//	// This is a bit hacky as we need our own event listener and own
+//	// render
+//	// function.
+//	inputDirective.link.pre(scope, {
+//	on: angular.noop,
+//	0: {}
+//	}, attr, [ngModelCtrl]);
+
+//	scope.mouseActive = false;
+//	element.on('click', listener)
+//	.on('keypress', keypressHandler)
+//	.on('mousedown', function() {
+//	scope.mouseActive = true;
+//	$timeout(function() {
+//	scope.mouseActive = false;
+//	}, 100);
+//	})
+//	.on('focus', function() {
+//	if (scope.mouseActive === false) {
+//	element.addClass('md-focused');
+//	}
+//	})
+//	.on('blur', function() {
+//	element.removeClass('md-focused');
+//	});
+
+	ngModelCtrl.$render = render;
+
+//	function $$watchExpr(expr, htmlAttr, valueOpts) {
+//	if (attr[expr]) {
+//	scope.$watch(attr[expr], function(val) {
+//	if (valueOpts[val]) {
+//	element.attr(htmlAttr, valueOpts[val]);
+//	}
+//	});
+//	}
+//	}
+
+//	function keypressHandler(ev) {
+//	var keyCode = ev.which || ev.keyCode;
+//	if (keyCode === $mdConstant.KEY_CODE.SPACE || keyCode === $mdConstant.KEY_CODE.ENTER) {
+//	ev.preventDefault();
+//	element.addClass('md-focused');
+//	listener(ev);
+//	}
+//	}
+
+//	function listener(ev) {
+//	// skipToggle boolean is used by the switch directive to
+//	// prevent
+//	// the click event
+//	// when releasing the drag. There will be always a click if
+//	// releasing the drag over the checkbox
+//	if (element[0].hasAttribute('disabled') || scope.skipToggle) {
+//	return;
+//	}
+
+//	scope.$apply(function() {
+//	// Toggle the checkbox value...
+//	var viewValue = attr.ngChecked ? attr.checked : !ngModelCtrl.$viewValue;
+
+//	ngModelCtrl.$setViewValue(viewValue, ev && ev.type);
+//	ngModelCtrl.$render();
+//	});
+//	}
+
+	function render() {
+	    for (var item in scope.xitems) {
+		if (item.value == ngModelCtrl.$modelValue){
+		    scope.selectedIndex = scope.xitems.indexOf(item);
+		    return;
+		}
+	    }
+	    // TODO: maso, 2017: update default value.
+	    scope.selectedIndex = 0;
+	    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+	}
+
+//	function setIndeterminateState(newValue) {
+//	isIndeterminate = newValue !== false;
+//	if (isIndeterminate) {
+//	element.attr('aria-checked', 'mixed');
+//	}
+//	element.toggleClass('md-indeterminate', isIndeterminate);
+//	}
+    }
+
+
+
+    return {
+	templateUrl: 'views/directives/wb-ui-setting-choose.html',
+	restrict: 'E',
+	scope: true,
+	require: ['?ngModel'],
+	priority: 210, // Run before ngAria
+	link: postLink
+    };
+});
 
 /**
  * Created by mgh on 2/26/17.
@@ -2570,12 +2713,12 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-ui-choose.html',
-    "<md-tabs class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in items\"> <md-tab-label> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs>"
+    "<md-tabs class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in xitems\"> <md-tab-label> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-choose.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\" wb-icon-name={{icon}}> </wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <wb-ui-choose flex=100 items=items selected> </wb-ui-choose> </md-list-item>"
+    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\" wb-icon-name={{icon}}> </wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> </md-list-item>  <md-tabs class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in xitems\"> <md-tab-label> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs>"
   );
 
 
@@ -2620,12 +2763,12 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/settings/wb-layout-page.html',
-    " <md-list class=wb-setting-panel>  <wb-ui-setting-choose title=Direction icon=wb-direction items=flexDirection value=wbModel.style.flexDirection></wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.flexDirection=='wb-flex-row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.flexDirection=='wb-flex-row')?'face':'wb-horizontal-arrows'}}\" items=alignItems value=wbModel.style.alignItems></wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.flexDirection!='wb-flex-row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}\" items=justifyContent value=wbModel.style.justifyContent></wb-ui-setting-choose> </md-list>"
+    " <md-list class=wb-setting-panel>  <wb-ui-setting-choose title=Direction icon=wb-direction items=flexDirection ng-model=wbModel.style.flexDirection> </wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.flexDirection=='wb-flex-row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.flexDirection=='wb-flex-row')?'face':'wb-horizontal-arrows'}}\" items=alignItems ng-model=wbModel.style.alignItems> </wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.flexDirection!='wb-flex-row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}\" items=justifyContent ng-model=wbModel.style.justifyContent> </wb-ui-setting-choose> </md-list>"
   );
 
 
   $templateCache.put('views/settings/wb-layout-self.html',
-    " <md-list class=wb-setting-panel>  <wb-ui-setting-choose title=\"{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.flexDirection!='wb-flex-row')?'swap_vert':'swap_horiz'}}\" items=flexAlignItem value=wbModel.style.flexAlignItem></wb-ui-setting-choose>   <wb-ui-setting-on-off-switch title=\"Fill Space?\" icon=border_all value=wbModel.style.flexItemGrowEnabled></wb-ui-setting-on-off-switch>  <wb-ui-setting-number slider=\"\" ng-show=wbModel.style.flexItemGrowEnabled title=Weight icon=face value=wbModel.style.flexItemGrow></wb-ui-setting-number> </md-list>"
+    " <md-list class=wb-setting-panel>  <wb-ui-setting-choose title=\"{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.flexDirection!='wb-flex-row')?'swap_vert':'swap_horiz'}}\" items=flexAlignItem ng-model=wbModel.style.flexAlignItem> </wb-ui-setting-choose>   <wb-ui-setting-on-off-switch title=\"Fill Space?\" icon=border_all value=wbModel.style.flexItemGrowEnabled> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number slider=\"\" ng-show=wbModel.style.flexItemGrowEnabled title=Weight icon=face value=wbModel.style.flexItemGrow></wb-ui-setting-number> </md-list>"
   );
 
 
