@@ -1651,28 +1651,30 @@ angular.module('ngMaterialWeburger')
 	    scope.icon = icon;
 	});
 	var ngModelCtrl = ctrls[0] || $mdUtil.fakeNgModel();
+	var unregisterWatch = null;
 	$mdTheming(element);
-
-	scope.$watch('selectedIndex', function () {
-	    if(!angular.isDefined(scope.selectedIndex) || 
-		    (scope.selectedIndex < 0 || scope.selectedIndex >= scope.xitems.length)){
-		scope.selectedIndex = 0;
-	    }
-	    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
-	});
 
 	ngModelCtrl.$render = render;
 
+	scope.$watch('selectedIndex', function () {
+	    if(angular.isDefined(scope.selectedIndex)){
+		ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+	    }
+	});
+
 	function render() {
-	    for (var item in scope.xitems) {
-		if (item.value == ngModelCtrl.$modelValue){
-		    scope.selectedIndex = scope.xitems.indexOf(item);
-		    return;
+	    scope.selectedIndex = toIndex(ngModelCtrl.$modelValue);
+	    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+	}
+	
+	function toIndex (value){
+	    for (var index = 0; index < scope.xitems.length; index++) {
+		if (scope.xitems[index].value == value){
+		    return index;
 		}
 	    }
 	    // TODO: maso, 2017: update default value.
-	    scope.selectedIndex = 0;
-	    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+	    return 0;
 	}
     }
 
