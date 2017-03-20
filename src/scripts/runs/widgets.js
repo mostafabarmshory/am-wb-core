@@ -53,11 +53,6 @@ angular.module('ngMaterialWeburger')
 	    $widget.newWidget({
 		type: 'HtmlText',
 		templateUrl : 'views/widgets/wb-html.html',
-		controller: function($scope){
-//		    $scope.test = 'test string';
-//		    $scope.wbModel.text='my text';
-		},
-		controllerAs: 'Ctrl',
 		label : 'HTML text',
 		description : 'An HTML block text.',
 		image : 'images/wb/html.svg',

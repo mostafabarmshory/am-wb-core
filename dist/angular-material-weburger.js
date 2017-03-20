@@ -1637,7 +1637,7 @@ angular.module('ngMaterialWeburger')
  * @description a setting section for choosing values.
  *
  */
-.directive('wbUiSettingChoose', function (inputDirective, $mdAria, $mdConstant, $mdTheming, $mdUtil, $timeout, $parse) {
+.directive('wbUiSettingChoose', function ($mdTheming, $mdUtil) {
 
     // **********************************************************
     // Private Methods
@@ -1653,27 +1653,6 @@ angular.module('ngMaterialWeburger')
 	var ngModelCtrl = ctrls[0] || $mdUtil.fakeNgModel();
 	$mdTheming(element);
 
-//	// Redirect focus events to the root element, because IE11 is
-//	// always focusing the container element instead
-//	// of the md-checkbox element. This causes issues when using
-//	// ngModelOptions: `updateOnBlur`
-//	element.children().on('focus', function() {
-//	element.focus();
-//	});
-
-//	if ($mdUtil.parseAttributeBoolean(attr.mdIndeterminate)) {
-//	setIndeterminateState();
-//	scope.$watch(attr.mdIndeterminate, setIndeterminateState);
-//	}
-
-//	if (attr.ngChecked) {
-//	scope.$watch(scope.$eval.bind(scope, attr.ngChecked), function(value) {
-//	ngModelCtrl.$setViewValue(value);
-//	ngModelCtrl.$render();
-//	});
-//	}
-
-
 	scope.$watch('selectedIndex', function () {
 	    if(!angular.isDefined(scope.selectedIndex) || 
 		    (scope.selectedIndex < 0 || scope.selectedIndex >= scope.xitems.length)){
@@ -1682,81 +1661,7 @@ angular.module('ngMaterialWeburger')
 	    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
 	});
 
-
-//	$$watchExpr('ngDisabled', 'tabindex', {
-//	true: '-1',
-//	false: attr.tabindex
-//	});
-
-//	$mdAria.expectWithText(element, 'aria-label');
-
-//	// Reuse the original input[type=checkbox] directive from
-//	// Angular core.
-//	// This is a bit hacky as we need our own event listener and own
-//	// render
-//	// function.
-//	inputDirective.link.pre(scope, {
-//	on: angular.noop,
-//	0: {}
-//	}, attr, [ngModelCtrl]);
-
-//	scope.mouseActive = false;
-//	element.on('click', listener)
-//	.on('keypress', keypressHandler)
-//	.on('mousedown', function() {
-//	scope.mouseActive = true;
-//	$timeout(function() {
-//	scope.mouseActive = false;
-//	}, 100);
-//	})
-//	.on('focus', function() {
-//	if (scope.mouseActive === false) {
-//	element.addClass('md-focused');
-//	}
-//	})
-//	.on('blur', function() {
-//	element.removeClass('md-focused');
-//	});
-
 	ngModelCtrl.$render = render;
-
-//	function $$watchExpr(expr, htmlAttr, valueOpts) {
-//	if (attr[expr]) {
-//	scope.$watch(attr[expr], function(val) {
-//	if (valueOpts[val]) {
-//	element.attr(htmlAttr, valueOpts[val]);
-//	}
-//	});
-//	}
-//	}
-
-//	function keypressHandler(ev) {
-//	var keyCode = ev.which || ev.keyCode;
-//	if (keyCode === $mdConstant.KEY_CODE.SPACE || keyCode === $mdConstant.KEY_CODE.ENTER) {
-//	ev.preventDefault();
-//	element.addClass('md-focused');
-//	listener(ev);
-//	}
-//	}
-
-//	function listener(ev) {
-//	// skipToggle boolean is used by the switch directive to
-//	// prevent
-//	// the click event
-//	// when releasing the drag. There will be always a click if
-//	// releasing the drag over the checkbox
-//	if (element[0].hasAttribute('disabled') || scope.skipToggle) {
-//	return;
-//	}
-
-//	scope.$apply(function() {
-//	// Toggle the checkbox value...
-//	var viewValue = attr.ngChecked ? attr.checked : !ngModelCtrl.$viewValue;
-
-//	ngModelCtrl.$setViewValue(viewValue, ev && ev.type);
-//	ngModelCtrl.$render();
-//	});
-//	}
 
 	function render() {
 	    for (var item in scope.xitems) {
@@ -1769,18 +1674,11 @@ angular.module('ngMaterialWeburger')
 	    scope.selectedIndex = 0;
 	    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
 	}
-
-//	function setIndeterminateState(newValue) {
-//	isIndeterminate = newValue !== false;
-//	if (isIndeterminate) {
-//	element.attr('aria-checked', 'mixed');
-//	}
-//	element.toggleClass('md-indeterminate', isIndeterminate);
-//	}
     }
 
-
-
+    /*
+     * Directive info
+     */
     return {
 	templateUrl: 'views/directives/wb-ui-setting-choose.html',
 	restrict: 'E',
@@ -2187,11 +2085,6 @@ angular.module('ngMaterialWeburger')
 	    $widget.newWidget({
 		type: 'HtmlText',
 		templateUrl : 'views/widgets/wb-html.html',
-		controller: function($scope){
-//		    $scope.test = 'test string';
-//		    $scope.wbModel.text='my text';
-		},
-		controllerAs: 'Ctrl',
 		label : 'HTML text',
 		description : 'An HTML block text.',
 		image : 'images/wb/html.svg',
@@ -2713,7 +2606,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-ui-choose.html',
-    "<md-tabs class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in xitems\"> <md-tab-label> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs>"
+    "<md-tabs class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in items\"> <md-tab-label> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs>"
   );
 
 
