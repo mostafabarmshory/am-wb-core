@@ -36,22 +36,28 @@ angular.module('ngMaterialWeburger')
  * All primary actions of a widget are supported (such as remove and setting).
  */
 .directive('wbWidget', function() {
+    function postLink(scope, element, attrs, ctrl, transclude) {
+	var id = attrs.$attr.id || '';
+	var index = attrs.$attr.index || '';
+	element.attr('id', id);
+	element.attr('index', index);
+	// Modify angular transclude function
+	// see:
+	// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
+	// FIXME: maso, 2017: use regular dom insted of ng-transclude
+	transclude(scope, function(clone, scope) {
+	    var node = element//
+	    .find('wb-transclude')//
+	    .append(clone);
+	});
+    }
+
     return {
 	templateUrl : 'views/directives/wb-widget.html',
 	restrict : 'E',
 	transclude : true,
 	replace: true,
-	link : function(scope, element, attrs, ctrl, transclude) {
-	    // Modify angular transclude function
-	    // see:
-	    // http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
-	    // FIXME: maso, 2017: use regular dom insted of ng-transclude
-	    transclude(scope, function(clone, scope) {
-		var node = element//
-		.find('wb-transclude')//
-		.append(clone);
-	    });
-	},
+	link : postLink,
 	controller : function($scope, $element, $settings, $widget) {
 	    var element = $element;
 	    /**
