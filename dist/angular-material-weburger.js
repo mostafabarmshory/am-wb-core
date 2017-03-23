@@ -953,6 +953,162 @@ angular.module('ngMaterialWeburger')
  * 
  */
 .directive('wbContent', function($compile, $widget, $controller, $settings, $q) {
+    function postLink(scope, element, attrs) {
+	// Note that object must be an object or array,
+	// NOT a primitive value like string, number, etc.
+	// Note: id must be incremental
+	var objIdMap=new WeakMap();
+	var objectCount = 0;
+	function objectId(object){
+	    if (!objIdMap.has(object)) 
+		objIdMap.set(object,++objectCount);
+	    return objIdMap.get(object);
+	}
+
+	/**
+	 * Find the aunchor
+	 * 
+	 * The anchor is an element where widgets are added into.
+	 * 
+	 * @returns element anchor
+	 */
+	function getAnchor() {
+	    return element//
+	    .children(bodyElementSelector)//
+	    .children(placeholderElementSelector);
+	}
+
+	/**
+	 * Reload view
+	 * 
+	 * Removes all widgets and load the view agin.
+	 */
+	function reloadView() {
+	    cleanView();
+	    var anchor = getAnchor();
+	    var compilesJob = [];
+	    var elements = [];
+	    scope.wbModel.contents.forEach(function(item, index) {
+		compilesJob.push($widget.compile(item, scope)//
+			.then(function(elem) {
+			    elem.attr('id', objectId(item));
+			    elements[index] = elem;
+			}));
+	    });
+	    return $q.all(compilesJob)//
+	    .then(function() {
+		var anchor = getAnchor();
+		elements.forEach(function(item){
+		    anchor.append(item);
+		});
+	    });
+	}
+
+	/**
+	 * New widget
+	 */
+	function newWidget() {
+	    return $widget.select({
+		wbModel : {},
+		style : {}
+	    })//
+	    .then(function(model) {
+		$widget.compile(model, scope)//
+		.then(function(element) {
+		    element.attr('id', objectId(model));
+		    scope.wbModel.contents.push(model);
+		    getAnchor().append(element);
+		});
+	    });
+	}
+
+	/**
+	 * Clean view
+	 * 
+	 * Remove all widgets from the veiw and clean the tmeplate.
+	 * 
+	 */
+	function cleanView() {
+	    element//
+	    .children(bodyElementSelector)//
+	    .children(placeholderElementSelector)//
+	    .empty();
+	}
+
+	/*
+	 * Removes a widget
+	 * 
+	 * Data model and visual element related to the input model will be
+	 * removed.
+	 */
+	function removeChild(model) {
+	    var index = scope.wbModel.contents.indexOf(model);
+	    if (index > -1) {
+		var a = element//
+		.children(bodyElementSelector)//
+		.children(placeholderElementSelector)
+		.children('#'+objectId(model));
+		a.remove();
+		scope.wbModel.contents.splice(index, 1);
+	    }
+	}
+
+	/**
+	 * Load container settings
+	 * 
+	 * Loads settings of the current container.
+	 */
+	function settings() {
+	    return $settings.load({
+		wbModel : scope.wbModel,
+		wbParent : scope.wbParent
+	    });
+	}
+
+	/**
+	 * Adds dragged widget
+	 */
+	function dropCallback(event, index, item, external, type) {
+	    // add widget
+	    $widget.compile(item, scope)//
+	    .then(function(newElement) {
+		var list = element//
+		.children(bodyElementSelector)//
+		.children(placeholderElementSelector);
+		newElement.attr('id', objectId(item));
+		if (index < list[0].childNodes.length) {
+		    newElement.insertBefore(list[0].childNodes[index]);
+		} else {
+		    list.append(newElement);
+		}
+		scope.wbModel.contents.splice(index, 0, item);
+		console.log('widget add to list');
+	    });
+	    return true;
+	}
+
+	/*
+	 * Watch the model for modification.
+	 */
+	scope.$watch('wbModel', function() {
+	    if (!scope.wbModel) {
+		// XXX: maso, 1395: هنوز مدل تعیین نشده
+		return;
+	    }
+	    if (!angular.isArray(scope.wbModel.contents)) {
+		scope.wbModel.contents = [];
+	    }
+	    scope.wbModel.type = 'Container';
+	    reloadView();
+	});
+
+	scope.removeChild = removeChild;
+	scope.settings = settings;
+	scope.dropCallback = dropCallback;
+	scope.newWidget = newWidget;
+	scope.objectId = objectId;
+    }
+
     return {
 	templateUrl : 'views/directives/wb-content.html',
 	transclude : true,
@@ -962,169 +1118,7 @@ angular.module('ngMaterialWeburger')
 	    wbModel : '=?',
 	    wbEditable : '=?'
 	},
-	link : function(scope, element, attrs) {
-	    // Note that object must be an object or array,
-	    // NOT a primitive value like string, number, etc.
-	    var objIdMap=new WeakMap();
-	    var objectCount = 0;
-	    function objectId(object){
-		if (!objIdMap.has(object)) 
-		    objIdMap.set(object,++objectCount);
-		return objIdMap.get(object);
-	    }
-
-	    /**
-	     * Find the aunchor
-	     * 
-	     * The anchor is an element where widgets are added into.
-	     * 
-	     * @returns element anchor
-	     */
-	    function getAnchor() {
-		return element//
-		.children(bodyElementSelector)//
-		.children(placeholderElementSelector);
-	    }
-
-	    /**
-	     * Reload view
-	     * 
-	     * Removes all widgets and load the view agin.
-	     */
-	    function reloadView() {
-		cleanView();
-		var anchor = getAnchor();
-		var compilesJob = [];
-		var elements = [];
-		scope.wbModel.contents.forEach(function(item, index) {
-		    compilesJob.push($widget.compile(item, scope)//
-			    .then(function(elem) {
-				elem.attr('index', index);
-				elem.attr('id', objectId(item));
-				elements.push(elem);
-			    }));
-		});
-		return $q.all(compilesJob)//
-		.then(function() {
-		    elements.sort(function(a, b) {
-			if (a.attr('index') < b.attr('index'))
-			    return -1;
-			if (a.attr('index') > b.attr('index'))
-			    return 1;
-			return 0;
-		    });
-		    var anchor = getAnchor();
-		    elements.forEach(function(item){
-			anchor.append(item);
-		    });
-		});
-	    }
-
-	    /**
-	     * New widget
-	     */
-	    function newWidget() {
-		return $widget.select({
-		    wbModel : {},
-		    style : {}
-		})//
-		.then(function(model) {
-		    $widget.compile(model, scope)//
-		    .then(function(element) {
-			element.attr('index', scope.wbModel.contents.length);
-			element.attr('id', objectId(model));
-			scope.wbModel.contents.push(model);
-			getAnchor().append(element);
-		    });
-		});
-	    }
-
-	    /**
-	     * Clean view
-	     * 
-	     * Remove all widgets from the veiw and clean the tmeplate.
-	     * 
-	     */
-	    function cleanView() {
-		element//
-		.children(bodyElementSelector)//
-		.children(placeholderElementSelector)//
-		.empty();
-	    }
-
-	    /*
-	     * Removes a widget
-	     * 
-	     * Data model and visual element related to the input model will be
-	     * removed.
-	     */
-	    function removeChild(model) {
-		var index = scope.wbModel.contents.indexOf(model);
-		if (index > -1) {
-		    var a = element//
-		    .children(bodyElementSelector)//
-		    .children(placeholderElementSelector)
-		    .children('#'+objectId(model));
-		    a.remove();
-		    scope.wbModel.contents.splice(index, 1);
-		}
-	    }
-
-	    /**
-	     * Load container settings
-	     * 
-	     * Loads settings of the current container.
-	     */
-	    function settings() {
-		return $settings.load({
-		    wbModel : scope.wbModel,
-		    wbParent : scope.wbParent
-		});
-	    }
-
-	    /**
-	     * Adds dragged widget
-	     */
-	    function dropCallback(event, index, item, external, type) {
-		// add widget
-		$widget.compile(item, scope)//
-		.then(function(newElement) {
-		    var list = element//
-		    .children(bodyElementSelector)//
-		    .children(placeholderElementSelector);
-		    newElement.attr('id', objectId(item));
-		    if (index < list[0].childNodes.length) {
-			newElement.insertBefore(list[0].childNodes[index]);
-		    } else {
-			list.append(newElement);
-		    }
-		    scope.wbModel.contents.splice(index, 0, item);
-		    console.log('widget add to list');
-		});
-		return true;
-	    }
-
-	    /*
-	     * Watch the model for modification.
-	     */
-	    scope.$watch('wbModel', function() {
-		if (!scope.wbModel) {
-		    // XXX: maso, 1395: هنوز مدل تعیین نشده
-		    return;
-		}
-		if (!angular.isArray(scope.wbModel.contents)) {
-		    scope.wbModel.contents = [];
-		}
-		scope.wbModel.type = 'Container';
-		reloadView();
-	    });
-
-	    scope.removeChild = removeChild;
-	    scope.settings = settings;
-	    scope.dropCallback = dropCallback;
-	    scope.newWidget = newWidget;
-	    scope.objectId = objectId;
-	}
+	link : postLink
     };
 });//
 
@@ -1280,161 +1274,152 @@ angular.module('ngMaterialWeburger')
  * 
  */
 .directive('wbPanel', function($compile, $widget, $controller, $settings, $q) {
+    function postLink(scope, element, attrs, ctrls, transclud) {
+	
+	/**
+	 * Remove panel from parent
+	 */
+	function remove() {
+	    console.log('panel removed:' + element.attr('id'));
+	    return scope.$parent.removeChild(scope.wbModel);
+	}
+
+	/**
+	 * Empty view
+	 * 
+	 * Remove all widgets from the view.
+	 */
+	function cleanView() {
+	    console.log('remove all widgets:' + element.attr('id'));
+	    element//
+	    .children(bodyElementSelector)//
+	    .children(placeholderElementSelector)//
+	    .empty();
+	}
+
+	/**
+	 * Find aunchor
+	 * 
+	 * Find and return anchor element.
+	 */
+	function getAnchor() {
+	    return element//
+	    .children(bodyElementSelector)//
+	    .children(placeholderElementSelector);
+	}
+
+	/**
+	 * Relaod view
+	 */
+	function reloadView() {
+	    cleanView();
+	    var anchor = getAnchor();
+	    var compilesJob = [];
+	    var elements = [];
+	    scope.wbModel.contents.forEach(function(item, index) {
+		scope.objectId(item);
+		compilesJob.push($widget.compile(item, scope)//
+			.then(function(element) {
+			    element.attr('id', scope.objectId(item));
+			    elements[index] = element;
+			}));
+	    });
+	    return $q.all(compilesJob)//
+	    .then(function() {
+		var anchor = getAnchor();
+		elements.forEach(function(item) {
+		    anchor.append(item);
+		});
+	    });
+	}
+
+	/**
+	 * Adds dragged widget
+	 */
+	function dropCallback(event, index, item, external, type) {
+	    // add widget
+	    $widget.compile(item, scope)//
+	    .then(function(newElement) {
+		var list = element//
+		.children(bodyElementSelector)//
+		.children(placeholderElementSelector);
+		newElement.attr('id', scope.objectId(item));
+		if (index < list[0].childNodes.length) {
+		    newElement.insertBefore(list[0].childNodes[index]);
+		} else {
+		    list.append(newElement);
+		}
+		scope.wbModel.contents.splice(index, 0, item);
+		console.log('widget add to list');
+	    });
+	    return true;
+	}
+
+	/**
+	 * Removes a widget
+	 * 
+	 * Data model and visual element related to the input model will be
+	 * removed.
+	 */
+	function removeChild(model) {
+	    var index = scope.wbModel.contents.indexOf(model);
+	    if (index > -1) {
+		var a = element//
+		.children(bodyElementSelector)//
+		.children(placeholderElementSelector)
+		.children('#'+scope.objectId(model));
+		a.remove();
+		scope.wbModel.contents.splice(index, 1);
+	    }
+	}
+
+	function settings() {
+	    return $settings.load({
+		wbModel : scope.wbModel,
+		wbParent : scope.$parent
+	    });
+	}
+
+	/**
+	 * Select and add a widget
+	 * 
+	 * @deprecated
+	 */
+	function newWidget() {
+	    return $widget.select({
+		wbModel : {},
+		style : {}
+	    })//
+	    .then(function(model) {
+		$widget.compile(model, scope)//
+		.then(function(elem) {
+		    elem.attr('id', scope.objectId(model));
+		    scope.wbModel.contents.push(model);
+		    getAnchor().append(elem);
+		});
+	    });
+	}
+
+	scope.wbModel.name = scope.wbModel.name || 'Panel';
+	scope.removeChild = removeChild;
+	scope.remove = remove;
+	scope.settings = settings;
+	scope.dropCallback = dropCallback;
+	scope.newWidget = newWidget;
+
+	if (!angular.isArray(scope.wbModel.contents)) {
+	    scope.wbModel.contents = [];
+	    return;
+	}
+	reloadView();
+    }
+
     return {
 	templateUrl : 'views/directives/wb-panel.html',
 	restrict : 'E',
 	replace : true,
 	transclude : true,
-	link : function(scope, element, attrs) {
-	    /**
-	     * Remove panel from parent
-	     */
-	    function remove() {
-		console.log('panel removed:' + element.attr('id'));
-		return scope.$parent.removeChild(scope.wbModel);
-	    }
-
-	    /**
-	     * Empty view
-	     * 
-	     * Remove all widgets from the view.
-	     */
-	    function cleanView() {
-		console.log('remove all widgets:' + element.attr('id'));
-		element//
-		.children(bodyElementSelector)//
-		.children(placeholderElementSelector)//
-		.empty();
-	    }
-
-	    /**
-	     * Find aunchor
-	     * 
-	     * Find and return anchor element.
-	     */
-	    function getAnchor() {
-		return element//
-		.children(bodyElementSelector)//
-		.children(placeholderElementSelector);
-	    }
-
-	    /**
-	     * Relaod view
-	     */
-	    function reloadView() {
-		cleanView();
-		var anchor = getAnchor();
-		var compilesJob = [];
-		var elements = [];
-		scope.wbModel.contents.forEach(function(item, index) {
-		    compilesJob.push($widget.compile(item, scope)//
-			    .then(function(element) {
-				element.attr('index', index);
-				element.attr('id', scope.objectId(item));
-				elements.push(element);
-			    }));
-		});
-		return $q.all(compilesJob)//
-		.then(function() {
-		    elements.sort(function(a, b) {
-			if (a.attr('index') < b.attr('index'))
-			    return -1;
-			if (a.attr('index') > b.attr('index'))
-			    return 1;
-			return 0;
-		    });
-		    var anchor = getAnchor();
-		    elements.forEach(function(item) {
-			anchor.append(item);
-		    });
-		});
-	    }
-
-	    /**
-	     * Adds dragged widget
-	     */
-	    function dropCallback(event, index, item, external, type) {
-		// add widget
-		$widget.compile(item, scope)//
-		.then(function(newElement) {
-		    var list = element//
-		    .children(bodyElementSelector)//
-		    .children(placeholderElementSelector);
-		    newElement.attr('id', scope.objectId(item));
-		    if (index < list[0].childNodes.length) {
-			newElement.insertBefore(list[0].childNodes[index]);
-		    } else {
-			list.append(newElement);
-		    }
-		    scope.wbModel.contents.splice(index, 0, item);
-		    console.log('widget add to list');
-		});
-		return true;
-	    }
-
-	    /**
-	     * Removes a widget
-	     * 
-	     * Data model and visual element related to the input model will be
-	     * removed.
-	     */
-	    function removeChild(model) {
-		var index = scope.wbModel.contents.indexOf(model);
-		if (index > -1) {
-		    var a = element//
-		    .children(bodyElementSelector)//
-		    .children(placeholderElementSelector)
-		    .children('#'+scope.objectId(model));
-		    a.remove();
-		    scope.wbModel.contents.splice(index, 1);
-		}
-	    }
-
-	    function settings() {
-		return $settings.load({
-		    wbModel : scope.wbModel,
-		    wbParent : scope.$parent
-		});
-	    }
-
-	    /**
-	     * Select and add a widget
-	     * 
-	     * @deprecated
-	     */
-	    function newWidget() {
-		return $widget.select({
-		    wbModel : {},
-		    style : {}
-		})//
-		.then(function(model) {
-		    $widget.compile(model, scope)//
-		    .then(function(elem) {
-			elem.attr('index', scope.wbModel.contents.length);
-			elem.attr('id', scope.objectId(model));
-			scope.wbModel.contents.push(model);
-			getAnchor().append(elem);
-		    });
-		});
-	    }
-
-	    element.attr('id', scope.objectId(scope.wbModel));
-	    scope.removeChild = removeChild;
-	    scope.remove = remove;
-	    scope.settings = settings;
-	    scope.dropCallback = dropCallback;
-	    scope.newWidget = newWidget;
-
-	    if (!angular.isArray(scope.wbModel.contents)) {
-		scope.wbModel.contents = [];
-		return;
-	    }
-	    if(!angular.isDefined(scope.wbModel.name)){
-		scope.wbModel.name = 'Panel';
-	    }
-	    reloadView();
-
-	}
+	link : postLink
     };
 });//
 
@@ -1849,22 +1834,28 @@ angular.module('ngMaterialWeburger')
  * All primary actions of a widget are supported (such as remove and setting).
  */
 .directive('wbWidget', function() {
+    function postLink(scope, element, attrs, ctrl, transclude) {
+	var id = attrs.$attr.id || '';
+	var index = attrs.$attr.index || '';
+	element.attr('id', id);
+	element.attr('index', index);
+	// Modify angular transclude function
+	// see:
+	// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
+	// FIXME: maso, 2017: use regular dom insted of ng-transclude
+	transclude(scope, function(clone, scope) {
+	    var node = element//
+	    .find('wb-transclude')//
+	    .append(clone);
+	});
+    }
+
     return {
 	templateUrl : 'views/directives/wb-widget.html',
 	restrict : 'E',
 	transclude : true,
 	replace: true,
-	link : function(scope, element, attrs, ctrl, transclude) {
-	    // Modify angular transclude function
-	    // see:
-	    // http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
-	    // FIXME: maso, 2017: use regular dom insted of ng-transclude
-	    transclude(scope, function(clone, scope) {
-		var node = element//
-		.find('wb-transclude')//
-		.append(clone);
-	    });
-	},
+	link : postLink,
 	controller : function($scope, $element, $settings, $widget) {
 	    var element = $element;
 	    /**
@@ -2598,7 +2589,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-setting-panel-group.html',
-    "<div layout=column> <md-toolbar> hi </md-toolbar> <div id=WB-SETTING-PANEL>  </div> </div>"
+    "<div layout=column> <md-toolbar> Settings </md-toolbar> <div id=WB-SETTING-PANEL>  </div> </div>"
   );
 
 
