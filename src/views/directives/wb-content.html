@@ -2,7 +2,10 @@
 	dnd-disable-if="!wbEditable"
 	ng-class="{'wb-panel': wbEditable}">
     <!-- a header is added through edit-mode -->
-    <div ng-show="wbEditable" class="wb-panel-header" layout="row">
+    <div 
+    	ng-show="wbEditable" 
+    	class="wb-panel-header" 
+    	layout="row">
         <span translate> Content</span>
         <span flex></span>
         <md-button

@@ -158,6 +158,8 @@ angular.module('ngMaterialWeburger')
 	    });
 	}
 
+	// Set element ID after compile
+	element.attr('id', scope.objectId(scope.wbModel));
 	scope.wbModel.name = scope.wbModel.name || 'Panel';
 	scope.removeChild = removeChild;
 	scope.remove = remove;

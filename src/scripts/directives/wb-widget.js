@@ -37,10 +37,6 @@ angular.module('ngMaterialWeburger')
  */
 .directive('wbWidget', function() {
     function postLink(scope, element, attrs, ctrl, transclude) {
-	var id = attrs.$attr.id || '';
-	var index = attrs.$attr.index || '';
-	element.attr('id', id);
-	element.attr('index', index);
 	// Modify angular transclude function
 	// see:
 	// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
@@ -85,10 +81,9 @@ angular.module('ngMaterialWeburger')
 	    $scope.remove = remove;
 	    $scope.movedCallback = remove;
 	    $scope.settings = settings;
+	    // Sets widget id after compile
 	    element.attr('id', $scope.objectId($scope.wbModel));
-	    if(!angular.isDefined($scope.wbModel.name)){
-		$scope.wbModel.name = 'Widget';
-	    }
+	    $scope.wbModel.name = $scope.wbModel.name || 'Widget';
 	}
     };
 });

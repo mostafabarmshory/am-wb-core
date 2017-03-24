@@ -23,10 +23,6 @@
  */
 'use strict';
 
-var dragClass = 'wb-content-dragenter';
-var bodyElementSelector = 'div#wb-content-body';
-var placeholderElementSelector = 'div#wb-content-placeholder';
-
 angular.module('ngMaterialWeburger')
 /**
  * @ngdoc directive
@@ -42,6 +38,9 @@ angular.module('ngMaterialWeburger')
  * 
  */
 .directive('wbContent', function($compile, $widget, $controller, $settings, $q) {
+    var dragClass = 'wb-content-dragenter';
+    var bodyElementSelector = 'div#wb-content-body';
+    var placeholderElementSelector = 'div#wb-content-placeholder';
     function postLink(scope, element, attrs) {
 	// Note that object must be an object or array,
 	// NOT a primitive value like string, number, etc.
@@ -133,12 +132,14 @@ angular.module('ngMaterialWeburger')
 	function removeChild(model) {
 	    var index = scope.wbModel.contents.indexOf(model);
 	    if (index > -1) {
-		var a = element//
-		.children(bodyElementSelector)//
-		.children(placeholderElementSelector)
-		.children('#'+objectId(model));
-		a.remove();
-		scope.wbModel.contents.splice(index, 1);
+		var anchor = getAnchor();
+		var a = anchor.children('#'+objectId(model));
+		if(a.length > 0){
+		    a.remove();
+		    scope.wbModel.contents.splice(index, 1);
+		} else {
+		    console.log('node not found');
+		}
 	    }
 	}
 
