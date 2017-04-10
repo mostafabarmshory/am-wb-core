@@ -615,24 +615,69 @@ angular.module('ngMaterialWeburger')
 
 angular.module('ngMaterialWeburger')
 /**
+ * @ngdoc directive
+ * @memberof ngMaterialWeburger
  * @description Apply background into the element
  */
-.directive("wbSize", function() {
-    return {
-	restrict : 'A',
-	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbSize, function(style) {
+.directive("wbBackground", function() {
+	/**
+	 * Sets background attributes into element
+	 * 
+	 * @param element
+	 * @param style
+	 * @returns
+	 */
+	function setBackgroud(element, style){
 		if (!style) {
-		    return;
+			return;
 		}
-		element.css({
-		    'background-color' : style.backgroundColor,
-		    'color' : style.color,
-			'opacity':(style.isTransparent) ? style.opacity/100 : 1,
-		});
-	    }, true);
+		var cssValue = {};
+		if(style.background){
+			cssValue['background'] = style.background;
+		}
+
+		if(style.backgroundColor){
+			cssValue['background-color'] = style.backgroundColor;
+		}
+		if(style.backgroundSize) {
+			cssValue['background-size'] = style.backgroundSize;
+		}
+		if(style.backgroundRepeat) {
+			cssValue['background-repeat'] = style.backgroundRepeat;
+		}
+		if(style.backgroundPosition){
+			cssValue['background-position'] = style.backgroundPosition;
+		}
+		if(style.backgroundAttachment){
+			cssValue['background-attachment'] = style.backgroundAttachment;
+		}
+		if(style.backgroundOrigin){
+			cssValue['background-origin'] = style.backgroundOrigin;
+		}
+		if(style.backgroundClip){
+			cssValue['background-clip'] = style.backgroundClip;
+		}
+		
+		// FIXME: maso, 1395: thies are not background parameter
+		if(style.color){
+			cssValue['color'] = style.color;
+		}
+		if(style.opacity){
+			cssValue['opacity'] = (style.isTransparent) ? style.opacity/100 : 1;
+		}
+		element.css(cssValue);
 	}
-    };
+
+	function postLink(scope, element, attributes) {
+		return scope.$watch(attributes.wbSize, function(style){
+			return setBackgroud(element, style);
+		}, true);
+	}
+
+	return {
+		restrict : 'A',
+		link : postLink
+	};
 });
 /* 
  * The MIT License (MIT)
@@ -2632,7 +2677,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/settings/wb-background.html',
-    " <md-list class=wb-setting-panel>  <wb-ui-setting-on-off-switch title=Transparent? icon=blur_on value=wbModel.style.isTransparent></wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent title=Opacity icon=wb-opacity value=wbModel.style.opacity></wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent slider=\"\" icon=wb-blank value=wbModel.style.opacity></wb-ui-setting-number>  <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.backgroundColor></wb-ui-setting-color> </md-list>"
+    " <md-list class=wb-setting-panel>  <wb-ui-setting-on-off-switch title=Transparent? icon=blur_on value=wbModel.style.isTransparent> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent title=Opacity icon=wb-opacity value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent slider=\"\" icon=wb-blank value=wbModel.style.opacity> </wb-ui-setting-number>  <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background size</label> <input ng-model=wbModel.style.backgroundSize> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background repeat</label> <input ng-model=wbModel.style.backgroundRepeat> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background position</label> <input ng-model=wbModel.style.backgroundPosition> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background attachment</label> <input ng-model=wbModel.style.backgroundAttachment> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background origin</label> <input ng-model=wbModel.style.backgroundOrigin> </md-input-container> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.backgroundColor> </wb-ui-setting-color> </md-list>"
   );
 
 
