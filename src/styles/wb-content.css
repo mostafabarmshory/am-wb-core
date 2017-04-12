@@ -74,37 +74,3 @@ Panel contains serveral children to show a good view. Here is the structure:
 	background-color: #282828;
 	background-size: 12px 12px;
 }
-
-/**************************************************************************************
-Drag and drap 
-
-See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
-***************************************************************************************/
-
-/*
- * When an element is dragged over the list, a new placeholder child element 
- * will be added. This element is of type li and has the class dndPlaceholder 
- * set. Alternatively, you can define your own placeholder by creating a 
- * child element with dndPlaceholder class.
- */
-.dndPlaceholder {
-	/*
-	background: red;
-    */
-	list-style: none;
-	min-width: 36px;
-	min-height: 36px;
-	margin: 5px;
-	font-size: 1.25rem;
-	background-color: #c8dadf;
-	padding: 10px 10px;
-	outline: 2px dashed #92b0b3;
-	outline-offset: -10px;
-}
-
-/*
- * This class will be added to the list while an element is being dragged over the list.
- */
-.dndDragover {
-	
-}
