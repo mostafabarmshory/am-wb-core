@@ -14,6 +14,12 @@ of a widget:
 .wb-widget {
 	margin: 2px;
 	border: 1px dashed #8f9494;
+	height: auto;
+}
+
+.wb-widget-edit {
+	margin: 2px;
+	border: 1px dashed #8f9494;
 }
 
 .wb-widget-header {
@@ -21,9 +27,11 @@ of a widget:
 	background-image: repeating-linear-gradient(315deg, transparent, transparent 12px, rgba(255
 		, 255, 255, .5) 12px, rgba(255, 255, 255, .5) 24px);
 	color: black;
-	padding: 0px;
+	padding: 2px;
+	margin: 0px;
 	border: none;
 	border-bottom: 1px dashed #8f9494;
+	min-height: 24px;
 }
 
 .wb-widget-body {
@@ -52,6 +60,7 @@ of a widget:
 
 .wb-widget-container {
 	position: relative;
+	display: block;
 	top: 0;
 	left: 0;
 	width: 100%;

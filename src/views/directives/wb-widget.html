@@ -1,9 +1,11 @@
 <div 
+	wb-margin="wbModel.style"
 	dnd-disable-if="!wbEditable"
 	dnd-draggable="wbModel"
 	dnd-type="'wb.widget'"
 	dnd-moved="movedCallback()"
-	ng-class="{'wb-widget': wbEditable}" 
+	class="wb-wdget"
+	ng-class="{'wb-widget-edit': wbEditable}" 
 	layout="column"
 	name="{{wbModel.name}}">
     <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
@@ -47,13 +49,15 @@
 	
     <!-- body section (in non-edit mode, this area just shown -->
     <div
-		wb-margin="wbModel.style"
+    	class="wb-widget-body"
 		wb-padding="wbModel.style"
 		wb-size="wbModel.style"
 		wb-background="wbModel.style"
-		wb-border="wbModel.style"
-    	class="wb-widget-body">
-		<div ng-show="ctrl.hoveringDelBtn" class="wb-widget-overlay"></div>
+		wb-border="wbModel.style">
+		<div  
+			class="wb-widget-overlay"
+			ng-show="ctrl.hoveringDelBtn">
+		</div>
 	    <wb-transclude
 	    	class="wb-widget-container"
     		wb-layout="wbModel.style">
