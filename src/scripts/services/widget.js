@@ -34,176 +34,189 @@ angular.module('ngMaterialWeburger')
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$widget', function(
-	$q, $sce, $templateRequest, $compile, $controller, $rootScope,
-	$timeout, $mdDialog, PaginatorPage) {
+		$q, $sce, $templateRequest, $compile, $controller, $rootScope,
+		$timeout, $mdDialog, PaginatorPage) {
 
-    var contentElementAsso = [];
-    var elementKey = [];
-    var notFoundWidget = {
-	    templateUrl : 'views/widgets/wb-notfound.html',
-	    label : 'Not found',
-	    description : 'Element not found',
-    };
-    var container = {
-	    type : 'Container',
-	    label : 'Panel',
-	    description : 'Panel contains list of widgets.',
-	    image : 'images/wb/content.svg',
-	    setting : [ 'description', 'border', 'background',
-		'pageLayout', 'selfLayout' ],
-    };
+	var contentElementAsso = [];
+	var elementKey = [];
+	var notFoundWidget = {
+			templateUrl : 'views/widgets/wb-notfound.html',
+			label : 'Not found',
+			description : 'Element not found',
+	};
+	var container = {
+			type : 'Container',
+			label : 'Panel',
+			description : 'Panel contains list of widgets.',
+			image : 'images/wb/content.svg',
+			setting : [ 'description', 'border', 'background',
+				'pageLayout', 'selfLayout' ],
+	};
 
-    function _widget(model){
-	if (model.type in contentElementAsso) {
-	    return contentElementAsso[model.type];
-	}
-	if (model.type === 'Container') {
-	    return container;
-	}
-	return notFoundWidget;
-    }
-    /**
-     * Finds a widget related to the input model.
-     * 
-     * Widget type is stored in the widget data model. This function get the
-     * model type from the input data type and return related widget.
-     * 
-     * NotFoundElement widget is returned if the widget type is not found.
-     * 
-     * @param model
-     * @returns
-     */
-    function widget(model) {
-	var deferred = $q.defer();
-	$timeout(function() {
-	    deferred.resolve(_widget(model));
-	}, 1);
-	return deferred.promise;
-    }
-
-    /**
-     * Returns list of all registerd widgets.
-     * 
-     * @returns
-     */
-    function widgets() {
-	var deferred = $q.defer();
-	$timeout(function() {
-	    var widgets = new PaginatorPage({});
-	    // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-	    widgets.items = [];
-	    elementKey.forEach(function(type) {
-		widgets.items.push(contentElementAsso[type]);
-	    });
-	    deferred.resolve(widgets);
-	}, 1);
-	return deferred.promise;
-    }
-
-    /**
-     * Registers new widget
-     * 
-     * @See the following page for more information:
-     * 
-     *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
-     * 
-     * @param type
-     * @param model
-     * @returns
-     */
-    function newWidget(widget) {
-	if (widget.type in contentElementAsso) {
-	    // XXX: maso, throw exception
-	    return;
-	}
-	contentElementAsso[widget.type] = widget;
-	elementKey.push(widget.type);
-    }
-
-    /**
-     * Selects a widgetd
-     * 
-     * This is an utility method to help a user to select a widget.
-     * 
-     * @param locals
-     * @returns
-     */
-    function select(locals) {
-	// TODO: maso, 1394: just prepare data for view
-	return $mdDialog.show({
-	    controller : 'WbDialogsCtrl',
-	    templateUrl : 'views/dialogs/wb-selectwidget.html',
-	    parent : angular.element(document.body),
-	    clickOutsideToClose : true,
-	    fullscreen : true,
-	    locals : locals,
-	});
-    }
-
-
-    /*
-     * get setting page template
-     */
-    function getTemplateFor(widget) {
-	var template, templateUrl;
-	if (angular.isDefined(template = widget.template)) {
-	    if (angular.isFunction(template)) {
-		template = template(widget.params);
-	    }
-	} else if (angular.isDefined(templateUrl = widget.templateUrl)) {
-	    if (angular.isFunction(templateUrl)) {
-		templateUrl = templateUrl(widget.params);
-	    }
-	    if (angular.isDefined(templateUrl)) {
-		widget.loadedTemplateUrl = $sce.valueOf(templateUrl);
-		template = $templateRequest(templateUrl);
-	    }
-	}
-	return template;
-    }
-
-    function compile(model, parenScope){
-	var widget = _widget(model);
-	var childScope = null;
-	var element = null;
-
-	// 1- create scope
-	childScope = parenScope.$new(false, parenScope);
-	childScope.wbModel = model;
-
-	// 2- create element
-	return $q.when(getTemplateFor(widget))//
-	.then(function(template) {
-	    if (model.type != 'Page') {
-		template = '<wb-widget>' + template + '</wb-widget>';
-	    }
-	    element = angular.element(template);
-
-	    // 3- bind controller
-	    var link = $compile(element);
-	    if (angular.isDefined(widget.controller)) {
-		var locals = {
-			$scope : childScope,
-			$element : element,
-			// TODO: maso, 2017: bind wbModel, wbParent,
-			// and wbEditable
-		};
-		var controller = $controller(widget.controller, locals);
-		if (widget.controllerAs) {
-		    childScope[widget.controllerAs] = controller;
+	function _widget(model){
+		if (model.type in contentElementAsso) {
+			return contentElementAsso[model.type];
 		}
-		element.data('$ngControllerController', controller);
-	    }
-	    link(childScope);
-	    return element;
-	});
-    }
+		if (model.type === 'Container') {
+			return container;
+		}
+		return notFoundWidget;
+	}
+	/**
+	 * Finds a widget related to the input model.
+	 * 
+	 * Widget type is stored in the widget data model. This function get the
+	 * model type from the input data type and return related widget.
+	 * 
+	 * NotFoundElement widget is returned if the widget type is not found.
+	 * 
+	 * @param model
+	 * @returns
+	 */
+	function widget(model) {
+		var deferred = $q.defer();
+		$timeout(function() {
+			deferred.resolve(_widget(model));
+		}, 1);
+		return deferred.promise;
+	}
 
-    // تعیین سرویس‌ها
-    this.newWidget = newWidget;
-    this.widget = widget;
-    this.widgets = widgets;
-    this.select = select;
-    this.getTemplateFor = getTemplateFor;
-    this.compile = compile;
+	/**
+	 * Returns list of all registerd widgets.
+	 * 
+	 * @returns
+	 */
+	function widgets() {
+		var deferred = $q.defer();
+		$timeout(function() {
+			var widgets = new PaginatorPage({});
+			// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+			widgets.items = [];
+			elementKey.forEach(function(type) {
+				widgets.items.push(contentElementAsso[type]);
+			});
+			deferred.resolve(widgets);
+		}, 1);
+		return deferred.promise;
+	}
+
+	/**
+	 * Registers new widget
+	 * 
+	 * @See the following page for more information:
+	 * 
+	 *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
+	 * 
+	 * @param type
+	 * @param model
+	 * @returns
+	 */
+	function newWidget(widget) {
+		if (widget.type in contentElementAsso) {
+			// XXX: maso, throw exception
+			return;
+		}
+		contentElementAsso[widget.type] = widget;
+		elementKey.push(widget.type);
+	}
+
+	/**
+	 * Selects a widgetd
+	 * 
+	 * This is an utility method to help a user to select a widget.
+	 * 
+	 * @param locals
+	 * @returns
+	 */
+	function select(locals) {
+		// TODO: maso, 1394: just prepare data for view
+		return $mdDialog.show({
+			controller : 'WbDialogsCtrl',
+			templateUrl : 'views/dialogs/wb-selectwidget.html',
+			parent : angular.element(document.body),
+			clickOutsideToClose : true,
+			fullscreen : true,
+			locals : locals,
+		});
+	}
+
+
+	/*
+	 * get setting page template
+	 */
+	function getTemplateFor(widget) {
+		var template, templateUrl;
+		if (angular.isDefined(template = widget.template)) {
+			if (angular.isFunction(template)) {
+				template = template(widget.params);
+			}
+		} else if (angular.isDefined(templateUrl = widget.templateUrl)) {
+			if (angular.isFunction(templateUrl)) {
+				templateUrl = templateUrl(widget.params);
+			}
+			if (angular.isDefined(templateUrl)) {
+				widget.loadedTemplateUrl = $sce.valueOf(templateUrl);
+				template = $templateRequest(templateUrl);
+			}
+		}
+		return template;
+	}
+
+	function compile(model, parenScope){
+		var widget = _widget(model);
+		var childScope = null;
+		var element = null;
+
+		// 1- create scope
+		childScope = parenScope.$new(false, parenScope);
+		childScope.wbModel = model;
+
+		// 2- create element
+		return $q.when(getTemplateFor(widget))//
+		.then(function(template) {
+			if (model.type != 'Page') {
+				template = '<wb-widget>' + template + '</wb-widget>';
+			}
+			element = angular.element(template);
+
+			// 3- bind controller
+			var link = $compile(element);
+			if (angular.isDefined(widget.controller)) {
+				var locals = {
+						$scope : childScope,
+						$element : element,
+						// TODO: maso, 2017: bind wbModel, wbParent,
+						// and wbEditable
+				};
+				var controller = $controller(widget.controller, locals);
+				if (widget.controllerAs) {
+					childScope[widget.controllerAs] = controller;
+				}
+				element.data('$ngControllerController', controller);
+			}
+			link(childScope);
+			return element;
+		});
+	}
+	
+	/**
+	 * Creates new serialized data of widget
+	 * @param widget
+	 * @returns
+	 */
+	function widgetData(widget){
+		var sample = widget.data || {style:{}};
+		var data = angular.copy(sample);
+		data.type = widget.type;
+		return data;
+	}
+
+	// تعیین سرویس‌ها
+	this.newWidget = newWidget;
+	this.widget = widget;
+	this.widgets = widgets;
+	this.widgetData = widgetData;
+	this.select = select;
+	this.getTemplateFor = getTemplateFor;
+	this.compile = compile;
 });
