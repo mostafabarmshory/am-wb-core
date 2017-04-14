@@ -1,10 +1,9 @@
 <div 
-	wb-margin="wbModel.style"
 	dnd-disable-if="!wbEditable"
 	dnd-draggable="wbModel"
 	dnd-type="'wb.widget'"
 	dnd-moved="movedCallback()"
-	class="wb-wdget"
+	class="wb-widget"
 	ng-class="{'wb-widget-edit': wbEditable}" 
 	layout="column"
 	name="{{wbModel.name}}">
@@ -53,7 +52,8 @@
 		wb-padding="wbModel.style"
 		wb-size="wbModel.style"
 		wb-background="wbModel.style"
-		wb-border="wbModel.style">
+		wb-border="wbModel.style"
+		wb-margin="wbModel.style">
 		<div  
 			class="wb-widget-overlay"
 			ng-show="ctrl.hoveringDelBtn">
