@@ -536,56 +536,55 @@ angular.module('ngMaterialWeburger')
  * را انتخاب کند.
  */
 .controller('WbWidgetSelectCtrl',
-	function($scope, $widget, PaginatorParameter) {
-    var scope = $scope;
-    var paginatorParameter = new PaginatorParameter();
+		function($scope, $widget, PaginatorParameter) {
+	var scope = $scope;
+	var paginatorParameter = new PaginatorParameter();
 
-    /**
-     * ویجت‌های موجود را لود می‌کند
-     * 
-     * تمام ویجت‌های لود شده در متغیری به نام widgets توی اسکپ بار
-     * می‌شود.
-     * 
-     */
-    function loadWidgets() {
-	$widget.widgets(paginatorParameter).then(function(widgets) {
-	    scope.widgets = widgets;
-	    selectWidget(widgets.items[0]);
-	});
-    }
+	/**
+	 * ویجت‌های موجود را لود می‌کند
+	 * 
+	 * تمام ویجت‌های لود شده در متغیری به نام widgets توی اسکپ بار
+	 * می‌شود.
+	 * 
+	 */
+	function loadWidgets() {
+		$widget.widgets(paginatorParameter).then(function(widgets) {
+			scope.widgets = widgets;
+			selectWidget(widgets.items[0]);
+		});
+	}
 
-    /**
-     * ویجت پیش فرض را تعیین می‌کند
-     * 
-     * با انتخاب یک ویجت به عنوان ویجت پیش فرض می‌توان نمایش خاصی از آن
-     * را در سیستم ایجاد کرد.
-     * 
-     * @memberof WbWidgetSelectCtrl
-     * @param {Widget}
-     *                widget ویجت پیش فرض را تعیین می‌کند
-     * @returns
-     */
-    function selectWidget(widget) {
-	scope.cwidget = widget;
-	// TODO: bind the widget
-    }
+	/**
+	 * ویجت پیش فرض را تعیین می‌کند
+	 * 
+	 * با انتخاب یک ویجت به عنوان ویجت پیش فرض می‌توان نمایش خاصی از آن
+	 * را در سیستم ایجاد کرد.
+	 * 
+	 * @memberof WbWidgetSelectCtrl
+	 * @param {Widget}
+	 *                widget ویجت پیش فرض را تعیین می‌کند
+	 * @returns
+	 */
+	function selectWidget(widget) {
+		scope.cwidget = widget;
+		// TODO: bind the widget
+	}
 
-    /**
-     * ویجت را به عنوان ویجت انتخاب شده تعیین می‌کندs
-     * 
-     * @memberof WbWidgetSelectCtrl
-     * @param widget
-     * @returns
-     */
-    function answerWidget(widget) {
-	var element = angular.copy(widget.data);
-	$scope.answer(element);
-    }
+	/**
+	 * ویجت را به عنوان ویجت انتخاب شده تعیین می‌کندs
+	 * 
+	 * @memberof WbWidgetSelectCtrl
+	 * @param widget
+	 * @returns
+	 */
+	function answerWidget(widget) {
+		$scope.answer($widget.widgetData(widget));
+	}
 
-    // تعیین خصوصیت‌های اسکوپ
-    scope.selectWidget = selectWidget;
-    scope.answerWidget = answerWidget;
-    loadWidgets();
+	// تعیین خصوصیت‌های اسکوپ
+	scope.selectWidget = selectWidget;
+	scope.answerWidget = answerWidget;
+	loadWidgets();
 });
 
 /* 
@@ -1144,7 +1143,7 @@ angular.module('ngMaterialWeburger')
 	    if (!angular.isArray(scope.wbModel.contents)) {
 		scope.wbModel.contents = [];
 	    }
-	    scope.wbModel.type = 'Container';
+	    scope.wbModel.type = 'Page';
 	    reloadView();
 	});
 
@@ -2004,66 +2003,66 @@ angular.module('ngMaterialWeburger')
  * Load widgets
  */
 .run(function($settings) {
-    $settings.newPage({
-	type: 'general',
-	label : 'general',
-	templateUrl : 'views/settings/wb-general.html'
-    });
-    $settings.newPage({
-	type: 'background',
-	label : 'Background',
-	icon : 'image',
-	description : 'manage',
-	templateUrl : 'views/settings/wb-background.html'
-    });
-    $settings.newPage({
-	type: 'text',
-	label : 'Frontend text',
-	controller: 'WbTextSettingsCtrl',
-	templateUrl : 'views/settings/wb-text.html'
-    });
-    $settings.newPage({
-	type: 'description',
-	label : 'Description',
-	templateUrl : 'views/settings/wb-description.html'
-    });
-    $settings.newPage({
-	type: 'layout',
-	label : 'Layout',
-	icon: 'dashboard',
-	controller: 'WbLayoutWbSettingsCtrl',
-	templateUrl : 'views/settings/wb-layout.html'
-    });
-    $settings.newPage({
-	type: 'border',
-	label : 'Border',
-	icon: 'border_all',
-	controller: 'WbBorderSettingCtrl',
-	templateUrl : 'views/settings/wb-border.html'
-    });
-    $settings.newPage({
-	type: 'pageLayout',
-	label : 'Page Layout',
-	icon: 'dashboard',
-	controller: 'WbPageLayoutWbSettingsCtrl',
-	templateUrl : 'views/settings/wb-layout-page.html'
-    });
-    $settings.newPage({
-	type: 'selfLayout',
-	label : 'Self Layout',
-	controller: 'WbSelfLayoutWbSettingsCtrl',
-	templateUrl : 'views/settings/wb-layout-self.html'
-    });
-    $settings.newPage({
-	type: 'marginPadding',
-	label : 'Margin/Padding',
-	templateUrl : 'views/settings/wb-margin-padding.html'
-    });
-    $settings.newPage({
-	type: 'minMaxSize',
-	label : 'Min/Max',
-	templateUrl : 'views/settings/wb-min-max-size.html'
-    });
+	$settings.newPage({
+		type: 'general',
+		label : 'general',
+		templateUrl : 'views/settings/wb-general.html'
+	});
+	$settings.newPage({
+		type: 'background',
+		label : 'Background',
+		icon : 'image',
+		description : 'manage',
+		templateUrl : 'views/settings/wb-background.html'
+	});
+	$settings.newPage({
+		type: 'text',
+		label : 'Frontend text',
+		controller: 'WbTextSettingsCtrl',
+		templateUrl : 'views/settings/wb-text.html'
+	});
+	$settings.newPage({
+		type: 'description',
+		label : 'Description',
+		templateUrl : 'views/settings/wb-description.html'
+	});
+	$settings.newPage({
+		type: 'layout',
+		label : 'Layout',
+		icon: 'dashboard',
+		controller: 'WbLayoutWbSettingsCtrl',
+		templateUrl : 'views/settings/wb-layout.html'
+	});
+	$settings.newPage({
+		type: 'border',
+		label : 'Border',
+		icon: 'border_all',
+		controller: 'WbBorderSettingCtrl',
+		templateUrl : 'views/settings/wb-border.html'
+	});
+	$settings.newPage({
+		type: 'pageLayout',
+		label : 'Page Layout',
+		icon: 'dashboard',
+		controller: 'WbPageLayoutWbSettingsCtrl',
+		templateUrl : 'views/settings/wb-layout-page.html'
+	});
+	$settings.newPage({
+		type: 'selfLayout',
+		label : 'Self Layout',
+		controller: 'WbSelfLayoutWbSettingsCtrl',
+		templateUrl : 'views/settings/wb-layout-self.html'
+	});
+	$settings.newPage({
+		type: 'marginPadding',
+		label : 'Margin/Padding',
+		templateUrl : 'views/settings/wb-margin-padding.html'
+	});
+	$settings.newPage({
+		type: 'minMaxSize',
+		label : 'Min/Max',
+		templateUrl : 'views/settings/wb-min-max-size.html'
+	});
 });
 
 /* 
@@ -2097,57 +2096,30 @@ angular.module('ngMaterialWeburger')
  * Load widgets
  */
 .run(
-	function($widget) {
-	    // Page
-	    $widget.newWidget({
-		type: 'Page',
-		template : '<wb-panel></wb-panel>',
-		label : 'Panel',
-		description : 'Panel contains list of widgets.',
-		image : 'images/wb/content.svg',
-		help : 'http://dpq.co.ir/more-information-link',
-		setting: [ 'description', 'border',
-			'background', 'pageLayout',
-			'selfLayout' ],
-		data : {
-		    type : 'Page',
-		    style : {
-			direction : 'column',
-		    },
-		    contents : []
-		}
-	    });
-	    // HTML text
-	    $widget.newWidget({
-		type: 'HtmlText',
-		templateUrl : 'views/widgets/wb-html.html',
-		label : 'HTML text',
-		description : 'An HTML block text.',
-		image : 'images/wb/html.svg',
-		help : 'http://dpq.co.ir',
-		setting:['text', 'selfLayout', 'border',
-			'background', 'marginPadding',
-			'minMaxSize'],
-		data : {
-		    type : 'HtmlText',
-		    body : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-		    style : {
-			marginLeft : 1,
-			marginRight : 1,
-			marginTop : 1,
-			marginBottom : 1,
-			paddingLeft : 1,
-			paddingRight : 1,
-			paddingTop : 1,
-			paddingBottom : 1,
-			minWidth : 0,
-			maxWidth : 0,
-			minHeight : 0,
-			maxHeight : 0
-		    }
-		}
-	    });
-	});
+		function($widget) {
+			// Page
+			$widget.newWidget({
+				type: 'Group',
+				template : '<wb-panel></wb-panel>',
+				label : 'Panel',
+				description : 'Panel contains list of widgets.',
+				image : 'images/wb/content.svg',
+				help : 'http://dpq.co.ir/more-information-link',
+			});
+			// HTML text
+			$widget.newWidget({
+				type: 'HtmlText',
+				templateUrl : 'views/widgets/wb-html.html',
+				label : 'HTML text',
+				description : 'An HTML block text.',
+				image : 'images/wb/html.svg',
+				help : 'http://dpq.co.ir',
+				setting:['text'],
+				data : {
+					text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+				}
+			});
+		});
 
 /* 
  * The MIT License (MIT)
@@ -2224,184 +2196,214 @@ angular
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service(
-	'$settings',
-	function($rootScope, $controller, $widget, $q, $sce, $compile,
-		$document, $templateRequest) {
-	    var WB_SETTING_PANEL_ID = 'WB-SETTING-PANEL';
-	    /**
-	     * Setting page storage
-	     * 
-	     */
-	    var settingPages = {};
-	    var notFound = {
-		    label : 'Settings not found',
-		    templateUrl : 'views/settings/wb-notfound.html'
-	    };
+		'$settings',
+		function($rootScope, $controller, $widget, $q, $sce, $compile,
+				$document, $templateRequest) {
+			var WB_SETTING_PANEL_ID = 'WB-SETTING-PANEL';
 
-	    var oldScope;
+			/*
+			 * Default settings
+			 */
+			var WB_SETTINGS_PAGE_DEFAULT = ['description', 'border',
+				'background', 'pageLayout'];
+			var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
+				'background', 'pageLayout', 'selfLayout',
+				'marginPadding', 'minMaxSize' ];
+			var WB_SETTINGS_WIDGET_DEFAULT = [ 'selfLayout', 'border',
+				'background', 'marginPadding', 'minMaxSize' ];
+			/**
+			 * Setting page storage
+			 * 
+			 */
+			var settingPages = {};
+			var notFound = {
+					label : 'Settings not found',
+					templateUrl : 'views/settings/wb-notfound.html'
+			};
 
-	    /**
-	     * Fetchs a setting page.
-	     * 
-	     * @param model
-	     * @returns
-	     */
-	    function page(type) {
-		var widget = notFound;
-		if (type in settingPages) {
-		    widget = settingPages[type];
-		}
-		return widget;
-	    }
+			var oldScope;
 
-	    /**
-	     * Adds new setting page.
-	     * 
-	     * @returns
-	     */
-	    function newPage(page) {
-		settingPages[page.type] = page;
-	    }
+			/**
+			 * Fetchs a setting page.
+			 * 
+			 * @param model
+			 * @returns
+			 */
+			function page(type) {
+				var widget = notFound;
+				if (type in settingPages) {
+					widget = settingPages[type];
+				}
+				return widget;
+			}
 
-	    /**
-	     * Finds and lists all setting pages.
-	     * 
-	     * @returns
-	     */
-	    function pages() {
-		// TODO: maso, 1395:
-	    }
+			/**
+			 * Adds new setting page.
+			 * 
+			 * @returns
+			 */
+			function newPage(page) {
+				settingPages[page.type] = page;
+			}
 
-	    /*
-	     * get setting page template
-	     */
-	    function getTemplateFor(page) {
-		var template, templateUrl;
-		if (angular.isDefined(template = page.template)) {
-		    if (angular.isFunction(template)) {
-			template = template(page.params);
-		    }
-		} else if (angular
-			.isDefined(templateUrl = page.templateUrl)) {
-		    if (angular.isFunction(templateUrl)) {
-			templateUrl = templateUrl(page.params);
-		    }
-		    if (angular.isDefined(templateUrl)) {
-			page.loadedTemplateUrl = $sce
-			.valueOf(templateUrl);
-			template = $templateRequest(templateUrl);
-		    }
-		}
-		return template;
-	    }
+			/**
+			 * Finds and lists all setting pages.
+			 * 
+			 * @returns
+			 */
+			function pages() {
+				// TODO: maso, 1395:
+			}
 
-	    /**
-	     * encapsulate template srce with panel widget template.
-	     * 
-	     * @param page
-	     *                setting page config
-	     * @param tempateSrc
-	     *                setting page html template
-	     * @returns encapsulate html template
-	     */
-	    function _encapsulateSettingPanel(page, templateSrc) {
-		// TODO: maso, 2017: pass all paramter to the setting
-		// panel.
-		var attr = ' ';
-		if (page.label) {
-		    attr += ' label=\"' + page.label + '\"';
-		}
-		if (page.icon) {
-		    attr += ' icon=\"' + page.icon + '\"';
-		}
-		if (page.description) {
-		    attr += ' description=\"' + page.description + '\"';
-		}
-		return '<wb-setting-panel ' + attr + '>' + templateSrc
-		+ '</wb-setting-panel>';
-	    }
+			/**
+			 * Defines default settings for widget
+			 * 
+			 * @param widget
+			 * @returns
+			 */
+			function getDefaultSettingsFor(widget) {
+				if (widget.type === 'Page') {
+					return WB_SETTINGS_PAGE_DEFAULT;
+				}
+				if (widget.type === 'Group') {
+					return WB_SETTINGS_GROUP_DEFAULT;
+				}
+				return WB_SETTINGS_WIDGET_DEFAULT;
+			}
 
-	    /**
-	     * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-	     * 
-	     * @returns
-	     */
-	    function loadSetting(models) {
-		var widget = null;
-		var jobs = [];
-		var pages = [];
+			/*
+			 * get setting page template
+			 */
+			function getTemplateFor(page) {
+				var template, templateUrl;
+				if (angular.isDefined(template = page.template)) {
+					if (angular.isFunction(template)) {
+						template = template(page.params);
+					}
+				} else if (angular
+						.isDefined(templateUrl = page.templateUrl)) {
+					if (angular.isFunction(templateUrl)) {
+						templateUrl = templateUrl(page.params);
+					}
+					if (angular.isDefined(templateUrl)) {
+						page.loadedTemplateUrl = $sce
+						.valueOf(templateUrl);
+						template = $templateRequest(templateUrl);
+					}
+				}
+				return template;
+			}
 
-		// 0- destroy old resource
-		if (angular.isDefined(oldScope)) {
-		    oldScope.$destroy();
-		}
-		var scope = $rootScope.$new(true, $rootScope);
-		scope.wbModel = models.wbModel;
-		scope.wbParent = models.wbParent;
-		oldScope = scope;
+			/**
+			 * encapsulate template srce with panel widget template.
+			 * 
+			 * @param page
+			 *            setting page config
+			 * @param tempateSrc
+			 *            setting page html template
+			 * @returns encapsulate html template
+			 */
+			function _encapsulateSettingPanel(page, templateSrc) {
+				// TODO: maso, 2017: pass all paramter to the setting
+				// panel.
+				var attr = ' ';
+				if (page.label) {
+					attr += ' label=\"' + page.label + '\"';
+				}
+				if (page.icon) {
+					attr += ' icon=\"' + page.icon + '\"';
+				}
+				if (page.description) {
+					attr += ' description=\"' + page.description + '\"';
+				}
+				return '<wb-setting-panel ' + attr + '>' + templateSrc
+				+ '</wb-setting-panel>';
+			}
 
-		// 1- Find element
-		var target = $document.find('#' + WB_SETTING_PANEL_ID);
+			/**
+			 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+			 * 
+			 * @returns
+			 */
+			function loadSetting(models) {
+				var widget = null;
+				var jobs = [];
+				var pages = [];
 
-		// 2- Clear childrens
-		target.empty();
+				// 0- destroy old resource
+				if (angular.isDefined(oldScope)) {
+					oldScope.$destroy();
+				}
+				var scope = $rootScope.$new(true, $rootScope);
+				scope.wbModel = models.wbModel;
+				scope.wbParent = models.wbParent;
+				oldScope = scope;
 
-		// 3- load pages
-		$widget.widget(models.wbModel)//
-		.then(function(w) {
-		    widget = w;
-		    if (angular.isArray(widget.setting)) {
-			angular
-			.forEach(widget.setting, function(type) {
-			    var page = notFound;
-			    if (type in settingPages) {
-				page = settingPages[type];
-			    }
-			    var template = getTemplateFor(page);
-			    if (angular.isDefined(template)) {
-				var job = template.then(function(templateSrc) {
-				    templateSrc = _encapsulateSettingPanel(page, templateSrc);
-				    var element = angular.element(templateSrc);
-				    if (angular.isDefined(page.controller)) {
-					$controller(page.controller,{
-					    $scope : scope,
-					    $element : element,
+				// 1- Find element
+				var target = $document.find('#' + WB_SETTING_PANEL_ID);
+
+				// 2- Clear childrens
+				target.empty();
+
+				// 3- load pages
+				$widget.widget(models.wbModel)//
+				.then(function(w) {
+					widget = w;
+					var widgetSettings = getDefaultSettingsFor(w);
+					if (angular.isArray(widget.setting)) {
+						widgetSettings = widgetSettings
+						.concat(widget.setting);
+					}
+					angular.forEach(widgetSettings, function(type) {
+						var page = notFound;
+						if (type in settingPages) {
+							page = settingPages[type];
+						}
+						var template = getTemplateFor(page);
+						if (angular.isDefined(template)) {
+							var job = template.then(function(templateSrc) {
+								templateSrc = _encapsulateSettingPanel(page, templateSrc);
+								var element = angular.element(templateSrc);
+								if (angular .isDefined(page.controller)) {
+									$controller(page.controller, {
+										$scope : scope,
+										$element : element,
+									});
+								}
+								$compile(element)(scope);
+								element.attr('label',page.lable);
+								pages.push(element);
+							});
+							jobs.push(job);
+						}
 					});
-				    }
-				    $compile(element)(scope);
-				    element.attr('label', page.lable);
-				    pages.push(element);
-				});
-				jobs.push(job);
-			    }
-			});
-		    } else {
-			// TODO: maso, 2017: not setting
-			// page founnd
-		    }
-		})//
-		.then(function() {
-		    $q.all(jobs).then(function() {
-			pages.sort(function(a, b) {
-			    if (a.attr('label') < b.attr('label'))
-				return -1;
-			    if (a.attr('label') > b.attr('label'))
-				return 1;
-			    return 0;
-			});
-			angular.forEach(pages, function(element) {
-			    target.append(element);
-			});
-		    });
-		});
-	    }
 
-	    // تعیین سرویس‌ها
-	    this.WB_SETTING_PANEL_ID = WB_SETTING_PANEL_ID;
-	    this.page = page;
-	    this.load = loadSetting;
-	    this.newPage = newPage;
-	});
+				})
+				//
+				.then(function() {
+					$q.all(jobs)//
+					.then(function() {
+						pages.sort(function(a, b) {
+							if (a.attr('label') < b.attr('label'))
+								return -1;
+							if (a.attr('label') > b.attr('label'))
+								return 1;
+							return 0;
+						});
+						angular.forEach(pages, function(element) {
+							target
+							.append(element);
+						});
+					});
+				});
+			}
+
+			// تعیین سرویس‌ها
+			this.WB_SETTING_PANEL_ID = WB_SETTING_PANEL_ID;
+			this.page = page;
+			this.load = loadSetting;
+			this.newPage = newPage;
+		});
 
 /* 
  * The MIT License (MIT)
@@ -2439,178 +2441,189 @@ angular.module('ngMaterialWeburger')
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$widget', function(
-	$q, $sce, $templateRequest, $compile, $controller, $rootScope,
-	$timeout, $mdDialog, PaginatorPage) {
+		$q, $sce, $templateRequest, $compile, $controller, $rootScope,
+		$timeout, $mdDialog, PaginatorPage) {
 
-    var contentElementAsso = [];
-    var elementKey = [];
-    var notFoundWidget = {
-	    templateUrl : 'views/widgets/wb-notfound.html',
-	    label : 'Not found',
-	    description : 'Element not found',
-    };
-    var container = {
-	    type : 'Container',
-	    label : 'Panel',
-	    description : 'Panel contains list of widgets.',
-	    image : 'images/wb/content.svg',
-	    setting : [ 'description', 'border', 'background',
-		'pageLayout', 'selfLayout' ],
-    };
+	var contentElementAsso = [];
+	var elementKey = [];
+	var notFoundWidget = {
+			templateUrl : 'views/widgets/wb-notfound.html',
+			label : 'Not found',
+			description : 'Element not found',
+	};
+	var container = {
+			type : 'Page',
+			label : 'Page',
+			description : 'Panel contains list of widgets.',
+			image : 'images/wb/content.svg',
+	};
 
-    function _widget(model){
-	if (model.type in contentElementAsso) {
-	    return contentElementAsso[model.type];
-	}
-	if (model.type === 'Container') {
-	    return container;
-	}
-	return notFoundWidget;
-    }
-    /**
-     * Finds a widget related to the input model.
-     * 
-     * Widget type is stored in the widget data model. This function get the
-     * model type from the input data type and return related widget.
-     * 
-     * NotFoundElement widget is returned if the widget type is not found.
-     * 
-     * @param model
-     * @returns
-     */
-    function widget(model) {
-	var deferred = $q.defer();
-	$timeout(function() {
-	    deferred.resolve(_widget(model));
-	}, 1);
-	return deferred.promise;
-    }
-
-    /**
-     * Returns list of all registerd widgets.
-     * 
-     * @returns
-     */
-    function widgets() {
-	var deferred = $q.defer();
-	$timeout(function() {
-	    var widgets = new PaginatorPage({});
-	    // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-	    widgets.items = [];
-	    elementKey.forEach(function(type) {
-		widgets.items.push(contentElementAsso[type]);
-	    });
-	    deferred.resolve(widgets);
-	}, 1);
-	return deferred.promise;
-    }
-
-    /**
-     * Registers new widget
-     * 
-     * @See the following page for more information:
-     * 
-     *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
-     * 
-     * @param type
-     * @param model
-     * @returns
-     */
-    function newWidget(widget) {
-	if (widget.type in contentElementAsso) {
-	    // XXX: maso, throw exception
-	    return;
-	}
-	contentElementAsso[widget.type] = widget;
-	elementKey.push(widget.type);
-    }
-
-    /**
-     * Selects a widgetd
-     * 
-     * This is an utility method to help a user to select a widget.
-     * 
-     * @param locals
-     * @returns
-     */
-    function select(locals) {
-	// TODO: maso, 1394: just prepare data for view
-	return $mdDialog.show({
-	    controller : 'WbDialogsCtrl',
-	    templateUrl : 'views/dialogs/wb-selectwidget.html',
-	    parent : angular.element(document.body),
-	    clickOutsideToClose : true,
-	    fullscreen : true,
-	    locals : locals,
-	});
-    }
-
-
-    /*
-     * get setting page template
-     */
-    function getTemplateFor(widget) {
-	var template, templateUrl;
-	if (angular.isDefined(template = widget.template)) {
-	    if (angular.isFunction(template)) {
-		template = template(widget.params);
-	    }
-	} else if (angular.isDefined(templateUrl = widget.templateUrl)) {
-	    if (angular.isFunction(templateUrl)) {
-		templateUrl = templateUrl(widget.params);
-	    }
-	    if (angular.isDefined(templateUrl)) {
-		widget.loadedTemplateUrl = $sce.valueOf(templateUrl);
-		template = $templateRequest(templateUrl);
-	    }
-	}
-	return template;
-    }
-
-    function compile(model, parenScope){
-	var widget = _widget(model);
-	var childScope = null;
-	var element = null;
-
-	// 1- create scope
-	childScope = parenScope.$new(false, parenScope);
-	childScope.wbModel = model;
-
-	// 2- create element
-	return $q.when(getTemplateFor(widget))//
-	.then(function(template) {
-	    if (model.type != 'Page') {
-		template = '<wb-widget>' + template + '</wb-widget>';
-	    }
-	    element = angular.element(template);
-
-	    // 3- bind controller
-	    var link = $compile(element);
-	    if (angular.isDefined(widget.controller)) {
-		var locals = {
-			$scope : childScope,
-			$element : element,
-			// TODO: maso, 2017: bind wbModel, wbParent,
-			// and wbEditable
-		};
-		var controller = $controller(widget.controller, locals);
-		if (widget.controllerAs) {
-		    childScope[widget.controllerAs] = controller;
+	function _widget(model){
+		if (model.type in contentElementAsso) {
+			return contentElementAsso[model.type];
 		}
-		element.data('$ngControllerController', controller);
-	    }
-	    link(childScope);
-	    return element;
-	});
-    }
+		if (model.type === 'Page') {
+			return container;
+		}
+		return notFoundWidget;
+	}
+	/**
+	 * Finds a widget related to the input model.
+	 * 
+	 * Widget type is stored in the widget data model. This function get the
+	 * model type from the input data type and return related widget.
+	 * 
+	 * NotFoundElement widget is returned if the widget type is not found.
+	 * 
+	 * @param model
+	 * @returns
+	 */
+	function widget(model) {
+		var deferred = $q.defer();
+		$timeout(function() {
+			deferred.resolve(_widget(model));
+		}, 1);
+		return deferred.promise;
+	}
 
-    // تعیین سرویس‌ها
-    this.newWidget = newWidget;
-    this.widget = widget;
-    this.widgets = widgets;
-    this.select = select;
-    this.getTemplateFor = getTemplateFor;
-    this.compile = compile;
+	/**
+	 * Returns list of all registerd widgets.
+	 * 
+	 * @returns
+	 */
+	function widgets() {
+		var deferred = $q.defer();
+		$timeout(function() {
+			var widgets = new PaginatorPage({});
+			// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+			widgets.items = [];
+			elementKey.forEach(function(type) {
+				widgets.items.push(contentElementAsso[type]);
+			});
+			deferred.resolve(widgets);
+		}, 1);
+		return deferred.promise;
+	}
+
+	/**
+	 * Registers new widget
+	 * 
+	 * @See the following page for more information:
+	 * 
+	 *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
+	 * 
+	 * @param type
+	 * @param model
+	 * @returns
+	 */
+	function newWidget(widget) {
+		if (widget.type in contentElementAsso) {
+			// XXX: maso, throw exception
+			return;
+		}
+		contentElementAsso[widget.type] = widget;
+		elementKey.push(widget.type);
+	}
+
+	/**
+	 * Selects a widgetd
+	 * 
+	 * This is an utility method to help a user to select a widget.
+	 * 
+	 * @param locals
+	 * @returns
+	 */
+	function select(locals) {
+		// TODO: maso, 1394: just prepare data for view
+		return $mdDialog.show({
+			controller : 'WbDialogsCtrl',
+			templateUrl : 'views/dialogs/wb-selectwidget.html',
+			parent : angular.element(document.body),
+			clickOutsideToClose : true,
+			fullscreen : true,
+			locals : locals,
+		});
+	}
+
+
+	/*
+	 * get setting page template
+	 */
+	function getTemplateFor(widget) {
+		var template, templateUrl;
+		if (angular.isDefined(template = widget.template)) {
+			if (angular.isFunction(template)) {
+				template = template(widget.params);
+			}
+		} else if (angular.isDefined(templateUrl = widget.templateUrl)) {
+			if (angular.isFunction(templateUrl)) {
+				templateUrl = templateUrl(widget.params);
+			}
+			if (angular.isDefined(templateUrl)) {
+				widget.loadedTemplateUrl = $sce.valueOf(templateUrl);
+				template = $templateRequest(templateUrl);
+			}
+		}
+		return template;
+	}
+
+	function compile(model, parenScope){
+		var widget = _widget(model);
+		var childScope = null;
+		var element = null;
+
+		// 1- create scope
+		childScope = parenScope.$new(false, parenScope);
+		childScope.wbModel = model;
+
+		// 2- create element
+		return $q.when(getTemplateFor(widget))//
+		.then(function(template) {
+			if (model.type != 'Group') {
+				template = '<wb-widget>' + template + '</wb-widget>';
+			}
+			element = angular.element(template);
+
+			// 3- bind controller
+			var link = $compile(element);
+			if (angular.isDefined(widget.controller)) {
+				var locals = {
+						$scope : childScope,
+						$element : element,
+						// TODO: maso, 2017: bind wbModel, wbParent,
+						// and wbEditable
+				};
+				var controller = $controller(widget.controller, locals);
+				if (widget.controllerAs) {
+					childScope[widget.controllerAs] = controller;
+				}
+				element.data('$ngControllerController', controller);
+			}
+			link(childScope);
+			return element;
+		});
+	}
+	
+	/**
+	 * Creates new serialized data of widget
+	 * @param widget
+	 * @returns
+	 */
+	function widgetData(widget){
+		var sample = widget.data || {style:{}};
+		var data = angular.copy(sample);
+		data.type = widget.type;
+		return data;
+	}
+
+	// تعیین سرویس‌ها
+	this.newWidget = newWidget;
+	this.widget = widget;
+	this.widgets = widgets;
+	this.widgetData = widgetData;
+	this.select = select;
+	this.getTemplateFor = getTemplateFor;
+	this.compile = compile;
 });
 
 angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCache) {

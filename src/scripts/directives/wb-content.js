@@ -188,7 +188,7 @@ angular.module('ngMaterialWeburger')
 	    if (!angular.isArray(scope.wbModel.contents)) {
 		scope.wbModel.contents = [];
 	    }
-	    scope.wbModel.type = 'Container';
+	    scope.wbModel.type = 'Page';
 	    reloadView();
 	});
 
