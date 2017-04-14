@@ -32,21 +32,12 @@ angular.module('ngMaterialWeburger')
 		function($widget) {
 			// Page
 			$widget.newWidget({
-				type: 'Page',
+				type: 'Group',
 				template : '<wb-panel></wb-panel>',
 				label : 'Panel',
 				description : 'Panel contains list of widgets.',
 				image : 'images/wb/content.svg',
 				help : 'http://dpq.co.ir/more-information-link',
-				setting: [ 'description', 'border',
-					'background', 'pageLayout',
-					'selfLayout' ],
-					data : {
-						style : {
-							direction : 'column',
-						},
-						contents : []
-					}
 			});
 			// HTML text
 			$widget.newWidget({
@@ -56,25 +47,9 @@ angular.module('ngMaterialWeburger')
 				description : 'An HTML block text.',
 				image : 'images/wb/html.svg',
 				help : 'http://dpq.co.ir',
-				setting:['text', 'selfLayout', 'border',
-					'background', 'marginPadding',
-					'minMaxSize'],
-					data : {
-						body : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-						style : {
-							marginLeft : 1,
-							marginRight : 1,
-							marginTop : 1,
-							marginBottom : 1,
-							paddingLeft : 1,
-							paddingRight : 1,
-							paddingTop : 1,
-							paddingBottom : 1,
-							minWidth : 0,
-							maxWidth : 0,
-							minHeight : 0,
-							maxHeight : 0
-						}
-					}
+				setting:['text'],
+				data : {
+					text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+				}
 			});
 		});
