@@ -12,9 +12,6 @@ of a widget:
     -> widget container
 ***************************************************************************************/
 .wb-widget {
-	margin: 2px;
-	border: 1px dashed #8f9494;
-	height: auto;
 }
 
 .wb-widget-edit {
@@ -38,8 +35,7 @@ of a widget:
 	position: relative;
 	top: 0;
 	left: 0;
-	width: auto;
-	height: auto;
+
 }
 
 .wb-widget-overlay {
