@@ -172,7 +172,7 @@ angular.module('ngMaterialWeburger')
 		// 2- create element
 		return $q.when(getTemplateFor(widget))//
 		.then(function(template) {
-			if (model.type != 'Page') {
+			if (model.type != 'Group') {
 				template = '<wb-widget>' + template + '</wb-widget>';
 			}
 			element = angular.element(template);
