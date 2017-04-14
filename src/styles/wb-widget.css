@@ -16,6 +16,7 @@ of a widget:
 
 .wb-widget-edit {
 	margin: 2px;
+	position: relative;
 	border: 1px dashed #8f9494;
 }
 
