@@ -244,6 +244,26 @@ Panel contains serveral children to show a good view. Here is the structure:
      -> overlay
      -> wb-panel-container
 ***************************************************************************************/
+.wb-page:hover .wb-widget{
+	zoom: 1;
+	filter: alpha(opacity=45);
+	opacity: 0.45;
+	-webkit-transition: opacity .5s ease-in-out;
+	-moz-transition: opacity .5s ease-in-out;
+	-ms-transition: opacity .5s ease-in-out;
+	-o-transition: opacity .5s ease-in-out;
+	transition: opacity .5s ease-in-out;
+}
+.wb-page .wb-widget:hover{
+	box-shadow: 3px 3px 15px #666;
+	cursor: pointer;
+
+	/*Opacity*/
+	zoom: 1;
+	filter: alpha(opacity=100);
+	opacity: 1;
+}
+/* === */
 .wb-panel {
 	margin: 2px;
 	border: 1px dashed #039BE5;
@@ -437,13 +457,11 @@ of a widget:
     -> widget container
 ***************************************************************************************/
 .wb-widget {
-	margin: 2px;
-	border: 1px dashed #8f9494;
-	height: auto;
 }
 
 .wb-widget-edit {
 	margin: 2px;
+	position: relative;
 	border: 1px dashed #8f9494;
 }
 
@@ -463,8 +481,7 @@ of a widget:
 	position: relative;
 	top: 0;
 	left: 0;
-	width: auto;
-	height: auto;
+
 }
 
 .wb-widget-overlay {

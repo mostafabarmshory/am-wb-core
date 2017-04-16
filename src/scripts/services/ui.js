@@ -32,6 +32,13 @@ angular.module('ngMaterialWeburger')
  * @description Resource managment
  * 
  */
-.service('$resource', function($wbUi) {
+.service('$wbUi', function($mdDialog) {
     
+	/**
+	 * Opens dialog
+	 * @returns
+	 */
+	function openDialog(dialogData){
+		return $mdDialog.show(dialogData);
+	}
 });
