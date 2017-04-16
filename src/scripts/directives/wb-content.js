@@ -200,7 +200,7 @@ angular.module('ngMaterialWeburger')
     }
 
     return {
-	templateUrl : 'views/directives/wb-content.html',
+	templateUrl : 'views/directives/wb-page.html',
 	transclude : true,
 	restrict : 'E',
 	replace : true,
