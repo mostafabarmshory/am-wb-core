@@ -175,7 +175,7 @@ angular.module('ngMaterialWeburger')
     }
 
     return {
-	templateUrl : 'views/directives/wb-panel.html',
+	templateUrl : 'views/directives/wb-group.html',
 	restrict : 'E',
 	replace : true,
 	transclude : true,

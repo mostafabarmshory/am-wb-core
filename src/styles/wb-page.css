@@ -26,7 +26,7 @@ Panel contains serveral children to show a good view. Here is the structure:
      -> overlay
      -> wb-panel-container
 ***************************************************************************************/
-.wb-page:hover .wb-widget{
+.wb-page-edit:hover .wb-widget-edit{
 	zoom: 1;
 	filter: alpha(opacity=45);
 	opacity: 0.45;
@@ -36,7 +36,7 @@ Panel contains serveral children to show a good view. Here is the structure:
 	-o-transition: opacity .5s ease-in-out;
 	transition: opacity .5s ease-in-out;
 }
-.wb-page .wb-widget:hover{
+.wb-page-edit .wb-widget-edit:hover{
 	box-shadow: 3px 3px 15px #666;
 	cursor: pointer;
 
