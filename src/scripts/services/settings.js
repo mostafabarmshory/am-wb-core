@@ -164,10 +164,12 @@ angular
 			 * 
 			 * @returns
 			 */
-			function loadSetting(models) {
+			function loadSetting(models, panelId) {
 				var widget = null;
 				var jobs = [];
 				var pages = [];
+				
+				panelId = panelId || WB_SETTING_PANEL_ID;
 
 				// 0- destroy old resource
 				if (angular.isDefined(oldScope)) {
@@ -179,7 +181,7 @@ angular
 				oldScope = scope;
 
 				// 1- Find element
-				var target = $document.find('#' + WB_SETTING_PANEL_ID);
+				var target = $document.find('#' + panelId);
 
 				// 2- Clear childrens
 				target.empty();

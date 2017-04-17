@@ -41,4 +41,6 @@ angular.module('ngMaterialWeburger')
 	function openDialog(dialogData){
 		return $mdDialog.show(dialogData);
 	}
+	
+	this.openDialog = openDialog;
 });
