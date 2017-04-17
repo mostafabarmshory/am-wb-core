@@ -63,11 +63,13 @@
                 layout="row"
                 flex>
             <wb-setting-panel-group
+            		id="main"
                     ng-show="editable"
                     flex="30"
                     style="overflow: auto;">
             </wb-setting-panel-group>
             <wb-content
+            		wb-setting-anchor="main"
                     wb-editable="editable"
                     wb-model="model"
                     flex

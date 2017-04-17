@@ -36,54 +36,54 @@ angular.module('ngMaterialWeburger')
  * All primary actions of a widget are supported (such as remove and setting).
  */
 .directive('wbWidget', function() {
-    function postLink(scope, element, attrs, ctrl, transclude) {
-	// Modify angular transclude function
-	// see:
-	// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
-	// FIXME: maso, 2017: use regular dom insted of ng-transclude
-	transclude(scope, function(clone, scope) {
-	    var node = element//
-	    .find('wb-transclude')//
-	    .append(clone);
-	});
-    }
-
-    return {
-	templateUrl : 'views/directives/wb-widget.html',
-	restrict : 'E',
-	transclude : true,
-	replace: true,
-	link : postLink,
-	controller : function($scope, $element, $settings, $widget) {
-	    var element = $element;
-	    /**
-	     * Remove widget from parent
-	     */
-	    function remove() {
-		console.log('widget removed');
-		return $scope.$parent.removeChild($scope.wbModel);
-	    }
-
-	    /**
-	     * Load widget settings
-	     * 
-	     */
-	    function settings() {
-		return $settings.load({
-		    wbModel : $scope.wbModel,
-		    wbParent : $scope.$parent,
+	function postLink(scope, element, attrs, ctrl, transclude) {
+		// Modify angular transclude function
+		// see:
+		// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
+		// FIXME: maso, 2017: use regular dom insted of ng-transclude
+		transclude(scope, function(clone, scope) {
+			var node = element//
+			.find('wb-transclude')//
+			.append(clone);
 		});
-	    }
-
-	    /*
-	     * Add to scope
-	     */
-	    $scope.remove = remove;
-	    $scope.movedCallback = remove;
-	    $scope.settings = settings;
-	    // Sets widget id after compile
-	    element.attr('id', $scope.objectId($scope.wbModel));
-	    $scope.wbModel.name = $scope.wbModel.name || 'Widget';
 	}
-    };
+
+	return {
+		templateUrl : 'views/directives/wb-widget.html',
+		restrict : 'E',
+		transclude : true,
+		replace: true,
+		link : postLink,
+		controller : function($scope, $element, $settings, $widget) {
+			var element = $element;
+			/**
+			 * Remove widget from parent
+			 */
+			function remove() {
+				console.log('widget removed');
+				return $scope.$parent.removeChild($scope.wbModel);
+			}
+
+			/**
+			 * Load widget settings
+			 * 
+			 */
+			function settings() {
+				return $settings.load({
+					wbModel : $scope.wbModel,
+					wbParent : $scope.$parent,
+				}, $scope.$parent.settingAnchor());
+			}
+
+			/*
+			 * Add to scope
+			 */
+			$scope.remove = remove;
+			$scope.movedCallback = remove;
+			$scope.settings = settings;
+			// Sets widget id after compile
+			element.attr('id', $scope.objectId($scope.wbModel));
+			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
+		}
+	};
 });

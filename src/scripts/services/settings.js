@@ -168,8 +168,6 @@ angular
 				var widget = null;
 				var jobs = [];
 				var pages = [];
-				
-				panelId = panelId || WB_SETTING_PANEL_ID;
 
 				// 0- destroy old resource
 				if (angular.isDefined(oldScope)) {
@@ -181,7 +179,13 @@ angular
 				oldScope = scope;
 
 				// 1- Find element
-				var target = $document.find('#' + panelId);
+				
+				var target;
+				if(panelId){
+					target = $document.find('#'+panelId).find('#' + WB_SETTING_PANEL_ID);
+				} else {
+					target = $document.find('#' + WB_SETTING_PANEL_ID);
+				}
 
 				// 2- Clear childrens
 				target.empty();

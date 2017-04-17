@@ -135,7 +135,7 @@ angular.module('ngMaterialWeburger')
 	    return $settings.load({
 		wbModel : scope.wbModel,
 		wbParent : scope.$parent
-	    });
+	    }, scope.$parent.settingAnchor());
 	}
 
 	/**
