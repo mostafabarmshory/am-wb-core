@@ -31,35 +31,35 @@
  */
 angular.module('ngMaterialWeburgerTest', [ 'ngMaterialWeburger' ])//
 .controller('MyTestCtrl', function($scope, $http, $mdDialog, $usr) {
-    $http.get('temp.json').then(function(res) {
-	$scope.model = res.data;
-    });
-
-    $scope.cs = function() {
-	$usr.login({
-	    login : 'admin',
-	    password : 'admin'
-	})//
-	.then(function() {
-	    $mdDialog.show({
-		controller : 'WbDialogsCtrl',
-		templateUrl : 'views/dialogs/wb-selectcontent.html',
-		parent : angular.element(document.body),
-		fullscreen : true,
-		locals : {
-		    wbModel : {},
-		    style : {}
-		}
-	    }).then(function(content) {
-		alert(content.id);
-	    });
+	$http.get('examples/layout-row.json').then(function(res) {
+		$scope.model = res.data;
 	});
-    };
+
+	$scope.cs = function() {
+		$usr.login({
+			login : 'admin',
+			password : 'admin'
+		})//
+		.then(function() {
+			$mdDialog.show({
+				controller : 'WbDialogsCtrl',
+				templateUrl : 'views/dialogs/wb-selectcontent.html',
+				parent : angular.element(document.body),
+				fullscreen : true,
+				locals : {
+					wbModel : {},
+					style : {}
+				}
+			}).then(function(content) {
+				alert(content.id);
+			});
+		});
+	};
 })
-//
-//// تنظیم ایکون
+
+////تنظیم ایکون
 //.config(function($mdIconProvider, $mdThemingProvider) {
-//    $mdIconProvider//
-//    .fontSet('social', 'mono-social-icons')//
-//    .fontSet('material', 'material-icons');//
+//$mdIconProvider//
+//.fontSet('social', 'mono-social-icons')//
+//.fontSet('material', 'material-icons');//
 //})
