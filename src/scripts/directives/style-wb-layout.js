@@ -25,26 +25,78 @@
 
 angular.module('ngMaterialWeburger')
 /**
- * @description Apply layout into the element
+ * Apply layout into an element
+ * 
+ * Group and page are the main goles of this directive. By adding the wbLayout,
+ * widget are able to manages it layout automatically.
+ * 
+ * Note that, in smal screen devices, the colume layout apply as default.
+ * 
+ * @ngdoc directive
+ * @memberof ngMaterialWeburger
+ * @description Apply layout into an element
  */
 .directive("wbLayout", function() {
-    return {
-	restrict : 'A',
-	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbLayout, function(newValue, oldValue) {
-		if(oldValue){
-		    // Remove old class
-		    element.removeClass(oldValue.flexDirection);
-		    element.removeClass(oldValue.justifyContent);
-		    element.removeClass(oldValue.alignItems);
-		}
-		if(newValue){
-		    // Add new class
-		    element.addClass(newValue.flexDirection);
-		    element.addClass(newValue.justifyContent);
-		    element.addClass(newValue.alignItems);
-		}
-	    }, true);
+	/*
+	 * FIXME: maso, 2017: replace class with term
+	 * 
+	 * It is hard to port final design, while it is fulle tied into the
+	 * CSS classes. We must replace layout CSS classes with general terms
+	 * as soon as posible.
+	 */
+	/**
+	 * Remove layout config from element
+	 * 
+	 * @param element
+	 * @param config
+	 * @returns
+	 */
+	function removeLayout(element, config) {
+		// Remove old class
+		element.removeClass(config.flexDirection);
+		element.removeClass(config.justifyContent);
+		element.removeClass(config.alignItems);
 	}
-    };
+
+	/**
+	 * Adds layout config into the element
+	 * 
+	 * @param element
+	 * @param config
+	 * @returns
+	 */
+	function addLayout(element, config) {
+		// Add new class
+		element.addClass(config.flexDirection);
+		element.addClass(config.justifyContent);
+		element.addClass(config.alignItems);
+	}
+
+	/**
+	 * Link view with attributes
+	 * 
+	 * 
+	 * @param scope
+	 * @param element
+	 * @param attrs
+	 * @returns
+	 */
+	function postLink(scope, element, attrs) {
+		return scope.$watch(attrs.wbLayout, function(newValue, oldValue) {
+			if (oldValue) {
+				removeLayout(element, oldValue);
+			}
+			if (newValue) {
+				addLayout(element, newValue);
+			}
+		}, true);
+	}
+
+	/*
+	 * Directive
+	 */
+	return {
+		restrict : 'A',
+		link : postLink
+	};
 });
