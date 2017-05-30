@@ -1,6 +1,6 @@
 {
   "name": "angular-material-weburger",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "authors": [
     "Mostafa Barmshory <mostafa.barmshory@dpq.co.ir>",
     "Hadi mansouri <mohammad.hadi.mansouri@dpq.co.ir>",
@@ -38,6 +38,7 @@
   },
   "moduleName": "ngMaterialWeburger",
   "backend": {
-    "host": "webpich.com"
+    "host": "localhost",
+    "port": 8080
   }
 }
