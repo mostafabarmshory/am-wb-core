@@ -1,0 +1,383 @@
+{
+	"contents": [
+		{
+			"type": "HtmlText",
+			"body": "<h2>HTML Text</h2><p>Insert HTML text heare</p>",
+			"style": {
+				"marginLeft": 1,
+				"marginRight": 1,
+				"marginTop": 1,
+				"marginBottom": 1,
+				"paddingLeft": 1,
+				"paddingRight": 1,
+				"paddingTop": 1,
+				"paddingBottom": 1,
+				"minWidth": 0,
+				"maxWidth": 0,
+				"minHeight": 0,
+				"maxHeight": 0,
+				"padding": {
+					"isUniform": true,
+					"uniform": 100
+				},
+				"margin": {
+					"isUniform": true,
+					"uniform": 100
+				},
+				"borderRadius": {
+					
+				},
+				"borderStyleColorWidth": {
+					
+				},
+				"borderStyle": {
+					
+				},
+				"borderWidth": {
+					
+				},
+				"borderColor": {
+					"bottom": "none"
+				},
+				"flexAlignItem": "wb-flex-item-auto",
+				"backgroundColor": "rgb(246, 16, 30)"
+			},
+			"text": "<p>a</p>",
+			"name": "MyWidget"
+		},
+		{
+			"type": "Group",
+			"style": {
+				"direction": "column",
+				"padding": {
+					
+				},
+				"margin": {
+					
+				},
+				"borderRadius": {
+					
+				},
+				"borderStyleColorWidth": {
+					
+				},
+				"borderStyle": {
+					
+				},
+				"borderWidth": {
+					
+				},
+				"borderColor": {
+					
+				}
+			},
+			"contents": [
+				{
+					"type": "HtmlText",
+					"body": "<h2>HTML Text</h2><p>Insert HTML text heare</p>",
+					"style": {
+						"marginLeft": 1,
+						"marginRight": 1,
+						"marginTop": 1,
+						"marginBottom": 1,
+						"paddingLeft": 1,
+						"paddingRight": 1,
+						"paddingTop": 1,
+						"paddingBottom": 1,
+						"minWidth": 0,
+						"maxWidth": 0,
+						"minHeight": 0,
+						"maxHeight": 0,
+						"padding": {
+							
+						},
+						"margin": {
+							
+						},
+						"borderRadius": {
+							
+						},
+						"borderStyleColorWidth": {
+							
+						},
+						"borderStyle": {
+							
+						},
+						"borderWidth": {
+							
+						},
+						"borderColor": {
+							"bottom": "none"
+						},
+						"flexAlignItem": "wb-flex-item-auto",
+						"backgroundColor": "rgb(0, 4, 255)"
+					},
+					"text": "<p>b</p>",
+					"name": "YourWidget"
+				}
+			],
+			"name": "Panel"
+		},
+		{
+			"type": "HtmlText",
+			"body": "<h2>HTML Text</h2><p>Insert HTML text heare</p>",
+			"style": {
+				"marginLeft": 1,
+				"marginRight": 1,
+				"marginTop": 1,
+				"marginBottom": 1,
+				"paddingLeft": 1,
+				"paddingRight": 1,
+				"paddingTop": 1,
+				"paddingBottom": 1,
+				"minWidth": 0,
+				"maxWidth": 0,
+				"minHeight": 0,
+				"maxHeight": 0,
+				"padding": {
+					
+				},
+				"margin": {
+					"isUniform": true,
+					"uniform": 100
+				},
+				"borderRadius": {
+					
+				},
+				"borderStyleColorWidth": {
+					
+				},
+				"borderStyle": {
+					
+				},
+				"borderWidth": {
+					
+				},
+				"borderColor": {
+					"bottom": "none"
+				},
+				"flexAlignItem": "wb-flex-item-auto",
+				"backgroundColor": "rgb(0, 231, 220)"
+			},
+			"text": "<p>c</p>",
+			"name": "Widget"
+		},
+		{
+			"type": "Group",
+			"style": {
+				"direction": "column",
+				"padding": {
+					
+				},
+				"margin": {
+					
+				},
+				"borderRadius": {
+					
+				},
+				"borderStyleColorWidth": {
+					
+				},
+				"borderStyle": {
+					
+				},
+				"borderWidth": {
+					
+				},
+				"borderColor": {
+					
+				}
+			},
+			"contents": [
+				{
+					"type": "HtmlText",
+					"body": "<h2>HTML Text</h2><p>Insert HTML text heare</p>",
+					"style": {
+						"marginLeft": 1,
+						"marginRight": 1,
+						"marginTop": 1,
+						"marginBottom": 1,
+						"paddingLeft": 1,
+						"paddingRight": 1,
+						"paddingTop": 1,
+						"paddingBottom": 1,
+						"minWidth": 0,
+						"maxWidth": 0,
+						"minHeight": 0,
+						"maxHeight": 0,
+						"padding": {
+							
+						},
+						"margin": {
+							
+						},
+						"borderRadius": {
+							
+						},
+						"borderStyleColorWidth": {
+							
+						},
+						"borderStyle": {
+							
+						},
+						"borderWidth": {
+							
+						},
+						"borderColor": {
+							"bottom": "none"
+						},
+						"flexAlignItem": "wb-flex-item-auto",
+						"backgroundColor": "rgb(85, 255, 0)"
+					},
+					"text": "<p>d</p>",
+					"name": "Widget"
+				},
+				{
+					"type": "Group",
+					"style": {
+						"direction": "column",
+						"padding": {
+							
+						},
+						"margin": {
+							
+						},
+						"borderRadius": {
+							
+						},
+						"borderStyleColorWidth": {
+							
+						},
+						"borderStyle": {
+							
+						},
+						"borderWidth": {
+							
+						},
+						"borderColor": {
+							
+						}
+					},
+					"contents": [
+						{
+							"type": "HtmlText",
+							"body": "<h2>HTML Text</h2><p>Insert HTML text heare</p>",
+							"style": {
+								"marginLeft": 1,
+								"marginRight": 1,
+								"marginTop": 1,
+								"marginBottom": 1,
+								"paddingLeft": 1,
+								"paddingRight": 1,
+								"paddingTop": 1,
+								"paddingBottom": 1,
+								"minWidth": 0,
+								"maxWidth": 0,
+								"minHeight": 0,
+								"maxHeight": 0,
+								"padding": {
+									
+								},
+								"margin": {
+									"isUniform": true,
+									"uniform": 100
+								},
+								"borderRadius": {
+									
+								},
+								"borderStyleColorWidth": {
+									
+								},
+								"borderStyle": {
+									
+								},
+								"borderWidth": {
+									
+								},
+								"borderColor": {
+									"bottom": "none"
+								},
+								"flexAlignItem": "wb-flex-item-auto",
+								"backgroundColor": "rgb(247, 255, 0)"
+							},
+							"name": "Widget",
+							"text": "<p>e</p>"
+						}
+					],
+					"name": "Panel"
+				},
+				{
+					"type": "HtmlText",
+					"body": "<h2>HTML Text</h2><p>Insert HTML text heare</p>",
+					"style": {
+						"marginLeft": 1,
+						"marginRight": 1,
+						"marginTop": 1,
+						"marginBottom": 1,
+						"paddingLeft": 1,
+						"paddingRight": 1,
+						"paddingTop": 1,
+						"paddingBottom": 1,
+						"minWidth": 0,
+						"maxWidth": 0,
+						"minHeight": 0,
+						"maxHeight": 0,
+						"padding": {
+							
+						},
+						"margin": {
+							
+						},
+						"borderRadius": {
+							
+						},
+						"borderStyleColorWidth": {
+							
+						},
+						"borderStyle": {
+							
+						},
+						"borderWidth": {
+							
+						},
+						"borderColor": {
+							"bottom": "none"
+						},
+						"flexAlignItem": "wb-flex-item-auto",
+						"backgroundColor": "rgb(255, 106, 0)"
+					},
+					"name": "Widget",
+					"text": "<p>f</p>"
+				}
+			],
+			"name": "Panel"
+		}
+	],
+	"type": "Page",
+	"style": {
+		"borderColor": {
+			"bottom": "none"
+		},
+		"padding": {
+			
+		},
+		"margin": {
+			
+		},
+		"borderRadius": {
+			
+		},
+		"borderStyleColorWidth": {
+			
+		},
+		"borderStyle": {
+			
+		},
+		"borderWidth": {
+			
+		},
+		"flexDirection": "wb-flex-row",
+		"alignItems": "wb-flex-align-items-stretch",
+		"justifyContent": "wb-flex-justify-content-start"
+	}
+}

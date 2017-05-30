@@ -1,0 +1,52 @@
+/**************************************************************************************
+Drag and drap 
+
+See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
+***************************************************************************************/
+
+/*
+ * When an element is dragged over the list, a new placeholder child element 
+ * will be added. This element is of type li and has the class dndPlaceholder 
+ * set. Alternatively, you can define your own placeholder by creating a 
+ * child element with dndPlaceholder class.
+ */
+.dndPlaceholder {
+	/*
+	background: red;
+    */
+	list-style: none;
+	min-width: 36px;
+	min-height: 36px;
+	margin: 5px;
+	font-size: 1.25rem;
+	background-color: #c8dadf;
+	padding: 10px 10px;
+	outline: 2px dashed #92b0b3;
+	outline-offset: -10px;
+}
+
+/*
+ * This class will be added to the list while an element is being dragged over the list.
+ */
+.dndDragover {
+	
+}
+
+/*
+ * This class will be added to the element while the element is being dragged. 
+ * It will affect both the element you see while dragging and the source 
+ * element that stays at it's position. Do not try to hide the source element
+ * with this class, because that will abort the drag operation.
+*/
+.dndDragging {
+	background: #c8dadf !important;
+}
+
+/*
+ * This class will be added to the element after the drag operation was started, 
+ * meaning it only affects the original element that is still at it's source 
+ * position, and not the "element" that the user is dragging with his mouse pointer
+ */
+.dndDraggingSource {
+    display: none;
+}

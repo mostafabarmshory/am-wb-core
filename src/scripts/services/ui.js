@@ -26,30 +26,21 @@
 angular.module('ngMaterialWeburger')
 
 /**
- * Load widgets
+ * @ngdoc service
+ * @name $widget
+ * @memberof ngMaterialWeburger
+ * @description Resource managment
+ * 
  */
-.run(
-		function($widget) {
-			// Page
-			$widget.newWidget({
-				type: 'Group',
-				template : '<wb-panel></wb-panel>',
-				label : 'Panel',
-				description : 'Panel contains list of widgets.',
-				image : 'images/wb/content.svg',
-				help : 'http://dpq.co.ir/more-information-link',
-			});
-			// HTML text
-			$widget.newWidget({
-				type: 'HtmlText',
-				templateUrl : 'views/widgets/wb-html.html',
-				label : 'HTML text',
-				description : 'An HTML block text.',
-				image : 'images/wb/html.svg',
-				help : 'http://dpq.co.ir',
-				setting:['text'],
-				data : {
-					text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-				}
-			});
-		});
+.service('$wbUi', function($mdDialog) {
+    
+	/**
+	 * Opens dialog
+	 * @returns
+	 */
+	function openDialog(dialogData){
+		return $mdDialog.show(dialogData);
+	}
+	
+	this.openDialog = openDialog;
+});

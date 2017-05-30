@@ -3,7 +3,7 @@
 	dnd-draggable="wbModel"
 	dnd-type="'wb.widget'"
 	dnd-moved="remove()"
-	ng-class="{'wb-panel': wbEditable}"
+	ng-class="{'wb-panel wb-widget-edit': wbEditable}"
 	name="{{wbModel.name}}">
     <!-- a header is added through edit-mode -->
     <div ng-show="wbEditable" class="wb-panel-header" layout="row">
@@ -36,7 +36,7 @@
 	        ng-show="hoveringDelBtn" 
 	        class="wb-panel-overlay">
 	    </div>
-        <!-- تمام بچه‌ها در این قسمت اضافه می‌شن. -->
+        <!-- Children are added in this part -->
         <div class="wb-panel-container"
             wb-layout="wbModel.style"
 			wb-margin="wbModel.style"

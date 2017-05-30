@@ -8,23 +8,31 @@ the following items can be set for customizing container layout:
 - alignItems
 - justifyContent
 
-Completely rewrite by mgh on 2/24/17.
+@author Completely rewrite by mgh on 2/24/17.
+@author maso<mostafa.barmshory@dpq.co.ir>
 -->
-
 <md-list class="wb-setting-panel">
-
     <!-- direction -->
-    <wb-ui-setting-choose title="Direction" icon="wb-direction" items="flexDirection"
-                          value="wbModel.style.flexDirection"></wb-ui-setting-choose>
+    <wb-ui-setting-choose 
+    	title="Direction" 
+    	icon="wb-direction" 
+    	items="flexDirection"
+        ng-model="wbModel.style.flexDirection">
+	</wb-ui-setting-choose>
 
     <!-- Align Items -->
-    <wb-ui-setting-choose title="{{(wbModel.style.flexDirection=='wb-flex-row')?'Vert.':'Horz.'}}"
-                          icon="{{(wbModel.style.flexDirection=='wb-flex-row')?'face':'wb-horizontal-arrows'}}"
-                          items="alignItems" value="wbModel.style.alignItems"></wb-ui-setting-choose>
+    <wb-ui-setting-choose 
+    	title="{{(wbModel.style.flexDirection=='wb-flex-row')?'Vert.':'Horz.'}}"
+        icon="{{(wbModel.style.flexDirection=='wb-flex-row')?'face':'wb-horizontal-arrows'}}"
+        items="alignItems" 
+        ng-model="wbModel.style.alignItems">
+    </wb-ui-setting-choose>
 
     <!-- Justify Content -->
-    <wb-ui-setting-choose title="{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}"
-                          icon="{{(wbModel.style.flexDirection!='wb-flex-row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}"
-                          items="justifyContent" value="wbModel.style.justifyContent"></wb-ui-setting-choose>
-
+    <wb-ui-setting-choose 
+    	title="{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}"
+        icon="{{(wbModel.style.flexDirection!='wb-flex-row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}"
+        items="justifyContent" 
+        ng-model="wbModel.style.justifyContent">
+    </wb-ui-setting-choose>
 </md-list>

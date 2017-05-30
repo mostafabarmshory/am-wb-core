@@ -25,22 +25,67 @@
 
 angular.module('ngMaterialWeburger')
 /**
+ * @ngdoc directive
+ * @memberof ngMaterialWeburger
  * @description Apply background into the element
  */
-.directive("wbSize", function() {
-    return {
-	restrict : 'A',
-	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbSize, function(style) {
+.directive("wbBackground", function() {
+	/**
+	 * Sets background attributes into element
+	 * 
+	 * @param element
+	 * @param style
+	 * @returns
+	 */
+	function setBackgroud(element, style){
 		if (!style) {
-		    return;
+			return;
 		}
-		element.css({
-		    'background-color' : style.backgroundColor,
-		    'color' : style.color,
-			'opacity':(style.isTransparent) ? style.opacity/100 : 1,
-		});
-	    }, true);
+		var cssValue = {};
+		if(style.background){
+			cssValue['background'] = style.background;
+		}
+
+		if(style.backgroundColor){
+			cssValue['background-color'] = style.backgroundColor;
+		}
+		if(style.backgroundSize) {
+			cssValue['background-size'] = style.backgroundSize;
+		}
+		if(style.backgroundRepeat) {
+			cssValue['background-repeat'] = style.backgroundRepeat;
+		}
+		if(style.backgroundPosition){
+			cssValue['background-position'] = style.backgroundPosition;
+		}
+		if(style.backgroundAttachment){
+			cssValue['background-attachment'] = style.backgroundAttachment;
+		}
+		if(style.backgroundOrigin){
+			cssValue['background-origin'] = style.backgroundOrigin;
+		}
+		if(style.backgroundClip){
+			cssValue['background-clip'] = style.backgroundClip;
+		}
+		
+		// FIXME: maso, 1395: thies are not background parameter
+		if(style.color){
+			cssValue['color'] = style.color;
+		}
+		if(style.opacity){
+			cssValue['opacity'] = (style.isTransparent) ? style.opacity/100 : 1;
+		}
+		element.css(cssValue);
 	}
-    };
+
+	function postLink(scope, element, attributes) {
+		return scope.$watch(attributes.wbSize, function(style){
+			return setBackgroud(element, style);
+		}, true);
+	}
+
+	return {
+		restrict : 'A',
+		link : postLink
+	};
 });

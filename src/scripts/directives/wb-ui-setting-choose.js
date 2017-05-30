@@ -25,22 +25,63 @@
 
 angular.module('ngMaterialWeburger')
 
-    /**
-     * @ngdoc directive
-     * @name wbUiSettingChoose
-     * @memberof ngMaterialWeburger
-     * @description a setting section for choosing values.
-     *
+/**
+ * @ngdoc directive
+ * @name wbUiSettingChoose
+ * @memberof ngMaterialWeburger
+ * @description a setting section for choosing values.
+ *
+ */
+.directive('wbUiSettingChoose', function ($mdTheming, $mdUtil) {
+
+    // **********************************************************
+    // Private Methods
+    // **********************************************************
+    function postLink(scope, element, attr, ctrls) {
+	scope.xitems = scope.$eval(attr.items);
+	attr.$observe('title', function(title){
+	    scope.title = title;
+	});
+	attr.$observe('icon', function(icon){
+	    scope.icon = icon;
+	});
+	var ngModelCtrl = ctrls[0] || $mdUtil.fakeNgModel();
+	var unregisterWatch = null;
+	$mdTheming(element);
+
+	ngModelCtrl.$render = render;
+
+	scope.$watch('selectedIndex', function () {
+	    if(angular.isDefined(scope.selectedIndex)){
+		ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+	    }
+	});
+
+	function render() {
+	    scope.selectedIndex = toIndex(ngModelCtrl.$modelValue);
+	    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+	}
+	
+	function toIndex (value){
+	    for (var index = 0; index < scope.xitems.length; index++) {
+		if (scope.xitems[index].value == value){
+		    return index;
+		}
+	    }
+	    // TODO: maso, 2017: update default value.
+	    return 0;
+	}
+    }
+
+    /*
+     * Directive info
      */
-    .directive('wbUiSettingChoose', function () {
-        return {
-            templateUrl: 'views/directives/wb-ui-setting-choose.html',
-            restrict: 'E',
-            scope: {
-                title: '@title',
-                value: '=value',
-                icon: '@icon',
-                items:'=items'
-            }
-        };
-    });
+    return {
+	templateUrl: 'views/directives/wb-ui-setting-choose.html',
+	restrict: 'E',
+	scope: true,
+	require: ['?ngModel'],
+	priority: 210, // Run before ngAria
+	link: postLink
+    };
+});

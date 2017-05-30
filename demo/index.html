@@ -17,8 +17,9 @@
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
-    <!--<link rel="stylesheet" href="styles/main.css">-->
-    <link rel="stylesheet" href="styles/wb-content.css">
+    <link rel="stylesheet" href="styles/wb-dnd.css">
+    <link rel="stylesheet" href="styles/wb-page.css">
+    <link rel="stylesheet" href="styles/wb-group.css">
     <link rel="stylesheet" href="styles/wb-widget.css">
     <link rel="stylesheet" href="styles/dialogs.css">
 <!--    <link rel="stylesheet" href="styles/font-icon.css">-->
@@ -62,11 +63,13 @@
                 layout="row"
                 flex>
             <wb-setting-panel-group
+            		id="main"
                     ng-show="editable"
                     flex="30"
                     style="overflow: auto;">
             </wb-setting-panel-group>
             <wb-content
+            		wb-setting-anchor="main"
                     wb-editable="editable"
                     wb-model="model"
                     flex
@@ -95,6 +98,7 @@
 <script src="bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
 <script src="bower_components/angular-material-expansion-panel/dist/md-expansion-panel.js"></script>
 <script src="bower_components/angular-material-icons/angular-material-icons.min.js"></script>
+<script src="bower_components/weakmap-polyfill/weakmap-polyfill.js"></script>
 <!-- endbower -->
 <!-- endbuild -->
 
@@ -102,6 +106,9 @@
 <script src="scripts/demo.js"></script>
 
 <script src="scripts/app.js"></script>
+
+<script src="scripts/configs/icons.js"></script>
+
 <script src="scripts/runs/widgets.js"></script>
 <script src="scripts/runs/settings.js"></script>
 
@@ -113,8 +120,8 @@
 <script src="scripts/controllers/wb-bordersetting.js"></script>
 <script src="scripts/controllers/wb-textsetting.js"></script>
 
-<script src="scripts/directives/wb-content.js"></script>
-<script src="scripts/directives/wb-panel.js"></script>
+<script src="scripts/directives/wb-page.js"></script>
+<script src="scripts/directives/wb-group.js"></script>
 <script src="scripts/directives/wb-widget.js"></script>
 
 <script src="scripts/directives/wb-infinateScroll.js"></script>

@@ -1,6 +1,6 @@
 {
   "name": "angular-material-weburger",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "authors": [
     "Mostafa Barmshory <mostafa.barmshory@dpq.co.ir>",
     "Hadi mansouri <mohammad.hadi.mansouri@dpq.co.ir>",
@@ -30,13 +30,15 @@
     "angular-ui-tinymce": "latest",
     "angular-drag-and-drop-lists": "^2.0.0",
     "angular-material-expansion-panel": "^0.7.1",
-    "angular-material-icons": "^0.7.1"
+    "angular-material-icons": "^0.7.1",
+    "weakmap-polyfill": "^2.0.0"
   },
   "devDependencies": {
     "angular-mocks": "^1.6.0"
   },
   "moduleName": "ngMaterialWeburger",
   "backend": {
-    "host": "webpich.com"
+    "host": "localhost",
+    "port": 8080
   }
 }

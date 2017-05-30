@@ -38,7 +38,10 @@
 						<span class="md-subhead">{{widget.description}}</span>
 					</md-card-title-text>
 					<md-card-title-media>
-						<img src="{{widget.image}}" />
+						<img ng-show="widget.image" src="{{widget.image}}" />
+						<wb-icon 
+							ng-show="!widget.image&&widget.icon"
+							wb-icon-size="64">{{widget.icon}}</wb-icon>
 					</md-card-title-media>
 				</md-card-title>
 				<md-card-actions layout="row" layout-align="end center">

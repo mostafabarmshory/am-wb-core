@@ -32,6 +32,6 @@ angular.module('ngMaterialWeburger')
  * @description Resource managment
  * 
  */
-.service('$resource', function() {
-    // TODO: maso, 1395:
+.service('$resource', function($wbUi) {
+    
 });

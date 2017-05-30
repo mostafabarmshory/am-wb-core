@@ -4,9 +4,19 @@
     	wb-icon-name="{{icon}}">
     </wb-icon>
     <p ng-hide="title==undefined || title==null || title==''">{{title}}</p>
-    <wb-ui-choose 
-    	flex="100" 
-    	items="items" 
-    	selected="value">
-    </wb-ui-choose>
+
+	<md-tabs
+			flex="100"
+			class="wb-tab-as-choose-button"
+			md-selected="selectedIndex">
+		<md-tab ng-repeat="item in xitems">
+			<md-tab-label>
+				<wb-icon >{{item.icon}}</wb-icon>
+			</md-tab-label>
+		</md-tab>
+	</md-tabs>
+
+
 </md-list-item>
+<!-- FIXME: maso, 2017: update choose items -->
+

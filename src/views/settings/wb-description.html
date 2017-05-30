@@ -1,13 +1,14 @@
-<!-- تنظیم‌های متنی -->
+<!-- Descriptive settings -->
 <!-- 
-برخی از ماژولها به توصیف‌هایی نیاز دارن که با یک عنوان و یک متن ساده
-کارشون حله. اینجا یا صفحه ایجاد کردیم که این خصوصیت‌ها رو برای کاربران
-ویرایش کنه. خصوصیت‌هایی که توی این صفحه در نظر گرفته شده عبارتند از:
+Some widgets need simple description in text. This is a setting to manage
+these attributes. Here is list of attributes:
 
 - {Text} label 
 - {Text} description 
+- {Text} keywords
+
+These attributes are usefull in SEO.
 -->
-<!-- که به ترتیب یک متن ساده و یک ابر متن هست. -->
 <div 
 	layout="column"
 	style="width:100%">
@@ -16,10 +17,14 @@
 	  <input 
 	  	type="text" ng-model="wbModel.label">
 	</md-input-container>
-	
 	<md-input-container>
 	  <label translate>Description</label>
 	  <input 
 	  	type="text" ng-model="wbModel.description">
+	</md-input-container>
+	<md-input-container>
+	  <label translate>Keywords</label>
+	  <input 
+	  	type="text" ng-model="wbModel.keywords">
 	</md-input-container>
 </div>
