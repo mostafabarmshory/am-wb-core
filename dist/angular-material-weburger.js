@@ -125,6 +125,165 @@ angular.module('ngMaterialWeburger')
 angular.module('ngMaterialWeburger')
 /**
  * @ngdoc function
+ * @name WbResourceCtrl
+ * @description # WbResourceCtrl Controller of the ngMaterialWeburger
+ */
+.controller('WbResourceCtrl', function($scope, $mdDialog, $document, $wbUtil, $q, $compile, pages) {
+
+	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
+	function hide() {
+		$mdDialog.hide();
+	}
+
+	function cancel() {
+		$mdDialog.cancel();
+	}
+
+	function answer() {
+		$mdDialog.hide($scope.value);
+	}
+	
+	function setValue(value){
+		$scope.value = value;
+	}
+	
+	$scope.$watch('value', function(value){
+		// Deal with value
+		console.log(value);
+	});
+	
+
+
+	/**
+	 * encapsulate template srce with panel widget template.
+	 * 
+	 * @param page
+	 *            setting page config
+	 * @param tempateSrc
+	 *            setting page html template
+	 * @returns encapsulate html template
+	 */
+	function _encapsulatePanel(page, templateSrc) {
+		// TODO: maso, 2017: pass all paramter to the setting
+		// panel.
+		var attr = ' ';
+		if (page.label) {
+			attr += ' label=\"' + page.label + '\"';
+		}
+		if (page.icon) {
+			attr += ' icon=\"' + page.icon + '\"';
+		}
+		if (page.description) {
+			attr += ' description=\"' + page.description + '\"';
+		}
+		return '<md-tab ' + attr + '>' + templateSrc
+		+ '</md-tab>';
+	}
+
+	/**
+	 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+	 * 
+	 * @returns
+	 */
+	function loadPages() {
+		var widget = null;
+		var jobs = [];
+		var pages2 = [];
+
+
+		// 1- Find element
+		var target = $document.find('#' + CHILDREN_AUNCHOR);
+
+		// 2- Clear childrens
+		target.empty();
+
+		// 3- load pages
+		angular.forEach(pages, function(page) {
+			var template = $wbUtil.getTemplateFor(page);
+			if (angular.isDefined(template)) {
+				var job = template.then(function(templateSrc) {
+					templateSrc = _encapsulatePanel(page, templateSrc);
+					var element = angular.element(templateSrc);
+					if (angular .isDefined(page.controller)) {
+						$controller(page.controller, {
+							$scope : scope,
+							$element : element,
+						});
+					}
+					$compile(element)($scope);
+					element.attr('label',page.lable);
+					pages2.push(element);
+				});
+				jobs.push(job);
+			}
+		});
+
+		$q.all(jobs)//
+		.then(function() {
+			pages2.sort(function(a, b) {
+				if (a.attr('label') < b.attr('label'))
+					return -1;
+				if (a.attr('label') > b.attr('label'))
+					return 1;
+				return 0;
+			});
+			
+			var tabsElm = angular.element('<md-tabs md-border-bottom md-autoselect flex></md-tabs>');
+			angular.forEach(pages2, function(element) {
+				tabsElm.append(element);
+			});
+
+			$compile(tabsElm)($scope);
+			target.append(tabsElm);
+		});
+	}
+	
+	
+	$scope.$watch(function(){
+		return angular.element(document.body).hasClass('md-dialog-is-showing');
+	}, function(value){
+		if(value){
+			loadPages();
+		}
+	});
+	
+	
+	$scope.pages = pages;
+	
+	$scope.hide = hide;
+	$scope.cancel = cancel;
+	$scope.answer = answer;
+	$scope.setValue = setValue;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+/**
+ * @ngdoc function
  * @name WbBorderSettingCtrl
  * @description # WbBorderSettingCtrl Controller of the ngMaterialWeburger
  */
@@ -1909,6 +2068,63 @@ angular.module('ngMaterialWeburger')
         };
     });
 
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * @ngdoc directive
+ * @name wbUiSettingColor
+ * @memberof ngMaterialWeburger
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingImage', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-image.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon'
+		},
+		controller: function($scope, $resource){
+			function selectImage(){
+				return $resource.get('image')//
+				.then(function(value){
+					$scope.value = value;
+				});
+			}
+			
+			$scope.selectImage = selectImage;
+		}
+	};
+});
+
 /**
  * Created by mgh on 2/26/17.
  */
@@ -2115,6 +2331,45 @@ angular.module('ngMaterialWeburger')
 angular.module('ngMaterialWeburger')
 
 /**
+ * Load default resources
+ */
+.run(function($resource) {
+	$resource.newPage({
+		type: 'wb-url',
+		label : 'URL',
+		templateUrl : 'views/resources/wb-url.html',
+		tags: ['image', 'audio', 'video', 'file']
+	});
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
  * Load widgets
  */
 .run(function($settings) {
@@ -2271,7 +2526,77 @@ angular.module('ngMaterialWeburger')
  * 
  */
 .service('$resource', function($wbUi) {
-    
+
+	var resourcePages = {};
+	
+	
+	/**
+	 * Fetchs a page.
+	 * 
+	 * @param model
+	 * @returns
+	 */
+	function page(type) {
+		var widget = notFound;
+		if (type in resourcePages) {
+			widget = resourcePages[type];
+		}
+		return widget;
+	}
+
+	/**
+	 * Adds new page.
+	 * 
+	 * @returns
+	 */
+	function newPage(page) {
+		resourcePages[page.type] = page;
+	}
+
+	/**
+	 * Finds and lists all pages.
+	 * 
+	 * @returns
+	 */
+	function pages() {
+		// TODO: maso, 1395:
+	}
+	
+	/**
+	 * Get a resource 
+	 * 
+	 * @param tags
+	 * @returns
+	 */
+	function get(tag){
+		var pages = [];
+		if(tag){
+			angular.forEach(resourcePages, function(page) {
+				if(angular.isArray(page.tags) && page.tags.includes(tag)){
+					this.push(page);
+				}
+			}, pages);
+		} else {
+			pages = resourcePages;
+		}
+		
+		return $wbUi.openDialog({
+			controller : 'WbResourceCtrl',
+			templateUrl : 'views/dialogs/wb-select-resource.html',
+			parent : angular.element(document.body),
+			clickOutsideToClose : true,
+			locals : {
+				'pages' : pages,
+				'style' : {}
+			}
+		});
+	}
+	
+	
+	this.get = get;
+	this.newPage = newPage;
+	this.page = page;
+	this.pages = pages;
 });
 
 /* 
@@ -2299,8 +2624,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular
-.module('ngMaterialWeburger')
+angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc service
@@ -2311,7 +2635,7 @@ angular
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$settings',function($rootScope, $controller, $widget, $q, $sce, $compile,
-		$document, $templateRequest) {
+		$document, $templateRequest, $wbUtil) {
 	var WB_SETTING_PANEL_ID = 'WB-SETTING-PANEL';
 
 	/*
@@ -2382,29 +2706,6 @@ angular
 			return WB_SETTINGS_GROUP_DEFAULT;
 		}
 		return WB_SETTINGS_WIDGET_DEFAULT;
-	}
-
-	/*
-	 * get setting page template
-	 */
-	function getTemplateFor(page) {
-		var template, templateUrl;
-		if (angular.isDefined(template = page.template)) {
-			if (angular.isFunction(template)) {
-				template = template(page.params);
-			}
-		} else if (angular
-				.isDefined(templateUrl = page.templateUrl)) {
-			if (angular.isFunction(templateUrl)) {
-				templateUrl = templateUrl(page.params);
-			}
-			if (angular.isDefined(templateUrl)) {
-				page.loadedTemplateUrl = $sce
-				.valueOf(templateUrl);
-				template = $templateRequest(templateUrl);
-			}
-		}
-		return template;
 	}
 
 	/**
@@ -2481,7 +2782,7 @@ angular
 				if (type in settingPages) {
 					page = settingPages[type];
 				}
-				var template = getTemplateFor(page);
+				var template = $wbUtil.getTemplateFor(page);
 				if (angular.isDefined(template)) {
 					var job = template.then(function(templateSrc) {
 						templateSrc = _encapsulateSettingPanel(page, templateSrc);
@@ -2572,6 +2873,69 @@ angular.module('ngMaterialWeburger')
 	}
 	
 	this.openDialog = openDialog;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular
+.module('ngMaterialWeburger')
+
+/**
+ * @ngdoc service
+ * @name $wbUtil
+ * @memberof ngMaterialWeburger
+ * @description کدهای پایه
+ * 
+ */
+.service('$wbUtil',function($rootScope, $controller, $widget, $q, $sce, $compile,
+		$document, $templateRequest) {
+	/*
+	 * get setting page template
+	 */
+	function getTemplateFor(page) {
+		var template, templateUrl;
+		if (angular.isDefined(template = page.template)) {
+			if (angular.isFunction(template)) {
+				template = template(page.params);
+			}
+		} else if (angular
+				.isDefined(templateUrl = page.templateUrl)) {
+			if (angular.isFunction(templateUrl)) {
+				templateUrl = templateUrl(page.params);
+			}
+			if (angular.isDefined(templateUrl)) {
+				page.loadedTemplateUrl = $sce
+				.valueOf(templateUrl);
+				template = $templateRequest(templateUrl);
+			}
+		}
+		return template;
+	}
+
+	this.getTemplateFor = getTemplateFor;
 });
 
 /* 
@@ -2798,6 +3162,11 @@ angular.module('ngMaterialWeburger')
 angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCache) {
   'use strict';
 
+  $templateCache.put('views/dialogs/wb-select-resource.html',
+    "<md-dialog aria-label=\"edit action dialog\" ng-controller=WbWidgetSelectCtrl ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Widget list</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <md-content id=wb-select-resource-children class=\"md-padding md-dialog-content\"> </md-content> </md-dialog-content> </md-dialog>"
+  );
+
+
   $templateCache.put('views/dialogs/wb-selectwidget.html',
     "<md-dialog aria-label=\"edit action dialog\" ng-controller=WbWidgetSelectCtrl ng-cloak>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Widget list</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> </div> </md-toolbar>    <md-dialog-content> <md-content class=\"md-padding md-dialog-content\" layout-xs=column layout=row layout-wrap>    <md-card ng-repeat=\"widget in widgets.items\" flex-xs flex-gt-xs=45 md-theme-watch> <md-card-title> <md-card-title-text> <span class=md-headline>{{widget.label}}</span> <span class=md-subhead>{{widget.description}}</span> </md-card-title-text> <md-card-title-media> <img ng-show=widget.image src=\"{{widget.image}}\"> <wb-icon ng-show=!widget.image&&widget.icon wb-icon-size=64>{{widget.icon}}</wb-icon> </md-card-title-media> </md-card-title> <md-card-actions layout=row layout-align=\"end center\"> <md-button ng-click=answerWidget(widget)> <wb-icon>add</wb-icon> {{ 'Add' | translate }} </md-button>  </md-card-actions> </md-card> </md-content> </md-dialog-content> </md-dialog>"
   );
@@ -2843,6 +3212,11 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   );
 
 
+  $templateCache.put('views/directives/wb-ui-setting-image.html',
+    "<md-list-item> <img ng-click=selectImage() ng-src={{value}} width=48px height=48px class=\"md-avatar-icon\"> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
+  );
+
+
   $templateCache.put('views/directives/wb-ui-setting-number.html',
     "<md-list-item ng-show=\"slider==undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input style=\"width: 50px\" type=number ng-model=value flex> </md-input-container> </md-list-item> <md-list-item ng-show=\"slider!=undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='' || icon=='wb-blank'\">{{icon}}</wb-icon> <div ng-show=\"icon=='wb-blank'\" style=\"display: inline-block; width: 32px; opacity: 0.0\"></div> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-slider min=0 max=100 ng-model=value flex></md-slider> </md-list-item>"
   );
@@ -2858,6 +3232,11 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   );
 
 
+  $templateCache.put('views/resources/wb-url.html',
+    "<md-input-container class=\"md-icon-float md-block\"> <label translate>URL</label> <input ng-model=value> </md-input-container>"
+  );
+
+
   $templateCache.put('views/settings/wb-background.html',
     " <md-list class=wb-setting-panel>  <wb-ui-setting-on-off-switch title=Transparent? icon=blur_on value=wbModel.style.isTransparent> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent title=Opacity icon=wb-opacity value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent slider=\"\" icon=wb-blank value=wbModel.style.opacity> </wb-ui-setting-number>  <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background size</label> <input ng-model=wbModel.style.backgroundSize> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background repeat</label> <input ng-model=wbModel.style.backgroundRepeat> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background position</label> <input ng-model=wbModel.style.backgroundPosition> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background attachment</label> <input ng-model=wbModel.style.backgroundAttachment> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background origin</label> <input ng-model=wbModel.style.backgroundOrigin> </md-input-container> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.backgroundColor> </wb-ui-setting-color> </md-list>"
   );
@@ -2869,7 +3248,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/settings/wb-description.html',
-    " <div layout=column style=width:100%> <md-input-container> <label translate>Lable</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate>Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate>Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> </div>"
+    " <div layout=column style=width:100%> <md-input-container> <label translate>Lable</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate>Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate>Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=Cover value=wbModel.cover> </wb-ui-setting-image> </div>"
   );
 
 
