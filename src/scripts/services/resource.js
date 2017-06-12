@@ -79,7 +79,7 @@ angular.module('ngMaterialWeburger')
 		var pages = [];
 		if(tag){
 			angular.forEach(resourcePages, function(page) {
-				if(page.tags.contains(tag)){
+				if(angular.isArray(page.tags) && page.tags.includes(tag)){
 					this.push(page);
 				}
 			}, pages);
@@ -101,4 +101,7 @@ angular.module('ngMaterialWeburger')
 	
 	
 	this.get = get;
+	this.newPage = newPage;
+	this.page = page;
+	this.pages = pages;
 });

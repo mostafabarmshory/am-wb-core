@@ -12,15 +12,18 @@
 				ng-click="cancel()"> 
 				<wb-icon aria-label="Close dialog">close</wb-icon> 
 			</md-button>
+			<md-button
+				class="md-icon-button"
+				ng-click="answer()"> 
+				<wb-icon aria-label="done dialog">done</wb-icon> 
+			</md-button>
 		</div>
 	</md-toolbar>
 
 	<md-dialog-content>
 		<md-content 
-			class="md-padding md-dialog-content" 
-			layout-xs="column" 
-			layout="row" layout-wrap>
-			Under construct			
+			id="wb-select-resource-children"
+			class="md-padding md-dialog-content">
 		</md-content>
 	</md-dialog-content>
 </md-dialog>
