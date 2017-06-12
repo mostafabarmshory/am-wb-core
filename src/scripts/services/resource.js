@@ -92,6 +92,7 @@ angular.module('ngMaterialWeburger')
 			templateUrl : 'views/dialogs/wb-select-resource.html',
 			parent : angular.element(document.body),
 			clickOutsideToClose : true,
+			fullscreen : true,
 			locals : {
 				'pages' : pages,
 				'style' : {}

@@ -33,6 +33,11 @@ angular.module('ngMaterialWeburger')
 		type: 'wb-url',
 		label : 'URL',
 		templateUrl : 'views/resources/wb-url.html',
+		controller: function($scope){
+			$scope.$watch('value', function(value){
+				$scope.$parent.setValue(value);
+			});
+		},
 		tags: ['image', 'audio', 'video', 'file']
 	});
 });

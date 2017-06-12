@@ -1,6 +1,5 @@
 <md-dialog
 	aria-label="edit action dialog"
-	ng-controller="WbWidgetSelectCtrl"
 	ng-cloak>
 
 	<md-toolbar>
@@ -21,9 +20,22 @@
 	</md-toolbar>
 
 	<md-dialog-content>
-		<md-content 
-			id="wb-select-resource-children"
-			class="md-padding md-dialog-content">
-		</md-content>
+		<div 
+			class="md-dialog-content"
+			layout="column">
+			<md-tabs
+				md-selected="pageIndex">
+				<md-tab 
+					ng-repeat="page in pages"
+					label="{{page.label}}">
+				</md-tab>
+			</md-tabs>
+			<div 
+	 			id="wb-select-resource-children"
+				flex>
+			</div>
+		</div>
 	</md-dialog-content>
+	
+	
 </md-dialog>

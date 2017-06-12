@@ -29,9 +29,11 @@ angular.module('ngMaterialWeburger')
  * @name WbResourceCtrl
  * @description # WbResourceCtrl Controller of the ngMaterialWeburger
  */
-.controller('WbResourceCtrl', function($scope, $mdDialog, $document, $wbUtil, $q, $controller, $compile, pages) {
+.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, $wbUtil, $q, $controller, $compile, pages) {
 
 	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
+	$scope.value = '';
+	
 	function hide() {
 		$mdDialog.hide();
 	}
@@ -64,21 +66,10 @@ angular.module('ngMaterialWeburger')
 	 *            setting page html template
 	 * @returns encapsulate html template
 	 */
-	function _encapsulatePanel(page, templateSrc) {
+	function _encapsulatePanel(page, template) {
 		// TODO: maso, 2017: pass all paramter to the setting
 		// panel.
-		var attr = ' ';
-		if (page.label) {
-			attr += ' label=\"' + page.label + '\"';
-		}
-		if (page.icon) {
-			attr += ' icon=\"' + page.icon + '\"';
-		}
-		if (page.description) {
-			attr += ' description=\"' + page.description + '\"';
-		}
-		return '<md-tab ' + attr + '>' + templateSrc
-		+ '</md-tab>';
+		return template;
 	}
 
 	/**
@@ -86,7 +77,7 @@ angular.module('ngMaterialWeburger')
 	 * 
 	 * @returns
 	 */
-	function loadPages() {
+	function loadPage(index) {
 		var widget = null;
 		var jobs = [];
 		var pages2 = [];
@@ -99,52 +90,44 @@ angular.module('ngMaterialWeburger')
 		target.empty();
 
 		// 3- load pages
-		angular.forEach(pages, function(page) {
-			var template = $wbUtil.getTemplateFor(page);
-			if (angular.isDefined(template)) {
-				var job = template.then(function(templateSrc) {
-					templateSrc = _encapsulatePanel(page, templateSrc);
-					var element = angular.element(templateSrc);
-					if (angular .isDefined(page.controller)) {
-						$controller(page.controller, {
-							$scope : $scope,
-							$element : element,
-						});
-					}
-					$compile(element)($scope);
-					element.attr('label',page.lable);
-					pages2.push(element);
-				});
-				jobs.push(job);
-			}
-		});
+		var page = pages[index];
+		var template = $wbUtil.getTemplateFor(page);
+		if (angular.isDefined(template)) {
+			jobs.push(template.then(function(templateSrc) {
+				templateSrc = _encapsulatePanel(page, templateSrc);
+				var element = angular.element(templateSrc);
+				var scope = $rootScope.$new(false, $scope);
+				scope.page = page;
+				scope.value = $scope.value;
+				if (angular .isDefined(page.controller)) {
+					$controller(page.controller, {
+						$scope : scope,
+						$element : element,
+					});
+				}
+				$compile(element)(scope);
+				pages2.push(element);
+			}));
+		}
 
-		$q.all(jobs)//
-		.then(function() {
-			pages2.sort(function(a, b) {
-				if (a.attr('label') < b.attr('label'))
-					return -1;
-				if (a.attr('label') > b.attr('label'))
-					return 1;
-				return 0;
-			});
-			
-			var tabsElm = angular.element('<md-tabs md-border-bottom md-autoselect flex></md-tabs>');
+		$q.all(jobs).then(function() {
 			angular.forEach(pages2, function(element) {
-				tabsElm.append(element);
+				target.append(element);
 			});
-
-			$compile(tabsElm)($scope);
-			target.append(tabsElm);
 		});
 	}
 	
 	
-	$scope.$watch(function(){
-		return angular.element(document.body).hasClass('md-dialog-is-showing');
-	}, function(value){
-		if(value){
-			loadPages();
+//	$scope.$watch(function(){
+//		return angular.element(document.body).hasClass('md-dialog-is-showing');
+//	}, function(value){
+//		if(value){
+//			loadPages();
+//		}
+//	});
+	$scope.$watch('pageIndex', function(value){
+		if(value >= 0){
+			loadPage(value);
 		}
 	});
 	
