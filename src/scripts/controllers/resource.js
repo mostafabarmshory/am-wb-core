@@ -24,81 +24,26 @@
 'use strict';
 
 angular.module('ngMaterialWeburger')
-
 /**
- * @ngdoc service
- * @name $widget
- * @memberof ngMaterialWeburger
- * @description Resource managment
- * 
+ * @ngdoc function
+ * @name WbResourceCtrl
+ * @description # WbResourceCtrl Controller of the ngMaterialWeburger
  */
-.service('$resource', function($wbUi) {
+.controller('WbResourceCtrl', function($scope, $mdDialog) {
 
-	var resourcePages = {};
-	
-	
-	/**
-	 * Fetchs a page.
-	 * 
-	 * @param model
-	 * @returns
-	 */
-	function page(type) {
-		var widget = notFound;
-		if (type in resourcePages) {
-			widget = resourcePages[type];
-		}
-		return widget;
+	function hide() {
+		$mdDialog.hide();
 	}
 
-	/**
-	 * Adds new page.
-	 * 
-	 * @returns
-	 */
-	function newPage(page) {
-		resourcePages[page.type] = page;
+	function cancel() {
+		$mdDialog.cancel();
 	}
 
-	/**
-	 * Finds and lists all pages.
-	 * 
-	 * @returns
-	 */
-	function pages() {
-		// TODO: maso, 1395:
+	function answer(response) {
+		$mdDialog.hide(response);
 	}
-	
-	/**
-	 * Get a resource 
-	 * 
-	 * @param tags
-	 * @returns
-	 */
-	function get(tag){
-		var pages = [];
-		if(tag){
-			angular.forEach(resourcePages, function(page) {
-				if(page.tags.contains(tag)){
-					this.push(page);
-				}
-			}, pages);
-		} else {
-			pages = resourcePages;
-		}
-		
-		return $wbUi.openDialog({
-			controller : 'WbResourceCtrl',
-			templateUrl : 'views/dialogs/wb-select-resource.html',
-			parent : angular.element(document.body),
-			clickOutsideToClose : true,
-			locals : {
-				'pages' : pages,
-				'style' : {}
-			}
-		});
-	}
-	
-	
-	this.get = get;
+
+	$scope.hide = hide;
+	$scope.cancel = cancel;
+	$scope.answer = answer;
 });

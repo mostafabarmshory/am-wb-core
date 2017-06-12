@@ -26,79 +26,31 @@
 angular.module('ngMaterialWeburger')
 
 /**
- * @ngdoc service
- * @name $widget
+ * @ngdoc directive
+ * @name wbUiSettingColor
  * @memberof ngMaterialWeburger
- * @description Resource managment
- * 
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @description a setting section to set color.
+ *
  */
-.service('$resource', function($wbUi) {
-
-	var resourcePages = {};
-	
-	
-	/**
-	 * Fetchs a page.
-	 * 
-	 * @param model
-	 * @returns
-	 */
-	function page(type) {
-		var widget = notFound;
-		if (type in resourcePages) {
-			widget = resourcePages[type];
-		}
-		return widget;
-	}
-
-	/**
-	 * Adds new page.
-	 * 
-	 * @returns
-	 */
-	function newPage(page) {
-		resourcePages[page.type] = page;
-	}
-
-	/**
-	 * Finds and lists all pages.
-	 * 
-	 * @returns
-	 */
-	function pages() {
-		// TODO: maso, 1395:
-	}
-	
-	/**
-	 * Get a resource 
-	 * 
-	 * @param tags
-	 * @returns
-	 */
-	function get(tag){
-		var pages = [];
-		if(tag){
-			angular.forEach(resourcePages, function(page) {
-				if(page.tags.contains(tag)){
-					this.push(page);
-				}
-			}, pages);
-		} else {
-			pages = resourcePages;
-		}
-		
-		return $wbUi.openDialog({
-			controller : 'WbResourceCtrl',
-			templateUrl : 'views/dialogs/wb-select-resource.html',
-			parent : angular.element(document.body),
-			clickOutsideToClose : true,
-			locals : {
-				'pages' : pages,
-				'style' : {}
+.directive('wbUiSettingImage', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-image.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon'
+		},
+		controller: function($scope, $resource){
+			function selectImage(){
+				return $resource.get('image')//
+				.then(function(value){
+					$scope.value = value;
+				});
 			}
-		});
-	}
-	
-	
-	this.get = get;
+			
+			$scope.selectImage = selectImage;
+		}
+	};
 });

@@ -29,23 +29,48 @@ angular.module('ngMaterialWeburger')
  * @ngdoc directive
  * @name wbInfinateScroll
  * @description
- * 
  *  # wbInfinateScroll
  */
-.directive('wbInfinateScroll', function() {
-    return {
-	restrict : 'A',
-	// require : '^ddScroll',
-	scope : {
-	    loadPage : '=wbInfinateScroll'
-	},
-	link : function(scope, elem, attrs) {
-	    elem.on('scroll', function(evt) {
+.directive('wbInfinateScroll', function($q, $timeout) {
+
+	function postLink(scope, elem, attrs) {
 		var raw = elem[0];
-		if (raw.scrollTop + raw.offsetHeight  + 5 >= raw.scrollHeight) {
-		    scope.loadPage();
+
+		/**
+		 * 
+		 */
+		function loadNextPage() {
+		  var value = scope.loadPage();
+			return $q.when(value)//
+			.then(checkScroll);
 		}
-	    });
+
+		function checkScroll(value) {
+		  if(value){
+  			return $timeout(function(){
+  				if(raw.scrollHeight <= raw.offsetHeight){
+  					return loadNextPage();
+  				}
+  			}, 100);
+		  }
+		}
+
+		function scrollChange(evt) {
+			if (!(raw.scrollTop + raw.offsetHeight + 5 >= raw.scrollHeight)) {
+				return;
+			}
+			loadNextPage();
+		}
+
+		elem.on('scroll', scrollChange);
+		loadNextPage();
 	}
-    };
+
+	return {
+		restrict : 'A',
+		scope : {
+			loadPage : '=wbInfinateScroll'
+		},
+		link : postLink
+	};
 });

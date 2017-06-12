@@ -23,82 +23,40 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular
+.module('ngMaterialWeburger')
 
 /**
  * @ngdoc service
- * @name $widget
+ * @name $wbUtil
  * @memberof ngMaterialWeburger
- * @description Resource managment
+ * @description کدهای پایه
  * 
  */
-.service('$resource', function($wbUi) {
-
-	var resourcePages = {};
-	
-	
-	/**
-	 * Fetchs a page.
-	 * 
-	 * @param model
-	 * @returns
+.service('$wbUtil',function($rootScope, $controller, $widget, $q, $sce, $compile,
+		$document, $templateRequest) {
+	/*
+	 * get setting page template
 	 */
-	function page(type) {
-		var widget = notFound;
-		if (type in resourcePages) {
-			widget = resourcePages[type];
-		}
-		return widget;
-	}
-
-	/**
-	 * Adds new page.
-	 * 
-	 * @returns
-	 */
-	function newPage(page) {
-		resourcePages[page.type] = page;
-	}
-
-	/**
-	 * Finds and lists all pages.
-	 * 
-	 * @returns
-	 */
-	function pages() {
-		// TODO: maso, 1395:
-	}
-	
-	/**
-	 * Get a resource 
-	 * 
-	 * @param tags
-	 * @returns
-	 */
-	function get(tag){
-		var pages = [];
-		if(tag){
-			angular.forEach(resourcePages, function(page) {
-				if(page.tags.contains(tag)){
-					this.push(page);
-				}
-			}, pages);
-		} else {
-			pages = resourcePages;
-		}
-		
-		return $wbUi.openDialog({
-			controller : 'WbResourceCtrl',
-			templateUrl : 'views/dialogs/wb-select-resource.html',
-			parent : angular.element(document.body),
-			clickOutsideToClose : true,
-			locals : {
-				'pages' : pages,
-				'style' : {}
+	function getTemplateFor(page) {
+		var template, templateUrl;
+		if (angular.isDefined(template = page.template)) {
+			if (angular.isFunction(template)) {
+				template = template(page.params);
 			}
-		});
+		} else if (angular
+				.isDefined(templateUrl = page.templateUrl)) {
+			if (angular.isFunction(templateUrl)) {
+				templateUrl = templateUrl(page.params);
+			}
+			if (angular.isDefined(templateUrl)) {
+				page.loadedTemplateUrl = $sce
+				.valueOf(templateUrl);
+				template = $templateRequest(templateUrl);
+			}
+		}
+		return template;
 	}
-	
-	
-	this.get = get;
+
+	this.getTemplateFor = getTemplateFor;
 });
