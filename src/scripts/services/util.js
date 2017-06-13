@@ -23,54 +23,40 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular
+.module('ngMaterialWeburger')
 
 /**
- * @ngdoc directive
- * @name wbInfinateScroll
- * @description
- *  # wbInfinateScroll
+ * @ngdoc service
+ * @name $wbUtil
+ * @memberof ngMaterialWeburger
+ * @description کدهای پایه
+ * 
  */
-.directive('wbInfinateScroll', function($q, $timeout) {
-
-	function postLink(scope, elem, attrs) {
-		var raw = elem[0];
-
-		/**
-		 * 
-		 */
-		function loadNextPage() {
-		  var value = scope.loadPage();
-			return $q.when(value)//
-			.then(checkScroll);
-		}
-
-		function checkScroll(value) {
-		  if(value){
-  			return $timeout(function(){
-  				if(raw.scrollHeight <= raw.offsetHeight){
-  					return loadNextPage();
-  				}
-  			}, 100);
-		  }
-		}
-
-		function scrollChange(evt) {
-			if (!(raw.scrollTop + raw.offsetHeight + 5 >= raw.scrollHeight)) {
-				return;
+.service('$wbUtil',function($rootScope, $controller, $widget, $q, $sce, $compile,
+		$document, $templateRequest) {
+	/*
+	 * get setting page template
+	 */
+	function getTemplateFor(page) {
+		var template, templateUrl;
+		if (angular.isDefined(template = page.template)) {
+			if (angular.isFunction(template)) {
+				template = template(page.params);
 			}
-			loadNextPage();
+		} else if (angular
+				.isDefined(templateUrl = page.templateUrl)) {
+			if (angular.isFunction(templateUrl)) {
+				templateUrl = templateUrl(page.params);
+			}
+			if (angular.isDefined(templateUrl)) {
+				page.loadedTemplateUrl = $sce
+				.valueOf(templateUrl);
+				template = $templateRequest(templateUrl);
+			}
 		}
-
-		elem.on('scroll', scrollChange);
-		loadNextPage();
+		return template;
 	}
 
-	return {
-		restrict : 'A',
-		scope : {
-			loadPage : '=wbInfinateScroll'
-		},
-		link : postLink
-	};
+	this.getTemplateFor = getTemplateFor;
 });

@@ -48,15 +48,24 @@
             </md-button>
             <md-button
                     ng-class="{'md-primary' : showContent}"
-                    class="wb-group-button middle"
+                    class="wb-group-button right"
                     ng-click="showContent=!showContent">
                 <wb-icon>content_copy</wb-icon>
             </md-button>
-            <md-button
-                    class="wb-group-button right"
-                    ng-click="cs()">
-                <wb-icon>insert_photo</wb-icon>
-            </md-button>
+       </section>
+       <section layout="row" layout-align="center center">
+		    <wb-ui-setting-image
+		    	title="Cover" 
+		        value="cover">
+			</wb-ui-setting-image>
+		    <wb-ui-setting-audio
+		    	title="Audio" 
+		        value="audio">
+			</wb-ui-setting-audio>
+		    <wb-ui-setting-video
+		    	title="Video" 
+		        value="video">
+			</wb-ui-setting-video>
         </section>
         <textarea ng-show="showContent">{{model}}</textarea>
         <div
@@ -111,6 +120,7 @@
 
 <script src="scripts/runs/widgets.js"></script>
 <script src="scripts/runs/settings.js"></script>
+<script src="scripts/runs/resources.js"></script>
 
 <script src="scripts/controllers/wb-dialogs.js"></script>
 <script src="scripts/controllers/wb-widgetselect.js"></script>
@@ -119,6 +129,7 @@
 <script src="scripts/controllers/wb-selflayoutsetting.js"></script>
 <script src="scripts/controllers/wb-bordersetting.js"></script>
 <script src="scripts/controllers/wb-textsetting.js"></script>
+<script src="scripts/controllers/resource.js"></script>
 
 <script src="scripts/directives/wb-page.js"></script>
 <script src="scripts/directives/wb-group.js"></script>
@@ -136,6 +147,9 @@
 <script src="scripts/directives/wb-ui-setting-number.js"></script>
 <script src="scripts/directives/wb-ui-setting-color.js"></script>
 <script src="scripts/directives/wb-ui-setting-dropdown.js"></script>
+<script src="scripts/directives/wb-ui-setting-image.js"></script>
+<script src="scripts/directives/wb-ui-setting-audio.js"></script>
+<script src="scripts/directives/wb-ui-setting-video.js"></script>
 
 <script src="scripts/directives/style-wb-margin.js"></script>
 <script src="scripts/directives/style-wb-padding.js"></script>
@@ -149,6 +163,8 @@
 <script src="scripts/services/widget.js"></script>
 <script src="scripts/services/settings.js"></script>
 <script src="scripts/services/resource.js"></script>
+<script src="scripts/services/util.js"></script>
+<script src="scripts/services/ui.js"></script>
 <!-- endbuild -->
 
 </body>

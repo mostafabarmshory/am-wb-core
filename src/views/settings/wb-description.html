@@ -15,16 +15,26 @@ These attributes are usefull in SEO.
 	<md-input-container>
 	  <label translate>Lable</label>
 	  <input 
-	  	type="text" ng-model="wbModel.label">
+	  	type="text" 
+	  	ng-model="wbModel.label">
 	</md-input-container>
 	<md-input-container>
 	  <label translate>Description</label>
 	  <input 
-	  	type="text" ng-model="wbModel.description">
+	  	type="text" 
+	  	ng-model="wbModel.description">
 	</md-input-container>
 	<md-input-container>
 	  <label translate>Keywords</label>
 	  <input 
-	  	type="text" ng-model="wbModel.keywords">
+	  	type="text" 
+	  	ng-model="wbModel.keywords">
 	</md-input-container>
+	
+	
+    <wb-ui-setting-image
+    	title="Cover" 
+        value="wbModel.cover">
+	</wb-ui-setting-image>
+	
 </div>
