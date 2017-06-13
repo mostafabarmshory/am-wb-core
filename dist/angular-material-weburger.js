@@ -1924,6 +1924,64 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc directive
+ * @name wbUiSettingAudio
+ * @memberof ngMaterialWeburger
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @description a setting section to select audio file.
+ *
+ */
+.directive('wbUiSettingAudio', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-audio.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon'
+		},
+		controller: function($scope, $resource){
+			function selectAudio(){
+				return $resource.get('audio')//
+				.then(function(value){
+					$scope.value = value;
+				});
+			}
+			
+			$scope.selectAudio = selectAudio;
+		}
+	};
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * @ngdoc directive
  * @name wbUiSettingChoose
  * @memberof ngMaterialWeburger
  * @description a setting section for choosing values.
@@ -2159,6 +2217,64 @@ angular.module('ngMaterialWeburger')
             }
         };
     });
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * @ngdoc directive
+ * @name wbUiSettingVideo
+ * @memberof ngMaterialWeburger
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @description a setting section to select audio file.
+ *
+ */
+.directive('wbUiSettingVideo', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-video.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon'
+		},
+		controller: function($scope, $resource){
+			function selectVideo(){
+				return $resource.get('video')//
+				.then(function(value){
+					$scope.value = value;
+				});
+			}
+			
+			$scope.selectVideo = selectVideo;
+		}
+	};
+});
 
 /* 
  * The MIT License (MIT)
@@ -3189,6 +3305,11 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   );
 
 
+  $templateCache.put('views/directives/wb-ui-setting-audio.html',
+    "<md-list-item> <img ng-click=selectAudio() ng-src={{value}} width=48px height=48px class=\"md-avatar-icon\"> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
+  );
+
+
   $templateCache.put('views/directives/wb-ui-setting-choose.html',
     "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\" wb-icon-name={{icon}}> </wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-tabs flex=100 class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in xitems\"> <md-tab-label> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs> </md-list-item> "
   );
@@ -3216,6 +3337,11 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
   $templateCache.put('views/directives/wb-ui-setting-on-off-switch.html',
     "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-switch class=md-secondary ng-model=value></md-switch> </md-list-item>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-video.html',
+    "<md-list-item> <img ng-click=selectVideo() ng-src={{value}} width=48px height=48px class=\"md-avatar-icon\"> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
   );
 
 
