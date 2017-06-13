@@ -45,6 +45,9 @@ angular.module('ngMaterialWeburger')
 		if(style.background){
 			cssValue['background'] = style.background;
 		}
+		if(style.backgroundImage){
+			cssValue['background-image'] = 'url(\''+style.backgroundImage+'\')';
+		}
 
 		if(style.backgroundColor){
 			cssValue['background-color'] = style.backgroundColor;
