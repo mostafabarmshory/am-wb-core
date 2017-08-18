@@ -27,36 +27,36 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc directive
- * @name wbUiSettingAudio
+ * @name wbUiSettingData
  * @memberof ngMaterialWeburger
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
- * @description a setting section to select audio file.
+ * @description a setting section to manage data.
  *
  */
-.directive('wbUiSettingAudio', function () {
+.directive('wbUiSettingData', function() {
 	return {
-		templateUrl: 'views/directives/wb-ui-setting-audio.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon'
+		templateUrl : 'views/directives/wb-ui-setting-data.html',
+		restrict : 'E',
+		scope : {
+			title : '@title',
+			value : '=value',
+			icon : '@icon'
 		},
-		controller: function($scope, $resource){
-			function selectAudio(){
-				return $resource.get('audio', {
-					style: {
-						title: 'Select Audio',
+		controller : function($scope, $resource) {
+			function editData(data) {
+				return $resource.get('data', {
+					style : {
+						title : 'Edit data source'
 					},
-					data: $scope.value
-				})//
-				.then(function(value){
-					$scope.value = value;
+					data : $scope.value
+				}) //
+				.then(function(data) {
+					$scope.value = data;
 				});
 			}
-			
-			$scope.edit = selectAudio;
+
+			$scope.edit = editData;
 		}
 	};
 });

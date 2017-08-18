@@ -99,9 +99,9 @@ angular.module('ngMaterialWeburger')
 			locals : {
 				'pages' : pages,
 				'style' : option.style || {
-					title: 'Resource:' + tag
+					title: 'Resource : ' + tag
 				},
-				'data' : option.data || {}
+				'data' : option.data
 			}
 		});
 	}

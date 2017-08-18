@@ -33,7 +33,7 @@ angular.module('ngMaterialWeburger')
 		$wbUtil, $q, $controller, $compile, pages, style, data) {
 
 	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
-	angular.copy(data, $scope.value);
+	$scope.value = angular.copy(data);
 	$scope.style = style;
 	
 	function hide() {

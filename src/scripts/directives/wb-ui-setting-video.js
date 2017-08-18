@@ -45,13 +45,18 @@ angular.module('ngMaterialWeburger')
 		},
 		controller: function($scope, $resource){
 			function selectVideo(){
-				return $resource.get('video')//
+				return $resource.get('video', {
+					style: {
+						title: 'Select audio'
+					},
+					data: $scope.value
+				})//
 				.then(function(value){
 					$scope.value = value;
 				});
 			}
-			
-			$scope.selectVideo = selectVideo;
+
+			$scope.edit = selectVideo;
 		}
 	};
 });
