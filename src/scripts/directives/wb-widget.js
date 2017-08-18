@@ -97,6 +97,19 @@ angular.module('ngMaterialWeburger')
 			element.attr('id', $scope.objectId($scope.wbModel));
 			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
 			$scope.isSelected = isSelected;
+			
+			$scope.tinymceOptions = {
+//				    onChange: function(e) {
+//				      // put logic here for keypress and cut/paste changes
+//				    },
+					  selector: 'div.tinymce',
+					  theme: 'inlite',
+					  plugins: 'image table link paste contextmenu textpattern autolink',
+					  insert_toolbar: 'quickimage quicktable',
+					  selection_toolbar: 'bold italic | quicklink h2 h3 blockquote',
+					  inline: true,
+					  paste_data_images: true,
+				  }
 		}
 	};
 });
