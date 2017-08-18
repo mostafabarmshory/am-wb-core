@@ -91,9 +91,12 @@ angular.module('ngMaterialWeburger')
 		'wb-horizontal-boxes': '<path d="M3,4H21V8H3V4M3,10H21V14H3V10M3,16H21V20H3V16Z" />',
 		'wb-horizontal-arrows': '<path d="M12,18.17L8.83,15L7.42,16.41L12,21L16.59,16.41L15.17,15M12,5.83L15.17,9L16.58,7.59L12,3L7.41,7.59L8.83,9L12,5.83Z" />',
 		'wb-vertical-arrows': '<path d="M18.17,12L15,8.83L16.41,7.41L21,12L16.41,16.58L15,15.17L18.17,12M5.83,12L9,15.17L7.59,16.59L3,12L7.59,7.42L9,8.83L5.83,12Z" />',
+		'wb-direction':'<path d="M13,6V11H18V7.75L22.25,12L18,16.25V13H13V18H16.25L12,22.25L7.75,18H11V13H6V16.25L1.75,12L6,7.75V11H11V6H7.75L12,1.75L16.25,6H13Z" />',
 
-
-		'wb-direction':'<path d="M13,6V11H18V7.75L22.25,12L18,16.25V13H13V18H16.25L12,22.25L7.75,18H11V13H6V16.25L1.75,12L6,7.75V11H11V6H7.75L12,1.75L16.25,6H13Z" />'
+		'wb-object-video': ngMdIconServiceProvider.getShape('video_library'),
+		'wb-object-audio':  ngMdIconServiceProvider.getShape('audiotrack'),
+		'wb-object-data': ngMdIconServiceProvider.getShape('storage'),
+		
 	});/*.addViewBox('wb-direction','0 0 59.999 59.999');*/
 }]);
 
@@ -128,10 +131,12 @@ angular.module('ngMaterialWeburger')
  * @name WbResourceCtrl
  * @description # WbResourceCtrl Controller of the ngMaterialWeburger
  */
-.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, $wbUtil, $q, $controller, $compile, pages) {
+.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, 
+		$wbUtil, $q, $controller, $compile, pages, style, data) {
 
 	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
-	$scope.value = '';
+	$scope.value = angular.copy(data);
+	$scope.style = style;
 	
 	function hide() {
 		$mdDialog.hide();
@@ -1942,13 +1947,18 @@ angular.module('ngMaterialWeburger')
 		},
 		controller: function($scope, $resource){
 			function selectAudio(){
-				return $resource.get('audio')//
+				return $resource.get('audio', {
+					style: {
+						title: 'Select Audio',
+					},
+					data: $scope.value
+				})//
 				.then(function(value){
 					$scope.value = value;
 				});
 			}
 			
-			$scope.selectAudio = selectAudio;
+			$scope.edit = selectAudio;
 		}
 	};
 });
@@ -2065,6 +2075,68 @@ angular.module('ngMaterialWeburger')
         };
     });
 
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * @ngdoc directive
+ * @name wbUiSettingData
+ * @memberof ngMaterialWeburger
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @description a setting section to manage data.
+ *
+ */
+.directive('wbUiSettingData', function() {
+	return {
+		templateUrl : 'views/directives/wb-ui-setting-data.html',
+		restrict : 'E',
+		scope : {
+			title : '@title',
+			value : '=value',
+			icon : '@icon'
+		},
+		controller : function($scope, $resource) {
+			function editData(data) {
+				return $resource.get('data', {
+					style : {
+						title : 'Edit data source'
+					},
+					data : $scope.value
+				}) //
+				.then(function(data) {
+					$scope.value = data;
+				});
+			}
+
+			$scope.edit = editData;
+		}
+	};
+});
 /* 
  * The MIT License (MIT)
  * 
@@ -2265,13 +2337,18 @@ angular.module('ngMaterialWeburger')
 		},
 		controller: function($scope, $resource){
 			function selectVideo(){
-				return $resource.get('video')//
+				return $resource.get('video', {
+					style: {
+						title: 'Select audio'
+					},
+					data: $scope.value
+				})//
 				.then(function(value){
 					$scope.value = value;
 				});
 			}
-			
-			$scope.selectVideo = selectVideo;
+
+			$scope.edit = selectVideo;
 		}
 	};
 });
@@ -2320,8 +2397,8 @@ angular.module('ngMaterialWeburger')
 		// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
 		// FIXME: maso, 2017: use regular dom insted of ng-transclude
 		transclude(scope, function(clone, scope) {
-			var node = element//
-			.find('wb-transclude')//
+			var node = element //
+			.find('wb-transclude') //
 			.append(clone);
 		});
 	}
@@ -2330,7 +2407,7 @@ angular.module('ngMaterialWeburger')
 		templateUrl : 'views/directives/wb-widget.html',
 		restrict : 'E',
 		transclude : true,
-		replace: true,
+		replace : true,
 		link : postLink,
 		controller : function($scope, $element, $settings, $widget) {
 			var element = $element;
@@ -2353,19 +2430,44 @@ angular.module('ngMaterialWeburger')
 				}, $scope.$parent.settingAnchor());
 			}
 
+			function selected() {
+				if (!$scope.wbEditable) {
+					return;
+				}
+				return settings();
+			}
+
+			function isSelected() {
+				return $scope.wbEditable && $settings.isCurrentModel($scope.wbModel);
+			}
+
 			/*
 			 * Add to scope
 			 */
 			$scope.remove = remove;
 			$scope.movedCallback = remove;
 			$scope.settings = settings;
+			$scope.selected = selected;
 			// Sets widget id after compile
 			element.attr('id', $scope.objectId($scope.wbModel));
 			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
+			$scope.isSelected = isSelected;
+
+			$scope.tinymceOptions = {
+					selector : 'div.tinymce',
+					theme : 'inlite',
+					plugins : 'directionality contextmenu table link paste image imagetools hr textpattern autolink ',
+					insert_toolbar : 'quickimage quicktable',
+					selection_toolbar : 'bold italic | quicklink h1 h2 h3 blockquote | ltr rtl',
+					insert_button_items: 'image link | inserttable | hr',
+					inline : true,
+					paste_data_images : true,
+					branding: false,
+					imagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'
+			}
 		}
 	};
 });
-
 /* 
  * The MIT License (MIT)
  * 
@@ -2542,6 +2644,61 @@ angular.module('ngMaterialWeburger')
 	});
 });
 
+/**
+ * plugin.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+/*global tinymce:true */
+
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * Load default resources
+ */
+.run(function($resource) {
+
+	function imageTool(editor) {
+
+		function insertImage(url){
+	          editor.insertContent('<img src="' + url + '" >');
+		}
+		
+		function showDialog(){
+			$resource.get('image')//
+			.then(function(value){
+				insertImage(value);
+			});
+		}
+		
+		editor.addButton('image', {
+			icon: 'image',
+			tooltip: 'Insert/edit image',
+			onclick: showDialog,
+			stateSelector: 'img:not([data-mce-object],[data-mce-placeholder]),figure.image'
+		});
+
+		editor.addMenuItem('image', {
+			icon: 'image',
+			text: 'Image',
+			onclick: showDialog,
+			context: 'insert',
+			prependToContext: true
+		});
+
+		editor.addCommand('mceImage', showDialog);
+	}
+
+	tinymce.PluginManager.add('image', imageTool);
+
+});
+
 /* 
  * The MIT License (MIT)
  * 
@@ -2635,8 +2792,8 @@ angular.module('ngMaterialWeburger')
 .service('$resource', function($wbUi) {
 
 	var resourcePages = {};
-	
-	
+
+
 	/**
 	 * Fetchs a page.
 	 * 
@@ -2668,14 +2825,17 @@ angular.module('ngMaterialWeburger')
 	function pages() {
 		// TODO: maso, 1395:
 	}
-	
+
 	/**
 	 * Get a resource 
 	 * 
 	 * @param tags
 	 * @returns
 	 */
-	function get(tag){
+	function get(tag, option){
+		if(!option){
+			option = {};
+		}
 		var pages = [];
 		if(tag){
 			angular.forEach(resourcePages, function(page) {
@@ -2686,7 +2846,7 @@ angular.module('ngMaterialWeburger')
 		} else {
 			pages = resourcePages;
 		}
-		
+
 		return $wbUi.openDialog({
 			controller : 'WbResourceCtrl',
 			templateUrl : 'views/dialogs/wb-select-resource.html',
@@ -2695,12 +2855,15 @@ angular.module('ngMaterialWeburger')
 			fullscreen : true,
 			locals : {
 				'pages' : pages,
-				'style' : {}
+				'style' : option.style || {
+					title: 'Resource : ' + tag
+				},
+				'data' : option.data
 			}
 		});
 	}
-	
-	
+
+
 	this.get = get;
 	this.newPage = newPage;
 	this.page = page;
@@ -2843,6 +3006,13 @@ angular.module('ngMaterialWeburger')
 	}
 
 	/**
+	 * Check if this is the current model
+	 */
+	function isLoaded(wbModel) {
+    	return oldScope && oldScope.wbModel == wbModel;
+    }
+	
+	/**
 	 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
 	 * 
 	 * @returns
@@ -2853,7 +3023,7 @@ angular.module('ngMaterialWeburger')
 		var pages = [];
 
 		// 0- destroy old resource
-		if(oldScope && oldScope.wbModel == models.wbModel){
+		if(isLoaded(models.wbModel)){
 			return;
 		}
 		if (angular.isDefined(oldScope)) {
@@ -2934,6 +3104,7 @@ angular.module('ngMaterialWeburger')
 	this.page = page;
 	this.load = loadSetting;
 	this.newPage = newPage;
+	this.isCurrentModel = isLoaded;
 });
 
 /* 
@@ -3271,7 +3442,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Widget list</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <div class=md-dialog-content layout=column> <md-tabs md-selected=pageIndex> <md-tab ng-repeat=\"page in pages\" label={{page.label}}> </md-tab> </md-tabs> <div id=wb-select-resource-children flex> </div> </div> </md-dialog-content> </md-dialog>"
+    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>{{style.title}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <div class=md-dialog-content layout=column> <md-tabs md-selected=pageIndex> <md-tab ng-repeat=\"page in pages\" label={{page.label}}> </md-tab> </md-tabs> <div id=wb-select-resource-children flex> </div> </div> </md-dialog-content> </md-dialog>"
   );
 
 
@@ -3306,7 +3477,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-ui-setting-audio.html',
-    "<md-list-item> <img ng-click=selectAudio() ng-src={{value}} width=48px height=48px class=\"md-avatar-icon\"> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
+    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-audio</wb-icon> </md-button> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
   );
 
 
@@ -3317,6 +3488,11 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
   $templateCache.put('views/directives/wb-ui-setting-color.html',
     "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='title'\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false ng-model=value> </md-color-picker> </md-list-item>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-data.html',
+    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-data</wb-icon> </md-button> <md-input-container> <input ng-model=value.key> </md-input-container> </md-list-item>"
   );
 
 
@@ -3341,12 +3517,12 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-ui-setting-video.html',
-    "<md-list-item> <img ng-click=selectVideo() ng-src={{value}} width=48px height=48px class=\"md-avatar-icon\"> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
+    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-video</wb-icon> </md-button> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
   );
 
 
   $templateCache.put('views/directives/wb-widget.html',
-    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=movedCallback() class=wb-widget ng-class=\"{'wb-widget-edit': wbEditable}\" layout=column name={{wbModel.name}}>  <div ng-show=wbEditable layout=row class=wb-widget-header> <span translate> {{wbModel.name}}</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>settings</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=remove() ng-show=remove ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <wb-icon class=mde-icon-mini>delete</wb-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <wb-icon class=mde-icon-mini>{{item.icon}}</wb-icon> </md-button> </div>  <div class=wb-widget-body wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-margin=wbModel.style> <div class=wb-widget-overlay ng-show=ctrl.hoveringDelBtn> </div> <wb-transclude class=wb-widget-container wb-layout=wbModel.style> </wb-transclude> </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-selected=selected() dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=movedCallback() class=wb-widget ng-class=\"{'wb-widget-edit': wbEditable}\" layout=column name={{wbModel.name}}>  <div ng-show=isSelected() layout=row class=wb-widget-header> <span translate> {{wbModel.name}}</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>add_circle</wb-icon> </md-button>      <md-button class=\"md-icon-button md-mini\" ng-click=remove() ng-show=remove ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <wb-icon class=mde-icon-mini>delete</wb-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <wb-icon class=mde-icon-mini>{{item.icon}}</wb-icon> </md-button> </div>  <div class=wb-widget-body wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-margin=wbModel.style> <div class=wb-widget-overlay ng-show=ctrl.hoveringDelBtn> </div> <wb-transclude class=wb-widget-container wb-layout=wbModel.style> </wb-transclude> </div> </div>"
   );
 
 
@@ -3396,13 +3572,23 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/settings/wb-text.html',
-    " <textarea ui-tinymce=tinymceOptions ng-model=wbModel.text flex>\n" +
-    "</textarea>            "
+    " <textarea ui-tinymce=\"{\n" +
+    "\t\t plugins : 'directionality contextmenu table link paste hr emoticons advlist autolink link lists advlist charmap print preview wordcount code anchor image imagetools codesample visualchars',\n" +
+    "\t\t toolbar: [\n" +
+    "\t\t \t'undo redo visualchars | styleselect | link image emoticons | hr ',\n" +
+    "\t\t \t'alignleft aligncenter alignright | ltr rtl | bold italic | numlist bullist ',\n" +
+    "\t\t ],\n" +
+    "\t\t contextmenu: 'link image inserttable | cell row column deletetable',\n" +
+    "\t\t elementpath: true,\n" +
+    "\t\t branding: false,\n" +
+    "\t\t image_advtab: false\n" +
+    "\t}\" ng-model=wbModel.text flex>\n" +
+    "</textarea>"
   );
 
 
   $templateCache.put('views/widgets/wb-html.html',
-    " <div ng-bind-html=\"wbModel.text | wbunsafe\"> </div>"
+    " <div ng-hide=isSelected() ng-bind-html=\"wbModel.text | wbunsafe\"> </div> <div ui-tinymce=tinymceOptions ng-model=wbModel.text ng-show=isSelected() flex> </div>"
   );
 
 

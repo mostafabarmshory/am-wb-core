@@ -42,8 +42,8 @@ angular.module('ngMaterialWeburger')
 		// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
 		// FIXME: maso, 2017: use regular dom insted of ng-transclude
 		transclude(scope, function(clone, scope) {
-			var node = element//
-			.find('wb-transclude')//
+			var node = element //
+			.find('wb-transclude') //
 			.append(clone);
 		});
 	}
@@ -52,7 +52,7 @@ angular.module('ngMaterialWeburger')
 		templateUrl : 'views/directives/wb-widget.html',
 		restrict : 'E',
 		transclude : true,
-		replace: true,
+		replace : true,
 		link : postLink,
 		controller : function($scope, $element, $settings, $widget) {
 			var element = $element;
@@ -74,14 +74,14 @@ angular.module('ngMaterialWeburger')
 					wbParent : $scope.$parent,
 				}, $scope.$parent.settingAnchor());
 			}
-			
+
 			function selected() {
-				if(!$scope.wbEditable){
+				if (!$scope.wbEditable) {
 					return;
 				}
 				return settings();
 			}
-			
+
 			function isSelected() {
 				return $scope.wbEditable && $settings.isCurrentModel($scope.wbModel);
 			}
@@ -97,19 +97,19 @@ angular.module('ngMaterialWeburger')
 			element.attr('id', $scope.objectId($scope.wbModel));
 			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
 			$scope.isSelected = isSelected;
-			
+
 			$scope.tinymceOptions = {
-//				    onChange: function(e) {
-//				      // put logic here for keypress and cut/paste changes
-//				    },
-					  selector: 'div.tinymce',
-					  theme: 'inlite',
-					  plugins: 'image table link paste contextmenu textpattern autolink',
-					  insert_toolbar: 'quickimage quicktable',
-					  selection_toolbar: 'bold italic | quicklink h2 h3 blockquote',
-					  inline: true,
-					  paste_data_images: true,
-				  }
+					selector : 'div.tinymce',
+					theme : 'inlite',
+					plugins : 'directionality contextmenu table link paste image imagetools hr textpattern autolink ',
+					insert_toolbar : 'quickimage quicktable',
+					selection_toolbar : 'bold italic | quicklink h1 h2 h3 blockquote | ltr rtl',
+					insert_button_items: 'image link | inserttable | hr',
+					inline : true,
+					paste_data_images : true,
+					branding: false,
+					imagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'
+			}
 		}
 	};
 });
