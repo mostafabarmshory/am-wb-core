@@ -134,6 +134,13 @@ angular.module('ngMaterialWeburger')
 	}
 
 	/**
+	 * Check if this is the current model
+	 */
+	function isLoaded(wbModel) {
+    	return oldScope && oldScope.wbModel == wbModel;
+    }
+	
+	/**
 	 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
 	 * 
 	 * @returns
@@ -144,7 +151,7 @@ angular.module('ngMaterialWeburger')
 		var pages = [];
 
 		// 0- destroy old resource
-		if(oldScope && oldScope.wbModel == models.wbModel){
+		if(isLoaded(models.wbModel)){
 			return;
 		}
 		if (angular.isDefined(oldScope)) {
@@ -225,4 +232,5 @@ angular.module('ngMaterialWeburger')
 	this.page = page;
 	this.load = loadSetting;
 	this.newPage = newPage;
+	this.isCurrentModel = isLoaded;
 });

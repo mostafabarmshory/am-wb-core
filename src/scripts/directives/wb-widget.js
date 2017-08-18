@@ -74,6 +74,17 @@ angular.module('ngMaterialWeburger')
 					wbParent : $scope.$parent,
 				}, $scope.$parent.settingAnchor());
 			}
+			
+			function selected() {
+				if(!$scope.wbEditable){
+					return;
+				}
+				return settings();
+			}
+			
+			function isSelected() {
+				return $scope.wbEditable && $settings.isCurrentModel($scope.wbModel);
+			}
 
 			/*
 			 * Add to scope
@@ -81,9 +92,11 @@ angular.module('ngMaterialWeburger')
 			$scope.remove = remove;
 			$scope.movedCallback = remove;
 			$scope.settings = settings;
+			$scope.selected = selected;
 			// Sets widget id after compile
 			element.attr('id', $scope.objectId($scope.wbModel));
 			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
+			$scope.isSelected = isSelected;
 		}
 	};
 });
