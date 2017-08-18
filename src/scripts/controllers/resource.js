@@ -29,10 +29,12 @@ angular.module('ngMaterialWeburger')
  * @name WbResourceCtrl
  * @description # WbResourceCtrl Controller of the ngMaterialWeburger
  */
-.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, $wbUtil, $q, $controller, $compile, pages) {
+.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, 
+		$wbUtil, $q, $controller, $compile, pages, style, data) {
 
 	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
 	$scope.value = '';
+	$scope.style = style;
 	
 	function hide() {
 		$mdDialog.hide();

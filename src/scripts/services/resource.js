@@ -35,8 +35,8 @@ angular.module('ngMaterialWeburger')
 .service('$resource', function($wbUi) {
 
 	var resourcePages = {};
-	
-	
+
+
 	/**
 	 * Fetchs a page.
 	 * 
@@ -68,14 +68,17 @@ angular.module('ngMaterialWeburger')
 	function pages() {
 		// TODO: maso, 1395:
 	}
-	
+
 	/**
 	 * Get a resource 
 	 * 
 	 * @param tags
 	 * @returns
 	 */
-	function get(tag){
+	function get(tag, option){
+		if(!option){
+			option = {};
+		}
 		var pages = [];
 		if(tag){
 			angular.forEach(resourcePages, function(page) {
@@ -86,7 +89,7 @@ angular.module('ngMaterialWeburger')
 		} else {
 			pages = resourcePages;
 		}
-		
+
 		return $wbUi.openDialog({
 			controller : 'WbResourceCtrl',
 			templateUrl : 'views/dialogs/wb-select-resource.html',
@@ -95,12 +98,15 @@ angular.module('ngMaterialWeburger')
 			fullscreen : true,
 			locals : {
 				'pages' : pages,
-				'style' : {}
+				'style' : option.style || {
+					title: 'Resource:' + tag
+				},
+				'data' : option.data || {}
 			}
 		});
 	}
-	
-	
+
+
 	this.get = get;
 	this.newPage = newPage;
 	this.page = page;
