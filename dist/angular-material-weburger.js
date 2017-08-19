@@ -3462,7 +3462,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-setting-panel-group.html',
-    "<div layout=column> <md-toolbar> Settings </md-toolbar> <div id=WB-SETTING-PANEL>  </div> </div>"
+    "<div layout=column> <md-nav-bar md-selected-nav-item=currentNavItem nav-bar-aria-label=\"navigation links\"> <md-nav-item md-nav-click=\"goto('page1')\" name=page1>Settings</md-nav-item> </md-nav-bar> <div id=WB-SETTING-PANEL>  </div> </div>"
   );
 
 
