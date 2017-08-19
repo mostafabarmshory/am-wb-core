@@ -27,50 +27,36 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc directive
- * @name wbInfinateScroll
- * @description
- *  # wbInfinateScroll
+ * @name wbUiSettingData
+ * @memberof ngMaterialWeburger
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @description a setting section to manage data.
+ *
  */
-.directive('wbInfinateScroll', function($q, $timeout) {
-
-	function postLink(scope, elem, attrs) {
-		var raw = elem[0];
-
-		/**
-		 * 
-		 */
-		function loadNextPage() {
-		  var value = scope.loadPage();
-			return $q.when(value)//
-			.then(checkScroll);
-		}
-
-		function checkScroll(value) {
-		  if(value){
-  			return $timeout(function(){
-  				if(raw.scrollHeight <= raw.offsetHeight){
-  					return loadNextPage();
-  				}
-  			}, 100);
-		  }
-		}
-
-		function scrollChange(evt) {
-			if (!(raw.scrollTop + raw.offsetHeight + 5 >= raw.scrollHeight)) {
-				return;
-			}
-			loadNextPage();
-		}
-
-		elem.on('scroll', scrollChange);
-		loadNextPage();
-	}
-
+.directive('wbUiSettingData', function() {
 	return {
-		restrict : 'A',
+		templateUrl : 'views/directives/wb-ui-setting-data.html',
+		restrict : 'E',
 		scope : {
-			loadPage : '=wbInfinateScroll'
+			title : '@title',
+			value : '=value',
+			icon : '@icon'
 		},
-		link : postLink
+		controller : function($scope, $resource) {
+			function editData(data) {
+				return $resource.get('data', {
+					style : {
+						title : 'Edit data source'
+					},
+					data : $scope.value
+				}) //
+				.then(function(data) {
+					$scope.value = data;
+				});
+			}
+
+			$scope.edit = editData;
+		}
 	};
 });

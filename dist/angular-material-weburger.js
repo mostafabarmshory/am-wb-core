@@ -91,11 +91,158 @@ angular.module('ngMaterialWeburger')
 		'wb-horizontal-boxes': '<path d="M3,4H21V8H3V4M3,10H21V14H3V10M3,16H21V20H3V16Z" />',
 		'wb-horizontal-arrows': '<path d="M12,18.17L8.83,15L7.42,16.41L12,21L16.59,16.41L15.17,15M12,5.83L15.17,9L16.58,7.59L12,3L7.41,7.59L8.83,9L12,5.83Z" />',
 		'wb-vertical-arrows': '<path d="M18.17,12L15,8.83L16.41,7.41L21,12L16.41,16.58L15,15.17L18.17,12M5.83,12L9,15.17L7.59,16.59L3,12L7.59,7.42L9,8.83L5.83,12Z" />',
+		'wb-direction':'<path d="M13,6V11H18V7.75L22.25,12L18,16.25V13H13V18H16.25L12,22.25L7.75,18H11V13H6V16.25L1.75,12L6,7.75V11H11V6H7.75L12,1.75L16.25,6H13Z" />',
 
-
-		'wb-direction':'<path d="M13,6V11H18V7.75L22.25,12L18,16.25V13H13V18H16.25L12,22.25L7.75,18H11V13H6V16.25L1.75,12L6,7.75V11H11V6H7.75L12,1.75L16.25,6H13Z" />'
+		'wb-object-video': ngMdIconServiceProvider.getShape('video_library'),
+		'wb-object-audio':  ngMdIconServiceProvider.getShape('audiotrack'),
+		'wb-object-data': ngMdIconServiceProvider.getShape('storage'),
+		
 	});/*.addViewBox('wb-direction','0 0 59.999 59.999');*/
 }]);
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+/**
+ * @ngdoc function
+ * @name WbResourceCtrl
+ * @description # WbResourceCtrl Controller of the ngMaterialWeburger
+ */
+.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, 
+		$wbUtil, $q, $controller, $compile, pages, style, data) {
+
+	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
+	$scope.value = angular.copy(data);
+	$scope.style = style;
+	
+	function hide() {
+		$mdDialog.hide();
+	}
+
+	function cancel() {
+		$mdDialog.cancel();
+	}
+
+	function answer() {
+		$mdDialog.hide($scope.value);
+	}
+	
+	function setValue(value){
+		$scope.value = value;
+	}
+	
+	$scope.$watch('value', function(value){
+		// Deal with value
+		console.log(value);
+	});
+	
+
+
+	/**
+	 * encapsulate template srce with panel widget template.
+	 * 
+	 * @param page
+	 *            setting page config
+	 * @param tempateSrc
+	 *            setting page html template
+	 * @returns encapsulate html template
+	 */
+	function _encapsulatePanel(page, template) {
+		// TODO: maso, 2017: pass all paramter to the setting
+		// panel.
+		return template;
+	}
+
+	/**
+	 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+	 * 
+	 * @returns
+	 */
+	function loadPage(index) {
+		var widget = null;
+		var jobs = [];
+		var pages2 = [];
+
+
+		// 1- Find element
+		var target = $document.find('#' + CHILDREN_AUNCHOR);
+
+		// 2- Clear childrens
+		target.empty();
+
+		// 3- load pages
+		var page = pages[index];
+		var template = $wbUtil.getTemplateFor(page);
+		if (angular.isDefined(template)) {
+			jobs.push(template.then(function(templateSrc) {
+				templateSrc = _encapsulatePanel(page, templateSrc);
+				var element = angular.element(templateSrc);
+				var scope = $rootScope.$new(false, $scope);
+				scope.page = page;
+				scope.value = $scope.value;
+				if (angular .isDefined(page.controller)) {
+					$controller(page.controller, {
+						$scope : scope,
+						$element : element,
+					});
+				}
+				$compile(element)(scope);
+				pages2.push(element);
+			}));
+		}
+
+		$q.all(jobs).then(function() {
+			angular.forEach(pages2, function(element) {
+				target.append(element);
+			});
+		});
+	}
+	
+	
+//	$scope.$watch(function(){
+//		return angular.element(document.body).hasClass('md-dialog-is-showing');
+//	}, function(value){
+//		if(value){
+//			loadPages();
+//		}
+//	});
+	$scope.$watch('pageIndex', function(value){
+		if(value >= 0){
+			loadPage(value);
+		}
+	});
+	
+	
+	$scope.pages = pages;
+	
+	$scope.hide = hide;
+	$scope.cancel = cancel;
+	$scope.answer = answer;
+	$scope.setValue = setValue;
+});
 
 /* 
  * The MIT License (MIT)
@@ -666,6 +813,9 @@ angular.module('ngMaterialWeburger')
 		var cssValue = {};
 		if(style.background){
 			cssValue['background'] = style.background;
+		}
+		if(style.backgroundImage){
+			cssValue['background-image'] = 'url(\''+style.backgroundImage+'\')';
 		}
 
 		if(style.backgroundColor){
@@ -1320,25 +1470,50 @@ angular.module('ngMaterialWeburger')
  * @ngdoc directive
  * @name wbInfinateScroll
  * @description
- * 
  *  # wbInfinateScroll
  */
-.directive('wbInfinateScroll', function() {
-    return {
-	restrict : 'A',
-	// require : '^ddScroll',
-	scope : {
-	    loadPage : '=wbInfinateScroll'
-	},
-	link : function(scope, elem, attrs) {
-	    elem.on('scroll', function(evt) {
+.directive('wbInfinateScroll', function($q, $timeout) {
+
+	function postLink(scope, elem, attrs) {
 		var raw = elem[0];
-		if (raw.scrollTop + raw.offsetHeight  + 5 >= raw.scrollHeight) {
-		    scope.loadPage();
+
+		/**
+		 * 
+		 */
+		function loadNextPage() {
+		  var value = scope.loadPage();
+			return $q.when(value)//
+			.then(checkScroll);
 		}
-	    });
+
+		function checkScroll(value) {
+		  if(value){
+  			return $timeout(function(){
+  				if(raw.scrollHeight <= raw.offsetHeight){
+  					return loadNextPage();
+  				}
+  			}, 100);
+		  }
+		}
+
+		function scrollChange(evt) {
+			if (!(raw.scrollTop + raw.offsetHeight + 5 >= raw.scrollHeight)) {
+				return;
+			}
+			loadNextPage();
+		}
+
+		elem.on('scroll', scrollChange);
+		loadNextPage();
 	}
-    };
+
+	return {
+		restrict : 'A',
+		scope : {
+			loadPage : '=wbInfinateScroll'
+		},
+		link : postLink
+	};
 });
 
 /* 
@@ -1754,6 +1929,69 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc directive
+ * @name wbUiSettingAudio
+ * @memberof ngMaterialWeburger
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @description a setting section to select audio file.
+ *
+ */
+.directive('wbUiSettingAudio', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-audio.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon'
+		},
+		controller: function($scope, $resource){
+			function selectAudio(){
+				return $resource.get('audio', {
+					style: {
+						title: 'Select Audio',
+					},
+					data: $scope.value
+				})//
+				.then(function(value){
+					$scope.value = value;
+				});
+			}
+			
+			$scope.edit = selectAudio;
+		}
+	};
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * @ngdoc directive
  * @name wbUiSettingChoose
  * @memberof ngMaterialWeburger
  * @description a setting section for choosing values.
@@ -1864,6 +2102,68 @@ angular.module('ngMaterialWeburger')
 
 angular.module('ngMaterialWeburger')
 
+/**
+ * @ngdoc directive
+ * @name wbUiSettingData
+ * @memberof ngMaterialWeburger
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @description a setting section to manage data.
+ *
+ */
+.directive('wbUiSettingData', function() {
+	return {
+		templateUrl : 'views/directives/wb-ui-setting-data.html',
+		restrict : 'E',
+		scope : {
+			title : '@title',
+			value : '=value',
+			icon : '@icon'
+		},
+		controller : function($scope, $resource) {
+			function editData(data) {
+				return $resource.get('data', {
+					style : {
+						title : 'Edit data source'
+					},
+					data : $scope.value
+				}) //
+				.then(function(data) {
+					$scope.value = data;
+				});
+			}
+
+			$scope.edit = editData;
+		}
+	};
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
     /**
      * @ngdoc directive
      * @name wbUiSettingDropdown
@@ -1883,6 +2183,63 @@ angular.module('ngMaterialWeburger')
             }
         };
     });
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * @ngdoc directive
+ * @name wbUiSettingColor
+ * @memberof ngMaterialWeburger
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingImage', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-image.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon'
+		},
+		controller: function($scope, $resource){
+			function selectImage(){
+				return $resource.get('image')//
+				.then(function(value){
+					$scope.value = value;
+				});
+			}
+			
+			$scope.selectImage = selectImage;
+		}
+	};
+});
 
 /**
  * Created by mgh on 2/26/17.
@@ -1962,6 +2319,69 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc directive
+ * @name wbUiSettingVideo
+ * @memberof ngMaterialWeburger
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @description a setting section to select audio file.
+ *
+ */
+.directive('wbUiSettingVideo', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-video.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon'
+		},
+		controller: function($scope, $resource){
+			function selectVideo(){
+				return $resource.get('video', {
+					style: {
+						title: 'Select audio'
+					},
+					data: $scope.value
+				})//
+				.then(function(value){
+					$scope.value = value;
+				});
+			}
+
+			$scope.edit = selectVideo;
+		}
+	};
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * @ngdoc directive
  * @name wbWidget
  * @memberof ngMaterialWeburger
  * @description Widgets container
@@ -1977,8 +2397,8 @@ angular.module('ngMaterialWeburger')
 		// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
 		// FIXME: maso, 2017: use regular dom insted of ng-transclude
 		transclude(scope, function(clone, scope) {
-			var node = element//
-			.find('wb-transclude')//
+			var node = element //
+			.find('wb-transclude') //
 			.append(clone);
 		});
 	}
@@ -1987,7 +2407,7 @@ angular.module('ngMaterialWeburger')
 		templateUrl : 'views/directives/wb-widget.html',
 		restrict : 'E',
 		transclude : true,
-		replace: true,
+		replace : true,
 		link : postLink,
 		controller : function($scope, $element, $settings, $widget) {
 			var element = $element;
@@ -2010,19 +2430,44 @@ angular.module('ngMaterialWeburger')
 				}, $scope.$parent.settingAnchor());
 			}
 
+			function selected() {
+				if (!$scope.wbEditable) {
+					return;
+				}
+				return settings();
+			}
+
+			function isSelected() {
+				return $scope.wbEditable && $settings.isCurrentModel($scope.wbModel);
+			}
+
 			/*
 			 * Add to scope
 			 */
 			$scope.remove = remove;
 			$scope.movedCallback = remove;
 			$scope.settings = settings;
+			$scope.selected = selected;
 			// Sets widget id after compile
 			element.attr('id', $scope.objectId($scope.wbModel));
 			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
+			$scope.isSelected = isSelected;
+
+			$scope.tinymceOptions = {
+					selector : 'div.tinymce',
+					theme : 'inlite',
+					plugins : 'directionality contextmenu table link paste image imagetools hr textpattern autolink ',
+					insert_toolbar : 'quickimage quicktable',
+					selection_toolbar : 'bold italic | quicklink h1 h2 h3 blockquote | ltr rtl',
+					insert_button_items: 'image link | inserttable | hr',
+					inline : true,
+					paste_data_images : true,
+					branding: false,
+					imagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'
+			}
 		}
 	};
 });
-
 /* 
  * The MIT License (MIT)
  * 
@@ -2060,6 +2505,50 @@ angular.module('ngMaterialWeburger')
 	return function(val) {
 		return $sce.trustAsHtml(val);
 	};
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * Load default resources
+ */
+.run(function($resource) {
+	$resource.newPage({
+		type: 'wb-url',
+		label : 'URL',
+		templateUrl : 'views/resources/wb-url.html',
+		controller: function($scope){
+			$scope.$watch('value', function(value){
+				$scope.$parent.setValue(value);
+			});
+		},
+		tags: ['image', 'audio', 'video', 'file']
+	});
 });
 
 /* 
@@ -2155,6 +2644,61 @@ angular.module('ngMaterialWeburger')
 	});
 });
 
+/**
+ * plugin.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+/*global tinymce:true */
+
+
+angular.module('ngMaterialWeburger')
+
+/**
+ * Load default resources
+ */
+.run(function($resource) {
+
+	function imageTool(editor) {
+
+		function insertImage(url){
+	          editor.insertContent('<img src="' + url + '" >');
+		}
+		
+		function showDialog(){
+			$resource.get('image')//
+			.then(function(value){
+				insertImage(value);
+			});
+		}
+		
+		editor.addButton('image', {
+			icon: 'image',
+			tooltip: 'Insert/edit image',
+			onclick: showDialog,
+			stateSelector: 'img:not([data-mce-object],[data-mce-placeholder]),figure.image'
+		});
+
+		editor.addMenuItem('image', {
+			icon: 'image',
+			text: 'Image',
+			onclick: showDialog,
+			context: 'insert',
+			prependToContext: true
+		});
+
+		editor.addCommand('mceImage', showDialog);
+	}
+
+	tinymce.PluginManager.add('image', imageTool);
+
+});
+
 /* 
  * The MIT License (MIT)
  * 
@@ -2246,7 +2790,84 @@ angular.module('ngMaterialWeburger')
  * 
  */
 .service('$resource', function($wbUi) {
-    
+
+	var resourcePages = {};
+
+
+	/**
+	 * Fetchs a page.
+	 * 
+	 * @param model
+	 * @returns
+	 */
+	function page(type) {
+		var widget = notFound;
+		if (type in resourcePages) {
+			widget = resourcePages[type];
+		}
+		return widget;
+	}
+
+	/**
+	 * Adds new page.
+	 * 
+	 * @returns
+	 */
+	function newPage(page) {
+		resourcePages[page.type] = page;
+	}
+
+	/**
+	 * Finds and lists all pages.
+	 * 
+	 * @returns
+	 */
+	function pages() {
+		// TODO: maso, 1395:
+	}
+
+	/**
+	 * Get a resource 
+	 * 
+	 * @param tags
+	 * @returns
+	 */
+	function get(tag, option){
+		if(!option){
+			option = {};
+		}
+		var pages = [];
+		if(tag){
+			angular.forEach(resourcePages, function(page) {
+				if(angular.isArray(page.tags) && page.tags.includes(tag)){
+					this.push(page);
+				}
+			}, pages);
+		} else {
+			pages = resourcePages;
+		}
+
+		return $wbUi.openDialog({
+			controller : 'WbResourceCtrl',
+			templateUrl : 'views/dialogs/wb-select-resource.html',
+			parent : angular.element(document.body),
+			clickOutsideToClose : true,
+			fullscreen : true,
+			locals : {
+				'pages' : pages,
+				'style' : option.style || {
+					title: 'Resource : ' + tag
+				},
+				'data' : option.data
+			}
+		});
+	}
+
+
+	this.get = get;
+	this.newPage = newPage;
+	this.page = page;
+	this.pages = pages;
 });
 
 /* 
@@ -2274,8 +2895,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular
-.module('ngMaterialWeburger')
+angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc service
@@ -2286,7 +2906,7 @@ angular
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$settings',function($rootScope, $controller, $widget, $q, $sce, $compile,
-		$document, $templateRequest) {
+		$document, $templateRequest, $wbUtil) {
 	var WB_SETTING_PANEL_ID = 'WB-SETTING-PANEL';
 
 	/*
@@ -2359,29 +2979,6 @@ angular
 		return WB_SETTINGS_WIDGET_DEFAULT;
 	}
 
-	/*
-	 * get setting page template
-	 */
-	function getTemplateFor(page) {
-		var template, templateUrl;
-		if (angular.isDefined(template = page.template)) {
-			if (angular.isFunction(template)) {
-				template = template(page.params);
-			}
-		} else if (angular
-				.isDefined(templateUrl = page.templateUrl)) {
-			if (angular.isFunction(templateUrl)) {
-				templateUrl = templateUrl(page.params);
-			}
-			if (angular.isDefined(templateUrl)) {
-				page.loadedTemplateUrl = $sce
-				.valueOf(templateUrl);
-				template = $templateRequest(templateUrl);
-			}
-		}
-		return template;
-	}
-
 	/**
 	 * encapsulate template srce with panel widget template.
 	 * 
@@ -2409,6 +3006,13 @@ angular
 	}
 
 	/**
+	 * Check if this is the current model
+	 */
+	function isLoaded(wbModel) {
+    	return oldScope && oldScope.wbModel == wbModel;
+    }
+	
+	/**
 	 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
 	 * 
 	 * @returns
@@ -2419,7 +3023,7 @@ angular
 		var pages = [];
 
 		// 0- destroy old resource
-		if(oldScope && oldScope.wbModel == models.wbModel){
+		if(isLoaded(models.wbModel)){
 			return;
 		}
 		if (angular.isDefined(oldScope)) {
@@ -2456,7 +3060,7 @@ angular
 				if (type in settingPages) {
 					page = settingPages[type];
 				}
-				var template = getTemplateFor(page);
+				var template = $wbUtil.getTemplateFor(page);
 				if (angular.isDefined(template)) {
 					var job = template.then(function(templateSrc) {
 						templateSrc = _encapsulateSettingPanel(page, templateSrc);
@@ -2500,6 +3104,7 @@ angular
 	this.page = page;
 	this.load = loadSetting;
 	this.newPage = newPage;
+	this.isCurrentModel = isLoaded;
 });
 
 /* 
@@ -2547,6 +3152,69 @@ angular.module('ngMaterialWeburger')
 	}
 	
 	this.openDialog = openDialog;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular
+.module('ngMaterialWeburger')
+
+/**
+ * @ngdoc service
+ * @name $wbUtil
+ * @memberof ngMaterialWeburger
+ * @description کدهای پایه
+ * 
+ */
+.service('$wbUtil',function($rootScope, $controller, $widget, $q, $sce, $compile,
+		$document, $templateRequest) {
+	/*
+	 * get setting page template
+	 */
+	function getTemplateFor(page) {
+		var template, templateUrl;
+		if (angular.isDefined(template = page.template)) {
+			if (angular.isFunction(template)) {
+				template = template(page.params);
+			}
+		} else if (angular
+				.isDefined(templateUrl = page.templateUrl)) {
+			if (angular.isFunction(templateUrl)) {
+				templateUrl = templateUrl(page.params);
+			}
+			if (angular.isDefined(templateUrl)) {
+				page.loadedTemplateUrl = $sce
+				.valueOf(templateUrl);
+				template = $templateRequest(templateUrl);
+			}
+		}
+		return template;
+	}
+
+	this.getTemplateFor = getTemplateFor;
 });
 
 /* 
@@ -2773,6 +3441,11 @@ angular.module('ngMaterialWeburger')
 angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCache) {
   'use strict';
 
+  $templateCache.put('views/dialogs/wb-select-resource.html',
+    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>{{style.title}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <div class=md-dialog-content layout=column> <md-tabs md-selected=pageIndex> <md-tab ng-repeat=\"page in pages\" label={{page.label}}> </md-tab> </md-tabs> <div id=wb-select-resource-children flex> </div> </div> </md-dialog-content> </md-dialog>"
+  );
+
+
   $templateCache.put('views/dialogs/wb-selectwidget.html',
     "<md-dialog aria-label=\"edit action dialog\" ng-controller=WbWidgetSelectCtrl ng-cloak>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Widget list</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> </div> </md-toolbar>    <md-dialog-content> <md-content class=\"md-padding md-dialog-content\" layout-xs=column layout=row layout-wrap>    <md-card ng-repeat=\"widget in widgets.items\" flex-xs flex-gt-xs=45 md-theme-watch> <md-card-title> <md-card-title-text> <span class=md-headline>{{widget.label}}</span> <span class=md-subhead>{{widget.description}}</span> </md-card-title-text> <md-card-title-media> <img ng-show=widget.image src=\"{{widget.image}}\"> <wb-icon ng-show=!widget.image&&widget.icon wb-icon-size=64>{{widget.icon}}</wb-icon> </md-card-title-media> </md-card-title> <md-card-actions layout=row layout-align=\"end center\"> <md-button ng-click=answerWidget(widget)> <wb-icon>add</wb-icon> {{ 'Add' | translate }} </md-button>  </md-card-actions> </md-card> </md-content> </md-dialog-content> </md-dialog>"
   );
@@ -2789,7 +3462,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-setting-panel-group.html',
-    "<div layout=column> <md-toolbar> Settings </md-toolbar> <div id=WB-SETTING-PANEL>  </div> </div>"
+    "<div layout=column> <md-nav-bar md-selected-nav-item=currentNavItem nav-bar-aria-label=\"navigation links\"> <md-nav-item md-nav-click=\"goto('page1')\" name=page1>Settings</md-nav-item> </md-nav-bar> <div id=WB-SETTING-PANEL>  </div> </div>"
   );
 
 
@@ -2803,6 +3476,11 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   );
 
 
+  $templateCache.put('views/directives/wb-ui-setting-audio.html',
+    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-audio</wb-icon> </md-button> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
+  );
+
+
   $templateCache.put('views/directives/wb-ui-setting-choose.html',
     "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\" wb-icon-name={{icon}}> </wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-tabs flex=100 class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in xitems\"> <md-tab-label> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs> </md-list-item> "
   );
@@ -2813,8 +3491,18 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   );
 
 
+  $templateCache.put('views/directives/wb-ui-setting-data.html',
+    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-data</wb-icon> </md-button> <md-input-container> <input ng-model=value.key> </md-input-container> </md-list-item>"
+  );
+
+
   $templateCache.put('views/directives/wb-ui-setting-dropdown.html',
     "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-select style=\"margin: 0px\" ng-model=value> <md-option ng-repeat=\"item in items\" value={{item.value}}> {{item.title}} </md-option> </md-select> </md-list-item>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-image.html',
+    "<md-list-item> <img ng-click=selectImage() ng-src={{value}} width=48px height=48px class=\"md-avatar-icon\"> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
   );
 
 
@@ -2828,13 +3516,23 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
   );
 
 
+  $templateCache.put('views/directives/wb-ui-setting-video.html',
+    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-video</wb-icon> </md-button> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
+  );
+
+
   $templateCache.put('views/directives/wb-widget.html',
-    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=movedCallback() class=wb-widget ng-class=\"{'wb-widget-edit': wbEditable}\" layout=column name={{wbModel.name}}>  <div ng-show=wbEditable layout=row class=wb-widget-header> <span translate> {{wbModel.name}}</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>settings</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=remove() ng-show=remove ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <wb-icon class=mde-icon-mini>delete</wb-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <wb-icon class=mde-icon-mini>{{item.icon}}</wb-icon> </md-button> </div>  <div class=wb-widget-body wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-margin=wbModel.style> <div class=wb-widget-overlay ng-show=ctrl.hoveringDelBtn> </div> <wb-transclude class=wb-widget-container wb-layout=wbModel.style> </wb-transclude> </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-selected=selected() dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=movedCallback() class=wb-widget ng-class=\"{'wb-widget-edit': wbEditable}\" layout=column name={{wbModel.name}}>  <div ng-show=isSelected() layout=row class=wb-widget-header> <span translate> {{wbModel.name}}</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>add_circle</wb-icon> </md-button>      <md-button class=\"md-icon-button md-mini\" ng-click=remove() ng-show=remove ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <wb-icon class=mde-icon-mini>delete</wb-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <wb-icon class=mde-icon-mini>{{item.icon}}</wb-icon> </md-button> </div>  <div class=wb-widget-body wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-margin=wbModel.style> <div class=wb-widget-overlay ng-show=ctrl.hoveringDelBtn> </div> <wb-transclude class=wb-widget-container wb-layout=wbModel.style> </wb-transclude> </div> </div>"
+  );
+
+
+  $templateCache.put('views/resources/wb-url.html',
+    "<md-input-container class=\"md-icon-float md-block\"> <label translate>URL</label> <input ng-model=value> </md-input-container>"
   );
 
 
   $templateCache.put('views/settings/wb-background.html',
-    " <md-list class=wb-setting-panel>  <wb-ui-setting-on-off-switch title=Transparent? icon=blur_on value=wbModel.style.isTransparent> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent title=Opacity icon=wb-opacity value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent slider=\"\" icon=wb-blank value=wbModel.style.opacity> </wb-ui-setting-number>  <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background size</label> <input ng-model=wbModel.style.backgroundSize> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background repeat</label> <input ng-model=wbModel.style.backgroundRepeat> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background position</label> <input ng-model=wbModel.style.backgroundPosition> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background attachment</label> <input ng-model=wbModel.style.backgroundAttachment> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background origin</label> <input ng-model=wbModel.style.backgroundOrigin> </md-input-container> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.backgroundColor> </wb-ui-setting-color> </md-list>"
+    " <md-list class=wb-setting-panel>  <wb-ui-setting-on-off-switch title=Transparent? icon=blur_on value=wbModel.style.isTransparent> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent title=Opacity icon=wb-opacity value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent slider=\"\" icon=wb-blank value=wbModel.style.opacity> </wb-ui-setting-number>  <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background> </md-input-container> <wb-ui-setting-image title=Image value=wbModel.style.backgroundImage> </wb-ui-setting-image> <md-input-container class=\"md-icon-float md-block\"> <label>Background size</label> <input ng-model=wbModel.style.backgroundSize> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background repeat</label> <input ng-model=wbModel.style.backgroundRepeat> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background position</label> <input ng-model=wbModel.style.backgroundPosition> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background attachment</label> <input ng-model=wbModel.style.backgroundAttachment> </md-input-container> <md-input-container class=\"md-icon-float md-block\"> <label>Background origin</label> <input ng-model=wbModel.style.backgroundOrigin> </md-input-container> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.backgroundColor> </wb-ui-setting-color> </md-list>"
   );
 
 
@@ -2844,7 +3542,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/settings/wb-description.html',
-    " <div layout=column style=width:100%> <md-input-container> <label translate>Lable</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate>Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate>Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> </div>"
+    " <div layout=column style=width:100%> <md-input-container> <label translate>Lable</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate>Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate>Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=Cover value=wbModel.cover> </wb-ui-setting-image> </div>"
   );
 
 
@@ -2874,13 +3572,23 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/settings/wb-text.html',
-    " <textarea ui-tinymce=tinymceOptions ng-model=wbModel.text flex>\n" +
-    "</textarea>            "
+    " <textarea ui-tinymce=\"{\n" +
+    "\t\t plugins : 'directionality contextmenu table link paste hr emoticons advlist autolink link lists advlist charmap print preview wordcount code anchor image imagetools codesample visualchars',\n" +
+    "\t\t toolbar: [\n" +
+    "\t\t \t'undo redo visualchars | styleselect | link image emoticons | hr ',\n" +
+    "\t\t \t'alignleft aligncenter alignright | ltr rtl | bold italic | numlist bullist ',\n" +
+    "\t\t ],\n" +
+    "\t\t contextmenu: 'link image inserttable | cell row column deletetable',\n" +
+    "\t\t elementpath: true,\n" +
+    "\t\t branding: false,\n" +
+    "\t\t image_advtab: false\n" +
+    "\t}\" ng-model=wbModel.text flex>\n" +
+    "</textarea>"
   );
 
 
   $templateCache.put('views/widgets/wb-html.html',
-    " <div ng-bind-html=\"wbModel.text | wbunsafe\"> </div>"
+    " <div ng-hide=isSelected() ng-bind-html=\"wbModel.text | wbunsafe\"> </div> <div ui-tinymce=tinymceOptions ng-model=wbModel.text ng-show=isSelected() flex> </div>"
   );
 
 

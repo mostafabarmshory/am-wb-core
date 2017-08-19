@@ -1,5 +1,6 @@
 <div 
 	dnd-disable-if="!wbEditable"
+	dnd-selected="selected()"
 	dnd-draggable="wbModel"
 	dnd-type="'wb.widget'"
 	dnd-moved="movedCallback()"
@@ -8,7 +9,7 @@
 	layout="column"
 	name="{{wbModel.name}}">
     <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
-    <div ng-show="wbEditable"
+    <div ng-show="isSelected()"
          layout="row"
          class="wb-widget-header">
 		<span translate> {{wbModel.name}}</span> 
@@ -19,11 +20,11 @@
 			class="md-icon-button md-mini">
 			<wb-icon class="mde-icon-mini">add_circle</wb-icon> 
 		</md-button>
-		<md-button 
-			ng-click="settings()"
-			 class="md-icon-button md-mini">
-			<wb-icon class="mde-icon-mini">settings</wb-icon> 
-		</md-button>
+<!-- 		<md-button  -->
+<!-- 			ng-click="settings()" -->
+<!-- 			 class="md-icon-button md-mini"> -->
+<!-- 			<wb-icon class="mde-icon-mini">settings</wb-icon>  -->
+<!-- 		</md-button> -->
 		<md-button 
 			class="md-icon-button md-mini" 
 			ng-click="remove()"

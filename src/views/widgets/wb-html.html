@@ -5,5 +5,12 @@
 
  -->
 <div
+	ng-hide="isSelected()"
     ng-bind-html="wbModel.text | wbunsafe">
+</div>
+<div
+	ui-tinymce="tinymceOptions"
+	ng-model="wbModel.text"
+	ng-show="isSelected()"
+	flex>
 </div>

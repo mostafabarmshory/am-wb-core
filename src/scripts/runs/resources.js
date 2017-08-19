@@ -26,51 +26,18 @@
 angular.module('ngMaterialWeburger')
 
 /**
- * @ngdoc directive
- * @name wbInfinateScroll
- * @description
- *  # wbInfinateScroll
+ * Load default resources
  */
-.directive('wbInfinateScroll', function($q, $timeout) {
-
-	function postLink(scope, elem, attrs) {
-		var raw = elem[0];
-
-		/**
-		 * 
-		 */
-		function loadNextPage() {
-		  var value = scope.loadPage();
-			return $q.when(value)//
-			.then(checkScroll);
-		}
-
-		function checkScroll(value) {
-		  if(value){
-  			return $timeout(function(){
-  				if(raw.scrollHeight <= raw.offsetHeight){
-  					return loadNextPage();
-  				}
-  			}, 100);
-		  }
-		}
-
-		function scrollChange(evt) {
-			if (!(raw.scrollTop + raw.offsetHeight + 5 >= raw.scrollHeight)) {
-				return;
-			}
-			loadNextPage();
-		}
-
-		elem.on('scroll', scrollChange);
-		loadNextPage();
-	}
-
-	return {
-		restrict : 'A',
-		scope : {
-			loadPage : '=wbInfinateScroll'
+.run(function($resource) {
+	$resource.newPage({
+		type: 'wb-url',
+		label : 'URL',
+		templateUrl : 'views/resources/wb-url.html',
+		controller: function($scope){
+			$scope.$watch('value', function(value){
+				$scope.$parent.setValue(value);
+			});
 		},
-		link : postLink
-	};
+		tags: ['image', 'audio', 'video', 'file']
+	});
 });

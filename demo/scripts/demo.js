@@ -31,30 +31,9 @@
  */
 angular.module('ngMaterialWeburgerTest', [ 'ngMaterialWeburger' ])//
 .controller('MyTestCtrl', function($scope, $http, $mdDialog, $usr) {
-	$http.get('examples/layout-row.json').then(function(res) {
+	$http.get('examples/html.json').then(function(res) {
 		$scope.model = res.data;
 	});
-
-	$scope.cs = function() {
-		$usr.login({
-			login : 'admin',
-			password : 'admin'
-		})//
-		.then(function() {
-			$mdDialog.show({
-				controller : 'WbDialogsCtrl',
-				templateUrl : 'views/dialogs/wb-selectcontent.html',
-				parent : angular.element(document.body),
-				fullscreen : true,
-				locals : {
-					wbModel : {},
-					style : {}
-				}
-			}).then(function(content) {
-				alert(content.id);
-			});
-		});
-	};
 })
 
 ////تنظیم ایکون

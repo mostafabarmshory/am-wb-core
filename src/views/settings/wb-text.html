@@ -7,20 +7,18 @@ created by mgh.
 -->
 <!-- using tinymce wysiwyg editor -->
 <textarea
-	ui-tinymce="tinymceOptions"
+	ui-tinymce="{
+		 plugins : 'directionality contextmenu table link paste hr emoticons advlist autolink link lists advlist charmap print preview wordcount code anchor image imagetools codesample visualchars',
+		 toolbar: [
+		 	'undo redo visualchars | styleselect | link image emoticons | hr ',
+		 	'alignleft aligncenter alignright | ltr rtl | bold italic | numlist bullist ',
+		 ],
+		 contextmenu: 'link image inserttable | cell row column deletetable',
+		 elementpath: true,
+		 branding: false,
+		 image_advtab: false
+	}"
 	ng-model="wbModel.text"
 	flex>
 </textarea>
 
-<!-- using angular material wysiwyg editor -->
-<!-- <md-wysiwyg -->
-<!-- 	flex -->
-<!-- 	textarea-id="question" -->
-<!-- 	textarea-class="form-control" -->
-<!-- 	textarea-height="80px" -->
-<!-- 	textarea-name="textareaQuestion" -->
-<!-- 	textarea-required -->
-<!-- 	ng-model="wbModel.text" -->
-<!-- 	enable-bootstrap-title="true" -->
-<!-- 	textarea-menu="yourModel.customMenu"> -->
-<!-- </md-wysiwyg> -->

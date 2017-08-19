@@ -23,8 +23,7 @@
  */
 'use strict';
 
-angular
-.module('ngMaterialWeburger')
+angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc service
@@ -35,7 +34,7 @@ angular
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$settings',function($rootScope, $controller, $widget, $q, $sce, $compile,
-		$document, $templateRequest) {
+		$document, $templateRequest, $wbUtil) {
 	var WB_SETTING_PANEL_ID = 'WB-SETTING-PANEL';
 
 	/*
@@ -108,29 +107,6 @@ angular
 		return WB_SETTINGS_WIDGET_DEFAULT;
 	}
 
-	/*
-	 * get setting page template
-	 */
-	function getTemplateFor(page) {
-		var template, templateUrl;
-		if (angular.isDefined(template = page.template)) {
-			if (angular.isFunction(template)) {
-				template = template(page.params);
-			}
-		} else if (angular
-				.isDefined(templateUrl = page.templateUrl)) {
-			if (angular.isFunction(templateUrl)) {
-				templateUrl = templateUrl(page.params);
-			}
-			if (angular.isDefined(templateUrl)) {
-				page.loadedTemplateUrl = $sce
-				.valueOf(templateUrl);
-				template = $templateRequest(templateUrl);
-			}
-		}
-		return template;
-	}
-
 	/**
 	 * encapsulate template srce with panel widget template.
 	 * 
@@ -158,6 +134,13 @@ angular
 	}
 
 	/**
+	 * Check if this is the current model
+	 */
+	function isLoaded(wbModel) {
+    	return oldScope && oldScope.wbModel == wbModel;
+    }
+	
+	/**
 	 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
 	 * 
 	 * @returns
@@ -168,7 +151,7 @@ angular
 		var pages = [];
 
 		// 0- destroy old resource
-		if(oldScope && oldScope.wbModel == models.wbModel){
+		if(isLoaded(models.wbModel)){
 			return;
 		}
 		if (angular.isDefined(oldScope)) {
@@ -205,7 +188,7 @@ angular
 				if (type in settingPages) {
 					page = settingPages[type];
 				}
-				var template = getTemplateFor(page);
+				var template = $wbUtil.getTemplateFor(page);
 				if (angular.isDefined(template)) {
 					var job = template.then(function(templateSrc) {
 						templateSrc = _encapsulateSettingPanel(page, templateSrc);
@@ -249,4 +232,5 @@ angular
 	this.page = page;
 	this.load = loadSetting;
 	this.newPage = newPage;
+	this.isCurrentModel = isLoaded;
 });

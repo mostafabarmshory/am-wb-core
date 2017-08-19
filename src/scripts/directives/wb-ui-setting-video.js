@@ -27,50 +27,36 @@ angular.module('ngMaterialWeburger')
 
 /**
  * @ngdoc directive
- * @name wbInfinateScroll
- * @description
- *  # wbInfinateScroll
+ * @name wbUiSettingVideo
+ * @memberof ngMaterialWeburger
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @description a setting section to select audio file.
+ *
  */
-.directive('wbInfinateScroll', function($q, $timeout) {
-
-	function postLink(scope, elem, attrs) {
-		var raw = elem[0];
-
-		/**
-		 * 
-		 */
-		function loadNextPage() {
-		  var value = scope.loadPage();
-			return $q.when(value)//
-			.then(checkScroll);
-		}
-
-		function checkScroll(value) {
-		  if(value){
-  			return $timeout(function(){
-  				if(raw.scrollHeight <= raw.offsetHeight){
-  					return loadNextPage();
-  				}
-  			}, 100);
-		  }
-		}
-
-		function scrollChange(evt) {
-			if (!(raw.scrollTop + raw.offsetHeight + 5 >= raw.scrollHeight)) {
-				return;
-			}
-			loadNextPage();
-		}
-
-		elem.on('scroll', scrollChange);
-		loadNextPage();
-	}
-
+.directive('wbUiSettingVideo', function () {
 	return {
-		restrict : 'A',
-		scope : {
-			loadPage : '=wbInfinateScroll'
+		templateUrl: 'views/directives/wb-ui-setting-video.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon'
 		},
-		link : postLink
+		controller: function($scope, $resource){
+			function selectVideo(){
+				return $resource.get('video', {
+					style: {
+						title: 'Select audio'
+					},
+					data: $scope.value
+				})//
+				.then(function(value){
+					$scope.value = value;
+				});
+			}
+
+			$scope.edit = selectVideo;
+		}
 	};
 });

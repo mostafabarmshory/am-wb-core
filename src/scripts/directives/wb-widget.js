@@ -42,8 +42,8 @@ angular.module('ngMaterialWeburger')
 		// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
 		// FIXME: maso, 2017: use regular dom insted of ng-transclude
 		transclude(scope, function(clone, scope) {
-			var node = element//
-			.find('wb-transclude')//
+			var node = element //
+			.find('wb-transclude') //
 			.append(clone);
 		});
 	}
@@ -52,7 +52,7 @@ angular.module('ngMaterialWeburger')
 		templateUrl : 'views/directives/wb-widget.html',
 		restrict : 'E',
 		transclude : true,
-		replace: true,
+		replace : true,
 		link : postLink,
 		controller : function($scope, $element, $settings, $widget) {
 			var element = $element;
@@ -75,15 +75,41 @@ angular.module('ngMaterialWeburger')
 				}, $scope.$parent.settingAnchor());
 			}
 
+			function selected() {
+				if (!$scope.wbEditable) {
+					return;
+				}
+				return settings();
+			}
+
+			function isSelected() {
+				return $scope.wbEditable && $settings.isCurrentModel($scope.wbModel);
+			}
+
 			/*
 			 * Add to scope
 			 */
 			$scope.remove = remove;
 			$scope.movedCallback = remove;
 			$scope.settings = settings;
+			$scope.selected = selected;
 			// Sets widget id after compile
 			element.attr('id', $scope.objectId($scope.wbModel));
 			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
+			$scope.isSelected = isSelected;
+
+			$scope.tinymceOptions = {
+					selector : 'div.tinymce',
+					theme : 'inlite',
+					plugins : 'directionality contextmenu table link paste image imagetools hr textpattern autolink ',
+					insert_toolbar : 'quickimage quicktable',
+					selection_toolbar : 'bold italic | quicklink h1 h2 h3 blockquote | ltr rtl',
+					insert_button_items: 'image link | inserttable | hr',
+					inline : true,
+					paste_data_images : true,
+					branding: false,
+					imagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'
+			}
 		}
 	};
 });

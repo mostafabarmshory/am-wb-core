@@ -33,5 +33,82 @@ angular.module('ngMaterialWeburger')
  * 
  */
 .service('$resource', function($wbUi) {
-    
+
+	var resourcePages = {};
+
+
+	/**
+	 * Fetchs a page.
+	 * 
+	 * @param model
+	 * @returns
+	 */
+	function page(type) {
+		var widget = notFound;
+		if (type in resourcePages) {
+			widget = resourcePages[type];
+		}
+		return widget;
+	}
+
+	/**
+	 * Adds new page.
+	 * 
+	 * @returns
+	 */
+	function newPage(page) {
+		resourcePages[page.type] = page;
+	}
+
+	/**
+	 * Finds and lists all pages.
+	 * 
+	 * @returns
+	 */
+	function pages() {
+		// TODO: maso, 1395:
+	}
+
+	/**
+	 * Get a resource 
+	 * 
+	 * @param tags
+	 * @returns
+	 */
+	function get(tag, option){
+		if(!option){
+			option = {};
+		}
+		var pages = [];
+		if(tag){
+			angular.forEach(resourcePages, function(page) {
+				if(angular.isArray(page.tags) && page.tags.includes(tag)){
+					this.push(page);
+				}
+			}, pages);
+		} else {
+			pages = resourcePages;
+		}
+
+		return $wbUi.openDialog({
+			controller : 'WbResourceCtrl',
+			templateUrl : 'views/dialogs/wb-select-resource.html',
+			parent : angular.element(document.body),
+			clickOutsideToClose : true,
+			fullscreen : true,
+			locals : {
+				'pages' : pages,
+				'style' : option.style || {
+					title: 'Resource : ' + tag
+				},
+				'data' : option.data
+			}
+		});
+	}
+
+
+	this.get = get;
+	this.newPage = newPage;
+	this.page = page;
+	this.pages = pages;
 });
