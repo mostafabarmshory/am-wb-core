@@ -36,7 +36,6 @@ angular
         'ngAria',//
         'ngMaterial',//
         'pascalprecht.translate',//
-        'pluf',//
         'mdColorPicker',//
         //'ngMaterialWysiwyg',
         'ui.tinymce', //
@@ -716,9 +715,8 @@ angular.module('ngMaterialWeburger')
  * را انتخاب کند.
  */
 .controller('WbWidgetSelectCtrl',
-		function($scope, $widget, PaginatorParameter) {
+		function($scope, $widget) {
 	var scope = $scope;
-	var paginatorParameter = new PaginatorParameter();
 
 	/**
 	 * ویجت‌های موجود را لود می‌کند
@@ -728,7 +726,7 @@ angular.module('ngMaterialWeburger')
 	 * 
 	 */
 	function loadWidgets() {
-		$widget.widgets(paginatorParameter).then(function(widgets) {
+		$widget.widgets().then(function(widgets) {
 			scope.widgets = widgets;
 			selectWidget(widgets.items[0]);
 		});
@@ -3254,7 +3252,7 @@ angular.module('ngMaterialWeburger')
  */
 .service('$widget', function(
 		$q, $sce, $templateRequest, $compile, $controller, $rootScope,
-		$timeout, $mdDialog, PaginatorPage) {
+		$timeout, $mdDialog) {
 
 	var contentElementAsso = [];
 	var elementKey = [];
@@ -3306,7 +3304,7 @@ angular.module('ngMaterialWeburger')
 	function widgets() {
 		var deferred = $q.defer();
 		$timeout(function() {
-			var widgets = new PaginatorPage({});
+			var widgets = {};
 			// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
 			widgets.items = [];
 			elementKey.forEach(function(type) {
