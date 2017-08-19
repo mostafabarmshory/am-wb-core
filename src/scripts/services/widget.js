@@ -35,7 +35,7 @@ angular.module('ngMaterialWeburger')
  */
 .service('$widget', function(
 		$q, $sce, $templateRequest, $compile, $controller, $rootScope,
-		$timeout, $mdDialog, PaginatorPage) {
+		$timeout, $mdDialog) {
 
 	var contentElementAsso = [];
 	var elementKey = [];
@@ -87,7 +87,7 @@ angular.module('ngMaterialWeburger')
 	function widgets() {
 		var deferred = $q.defer();
 		$timeout(function() {
-			var widgets = new PaginatorPage({});
+			var widgets = {};
 			// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
 			widgets.items = [];
 			elementKey.forEach(function(type) {

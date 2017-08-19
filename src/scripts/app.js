@@ -36,7 +36,6 @@ angular
         'ngAria',//
         'ngMaterial',//
         'pascalprecht.translate',//
-        'pluf',//
         'mdColorPicker',//
         //'ngMaterialWysiwyg',
         'ui.tinymce', //
