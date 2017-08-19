@@ -36,6 +36,12 @@ module.exports = function(config) {
       'bower_components/angular-material-expansion-panel/dist/md-expansion-panel.js',
       'bower_components/angular-material-icons/angular-material-icons.min.js',
       'bower_components/weakmap-polyfill/weakmap-polyfill.js',
+      'bower_components/moment/moment.js',
+      'bower_components/numbro/numbro.js',
+      'bower_components/pikaday/pikaday.js',
+      'bower_components/zeroclipboard/dist/ZeroClipboard.js',
+      'bower_components/handsontable/dist/handsontable.js',
+      'bower_components/ngHandsontable/dist/ngHandsontable.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       'src/**/*.js',
