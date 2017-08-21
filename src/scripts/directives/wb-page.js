@@ -177,6 +177,24 @@ angular.module('ngMaterialWeburger')
 			return true;
 		}
 
+		/**
+		 * Insert new model befor selecte model
+		 */
+		function insertBefore(model, newModel){
+			var index = scope.wbModel.contents.indexOf(model);
+			if (index > -1) {
+				$widget.compile(newModel, scope)//
+				.then(function(newElement) {
+					var a = element//
+					.children(bodyElementSelector)//
+					.children(placeholderElementSelector)//
+					.children('#'+scope.objectId(model));
+					newElement.insertBefore(a);
+					scope.wbModel.contents.splice(index, 0, newModel);
+				})
+			}
+		}
+
 		function settingAnchor(){
 			return attrs['wbSettingAnchor'];
 		}
@@ -198,6 +216,7 @@ angular.module('ngMaterialWeburger')
 
 		scope.settingAnchor = settingAnchor;
 		scope.removeChild = removeChild;
+		scope.insertBefore = insertBefore;
 		scope.settings = settings;
 		scope.dropCallback = dropCallback;
 		scope.newWidget = newWidget;

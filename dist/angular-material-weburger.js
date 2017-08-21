@@ -2132,6 +2132,10 @@ angular.module('ngMaterialWeburger')
 				});
 			}
 
+			$scope.value = $scope.vlaue || {
+				key : 'empty',
+				value : [[1,1],[2,2]]
+			};
 			$scope.edit = editData;
 		}
 	};
@@ -2547,6 +2551,21 @@ angular.module('ngMaterialWeburger')
 			});
 		},
 		tags: ['image', 'audio', 'video', 'file']
+	});
+	$resource.newPage({
+		type: 'wb-sheet',
+		label : 'Sheet',
+		templateUrl : 'views/resources/wb-sheet.html',
+		controller: function($scope){
+			$scope.$watch('value', function(value){
+				if(angular.isDefined(value)){
+					$scope.$parent.setValue(value);
+				} else {
+					$scope.$parent.setValue({});
+				}
+			}, true);
+		},
+		tags: ['data']
 	});
 });
 
@@ -3522,6 +3541,15 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
   $templateCache.put('views/directives/wb-widget.html',
     "<div dnd-disable-if=!wbEditable dnd-selected=selected() dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=movedCallback() class=wb-widget ng-class=\"{'wb-widget-edit': wbEditable}\" layout=column name={{wbModel.name}}>  <div ng-show=isSelected() layout=row class=wb-widget-header> <span translate> {{wbModel.name}}</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>add_circle</wb-icon> </md-button>      <md-button class=\"md-icon-button md-mini\" ng-click=remove() ng-show=remove ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <wb-icon class=mde-icon-mini>delete</wb-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <wb-icon class=mde-icon-mini>{{item.icon}}</wb-icon> </md-button> </div>  <div class=wb-widget-body wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-margin=wbModel.style> <div class=wb-widget-overlay ng-show=ctrl.hoveringDelBtn> </div> <wb-transclude class=wb-widget-container wb-layout=wbModel.style> </wb-transclude> </div> </div>"
+  );
+
+
+  $templateCache.put('views/resources/wb-sheet.html',
+    "<div flex layout=column> <hot-table settings=\"{\n" +
+    "\t\t \tcolHeaders: true, \n" +
+    "\t\t \tcontextMenu: ['row_above', 'row_below', 'remove_row', 'hsep1', 'col_left', 'col_right', 'hsep2', 'remove_row', 'remove_col', 'hsep3', 'undo', 'redo', 'make_read_only', 'alignment', 'borders'], \n" +
+    "\t\t \tafterChange: true\n" +
+    "\t\t }\" row-headers=true min-spare-rows=minSpareRows datarows=value.value height=300 width=500 flex> </hot-table> </div>"
   );
 
 

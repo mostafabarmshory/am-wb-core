@@ -12,18 +12,27 @@
         <md-button
                 ng-click="newWidget(wbModel)"
                 class="md-icon-button md-mini">
+  			<md-tooltip>Add new widget</md-tooltip>
             <wb-icon class="wb-icon-mini">add_circle</wb-icon>
         </md-button>
+		<md-button 
+			ng-click="clone()"
+			 class="md-icon-button md-mini">
+  			<md-tooltip>Clone current group</md-tooltip>
+			<wb-icon class="mde-icon-mini">content_copy</wb-icon> 
+		</md-button>
         <md-button
-                ng-click="settings()"
-                class="md-icon-button md-mini">
+            ng-click="settings()"
+            class="md-icon-button md-mini">
+  			<md-tooltip>Load settings</md-tooltip>
             <wb-icon class="wb-icon-mini">settings</wb-icon>
         </md-button>
         <md-button
-                class="md-icon-button md-mini"
-                ng-mouseenter="hoveringDelBtn=true"
-                ng-mouseleave="hoveringDelBtn=false"
-                ng-click="remove()">
+            class="md-icon-button md-mini"
+            ng-mouseenter="hoveringDelBtn=true"
+            ng-mouseleave="hoveringDelBtn=false"
+            ng-click="remove()">
+  			<md-tooltip>Remove current group</md-tooltip>
             <wb-icon class="wb-icon-mini">delete</wb-icon>
         </md-button>
     </div>
