@@ -52,5 +52,5 @@ angular.module('ngMaterialWeburger')
 		
 		'wb-widget-group': ngMdIconServiceProvider.getShape('pages'),
 		'wb-widget-html': ngMdIconServiceProvider.getShape('settings_ethernet'),
-	});/*.addViewBox('wb-direction','0 0 59.999 59.999');*/
+	});
 }]);
