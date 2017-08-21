@@ -97,6 +97,8 @@ angular.module('ngMaterialWeburger')
 		'wb-object-audio':  ngMdIconServiceProvider.getShape('audiotrack'),
 		'wb-object-data': ngMdIconServiceProvider.getShape('storage'),
 		
+		'wb-widget-group': ngMdIconServiceProvider.getShape('pages'),
+		'wb-widget-html': ngMdIconServiceProvider.getShape('settings_ethernet'),
 	});/*.addViewBox('wb-direction','0 0 59.999 59.999');*/
 }]);
 
@@ -2817,31 +2819,30 @@ angular.module('ngMaterialWeburger')
 /**
  * Load widgets
  */
-.run(
-		function($widget) {
-			// Page
-			$widget.newWidget({
-				type: 'Group',
-				template : '<wb-panel></wb-panel>',
-				label : 'Panel',
-				description : 'Panel contains list of widgets.',
-				image : 'images/wb/content.svg',
-				help : 'http://dpq.co.ir/more-information-link',
-			});
-			// HTML text
-			$widget.newWidget({
-				type: 'HtmlText',
-				templateUrl : 'views/widgets/wb-html.html',
-				label : 'HTML text',
-				description : 'An HTML block text.',
-				image : 'images/wb/html.svg',
-				help : 'http://dpq.co.ir',
-				setting:['text'],
-				data : {
-					text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-				}
-			});
-		});
+.run(function($widget) {
+	// Page
+	$widget.newWidget({
+		type: 'Group',
+		template : '<wb-panel></wb-panel>',
+		label : 'Panel',
+		description : 'Panel contains list of widgets.',
+		icon : 'wb-widget-group',
+		help : 'http://dpq.co.ir/more-information-link',
+	});
+	// HTML text
+	$widget.newWidget({
+		type: 'HtmlText',
+		templateUrl : 'views/widgets/wb-html.html',
+		label : 'HTML text',
+		description : 'An HTML block text.',
+		icon : 'wb-widget-html',
+		help : 'http://dpq.co.ir',
+		setting:['text'],
+		data : {
+			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+		}
+	});
+});
 
 /* 
  * The MIT License (MIT)
@@ -3552,7 +3553,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-setting-panel-group.html',
-    "<div layout=column> <md-nav-bar md-selected-nav-item=currentNavItem nav-bar-aria-label=\"navigation links\"> <md-nav-item md-nav-click=\"goto('setting')\" name=setting>Settings</md-nav-item> <md-nav-item md-nav-click=\"goto('widget')\" name=widget>Widgets</md-nav-item> </md-nav-bar> <div ng-show=\"page=='widget'\" layout=column> <md-list flex> <md-list-item class=md-3-line ng-repeat=\"widget in widgets\" dnd-draggable=widget.data dnd-type=\"'wb.widget'\" dnd-effect-allowed=copy> <img ng-src={{widget.image}} class=md-avatar alt=\"{{widget.type}}\"> <div class=md-list-item-text layout=column> <h3>{{ widget.label }}</h3> <p>{{ widget.description }}</p> </div> </md-list-item> </md-list> </div> <div ng-show=\"page=='setting'\" id=WB-SETTING-PANEL>  </div> </div>"
+    "<div layout=column> <md-nav-bar md-selected-nav-item=currentNavItem nav-bar-aria-label=\"navigation links\"> <md-nav-item md-nav-click=\"goto('setting')\" name=setting>Settings</md-nav-item> <md-nav-item md-nav-click=\"goto('widget')\" name=widget>Widgets</md-nav-item> </md-nav-bar> <div ng-show=\"page=='widget'\" layout=column> <md-list flex> <md-list-item class=md-2-line ng-repeat=\"widget in widgets\" dnd-draggable=widget.data dnd-type=\"'wb.widget'\" dnd-effect-allowed=copy> <wb-icon wb-icon-name={{widget.icon}}></wb-icon> <div class=md-list-item-text layout=column> <h3>{{ widget.label }}</h3> <p>{{ widget.description }}</p> </div> </md-list-item> </md-list> </div> <div ng-show=\"page=='setting'\" id=WB-SETTING-PANEL>  </div> </div>"
   );
 
 

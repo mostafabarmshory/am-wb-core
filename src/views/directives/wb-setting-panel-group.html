@@ -9,14 +9,13 @@
 		layout="column">
 		<md-list flex>
 	        <md-list-item 
-	        	class="md-3-line" 
+	        	class="md-2-line" 
 	        	ng-repeat="widget in widgets"
 
 	        	dnd-draggable="widget.data"
 				dnd-type="'wb.widget'"
-		        dnd-effect-allowed="copy"
-	        	>
-				<img ng-src="{{widget.image}}" class="md-avatar" alt="{{widget.type}}" />
+		        dnd-effect-allowed="copy">
+				<wb-icon wb-icon-name="{{widget.icon}}"></wb-icon>
 				<div class="md-list-item-text" layout="column">
 				  <h3>{{ widget.label }}</h3>
 				  <p>{{ widget.description }}</p>
