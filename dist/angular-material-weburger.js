@@ -99,7 +99,7 @@ angular.module('ngMaterialWeburger')
 		
 		'wb-widget-group': ngMdIconServiceProvider.getShape('pages'),
 		'wb-widget-html': ngMdIconServiceProvider.getShape('settings_ethernet'),
-	});/*.addViewBox('wb-direction','0 0 59.999 59.999');*/
+	});
 }]);
 
 /* 
@@ -2202,10 +2202,10 @@ angular.module('ngMaterialWeburger')
 				});
 			}
 
-			$scope.value = $scope.vlaue || {
-				key : 'empty',
-				value : [[1,1],[2,2]]
-			};
+//			$scope.value = $scope.vlaue || {
+//				key : 'empty',
+//				value : [[1,1],[2,2]]
+//			};
 			$scope.edit = editData;
 		}
 	};
