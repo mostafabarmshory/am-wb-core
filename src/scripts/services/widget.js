@@ -114,6 +114,10 @@ angular.module('ngMaterialWeburger')
 			// XXX: maso, throw exception
 			return;
 		}
+		// fix widget data
+		widget.data = widget.data || {style:{}};
+		widget.data.type = widget.type;
+		
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);
 	}
@@ -203,9 +207,7 @@ angular.module('ngMaterialWeburger')
 	 * @returns
 	 */
 	function widgetData(widget){
-		var sample = widget.data || {style:{}};
 		var data = angular.copy(sample);
-		data.type = widget.type;
 		return data;
 	}
 
