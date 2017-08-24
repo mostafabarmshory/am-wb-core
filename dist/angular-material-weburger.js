@@ -3515,7 +3515,7 @@ angular.module('ngMaterialWeburger')
 	 * @returns
 	 */
 	function widgetData(widget){
-		var data = angular.copy(sample);
+		var data = angular.copy(widget.data);
 		return data;
 	}
 
