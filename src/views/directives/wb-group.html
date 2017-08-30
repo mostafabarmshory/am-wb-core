@@ -10,6 +10,12 @@
         <span translate> {{wbModel.name}}</span>
         <span flex></span>
         <md-button
+                ng-click="toggleDirection()"
+                class="md-icon-button md-mini">
+  			<md-tooltip>Toggle direction</md-tooltip>
+            <wb-icon class="wb-icon-mini">swap_horiz</wb-icon>
+        </md-button>
+        <md-button
                 ng-click="newWidget(wbModel)"
                 class="md-icon-button md-mini">
   			<md-tooltip>Add new widget</md-tooltip>
@@ -47,6 +53,7 @@
 	    </div>
         <!-- Children are added in this part -->
         <div class="wb-panel-container"
+        	dir="{{wbModel.direction}}"
             wb-layout="wbModel.style"
 			wb-margin="wbModel.style"
 			wb-padding="wbModel.style"

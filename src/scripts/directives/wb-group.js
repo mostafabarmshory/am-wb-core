@@ -181,9 +181,14 @@ angular.module('ngMaterialWeburger')
 			return scope.$parent.insertBefore(scope.wbModel, newObject);
 		}
 
+		function toggleDirection(){
+			scope.wbModel.direction = scope.wbModel.direction == 'ltr' ? 'rtl' : 'ltr';
+		}
+		
 		// Set element ID after compile
 		element.attr('id', scope.objectId(scope.wbModel));
 		scope.wbModel.name = scope.wbModel.name || 'Panel';
+		scope.wbModel.direction = 'ltr';
 
 		scope.removeChild = removeChild;
 		scope.remove = remove;
@@ -193,6 +198,7 @@ angular.module('ngMaterialWeburger')
 		scope.dropCallback = dropCallback;
 		scope.newWidget = newWidget;
 		scope.clone = clone;
+		scope.toggleDirection = toggleDirection;
 
 		if (!angular.isArray(scope.wbModel.contents)) {
 			scope.wbModel.contents = [];
