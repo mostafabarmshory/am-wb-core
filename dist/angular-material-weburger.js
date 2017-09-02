@@ -3679,7 +3679,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
   $templateCache.put('views/settings/wb-text.html',
     " <textarea ui-tinymce=\"{\n" +
-    "\t\t plugins : 'directionality contextmenu table link paste hr emoticons advlist autolink link lists advlist charmap print preview wordcount code anchor image imagetools codesample visualchars',\n" +
+    "\t\t plugins : 'directionality contextmenu table link paste hr emoticons advlist autolink link lists advlist charmap print preview wordcount code anchor image imagetools visualchars',\n" +
     "\t\t toolbar: [\n" +
     "\t\t \t'undo redo visualchars | styleselect | link image emoticons | hr ',\n" +
     "\t\t \t'alignleft aligncenter alignright | ltr rtl | bold italic | numlist bullist ',\n" +
