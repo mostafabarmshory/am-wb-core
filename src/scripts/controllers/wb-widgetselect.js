@@ -35,9 +35,8 @@ angular.module('ngMaterialWeburger')
  * را انتخاب کند.
  */
 .controller('WbWidgetSelectCtrl',
-		function($scope, $widget, PaginatorParameter) {
+		function($scope, $widget) {
 	var scope = $scope;
-	var paginatorParameter = new PaginatorParameter();
 
 	/**
 	 * ویجت‌های موجود را لود می‌کند
@@ -47,7 +46,7 @@ angular.module('ngMaterialWeburger')
 	 * 
 	 */
 	function loadWidgets() {
-		$widget.widgets(paginatorParameter).then(function(widgets) {
+		$widget.widgets().then(function(widgets) {
 			scope.widgets = widgets;
 			selectWidget(widgets.items[0]);
 		});

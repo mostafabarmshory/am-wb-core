@@ -28,28 +28,27 @@ angular.module('ngMaterialWeburger')
 /**
  * Load widgets
  */
-.run(
-		function($widget) {
-			// Page
-			$widget.newWidget({
-				type: 'Group',
-				template : '<wb-panel></wb-panel>',
-				label : 'Panel',
-				description : 'Panel contains list of widgets.',
-				image : 'images/wb/content.svg',
-				help : 'http://dpq.co.ir/more-information-link',
-			});
-			// HTML text
-			$widget.newWidget({
-				type: 'HtmlText',
-				templateUrl : 'views/widgets/wb-html.html',
-				label : 'HTML text',
-				description : 'An HTML block text.',
-				image : 'images/wb/html.svg',
-				help : 'http://dpq.co.ir',
-				setting:['text'],
-				data : {
-					text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-				}
-			});
-		});
+.run(function($widget) {
+	// Page
+	$widget.newWidget({
+		type: 'Group',
+		template : '<wb-panel></wb-panel>',
+		label : 'Panel',
+		description : 'Panel contains list of widgets.',
+		icon : 'wb-widget-group',
+		help : 'http://dpq.co.ir/more-information-link',
+	});
+	// HTML text
+	$widget.newWidget({
+		type: 'HtmlText',
+		templateUrl : 'views/widgets/wb-html.html',
+		label : 'HTML text',
+		description : 'An HTML block text.',
+		icon : 'wb-widget-html',
+		help : 'http://dpq.co.ir',
+		setting:['text'],
+		data : {
+			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+		}
+	});
+});

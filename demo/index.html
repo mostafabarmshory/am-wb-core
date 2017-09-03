@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="bower_components/md-color-picker/dist/mdColorPicker.min.css" />
     <link rel="stylesheet" href="bower_components/angular-material-expansion-panel/dist/md-expansion-panel.css" />
     <link rel="stylesheet" href="bower_components/angular-material-icons/angular-material-icons.css" />
+    <link rel="stylesheet" href="bower_components/pikaday/css/pikaday.css" />
+    <link rel="stylesheet" href="bower_components/handsontable/dist/handsontable.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -22,14 +24,15 @@
     <link rel="stylesheet" href="styles/wb-group.css">
     <link rel="stylesheet" href="styles/wb-widget.css">
     <link rel="stylesheet" href="styles/dialogs.css">
-<!--    <link rel="stylesheet" href="styles/font-icon.css">-->
-<!--    <link rel="stylesheet" href="styles/font-svg.css">-->
     <link rel="stylesheet" href="styles/typography.css">
     <link rel="stylesheet" href="styles/setting-layout.css">
     <link rel="stylesheet" href="styles/flex-util.css">
     <link rel="stylesheet" href="styles/wb-group-button.css">
     <link rel="stylesheet" href="styles/wb-ui-choose.css">
     <link rel="stylesheet" href="styles/wb-ui-setting-color.css">
+
+   <link rel="stylesheet" href="styles/main.css">
+   <link rel="stylesheet" href="styles/font-awesome.css">
     <!-- endbuild -->
 </head>
 <body>
@@ -53,7 +56,7 @@
                 <wb-icon>content_copy</wb-icon>
             </md-button>
        </section>
-<!--        <md-list> -->
+       <md-list>
 <!-- 		    <wb-ui-setting-image -->
 <!-- 		    	title="Cover"  -->
 <!-- 		        value="cover"> -->
@@ -66,10 +69,10 @@
 <!-- 		    	title="Video"  -->
 <!-- 		        value="video"> -->
 <!-- 			</wb-ui-setting-video> -->
-<!-- 		    <wb-ui-setting-data  -->
-<!-- 		        value="myData"> -->
-<!-- 			</wb-ui-setting-data> -->
-<!--         </md-list> -->
+		    <wb-ui-setting-data 
+		        value="myData">
+			</wb-ui-setting-data>
+        </md-list>
         <textarea ng-show="showContent">{{model}}</textarea>
         <div
                 layout="row"
@@ -95,9 +98,6 @@
 <!-- bower:js -->
 <script src="bower_components/jquery/dist/jquery.js"></script>
 <script src="bower_components/angular/angular.js"></script>
-<script src="bower_components/moment/moment.js"></script>
-<script src="bower_components/moment-jalaali/build/moment-jalaali.js"></script>
-<script src="bower_components/angular-pluf/dist/angular-pluf.js"></script>
 <script src="bower_components/angular-animate/angular-animate.js"></script>
 <script src="bower_components/angular-aria/angular-aria.js"></script>
 <script src="bower_components/angular-messages/angular-messages.js"></script>
@@ -111,6 +111,12 @@
 <script src="bower_components/angular-material-expansion-panel/dist/md-expansion-panel.js"></script>
 <script src="bower_components/angular-material-icons/angular-material-icons.min.js"></script>
 <script src="bower_components/weakmap-polyfill/weakmap-polyfill.js"></script>
+<script src="bower_components/moment/moment.js"></script>
+<script src="bower_components/numbro/numbro.js"></script>
+<script src="bower_components/pikaday/pikaday.js"></script>
+<script src="bower_components/zeroclipboard/dist/ZeroClipboard.js"></script>
+<script src="bower_components/handsontable/dist/handsontable.js"></script>
+<script src="bower_components/ngHandsontable/dist/ngHandsontable.js"></script>
 <!-- endbower -->
 <!-- endbuild -->
 

@@ -75,6 +75,9 @@ angular.module('ngMaterialWeburger')
 				}, $scope.$parent.settingAnchor());
 			}
 
+			/**
+			 * Notify this widget is selected
+			 */
 			function selected() {
 				if (!$scope.wbEditable) {
 					return;
@@ -82,8 +85,19 @@ angular.module('ngMaterialWeburger')
 				return settings();
 			}
 
+			/**
+			 * Check if the widget is selected one
+			 */
 			function isSelected() {
 				return $scope.wbEditable && $settings.isCurrentModel($scope.wbModel);
+			}
+			
+			/**
+			 * Clone current widget
+			 */
+			function clone() {
+				var newObject = angular.copy($scope.wbModel);
+				return $scope.$parent.insertBefore($scope.wbModel, newObject);
 			}
 
 			/*
@@ -97,19 +111,7 @@ angular.module('ngMaterialWeburger')
 			element.attr('id', $scope.objectId($scope.wbModel));
 			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
 			$scope.isSelected = isSelected;
-
-			$scope.tinymceOptions = {
-					selector : 'div.tinymce',
-					theme : 'inlite',
-					plugins : 'directionality contextmenu table link paste image imagetools hr textpattern autolink ',
-					insert_toolbar : 'quickimage quicktable',
-					selection_toolbar : 'bold italic | quicklink h1 h2 h3 blockquote | ltr rtl',
-					insert_button_items: 'image link | inserttable | hr',
-					inline : true,
-					paste_data_images : true,
-					branding: false,
-					imagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'
-			}
+			$scope.clone = clone;
 		}
 	};
 });

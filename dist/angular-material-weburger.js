@@ -36,13 +36,13 @@ angular
         'ngAria',//
         'ngMaterial',//
         'pascalprecht.translate',//
-        'pluf',//
         'mdColorPicker',//
         //'ngMaterialWysiwyg',
         'ui.tinymce', //
         'dndLists',//
         'material.components.expansionPanels',//
-        'ngMdIcons' // Material icons
+        'ngMdIcons', // Material icons
+        'ngHandsontable',
     ]);
 
 /* 
@@ -97,7 +97,9 @@ angular.module('ngMaterialWeburger')
 		'wb-object-audio':  ngMdIconServiceProvider.getShape('audiotrack'),
 		'wb-object-data': ngMdIconServiceProvider.getShape('storage'),
 		
-	});/*.addViewBox('wb-direction','0 0 59.999 59.999');*/
+		'wb-widget-group': ngMdIconServiceProvider.getShape('pages'),
+		'wb-widget-html': ngMdIconServiceProvider.getShape('settings_ethernet'),
+	});
 }]);
 
 /* 
@@ -716,9 +718,8 @@ angular.module('ngMaterialWeburger')
  * را انتخاب کند.
  */
 .controller('WbWidgetSelectCtrl',
-		function($scope, $widget, PaginatorParameter) {
+		function($scope, $widget) {
 	var scope = $scope;
-	var paginatorParameter = new PaginatorParameter();
 
 	/**
 	 * ویجت‌های موجود را لود می‌کند
@@ -728,7 +729,7 @@ angular.module('ngMaterialWeburger')
 	 * 
 	 */
 	function loadWidgets() {
-		$widget.widgets(paginatorParameter).then(function(widgets) {
+		$widget.widgets().then(function(widgets) {
 			scope.widgets = widgets;
 			selectWidget(widgets.items[0]);
 		});
@@ -1222,155 +1223,188 @@ angular.module('ngMaterialWeburger')
  * 
  */
 .directive('wbPanel', function($compile, $widget, $controller, $settings, $q) {
-    function postLink(scope, element, attrs, ctrls, transclud) {
-	
-	/**
-	 * Remove panel from parent
-	 */
-	function remove() {
-	    console.log('panel removed:' + element.attr('id'));
-	    return scope.$parent.removeChild(scope.wbModel);
-	}
+	function postLink(scope, element, attrs, ctrls, transclud) {
 
-	/**
-	 * Empty view
-	 * 
-	 * Remove all widgets from the view.
-	 */
-	function cleanView() {
-	    console.log('remove all widgets:' + element.attr('id'));
-	    element//
-	    .children(bodyElementSelector)//
-	    .children(placeholderElementSelector)//
-	    .empty();
-	}
-
-	/**
-	 * Find aunchor
-	 * 
-	 * Find and return anchor element.
-	 */
-	function getAnchor() {
-	    return element//
-	    .children(bodyElementSelector)//
-	    .children(placeholderElementSelector);
-	}
-
-	/**
-	 * Relaod view
-	 */
-	function reloadView() {
-	    cleanView();
-	    var anchor = getAnchor();
-	    var compilesJob = [];
-	    var elements = [];
-	    scope.wbModel.contents.forEach(function(item, index) {
-		scope.objectId(item);
-		compilesJob.push($widget.compile(item, scope)//
-			.then(function(element) {
-			    element.attr('id', scope.objectId(item));
-			    elements[index] = element;
-			}));
-	    });
-	    return $q.all(compilesJob)//
-	    .then(function() {
-		var anchor = getAnchor();
-		elements.forEach(function(item) {
-		    anchor.append(item);
-		});
-	    });
-	}
-
-	/**
-	 * Adds dragged widget
-	 */
-	function dropCallback(event, index, item, external, type) {
-	    // add widget
-	    $widget.compile(item, scope)//
-	    .then(function(newElement) {
-		var list = element//
-		.children(bodyElementSelector)//
-		.children(placeholderElementSelector);
-		newElement.attr('id', scope.objectId(item));
-		if (index < list[0].childNodes.length) {
-		    newElement.insertBefore(list[0].childNodes[index]);
-		} else {
-		    list.append(newElement);
+		/**
+		 * Remove panel from parent
+		 */
+		function remove() {
+			return scope.$parent.removeChild(scope.wbModel);
 		}
-		scope.wbModel.contents.splice(index, 0, item);
-		console.log('widget add to list');
-	    });
-	    return true;
+
+		/**
+		 * Empty view
+		 * 
+		 * Remove all widgets from the view.
+		 */
+		function cleanView() {
+			element//
+			.children(bodyElementSelector)//
+			.children(placeholderElementSelector)//
+			.empty();
+		}
+
+		/**
+		 * Find aunchor
+		 * 
+		 * Find and return anchor element.
+		 */
+		function getAnchor() {
+			return element//
+			.children(bodyElementSelector)//
+			.children(placeholderElementSelector);
+		}
+
+		/**
+		 * Relaod view
+		 */
+		function reloadView() {
+			cleanView();
+			var anchor = getAnchor();
+			var compilesJob = [];
+			var elements = [];
+			scope.wbModel.contents.forEach(function(item, index) {
+				scope.objectId(item);
+				compilesJob.push($widget.compile(item, scope)//
+						.then(function(element) {
+							element.attr('id', scope.objectId(item));
+							elements[index] = element;
+						}));
+			});
+			return $q.all(compilesJob)//
+			.then(function() {
+				var anchor = getAnchor();
+				elements.forEach(function(item) {
+					anchor.append(item);
+				});
+			});
+		}
+
+		/**
+		 * Adds dragged widget
+		 */
+		function dropCallback(event, index, item, external, type) {
+			// add widget
+			$widget.compile(item, scope)//
+			.then(function(newElement) {
+				var list = element//
+				.children(bodyElementSelector)//
+				.children(placeholderElementSelector);
+				newElement.attr('id', scope.objectId(item));
+				if (index < list[0].childNodes.length) {
+					newElement.insertBefore(list[0].childNodes[index]);
+				} else {
+					list.append(newElement);
+				}
+				scope.wbModel.contents.splice(index, 0, item);
+			});
+			return true;
+		}
+
+		/**
+		 * Removes a widget
+		 * 
+		 * Data model and visual element related to the input model will be
+		 * removed.
+		 */
+		function removeChild(model) {
+			var index = scope.wbModel.contents.indexOf(model);
+			if (index > -1) {
+				var a = element//
+				.children(bodyElementSelector)//
+				.children(placeholderElementSelector)
+				.children('#'+scope.objectId(model));
+				a.remove();
+				scope.wbModel.contents.splice(index, 1);
+			}
+		}
+
+		/**
+		 * Insert new model befor selecte model
+		 */
+		function insertBefore(model, newModel){
+			var index = scope.wbModel.contents.indexOf(model);
+			if (index > -1) {
+				$widget.compile(newModel, scope)//
+				.then(function(newElement) {
+					var a = element//
+					.children(bodyElementSelector)//
+					.children(placeholderElementSelector)//
+					.children('#'+scope.objectId(model));
+					newElement.insertBefore(a);
+					scope.wbModel.contents.splice(index, 0, newModel);
+				})
+			}
+		}
+
+		function settings() {
+			return $settings.load({
+				wbModel : scope.wbModel,
+				wbParent : scope.$parent
+			}, scope.$parent.settingAnchor());
+		}
+
+		/**
+		 * Select and add a widget
+		 * 
+		 * @deprecated
+		 */
+		function newWidget() {
+			return $widget.select({
+				wbModel : {},
+				style : {}
+			})//
+			.then(function(model) {
+				$widget.compile(model, scope)//
+				.then(function(elem) {
+					elem.attr('id', scope.objectId(model));
+					scope.wbModel.contents.push(model);
+					getAnchor().append(elem);
+				});
+			});
+		}
+
+		/**
+		 * Clone current widget
+		 */
+		function clone() {
+			var newObject = angular.copy(scope.wbModel);
+			return scope.$parent.insertBefore(scope.wbModel, newObject);
+		}
+
+		function toggleDirection(){
+			scope.wbModel.direction = scope.wbModel.direction == 'ltr' ? 'rtl' : 'ltr';
+		}
+		
+		// Set element ID after compile
+		element.attr('id', scope.objectId(scope.wbModel));
+		scope.wbModel.name = scope.wbModel.name || 'Panel';
+		scope.wbModel.direction = 'ltr';
+
+		scope.removeChild = removeChild;
+		scope.remove = remove;
+		scope.insertBefore = insertBefore;
+
+		scope.settings = settings;
+		scope.dropCallback = dropCallback;
+		scope.newWidget = newWidget;
+		scope.clone = clone;
+		scope.toggleDirection = toggleDirection;
+
+		if (!angular.isArray(scope.wbModel.contents)) {
+			scope.wbModel.contents = [];
+			return;
+		}
+		reloadView();
 	}
 
-	/**
-	 * Removes a widget
-	 * 
-	 * Data model and visual element related to the input model will be
-	 * removed.
-	 */
-	function removeChild(model) {
-	    var index = scope.wbModel.contents.indexOf(model);
-	    if (index > -1) {
-		var a = element//
-		.children(bodyElementSelector)//
-		.children(placeholderElementSelector)
-		.children('#'+scope.objectId(model));
-		a.remove();
-		scope.wbModel.contents.splice(index, 1);
-	    }
-	}
-
-	function settings() {
-	    return $settings.load({
-		wbModel : scope.wbModel,
-		wbParent : scope.$parent
-	    }, scope.$parent.settingAnchor());
-	}
-
-	/**
-	 * Select and add a widget
-	 * 
-	 * @deprecated
-	 */
-	function newWidget() {
-	    return $widget.select({
-		wbModel : {},
-		style : {}
-	    })//
-	    .then(function(model) {
-		$widget.compile(model, scope)//
-		.then(function(elem) {
-		    elem.attr('id', scope.objectId(model));
-		    scope.wbModel.contents.push(model);
-		    getAnchor().append(elem);
-		});
-	    });
-	}
-
-	// Set element ID after compile
-	element.attr('id', scope.objectId(scope.wbModel));
-	scope.wbModel.name = scope.wbModel.name || 'Panel';
-	scope.removeChild = removeChild;
-	scope.remove = remove;
-	scope.settings = settings;
-	scope.dropCallback = dropCallback;
-	scope.newWidget = newWidget;
-
-	if (!angular.isArray(scope.wbModel.contents)) {
-	    scope.wbModel.contents = [];
-	    return;
-	}
-	reloadView();
-    }
-
-    return {
-	templateUrl : 'views/directives/wb-group.html',
-	restrict : 'E',
-	replace : true,
-	transclude : true,
-	link : postLink
-    };
+	return {
+		templateUrl : 'views/directives/wb-group.html',
+		restrict : 'E',
+		replace : true,
+		transclude : true,
+		link : postLink
+	};
 });//
 
 
@@ -1695,6 +1729,24 @@ angular.module('ngMaterialWeburger')
 			return true;
 		}
 
+		/**
+		 * Insert new model befor selecte model
+		 */
+		function insertBefore(model, newModel){
+			var index = scope.wbModel.contents.indexOf(model);
+			if (index > -1) {
+				$widget.compile(newModel, scope)//
+				.then(function(newElement) {
+					var a = element//
+					.children(bodyElementSelector)//
+					.children(placeholderElementSelector)//
+					.children('#'+scope.objectId(model));
+					newElement.insertBefore(a);
+					scope.wbModel.contents.splice(index, 0, newModel);
+				})
+			}
+		}
+
 		function settingAnchor(){
 			return attrs['wbSettingAnchor'];
 		}
@@ -1716,6 +1768,7 @@ angular.module('ngMaterialWeburger')
 
 		scope.settingAnchor = settingAnchor;
 		scope.removeChild = removeChild;
+		scope.insertBefore = insertBefore;
 		scope.settings = settings;
 		scope.dropCallback = dropCallback;
 		scope.newWidget = newWidget;
@@ -1773,14 +1826,36 @@ angular.module('ngMaterialWeburger')
  * 
  * All primary actions of a widget are supported (such as remove and setting).
  */
-.directive('wbSettingPanelGroup', function($settings) {
-    return {
-	restrict : 'E',
-	templateUrl: 'views/directives/wb-setting-panel-group.html',
-//	link : function(scope, element, attrs, ctrl, transclude) {
-//	    element.attr('id', $settings.WB_SETTING_PANEL_ID);
-//	},
-    };
+.directive('wbSettingPanelGroup', function($settings, $widget) {
+	
+	/**
+	 * Init settings
+	 */
+	function postLink(scope, element, attrs, ctrl, transclude) {
+		/**
+		 * change current page of setting group
+		 */
+		function goto(page){
+			scope.page = page;
+		}
+		
+		$widget.widgets()//
+		.then(function(ws){
+			scope.widgets = ws.items;
+		});
+		
+		// init scope
+		scope.goto = goto;
+		
+
+		scope.page = 'setting';
+	}
+	
+	return {
+		restrict : 'E',
+		templateUrl: 'views/directives/wb-setting-panel-group.html',
+		link : postLink
+	};
 });
 
 /* 
@@ -2133,6 +2208,10 @@ angular.module('ngMaterialWeburger')
 				});
 			}
 
+//			$scope.value = $scope.vlaue || {
+//				key : 'empty',
+//				value : [[1,1],[2,2]]
+//			};
 			$scope.edit = editData;
 		}
 	};
@@ -2430,6 +2509,9 @@ angular.module('ngMaterialWeburger')
 				}, $scope.$parent.settingAnchor());
 			}
 
+			/**
+			 * Notify this widget is selected
+			 */
 			function selected() {
 				if (!$scope.wbEditable) {
 					return;
@@ -2437,8 +2519,19 @@ angular.module('ngMaterialWeburger')
 				return settings();
 			}
 
+			/**
+			 * Check if the widget is selected one
+			 */
 			function isSelected() {
 				return $scope.wbEditable && $settings.isCurrentModel($scope.wbModel);
+			}
+			
+			/**
+			 * Clone current widget
+			 */
+			function clone() {
+				var newObject = angular.copy($scope.wbModel);
+				return $scope.$parent.insertBefore($scope.wbModel, newObject);
 			}
 
 			/*
@@ -2452,19 +2545,7 @@ angular.module('ngMaterialWeburger')
 			element.attr('id', $scope.objectId($scope.wbModel));
 			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
 			$scope.isSelected = isSelected;
-
-			$scope.tinymceOptions = {
-					selector : 'div.tinymce',
-					theme : 'inlite',
-					plugins : 'directionality contextmenu table link paste image imagetools hr textpattern autolink ',
-					insert_toolbar : 'quickimage quicktable',
-					selection_toolbar : 'bold italic | quicklink h1 h2 h3 blockquote | ltr rtl',
-					insert_button_items: 'image link | inserttable | hr',
-					inline : true,
-					paste_data_images : true,
-					branding: false,
-					imagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'
-			}
+			$scope.clone = clone;
 		}
 	};
 });
@@ -2548,6 +2629,21 @@ angular.module('ngMaterialWeburger')
 			});
 		},
 		tags: ['image', 'audio', 'video', 'file']
+	});
+	$resource.newPage({
+		type: 'wb-sheet',
+		label : 'Sheet',
+		templateUrl : 'views/resources/wb-sheet.html',
+		controller: function($scope){
+			$scope.$watch('value', function(value){
+				if(angular.isDefined(value)){
+					$scope.$parent.setValue(value);
+				} else {
+					$scope.$parent.setValue({});
+				}
+			}, true);
+		},
+		tags: ['data']
 	});
 });
 
@@ -2729,31 +2825,30 @@ angular.module('ngMaterialWeburger')
 /**
  * Load widgets
  */
-.run(
-		function($widget) {
-			// Page
-			$widget.newWidget({
-				type: 'Group',
-				template : '<wb-panel></wb-panel>',
-				label : 'Panel',
-				description : 'Panel contains list of widgets.',
-				image : 'images/wb/content.svg',
-				help : 'http://dpq.co.ir/more-information-link',
-			});
-			// HTML text
-			$widget.newWidget({
-				type: 'HtmlText',
-				templateUrl : 'views/widgets/wb-html.html',
-				label : 'HTML text',
-				description : 'An HTML block text.',
-				image : 'images/wb/html.svg',
-				help : 'http://dpq.co.ir',
-				setting:['text'],
-				data : {
-					text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-				}
-			});
-		});
+.run(function($widget) {
+	// Page
+	$widget.newWidget({
+		type: 'Group',
+		template : '<wb-panel></wb-panel>',
+		label : 'Panel',
+		description : 'Panel contains list of widgets.',
+		icon : 'wb-widget-group',
+		help : 'http://dpq.co.ir/more-information-link',
+	});
+	// HTML text
+	$widget.newWidget({
+		type: 'HtmlText',
+		templateUrl : 'views/widgets/wb-html.html',
+		label : 'HTML text',
+		description : 'An HTML block text.',
+		icon : 'wb-widget-html',
+		help : 'http://dpq.co.ir',
+		setting:['text'],
+		data : {
+			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+		}
+	});
+});
 
 /* 
  * The MIT License (MIT)
@@ -3254,7 +3349,7 @@ angular.module('ngMaterialWeburger')
  */
 .service('$widget', function(
 		$q, $sce, $templateRequest, $compile, $controller, $rootScope,
-		$timeout, $mdDialog, PaginatorPage) {
+		$timeout, $mdDialog) {
 
 	var contentElementAsso = [];
 	var elementKey = [];
@@ -3306,7 +3401,7 @@ angular.module('ngMaterialWeburger')
 	function widgets() {
 		var deferred = $q.defer();
 		$timeout(function() {
-			var widgets = new PaginatorPage({});
+			var widgets = {};
 			// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
 			widgets.items = [];
 			elementKey.forEach(function(type) {
@@ -3333,6 +3428,10 @@ angular.module('ngMaterialWeburger')
 			// XXX: maso, throw exception
 			return;
 		}
+		// fix widget data
+		widget.data = widget.data || {style:{}};
+		widget.data.type = widget.type;
+		
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);
 	}
@@ -3422,9 +3521,7 @@ angular.module('ngMaterialWeburger')
 	 * @returns
 	 */
 	function widgetData(widget){
-		var sample = widget.data || {style:{}};
-		var data = angular.copy(sample);
-		data.type = widget.type;
+		var data = angular.copy(widget.data);
 		return data;
 	}
 
@@ -3452,7 +3549,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-group.html',
-    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=remove() ng-class=\"{'wb-panel wb-widget-edit': wbEditable}\" name={{wbModel.name}}>  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> {{wbModel.name}}</span> <span flex></span> <md-button ng-click=newWidget(wbModel) class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=remove()> <wb-icon class=wb-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=wb-panel-overlay> </div>  <div class=wb-panel-container wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div>  </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=remove() ng-class=\"{'wb-panel wb-widget-edit': wbEditable}\" name={{wbModel.name}}>  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> {{wbModel.name}}</span> <span flex></span> <md-button ng-click=toggleDirection() class=\"md-icon-button md-mini\"> <md-tooltip>Toggle direction</md-tooltip> <wb-icon class=wb-icon-mini>swap_horiz</wb-icon> </md-button> <md-button ng-click=newWidget(wbModel) class=\"md-icon-button md-mini\"> <md-tooltip>Add new widget</md-tooltip> <wb-icon class=wb-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <md-tooltip>Clone current group</md-tooltip> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-tooltip>Load settings</md-tooltip> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=remove()> <md-tooltip>Remove current group</md-tooltip> <wb-icon class=wb-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=wb-panel-overlay> </div>  <div class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div>  </div> </div>"
   );
 
 
@@ -3462,7 +3559,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-setting-panel-group.html',
-    "<div layout=column> <md-nav-bar md-selected-nav-item=currentNavItem nav-bar-aria-label=\"navigation links\"> <md-nav-item md-nav-click=\"goto('page1')\" name=page1>Settings</md-nav-item> </md-nav-bar> <div id=WB-SETTING-PANEL>  </div> </div>"
+    "<div layout=column> <md-nav-bar md-selected-nav-item=currentNavItem nav-bar-aria-label=\"navigation links\"> <md-nav-item md-nav-click=\"goto('setting')\" name=setting>Settings</md-nav-item> <md-nav-item md-nav-click=\"goto('widget')\" name=widget>Widgets</md-nav-item> </md-nav-bar> <div ng-show=\"page=='widget'\" layout=column> <md-list flex> <md-list-item class=md-2-line ng-repeat=\"widget in widgets\" dnd-draggable=widget.data dnd-type=\"'wb.widget'\" dnd-effect-allowed=copy> <wb-icon wb-icon-name={{widget.icon}}></wb-icon> <div class=md-list-item-text layout=column> <h3>{{ widget.label }}</h3> <p>{{ widget.description }}</p> </div> </md-list-item> </md-list> </div> <div ng-show=\"page=='setting'\" id=WB-SETTING-PANEL>  </div> </div>"
   );
 
 
@@ -3522,7 +3619,16 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-widget.html',
-    "<div dnd-disable-if=!wbEditable dnd-selected=selected() dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=movedCallback() class=wb-widget ng-class=\"{'wb-widget-edit': wbEditable}\" layout=column name={{wbModel.name}}>  <div ng-show=isSelected() layout=row class=wb-widget-header> <span translate> {{wbModel.name}}</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>add_circle</wb-icon> </md-button>      <md-button class=\"md-icon-button md-mini\" ng-click=remove() ng-show=remove ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <wb-icon class=mde-icon-mini>delete</wb-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <wb-icon class=mde-icon-mini>{{item.icon}}</wb-icon> </md-button> </div>  <div class=wb-widget-body wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-margin=wbModel.style> <div class=wb-widget-overlay ng-show=ctrl.hoveringDelBtn> </div> <wb-transclude class=wb-widget-container wb-layout=wbModel.style> </wb-transclude> </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-selected=selected() dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=movedCallback() class=wb-widget ng-class=\"{'wb-widget-edit': wbEditable}\" layout=column name={{wbModel.name}}>  <div ng-show=isSelected() layout=row class=wb-widget-header> <span translate> {{wbModel.name}}</span> <span flex></span> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=remove() ng-show=remove ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <wb-icon class=mde-icon-mini>delete</wb-icon> </md-button> <md-divider></md-divider>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-click=item.action()> <wb-icon class=mde-icon-mini>{{item.icon}}</wb-icon> </md-button> </div>  <div class=wb-widget-body wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-margin=wbModel.style> <div class=wb-widget-overlay ng-show=ctrl.hoveringDelBtn> </div> <wb-transclude class=wb-widget-container wb-layout=wbModel.style> </wb-transclude> </div> </div>"
+  );
+
+
+  $templateCache.put('views/resources/wb-sheet.html',
+    "<div flex layout=column> <hot-table settings=\"{\n" +
+    "\t\t \tcolHeaders: true, \n" +
+    "\t\t \tcontextMenu: ['row_above', 'row_below', 'remove_row', 'hsep1', 'col_left', 'col_right', 'hsep2', 'remove_row', 'remove_col', 'hsep3', 'undo', 'redo', 'make_read_only', 'alignment', 'borders'], \n" +
+    "\t\t \tafterChange: true\n" +
+    "\t\t }\" row-headers=true min-spare-rows=minSpareRows datarows=value.value height=300 width=500 flex> </hot-table> </div>"
   );
 
 
@@ -3573,7 +3679,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
   $templateCache.put('views/settings/wb-text.html',
     " <textarea ui-tinymce=\"{\n" +
-    "\t\t plugins : 'directionality contextmenu table link paste hr emoticons advlist autolink link lists advlist charmap print preview wordcount code anchor image imagetools codesample visualchars',\n" +
+    "\t\t plugins : 'directionality contextmenu table link paste hr emoticons advlist autolink link lists advlist charmap print preview wordcount code anchor image imagetools visualchars',\n" +
     "\t\t toolbar: [\n" +
     "\t\t \t'undo redo visualchars | styleselect | link image emoticons | hr ',\n" +
     "\t\t \t'alignleft aligncenter alignright | ltr rtl | bold italic | numlist bullist ',\n" +
@@ -3588,7 +3694,18 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/widgets/wb-html.html',
-    " <div ng-hide=isSelected() ng-bind-html=\"wbModel.text | wbunsafe\"> </div> <div ui-tinymce=tinymceOptions ng-model=wbModel.text ng-show=isSelected() flex> </div>"
+    " <div ng-hide=isSelected() ng-bind-html=\"wbModel.text | wbunsafe\"> </div> <div ui-tinymce=\"{\n" +
+    "\t\tselector : 'div.tinymce',\n" +
+    "\t\ttheme : 'inlite',\n" +
+    "\t\tplugins : 'directionality contextmenu table link paste image imagetools hr textpattern autolink textcolor colorpicker',\n" +
+    "\t\tinsert_toolbar : 'quickimage quicktable',\n" +
+    "\t\tselection_toolbar : 'bold italic | quicklink h1 h2 h3 blockquote | ltr rtl | forecolor',\n" +
+    "\t\tinsert_button_items: 'image link | inserttable | hr',\n" +
+    "\t\tinline : true,\n" +
+    "\t\tpaste_data_images : true,\n" +
+    "\t\tbranding: false,\n" +
+    "\t\timagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'\n" +
+    "\t}\" ng-model=wbModel.text ng-show=isSelected() flex> </div>"
   );
 
 

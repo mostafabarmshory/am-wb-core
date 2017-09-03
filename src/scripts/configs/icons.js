@@ -50,5 +50,7 @@ angular.module('ngMaterialWeburger')
 		'wb-object-audio':  ngMdIconServiceProvider.getShape('audiotrack'),
 		'wb-object-data': ngMdIconServiceProvider.getShape('storage'),
 		
-	});/*.addViewBox('wb-direction','0 0 59.999 59.999');*/
+		'wb-widget-group': ngMdIconServiceProvider.getShape('pages'),
+		'wb-widget-html': ngMdIconServiceProvider.getShape('settings_ethernet'),
+	});
 }]);

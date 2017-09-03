@@ -40,4 +40,19 @@ angular.module('ngMaterialWeburger')
 		},
 		tags: ['image', 'audio', 'video', 'file']
 	});
+	$resource.newPage({
+		type: 'wb-sheet',
+		label : 'Sheet',
+		templateUrl : 'views/resources/wb-sheet.html',
+		controller: function($scope){
+			$scope.$watch('value', function(value){
+				if(angular.isDefined(value)){
+					$scope.$parent.setValue(value);
+				} else {
+					$scope.$parent.setValue({});
+				}
+			}, true);
+		},
+		tags: ['data']
+	});
 });

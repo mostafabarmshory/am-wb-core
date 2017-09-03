@@ -35,12 +35,34 @@ angular.module('ngMaterialWeburger')
  * 
  * All primary actions of a widget are supported (such as remove and setting).
  */
-.directive('wbSettingPanelGroup', function($settings) {
-    return {
-	restrict : 'E',
-	templateUrl: 'views/directives/wb-setting-panel-group.html',
-//	link : function(scope, element, attrs, ctrl, transclude) {
-//	    element.attr('id', $settings.WB_SETTING_PANEL_ID);
-//	},
-    };
+.directive('wbSettingPanelGroup', function($settings, $widget) {
+	
+	/**
+	 * Init settings
+	 */
+	function postLink(scope, element, attrs, ctrl, transclude) {
+		/**
+		 * change current page of setting group
+		 */
+		function goto(page){
+			scope.page = page;
+		}
+		
+		$widget.widgets()//
+		.then(function(ws){
+			scope.widgets = ws.items;
+		});
+		
+		// init scope
+		scope.goto = goto;
+		
+
+		scope.page = 'setting';
+	}
+	
+	return {
+		restrict : 'E',
+		templateUrl: 'views/directives/wb-setting-panel-group.html',
+		link : postLink
+	};
 });

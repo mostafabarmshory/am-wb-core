@@ -35,7 +35,7 @@ angular.module('ngMaterialWeburger')
  */
 .service('$widget', function(
 		$q, $sce, $templateRequest, $compile, $controller, $rootScope,
-		$timeout, $mdDialog, PaginatorPage) {
+		$timeout, $mdDialog) {
 
 	var contentElementAsso = [];
 	var elementKey = [];
@@ -87,7 +87,7 @@ angular.module('ngMaterialWeburger')
 	function widgets() {
 		var deferred = $q.defer();
 		$timeout(function() {
-			var widgets = new PaginatorPage({});
+			var widgets = {};
 			// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
 			widgets.items = [];
 			elementKey.forEach(function(type) {
@@ -114,6 +114,10 @@ angular.module('ngMaterialWeburger')
 			// XXX: maso, throw exception
 			return;
 		}
+		// fix widget data
+		widget.data = widget.data || {style:{}};
+		widget.data.type = widget.type;
+		
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);
 	}
@@ -203,9 +207,7 @@ angular.module('ngMaterialWeburger')
 	 * @returns
 	 */
 	function widgetData(widget){
-		var sample = widget.data || {style:{}};
-		var data = angular.copy(sample);
-		data.type = widget.type;
+		var data = angular.copy(widget.data);
 		return data;
 	}
 

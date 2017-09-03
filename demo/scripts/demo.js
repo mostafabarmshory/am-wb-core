@@ -30,7 +30,7 @@
  * 
  */
 angular.module('ngMaterialWeburgerTest', [ 'ngMaterialWeburger' ])//
-.controller('MyTestCtrl', function($scope, $http, $mdDialog, $usr) {
+.controller('MyTestCtrl', function($scope, $http, $mdDialog) {
 	$http.get('examples/html.json').then(function(res) {
 		$scope.model = res.data;
 	});

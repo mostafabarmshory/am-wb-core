@@ -36,11 +36,11 @@ angular
         'ngAria',//
         'ngMaterial',//
         'pascalprecht.translate',//
-        'pluf',//
         'mdColorPicker',//
         //'ngMaterialWysiwyg',
         'ui.tinymce', //
         'dndLists',//
         'material.components.expansionPanels',//
-        'ngMdIcons' // Material icons
+        'ngMdIcons', // Material icons
+        'ngHandsontable',
     ]);
