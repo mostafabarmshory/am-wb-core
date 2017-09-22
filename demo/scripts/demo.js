@@ -31,7 +31,7 @@
  */
 angular.module('ngMaterialWeburgerTest', [ 'ngMaterialWeburger' ])//
 .controller('MyTestCtrl', function($scope, $http, $mdDialog) {
-	$http.get('examples/html.json').then(function(res) {
+	$http.get('examples/padding.json').then(function(res) {
 		$scope.model = res.data;
 	});
 })

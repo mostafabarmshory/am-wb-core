@@ -154,26 +154,6 @@ angular.module('ngMaterialWeburger')
 		}
 
 		/**
-		 * Select and add a widget
-		 * 
-		 * @deprecated
-		 */
-		function newWidget() {
-			return $widget.select({
-				wbModel : {},
-				style : {}
-			})//
-			.then(function(model) {
-				$widget.compile(model, scope)//
-				.then(function(elem) {
-					elem.attr('id', scope.objectId(model));
-					scope.wbModel.contents.push(model);
-					getAnchor().append(elem);
-				});
-			});
-		}
-
-		/**
 		 * Clone current widget
 		 */
 		function clone() {
@@ -181,14 +161,9 @@ angular.module('ngMaterialWeburger')
 			return scope.$parent.insertBefore(scope.wbModel, newObject);
 		}
 
-		function toggleDirection(){
-			scope.wbModel.direction = scope.wbModel.direction == 'ltr' ? 'rtl' : 'ltr';
-		}
-		
 		// Set element ID after compile
 		element.attr('id', scope.objectId(scope.wbModel));
 		scope.wbModel.name = scope.wbModel.name || 'Panel';
-		scope.wbModel.direction = 'ltr';
 
 		scope.removeChild = removeChild;
 		scope.remove = remove;
@@ -196,9 +171,7 @@ angular.module('ngMaterialWeburger')
 
 		scope.settings = settings;
 		scope.dropCallback = dropCallback;
-		scope.newWidget = newWidget;
 		scope.clone = clone;
-		scope.toggleDirection = toggleDirection;
 
 		if (!angular.isArray(scope.wbModel.contents)) {
 			scope.wbModel.contents = [];
