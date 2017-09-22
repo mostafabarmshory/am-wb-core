@@ -1345,26 +1345,6 @@ angular.module('ngMaterialWeburger')
 		}
 
 		/**
-		 * Select and add a widget
-		 * 
-		 * @deprecated
-		 */
-		function newWidget() {
-			return $widget.select({
-				wbModel : {},
-				style : {}
-			})//
-			.then(function(model) {
-				$widget.compile(model, scope)//
-				.then(function(elem) {
-					elem.attr('id', scope.objectId(model));
-					scope.wbModel.contents.push(model);
-					getAnchor().append(elem);
-				});
-			});
-		}
-
-		/**
 		 * Clone current widget
 		 */
 		function clone() {
@@ -1372,14 +1352,9 @@ angular.module('ngMaterialWeburger')
 			return scope.$parent.insertBefore(scope.wbModel, newObject);
 		}
 
-		function toggleDirection(){
-			scope.wbModel.direction = scope.wbModel.direction == 'ltr' ? 'rtl' : 'ltr';
-		}
-		
 		// Set element ID after compile
 		element.attr('id', scope.objectId(scope.wbModel));
 		scope.wbModel.name = scope.wbModel.name || 'Panel';
-		scope.wbModel.direction = 'ltr';
 
 		scope.removeChild = removeChild;
 		scope.remove = remove;
@@ -1387,9 +1362,7 @@ angular.module('ngMaterialWeburger')
 
 		scope.settings = settings;
 		scope.dropCallback = dropCallback;
-		scope.newWidget = newWidget;
 		scope.clone = clone;
-		scope.toggleDirection = toggleDirection;
 
 		if (!angular.isArray(scope.wbModel.contents)) {
 			scope.wbModel.contents = [];
@@ -3549,12 +3522,12 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-group.html',
-    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=remove() ng-class=\"{'wb-panel wb-widget-edit': wbEditable}\" name={{wbModel.name}}>  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> {{wbModel.name}}</span> <span flex></span> <md-button ng-click=toggleDirection() class=\"md-icon-button md-mini\"> <md-tooltip>Toggle direction</md-tooltip> <wb-icon class=wb-icon-mini>swap_horiz</wb-icon> </md-button> <md-button ng-click=newWidget(wbModel) class=\"md-icon-button md-mini\"> <md-tooltip>Add new widget</md-tooltip> <wb-icon class=wb-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <md-tooltip>Clone current group</md-tooltip> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-tooltip>Load settings</md-tooltip> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=remove()> <md-tooltip>Remove current group</md-tooltip> <wb-icon class=wb-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=wb-panel-overlay> </div>  <div class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div>  </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=remove() ng-class=\"{'wb-panel wb-widget-edit': wbEditable}\" name={{wbModel.name}}>  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> {{wbModel.name}}</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip>Left to right direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip>Right to left direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <md-tooltip>Clone current group</md-tooltip> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-tooltip>Load settings</md-tooltip> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=remove()> <md-tooltip>Remove current group</md-tooltip> <wb-icon class=wb-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=wb-panel-overlay> </div>  <div class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div>  </div> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-page.html',
-    "<div class=wb-page dnd-disable-if=!wbEditable ng-class=\"{'wb-page-edit': wbEditable}\">  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> Content</span> <span flex></span> <md-button ng-click=newWidget() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=wb-panel-overlay> </div>  <div class=wb-panel-container wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div>  </div> </div>"
+    "<div class=wb-page dnd-disable-if=!wbEditable ng-class=\"{'wb-page-edit': wbEditable}\">  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> Content</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip>Left to right direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip>Right to left direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=newWidget() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=wb-panel-overlay> </div>  <div class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div>  </div> </div>"
   );
 
 
