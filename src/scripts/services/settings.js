@@ -41,7 +41,7 @@ angular.module('ngMaterialWeburger')
 	 * Default settings
 	 */
 	var WB_SETTINGS_PAGE_DEFAULT = ['description', 'border',
-		'background', 'pageLayout'];
+		'background', 'pageLayout', 'marginPadding'];
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
 		'background', 'pageLayout', 'selfLayout',
 		'marginPadding', 'minMaxSize' ];
