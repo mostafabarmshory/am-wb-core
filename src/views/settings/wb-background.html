@@ -34,39 +34,59 @@ Created by mgh.
     	value="wbModel.style.opacity">
     </wb-ui-setting-number>
 
+
+
     <!-- background -->
-	<md-input-container class="md-icon-float md-block">
-		<label>Background</label>
-		<input ng-model="wbModel.style.background" type="text">
-	</md-input-container>
     <wb-ui-setting-image
-    	title="Image" 
+    	title="Background image" 
         value="wbModel.style.backgroundImage">
 	</wb-ui-setting-image>
-	<md-input-container class="md-icon-float md-block">
-		<label>Background size</label>
-		<input ng-model="wbModel.style.backgroundSize" type="text">
-	</md-input-container>
-	<md-input-container class="md-icon-float md-block">
-		<label>Background repeat</label>
-		<input ng-model="wbModel.style.backgroundRepeat" type="text">
-	</md-input-container>
-	<md-input-container class="md-icon-float md-block">
-		<label>Background position</label>
-		<input ng-model="wbModel.style.backgroundPosition" type="text">
-	</md-input-container>
-	<md-input-container class="md-icon-float md-block">
-		<label>Background attachment</label>
-		<input ng-model="wbModel.style.backgroundAttachment" type="text">
-	</md-input-container>
-	<md-input-container class="md-icon-float md-block">
-		<label>Background origin</label>
-		<input ng-model="wbModel.style.backgroundOrigin" type="text">
-	</md-input-container>
     <wb-ui-setting-color 
     	title="Background Color" 
     	icon="format_color_fill" 
     	value="wbModel.style.backgroundColor">
     </wb-ui-setting-color>
+    
+    <!-- advanced background -->
+    <wb-ui-setting-on-off-switch 
+    	title="Advance Background options" 
+    	value="_abo">
+    </wb-ui-setting-on-off-switch>
+	<md-input-container 
+    	ng-show="_abo" 
+		class="md-icon-float md-block">
+		<label>Background</label>
+		<input ng-model="wbModel.style.background" type="text">
+	</md-input-container>
+	<md-input-container 
+    	ng-show="_abo" 
+		class="md-icon-float md-block">
+		<label>Background size</label>
+		<input ng-model="wbModel.style.backgroundSize" type="text">
+	</md-input-container>
+	<md-input-container 
+    	ng-show="_abo" 
+		class="md-icon-float md-block">
+		<label>Background repeat</label>
+		<input ng-model="wbModel.style.backgroundRepeat" type="text">
+	</md-input-container>
+	<md-input-container 
+    	ng-show="_abo" 
+		class="md-icon-float md-block">
+		<label>Background position</label>
+		<input ng-model="wbModel.style.backgroundPosition" type="text">
+	</md-input-container>
+	<md-input-container 
+    	ng-show="_abo" 
+		class="md-icon-float md-block">
+		<label>Background attachment</label>
+		<input ng-model="wbModel.style.backgroundAttachment" type="text">
+	</md-input-container>
+	<md-input-container 
+    	ng-show="_abo" 
+		class="md-icon-float md-block">
+		<label>Background origin</label>
+		<input ng-model="wbModel.style.backgroundOrigin" type="text">
+	</md-input-container>
 
 </md-list>
