@@ -9,6 +9,24 @@
     	layout="row">
         <span translate> Content</span>
         <span flex></span>
+        
+		<!--         Direction setting -->
+        <md-button
+        	ng-disabled="wbModel.direction!='rtl'"
+            ng-click="wbModel.direction='ltr'"
+            class="md-icon-button md-mini">
+  			<md-tooltip>Left to right direction</md-tooltip>
+            <wb-icon class="wb-icon-mini">format_textdirection_l_to_r</wb-icon>
+        </md-button>
+        <md-button
+        	ng-disabled="wbModel.direction=='rtl'"
+            ng-click="wbModel.direction='rtl'"
+            class="md-icon-button md-mini">
+  			<md-tooltip>Right to left direction</md-tooltip>
+            <wb-icon class="wb-icon-mini">format_textdirection_r_to_l</wb-icon>
+        </md-button>
+        <md-divider></md-divider>
+        
         <md-button
                 ng-click="newWidget()"
                 class="md-icon-button md-mini">
@@ -31,6 +49,7 @@
 	    </div>
         <!-- تمام بچه‌ها در این قسمت اضافه می‌شن. -->
         <div class="wb-panel-container"
+        	dir="{{wbModel.direction}}"
             wb-layout="wbModel.style"
 			wb-margin="wbModel.style"
 			wb-padding="wbModel.style"

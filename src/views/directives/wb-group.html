@@ -9,18 +9,24 @@
     <div ng-show="wbEditable" class="wb-panel-header" layout="row">
         <span translate> {{wbModel.name}}</span>
         <span flex></span>
+        
+		<!--         Direction setting -->
         <md-button
-                ng-click="toggleDirection()"
-                class="md-icon-button md-mini">
-  			<md-tooltip>Toggle direction</md-tooltip>
-            <wb-icon class="wb-icon-mini">swap_horiz</wb-icon>
+        	ng-disabled="wbModel.direction!='rtl'"
+            ng-click="wbModel.direction='ltr'"
+            class="md-icon-button md-mini">
+  			<md-tooltip>Left to right direction</md-tooltip>
+            <wb-icon class="wb-icon-mini">format_textdirection_l_to_r</wb-icon>
         </md-button>
         <md-button
-                ng-click="newWidget(wbModel)"
-                class="md-icon-button md-mini">
-  			<md-tooltip>Add new widget</md-tooltip>
-            <wb-icon class="wb-icon-mini">add_circle</wb-icon>
+        	ng-disabled="wbModel.direction=='rtl'"
+            ng-click="wbModel.direction='rtl'"
+            class="md-icon-button md-mini">
+  			<md-tooltip>Right to left direction</md-tooltip>
+            <wb-icon class="wb-icon-mini">format_textdirection_r_to_l</wb-icon>
         </md-button>
+        <md-divider></md-divider>
+        
 		<md-button 
 			ng-click="clone()"
 			 class="md-icon-button md-mini">
