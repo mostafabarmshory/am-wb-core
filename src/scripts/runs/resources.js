@@ -30,29 +30,32 @@ angular.module('ngMaterialWeburger')
  */
 .run(function($resource) {
 	$resource.newPage({
-		type: 'wb-url',
+		type : 'wb-url',
 		label : 'URL',
 		templateUrl : 'views/resources/wb-url.html',
-		controller: function($scope){
-			$scope.$watch('value', function(value){
+		controller : function($scope) {
+			$scope.$watch('value', function(value) {
 				$scope.$parent.setValue(value);
 			});
 		},
-		tags: ['image', 'audio', 'video', 'file']
+		tags : [ 'image', 'audio', 'video', 'file' ]
 	});
 	$resource.newPage({
-		type: 'wb-sheet',
+		type : 'wb-sheet',
 		label : 'Sheet',
 		templateUrl : 'views/resources/wb-sheet.html',
-		controller: function($scope){
-			$scope.$watch('value', function(value){
-				if(angular.isDefined(value)){
+		controller : function($scope) {
+			$scope.$watch('value', function(value) {
+				if (angular.isDefined(value)) {
 					$scope.$parent.setValue(value);
 				} else {
-					$scope.$parent.setValue({});
+					$scope.$parent.setValue({
+						'key' : 'value',
+						'value' : [ [ 1, 2 ], [ 1, 2 ] ]
+					});
 				}
 			}, true);
 		},
-		tags: ['data']
+		tags : [ 'data' ]
 	});
 });

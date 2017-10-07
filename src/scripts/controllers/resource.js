@@ -52,10 +52,10 @@ angular.module('ngMaterialWeburger')
 		$scope.value = value;
 	}
 	
-	$scope.$watch('value', function(value){
-		// Deal with value
-		console.log(value);
-	});
+//	$scope.$watch('value', function(value){
+//		// Deal with value
+//		console.log(value);
+//	});
 	
 
 

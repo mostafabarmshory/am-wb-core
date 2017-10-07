@@ -44,7 +44,12 @@ angular.module('ngMaterialWeburger')
 		},
 		controller: function($scope, $resource){
 			function selectImage(){
-				return $resource.get('image')//
+				return $resource.get('image', {
+					style: {
+						title: 'Select image'
+					},
+					data: $scope.value
+				})//
 				.then(function(value){
 					$scope.value = value;
 				});
