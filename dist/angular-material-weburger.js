@@ -1122,25 +1122,28 @@ angular.module('ngMaterialWeburger')
  * @description Apply padding into the element
  */
 .directive("wbPadding", function() {
-    return {
-	restrict : 'A',
-	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbPadding, function(style) {
-		if(!style){
-		    return;
+	return {
+		restrict : 'A',
+		link : function(scope, element, attributes) {
+			return scope.$watch(attributes.wbPadding, function(style) {
+				if(!style || !style.padding){
+					return;
+				}
+				if(style.padding.isUniform){
+					element.css({
+						'padding': style.padding.uniform
+					});
+				} else {
+					element.css({
+						'padding-left':style.padding.left,
+						'padding-right':style.padding.right,
+						'padding-top':style.padding.top,
+						'padding-bottom':style.padding.bottom
+					});
+				}
+			}, true);
 		}
-		if(!style.padding){
-		    style.padding ={};
-		}
-		element.css({
-	            'padding-left':(style.padding.isUniform) ? style.padding.uniform : style.padding.left,
-	            'padding-right':(style.padding.isUniform) ? style.padding.uniform : style.padding.right,
-	            'padding-top':(style.padding.isUniform) ? style.padding.uniform : style.padding.top,
-	            'padding-bottom':(style.padding.isUniform) ? style.padding.uniform : style.padding.bottom
-	            });
-	    }, true);
-	}
-    };
+	};
 });
 /* 
  * The MIT License (MIT)
@@ -3644,7 +3647,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/settings/wb-margin-padding.html',
-    " <md-list class=wb-setting-panel>   <md-subheader class=md-no-sticky>Margin</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" icon=rounded_corner value=wbModel.style.margin.isUniform> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.margin.isUniform title=Radius icon=rounded_corner value=wbModel.style.margin.uniform> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.margin.isUniform slider=\"\" icon=wb-blank value=wbModel.style.margin.uniform> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.margin.isUniform title=Left icon=rounded_corner value=wbModel.style.margin.left> </wb-ui-setting-number> <wb-ui-setting-number ng-show=!wbModel.style.margin.isUniform title=Right icon=rounded_corner value=wbModel.style.margin.right> </wb-ui-setting-number> <wb-ui-setting-number ng-show=!wbModel.style.margin.isUniform title=Top icon=rounded_corner value=wbModel.style.margin.top> </wb-ui-setting-number> <wb-ui-setting-number ng-show=!wbModel.style.margin.isUniform title=Botton icon=rounded_corner value=wbModel.style.margin.bottom> </wb-ui-setting-number>   <md-subheader class=md-no-sticky>Padding</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" icon=rounded_corner value=wbModel.style.padding.isUniform> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.padding.isUniform title=Radius icon=rounded_corner value=wbModel.style.padding.uniform> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.padding.isUniform slider=\"\" icon=wb-blank value=wbModel.style.padding.uniform> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.padding.isUniform title=Left icon=rounded_corner value=wbModel.style.padding.left> </wb-ui-setting-number> <wb-ui-setting-number ng-show=!wbModel.style.padding.isUniform title=Right icon=rounded_corner value=wbModel.style.padding.right> </wb-ui-setting-number> <wb-ui-setting-number ng-show=!wbModel.style.padding.isUniform title=Top icon=rounded_corner value=wbModel.style.padding.top> </wb-ui-setting-number> <wb-ui-setting-number ng-show=!wbModel.style.padding.isUniform title=Down icon=rounded_corner value=wbModel.style.padding.down> </wb-ui-setting-number> </md-list>"
+    " <md-list class=wb-setting-panel>   <md-subheader class=md-no-sticky>Margin</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" icon=rounded_corner value=wbModel.style.margin.isUniform> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.margin.isUniform title=Radius icon=rounded_corner value=wbModel.style.margin.uniform> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.margin.isUniform slider=\"\" icon=wb-blank value=wbModel.style.margin.uniform> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.margin.isUniform title=Left icon=rounded_corner value=wbModel.style.margin.left> </wb-ui-setting-number> <wb-ui-setting-number ng-show=!wbModel.style.margin.isUniform title=Right icon=rounded_corner value=wbModel.style.margin.right> </wb-ui-setting-number> <wb-ui-setting-number ng-show=!wbModel.style.margin.isUniform title=Top icon=rounded_corner value=wbModel.style.margin.top> </wb-ui-setting-number> <wb-ui-setting-number ng-show=!wbModel.style.margin.isUniform title=Botton icon=rounded_corner value=wbModel.style.margin.bottom> </wb-ui-setting-number>   <md-subheader class=md-no-sticky>Padding</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" icon=rounded_corner value=wbModel.style.padding.isUniform> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.padding.isUniform title=Radius icon=rounded_corner value=wbModel.style.padding.uniform> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.padding.isUniform slider=\"\" icon=wb-blank value=wbModel.style.padding.uniform> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.padding.isUniform title=Left icon=rounded_corner value=wbModel.style.padding.left> </wb-ui-setting-number> <wb-ui-setting-number ng-show=!wbModel.style.padding.isUniform title=Right icon=rounded_corner value=wbModel.style.padding.right> </wb-ui-setting-number> <wb-ui-setting-number ng-show=!wbModel.style.padding.isUniform title=Top icon=rounded_corner value=wbModel.style.padding.top> </wb-ui-setting-number> <wb-ui-setting-number ng-show=!wbModel.style.padding.isUniform title=Down icon=rounded_corner value=wbModel.style.padding.bottom> </wb-ui-setting-number> </md-list>"
   );
 
 
