@@ -28,23 +28,26 @@ angular.module('ngMaterialWeburger')
  * @description Apply padding into the element
  */
 .directive("wbPadding", function() {
-    return {
-	restrict : 'A',
-	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbPadding, function(style) {
-		if(!style){
-		    return;
+	return {
+		restrict : 'A',
+		link : function(scope, element, attributes) {
+			return scope.$watch(attributes.wbPadding, function(style) {
+				if(!style || !style.padding){
+					return;
+				}
+				if(style.padding.isUniform){
+					element.css({
+						'padding': style.padding.uniform
+					});
+				} else {
+					element.css({
+						'padding-left':style.padding.left,
+						'padding-right':style.padding.right,
+						'padding-top':style.padding.top,
+						'padding-bottom':style.padding.bottom
+					});
+				}
+			}, true);
 		}
-		if(!style.padding){
-		    style.padding ={};
-		}
-		element.css({
-	            'padding-left':(style.padding.isUniform) ? style.padding.uniform : style.padding.left,
-	            'padding-right':(style.padding.isUniform) ? style.padding.uniform : style.padding.right,
-	            'padding-top':(style.padding.isUniform) ? style.padding.uniform : style.padding.top,
-	            'padding-bottom':(style.padding.isUniform) ? style.padding.uniform : style.padding.bottom
-	            });
-	    }, true);
-	}
-    };
+	};
 });
