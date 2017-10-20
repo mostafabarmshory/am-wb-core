@@ -284,6 +284,7 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
 .dndDraggingSource {
     display: none;
 }
+/*
 .wb-group-button {
     font-size: 16px;
     margin: 20px 0;
@@ -314,6 +315,7 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
     color: rgba(44, 65, 164, 0.96);
     transition: 0.3s;
 }
+*/
 /*
 .md-button.md-icon-button.md-mini {
 	line-height: 1rem;
