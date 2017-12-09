@@ -55,11 +55,6 @@ angular.module('ngMaterialWeburger')
 					$scope.value = data;
 				});
 			}
-
-//			$scope.value = $scope.vlaue || {
-//				key : 'empty',
-//				value : [[1,1],[2,2]]
-//			};
 			$scope.edit = editData;
 		}
 	};

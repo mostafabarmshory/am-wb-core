@@ -51,7 +51,7 @@ angular.module('ngMaterialWeburger')
 				} else {
 					$scope.$parent.setValue({
 						'key' : 'value',
-						'value' : [ [ 1, 2 ], [ 1, 2 ] ]
+						'values' : [ [ 1, 2 ], [ 1, 2 ] ]
 					});
 				}
 			}, true);

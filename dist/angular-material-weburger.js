@@ -2177,17 +2177,12 @@ angular.module('ngMaterialWeburger')
 					style : {
 						title : 'Edit data source'
 					},
-					data : $scope.value
+					data : $scope.values
 				}) //
 				.then(function(data) {
-					$scope.value = data;
+					$scope.values = data;
 				});
 			}
-
-//			$scope.value = $scope.vlaue || {
-//				key : 'empty',
-//				value : [[1,1],[2,2]]
-//			};
 			$scope.edit = editData;
 		}
 	};
@@ -2622,7 +2617,7 @@ angular.module('ngMaterialWeburger')
 				} else {
 					$scope.$parent.setValue({
 						'key' : 'value',
-						'value' : [ [ 1, 2 ], [ 1, 2 ] ]
+						'values' : [ [ 1, 2 ], [ 1, 2 ] ]
 					});
 				}
 			}, true);
@@ -3612,7 +3607,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
     "\t\t \tcolHeaders: true, \n" +
     "\t\t \tcontextMenu: ['row_above', 'row_below', 'remove_row', 'hsep1', 'col_left', 'col_right', 'hsep2', 'remove_row', 'remove_col', 'hsep3', 'undo', 'redo', 'make_read_only', 'alignment', 'borders'], \n" +
     "\t\t \tafterChange: true\n" +
-    "\t\t }\" row-headers=true min-spare-rows=minSpareRows datarows=value.value height=300 width=500 flex> </hot-table> </div>"
+    "\t\t }\" row-headers=true min-spare-rows=minSpareRows datarows=value.values height=300 width=500 flex> </hot-table> </div>"
   );
 
 
