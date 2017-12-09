@@ -2177,10 +2177,10 @@ angular.module('ngMaterialWeburger')
 					style : {
 						title : 'Edit data source'
 					},
-					data : $scope.values
+					data : $scope.value
 				}) //
 				.then(function(data) {
-					$scope.values = data;
+					$scope.value = data;
 				});
 			}
 			$scope.edit = editData;
