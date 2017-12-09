@@ -52,7 +52,12 @@ angular.module('ngMaterialWeburger')
 					data : $scope.value
 				}) //
 				.then(function(data) {
-					$scope.value = data;
+					if(!angular.isDefined($scope.value)){
+						$scope.value = {};
+					}
+					// Just copy data values
+					$scope.value.key = data.key;
+					$scope.value.values = data.values;
 				});
 			}
 			$scope.edit = editData;
