@@ -4,7 +4,7 @@
 	ng-class="{'wb-page-edit': wbEditable}">
     <!-- a header is added through edit-mode -->
     <div 
-    	ng-show="wbEditable" 
+    	ng-if="wbEditable" 
     	class="wb-panel-header" 
     	layout="row">
         <span translate> Content</span>
@@ -27,11 +27,6 @@
         </md-button>
         <md-divider></md-divider>
         
-        <md-button
-                ng-click="newWidget()"
-                class="md-icon-button md-mini">
-            <wb-icon class="wb-icon-mini">add_circle</wb-icon>
-        </md-button>
         <md-button
                 ng-click="settings()"
                 class="md-icon-button md-mini">

@@ -48,14 +48,18 @@ angular.module('ngMaterialWeburger')
 		$mdDialog.hide($scope.value);
 	}
 	
+	/**
+	 * Sets value to the real var
+	 * 
+	 */
 	function setValue(value){
 		$scope.value = value;
 	}
 	
-	$scope.$watch('value', function(value){
-		// Deal with value
-		console.log(value);
-	});
+//	$scope.$watch('value', function(value){
+//		// Deal with value
+//		console.log(value);
+//	});
 	
 
 
