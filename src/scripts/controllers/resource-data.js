@@ -24,23 +24,20 @@
 'use strict';
 
 angular.module('ngMaterialWeburger')
-
 /**
- * Load default resources
+ * @ngdoc function
+ * @name WbResourceCtrl
+ * @description # WbResourceCtrl Controller of the ngMaterialWeburger
  */
-.run(function($resource) {
-	$resource.newPage({
-		type : 'wb-url',
-		label : 'URL',
-		templateUrl : 'views/resources/wb-url.html',
-		controller : 'WbResourceUrlCtrl',
-		tags : [ 'image', 'audio', 'video', 'file' ]
-	});
-	$resource.newPage({
-		type : 'wb-sheet',
-		label : 'Sheet',
-		templateUrl : 'views/resources/wb-sheet.html',
-		controller : 'WbResourceDataCtrl',
-		tags : [ 'data' ]
-	});
+.controller('WbResourceDataCtrl', function($scope) {
+	$scope.$watch('value', function(value) {
+		if (angular.isDefined(value)) {
+			$scope.$parent.setValue(value);
+		} else {
+			$scope.$parent.setValue({
+				'key' : 'value',
+				'values' : [ [ 1, 2 ], [ 1, 2 ] ]
+			});
+		}
+	}, true);
 });
