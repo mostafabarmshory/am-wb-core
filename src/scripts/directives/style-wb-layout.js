@@ -23,7 +23,7 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * Apply layout into an element
  * 
@@ -33,7 +33,7 @@ angular.module('ngMaterialWeburger')
  * Note that, in smal screen devices, the colume layout apply as default.
  * 
  * @ngdoc directive
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description Apply layout into an element
  */
 .directive("wbLayout", function() {

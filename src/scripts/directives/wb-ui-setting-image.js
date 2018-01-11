@@ -23,12 +23,12 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc directive
  * @name wbUiSettingColor
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @description a setting section to set color.
  *

@@ -27,7 +27,7 @@ var dragClass = 'wb-content-dragenter';
 var bodyElementSelector = 'div#wb-content-body';
 var placeholderElementSelector = 'div#wb-content-placeholder';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * 
  */

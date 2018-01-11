@@ -3,7 +3,7 @@
 //describe('Directive: mdeContent', function () {
 //
 //  // load the directive's module
-//  beforeEach(module('ngMaterialWeburger'));
+//  beforeEach(module('am-wb-core'));
 //
 //  var element,
 //    scope;

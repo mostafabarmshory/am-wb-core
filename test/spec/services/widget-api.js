@@ -26,7 +26,7 @@
 describe('Service $widget', function () {
 
     // load the service's module
-    beforeEach(module('ngMaterialWeburger'));
+    beforeEach(module('am-wb-core'));
 
     // instantiate service
     var $widget;

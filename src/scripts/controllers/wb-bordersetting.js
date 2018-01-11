@@ -23,11 +23,11 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * @ngdoc function
  * @name WbBorderSettingCtrl
- * @description # WbBorderSettingCtrl Controller of the ngMaterialWeburger
+ * @description # WbBorderSettingCtrl Controller of the am-wb-core
  */
 .controller(
 	'WbBorderSettingCtrl',

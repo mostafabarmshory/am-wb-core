@@ -29,7 +29,7 @@
  * @description
  *
  */
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 .config(['ngMdIconServiceProvider', function(ngMdIconServiceProvider) {
 	ngMdIconServiceProvider
 	// Add single icon

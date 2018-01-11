@@ -23,12 +23,12 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc directive
  * @name wbWidget
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description Widgets container
  * 
  * This is widget containers.

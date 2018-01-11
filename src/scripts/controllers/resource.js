@@ -23,11 +23,11 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * @ngdoc function
  * @name WbResourceCtrl
- * @description # WbResourceCtrl Controller of the ngMaterialWeburger
+ * @description # WbResourceCtrl Controller of the am-wb-core
  */
 .controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, 
 		$wbUtil, $q, $controller, $compile, pages, style, data) {

@@ -11,7 +11,7 @@
 /*global tinymce:true */
 
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * Load default resources

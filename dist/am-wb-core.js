@@ -30,7 +30,7 @@
  *
  */
 angular
-    .module('ngMaterialWeburger', [
+    .module('am-wb-core', [
         'ngMessages',//
         'ngAnimate',//
         'ngAria',//
@@ -76,7 +76,7 @@ angular
  * @description
  *
  */
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 .config(['ngMdIconServiceProvider', function(ngMdIconServiceProvider) {
 	ngMdIconServiceProvider
 	// Add single icon
@@ -127,11 +127,92 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * @ngdoc function
  * @name WbResourceCtrl
- * @description # WbResourceCtrl Controller of the ngMaterialWeburger
+ * @description # WbResourceCtrl Controller of the am-wb-core
+ */
+.controller('WbResourceDataCtrl', function($scope) {
+	$scope.$watch('value', function(value) {
+		if (angular.isDefined(value)) {
+			$scope.$parent.setValue(value);
+		} else {
+			$scope.$parent.setValue({
+				'key' : 'value',
+				'values' : [ [ 1, 2 ], [ 1, 2 ] ]
+			});
+		}
+	}, true);
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc function
+ * @name WbResourceCtrl
+ * @description # WbResourceCtrl Controller of the am-wb-core
+ */
+.controller('WbResourceUrlCtrl', function($scope) {
+	$scope.$watch('value', function(value) {
+		$scope.$parent.setValue(value);
+	});
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc function
+ * @name WbResourceCtrl
+ * @description # WbResourceCtrl Controller of the am-wb-core
  */
 .controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, 
 		$wbUtil, $q, $controller, $compile, pages, style, data) {
@@ -275,11 +356,11 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * @ngdoc function
  * @name WbBorderSettingCtrl
- * @description # WbBorderSettingCtrl Controller of the ngMaterialWeburger
+ * @description # WbBorderSettingCtrl Controller of the am-wb-core
  */
 .controller(
 	'WbBorderSettingCtrl',
@@ -355,7 +436,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc function
@@ -407,12 +488,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc controller
  * @name WbLayoutWbSettingsCtrl
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description کنترلر یک عمل برای مدیریت و ویرایش آن ایجاد شده است. این کنترل
  *              در دیالوگ و یا نمایش‌های دیگر کاربرد دارد.
  * 
@@ -501,7 +582,7 @@ angular
  * @date 2016
  * @author mgh
  */
-.module('ngMaterialWeburger')
+.module('am-wb-core')
 
 .controller('WbPageLayoutWbSettingsCtrl', function($scope, $settings) {
     var wbModel = $scope.wbModel;
@@ -588,7 +669,7 @@ angular
 /**
  * Created by mgh on 8/10/2016.
  */
-.module('ngMaterialWeburger')
+.module('am-wb-core')
 
 .controller('WbSelfLayoutWbSettingsCtrl', function($scope, $settings) {
     var scope = $scope;
@@ -640,7 +721,7 @@ angular
  * SOFTWARE.
  */
 'use strict';
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * Created by mgh on 8/10/2016.
@@ -710,12 +791,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc controller
  * @name WbWidgetSelectCtrl
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description مدیریتی برای انتخاب ویجت‌های جدید
  * 
  * در این کنترل امکاناتی فراهم شده که کاربر بتواند از میان ویجت‌های موجودی یکی
@@ -797,10 +878,10 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * @ngdoc directive
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description Apply background into the element
  */
 .directive("wbBackground", function() {
@@ -891,7 +972,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * @description Apply border into the element
  */
@@ -969,7 +1050,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * Apply layout into an element
  * 
@@ -979,7 +1060,7 @@ angular.module('ngMaterialWeburger')
  * Note that, in smal screen devices, the colume layout apply as default.
  * 
  * @ngdoc directive
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description Apply layout into an element
  */
 .directive("wbLayout", function() {
@@ -1071,7 +1152,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * @description Apply margin into the element
  */
@@ -1121,7 +1202,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * @description Apply padding into the element
  */
@@ -1174,7 +1255,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * @description Apply margin into the element
  */
@@ -1225,7 +1306,7 @@ var dragClass = 'wb-content-dragenter';
 var bodyElementSelector = 'div#wb-content-body';
 var placeholderElementSelector = 'div#wb-content-placeholder';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * 
  */
@@ -1413,7 +1494,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  */
@@ -1478,7 +1559,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc directive
@@ -1555,7 +1636,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * @ngdoc directive
  * @name donateMainApp.directive:wbContent
@@ -1794,12 +1875,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc directive
  * @name wbWidget
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description Widgets container
  * 
  * This is widget containers.
@@ -1863,12 +1944,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc directive
  * @name wbWidget
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description Widgets container
  * 
  * This is widget containers.
@@ -1914,12 +1995,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
     /**
      * @ngdoc directive
      * @name wbWidget
-     * @memberof ngMaterialWeburger
+     * @memberof am-wb-core
      * @description Widgets container
      *
      * This is widget containers.
@@ -1980,12 +2061,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc directive
  * @name wbUiSettingAudio
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
  * @description a setting section to select audio file.
@@ -2043,12 +2124,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc directive
  * @name wbUiSettingChoose
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description a setting section for choosing values.
  *
  */
@@ -2109,12 +2190,12 @@ angular.module('ngMaterialWeburger')
 /**
  * Created by mgh on 2/26/17.
  */
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
     /**
      * @ngdoc directive
      * @name wbUiSettingColor
-     * @memberof ngMaterialWeburger
+     * @memberof am-wb-core
      * @description a setting section to set color.
      *
      */
@@ -2155,12 +2236,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc directive
  * @name wbUiSettingData
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
  * @description a setting section to manage data.
@@ -2221,12 +2302,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
     /**
      * @ngdoc directive
      * @name wbUiSettingDropdown
-     * @memberof ngMaterialWeburger
+     * @memberof am-wb-core
      * @description a setting section for choosing values.
      *
      */
@@ -2268,12 +2349,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc directive
  * @name wbUiSettingColor
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @description a setting section to set color.
  *
@@ -2308,12 +2389,12 @@ angular.module('ngMaterialWeburger')
 /**
  * Created by mgh on 2/26/17.
  */
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
     /**
      * @ngdoc directive
      * @name wbUiSettingNumber
-     * @memberof ngMaterialWeburger
+     * @memberof am-wb-core
      * @description a setting section to set a number.
      *
      */
@@ -2333,12 +2414,12 @@ angular.module('ngMaterialWeburger')
 /**
  * Created by mgh on 2/26/17.
  */
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
     /**
      * @ngdoc directive
      * @name wbUiSettingOnOffSwitch
-     * @memberof ngMaterialWeburger
+     * @memberof am-wb-core
      * @description a setting section for on/off switch.
      *
      */
@@ -2379,12 +2460,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc directive
  * @name wbUiSettingVideo
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
  * @description a setting section to select audio file.
@@ -2442,12 +2523,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc directive
  * @name wbWidget
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description Widgets container
  * 
  * This is widget containers.
@@ -2559,7 +2640,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc filter
@@ -2598,7 +2679,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * Load default resources
@@ -2608,29 +2689,14 @@ angular.module('ngMaterialWeburger')
 		type : 'wb-url',
 		label : 'URL',
 		templateUrl : 'views/resources/wb-url.html',
-		controller : function($scope) {
-			$scope.$watch('value', function(value) {
-				$scope.$parent.setValue(value);
-			});
-		},
+		controller : 'WbResourceUrlCtrl',
 		tags : [ 'image', 'audio', 'video', 'file' ]
 	});
 	$resource.newPage({
 		type : 'wb-sheet',
 		label : 'Sheet',
 		templateUrl : 'views/resources/wb-sheet.html',
-		controller : function($scope) {
-			$scope.$watch('value', function(value) {
-				if (angular.isDefined(value)) {
-					$scope.$parent.setValue(value);
-				} else {
-					$scope.$parent.setValue({
-						'key' : 'value',
-						'values' : [ [ 1, 2 ], [ 1, 2 ] ]
-					});
-				}
-			}, true);
-		},
+		controller : 'WbResourceDataCtrl',
 		tags : [ 'data' ]
 	});
 });
@@ -2660,7 +2726,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * Load widgets
@@ -2741,7 +2807,7 @@ angular.module('ngMaterialWeburger')
 /*global tinymce:true */
 
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * Load default resources
@@ -2808,7 +2874,7 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * Load widgets
@@ -2863,12 +2929,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc service
  * @name $widget
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description Resource managment
  * 
  */
@@ -2978,12 +3044,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc service
  * @name $widget
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description مدیریت ویجت‌های سیستم
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
@@ -3215,12 +3281,12 @@ angular.module('ngMaterialWeburger')
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc service
  * @name $widget
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description Resource managment
  * 
  */
@@ -3263,12 +3329,12 @@ angular.module('ngMaterialWeburger')
 'use strict';
 
 angular
-.module('ngMaterialWeburger')
+.module('am-wb-core')
 
 /**
  * @ngdoc service
  * @name $wbUtil
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description کدهای پایه
  * 
  */
@@ -3325,12 +3391,12 @@ angular
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc service
  * @name $widget
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description مدیریت ویجت‌های سیستم
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
@@ -3523,7 +3589,7 @@ angular.module('ngMaterialWeburger')
 	this.compile = compile;
 });
 
-angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCache) {
+angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
@@ -3577,7 +3643,7 @@ angular.module('ngMaterialWeburger').run(['$templateCache', function($templateCa
 
 
   $templateCache.put('views/directives/wb-ui-setting-data.html',
-    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-data</wb-icon> </md-button> <md-input-container> <input ng-model=value.key> </md-input-container> </md-list-item>"
+    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>{{icon || 'wb-object-data'}}</wb-icon> </md-button> <md-input-container> <input ng-model=value.key> </md-input-container> </md-list-item>"
   );
 
 

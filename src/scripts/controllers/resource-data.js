@@ -23,24 +23,21 @@
  */
 'use strict';
 
+angular.module('am-wb-core')
 /**
- * @ngdoc module
- * @name ngDonate
- * @description
- *
+ * @ngdoc function
+ * @name WbResourceCtrl
+ * @description # WbResourceCtrl Controller of the am-wb-core
  */
-angular
-    .module('am-wb-core', [
-        'ngMessages',//
-        'ngAnimate',//
-        'ngAria',//
-        'ngMaterial',//
-        'pascalprecht.translate',//
-        'mdColorPicker',//
-        //'ngMaterialWysiwyg',
-        'ui.tinymce', //
-        'dndLists',//
-        'material.components.expansionPanels',//
-        'ngMdIcons', // Material icons
-        'ngHandsontable',
-    ]);
+.controller('WbResourceDataCtrl', function($scope) {
+	$scope.$watch('value', function(value) {
+		if (angular.isDefined(value)) {
+			$scope.$parent.setValue(value);
+		} else {
+			$scope.$parent.setValue({
+				'key' : 'value',
+				'values' : [ [ 1, 2 ], [ 1, 2 ] ]
+			});
+		}
+	}, true);
+});

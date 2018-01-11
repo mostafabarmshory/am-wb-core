@@ -23,7 +23,7 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc directive

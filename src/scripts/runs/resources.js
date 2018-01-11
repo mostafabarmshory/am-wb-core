@@ -23,7 +23,7 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * Load default resources
@@ -33,29 +33,14 @@ angular.module('ngMaterialWeburger')
 		type : 'wb-url',
 		label : 'URL',
 		templateUrl : 'views/resources/wb-url.html',
-		controller : function($scope) {
-			$scope.$watch('value', function(value) {
-				$scope.$parent.setValue(value);
-			});
-		},
+		controller : 'WbResourceUrlCtrl',
 		tags : [ 'image', 'audio', 'video', 'file' ]
 	});
 	$resource.newPage({
 		type : 'wb-sheet',
 		label : 'Sheet',
 		templateUrl : 'views/resources/wb-sheet.html',
-		controller : function($scope) {
-			$scope.$watch('value', function(value) {
-				if (angular.isDefined(value)) {
-					$scope.$parent.setValue(value);
-				} else {
-					$scope.$parent.setValue({
-						'key' : 'value',
-						'values' : [ [ 1, 2 ], [ 1, 2 ] ]
-					});
-				}
-			}, true);
-		},
+		controller : 'WbResourceDataCtrl',
 		tags : [ 'data' ]
 	});
 });

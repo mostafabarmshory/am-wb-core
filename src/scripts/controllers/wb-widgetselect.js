@@ -23,12 +23,12 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc controller
  * @name WbWidgetSelectCtrl
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description مدیریتی برای انتخاب ویجت‌های جدید
  * 
  * در این کنترل امکاناتی فراهم شده که کاربر بتواند از میان ویجت‌های موجودی یکی

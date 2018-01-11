@@ -3,7 +3,7 @@
 describe('Controller: WbDialogsCtrl', function() {
 
     // load the controller's module
-    beforeEach(module('ngMaterialWeburger'));
+    beforeEach(module('am-wb-core'));
 
     var WbDialogsCtrl;
     var scope;

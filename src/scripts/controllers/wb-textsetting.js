@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 'use strict';
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * Created by mgh on 8/10/2016.

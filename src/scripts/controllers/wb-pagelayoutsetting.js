@@ -29,7 +29,7 @@ angular
  * @date 2016
  * @author mgh
  */
-.module('ngMaterialWeburger')
+.module('am-wb-core')
 
 .controller('WbPageLayoutWbSettingsCtrl', function($scope, $settings) {
     var wbModel = $scope.wbModel;

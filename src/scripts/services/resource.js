@@ -23,12 +23,12 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc service
  * @name $widget
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description Resource managment
  * 
  */

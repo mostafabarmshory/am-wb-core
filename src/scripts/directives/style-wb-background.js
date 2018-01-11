@@ -23,10 +23,10 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * @ngdoc directive
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description Apply background into the element
  */
 .directive("wbBackground", function() {
