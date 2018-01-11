@@ -23,11 +23,11 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 /**
  * @ngdoc function
  * @name WbResourceCtrl
- * @description # WbResourceCtrl Controller of the ngMaterialWeburger
+ * @description # WbResourceCtrl Controller of the am-wb-core
  */
 .controller('WbResourceUrlCtrl', function($scope) {
 	$scope.$watch('value', function(value) {

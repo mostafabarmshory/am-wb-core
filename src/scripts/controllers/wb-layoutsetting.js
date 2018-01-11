@@ -23,12 +23,12 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc controller
  * @name WbLayoutWbSettingsCtrl
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description کنترلر یک عمل برای مدیریت و ویرایش آن ایجاد شده است. این کنترل
  *              در دیالوگ و یا نمایش‌های دیگر کاربرد دارد.
  * 

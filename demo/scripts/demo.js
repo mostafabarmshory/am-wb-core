@@ -29,7 +29,7 @@
  * @description
  * 
  */
-angular.module('ngMaterialWeburgerTest', [ 'ngMaterialWeburger' ])//
+angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 .controller('MyTestCtrl', function($scope, $http, $mdDialog) {
 	$http.get('examples/padding.json').then(function(res) {
 		$scope.model = res.data;

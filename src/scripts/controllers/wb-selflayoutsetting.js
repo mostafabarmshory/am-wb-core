@@ -27,7 +27,7 @@ angular
 /**
  * Created by mgh on 8/10/2016.
  */
-.module('ngMaterialWeburger')
+.module('am-wb-core')
 
 .controller('WbSelfLayoutWbSettingsCtrl', function($scope, $settings) {
     var scope = $scope;

@@ -24,12 +24,12 @@
 'use strict';
 
 angular
-.module('ngMaterialWeburger')
+.module('am-wb-core')
 
 /**
  * @ngdoc service
  * @name $wbUtil
- * @memberof ngMaterialWeburger
+ * @memberof am-wb-core
  * @description کدهای پایه
  * 
  */

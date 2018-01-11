@@ -23,12 +23,12 @@
  */
 'use strict';
 
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
     /**
      * @ngdoc directive
      * @name wbUiSettingDropdown
-     * @memberof ngMaterialWeburger
+     * @memberof am-wb-core
      * @description a setting section for choosing values.
      *
      */

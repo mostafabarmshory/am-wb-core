@@ -1,12 +1,12 @@
 /**
  * Created by mgh on 2/26/17.
  */
-angular.module('ngMaterialWeburger')
+angular.module('am-wb-core')
 
     /**
      * @ngdoc directive
      * @name wbUiSettingNumber
-     * @memberof ngMaterialWeburger
+     * @memberof am-wb-core
      * @description a setting section to set a number.
      *
      */

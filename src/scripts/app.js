@@ -30,7 +30,7 @@
  *
  */
 angular
-    .module('ngMaterialWeburger', [
+    .module('am-wb-core', [
         'ngMessages',//
         'ngAnimate',//
         'ngAria',//
