@@ -13,17 +13,17 @@ Margin and padding setting
     <!-- are all sides have equal margin? -->
     <wb-ui-setting-on-off-switch 
     	title="All Equal?" 
-    	icon="rounded_corner" 
+    	icon="filter_none" 
     	value="wbModel.style.margin.isUniform">
     </wb-ui-setting-on-off-switch>
 
     <!-- uniform margin as a text-box -->
-    <wb-ui-setting-number 
+    <md-input-container 
     	ng-show="wbModel.style.margin.isUniform" 
-    	title="Radius" 
-    	icon="rounded_corner"  
-    	value="wbModel.style.margin.uniform">
-    </wb-ui-setting-number>
+		class="md-icon-float md-block">
+		<label>Margin Value</label>
+		<input ng-model="wbModel.style.margin.uniform" type="text">
+	</md-input-container>
 
     <!-- uniform margin as a slider -->
     <wb-ui-setting-number 
@@ -34,31 +34,30 @@ Margin and padding setting
     </wb-ui-setting-number>
 
     <!-- 4 controls for left-right-bottom-up margins -->
-    <wb-ui-setting-number 
+    <md-input-container 
     	ng-show="!wbModel.style.margin.isUniform" 
-    	title="Left" 
-    	icon="rounded_corner"  
-    	value="wbModel.style.margin.left">
-    </wb-ui-setting-number>
-    <wb-ui-setting-number 
-    	ng-show="!wbModel.style.margin.isUniform"
-    	title="Right" 
-    	icon="rounded_corner"  
-    	value="wbModel.style.margin.right">
-    </wb-ui-setting-number>
-    <wb-ui-setting-number 
+		class="md-icon-float md-block">
+		<label>Left Margin</label>
+		<input ng-model="wbModel.style.margin.left" type="text">
+	</md-input-container>
+    <md-input-container 
     	ng-show="!wbModel.style.margin.isUniform" 
-    	title="Top" 
-    	icon="rounded_corner"  
-    	value="wbModel.style.margin.top">
-    </wb-ui-setting-number>
-    <wb-ui-setting-number 
+		class="md-icon-float md-block">
+		<label>Right Margin</label>
+		<input ng-model="wbModel.style.margin.right" type="text">
+	</md-input-container>
+    <md-input-container 
     	ng-show="!wbModel.style.margin.isUniform" 
-    	title="Bottom" 
-    	icon="rounded_corner"  
-    	value="wbModel.style.margin.bottom">
-    </wb-ui-setting-number>
-
+		class="md-icon-float md-block">
+		<label>Top Margin</label>
+		<input ng-model="wbModel.style.margin.top" type="text">
+	</md-input-container>
+    <md-input-container 
+    	ng-show="!wbModel.style.margin.isUniform" 
+		class="md-icon-float md-block">
+		<label>Bottom Margin</label>
+		<input ng-model="wbModel.style.margin.bottom" type="text">
+	</md-input-container>
 
     <!-- SECTION: Padding -->
     <!-- uniform padding -->
@@ -67,17 +66,17 @@ Margin and padding setting
     <!-- are all sides have equal padding? -->
     <wb-ui-setting-on-off-switch 
     	title="All Equal?" 
-    	icon="rounded_corner" 
+    	icon="settings_overscan" 
     	value="wbModel.style.padding.isUniform">
     </wb-ui-setting-on-off-switch>
 
     <!-- uniform padding as a text-box -->
-    <wb-ui-setting-number 
+    <md-input-container 
     	ng-show="wbModel.style.padding.isUniform" 
-    	title="Radius" 
-    	icon="rounded_corner"  
-    	value="wbModel.style.padding.uniform">
-    </wb-ui-setting-number>
+		class="md-icon-float md-block">
+		<label>Padding Value</label>
+		<input ng-model="wbModel.style.padding.uniform" type="text">
+	</md-input-container>
 
     <!-- uniform padding as a slider -->
     <wb-ui-setting-number 
@@ -88,28 +87,28 @@ Margin and padding setting
     </wb-ui-setting-number>
 
     <!-- 4 controls for left-right-bottom-up padding -->
-    <wb-ui-setting-number 
+    <md-input-container 
     	ng-show="!wbModel.style.padding.isUniform" 
-    	title="Left" 
-    	icon="rounded_corner"
-    	value="wbModel.style.padding.left">
-    </wb-ui-setting-number>
-    <wb-ui-setting-number 
+		class="md-icon-float md-block">
+		<label>Left Padding</label>
+		<input ng-model="wbModel.style.padding.left" type="text">
+	</md-input-container>
+    <md-input-container 
     	ng-show="!wbModel.style.padding.isUniform" 
-    	title="Right" 
-    	icon="rounded_corner"  
-    	value="wbModel.style.padding.right">
-    </wb-ui-setting-number>
-    <wb-ui-setting-number 
+		class="md-icon-float md-block">
+		<label>Right Padding</label>
+		<input ng-model="wbModel.style.padding.right" type="text">
+	</md-input-container>
+    <md-input-container 
     	ng-show="!wbModel.style.padding.isUniform" 
-    	title="Top" 
-    	icon="rounded_corner" 
-    	value="wbModel.style.padding.top">
-    </wb-ui-setting-number>
-    <wb-ui-setting-number 
+		class="md-icon-float md-block">
+		<label>Top Padding</label>
+		<input ng-model="wbModel.style.padding.top" type="text">
+	</md-input-container>
+    <md-input-container 
     	ng-show="!wbModel.style.padding.isUniform" 
-    	title="Bottom" 
-    	icon="rounded_corner" 
-    	value="wbModel.style.padding.bottom">
-    </wb-ui-setting-number>
+		class="md-icon-float md-block">
+		<label>Bottom Padding</label>
+		<input ng-model="wbModel.style.padding.bottom" type="text">
+	</md-input-container>
 </md-list>
