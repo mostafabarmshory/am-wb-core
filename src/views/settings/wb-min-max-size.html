@@ -8,19 +8,33 @@ Created by mgh.
     <md-subheader class="md-no-sticky">Min</md-subheader>
 
     <!-- min width -->
-    <wb-ui-setting-number title="Min Width" icon="face" value="wbModel.style.minWidth"></wb-ui-setting-number>
-
+	<md-input-container 
+		class="md-icon-float md-block">
+		<label>Min Width</label>
+		<input ng-model="wbModel.style.minWidth" type="text">
+	</md-input-container>
     <!-- min height -->
-    <wb-ui-setting-number title="Min Height" icon="face" value="wbModel.style.minHeight"></wb-ui-setting-number>
-
+	<md-input-container 
+		class="md-icon-float md-block">
+		<label>Min Height</label>
+		<input ng-model="wbModel.style.minHeight" type="text">
+	</md-input-container>
 
     <!-- SECTION: Max -->
     <md-subheader class="md-no-sticky">Max</md-subheader>
 
     <!-- max width -->
-    <wb-ui-setting-number title="Max Width" icon="face" value="wbModel.style.maxWidth"></wb-ui-setting-number>
+	<md-input-container 
+		class="md-icon-float md-block">
+		<label>Max Width</label>
+		<input ng-model="wbModel.style.maxWidth" type="text">
+	</md-input-container>
 
     <!-- max height -->
-    <wb-ui-setting-number title="Max Height" icon="face" value="wbModel.style.maxHeight"></wb-ui-setting-number>
+	<md-input-container 
+		class="md-icon-float md-block">
+		<label>Max Height</label>
+		<input ng-model="wbModel.style.maxHeight" type="text">
+	</md-input-container>
 
 </md-list>

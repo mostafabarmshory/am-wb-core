@@ -117,6 +117,9 @@ angular.module('am-wb-core')
 		// fix widget data
 		widget.data = widget.data || {style:{}};
 		widget.data.type = widget.type;
+		if(widget.name){
+			widget.data.name = widget.name; 
+		}
 		
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);

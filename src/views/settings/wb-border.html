@@ -48,11 +48,11 @@ Created by mgh.
 	
 	<!-- border style for all situation -->
 	<wb-ui-setting-dropdown ng-show="wbModel.style.borderStyleColorWidth.uniform"
-							title="Border" icon="style" items="styles" value="wbModel.style.borderStyle.all"></wb-ui-setting-dropdown>
+							title="Border" icon="line_style" items="styles" value="wbModel.style.borderStyle.all"></wb-ui-setting-dropdown>
 	
 	<!-- border thickness for all situation -->
 	<wb-ui-setting-number ng-show="wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'"
-						  title="Thickness" icon="thickness"  value="wbModel.style.borderWidth.all"></wb-ui-setting-number>
+						  title="Thickness" icon="line_weight"  value="wbModel.style.borderWidth.all"></wb-ui-setting-number>
 
 	<!-- border color for all situation -->
 	<wb-ui-setting-color ng-show="wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'"
@@ -65,7 +65,7 @@ Created by mgh.
 						  items="styles" value="wbModel.style.borderStyle.left"></wb-ui-setting-dropdown>
 
 	<wb-ui-setting-number ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'"
-						  title="Thickness" icon="thickness"  value="wbModel.style.borderWidth.left"></wb-ui-setting-number>
+						  title="Thickness" icon="line_weight"  value="wbModel.style.borderWidth.left"></wb-ui-setting-number>
 
 	<wb-ui-setting-color ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'"
 						  title="Color" icon="format_color_fill"  value="wbModel.style.borderColor.left"></wb-ui-setting-color>
@@ -77,7 +77,7 @@ Created by mgh.
 							items="styles" value="wbModel.style.borderStyle.right"></wb-ui-setting-dropdown>
 
 	<wb-ui-setting-number ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'"
-						  title="Thickness" icon="thickness"  value="wbModel.style.borderWidth.right"></wb-ui-setting-number>
+						  title="Thickness" icon="line_weight"  value="wbModel.style.borderWidth.right"></wb-ui-setting-number>
 
 	<wb-ui-setting-color ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'"
 						 title="Color" icon="format_color_fill"  value="wbModel.style.borderColor.right"></wb-ui-setting-color>
@@ -90,7 +90,7 @@ Created by mgh.
 							items="styles" value="wbModel.style.borderStyle.top"></wb-ui-setting-dropdown>
 
 	<wb-ui-setting-number ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'"
-						  title="Thickness" icon="thickness"  value="wbModel.style.borderWidth.top"></wb-ui-setting-number>
+						  title="Thickness" icon="line_weight"  value="wbModel.style.borderWidth.top"></wb-ui-setting-number>
 
 	<wb-ui-setting-color ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'"
 						 title="Color" icon="format_color_fill"  value="wbModel.style.borderColor.top"></wb-ui-setting-color>
@@ -103,7 +103,7 @@ Created by mgh.
 							items="styles" value="wbModel.style.borderStyle.bottom"></wb-ui-setting-dropdown>
 
 	<wb-ui-setting-number ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'"
-						  title="Thickness" icon="thickness"  value="wbModel.style.borderWidth.bottom"></wb-ui-setting-number>
+						  title="Thickness" icon="line_weight"  value="wbModel.style.borderWidth.bottom"></wb-ui-setting-number>
 
 	<wb-ui-setting-color ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'"
 						 title="Color" icon="format_color_fill"  value="wbModel.style.borderColor.bottom"></wb-ui-setting-color>

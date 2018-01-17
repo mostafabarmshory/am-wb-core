@@ -14,6 +14,20 @@
          class="wb-widget-header">
 		<span translate> {{wbModel.name}}</span> 
 		<span flex></span>
+		<!-- 
+			Extra Actions:
+			Widgets can contributes customized action with extraActions in
+			scope.
+		 -->
+		<md-button 
+			class="md-icon-button md-mini" 
+			ng-repeat="item in extraActions"
+			ng-hide="item.hide()"
+			ng-disabled="item.disable()"
+			ng-click="item.action()"> 
+			<wb-icon class="mde-icon-mini">{{item.icon}}</wb-icon>
+		</md-button>
+		<md-divider></md-divider>
 		<md-button 
 			ng-if="add"
 			ng-click="add()" 
@@ -32,18 +46,6 @@
             ng-mouseenter="ctrl.hoveringDelBtn=true"
             ng-mouseleave="ctrl.hoveringDelBtn=false"> 
 			<wb-icon class="mde-icon-mini">delete</wb-icon>
-		</md-button>
-		<md-divider></md-divider>
-		<!-- 
-			Extra Actions:
-			Widgets can contributes customized action with extraActions in
-			scope.
-		 -->
-		<md-button 
-			class="md-icon-button md-mini" 
-			ng-repeat="item in extraActions"
-			ng-click="item.action()"> 
-			<wb-icon class="mde-icon-mini">{{item.icon}}</wb-icon>
 		</md-button>
     </div>
 	
