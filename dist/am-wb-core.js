@@ -358,6 +358,58 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 /**
+ * @ngdoc controller
+ * @name WbTemplatesSheetCtrl
+ * @description # WbTemplatesSheetCtrl manages templates in sheet
+ * 
+ */
+.controller('WbTemplatesSheetCtrl', function($scope, $mdBottomSheet, $wbUi) {
+
+	function loadTemplate(themplate) {
+		$mdBottomSheet.hide(themplate);
+	}
+	
+	function hideTemplates($event){
+		$mdBottomSheet.hide();
+	}
+
+	// load templates
+	$wbUi.templates()
+	.then(function(page){
+		$scope.templates = page.items;
+	});
+	
+	$scope.hideTemplates = hideTemplates;
+	$scope.loadTemplate = loadTemplate;
+
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+/**
  * @ngdoc function
  * @name WbBorderSettingCtrl
  * @description # WbBorderSettingCtrl Controller of the am-wb-core
@@ -1650,7 +1702,7 @@ angular.module('am-wb-core')
  * Widget data is bind into the wbModel automatically.
  * 
  */
-.directive('wbContent', function($compile, $widget, $controller, $settings, $q) {
+.directive('wbContent', function($compile, $widget, $controller, $settings, $q, $mdBottomSheet, $wbUi) {
 	var dragClass = 'wb-content-dragenter';
 	var bodyElementSelector = 'div#wb-content-body';
 	var placeholderElementSelector = 'div#wb-content-placeholder';
@@ -1816,6 +1868,7 @@ angular.module('am-wb-core')
 		 * Watch the model for modification.
 		 */
 		scope.$watch('wbModel', function() {
+			scope.wbModelLoadeding = true;
 			if (!scope.wbModel) {
 				// XXX: maso, 1395: هنوز مدل تعیین نشده
 				return;
@@ -1824,8 +1877,39 @@ angular.module('am-wb-core')
 				scope.wbModel.contents = [];
 			}
 			scope.wbModel.type = 'Page';
-			reloadView();
+			reloadView().then(function(){
+				scope.wbModelLoadeding = false;
+			});
 		});
+		
+		// Watch editable
+		scope.$watch('wbEditable', function(editable){
+			if(scope.wbEditable && !scope.wbModel.contents.length){
+				loadTemplate();
+			}
+		});
+		
+		/**
+		 * Load a template
+		 */
+		function loadTemplate(){
+			scope.alert = '';
+		    return $mdBottomSheet.show({
+		      templateUrl: 'views/sheets/wb-themplates.html',
+		      controller: 'WbTemplatesSheetCtrl',
+		      clickOutsideToClose: false
+		    }).then(function(template) {
+		    	return $wbUi.loadTemplate(template);
+		    })
+		    .then(function(newModel){
+		    	scope.wbModel = newModel;
+		    })
+//		    .catch(function(error) {
+//		      // User clicked outside or hit escape
+//		    });
+
+		}
+		scope.loadTemplate = loadTemplate;
 
 		scope.settingAnchor = settingAnchor;
 		scope.removeChild = removeChild;
@@ -1843,7 +1927,8 @@ angular.module('am-wb-core')
 		replace : true,
 		scope : {
 			wbModel : '=?',
-			wbEditable : '=?'
+			wbEditable : '=?',
+			wbModelLoaded : '='
 		},
 		link : postLink
 	};
@@ -3292,8 +3377,10 @@ angular.module('am-wb-core')
  * @description Resource managment
  * 
  */
-.service('$wbUi', function($mdDialog) {
-    
+.service('$wbUi', function($mdDialog, $q, $http) {
+
+	var _templates = [];
+
 	/**
 	 * Opens dialog
 	 * @returns
@@ -3301,8 +3388,48 @@ angular.module('am-wb-core')
 	function openDialog(dialogData){
 		return $mdDialog.show(dialogData);
 	}
+
+	/**
+	 * Get list of registered templates
+	 * 
+	 * @memberof $wbUi
+	 */
+	function templates(){
+		return $q.when({
+			items: _templates
+		});
+	}
 	
+	/**
+	 * Adds new template
+	 * 
+	 * @memberof $wbUi
+	 */
+	function newTemplate(template){
+		_templates.push(template);
+		return this;
+	}
+	
+	/**
+	 * Load a template
+	 * 
+	 * @memberof $wbUi
+	 */
+	function loadTemplate(template){
+		// TODO: maso, 2018: check if templage is a function
+		if(angular.isDefined(template.template)){
+			return $q.when(JSON.parse(template.template));
+		}
+		return $http.get(template.templateUrl)
+		.then(function(res){
+			return res.data;
+		});
+	}
+
 	this.openDialog = openDialog;
+	this.templates = templates;
+	this.newTemplate = newTemplate;
+	this.loadTemplate = loadTemplate;
 });
 
 /* 
@@ -3608,12 +3735,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-group.html',
-    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=remove() ng-class=\"{'wb-panel wb-widget-edit': wbEditable}\" name={{wbModel.name}}>  <div ng-show=wbEditable class=wb-panel-header layout=row> <span translate> {{wbModel.name}}</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip>Left to right direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip>Right to left direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <md-tooltip>Clone current group</md-tooltip> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-tooltip>Load settings</md-tooltip> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=remove()> <md-tooltip>Remove current group</md-tooltip> <wb-icon class=wb-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=wb-panel-overlay> </div>  <div class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div>  </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=remove() ng-class=\"{'wb-panel wb-widget-edit': wbEditable}\" name={{wbModel.name}}>  <div ng-if=wbEditable class=wb-panel-header layout=row> <span translate> {{wbModel.name}}</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Left to right direction</span> </md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Right to left direction</span> </md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Clone current group</span> </md-tooltip> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Load settings</span> </md-tooltip> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=remove()> <md-tooltip> <span translate>Remove current group</span> </md-tooltip> <wb-icon class=wb-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-if=wbEditable&&hoveringDelBtn class=wb-panel-overlay> </div>  <div id=wb-content-placeholder class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div> </div> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-page.html',
-    "<div class=wb-page dnd-disable-if=!wbEditable ng-class=\"{'wb-page-edit': wbEditable}\">  <div ng-if=wbEditable class=wb-panel-header layout=row> <span translate> Content</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip>Left to right direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip>Right to left direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-show=hoveringDelBtn class=wb-panel-overlay> </div>  <div class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div>  </div> </div>"
+    "<div class=wb-page dnd-disable-if=!wbEditable ng-class=\"{'wb-page-edit': wbEditable}\">  <div ng-if=wbEditable class=wb-panel-header layout=row> <span translate> Content</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip>Left to right direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip>Right to left direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button ng-click=loadTemplate() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>photo_album</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-if=hoveringDelBtn class=wb-panel-overlay> </div>  <div class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div> </div> </div>"
   );
 
 
@@ -3749,6 +3876,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
     "\t\t image_advtab: false\n" +
     "\t}\" ng-model=wbModel.text flex>\n" +
     "</textarea>"
+  );
+
+
+  $templateCache.put('views/sheets/wb-themplates.html',
+    "<md-bottom-sheet class=\"md-list md-has-header\" md-colors=\"{backgroundColor: 'background-900'}\"> <div style=\"padding: 16px\">  <div layout=row layout-align=\"start center\" style=\"padding: 0px 8px; margin: 0px\"> <span translate>Start a new page</span> <span flex></span> <span translate>Template gallery</span> <md-divider></md-divider> <md-menu> <md-button aria-label=\"Open them interactions menu\" class=md-icon-button ng-click=$mdMenu.open($event)> <wb-icon>more_vert </wb-icon></md-button> <md-menu-content width=4 md-colors=\"{backgroundColor: 'background'}\"> <md-menu-item> <md-button ng-click=hideTemplates($event)> <span translate>Hide templates</span> </md-button> </md-menu-item> </md-menu-content> </md-menu> </div>  <md-content layout=row md-colors=\"{backgroundColor: 'background-900'}\"> <div layout=column ng-repeat=\"template in templates\" ng-click=loadTemplate(template) layout-padding style=\"cursor: pointer\"> <img width=215px height=152px ng-src={{template.thumbnail}} style=\"border-bottom-width: 1px; border: solid\"> {{template.name}} </div> </md-content> </div> </md-bottom-sheet>"
   );
 
 
