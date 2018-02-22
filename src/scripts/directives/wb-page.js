@@ -37,7 +37,7 @@ angular.module('am-wb-core')
  * Widget data is bind into the wbModel automatically.
  * 
  */
-.directive('wbContent', function($compile, $widget, $controller, $settings, $q) {
+.directive('wbContent', function($compile, $widget, $controller, $settings, $q, $mdBottomSheet, $wbUi) {
 	var dragClass = 'wb-content-dragenter';
 	var bodyElementSelector = 'div#wb-content-body';
 	var placeholderElementSelector = 'div#wb-content-placeholder';
@@ -203,6 +203,7 @@ angular.module('am-wb-core')
 		 * Watch the model for modification.
 		 */
 		scope.$watch('wbModel', function() {
+			scope.wbModelLoadeding = true;
 			if (!scope.wbModel) {
 				// XXX: maso, 1395: هنوز مدل تعیین نشده
 				return;
@@ -211,8 +212,39 @@ angular.module('am-wb-core')
 				scope.wbModel.contents = [];
 			}
 			scope.wbModel.type = 'Page';
-			reloadView();
+			reloadView().then(function(){
+				scope.wbModelLoadeding = false;
+			});
 		});
+		
+		// Watch editable
+		scope.$watch('wbEditable', function(editable){
+			if(scope.wbEditable && !scope.wbModel.contents.length){
+				loadTemplate();
+			}
+		});
+		
+		/**
+		 * Load a template
+		 */
+		function loadTemplate(){
+			scope.alert = '';
+		    return $mdBottomSheet.show({
+		      templateUrl: 'views/sheets/wb-themplates.html',
+		      controller: 'WbTemplatesSheetCtrl',
+		      clickOutsideToClose: false
+		    }).then(function(template) {
+		    	return $wbUi.loadTemplate(template);
+		    })
+		    .then(function(newModel){
+		    	scope.wbModel = newModel;
+		    })
+//		    .catch(function(error) {
+//		      // User clicked outside or hit escape
+//		    });
+
+		}
+		scope.loadTemplate = loadTemplate;
 
 		scope.settingAnchor = settingAnchor;
 		scope.removeChild = removeChild;
@@ -230,7 +262,8 @@ angular.module('am-wb-core')
 		replace : true,
 		scope : {
 			wbModel : '=?',
-			wbEditable : '=?'
+			wbEditable : '=?',
+			wbModelLoaded : '='
 		},
 		link : postLink
 	};

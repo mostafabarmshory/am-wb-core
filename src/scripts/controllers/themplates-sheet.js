@@ -24,65 +24,29 @@
 'use strict';
 
 angular.module('am-wb-core')
-
 /**
- * @ngdoc service
- * @name $widget
- * @memberof am-wb-core
- * @description Resource managment
+ * @ngdoc controller
+ * @name WbTemplatesSheetCtrl
+ * @description # WbTemplatesSheetCtrl manages templates in sheet
  * 
  */
-.service('$wbUi', function($mdDialog, $q, $http) {
+.controller('WbTemplatesSheetCtrl', function($scope, $mdBottomSheet, $wbUi) {
 
-	var _templates = [];
-
-	/**
-	 * Opens dialog
-	 * @returns
-	 */
-	function openDialog(dialogData){
-		return $mdDialog.show(dialogData);
-	}
-
-	/**
-	 * Get list of registered templates
-	 * 
-	 * @memberof $wbUi
-	 */
-	function templates(){
-		return $q.when({
-			items: _templates
-		});
+	function loadTemplate(themplate) {
+		$mdBottomSheet.hide(themplate);
 	}
 	
-	/**
-	 * Adds new template
-	 * 
-	 * @memberof $wbUi
-	 */
-	function newTemplate(template){
-		_templates.push(template);
-		return this;
-	}
-	
-	/**
-	 * Load a template
-	 * 
-	 * @memberof $wbUi
-	 */
-	function loadTemplate(template){
-		// TODO: maso, 2018: check if templage is a function
-		if(angular.isDefined(template.template)){
-			return $q.when(JSON.parse(template.template));
-		}
-		return $http.get(template.templateUrl)
-		.then(function(res){
-			return res.data;
-		});
+	function hideTemplates($event){
+		$mdBottomSheet.hide();
 	}
 
-	this.openDialog = openDialog;
-	this.templates = templates;
-	this.newTemplate = newTemplate;
-	this.loadTemplate = loadTemplate;
+	// load templates
+	$wbUi.templates()
+	.then(function(page){
+		$scope.templates = page.items;
+	});
+	
+	$scope.hideTemplates = hideTemplates;
+	$scope.loadTemplate = loadTemplate;
+
 });

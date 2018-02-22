@@ -31,14 +31,45 @@
  */
 angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 .controller('MyTestCtrl', function($scope, $http, $mdDialog) {
-	$http.get('examples/padding.json').then(function(res) {
+	$http.get('examples/empty.json')
+	.then(function(res) {
 		$scope.model = res.data;
 	});
 })
 
-////تنظیم ایکون
-//.config(function($mdIconProvider, $mdThemingProvider) {
-//$mdIconProvider//
-//.fontSet('social', 'mono-social-icons')//
-//.fontSet('material', 'material-icons');//
-//})
+.config(function($mdThemingProvider) {
+	  $mdThemingProvider.theme('default')
+	  	.backgroundPalette('blue')
+	  	.warnPalette('red')
+	    .primaryPalette('pink')
+	    .accentPalette('orange');
+})
+
+
+/**
+ * Load widgets
+ */
+.run(function($wbUi) {
+	// Page
+	$wbUi
+	.newTemplate({
+		name : 'Blank page',
+		thumbnail : 'images/html.svg',
+		template: '{}',
+		priority: 1000
+	})
+	.newTemplate({
+		name : 'Test template2',
+		thumbnail : 'images/brandaction.svg',
+		templateUrl: 'resources/templates/test-en.json',
+		language: 'en',
+		priority: 100
+	})
+	.newTemplate({
+		name : 'Test template3',
+		thumbnail : 'images/brandaction.svg',
+		templateUrl: 'resources/templates/test-fa.json',
+		language: 'fa',
+		priority: 100
+	});
+});

@@ -6,23 +6,30 @@
 	ng-class="{'wb-panel wb-widget-edit': wbEditable}"
 	name="{{wbModel.name}}">
     <!-- a header is added through edit-mode -->
-    <div ng-show="wbEditable" class="wb-panel-header" layout="row">
+    <div 
+    	ng-if="wbEditable" 
+    	class="wb-panel-header" 
+    	layout="row">
         <span translate> {{wbModel.name}}</span>
         <span flex></span>
         
-		<!--         Direction setting -->
+		<!-- Direction setting -->
         <md-button
         	ng-disabled="wbModel.direction!='rtl'"
             ng-click="wbModel.direction='ltr'"
             class="md-icon-button md-mini">
-  			<md-tooltip>Left to right direction</md-tooltip>
+  			<md-tooltip>
+  				<span translate>Left to right direction</span>
+  			</md-tooltip>
             <wb-icon class="wb-icon-mini">format_textdirection_l_to_r</wb-icon>
         </md-button>
         <md-button
         	ng-disabled="wbModel.direction=='rtl'"
             ng-click="wbModel.direction='rtl'"
             class="md-icon-button md-mini">
-  			<md-tooltip>Right to left direction</md-tooltip>
+  			<md-tooltip>
+  				<span translate>Right to left direction</span>
+  			</md-tooltip>
             <wb-icon class="wb-icon-mini">format_textdirection_r_to_l</wb-icon>
         </md-button>
         <md-divider></md-divider>
@@ -30,13 +37,17 @@
 		<md-button 
 			ng-click="clone()"
 			 class="md-icon-button md-mini">
-  			<md-tooltip>Clone current group</md-tooltip>
+  			<md-tooltip>
+  				<span translate>Clone current group</span>
+  			</md-tooltip>
 			<wb-icon class="mde-icon-mini">content_copy</wb-icon> 
 		</md-button>
         <md-button
             ng-click="settings()"
             class="md-icon-button md-mini">
-  			<md-tooltip>Load settings</md-tooltip>
+  			<md-tooltip>
+  				<span translate>Load settings</span>
+  			</md-tooltip>
             <wb-icon class="wb-icon-mini">settings</wb-icon>
         </md-button>
         <md-button
@@ -44,7 +55,9 @@
             ng-mouseenter="hoveringDelBtn=true"
             ng-mouseleave="hoveringDelBtn=false"
             ng-click="remove()">
-  			<md-tooltip>Remove current group</md-tooltip>
+  			<md-tooltip>
+  				<span translate>Remove current group</span>
+  			</md-tooltip>
             <wb-icon class="wb-icon-mini">delete</wb-icon>
         </md-button>
     </div>
@@ -54,11 +67,13 @@
     	class="wb-panel-body" 
     	id="wb-content-body">
         <div 
-	        ng-show="hoveringDelBtn" 
+	        ng-if="wbEditable&&hoveringDelBtn" 
 	        class="wb-panel-overlay">
 	    </div>
         <!-- Children are added in this part -->
-        <div class="wb-panel-container"
+        <div 
+            id="wb-content-placeholder"
+        	class="wb-panel-container"
         	dir="{{wbModel.direction}}"
             wb-layout="wbModel.style"
 			wb-margin="wbModel.style"
@@ -66,12 +81,10 @@
 			wb-size="wbModel.style"
 			wb-background="wbModel.style"
 			wb-border="wbModel.style"
-            id="wb-content-placeholder"
 			dnd-external-sources="true"
             dnd-list="wbModel.contents"
     		dnd-allowed-types="['wb.widget']"
     		dnd-drop="dropCallback(event, index, item, external, type)">
         </div>
-        <!-- <div ng-include src="'views/partials/wb-edit-hint-panel.html'"></div> -->
     </div>
 </div>

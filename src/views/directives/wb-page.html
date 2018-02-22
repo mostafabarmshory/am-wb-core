@@ -32,6 +32,11 @@
                 class="md-icon-button md-mini">
             <wb-icon class="wb-icon-mini">settings</wb-icon>
         </md-button>
+        <md-button
+                ng-click="loadTemplate()"
+                class="md-icon-button md-mini">
+            <wb-icon class="wb-icon-mini">photo_album</wb-icon>
+        </md-button>
     </div>
 
     <!-- body section (in non-edit mode, this area just shown -->
@@ -39,7 +44,7 @@
     	class="wb-panel-body" 
     	id="wb-content-body">
         <div 
-	        ng-show="hoveringDelBtn" 
+	        ng-if="hoveringDelBtn" 
 	        class="wb-panel-overlay">
 	    </div>
         <!-- تمام بچه‌ها در این قسمت اضافه می‌شن. -->
@@ -57,6 +62,5 @@
     		dnd-allowed-types="['wb.widget']"
     		dnd-drop="dropCallback(event, index, item, external, type)">
         </div>
-        <!-- <div ng-include src="'views/partials/wb-edit-hint-panel.html'"></div> -->
     </div>
 </div>
