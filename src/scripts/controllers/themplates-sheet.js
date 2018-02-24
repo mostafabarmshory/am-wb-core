@@ -23,53 +23,30 @@
  */
 'use strict';
 
+angular.module('am-wb-core')
 /**
- * @ngdoc module
- * @name ngDonate
- * @description
+ * @ngdoc controller
+ * @name WbTemplatesSheetCtrl
+ * @description # WbTemplatesSheetCtrl manages templates in sheet
  * 
  */
-angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
-.controller('MyTestCtrl', function($scope, $http, $mdDialog) {
-	$http.get('examples/empty.json')
-	.then(function(res) {
-		$scope.model = res.data;
+.controller('WbTemplatesSheetCtrl', function($scope, $mdBottomSheet, $wbUi) {
+
+	function loadTemplate(themplate) {
+		$mdBottomSheet.hide(themplate);
+	}
+	
+	function hideTemplates($event){
+		$mdBottomSheet.hide();
+	}
+
+	// load templates
+	$wbUi.templates()
+	.then(function(page){
+		$scope.templates = page.items;
 	});
-})
+	
+	$scope.hideTemplates = hideTemplates;
+	$scope.loadTemplate = loadTemplate;
 
-.config(function($mdThemingProvider) {
-	  $mdThemingProvider.theme('default')
-	  	.backgroundPalette('blue')
-	  	.warnPalette('red')
-	    .primaryPalette('pink')
-	    .accentPalette('orange');
-})
-
-
-/**
- * Load widgets
- */
-.run(function($wbUi) {
-	// Page
-	$wbUi
-	.newTemplate({
-		name : 'Blank page',
-		thumbnail : 'images/html.svg',
-		template: '{}',
-		priority: 1000
-	})
-	.newTemplate({
-		name : 'Test template2',
-		thumbnail : 'images/brandaction.svg',
-		templateUrl: 'resources/templates/test-en.json',
-		language: 'en',
-		priority: 100
-	})
-	.newTemplate({
-		name : 'Test template3',
-		thumbnail : 'images/brandaction.svg',
-		templateUrl: 'resources/templates/test-fa.json',
-		language: 'fa',
-		priority: 100
-	});
 });
