@@ -3416,7 +3416,7 @@ angular.module('am-wb-core')
 	 * @memberof $wbUi
 	 */
 	function loadTemplate(template){
-		// TODO: maso, 2018: check if templage is a function
+		// TODO: maso, 2018: check if template is a function
 		if(angular.isDefined(template.template)){
 			return $q.when(JSON.parse(template.template));
 		}
