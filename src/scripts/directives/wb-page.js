@@ -219,7 +219,7 @@ angular.module('am-wb-core')
 		
 		// Watch editable
 		scope.$watch('wbEditable', function(editable){
-			if(scope.wbEditable && !scope.wbModel.contents.length){
+			if(scope.wbEditable && (!scope.wbModel || !scope.wbModel.contents.length)){
 				loadTemplate();
 			}
 		});
