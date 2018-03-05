@@ -30,7 +30,7 @@ angular.module('am-wb-core')
 .directive('wbIcon', function($interpolate) {
     return {
 	restrict : 'E',
-	template : '<ng-md-icon icon="{{iconValue}}"></ng-md-icon>',
+	template : '<ng-md-icon style="height: auto;width: auto;" icon="{{iconValue}}"></ng-md-icon>',
 	replace : true,
 	transclude : true,
 	link : postLink
@@ -52,6 +52,7 @@ angular.module('am-wb-core')
 	if (attrName) {
 	    attr.$observe('wbIconName', iconChange);
 	}
+
 
 	/*
 	 * change icon
