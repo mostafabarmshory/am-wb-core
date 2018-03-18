@@ -99,7 +99,7 @@ angular.module('am-wb-core')
 			locals : {
 				'pages' : pages,
 				'style' : option.style || {
-					title: 'Resource : ' + tag
+					title: tag
 				},
 				'data' : option.data
 			}

@@ -4,7 +4,7 @@
 
 	<md-toolbar>
 		<div class="md-toolbar-tools">
-			<h2 translate>{{style.title}}</h2>
+			<h2 translate>{{style.title | translate}}</h2>
 			<span flex></span>
 			<md-button
 				class="md-icon-button"
@@ -27,7 +27,7 @@
 				md-selected="pageIndex">
 				<md-tab 
 					ng-repeat="page in pages"
-					label="{{page.label}}">
+					label="{{page.label | translate}}">
 				</md-tab>
 			</md-tabs>
 			<div 
