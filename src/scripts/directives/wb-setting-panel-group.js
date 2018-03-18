@@ -41,28 +41,16 @@ angular.module('am-wb-core')
 	 * Init settings
 	 */
 	function postLink(scope, element, attrs, ctrl, transclude) {
-		/**
-		 * change current page of setting group
-		 */
-		function goto(page){
-			scope.page = page;
-		}
-		
 		$widget.widgets()//
 		.then(function(ws){
 			scope.widgets = ws.items;
 		});
-		
-		// init scope
-		scope.goto = goto;
-		
-
-		scope.page = 'setting';
 	}
 	
 	return {
 		restrict : 'E',
 		templateUrl: 'views/directives/wb-setting-panel-group.html',
+		scope : {},
 		link : postLink
 	};
 });

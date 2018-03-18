@@ -115,11 +115,9 @@ angular.module('am-wb-core')
 			return;
 		}
 		// fix widget data
-		widget.data = widget.data || {style:{}};
-		widget.data.type = widget.type;
-		if(widget.name){
-			widget.data.name = widget.name; 
-		}
+		widget.model = widget.model || {style:{}};
+		widget.model.type = widget.type;
+		widget.model.name = widget.model.name || widget.title; 
 		
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);
@@ -210,8 +208,7 @@ angular.module('am-wb-core')
 	 * @returns
 	 */
 	function widgetData(widget){
-		var data = angular.copy(widget.data);
-		return data;
+		return angular.copy(widget.model);
 	}
 
 	// تعیین سرویس‌ها

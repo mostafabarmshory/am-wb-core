@@ -26,48 +26,44 @@
 angular.module('am-wb-core')
 
 /**
- * Load widgets
+ * @ngdoc directive
+ * @name wb-widgets-explorer
+ * @description Widgets explorers
+ * 
+ * This is widgets explorer list.
+ * 
  */
-.run(function($widget) {
-	
-	// Widget 
+.directive('wbWidgetsExplorer', function() {
+	/*
+	 * link function
+	 */
+	function postLink(scope, element, attrs, ctrls) {
+		var ngModel = ctrls[0];
+		var widgets = null;
+		
+		
+		function _load(){
+			if(!widgets){
+				scope.widgets = [];
+				return;
+			}
+			scope.widgets = widgets;
+			// TODO: maso, 2018: clear configs
+		}
+		
+		// Load models
+		ngModel.$render = function(){
+			widgets = ngModel.$modelValue;
+			_load();
+		}
+	}
 
-//	type : 'http-get',
-//	title : 'GET',
-//	description : 'Requests a representation of the specified resource',
-//	groups: ['http'],
-//	icon : 'wb-widget-group',
-//	iconUrl: '/link/to/image',
-//	model:{},
-	
-	
-	// Page
-	$widget.newWidget({
-		// widget description
-		type: 'Group',
-		title: 'Panel',	
-		description : 'Panel contains list of widgets.',
-		icon : 'wb-widget-group',
-		groups: [],
-		model: {},
-		// functional properties
-		template : '<wb-panel></wb-panel>',
-		help : 'http://dpq.co.ir/more-information-link',
-	});
-	// HTML text
-	$widget.newWidget({
-		// widget description
-		type: 'HtmlText',
-		title : 'HTML text',
-		description : 'An HTML block text.',
-		icon : 'wb-widget-html',
-		groups: [],
-		model : {
-			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-		},
-		// functional properties
-		templateUrl : 'views/widgets/wb-html.html',
-		help : 'http://dpq.co.ir',
-		setting:['text'],
-	});
+	return {
+		templateUrl : 'views/directives/wb-widgets-explorer.html',
+		restrict : 'E',
+		replace : true,
+		scope: {},
+		require: ['ngModel'],
+		link : postLink,
+	};
 });
