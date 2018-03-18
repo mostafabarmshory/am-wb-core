@@ -3093,7 +3093,7 @@ angular.module('am-wb-core')
 			locals : {
 				'pages' : pages,
 				'style' : option.style || {
-					title: 'Resource : ' + tag
+					title: tag
 				},
 				'data' : option.data
 			}
@@ -3726,7 +3726,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>{{style.title}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <div class=md-dialog-content layout=column> <md-tabs md-selected=pageIndex> <md-tab ng-repeat=\"page in pages\" label={{page.label}}> </md-tab> </md-tabs> <div id=wb-select-resource-children flex> </div> </div> </md-dialog-content> </md-dialog>"
+    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>{{style.title | translate}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <div class=md-dialog-content layout=column> <md-tabs md-selected=pageIndex> <md-tab ng-repeat=\"page in pages\" label=\"{{page.label | translate}}\"> </md-tab> </md-tabs> <div id=wb-select-resource-children flex> </div> </div> </md-dialog-content> </md-dialog>"
   );
 
 
