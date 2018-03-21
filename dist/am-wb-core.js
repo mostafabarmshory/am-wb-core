@@ -1497,6 +1497,7 @@ angular.module('am-wb-core')
 		// Set element ID after compile
 		element.attr('id', scope.objectId(scope.wbModel));
 		scope.wbModel.name = scope.wbModel.name || 'Panel';
+		scope.getAllowedTypes = $widget.widgetsKey;
 
 		scope.removeChild = removeChild;
 		scope.remove = remove;
@@ -1916,10 +1917,7 @@ angular.module('am-wb-core')
 
 		}
 		
-		scope.getAllowedTypes = function (){
-			// XXX: maso, 2018: getting all types;
-			return ['Group', 'HtmlText'];
-		}
+		scope.getAllowedTypes = $widget.widgetsKey;
 		scope.loadTemplate = loadTemplate;
 
 		scope.settingAnchor = settingAnchor;
@@ -3190,10 +3188,11 @@ angular.module('am-wb-core')
 //	groups: ['http'],
 //	icon : 'wb-widget-group',
 //	iconUrl: '/link/to/image',
+//	groups: ['basic'],
 //	model:{},
 	
 	
-	// Page
+	// Group
 	$widget.newWidget({
 		// widget description
 		type: 'Group',
@@ -3205,6 +3204,7 @@ angular.module('am-wb-core')
 		// functional properties
 		template : '<wb-panel></wb-panel>',
 		help : 'http://dpq.co.ir/more-information-link',
+		helpId: 'wb-widget-group'
 	});
 	// HTML text
 	$widget.newWidget({
@@ -3217,9 +3217,11 @@ angular.module('am-wb-core')
 		model : {
 			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
 		},
+		// help id
+		help : 'http://dpq.co.ir',
+		helpId: 'wb-widget-html',
 		// functional properties
 		templateUrl : 'views/widgets/wb-html.html',
-		help : 'http://dpq.co.ir',
 		setting:['text'],
 	});
 });
@@ -3826,11 +3828,7 @@ angular.module('am-wb-core')
 	 * @returns
 	 */
 	function widget(model) {
-		var deferred = $q.defer();
-		$timeout(function() {
-			deferred.resolve(_widget(model));
-		}, 1);
-		return deferred.promise;
+		return $q.when(_widget(model));
 	}
 
 	/**
@@ -3839,17 +3837,23 @@ angular.module('am-wb-core')
 	 * @returns
 	 */
 	function widgets() {
-		var deferred = $q.defer();
-		$timeout(function() {
-			var widgets = {};
-			// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-			widgets.items = [];
-			elementKey.forEach(function(type) {
-				widgets.items.push(contentElementAsso[type]);
-			});
-			deferred.resolve(widgets);
-		}, 1);
-		return deferred.promise;
+		var widgets = {};
+		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+		widgets.items = [];
+		elementKey.forEach(function(type) {
+			widgets.items.push(contentElementAsso[type]);
+		});
+		return $q.when(widgets);
+	}
+	
+	/**
+	 * List of all registered widgets
+	 * 
+	 * @memberof $widget
+	 * @returns keys {array} list of all keys
+	 */
+	function widgetsKey(){
+		return elementKey;
 	}
 
 	/**
@@ -3865,7 +3869,7 @@ angular.module('am-wb-core')
 	 */
 	function newWidget(widget) {
 		if (widget.type in contentElementAsso) {
-			// XXX: maso, throw exception
+			// XXX: maso, 2017: throw exception
 			return;
 		}
 		// fix widget data
@@ -3996,7 +4000,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-group.html',
-    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=remove() ng-class=\"{'wb-panel wb-widget-edit': wbEditable}\" name={{wbModel.name}}>  <div ng-if=wbEditable class=wb-panel-header layout=row> <span translate> {{wbModel.name}}</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Left to right direction</span> </md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Right to left direction</span> </md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Clone current group</span> </md-tooltip> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Load settings</span> </md-tooltip> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=remove()> <md-tooltip> <span translate>Remove current group</span> </md-tooltip> <wb-icon class=wb-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-if=wbEditable&&hoveringDelBtn class=wb-panel-overlay> </div>  <div id=wb-content-placeholder class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div> </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=remove() ng-class=\"{'wb-panel wb-widget-edit': wbEditable}\" name={{wbModel.name}}>  <div ng-if=wbEditable class=wb-panel-header layout=row> <span translate> {{wbModel.name}}</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Left to right direction</span> </md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Right to left direction</span> </md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Clone current group</span> </md-tooltip> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Load settings</span> </md-tooltip> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=remove()> <md-tooltip> <span translate>Remove current group</span> </md-tooltip> <wb-icon class=wb-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-if=wbEditable&&hoveringDelBtn class=wb-panel-overlay> </div>  <div id=wb-content-placeholder class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=getAllowedTypes() dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div> </div> </div>"
   );
 
 

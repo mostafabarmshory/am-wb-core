@@ -38,10 +38,11 @@ angular.module('am-wb-core')
 //	groups: ['http'],
 //	icon : 'wb-widget-group',
 //	iconUrl: '/link/to/image',
+//	groups: ['basic'],
 //	model:{},
 	
 	
-	// Page
+	// Group
 	$widget.newWidget({
 		// widget description
 		type: 'Group',
@@ -53,6 +54,7 @@ angular.module('am-wb-core')
 		// functional properties
 		template : '<wb-panel></wb-panel>',
 		help : 'http://dpq.co.ir/more-information-link',
+		helpId: 'wb-widget-group'
 	});
 	// HTML text
 	$widget.newWidget({
@@ -65,9 +67,11 @@ angular.module('am-wb-core')
 		model : {
 			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
 		},
+		// help id
+		help : 'http://dpq.co.ir',
+		helpId: 'wb-widget-html',
 		// functional properties
 		templateUrl : 'views/widgets/wb-html.html',
-		help : 'http://dpq.co.ir',
 		setting:['text'],
 	});
 });

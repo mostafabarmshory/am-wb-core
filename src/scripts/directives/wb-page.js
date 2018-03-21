@@ -245,10 +245,7 @@ angular.module('am-wb-core')
 
 		}
 		
-		scope.getAllowedTypes = function (){
-			// XXX: maso, 2018: getting all types;
-			return ['Group', 'HtmlText'];
-		}
+		scope.getAllowedTypes = $widget.widgetsKey;
 		scope.loadTemplate = loadTemplate;
 
 		scope.settingAnchor = settingAnchor;

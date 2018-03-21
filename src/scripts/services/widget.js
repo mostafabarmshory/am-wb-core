@@ -96,11 +96,7 @@ angular.module('am-wb-core')
 	 * @returns
 	 */
 	function widget(model) {
-		var deferred = $q.defer();
-		$timeout(function() {
-			deferred.resolve(_widget(model));
-		}, 1);
-		return deferred.promise;
+		return $q.when(_widget(model));
 	}
 
 	/**
@@ -109,17 +105,23 @@ angular.module('am-wb-core')
 	 * @returns
 	 */
 	function widgets() {
-		var deferred = $q.defer();
-		$timeout(function() {
-			var widgets = {};
-			// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-			widgets.items = [];
-			elementKey.forEach(function(type) {
-				widgets.items.push(contentElementAsso[type]);
-			});
-			deferred.resolve(widgets);
-		}, 1);
-		return deferred.promise;
+		var widgets = {};
+		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+		widgets.items = [];
+		elementKey.forEach(function(type) {
+			widgets.items.push(contentElementAsso[type]);
+		});
+		return $q.when(widgets);
+	}
+	
+	/**
+	 * List of all registered widgets
+	 * 
+	 * @memberof $widget
+	 * @returns keys {array} list of all keys
+	 */
+	function widgetsKey(){
+		return elementKey;
 	}
 
 	/**
@@ -135,7 +137,7 @@ angular.module('am-wb-core')
 	 */
 	function newWidget(widget) {
 		if (widget.type in contentElementAsso) {
-			// XXX: maso, throw exception
+			// XXX: maso, 2017: throw exception
 			return;
 		}
 		// fix widget data

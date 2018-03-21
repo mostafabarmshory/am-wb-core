@@ -164,6 +164,7 @@ angular.module('am-wb-core')
 		// Set element ID after compile
 		element.attr('id', scope.objectId(scope.wbModel));
 		scope.wbModel.name = scope.wbModel.name || 'Panel';
+		scope.getAllowedTypes = $widget.widgetsKey;
 
 		scope.removeChild = removeChild;
 		scope.remove = remove;
