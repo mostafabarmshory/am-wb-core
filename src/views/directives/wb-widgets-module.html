@@ -1,16 +1,17 @@
 <div
 	layout="column"
 	layout-gt-sm="row"
+	layout-align="space-around"
 	layout-wrap
 	layout-padding>
 	<div 
-		class="md-whiteframe-1dp"
+		class="wb-widgets-module md-whiteframe-1dp"
 		ng-repeat="widget in widgets"
 		dnd-draggable="widget.model || {}"
 		dnd-type="widget.type"
 		dnd-effect-allowed="copy"
 		flex="none"
-		flex-gt-sm="50">
+		flex-gt-sm="45">
 		<div 
 			layout="row"
 			layout-padding>

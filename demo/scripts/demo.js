@@ -49,7 +49,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 /**
  * Load widgets
  */
-.run(function($wbUi) {
+.run(function($wbUi, $widget) {
 	// Page
 	$wbUi
 	.newTemplate({
@@ -72,4 +72,24 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 		language: 'fa',
 		priority: 100
 	});
+	
+
+	for(var i = 0; i < 10; i++){
+		// HTML text
+		$widget.newWidget({
+			// widget description
+			type: 'HtmlText-'+i,
+			title : 'HTML text',
+			description : 'An HTML block which is used to test widgets explorer. Do not use in real usage	.',
+			icon : 'wb-widget-html',
+			groups: ['test', 'test'+i],
+			model : {
+				text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+			},
+			// functional properties
+			templateUrl : 'views/widgets/wb-html.html',
+			help : 'http://dpq.co.ir',
+			setting:['text'],
+		});
+	}
 });
