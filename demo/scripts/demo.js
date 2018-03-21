@@ -49,7 +49,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 /**
  * Load widgets
  */
-.run(function($wbUi, $widget) {
+.run(function($wbUi, $widget, $window) {
 	// Page
 	$wbUi
 	.newTemplate({
@@ -90,6 +90,17 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 			templateUrl : 'views/widgets/wb-html.html',
 			help : 'http://dpq.co.ir',
 			setting:['text'],
+			helpId: 'test'+i
 		});
+	}
+	
+	/**
+	 * Show help
+	 * 
+	 * By adding a function into the $window service, you can display help of
+	 * an widget
+	 */
+	$window.openHelp = function (object){
+		alert('Adding openHelp to $window to display help:'+object.helpId);
 	}
 });

@@ -93,6 +93,8 @@ angular.module('am-wb-core')
 		'wb-vertical-arrows': '<path d="M18.17,12L15,8.83L16.41,7.41L21,12L16.41,16.58L15,15.17L18.17,12M5.83,12L9,15.17L7.59,16.59L3,12L7.59,7.42L9,8.83L5.83,12Z" />',
 		'wb-direction':'<path d="M13,6V11H18V7.75L22.25,12L18,16.25V13H13V18H16.25L12,22.25L7.75,18H11V13H6V16.25L1.75,12L6,7.75V11H11V6H7.75L12,1.75L16.25,6H13Z" />',
 
+		'list_tree': '<path d="m 3.0063556,9.3749998 2.3368645,-1.125 -2.3432204,-1.25 z M 11,13 H 21 V 11 H 11 Z m 0,4 H 21 V 15 H 11 Z M 6.9999997,6.9999998 v 2 H 21 v -2 z" />',
+		
 		'wb-object-video': ngMdIconServiceProvider.getShape('video_library'),
 		'wb-object-audio':  ngMdIconServiceProvider.getShape('audiotrack'),
 		'wb-object-data': ngMdIconServiceProvider.getShape('storage'),
@@ -1551,39 +1553,42 @@ angular.module('am-wb-core')
 /**
  */
 .directive('wbIcon', function($interpolate) {
-    return {
-	restrict : 'E',
-	template : '<ng-md-icon style="height: auto;width: auto;" icon="{{iconValue}}"></ng-md-icon>',
-	replace : true,
-	transclude : true,
-	link : postLink
-    };
+	return {
+		restrict : 'E',
+		template : '<ng-md-icon style="height: auto;width: auto;" icon="{{iconValue}}"></ng-md-icon>',
+		replace : true,
+		transclude : true,
+		link : postLink
+	};
 
-    function postLink(scope, element, attr, ctrl, transclude) {
-	// Looking for icon
-	var attrName = attr.$normalize(attr.$attr.wbIconName || '');
-	var contentValue = null;
+	function postLink(scope, element, attr, ctrl, transclude) {
+		// Looking for icon
+		var attrName = attr.$normalize(attr.$attr.wbIconName || '');
+		var contentValue = null;
 
-	transclude(scope, function(clone) {
-	    var text = clone.text();
-	    if (text && text.trim()) {
-		contentValue = $interpolate(text.trim())(scope);
-		scope.iconValue = contentValue;
-	    }
-	});
+		transclude(scope, function(clone) {
+			var text = clone.text();
+			if (text && text.trim()) {
+				scope.$watch(function(){
+					return $interpolate(text.trim())(scope);
+				}, function(value){
+					scope.iconValue = value;
+				});
+			}
+		});
 
-	if (attrName) {
-	    attr.$observe('wbIconName', iconChange);
+		if (attrName) {
+			attr.$observe('wbIconName', iconChange);
+		}
+
+
+		/*
+		 * change icon
+		 */
+		function iconChange() {
+			scope.iconValue = scope.contentValue || attr.wbIconName || '';
+		}
 	}
-
-
-	/*
-	 * change icon
-	 */
-	function iconChange() {
-	    scope.iconValue = scope.contentValue || attr.wbIconName || '';
-	}
-    }
 
 });
 
@@ -1910,6 +1915,11 @@ angular.module('am-wb-core')
 //		    });
 
 		}
+		
+		scope.getAllowedTypes = function (){
+			// XXX: maso, 2018: getting all types;
+			return ['Group', 'HtmlText'];
+		}
 		scope.loadTemplate = loadTemplate;
 
 		scope.settingAnchor = settingAnchor;
@@ -1979,28 +1989,16 @@ angular.module('am-wb-core')
 	 * Init settings
 	 */
 	function postLink(scope, element, attrs, ctrl, transclude) {
-		/**
-		 * change current page of setting group
-		 */
-		function goto(page){
-			scope.page = page;
-		}
-		
 		$widget.widgets()//
 		.then(function(ws){
 			scope.widgets = ws.items;
 		});
-		
-		// init scope
-		scope.goto = goto;
-		
-
-		scope.page = 'setting';
 	}
 	
 	return {
 		restrict : 'E',
 		templateUrl: 'views/directives/wb-setting-panel-group.html',
+		scope : {},
 		link : postLink
 	};
 });
@@ -2729,6 +2727,223 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
+ * @ngdoc directive
+ * @name wb-widgets-explorer
+ * @description Widgets explorers
+ * 
+ * This is widgets explorer list.
+ * 
+ */
+.directive('wbWidgetsExplorer', function($widget) {
+	/*
+	 * link function
+	 */
+	function postLink(scope, element, attrs, ctrls) {
+		var ngModel = ctrls[0];
+		var widgets = null;
+		
+		/*
+		 * Filter widgets width the query
+		 */
+		function _loadQuery(query, widgets){
+			if(query) {
+				var q = query.trim().toLowerCase();
+				return widgets.filter(function(w){
+					return w.title.toLowerCase().indexOf(q) > -1 || w.description.indexOf(q) > -1;
+				});
+			}
+			return widgets;
+		}
+		
+		/*
+		 * Load widgets in groups
+		 */
+		function _loadGroups(widgets){
+			var groups = [];
+			var tmp = {};
+			for(var i = 0; i < widgets.length; i++){
+				var gl = widgets[i].groups || [];
+				for(var j = 0; j < gl.length; j++){
+					var gid = gl[j];
+					if(!angular.isDefined(tmp[gid])){
+						tmp[gid] = angular.copy($widget.group(gid));
+						tmp[gid].widgets = [];
+						groups.push(tmp[gid]);
+					}
+					tmp[gid].widgets.push(widgets[i]);
+				}
+			}
+			return groups;
+		}
+		
+		function _runQuery(query, $event){
+			scope.widgets = _loadQuery(scope.query, widgets);
+			scope.groups = _loadGroups(scope.widgets);
+		}
+		
+		function _load(){
+			if(!widgets){
+				scope.widgets = [];
+				return;
+			}
+			// maso, 2018: clear configs
+			scope.query = '';
+			scope.widgets = _loadQuery(scope.query, widgets);
+			scope.groups = _loadGroups(scope.widgets);
+		}
+		
+		// Load models
+		ngModel.$render = function(){
+			widgets = ngModel.$modelValue;
+			_load();
+		}
+		
+		scope.runQuery = _runQuery;
+	}
+
+	return {
+		templateUrl : 'views/directives/wb-widgets-explorer.html',
+		restrict : 'E',
+		replace : true,
+		scope: {},
+		require: ['ngModel'],
+		link : postLink,
+	};
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc directive
+ * @name wb-widgets-list
+ * @description Widgets explorers
+ * 
+ * This is widgets explorer list.
+ * 
+ */
+.directive('wbWidgetsList', function($window) {
+
+	return {
+		templateUrl : 'views/directives/wb-widgets-list.html',
+		restrict : 'E',
+		replace : true,
+		scope: {
+			widgets: '<'
+		},
+		controller: function($scope){
+			if(angular.isFunction($window.openHelp)){
+				$scope.openHelp = function(widget, $event){
+					$window.openHelp(widget, $event);
+				}
+			}
+		}
+	};
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc directive
+ * @name wb-widgets-module
+ * @description Widgets explorers
+ * 
+ * This is widgets explorer list.
+ * 
+ */
+.directive('wbWidgetsModule', function($window) {
+
+	return {
+		templateUrl : 'views/directives/wb-widgets-module.html',
+		restrict : 'E',
+		replace : true,
+		scope: {
+			widgets: '<'
+		},
+		controller: function($scope){
+			if(angular.isFunction($window.openHelp)){
+				$scope.openHelp = function(widget, $event){
+					$window.openHelp(widget, $event);
+				}
+			}
+		}
+	};
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
  * @ngdoc filter
  * @name wbunsafe
  * @function
@@ -2966,29 +3181,46 @@ angular.module('am-wb-core')
  * Load widgets
  */
 .run(function($widget) {
+	
+	// Widget 
+
+//	type : 'http-get',
+//	title : 'GET',
+//	description : 'Requests a representation of the specified resource',
+//	groups: ['http'],
+//	icon : 'wb-widget-group',
+//	iconUrl: '/link/to/image',
+//	model:{},
+	
+	
 	// Page
 	$widget.newWidget({
+		// widget description
 		type: 'Group',
-		template : '<wb-panel></wb-panel>',
-		label : 'Panel',
-		name : 'Panel',
+		title: 'Panel',	
 		description : 'Panel contains list of widgets.',
 		icon : 'wb-widget-group',
+		groups: ['basic'],
+		model: {},
+		// functional properties
+		template : '<wb-panel></wb-panel>',
 		help : 'http://dpq.co.ir/more-information-link',
 	});
 	// HTML text
 	$widget.newWidget({
+		// widget description
 		type: 'HtmlText',
-		templateUrl : 'views/widgets/wb-html.html',
-		label : 'HTML text',
-		name : 'HTML text',
+		title : 'HTML text',
 		description : 'An HTML block text.',
 		icon : 'wb-widget-html',
+		groups: ['basic'],
+		model : {
+			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+		},
+		// functional properties
+		templateUrl : 'views/widgets/wb-html.html',
 		help : 'http://dpq.co.ir',
 		setting:['text'],
-		data : {
-			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-		}
 	});
 });
 
@@ -3535,8 +3767,10 @@ angular.module('am-wb-core')
 		$q, $sce, $templateRequest, $compile, $controller, $rootScope,
 		$timeout, $mdDialog) {
 
+	var _group_repo = [];
 	var contentElementAsso = [];
 	var elementKey = [];
+	
 	var notFoundWidget = {
 			templateUrl : 'views/widgets/wb-notfound.html',
 			label : 'Not found',
@@ -3548,6 +3782,28 @@ angular.module('am-wb-core')
 			description : 'Panel contains list of widgets.',
 			image : 'images/wb/content.svg',
 	};
+	
+	function _newGroup(group){
+		var g = _group(group.id);
+		angular.extend(g, group);
+	}
+	
+	function _group(groupId){
+		for(var i = 0; i < _group_repo.length; i++){
+			if(_group_repo[i].id == groupId){
+				return _group_repo[i];
+			}
+		}
+		var group = {
+				id: groupId
+		};
+		_group_repo.push(group);
+		return group;
+	}
+	
+	function _groups(){
+		return _group_repo;
+	}
 
 	function _widget(model){
 		if (model.type in contentElementAsso) {
@@ -3613,11 +3869,9 @@ angular.module('am-wb-core')
 			return;
 		}
 		// fix widget data
-		widget.data = widget.data || {style:{}};
-		widget.data.type = widget.type;
-		if(widget.name){
-			widget.data.name = widget.name; 
-		}
+		widget.model = widget.model || {style:{}};
+		widget.model.type = widget.type;
+		widget.model.name = widget.model.name || widget.title; 
 		
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);
@@ -3708,15 +3962,21 @@ angular.module('am-wb-core')
 	 * @returns
 	 */
 	function widgetData(widget){
-		var data = angular.copy(widget.data);
-		return data;
+		return angular.copy(widget.model);
 	}
 
-	// تعیین سرویس‌ها
+	// widgets
 	this.newWidget = newWidget;
 	this.widget = widget;
 	this.widgets = widgets;
 	this.widgetData = widgetData;
+	
+	// widget groups
+	this.group = _group;
+	this.groups = _groups;
+	this.newGroup = _newGroup;
+	
+	// utils
 	this.select = select;
 	this.getTemplateFor = getTemplateFor;
 	this.compile = compile;
@@ -3741,12 +4001,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-page.html',
-    "<div class=wb-page dnd-disable-if=!wbEditable ng-class=\"{'wb-page-edit': wbEditable}\">  <div ng-if=wbEditable class=wb-panel-header layout=row> <span translate> Content</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip>Left to right direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip>Right to left direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button ng-click=loadTemplate() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>photo_album</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-if=hoveringDelBtn class=wb-panel-overlay> </div>  <div class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style id=wb-content-placeholder dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=\"['wb.widget']\" dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div> </div> </div>"
+    "<div class=wb-page dnd-disable-if=!wbEditable ng-class=\"{'wb-page-edit': wbEditable}\">  <div ng-if=wbEditable class=wb-panel-header layout=row> <span translate> Content</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip>Left to right direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip>Right to left direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button ng-click=loadTemplate() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>photo_album</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-if=hoveringDelBtn class=wb-panel-overlay> </div>  <div id=wb-content-placeholder class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=getAllowedTypes() dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div> </div> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-setting-panel-group.html',
-    "<div layout=column> <md-nav-bar md-selected-nav-item=currentNavItem nav-bar-aria-label=\"navigation links\"> <md-nav-item md-nav-click=\"goto('setting')\" name=setting>Settings</md-nav-item> <md-nav-item md-nav-click=\"goto('widget')\" name=widget>Widgets</md-nav-item> </md-nav-bar> <div ng-show=\"page=='widget'\" layout=column> <md-list flex> <md-list-item class=md-2-line ng-repeat=\"widget in widgets\" dnd-draggable=widget.data dnd-type=\"'wb.widget'\" dnd-effect-allowed=copy> <wb-icon wb-icon-name={{widget.icon}}></wb-icon> <div class=md-list-item-text layout=column> <h3>{{ widget.label }}</h3> <p>{{ widget.description }}</p> </div> </md-list-item> </md-list> </div> <div ng-show=\"page=='setting'\" id=WB-SETTING-PANEL>  </div> </div>"
+    "<div layout=column> <md-nav-bar ng-init=\"page='widget'\" md-selected-nav-item=page nav-bar-aria-label=\"navigation links\"> <md-nav-item md-nav-click=\"goto('widget')\" name=widget>Widgets</md-nav-item> <md-nav-item md-nav-click=\"goto('setting')\" name=setting>Settings</md-nav-item> </md-nav-bar> <wb-widgets-explorer ng-show=\"page=='widget'\" ng-model=widgets> </wb-widgets-explorer> <div ng-show=\"page=='setting'\" id=WB-SETTING-PANEL>  </div> </div>"
   );
 
 
@@ -3807,6 +4067,21 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-widget.html',
     "<div dnd-disable-if=!wbEditable dnd-selected=selected() dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=movedCallback() class=wb-widget ng-class=\"{'wb-widget-edit': wbEditable}\" layout=column name={{wbModel.name}}>  <div ng-show=isSelected() layout=row class=wb-widget-header> <span translate> {{wbModel.name}}</span> <span flex></span>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-hide=item.hide() ng-disabled=item.disable() ng-click=item.action()> <wb-icon class=mde-icon-mini>{{item.icon}}</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=remove() ng-show=remove ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <wb-icon class=mde-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-widget-body wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-margin=wbModel.style> <div class=wb-widget-overlay ng-show=ctrl.hoveringDelBtn> </div> <wb-transclude class=wb-widget-container wb-layout=wbModel.style> </wb-transclude> </div> </div>"
+  );
+
+
+  $templateCache.put('views/directives/wb-widgets-explorer.html',
+    "<div layout=column>  <md-toolbar ng-show=!(showSearch||showSort||showState)> <div class=md-toolbar-tools> <h3 flex translate>Widgets</h3> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=\"_view_list=!_view_list\" class=md-icon-button aria-label=\"View mode\"> <wb-icon>{{_view_list ? 'view_module' : 'view_list'}}</wb-icon> </md-button> <md-button ng-click=\"_tree_mode=!_tree_mode\" class=md-icon-button aria-label=\"Tree mode\"> <wb-icon>{{_tree_mode? 'list' : 'list_tree'}}</wb-icon> </md-button> </div> </md-toolbar>  <md-toolbar class=md-hue-1 ng-show=showSearch> <div class=md-toolbar-tools> <md-button class=md-icon-button ng-click=\"showSearch = !showSearch\" aria-label=Back> <wb-icon>arrow_back</wb-icon> </md-button> <md-input-container md-theme=input flex> <label>&nbsp;</label> <input ng-model=query ng-keyup=\"runQuery(query, $event)\"> </md-input-container> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> </div> </md-toolbar> <md-expansion-panel-group ng-if=_tree_mode> <md-expansion-panel ng-repeat=\"group in groups\"> <md-expansion-panel-collapsed> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-header> <md-expansion-panel-content> <wb-widgets-list ng-if=_view_list widgets=group.widgets> </wb-widgets-list> <wb-widgets-module ng-if=!_view_list widgets=group.widgets> </wb-widgets-module> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </md-expansion-panel-group> <wb-widgets-list ng-if=!_tree_mode&amp;&amp;_view_list widgets=widgets> </wb-widgets-list> <wb-widgets-module ng-if=!_tree_mode&amp;&amp;!_view_list widgets=widgets> </wb-widgets-module> </div>"
+  );
+
+
+  $templateCache.put('views/directives/wb-widgets-list.html',
+    "<md-list flex> <md-list-item class=md-2-line ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy> <wb-icon wb-icon-name={{widget.icon}}></wb-icon> <div class=md-list-item-text layout=column> <h3>{{ widget.title }}</h3> <p>{{ widget.description }}</p> </div> <wb-icon ng-if=openHelp class=md-secondary ng-click=openHelp($event) aria-label=\"Show help\">help</wb-icon> </md-list-item> </md-list>"
+  );
+
+
+  $templateCache.put('views/directives/wb-widgets-module.html',
+    "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap layout-padding> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy flex=none flex-gt-sm=45> <div layout=row layout-padding> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <h3 flex translate>{{ widget.title }}</h3> </div> <p translate>{{ widget.description }}</p> <div ng-if=openHelp layout=row> <span flex></span> <md-button class=md-icon-button ng-click=\"openHelp(widget, $event)\"> <wb-icon>help</wb-icon> </md-button> </div> </div> </div>"
   );
 
 

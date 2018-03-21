@@ -33,7 +33,7 @@ angular.module('am-wb-core')
  * This is widgets explorer list.
  * 
  */
-.directive('wbWidgetsModule', function() {
+.directive('wbWidgetsModule', function($window) {
 
 	return {
 		templateUrl : 'views/directives/wb-widgets-module.html',
@@ -41,6 +41,13 @@ angular.module('am-wb-core')
 		replace : true,
 		scope: {
 			widgets: '<'
+		},
+		controller: function($scope){
+			if(angular.isFunction($window.openHelp)){
+				$scope.openHelp = function(widget, $event){
+					$window.openHelp(widget, $event);
+				}
+			}
 		}
 	};
 });

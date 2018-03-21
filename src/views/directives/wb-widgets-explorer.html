@@ -64,11 +64,11 @@
 		<md-expansion-panel
 			ng-repeat="group in groups">
 			<md-expansion-panel-collapsed>
-				{{group.title || group.id}}
+				<span translate>{{group.title || group.id}}</span>
 			</md-expansion-panel-collapsed>
 			<md-expansion-panel-expanded>
 				<md-expansion-panel-header>
-					{{group.title || group.id}}
+					<span translate>{{group.title || group.id}}</span>
 				</md-expansion-panel-header>
 				<md-expansion-panel-content>
 					<wb-widgets-list 

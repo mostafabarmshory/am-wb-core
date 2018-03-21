@@ -1,4 +1,4 @@
-<md-list 
+ <md-list 
 	flex>
 	<md-list-item 
 		class="md-2-line" 
@@ -11,5 +11,10 @@
 			<h3>{{ widget.title }}</h3>
 			<p>{{ widget.description }}</p>
 		</div>
+		<wb-icon 
+			ng-if="openHelp"
+			class="md-secondary" 
+			ng-click="openHelp($event)" 
+			aria-label="Show help">help</wb-icon>
 	</md-list-item>
 </md-list>
