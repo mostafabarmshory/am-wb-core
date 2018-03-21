@@ -48,7 +48,7 @@ angular.module('am-wb-core')
 		title: 'Panel',	
 		description : 'Panel contains list of widgets.',
 		icon : 'wb-widget-group',
-		groups: [],
+		groups: ['basic'],
 		model: {},
 		// functional properties
 		template : '<wb-panel></wb-panel>',
@@ -61,7 +61,7 @@ angular.module('am-wb-core')
 		title : 'HTML text',
 		description : 'An HTML block text.',
 		icon : 'wb-widget-html',
-		groups: [],
+		groups: ['basic'],
 		model : {
 			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
 		},

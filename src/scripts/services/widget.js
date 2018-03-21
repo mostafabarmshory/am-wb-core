@@ -37,8 +37,10 @@ angular.module('am-wb-core')
 		$q, $sce, $templateRequest, $compile, $controller, $rootScope,
 		$timeout, $mdDialog) {
 
+	var _group_repo = [];
 	var contentElementAsso = [];
 	var elementKey = [];
+	
 	var notFoundWidget = {
 			templateUrl : 'views/widgets/wb-notfound.html',
 			label : 'Not found',
@@ -50,6 +52,28 @@ angular.module('am-wb-core')
 			description : 'Panel contains list of widgets.',
 			image : 'images/wb/content.svg',
 	};
+	
+	function _newGroup(group){
+		var g = _group(group.id);
+		angular.extend(g, group);
+	}
+	
+	function _group(groupId){
+		for(var i = 0; i < _group_repo.length; i++){
+			if(_group_repo[i].id == groupId){
+				return _group_repo[i];
+			}
+		}
+		var group = {
+				id: groupId
+		};
+		_group_repo.push(group);
+		return group;
+	}
+	
+	function _groups(){
+		return _group_repo;
+	}
 
 	function _widget(model){
 		if (model.type in contentElementAsso) {
@@ -211,11 +235,18 @@ angular.module('am-wb-core')
 		return angular.copy(widget.model);
 	}
 
-	// تعیین سرویس‌ها
+	// widgets
 	this.newWidget = newWidget;
 	this.widget = widget;
 	this.widgets = widgets;
 	this.widgetData = widgetData;
+	
+	// widget groups
+	this.group = _group;
+	this.groups = _groups;
+	this.newGroup = _newGroup;
+	
+	// utils
 	this.select = select;
 	this.getTemplateFor = getTemplateFor;
 	this.compile = compile;

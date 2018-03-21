@@ -23,53 +23,24 @@
  */
 'use strict';
 
+angular.module('am-wb-core')
+
 /**
- * @ngdoc module
- * @name ngDonate
- * @description
+ * @ngdoc directive
+ * @name wb-widgets-list
+ * @description Widgets explorers
+ * 
+ * This is widgets explorer list.
  * 
  */
-angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
-.controller('MyTestCtrl', function($scope, $http, $mdDialog) {
-	$http.get('examples/empty.json')
-	.then(function(res) {
-		$scope.model = res.data;
-	});
-})
+.directive('wbWidgetsList', function() {
 
-.config(function($mdThemingProvider) {
-//	  $mdThemingProvider.theme('default')
-//	  	.backgroundPalette('blue')
-//	  	.warnPalette('red')
-//	    .primaryPalette('pink')
-//	    .accentPalette('orange');
-})
-
-
-/**
- * Load widgets
- */
-.run(function($wbUi) {
-	// Page
-	$wbUi
-	.newTemplate({
-		name : 'Blank page',
-		thumbnail : 'images/html.svg',
-		template: '{}',
-		priority: 1000
-	})
-	.newTemplate({
-		name : 'Test template2',
-		thumbnail : 'images/brandaction.svg',
-		templateUrl: 'resources/templates/test-en.json',
-		language: 'en',
-		priority: 100
-	})
-	.newTemplate({
-		name : 'Test template3',
-		thumbnail : 'images/brandaction.svg',
-		templateUrl: 'resources/templates/test-fa.json',
-		language: 'fa',
-		priority: 100
-	});
+	return {
+		templateUrl : 'views/directives/wb-widgets-list.html',
+		restrict : 'E',
+		replace : true,
+		scope: {
+			widgets: '<'
+		}
+	};
 });

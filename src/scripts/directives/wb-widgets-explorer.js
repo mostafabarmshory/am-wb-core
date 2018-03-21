@@ -33,7 +33,7 @@ angular.module('am-wb-core')
  * This is widgets explorer list.
  * 
  */
-.directive('wbWidgetsExplorer', function() {
+.directive('wbWidgetsExplorer', function($widget) {
 	/*
 	 * link function
 	 */
@@ -41,14 +41,54 @@ angular.module('am-wb-core')
 		var ngModel = ctrls[0];
 		var widgets = null;
 		
+		/*
+		 * Filter widgets width the query
+		 */
+		function _loadQuery(query, widgets){
+			if(query) {
+				var q = query.trim().toLowerCase();
+				return widgets.filter(function(w){
+					return w.title.toLowerCase().indexOf(q) > -1 || w.description.indexOf(q) > -1;
+				});
+			}
+			return widgets;
+		}
+		
+		/*
+		 * Load widgets in groups
+		 */
+		function _loadGroups(widgets){
+			var groups = [];
+			var tmp = {};
+			for(var i = 0; i < widgets.length; i++){
+				var gl = widgets[i].groups || [];
+				for(var j = 0; j < gl.length; j++){
+					var gid = gl[j];
+					if(!angular.isDefined(tmp[gid])){
+						tmp[gid] = angular.copy($widget.group(gid));
+						tmp[gid].widgets = [];
+						groups.push(tmp[gid]);
+					}
+					tmp[gid].widgets.push(widgets[i]);
+				}
+			}
+			return groups;
+		}
+		
+		function _runQuery(query, $event){
+			scope.widgets = _loadQuery(scope.query, widgets);
+			scope.groups = _loadGroups(scope.widgets);
+		}
 		
 		function _load(){
 			if(!widgets){
 				scope.widgets = [];
 				return;
 			}
-			scope.widgets = widgets;
-			// TODO: maso, 2018: clear configs
+			// maso, 2018: clear configs
+			scope.query = '';
+			scope.widgets = _loadQuery(scope.query, widgets);
+			scope.groups = _loadGroups(scope.widgets);
 		}
 		
 		// Load models
@@ -56,6 +96,8 @@ angular.module('am-wb-core')
 			widgets = ngModel.$modelValue;
 			_load();
 		}
+		
+		scope.runQuery = _runQuery;
 	}
 
 	return {
