@@ -1,0 +1,35 @@
+<div
+	layout="column"
+	layout-gt-sm="row"
+	layout-align="space-around"
+	layout-wrap
+	layout-padding>
+	<div 
+		class="wb-widgets-module md-whiteframe-1dp"
+		ng-repeat="widget in widgets"
+		dnd-draggable="widget.model || {}"
+		dnd-type="widget.type"
+		dnd-effect-allowed="copy"
+		flex="none"
+		flex-gt-sm="45">
+		<div 
+			layout="row"
+			layout-padding>
+			<wb-icon 
+				size="32px"
+				wb-icon-name="{{widget.icon}}"></wb-icon>
+			<h3 flex translate>{{ widget.title }}</h3>
+		</div>
+		<p translate>{{ widget.description }}</p>
+		<div 
+			ng-if="openHelp"
+			layout="row">
+			<span flex></span>
+			<md-button
+				class="md-icon-button"
+				ng-click="openHelp(widget, $event)">
+				<wb-icon>help</wb-icon>
+			</md-button>
+		</div>
+	</div>
+</div>

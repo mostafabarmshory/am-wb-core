@@ -28,38 +28,41 @@ angular.module('am-wb-core')
 /**
  */
 .directive('wbIcon', function($interpolate) {
-    return {
-	restrict : 'E',
-	template : '<ng-md-icon style="height: auto;width: auto;" icon="{{iconValue}}"></ng-md-icon>',
-	replace : true,
-	transclude : true,
-	link : postLink
-    };
+	return {
+		restrict : 'E',
+		template : '<ng-md-icon style="height: auto;width: auto;" icon="{{iconValue}}"></ng-md-icon>',
+		replace : true,
+		transclude : true,
+		link : postLink
+	};
 
-    function postLink(scope, element, attr, ctrl, transclude) {
-	// Looking for icon
-	var attrName = attr.$normalize(attr.$attr.wbIconName || '');
-	var contentValue = null;
+	function postLink(scope, element, attr, ctrl, transclude) {
+		// Looking for icon
+		var attrName = attr.$normalize(attr.$attr.wbIconName || '');
+		var contentValue = null;
 
-	transclude(scope, function(clone) {
-	    var text = clone.text();
-	    if (text && text.trim()) {
-		contentValue = $interpolate(text.trim())(scope);
-		scope.iconValue = contentValue;
-	    }
-	});
+		transclude(scope, function(clone) {
+			var text = clone.text();
+			if (text && text.trim()) {
+				scope.$watch(function(){
+					return $interpolate(text.trim())(scope);
+				}, function(value){
+					scope.iconValue = value;
+				});
+			}
+		});
 
-	if (attrName) {
-	    attr.$observe('wbIconName', iconChange);
+		if (attrName) {
+			attr.$observe('wbIconName', iconChange);
+		}
+
+
+		/*
+		 * change icon
+		 */
+		function iconChange() {
+			scope.iconValue = scope.contentValue || attr.wbIconName || '';
+		}
 	}
-
-
-	/*
-	 * change icon
-	 */
-	function iconChange() {
-	    scope.iconValue = scope.contentValue || attr.wbIconName || '';
-	}
-    }
 
 });

@@ -48,7 +48,9 @@
 	        class="wb-panel-overlay">
 	    </div>
         <!-- تمام بچه‌ها در این قسمت اضافه می‌شن. -->
-        <div class="wb-panel-container"
+        <div 
+            id="wb-content-placeholder"
+        	class="wb-panel-container"
         	dir="{{wbModel.direction}}"
             wb-layout="wbModel.style"
 			wb-margin="wbModel.style"
@@ -56,10 +58,9 @@
 			wb-size="wbModel.style"
 			wb-background="wbModel.style"
 			wb-border="wbModel.style"
-            id="wb-content-placeholder"
 			dnd-external-sources="true"
             dnd-list="wbModel.contents"
-    		dnd-allowed-types="['wb.widget']"
+    		dnd-allowed-types="getAllowedTypes()"
     		dnd-drop="dropCallback(event, index, item, external, type)">
         </div>
     </div>

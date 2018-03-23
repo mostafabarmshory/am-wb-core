@@ -26,52 +26,28 @@
 angular.module('am-wb-core')
 
 /**
- * Load widgets
+ * @ngdoc directive
+ * @name wb-widgets-module
+ * @description Widgets explorers
+ * 
+ * This is widgets explorer list.
+ * 
  */
-.run(function($widget) {
-	
-	// Widget 
+.directive('wbWidgetsModule', function($window) {
 
-//	type : 'http-get',
-//	title : 'GET',
-//	description : 'Requests a representation of the specified resource',
-//	groups: ['http'],
-//	icon : 'wb-widget-group',
-//	iconUrl: '/link/to/image',
-//	groups: ['basic'],
-//	model:{},
-	
-	
-	// Group
-	$widget.newWidget({
-		// widget description
-		type: 'Group',
-		title: 'Panel',	
-		description : 'Panel contains list of widgets.',
-		icon : 'wb-widget-group',
-		groups: ['basic'],
-		model: {},
-		// functional properties
-		template : '<wb-panel></wb-panel>',
-		help : 'http://dpq.co.ir/more-information-link',
-		helpId: 'wb-widget-group'
-	});
-	// HTML text
-	$widget.newWidget({
-		// widget description
-		type: 'HtmlText',
-		title : 'HTML text',
-		description : 'An HTML block text.',
-		icon : 'wb-widget-html',
-		groups: ['basic'],
-		model : {
-			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+	return {
+		templateUrl : 'views/directives/wb-widgets-module.html',
+		restrict : 'E',
+		replace : true,
+		scope: {
+			widgets: '<'
 		},
-		// help id
-		help : 'http://dpq.co.ir',
-		helpId: 'wb-widget-html',
-		// functional properties
-		templateUrl : 'views/widgets/wb-html.html',
-		setting:['text'],
-	});
+		controller: function($scope){
+			if(angular.isFunction($window.openHelp)){
+				$scope.openHelp = function(widget, $event){
+					$window.openHelp(widget, $event);
+				}
+			}
+		}
+	};
 });

@@ -244,6 +244,8 @@ angular.module('am-wb-core')
 //		    });
 
 		}
+		
+		scope.getAllowedTypes = $widget.widgetsKey;
 		scope.loadTemplate = loadTemplate;
 
 		scope.settingAnchor = settingAnchor;
