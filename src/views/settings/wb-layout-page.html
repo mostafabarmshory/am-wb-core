@@ -23,8 +23,8 @@ the following items can be set for customizing container layout:
     <!-- Align Items -->
     <wb-ui-setting-choose 
     	title="{{(wbModel.style.flexDirection=='wb-flex-row')?'Vert.':'Horz.'}}"
-        icon="{{(wbModel.style.flexDirection=='wb-flex-row')?'face':'wb-horizontal-arrows'}}"
-        items="alignItems" 
+        icon="{{(wbModel.style.flexDirection=='wb-flex-row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}"
+        items="alignItems[wbModel.style.flexDirection]" 
         ng-model="wbModel.style.alignItems">
     </wb-ui-setting-choose>
 
@@ -32,7 +32,7 @@ the following items can be set for customizing container layout:
     <wb-ui-setting-choose 
     	title="{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}"
         icon="{{(wbModel.style.flexDirection!='wb-flex-row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}"
-        items="justifyContent" 
+        items="justifyContent[wbModel.style.flexDirection]" 
         ng-model="wbModel.style.justifyContent">
     </wb-ui-setting-choose>
 </md-list>
