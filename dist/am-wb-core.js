@@ -222,6 +222,7 @@ angular.module('am-wb-core')
 	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
 	$scope.value = angular.copy(data);
 	$scope.style = style;
+	var currentScope = null;
 	
 	function hide() {
 		$mdDialog.hide();
@@ -231,8 +232,27 @@ angular.module('am-wb-core')
 		$mdDialog.cancel();
 	}
 
+	/**
+	 * Answer the dialog
+	 * 
+	 * If there is an answer function in the current page controller
+	 * then the result of the answer function will be returned as 
+	 * the main result.
+	 * 
+	 * @memberof WbResourceCtrl
+	 */
 	function answer() {
-		$mdDialog.hide($scope.value);
+	    $scope.loadingAnswer = true;
+	    var res = null;
+	    if(currentScope && angular.isFunction(currentScope.answer)){
+	        res =  $q.when(currentScope.answer())
+	        .then($mdDialog.hide);
+	    } else {
+	        res = $mdDialog.hide($scope.value);
+	    }
+        return res.finally(function(){
+            $scope.loadingAnswer = false;
+        });
 	}
 	
 	/**
@@ -242,13 +262,6 @@ angular.module('am-wb-core')
 	function setValue(value){
 		$scope.value = value;
 	}
-	
-//	$scope.$watch('value', function(value){
-//		// Deal with value
-//		console.log(value);
-//	});
-	
-
 
 	/**
 	 * encapsulate template srce with panel widget template.
@@ -281,19 +294,22 @@ angular.module('am-wb-core')
 
 		// 2- Clear childrens
 		target.empty();
+		currentScope = null;
+
 
 		// 3- load pages
 		var page = pages[index];
 		var template = $wbUtil.getTemplateFor(page);
 		if (angular.isDefined(template)) {
-			jobs.push(template.then(function(templateSrc) {
+			jobs.push($q.when(template).then(function(templateSrc) {
 				templateSrc = _encapsulatePanel(page, templateSrc);
 				var element = angular.element(templateSrc);
 				var scope = $rootScope.$new(false, $scope);
+				currentScope = scope;
 				scope.page = page;
 				scope.value = $scope.value;
 				if (angular .isDefined(page.controller)) {
-					$controller(page.controller, {
+					 $controller(page.controller, {
 						$scope : scope,
 						$element : element,
 					});
@@ -3990,7 +4006,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>{{style.title | translate}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <div class=md-dialog-content layout=column> <md-tabs md-selected=pageIndex> <md-tab ng-repeat=\"page in pages\" label=\"{{page.label | translate}}\"> </md-tab> </md-tabs> <div id=wb-select-resource-children flex> </div> </div> </md-dialog-content> </md-dialog>"
+    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>{{style.title | translate}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content ng-init=\"pageIndex=0;\" layout=column flex> <md-tabs md-selected=pageIndex ng-show=\"pages.length && pages.length &gt; 1\" md-stretch-tabs=always md-center-tabs=true> <md-tab ng-repeat=\"page in pages\" label=\"{{page.label | translate}}\"> </md-tab> </md-tabs> <div layout=row id=wb-select-resource-children> </div> </md-dialog-content> </md-dialog>"
   );
 
 
