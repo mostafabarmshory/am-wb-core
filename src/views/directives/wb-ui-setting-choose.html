@@ -6,17 +6,16 @@
     <p ng-hide="title==undefined || title==null || title==''">{{title}}</p>
 
 	<md-tabs
-			flex="100"
-			class="wb-tab-as-choose-button"
-			md-selected="selectedIndex">
+		flex="100"
+		class="wb-tab-as-choose-button"
+		md-selected="selectedIndex">
 		<md-tab ng-repeat="item in xitems">
 			<md-tab-label>
+				<md-tooltip ng-show="item.title">{{item.title | translate}}</md-tooltip>
 				<wb-icon >{{item.icon}}</wb-icon>
 			</md-tab-label>
 		</md-tab>
 	</md-tabs>
-
-
 </md-list-item>
 <!-- FIXME: maso, 2017: update choose items -->
 

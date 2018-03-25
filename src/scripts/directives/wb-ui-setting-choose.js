@@ -38,13 +38,13 @@ angular.module('am-wb-core')
     // Private Methods
     // **********************************************************
     function postLink(scope, element, attr, ctrls) {
-	scope.xitems = scope.$eval(attr.items);
-	attr.$observe('title', function(title){
-	    scope.title = title;
-	});
-	attr.$observe('icon', function(icon){
-	    scope.icon = icon;
-	});
+//	scope.xitems = scope.$eval(attr.items);
+//	attr.$observe('title', function(title){
+//	    scope.title = title;
+//	});
+//	attr.$observe('icon', function(icon){
+//	    scope.icon = icon;
+//	});
 	var ngModelCtrl = ctrls[0] || $mdUtil.fakeNgModel();
 	var unregisterWatch = null;
 	$mdTheming(element);
@@ -79,7 +79,11 @@ angular.module('am-wb-core')
     return {
 	templateUrl: 'views/directives/wb-ui-setting-choose.html',
 	restrict: 'E',
-	scope: true,
+	scope: {
+		icon: '@',
+		title: '@',
+		xitems: '<items'
+	},
 	require: ['?ngModel'],
 	priority: 210, // Run before ngAria
 	link: postLink
