@@ -1,7 +1,6 @@
 <md-dialog
 	aria-label="edit action dialog"
 	ng-cloak>
-
 	<md-toolbar>
 		<div class="md-toolbar-tools">
 			<h2 translate>{{style.title | translate}}</h2>
@@ -19,23 +18,23 @@
 		</div>
 	</md-toolbar>
 
-	<md-dialog-content>
+	<md-dialog-content 
+		ng-init="pageIndex=0;"
+		layout="column"
+		flex>
+		<md-tabs
+			md-selected="pageIndex"
+			ng-show="pages.length && pages.length &gt; 1"
+			md-stretch-tabs="always"
+			md-center-tabs="true">
+			<md-tab 
+				ng-repeat="page in pages"
+				label="{{page.label | translate}}">
+			</md-tab>
+		</md-tabs>
 		<div 
-			class="md-dialog-content"
-			layout="column">
-			<md-tabs
-				md-selected="pageIndex">
-				<md-tab 
-					ng-repeat="page in pages"
-					label="{{page.label | translate}}">
-				</md-tab>
-			</md-tabs>
-			<div 
-	 			id="wb-select-resource-children"
-				flex>
-			</div>
+			layout="row"
+ 			id="wb-select-resource-children">
 		</div>
 	</md-dialog-content>
-	
-	
 </md-dialog>
