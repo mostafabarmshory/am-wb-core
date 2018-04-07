@@ -31,6 +31,13 @@ angular.module('am-wb-core')
  */
 .controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, 
 		$wbUtil, $q, $controller, $compile, pages, style, data) {
+    
+    /*
+     * Sort pages 
+     */
+    pages.sort(function(a, b){
+        return a.priority > b.priority;
+    });
 
 	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
 	$scope.value = angular.copy(data);
@@ -139,14 +146,6 @@ angular.module('am-wb-core')
 		});
 	}
 	
-	
-//	$scope.$watch(function(){
-//		return angular.element(document.body).hasClass('md-dialog-is-showing');
-//	}, function(value){
-//		if(value){
-//			loadPages();
-//		}
-//	});
 	$scope.$watch('pageIndex', function(value){
 		if(value >= 0){
 			loadPage(value);
