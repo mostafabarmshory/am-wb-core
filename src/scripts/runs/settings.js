@@ -86,7 +86,7 @@ angular.module('am-wb-core')
 	});
 	$settings.newPage({
 		type: 'minMaxSize',
-		label : 'Min/Max',
+		label : 'Min/Max Size',
 		templateUrl : 'views/settings/wb-min-max-size.html'
 	});
 });

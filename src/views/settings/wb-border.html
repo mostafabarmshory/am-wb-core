@@ -16,26 +16,60 @@ Created by mgh.
 	<md-subheader class="md-no-sticky">Corner Radius</md-subheader>
 
 	<!-- are all corners have equal border? -->
-	<wb-ui-setting-on-off-switch title="All Equal?" icon="rounded_corner" value="wbModel.style.borderRadius.uniform"></wb-ui-setting-on-off-switch>
+	<wb-ui-setting-on-off-switch 
+		title="All Equal?" 
+		icon="full_rounded" 
+		value="wbModel.style.borderRadius.uniform">
+	</wb-ui-setting-on-off-switch>
 
 	<!-- uniform corner radius as a text-box -->
-	<wb-ui-setting-number ng-show="wbModel.style.borderRadius.uniform" title="Radius" icon="rounded_corner"  value="wbModel.style.borderRadius.all"></wb-ui-setting-number>
+	<wb-ui-setting-number 
+		ng-show="wbModel.style.borderRadius.uniform" 
+		title="Radius" 
+		icon="rounded_corner"  
+		value="wbModel.style.borderRadius.all">
+	</wb-ui-setting-number>
 
 	<!-- uniform corner radius as a slider -->
-	<wb-ui-setting-number ng-show="wbModel.style.borderRadius.uniform" slider="" icon="wb-blank" value="wbModel.style.borderRadius.all"></wb-ui-setting-number>
+	<wb-ui-setting-number 
+		ng-show="wbModel.style.borderRadius.uniform" 
+		slider="" 
+		icon="wb-blank" 
+		value="wbModel.style.borderRadius.all">
+	</wb-ui-setting-number>
 	
 	<!-- 4 sliders for left-right-bottom-up corner radius -->
 	<!-- top-left radius -->
-	<wb-ui-setting-number ng-show="!wbModel.style.borderRadius.uniform" title="Top-Left" icon="face"  value="wbModel.style.borderRadius.topLeft"></wb-ui-setting-number>
+	<wb-ui-setting-number 
+		ng-show="!wbModel.style.borderRadius.uniform" 
+		title="Top-Left" 
+		icon="corner_top_left"  
+		value="wbModel.style.borderRadius.topLeft">
+	</wb-ui-setting-number>
 
 	<!-- top-right radius -->
-	<wb-ui-setting-number ng-show="!wbModel.style.borderRadius.uniform" title="Top-Right" icon="face"  value="wbModel.style.borderRadius.topRight"></wb-ui-setting-number>
+	<wb-ui-setting-number 
+		ng-show="!wbModel.style.borderRadius.uniform" 
+		title="Top-Right" 
+		icon="corner_top_right"  
+		value="wbModel.style.borderRadius.topRight">
+	</wb-ui-setting-number>
 
 	<!-- bottom-left radius -->
-	<wb-ui-setting-number ng-show="!wbModel.style.borderRadius.uniform" title="Bottom-left" icon="face"  value="wbModel.style.borderRadius.bottomLeft"></wb-ui-setting-number>
+	<wb-ui-setting-number 
+		ng-show="!wbModel.style.borderRadius.uniform" 
+		title="Bottom-left" 
+		icon="corner_bottom_left"  
+		value="wbModel.style.borderRadius.bottomLeft">
+	</wb-ui-setting-number>
 	
 	<!-- bottom-right radius -->
-	<wb-ui-setting-number ng-show="!wbModel.style.borderRadius.uniform" title="Bottom-Right" icon="face"  value="wbModel.style.borderRadius.bottomRight"></wb-ui-setting-number>
+	<wb-ui-setting-number 
+		ng-show="!wbModel.style.borderRadius.uniform" 
+		title="Bottom-Right" 
+		icon="corner_bottom_right"  
+		value="wbModel.style.borderRadius.bottomRight">
+	</wb-ui-setting-number>
 
 
 

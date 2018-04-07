@@ -31,18 +31,18 @@
  */
 angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 .controller('MyTestCtrl', function($scope, $http, $mdDialog) {
-	$http.get('examples/empty.json')
-	.then(function(res) {
-		$scope.model = res.data;
-	});
+    $http.get('examples/empty.json')
+    .then(function(res) {
+        $scope.model = res.data;
+    });
 })
 
 .config(function($mdThemingProvider) {
-//	  $mdThemingProvider.theme('default')
-//	  	.backgroundPalette('blue')
-//	  	.warnPalette('red')
-//	    .primaryPalette('pink')
-//	    .accentPalette('orange');
+//  $mdThemingProvider.theme('default')
+//  .backgroundPalette('blue')
+//  .warnPalette('red')
+//  .primaryPalette('pink')
+//  .accentPalette('orange');
 })
 
 
@@ -50,57 +50,91 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
  * Load widgets
  */
 .run(function($wbUi, $widget, $window) {
-	// Page
-	$wbUi
-	.newTemplate({
-		name : 'Blank page',
-		thumbnail : 'images/html.svg',
-		template: '{}',
-		priority: 1000
-	})
-	.newTemplate({
-		name : 'Test template2',
-		thumbnail : 'images/brandaction.svg',
-		templateUrl: 'resources/templates/test-en.json',
-		language: 'en',
-		priority: 100
-	})
-	.newTemplate({
-		name : 'Test template3',
-		thumbnail : 'images/brandaction.svg',
-		templateUrl: 'resources/templates/test-fa.json',
-		language: 'fa',
-		priority: 100
-	});
-	
+    // Page
+    $wbUi
+    .newTemplate({
+        name : 'Blank page',
+        thumbnail : 'images/html.svg',
+        template: '{}',
+        priority: 1000
+    })
+    .newTemplate({
+        name : 'Test template2',
+        thumbnail : 'images/brandaction.svg',
+        templateUrl: 'resources/templates/test-en.json',
+        language: 'en',
+        priority: 100
+    })
+    .newTemplate({
+        name : 'Test template3',
+        thumbnail : 'images/brandaction.svg',
+        templateUrl: 'resources/templates/test-fa.json',
+        language: 'fa',
+        priority: 100
+    });
 
-	for(var i = 0; i < 10; i++){
-		// HTML text
-		$widget.newWidget({
-			// widget description
-			type: 'HtmlText-'+i,
-			title : 'HTML text',
-			description : 'An HTML block which is used to test widgets explorer. Do not use in real usage	.',
-			icon : 'wb-widget-html',
-			groups: ['test', 'test'+i],
-			model : {
-				text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
-			},
-			// functional properties
-			templateUrl : 'views/widgets/wb-html.html',
-			help : 'http://dpq.co.ir',
-			setting:['text'],
-			helpId: 'test'+i
-		});
-	}
-	
-	/**
-	 * Show help
-	 * 
-	 * By adding a function into the $window service, you can display help of
-	 * an widget
-	 */
-	$window.openHelp = function (object){
-		alert('Adding openHelp to $window to display help:'+object.helpId);
-	}
+
+    for(var i = 0; i < 10; i++){
+        // HTML text
+        $widget.newWidget({
+            // widget description
+            type: 'HtmlText-'+i,
+            title : 'HTML text',
+            description : 'An HTML block which is used to test widgets explorer. Do not use in real usage	.',
+            icon : 'wb-widget-html',
+            groups: ['test', 'test'+i],
+            model : {
+                text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+            },
+            // functional properties
+            templateUrl : 'views/widgets/wb-html.html',
+            help : 'http://dpq.co.ir',
+            setting:['text'],
+            helpId: 'test'+i
+        });
+    }
+
+    /**
+     * Show help
+     * 
+     * By adding a function into the $window service, you can display help of
+     * an widget
+     */
+    $window.openHelp = function (object){
+        alert('Adding openHelp to $window to display help:'+object.helpId);
+    }
+})
+
+
+.controller('ConstSheetTestCtrl', function($scope){
+    function answer(){
+        var values = [];
+        for(var i = 0; i < $scope.x; i ++){
+            var data = [];
+            for(var j = 0; j < $scope.y; j++){
+                data.push(Math.random());
+            }
+            values.push(data);
+        }
+        return {
+            key: 'constant sheet',
+            values:values
+        }
+    }
+    
+    $scope.x = 4; 
+    $scope.y = 4;
+    $scope.answer = answer;
+})
+/**
+ * Load default resources
+ */
+.run(function($resource) {
+    $resource.newPage({
+        type : 'wb-sheet2',
+        label : 'Cunstant sheet',
+        template : '<div>Random sheet: ({{x}}, {{y}})</div>',
+        controller : 'ConstSheetTestCtrl',
+        tags : [ 'data' ]
+    });
 });

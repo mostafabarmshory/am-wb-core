@@ -84,6 +84,31 @@ angular.module('am-wb-core')
 	// Get an existing icon
 	.addShape('custom-delete', ngMdIconServiceProvider.getShape('delete'))
 	.addShape('vertical', ngMdIconServiceProvider.getShape('view_sequential'))
+	
+	.addShape('corner_bottom_left', '<path d="M 5,5 H 3 V 3 H 5 Z M 5,7 H 3 v 2 h 2 z m 16,4 h -2 v 2 h 2 z m 0,-4 h -2 v 2 h 2 z m 0,8 h -2 v 2 h 2 z m 0,4 h -2 v 2 h 2 z m -4,0 h -2 v 2 h 2 z M 9,3 H 7 v 2 h 2 z m 4,0 h -2 v 2 h 2 z M 9,3 H 7 v 2 h 2 z m 8,0 h -2 v 2 h 2 z m 4,0 h -2 v 2 h 2 z M 3,16 c 0,2.76 2.24,5 5,5 h 5 V 19 H 8 C 6.35,19 5,17.65 5,16 V 11 H 3 Z" />')
+	.addShape('corner_bottom_right', '<path d="m 5,19 v 2 H 3 v -2 z m 2,0 v 2 h 2 v -2 z m 4,-16 0,2 2,0 0,-2 z M 7,3 V 5 L 9,5 9,3 Z m 8,0 0,2 2,0 V 3 Z m 4,0 v 2 h 2 V 3 Z m 0,4 v 2 l 2,0 V 7 Z M 3,15 v 2 h 2 v -2 z m 0,-4 v 2 h 2 v -2 z m 0,4 v 2 H 5 V 15 Z M 3,7 V 9 H 5 V 7 Z M 3,3 V 5 H 5 V 3 Z m 13,18 c 2.76,0 5,-2.24 5,-5 v -5 l -2,0 0,5 c 0,1.65 -1.35,3 -3,3 l -5,0 v 2 z" />')
+	.addShape('corner_top_left', '<path d="M 19,5 V 3 h 2 V 5 Z M 17,5 V 3 h -2 v 2 z m -4,16 v -2 h -2 v 2 z m 4,0 v -2 h -2 v 2 z M 9,21 V 19 H 7 v 2 z M 5,21 V 19 H 3 l 0,2 z M 5,17 5,15 H 3 v 2 z M 21,9 V 7 h -2 v 2 z m 0,4 v -2 h -2 v 2 z M 21,9 V 7 h -2 v 2 z m 0,8 v -2 h -2 v 2 z m 0,4 v -2 h -2 v 2 z M 8,3 C 5.24,3 3,5.24 3,8 v 5 H 5 V 8 C 5,6.35 6.35,5 8,5 h 5 V 3 Z" />')
+	.addShape('corner_top_right', '<path d="m 19,19 h 2 v 2 h -2 z m 0,-2 h 2 V 15 H 19 Z M 3,13 H 5 V 11 H 3 Z m 0,4 H 5 V 15 H 3 Z M 3,9 H 5 V 7 H 3 Z M 3,5 H 5 V 3 H 3 Z M 7,5 H 9 V 3 H 7 Z m 8,16 h 2 v -2 h -2 z m -4,0 h 2 v -2 h -2 z m 4,0 h 2 V 19 H 15 Z M 7,21 H 9 V 19 H 7 Z M 3,21 H 5 V 19 H 3 Z M 21,8 C 21,5.24 18.76,3 16,3 h -5 v 2 h 5 c 1.65,0 3,1.35 3,3 v 5 h 2 z" />')
+//	.addShape('full_rounded', '<path d="M 8.0014104,3 C 5.24171,3 3.0019529,5.2696872 3.0019529,8.0664062 3.001871,10.700363 2.9999115,13.594641 3,15.933594 3,18.730313 5.2397571,21 7.9994576,21 10.666486,21 13.333514,21 16.000542,21 18.760243,21 21,18.730313 21,15.933594 21.001449,13.308911 20.998,10.689605 20.998,8.0664062 20.998047,5.2696872 18.75829,3 15.99859,3 13.32628,3 10.379799,3 8.0014104,3 Z m 0,2.0273438 c 2.6723096,0 5.6187916,0 7.9971796,0 1.649821,0 2.999674,1.3671108 2.999674,3.0390624 -0.0019,2.5827918 0.0022,5.4559078 0.002,7.8671878 0,1.671952 -1.349854,3.039062 -2.999675,3.039062 -2.67353,0 -5.621496,0 -8.0010844,0 -1.649821,0 -2.9996746,-1.36711 -2.9996746,-3.039062 8.18e-5,-2.633957 0.00204,-5.528236 0.00195,-7.8671878 0,-1.6719517 1.3498536,-3.0390624 2.9996745,-3.0390624 z" />')
+	.addShape('full_rounded', ngMdIconServiceProvider.getShape('crop_free'))
+	
+	.addShape('align_justify_vertical', '<path d="M 21,21 V 3 h -2 v 18 z m -4,0 V 3 h -2 l 0,18 z m -4,0 0,-18 h -2 l 0,18 z M 9,21 9,3 H 7 L 7,21 Z M 3,21 H 5 L 5,3 H 3 Z" />')
+	.addShape('align_center_vertical', '<path d="m 15,17 h 2 V 7 h -2 z m 6,4 V 3 h -2 v 18 z m -8,0 0,-18 h -2 l 0,18 z M 7,17 H 9 L 9,7 H 7 Z M 3,21 H 5 L 5,3 H 3 Z" />')
+	.addShape('align_end_vertical', '<path d="m 15,9 0,12 h 2 V 9 Z M 7,9 7,21 H 9 L 9,9 Z m 6,12 0,-18 h -2 l 0,18 z m 8,0 V 3 H 19 V 21 Z M 3,21 H 5 L 5,3 H 3 Z" />')
+	.addShape('align_start_vertical', '<path d="M 21,21 V 3 H 19 V 21 Z M 17,15 V 3 h -2 l 0,12 z m -4,6 0,-18 h -2 l 0,18 z M 9,15 9,3 H 7 V 15 Z M 3,21 H 5 L 5,3 H 3 Z" />')
+
+	.addShape('sort_space_between_horiz', '<path d="M 4.5710877,3 C 3.7069894,3 3,3.7007772 3,4.5572828 V 19.442717 C 3,20.299223 3.7069895,21 4.5710877,21 H 19.428912 C 20.293011,21 21,20.299223 21,19.442717 V 4.5572828 C 21,3.7007772 20.293011,3 19.428912,3 Z m 0,1.5496789 H 19.428912 V 19.451841 H 4.5710877 Z m 1.5373337,1.999831 c -0.4320491,0 -0.7855438,0.3503886 -0.7855438,0.7786414 v 9.3436967 c 0,0.428253 0.3534947,0.778642 0.7855438,0.778642 H 8.465053 c 0.4320489,0 0.7855436,-0.350389 0.7855436,-0.778642 V 7.3281513 c 0,-0.4282528 -0.3534947,-0.7786414 -0.7855436,-0.7786414 z m 9.4265256,0 c -0.432049,0 -0.785544,0.3503886 -0.785544,0.7786414 v 9.3436967 c 0,0.428253 0.353495,0.778642 0.785544,0.778642 h 2.356632 c 0.432049,0 0.785544,-0.350389 0.785544,-0.778642 V 7.3281513 c 0,-0.4282528 -0.353495,-0.7786414 -0.785544,-0.7786414 z" />')
+	.addShape('sort_space_around_horiz', '<path d="M 4.5710877,3 C 3.7069894,3 3,3.7007773 3,4.5572829 V 19.442717 C 3,20.299223 3.7069894,21 4.5710877,21 H 19.428912 C 20.293011,21 21,20.299223 21,19.442717 V 4.5572829 C 21,3.7007773 20.293011,3 19.428912,3 Z m 0,1.549679 H 19.428912 V 19.451842 H 4.5710877 Z m 2.6757586,1.9602906 c -0.4320491,0 -0.7855438,0.3503886 -0.7855438,0.7786414 v 9.343697 c 0,0.428253 0.3534947,0.778642 0.7855438,0.778642 h 2.3566315 c 0.4320492,0 0.7855442,-0.350389 0.7855442,-0.778642 V 7.288611 c 0,-0.4282528 -0.353495,-0.7786414 -0.7855442,-0.7786414 z m 7.0698947,0 c -0.432049,0 -0.785544,0.3503886 -0.785544,0.7786414 v 9.343697 c 0,0.428253 0.353495,0.778642 0.785544,0.778642 h 2.356631 c 0.432049,0 0.785544,-0.350389 0.785544,-0.778642 V 7.288611 c 0,-0.4282528 -0.353495,-0.7786414 -0.785544,-0.7786414 z" />')
+	.addShape('sort_center_horiz', '<path d="M 4.5710877,3 C 3.7069894,3 3,3.7007772 3,4.5572828 V 19.442717 C 3,20.299223 3.7069895,21 4.5710877,21 H 19.428912 C 20.293011,21 21,20.299223 21,19.442717 V 4.5572828 C 21,3.7007772 20.293011,3 19.428912,3 Z m 0,1.5496789 H 19.428912 V 19.451841 H 4.5710877 Z m 3.7344017,1.999831 c -0.4320492,0 -0.7855438,0.3503886 -0.7855438,0.7786414 v 9.3436967 c 0,0.428253 0.3534946,0.778642 0.7855438,0.778642 h 2.3566316 c 0.432049,0 0.785543,-0.350389 0.785543,-0.778642 V 7.3281513 c 0,-0.4282528 -0.353494,-0.7786414 -0.785543,-0.7786414 z m 5.4988066,0 c -0.432049,0 -0.785544,0.3503886 -0.785544,0.7786414 v 9.3436967 c 0,0.428253 0.353495,0.778642 0.785544,0.778642 h 2.356631 c 0.43205,0 0.785544,-0.350389 0.785544,-0.778642 V 7.3281513 c 0,-0.4282528 -0.353494,-0.7786414 -0.785544,-0.7786414 z" />')
+	.addShape('sort_start_horiz', '<path d="M 4.5710877,3 C 3.7069894,3 3,3.7007772 3,4.5572828 V 19.442717 C 3,20.299223 3.7069895,21 4.5710877,21 H 19.428912 C 20.293011,21 21,20.299223 21,19.442717 V 4.5572828 C 21,3.7007772 20.293011,3 19.428912,3 Z m 0,1.5496789 H 19.428912 V 19.451841 H 4.5710877 Z m 1.5373337,1.999831 c -0.4320491,0 -0.7855438,0.3503886 -0.7855438,0.7786414 v 9.3436967 c 0,0.428253 0.3534947,0.778642 0.7855438,0.778642 H 8.465053 c 0.4320489,0 0.7855436,-0.350389 0.7855436,-0.778642 V 7.3281513 c 0,-0.4282528 -0.3534947,-0.7786414 -0.7855436,-0.7786414 z m 5.4988066,0 c -0.432049,0 -0.785544,0.3503886 -0.785544,0.7786414 v 9.3436967 c 0,0.428253 0.353495,0.778642 0.785544,0.778642 h 2.356632 c 0.432049,0 0.785543,-0.350389 0.785543,-0.778642 V 7.3281513 c 0,-0.4282528 -0.353494,-0.7786414 -0.785543,-0.7786414 z" />')
+	.addShape('sort_end_horiz', '<path d="M 4.5710877,3 C 3.7069894,3 3,3.7007772 3,4.5572828 V 19.442717 C 3,20.299223 3.7069895,21 4.5710877,21 H 19.428912 C 20.293011,21 21,20.299223 21,19.442717 V 4.5572828 C 21,3.7007772 20.293011,3 19.428912,3 Z m 0,1.5496789 H 19.428912 V 19.451841 H 4.5710877 Z m 5.4650523,1.999831 c -0.4320487,0 -0.7855434,0.3503886 -0.7855434,0.7786414 v 9.3436967 c 0,0.428253 0.3534947,0.778642 0.7855434,0.778642 h 2.356632 c 0.432049,0 0.785544,-0.350389 0.785544,-0.778642 V 7.3281513 c 0,-0.4282528 -0.353495,-0.7786414 -0.785544,-0.7786414 z m 5.498807,0 c -0.432049,0 -0.785544,0.3503886 -0.785544,0.7786414 v 9.3436967 c 0,0.428253 0.353495,0.778642 0.785544,0.778642 h 2.356632 c 0.432049,0 0.785544,-0.350389 0.785544,-0.778642 V 7.3281513 c 0,-0.4282528 -0.353495,-0.7786414 -0.785544,-0.7786414 z" />')
+	
+	.addShape('sort_space_between_vert', '<path d="M 3,19.428912 C 3,20.293011 3.7007772,21 4.5572828,21 H 19.442717 C 20.299223,21 21,20.29301 21,19.428912 V 4.571088 C 21,3.706989 20.299223,3 19.442717,3 H 4.5572828 C 3.7007772,3 3,3.706989 3,4.571088 Z m 1.5496789,0 0,-14.857824 H 19.451841 v 14.857824 z m 1.999831,-1.537333 c 0,0.432049 0.3503886,0.785543 0.7786414,0.785543 h 9.3436967 c 0.428253,0 0.778642,-0.353494 0.778642,-0.785543 v -2.356632 c 0,-0.432049 -0.350389,-0.785544 -0.778642,-0.785544 l -9.3436967,0 c -0.4282528,0 -0.7786414,0.353495 -0.7786414,0.785544 z m 0,-9.426526 c 0,0.432049 0.3503886,0.785544 0.7786414,0.785544 l 9.3436967,0 c 0.428253,0 0.778642,-0.353495 0.778642,-0.785544 V 6.108421 c 0,-0.432049 -0.350389,-0.785544 -0.778642,-0.785544 H 7.3281513 c -0.4282528,0 -0.7786414,0.353495 -0.7786414,0.785544 z" />')
+	.addShape('sort_space_around_vert', '<path d="M 3,19.428912 C 3,20.293011 3.7007773,21 4.5572829,21 H 19.442717 C 20.299223,21 21,20.293011 21,19.428912 V 4.571088 C 21,3.706989 20.299223,3 19.442717,3 H 4.5572829 C 3.7007773,3 3,3.706989 3,4.571088 Z m 1.549679,0 0,-14.857824 h 14.902163 v 14.857824 z m 1.9602906,-2.675758 c 0,0.432049 0.3503886,0.785544 0.7786414,0.785544 h 9.343697 c 0.428253,0 0.778642,-0.353495 0.778642,-0.785544 v -2.356632 c 0,-0.432049 -0.350389,-0.785544 -0.778642,-0.785544 l -9.343697,0 c -0.4282528,0 -0.7786414,0.353495 -0.7786414,0.785544 z m 0,-7.069895 c 0,0.432049 0.3503886,0.785544 0.7786414,0.785544 l 9.343697,0 c 0.428253,0 0.778642,-0.353495 0.778642,-0.785544 V 7.326628 c 0,-0.432049 -0.350389,-0.785544 -0.778642,-0.785544 H 7.288611 c -0.4282528,0 -0.7786414,0.353495 -0.7786414,0.785544 z" />')
+	.addShape('sort_center_vert', '<path d="M 3,19.428912 C 3,20.293011 3.7007772,21 4.5572828,21 H 19.442717 C 20.299223,21 21,20.29301 21,19.428912 V 4.571088 C 21,3.706989 20.299223,3 19.442717,3 H 4.5572828 C 3.7007772,3 3,3.706989 3,4.571088 Z m 1.5496789,0 0,-14.857824 H 19.451841 v 14.857824 z m 1.999831,-3.734401 c 0,0.432049 0.3503886,0.785543 0.7786414,0.785543 h 9.3436967 c 0.428253,0 0.778642,-0.353494 0.778642,-0.785543 v -2.356632 c 0,-0.432049 -0.350389,-0.785543 -0.778642,-0.785543 l -9.3436967,0 c -0.4282528,0 -0.7786414,0.353494 -0.7786414,0.785543 z m 0,-5.498807 c 0,0.432049 0.3503886,0.785544 0.7786414,0.785544 l 9.3436967,0 c 0.428253,0 0.778642,-0.353495 0.778642,-0.785544 V 7.839073 c 0,-0.43205 -0.350389,-0.785544 -0.778642,-0.785544 H 7.3281513 c -0.4282528,0 -0.7786414,0.353494 -0.7786414,0.785544 z" />')
+	.addShape('sort_start_vert', '<path d="M 3,19.428912 C 3,20.293011 3.7007772,21 4.5572828,21 H 19.442717 C 20.299223,21 21,20.29301 21,19.428912 V 4.571088 C 21,3.706989 20.299223,3 19.442717,3 H 4.5572828 C 3.7007772,3 3,3.706989 3,4.571088 Z m 1.5496789,0 0,-14.857824 H 19.451841 v 14.857824 z m 1.999831,-5.465052 c 0,0.432049 0.3503886,0.785543 0.7786414,0.785543 l 9.3436967,0 c 0.428253,0 0.778642,-0.353494 0.778642,-0.785543 v -2.356632 c 0,-0.432049 -0.350389,-0.785544 -0.778642,-0.785544 l -9.3436967,0 c -0.4282528,0 -0.7786414,0.353495 -0.7786414,0.785544 z m 0,-5.498807 c 0,0.432049 0.3503886,0.785544 0.7786414,0.785544 l 9.3436967,0 c 0.428253,0 0.778642,-0.353495 0.778642,-0.785544 V 6.108421 c 0,-0.432049 -0.350389,-0.785544 -0.778642,-0.785544 H 7.3281513 c -0.4282528,0 -0.7786414,0.353495 -0.7786414,0.785544 z" />')
+	.addShape('sort_end_vert', '<path d="M 3,19.428912 C 3,20.293011 3.7007772,21 4.5572828,21 H 19.442717 C 20.299223,21 21,20.29301 21,19.428912 V 4.571088 C 21,3.706989 20.299223,3 19.442717,3 H 4.5572828 C 3.7007772,3 3,3.706989 3,4.571088 Z m 1.5496789,0 0,-14.857824 H 19.451841 v 14.857824 z m 1.999831,-1.537333 c 0,0.432049 0.3503886,0.785543 0.7786414,0.785543 h 9.3436967 c 0.428253,0 0.778642,-0.353494 0.778642,-0.785543 v -2.356632 c 0,-0.432049 -0.350389,-0.785544 -0.778642,-0.785544 l -9.3436967,0 c -0.4282528,0 -0.7786414,0.353495 -0.7786414,0.785544 z m 0,-5.498807 c 0,0.432049 0.3503886,0.785544 0.7786414,0.785544 l 9.3436967,0 c 0.428253,0 0.778642,-0.353495 0.778642,-0.785544 V 10.03614 c 0,-0.432049 -0.350389,-0.785543 -0.778642,-0.785543 l -9.3436967,0 c -0.4282528,0 -0.7786414,0.353494 -0.7786414,0.785543 z" />')
+	
 	// Add multiple icons
 	.addShapes({
 		'wb-opacity': '<path d="M3.55,18.54L4.96,19.95L6.76,18.16L5.34,16.74M11,22.45C11.32,22.45 13,22.45 13,22.45V19.5H11M12,5.5A6,6 0 0,0 6,11.5A6,6 0 0,0 12,17.5A6,6 0 0,0 18,11.5C18,8.18 15.31,5.5 12,5.5M20,12.5H23V10.5H20M17.24,18.16L19.04,19.95L20.45,18.54L18.66,16.74M20.45,4.46L19.04,3.05L17.24,4.84L18.66,6.26M13,0.55H11V3.5H13M4,10.5H1V12.5H4M6.76,4.84L4.96,3.05L3.55,4.46L5.34,6.26L6.76,4.84Z" />',
@@ -218,10 +243,18 @@ angular.module('am-wb-core')
  */
 .controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, 
 		$wbUtil, $q, $controller, $compile, pages, style, data) {
+    
+    /*
+     * Sort pages 
+     */
+    pages.sort(function(a, b){
+        return a.priority > b.priority;
+    });
 
 	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
 	$scope.value = angular.copy(data);
 	$scope.style = style;
+	var currentScope = null;
 	
 	function hide() {
 		$mdDialog.hide();
@@ -231,8 +264,27 @@ angular.module('am-wb-core')
 		$mdDialog.cancel();
 	}
 
+	/**
+	 * Answer the dialog
+	 * 
+	 * If there is an answer function in the current page controller
+	 * then the result of the answer function will be returned as 
+	 * the main result.
+	 * 
+	 * @memberof WbResourceCtrl
+	 */
 	function answer() {
-		$mdDialog.hide($scope.value);
+	    $scope.loadingAnswer = true;
+	    var res = null;
+	    if(currentScope && angular.isFunction(currentScope.answer)){
+	        res =  $q.when(currentScope.answer())
+	        .then($mdDialog.hide);
+	    } else {
+	        res = $mdDialog.hide($scope.value);
+	    }
+        return res.finally(function(){
+            $scope.loadingAnswer = false;
+        });
 	}
 	
 	/**
@@ -242,13 +294,6 @@ angular.module('am-wb-core')
 	function setValue(value){
 		$scope.value = value;
 	}
-	
-//	$scope.$watch('value', function(value){
-//		// Deal with value
-//		console.log(value);
-//	});
-	
-
 
 	/**
 	 * encapsulate template srce with panel widget template.
@@ -281,19 +326,22 @@ angular.module('am-wb-core')
 
 		// 2- Clear childrens
 		target.empty();
+		currentScope = null;
+
 
 		// 3- load pages
 		var page = pages[index];
 		var template = $wbUtil.getTemplateFor(page);
 		if (angular.isDefined(template)) {
-			jobs.push(template.then(function(templateSrc) {
+			jobs.push($q.when(template).then(function(templateSrc) {
 				templateSrc = _encapsulatePanel(page, templateSrc);
 				var element = angular.element(templateSrc);
 				var scope = $rootScope.$new(false, $scope);
+				currentScope = scope;
 				scope.page = page;
 				scope.value = $scope.value;
 				if (angular .isDefined(page.controller)) {
-					$controller(page.controller, {
+					 $controller(page.controller, {
 						$scope : scope,
 						$element : element,
 					});
@@ -310,14 +358,6 @@ angular.module('am-wb-core')
 		});
 	}
 	
-	
-//	$scope.$watch(function(){
-//		return angular.element(document.body).hasClass('md-dialog-is-showing');
-//	}, function(value){
-//		if(value){
-//			loadPages();
-//		}
-//	});
 	$scope.$watch('pageIndex', function(value){
 		if(value >= 0){
 			loadPage(value);
@@ -555,54 +595,54 @@ angular.module('am-wb-core')
  * می‌کند.
  */
 .controller('WbLayoutWbSettingsCtrl', function($scope, $settings) {
-    var scope = $scope;
+	var scope = $scope;
 
-    scope.directions = [ {
-	title : 'row',
-	icon : 'view_column',
-	value : 'row'
-    }, {
-	title : 'column',
-	icon : 'view_agenda',
-	value : 'column'
-    } ];
+	scope.directions = [ {
+		title : 'row',
+		icon : 'view_column',
+		value : 'row'
+	}, {
+		title : 'column',
+		icon : 'view_agenda',
+		value : 'column'
+	} ];
 
-    scope.directionAlignments = [ {
-	title : 'none',
-	value : 'none'
-    }, {
-	title : 'start',
-	value : 'start'
-    }, {
-	title : 'center',
-	value : 'center'
-    }, {
-	title : 'end',
-	value : 'end'
-    }, {
-	title : 'space-around',
-	value : 'space-around'
-    }, {
-	title : 'space-between',
-	value : 'space-between'
-    } ];
+	scope.directionAlignments = [ {
+		title : 'none',
+		value : 'none'
+	}, {
+		title : 'start',
+		value : 'start'
+	}, {
+		title : 'center',
+		value : 'center'
+	}, {
+		title : 'end',
+		value : 'end'
+	}, {
+		title : 'space-around',
+		value : 'space-around'
+	}, {
+		title : 'space-between',
+		value : 'space-between'
+	} ];
 
-    scope.perpendicularAlignments = [ {
-	title : 'none',
-	value : 'none'
-    }, {
-	title : 'start',
-	value : 'start'
-    }, {
-	title : 'center',
-	value : 'center'
-    }, {
-	title : 'end',
-	value : 'end'
-    }, {
-	title : 'stretch',
-	value : 'stretch'
-    }, ]
+	scope.perpendicularAlignments = [ {
+		title : 'none',
+		value : 'none'
+	}, {
+		title : 'start',
+		value : 'start'
+	}, {
+		title : 'center',
+		value : 'center'
+	}, {
+		title : 'end',
+		value : 'end'
+	}, {
+		title : 'stretch',
+		value : 'stretch'
+	}, ]
 });
 
 /* 
@@ -639,59 +679,105 @@ angular
 .module('am-wb-core')
 
 .controller('WbPageLayoutWbSettingsCtrl', function($scope, $settings) {
-    var wbModel = $scope.wbModel;
-    if (!wbModel.style) {
-	wbModel.style = {};
-    }
-    $scope.flexDirection = [ {
-	title : 'row',
-	icon : 'wb-vertical-boxes',
-	value : 'wb-flex-row'
-    }, {
-	title : 'column',
-	icon : 'wb-horizontal-boxes',
-	value : 'wb-flex-column'
-    } ];
+	var wbModel = $scope.wbModel;
+	if (!wbModel.style) {
+		wbModel.style = {};
+	}
+	$scope.flexDirection = [ {
+		title : 'row',
+		icon : 'wb-vertical-boxes',
+		value : 'wb-flex-row'
+	}, {
+		title : 'column',
+		icon : 'wb-horizontal-boxes',
+		value : 'wb-flex-column'
+	} ];
 
-    $scope.justifyContent = [ {
-	title : 'Start',
-	icon : 'looks_one',
-	value : 'wb-flex-justify-content-start'
-    }, {
-	title : 'End',
-	icon : 'looks_two',
-	value : 'wb-flex-justify-content-end'
-    }, {
-	title : 'Center',
-	icon : 'looks_3',
-	value : 'wb-flex-justify-content-center'
-    }, {
-	title : 'Space Around',
-	icon : 'looks_4',
-	value : 'wb-flex-justify-content-space-around'
-    }, {
-	title : 'Space Between',
-	icon : 'looks_5',
-	value : 'wb-flex-justify-content-space-between'
-    } ];
+	$scope.justifyContent = {
+		'wb-flex-row' : [ {
+			title : 'Start',
+			icon : 'sort_start_horiz',
+			value : 'wb-flex-justify-content-start'
+		}, {
+			title : 'End',
+			icon : 'sort_end_horiz',
+			value : 'wb-flex-justify-content-end'
+		}, {
+			title : 'Center',
+			icon : 'sort_center_horiz',
+			value : 'wb-flex-justify-content-center'
+		}, {
+			title : 'Space Around',
+			icon : 'sort_space_around_horiz',
+			value : 'wb-flex-justify-content-space-around'
+		}, {
+			title : 'Space Between',
+			icon : 'sort_space_between_horiz',
+			value : 'wb-flex-justify-content-space-between'
+		} ],
+		'wb-flex-column' : [ {
+			title : 'Start',
+			icon : 'sort_start_vert',
+			value : 'wb-flex-justify-content-start'
+		}, {
+			title : 'End',
+			icon : 'sort_end_vert',
+			value : 'wb-flex-justify-content-end'
+		}, {
+			title : 'Center',
+			icon : 'sort_center_vert',
+			value : 'wb-flex-justify-content-center'
+		}, {
+			title : 'Space Around',
+			icon : 'sort_space_around_vert',
+			value : 'wb-flex-justify-content-space-around'
+		}, {
+			title : 'Space Between',
+			icon : 'sort_space_between_vert',
+			value : 'wb-flex-justify-content-space-between'
+		} ]
+	};
 
-    $scope.alignItems = [ {
-	title : 'Stretch',
-	icon : 'looks_one',
-	value : 'wb-flex-align-items-stretch'
-    }, {
-	title : 'Start',
-	icon : 'looks_two',
-	value : 'wb-flex-align-items-start'
-    }, {
-	title : 'End',
-	icon : 'looks_3',
-	value : 'wb-flex-align-items-end'
-    }, {
-	title : 'Center',
-	icon : 'looks_4',
-	value : 'wb-flex-align-items-center'
-    } ];
+	$scope.alignItems = {
+		'wb-flex-column' : [ 
+				{
+					title : 'Stretch',
+					icon : 'format_align_justify',
+					value : 'wb-flex-align-items-stretch'
+				}, {
+					title : 'Start',
+					icon : 'format_align_left',
+					value : 'wb-flex-align-items-start'
+				}, {
+					title : 'End',
+					icon : 'format_align_right',
+					value : 'wb-flex-align-items-end'
+				}, {
+					title : 'Center',
+					icon : 'format_align_center',
+					value : 'wb-flex-align-items-center'
+				} 
+			],
+		'wb-flex-row': [ 
+				{
+					title : 'Stretch',
+					icon : 'align_justify_vertical',
+					value : 'wb-flex-align-items-stretch'
+				}, {
+					title : 'Start',
+					icon : 'align_start_vertical',
+					value : 'wb-flex-align-items-start'
+				}, {
+					title : 'End',
+					icon : 'align_end_vertical',
+					value : 'wb-flex-align-items-end'
+				}, {
+					title : 'Center',
+					icon : 'align_center_vertical',
+					value : 'wb-flex-align-items-center'
+				} 
+			]
+	};
 });
 
 /* 
@@ -2221,13 +2307,13 @@ angular.module('am-wb-core')
     // Private Methods
     // **********************************************************
     function postLink(scope, element, attr, ctrls) {
-	scope.xitems = scope.$eval(attr.items);
-	attr.$observe('title', function(title){
-	    scope.title = title;
-	});
-	attr.$observe('icon', function(icon){
-	    scope.icon = icon;
-	});
+//	scope.xitems = scope.$eval(attr.items);
+//	attr.$observe('title', function(title){
+//	    scope.title = title;
+//	});
+//	attr.$observe('icon', function(icon){
+//	    scope.icon = icon;
+//	});
 	var ngModelCtrl = ctrls[0] || $mdUtil.fakeNgModel();
 	var unregisterWatch = null;
 	$mdTheming(element);
@@ -2262,7 +2348,11 @@ angular.module('am-wb-core')
     return {
 	templateUrl: 'views/directives/wb-ui-setting-choose.html',
 	restrict: 'E',
-	scope: true,
+	scope: {
+		icon: '@',
+		title: '@',
+		xitems: '<items'
+	},
 	require: ['?ngModel'],
 	priority: 210, // Run before ngAria
 	link: postLink
@@ -3088,7 +3178,7 @@ angular.module('am-wb-core')
 	});
 	$settings.newPage({
 		type: 'minMaxSize',
-		label : 'Min/Max',
+		label : 'Min/Max Size',
 		templateUrl : 'views/settings/wb-min-max-size.html'
 	});
 });
@@ -3990,7 +4080,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>{{style.title | translate}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content> <div class=md-dialog-content layout=column> <md-tabs md-selected=pageIndex> <md-tab ng-repeat=\"page in pages\" label=\"{{page.label | translate}}\"> </md-tab> </md-tabs> <div id=wb-select-resource-children flex> </div> </div> </md-dialog-content> </md-dialog>"
+    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>{{style.title | translate}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content ng-init=\"pageIndex=0;\" layout=column flex> <md-tabs md-selected=pageIndex ng-show=\"pages.length && pages.length &gt; 1\" md-stretch-tabs=always md-center-tabs=true> <md-tab ng-repeat=\"page in pages\" label=\"{{page.label | translate}}\"> </md-tab> </md-tabs> <div layout=row id=wb-select-resource-children> </div> </md-dialog-content> </md-dialog>"
   );
 
 
@@ -4030,7 +4120,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-choose.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\" wb-icon-name={{icon}}> </wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-tabs flex=100 class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in xitems\"> <md-tab-label> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs> </md-list-item> "
+    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\" wb-icon-name={{icon}}> </wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-tabs flex=100 class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in xitems\"> <md-tab-label> <md-tooltip ng-show=item.title>{{item.title | translate}}</md-tooltip> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs> </md-list-item> "
   );
 
 
@@ -4075,7 +4165,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widgets-explorer.html',
-    "<div layout=column>  <md-toolbar ng-show=!(showSearch||showSort||showState)> <div class=md-toolbar-tools> <h3 flex translate>Widgets</h3> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=\"_view_list=!_view_list\" class=md-icon-button aria-label=\"View mode\"> <wb-icon>{{_view_list ? 'view_module' : 'view_list'}}</wb-icon> </md-button> <md-button ng-click=\"_tree_mode=!_tree_mode\" class=md-icon-button aria-label=\"Tree mode\"> <wb-icon>{{_tree_mode? 'list' : 'list_tree'}}</wb-icon> </md-button> </div> </md-toolbar>  <md-toolbar class=md-hue-1 ng-show=showSearch> <div class=md-toolbar-tools> <md-button class=md-icon-button ng-click=\"showSearch = !showSearch\" aria-label=Back> <wb-icon>arrow_back</wb-icon> </md-button> <md-input-container md-theme=input flex> <label>&nbsp;</label> <input ng-model=query ng-keyup=\"runQuery(query, $event)\"> </md-input-container> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> </div> </md-toolbar> <md-expansion-panel-group ng-if=_tree_mode> <md-expansion-panel ng-repeat=\"group in groups\"> <md-expansion-panel-collapsed> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-header> <md-expansion-panel-content> <wb-widgets-list ng-if=_view_list widgets=group.widgets> </wb-widgets-list> <wb-widgets-module ng-if=!_view_list widgets=group.widgets> </wb-widgets-module> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </md-expansion-panel-group> <wb-widgets-list ng-if=!_tree_mode&amp;&amp;_view_list widgets=widgets> </wb-widgets-list> <wb-widgets-module ng-if=!_tree_mode&amp;&amp;!_view_list widgets=widgets> </wb-widgets-module> </div>"
+    "<div layout=column>  <md-toolbar ng-show=!(showSearch||showSort||showState)> <div class=md-toolbar-tools> <h3 flex translate>Widgets</h3> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=\"_view_list=!_view_list\" class=md-icon-button aria-label=\"View mode\"> <wb-icon>{{_view_list ? 'view_module' : 'view_list'}}</wb-icon> </md-button> <md-button ng-click=\"_tree_mode=!_tree_mode\" class=md-icon-button aria-label=\"Tree mode\"> <wb-icon>{{_tree_mode? 'list' : 'list_tree'}}</wb-icon> </md-button> </div> </md-toolbar>  <md-toolbar class=md-hue-1 ng-show=showSearch> <div class=md-toolbar-tools> <md-button class=md-icon-button ng-click=\"showSearch = !showSearch\" aria-label=Back> <wb-icon>arrow_back</wb-icon> </md-button> <md-input-container md-theme=input flex> <label>&nbsp;</label> <input ng-model=query ng-keyup=\"runQuery(query, $event)\"> </md-input-container> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> </div> </md-toolbar> <md-expansion-panel-group ng-if=_tree_mode> <md-expansion-panel ng-repeat=\"group in groups\"> <md-expansion-panel-collapsed> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-header> <md-expansion-panel-content style=\"padding: 0px; margin: 0px\"> <wb-widgets-list ng-if=_view_list widgets=group.widgets> </wb-widgets-list> <wb-widgets-module ng-if=!_view_list widgets=group.widgets> </wb-widgets-module> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </md-expansion-panel-group> <wb-widgets-list ng-if=!_tree_mode&amp;&amp;_view_list widgets=widgets> </wb-widgets-list> <wb-widgets-module ng-if=!_tree_mode&amp;&amp;!_view_list widgets=widgets> </wb-widgets-module> </div>"
   );
 
 
@@ -4085,7 +4175,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widgets-module.html',
-    "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap layout-padding> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy flex=none flex-gt-sm=45> <div layout=row layout-padding> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <h3 flex translate>{{ widget.title }}</h3> </div> <p translate>{{ widget.description }}</p> <div ng-if=openHelp layout=row> <span flex></span> <md-button class=md-icon-button ng-click=\"openHelp(widget, $event)\"> <wb-icon>help</wb-icon> </md-button> </div> </div> </div>"
+    "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy flex=none flex-gt-sm=45> <div layout=row layout-padding> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <h3 flex translate>{{ widget.title }}</h3> </div> <p translate>{{ widget.description }}</p> <div ng-if=openHelp layout=row> <span flex></span> <md-button class=md-icon-button ng-click=\"openHelp(widget, $event)\"> <wb-icon>help</wb-icon> </md-button> </div> </div> </div>"
   );
 
 
@@ -4109,7 +4199,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-border.html',
-    " <md-list class=wb-setting-panel>   <md-subheader class=md-no-sticky>Corner Radius</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" icon=rounded_corner value=wbModel.style.borderRadius.uniform></wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.borderRadius.uniform title=Radius icon=rounded_corner value=wbModel.style.borderRadius.all></wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.borderRadius.uniform slider=\"\" icon=wb-blank value=wbModel.style.borderRadius.all></wb-ui-setting-number>   <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Top-Left icon=face value=wbModel.style.borderRadius.topLeft></wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Top-Right icon=face value=wbModel.style.borderRadius.topRight></wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Bottom-left icon=face value=wbModel.style.borderRadius.bottomLeft></wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Bottom-Right icon=face value=wbModel.style.borderRadius.bottomRight></wb-ui-setting-number>  <md-divider></md-divider> <md-subheader>Style/Color/Thickness</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" title=\"All Eaual?\" icon=border_all value=wbModel.style.borderStyleColorWidth.uniform></wb-ui-setting-on-off-switch>  <wb-ui-setting-dropdown ng-show=wbModel.style.borderStyleColorWidth.uniform title=Border icon=line_style items=styles value=wbModel.style.borderStyle.all></wb-ui-setting-dropdown>  <wb-ui-setting-number ng-show=\"wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.all></wb-ui-setting-number>  <wb-ui-setting-color ng-show=\"wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.all></wb-ui-setting-color>   <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Left-Border icon=border_left items=styles value=wbModel.style.borderStyle.left></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.left></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.left></wb-ui-setting-color>  <md-divider class=wb-sub-divider ng-show=!wbModel.style.borderStyleColorWidth.uniform></md-divider> <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Right-Border icon=border_right items=styles value=wbModel.style.borderStyle.right></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.right></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.right></wb-ui-setting-color>  <md-divider class=wb-sub-divider ng-show=!wbModel.style.borderStyleColorWidth.uniform></md-divider> <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Top-Border icon=border_top items=styles value=wbModel.style.borderStyle.top></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.top></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.top></wb-ui-setting-color>  <md-divider class=wb-sub-divider ng-show=!wbModel.style.borderStyleColorWidth.uniform></md-divider> <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Bottom-Border icon=border_bottom items=styles value=wbModel.style.borderStyle.bottom></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.bottom></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.bottom></wb-ui-setting-color> </md-list>"
+    " <md-list class=wb-setting-panel>   <md-subheader class=md-no-sticky>Corner Radius</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" icon=full_rounded value=wbModel.style.borderRadius.uniform> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.borderRadius.uniform title=Radius icon=rounded_corner value=wbModel.style.borderRadius.all> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.borderRadius.uniform slider=\"\" icon=wb-blank value=wbModel.style.borderRadius.all> </wb-ui-setting-number>   <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Top-Left icon=corner_top_left value=wbModel.style.borderRadius.topLeft> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Top-Right icon=corner_top_right value=wbModel.style.borderRadius.topRight> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Bottom-left icon=corner_bottom_left value=wbModel.style.borderRadius.bottomLeft> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Bottom-Right icon=corner_bottom_right value=wbModel.style.borderRadius.bottomRight> </wb-ui-setting-number>  <md-divider></md-divider> <md-subheader>Style/Color/Thickness</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" title=\"All Eaual?\" icon=border_all value=wbModel.style.borderStyleColorWidth.uniform></wb-ui-setting-on-off-switch>  <wb-ui-setting-dropdown ng-show=wbModel.style.borderStyleColorWidth.uniform title=Border icon=line_style items=styles value=wbModel.style.borderStyle.all></wb-ui-setting-dropdown>  <wb-ui-setting-number ng-show=\"wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.all></wb-ui-setting-number>  <wb-ui-setting-color ng-show=\"wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.all></wb-ui-setting-color>   <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Left-Border icon=border_left items=styles value=wbModel.style.borderStyle.left></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.left></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.left></wb-ui-setting-color>  <md-divider class=wb-sub-divider ng-show=!wbModel.style.borderStyleColorWidth.uniform></md-divider> <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Right-Border icon=border_right items=styles value=wbModel.style.borderStyle.right></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.right></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.right></wb-ui-setting-color>  <md-divider class=wb-sub-divider ng-show=!wbModel.style.borderStyleColorWidth.uniform></md-divider> <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Top-Border icon=border_top items=styles value=wbModel.style.borderStyle.top></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.top></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.top></wb-ui-setting-color>  <md-divider class=wb-sub-divider ng-show=!wbModel.style.borderStyleColorWidth.uniform></md-divider> <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Bottom-Border icon=border_bottom items=styles value=wbModel.style.borderStyle.bottom></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.bottom></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.bottom></wb-ui-setting-color> </md-list>"
   );
 
 
@@ -4119,7 +4209,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-layout-page.html',
-    " <md-list class=wb-setting-panel>  <wb-ui-setting-choose title=Direction icon=wb-direction items=flexDirection ng-model=wbModel.style.flexDirection> </wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.flexDirection=='wb-flex-row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.flexDirection=='wb-flex-row')?'face':'wb-horizontal-arrows'}}\" items=alignItems ng-model=wbModel.style.alignItems> </wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.flexDirection!='wb-flex-row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}\" items=justifyContent ng-model=wbModel.style.justifyContent> </wb-ui-setting-choose> </md-list>"
+    " <md-list class=wb-setting-panel>  <wb-ui-setting-choose title=Direction icon=wb-direction items=flexDirection ng-model=wbModel.style.flexDirection> </wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.flexDirection=='wb-flex-row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.flexDirection=='wb-flex-row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}\" items=alignItems[wbModel.style.flexDirection] ng-model=wbModel.style.alignItems> </wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.flexDirection!='wb-flex-row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.flexDirection!='wb-flex-row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}\" items=justifyContent[wbModel.style.flexDirection] ng-model=wbModel.style.justifyContent> </wb-ui-setting-choose> </md-list>"
   );
 
 

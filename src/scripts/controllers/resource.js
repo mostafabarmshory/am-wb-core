@@ -31,10 +31,18 @@ angular.module('am-wb-core')
  */
 .controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, 
 		$wbUtil, $q, $controller, $compile, pages, style, data) {
+    
+    /*
+     * Sort pages 
+     */
+    pages.sort(function(a, b){
+        return a.priority > b.priority;
+    });
 
 	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
 	$scope.value = angular.copy(data);
 	$scope.style = style;
+	var currentScope = null;
 	
 	function hide() {
 		$mdDialog.hide();
@@ -44,8 +52,27 @@ angular.module('am-wb-core')
 		$mdDialog.cancel();
 	}
 
+	/**
+	 * Answer the dialog
+	 * 
+	 * If there is an answer function in the current page controller
+	 * then the result of the answer function will be returned as 
+	 * the main result.
+	 * 
+	 * @memberof WbResourceCtrl
+	 */
 	function answer() {
-		$mdDialog.hide($scope.value);
+	    $scope.loadingAnswer = true;
+	    var res = null;
+	    if(currentScope && angular.isFunction(currentScope.answer)){
+	        res =  $q.when(currentScope.answer())
+	        .then($mdDialog.hide);
+	    } else {
+	        res = $mdDialog.hide($scope.value);
+	    }
+        return res.finally(function(){
+            $scope.loadingAnswer = false;
+        });
 	}
 	
 	/**
@@ -55,13 +82,6 @@ angular.module('am-wb-core')
 	function setValue(value){
 		$scope.value = value;
 	}
-	
-//	$scope.$watch('value', function(value){
-//		// Deal with value
-//		console.log(value);
-//	});
-	
-
 
 	/**
 	 * encapsulate template srce with panel widget template.
@@ -94,19 +114,22 @@ angular.module('am-wb-core')
 
 		// 2- Clear childrens
 		target.empty();
+		currentScope = null;
+
 
 		// 3- load pages
 		var page = pages[index];
 		var template = $wbUtil.getTemplateFor(page);
 		if (angular.isDefined(template)) {
-			jobs.push(template.then(function(templateSrc) {
+			jobs.push($q.when(template).then(function(templateSrc) {
 				templateSrc = _encapsulatePanel(page, templateSrc);
 				var element = angular.element(templateSrc);
 				var scope = $rootScope.$new(false, $scope);
+				currentScope = scope;
 				scope.page = page;
 				scope.value = $scope.value;
 				if (angular .isDefined(page.controller)) {
-					$controller(page.controller, {
+					 $controller(page.controller, {
 						$scope : scope,
 						$element : element,
 					});
@@ -123,14 +146,6 @@ angular.module('am-wb-core')
 		});
 	}
 	
-	
-//	$scope.$watch(function(){
-//		return angular.element(document.body).hasClass('md-dialog-is-showing');
-//	}, function(value){
-//		if(value){
-//			loadPages();
-//		}
-//	});
 	$scope.$watch('pageIndex', function(value){
 		if(value >= 0){
 			loadPage(value);
