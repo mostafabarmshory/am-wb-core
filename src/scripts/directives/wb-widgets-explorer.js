@@ -42,7 +42,7 @@ angular.module('am-wb-core')
 		var ngModel = ctrls[0];
 		var widgets = null;
 		
-		if($rootScope.app.setting) {
+		if($rootScope.app && $rootScope.app.setting) {
 		    // save setting in root scope
 		    if(!$rootScope.app.setting.wbWidgetExplorer){
 		        $rootScope.app.setting.wbWidgetExplorer = {};
