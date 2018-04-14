@@ -1,9 +1,14 @@
-<md-list-item>
-    <wb-icon ng-hide="icon==undefined || icon==null || icon=='title'">{{icon}}</wb-icon>
-    <p ng-hide="title==undefined || title==null || title==''">{{title}}</p>
+<div
+	layout="row">
+    <wb-icon 
+    	ng-hide="icon==undefined || icon==null || icon=='title'"
+		layout-padding>{{icon}}</wb-icon>
+    <p 
+    	ng-hide="title==undefined || title==null || title==''" 
+    	flex>{{title}}</p>
     <md-color-picker
             class="color-picker-hide-textbox"
             md-color-clear-button="false"
             ng-model="value">
     </md-color-picker>
-</md-list-item>
+</div>

@@ -10,7 +10,7 @@
 	<md-input-container
 		flex>
 		<label 
-			ng-hide="title==undefined || title==null || title==''">
+			ng-if="title==undefined || title==null || title==''">
 				{{title | translate}}
 		</label>
 		<input

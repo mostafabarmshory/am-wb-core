@@ -4132,7 +4132,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-color.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='title'\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false ng-model=value> </md-color-picker> </md-list-item>"
+    "<div layout=row> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='title'\" layout-padding>{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\" flex>{{title}}</p> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false ng-model=value> </md-color-picker> </div>"
   );
 
 
@@ -4147,7 +4147,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-image.html',
-    "<div layout-align=\"center center\" layout=row class=wb-ui-setting-image> <img ng-click=selectImage() ng-src={{value}} md-colors=\"{borderColor: 'primary-hue1'}\" class=\"wb-ui-setting-image-preview\"> <md-input-container flex> <label ng-hide=\"title==undefined || title==null || title==''\"> {{title | translate}} </label> <input ng-model=value> </md-input-container> </div>"
+    "<div layout-align=\"center center\" layout=row class=wb-ui-setting-image> <img ng-click=selectImage() ng-src={{value}} md-colors=\"{borderColor: 'primary-hue1'}\" class=\"wb-ui-setting-image-preview\"> <md-input-container flex> <label ng-if=\"title==undefined || title==null || title==''\"> {{title | translate}} </label> <input ng-model=value> </md-input-container> </div>"
   );
 
 
