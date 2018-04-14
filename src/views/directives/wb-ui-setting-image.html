@@ -1,20 +1,20 @@
-<div
-	layout="column">
-	<div>
-		<wb-icon ng-hide="icon==undefined || icon==null || icon==''">{{icon}}</wb-icon>
-		<p ng-hide="title==undefined || title==null || title==''">{{title | translate}}</p>
-	</div>
-	<div layout="row">
-		<img 
-			ng-click="selectImage()"
-			ng-src="{{value}}" 
-			width="24px" height="24px"
-			class="md-avatar-icon"/>
-		<md-input-container
-			flex>
-			<input
-				type="text"
-				ng-model="value">
-		</md-input-container>
-	</div>
+<div 
+	layout-align="center center"
+	layout="row"
+	class="wb-ui-setting-image">
+	<img 
+		ng-click="selectImage()"
+		ng-src="{{value}}" 
+		md-colors="{borderColor: 'primary-hue1'}"
+		class="wb-ui-setting-image-preview"/>
+	<md-input-container
+		flex>
+		<label 
+			ng-hide="title==undefined || title==null || title==''">
+				{{title | translate}}
+		</label>
+		<input
+			type="text"
+			ng-model="value" >
+	</md-input-container>
 </div>

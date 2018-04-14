@@ -101,6 +101,7 @@ angular.module('am-wb-core')
 		var jobs = [];
 		var pages2 = [];
 
+		$scope._selectedIndex = pages.indexOf(page);
 
 		// 1- Find element
 		var target = $element.find('#' + CHILDREN_AUNCHOR);

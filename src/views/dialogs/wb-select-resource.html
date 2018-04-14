@@ -26,8 +26,8 @@
 			ng-if="pages.length &gt; 1">
 			<md-list-item 
 				ng-repeat="page in pages | orderBy:priority"
-				ng-click="loadPage(page, $event)"
-				>
+				ng-click="loadPage(page, $event);"
+				md-colors="_selectedIndex===$index ? {background:'accent'} : {}">
 				<wb-icon>{{page.icon || 'attachment'}}</wb-icon>
 				<p>{{page.label | translate}}</p>
 			</md-list-item>

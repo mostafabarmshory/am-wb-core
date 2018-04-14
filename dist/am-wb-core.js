@@ -4146,7 +4146,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-image.html',
-    "<div layout=column> <div> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title | translate}}</p> </div> <div layout=row> <img ng-click=selectImage() ng-src={{value}} width=24px height=24px class=\"md-avatar-icon\"> <md-input-container flex> <input ng-model=value> </md-input-container> </div> </div>"
+    "<div layout=row> <md-input-container flex> <label ng-hide=\"title==undefined || title==null || title==''\"> {{title | translate}} </label> <img ng-click=selectImage() ng-src={{value}} width=24px height=24px class=\"md-avatar-icon\"> <input ng-model=value> </md-input-container> </div>"
   );
 
 

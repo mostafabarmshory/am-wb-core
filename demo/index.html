@@ -42,6 +42,7 @@
 	<link rel="stylesheet" href="styles/wb-page.css">
 	<link rel="stylesheet" href="styles/wb-ui-choose.css">
 	<link rel="stylesheet" href="styles/wb-ui-setting-color.css">
+	<link rel="stylesheet" href="styles/wb-ui-setting-image.css">
 	<link rel="stylesheet" href="styles/wb-widget.css">
 	<link rel="stylesheet" href="styles/wb-widgets-module.css">
 	<link rel="stylesheet" href="styles/font-awesome.css">
@@ -51,8 +52,8 @@
 </head>
 <body>
 <div
-        layout="row"
-        layout-fill>
+	layout="row"
+	layout-fill>
     <div layout="column" flex>
         <!-- 			Custom button group -->
         <!-- 			See: https://material.angularjs.org/latest/CSS/button#grouping-with-css-overrides -->
@@ -86,6 +87,9 @@
 		    <wb-ui-setting-data 
 		        value="myData">
 			</wb-ui-setting-data>
+		    <wb-ui-setting-image
+		        value="myData2">
+			</wb-ui-setting-image>
         </md-list>
         <textarea ng-show="showContent">{{model}}</textarea>
         <div
