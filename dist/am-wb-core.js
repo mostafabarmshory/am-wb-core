@@ -241,16 +241,9 @@ angular.module('am-wb-core')
  * @name WbResourceCtrl
  * @description # WbResourceCtrl Controller of the am-wb-core
  */
-.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, 
-		$wbUtil, $q, $controller, $compile, pages, style, data) {
+.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, 
+		$wbUtil, $q, $controller, $compile, pages, style, data, $element) {
     
-    /*
-     * Sort pages 
-     */
-    pages.sort(function(a, b){
-        return a.priority > b.priority;
-    });
-
 	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
 	$scope.value = angular.copy(data);
 	$scope.style = style;
@@ -315,14 +308,14 @@ angular.module('am-wb-core')
 	 * 
 	 * @returns
 	 */
-	function loadPage(index) {
+	function loadPage(page) {
 		var widget = null;
 		var jobs = [];
 		var pages2 = [];
 
 
 		// 1- Find element
-		var target = $document.find('#' + CHILDREN_AUNCHOR);
+		var target = $element.find('#' + CHILDREN_AUNCHOR);
 
 		// 2- Clear childrens
 		target.empty();
@@ -330,7 +323,7 @@ angular.module('am-wb-core')
 
 
 		// 3- load pages
-		var page = pages[index];
+//		var page = pages[index];
 		var template = $wbUtil.getTemplateFor(page);
 		if (angular.isDefined(template)) {
 			jobs.push($q.when(template).then(function(templateSrc) {
@@ -358,19 +351,19 @@ angular.module('am-wb-core')
 		});
 	}
 	
-	$scope.$watch('pageIndex', function(value){
-		if(value >= 0){
-			loadPage(value);
-		}
-	});
-	
 	
 	$scope.pages = pages;
+	
+	$scope.loadPage = loadPage;
 	
 	$scope.hide = hide;
 	$scope.cancel = cancel;
 	$scope.answer = answer;
 	$scope.setValue = setValue;
+	
+	if(pages.length){
+	    loadPage(pages[0]);
+	}
 });
 
 /* 
@@ -3087,13 +3080,15 @@ angular.module('am-wb-core')
 .run(function($resource) {
 	$resource.newPage({
 		type : 'wb-url',
+		icon: 'link',
 		label : 'URL',
 		templateUrl : 'views/resources/wb-url.html',
 		controller : 'WbResourceUrlCtrl',
-		tags : [ 'image', 'audio', 'video', 'file' ]
+		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url']
 	});
 	$resource.newPage({
 		type : 'wb-sheet',
+		icon : 'border_all',
 		label : 'Sheet',
 		templateUrl : 'views/resources/wb-sheet.html',
 		controller : 'WbResourceDataCtrl',
@@ -4091,7 +4086,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>{{style.title | translate}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content ng-init=\"pageIndex=0;\" layout=column flex> <md-tabs md-selected=pageIndex ng-show=\"pages.length && pages.length &gt; 1\" md-stretch-tabs=always md-center-tabs=true> <md-tab ng-repeat=\"page in pages\" label=\"{{page.label | translate}}\"> </md-tab> </md-tabs> <div layout=row id=wb-select-resource-children> </div> </md-dialog-content> </md-dialog>"
+    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>{{style.title | translate}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content layout=row ng-show=pages.length flex> <md-list ng-if=\"pages.length &gt; 1\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event)\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> <div class=md-whiteframe-8dp id=wb-select-resource-children flex> </div> </md-dialog-content> <md-dialog-content layout=row ng-show=!pages.length flex>  <p>Resource is not supported</p> </md-dialog-content> </md-dialog>"
   );
 
 
@@ -4200,7 +4195,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/resources/wb-url.html',
-    "<div flex layout=column> <p>Fill the following field with the URL.</p> <md-input-container class=\"md-icon-float md-block\"> <label translate>URL</label> <input ng-model=value> </md-input-container> </div>"
+    "<div layout=column layout-padding> <p translate>Insert a valid URL, please.</p> <md-input-container class=\"md-icon-float md-block\"> <label translate>URL</label> <input ng-model=value> </md-input-container> </div>"
   );
 
 
