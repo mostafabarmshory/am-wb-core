@@ -313,6 +313,7 @@ angular.module('am-wb-core')
 		var jobs = [];
 		var pages2 = [];
 
+		$scope._selectedIndex = pages.indexOf(page);
 
 		// 1- Find element
 		var target = $element.find('#' + CHILDREN_AUNCHOR);
@@ -4086,7 +4087,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>{{style.title | translate}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content layout=row ng-show=pages.length flex> <md-list ng-if=\"pages.length &gt; 1\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event)\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> <div class=md-whiteframe-8dp id=wb-select-resource-children flex> </div> </md-dialog-content> <md-dialog-content layout=row ng-show=!pages.length flex>  <p>Resource is not supported</p> </md-dialog-content> </md-dialog>"
+    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-toolbar> <div class=md-toolbar-tools> <h2 translate>{{style.title | translate}}</h2> <span flex></span> <md-button class=md-icon-button ng-click=answer()> <wb-icon aria-label=\"done dialog\">done</wb-icon> </md-button> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> </div> </md-toolbar> <md-dialog-content layout=row ng-show=pages.length flex> <md-list ng-if=\"pages.length &gt; 1\" style=padding:0px> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> <div class=md-whiteframe-8dp id=wb-select-resource-children flex> </div> </md-dialog-content> <md-dialog-content layout=row ng-show=!pages.length flex>  <p>Resource is not supported</p> </md-dialog-content> </md-dialog>"
   );
 
 
@@ -4146,7 +4147,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-image.html',
-    "<div layout=row> <md-input-container flex> <label ng-hide=\"title==undefined || title==null || title==''\"> {{title | translate}} </label> <img ng-click=selectImage() ng-src={{value}} width=24px height=24px class=\"md-avatar-icon\"> <input ng-model=value> </md-input-container> </div>"
+    "<div layout-align=\"center center\" layout=row class=wb-ui-setting-image> <img ng-click=selectImage() ng-src={{value}} md-colors=\"{borderColor: 'primary-hue1'}\" class=\"wb-ui-setting-image-preview\"> <md-input-container flex> <label ng-hide=\"title==undefined || title==null || title==''\"> {{title | translate}} </label> <input ng-model=value> </md-input-container> </div>"
   );
 
 

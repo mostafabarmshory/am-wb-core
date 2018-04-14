@@ -561,6 +561,26 @@ Panel contains serveral children to show a good view. Here is the structure:
     height: 32px;
 }
 
+.wb-ui-setting-image {
+/*  */
+}
+
+.wb-ui-setting-image-preview {
+	cursor: pointer;
+	border-radius: 50%;
+	border-width: 2px;
+	/* size */
+	width: 32px;
+	height: 32px;
+	
+	/* margin */
+	margin-right: 8px;
+}
+
+.wb-ui-setting-image-preview[dir='rtl'] {
+	/* margin */
+	margin-left: 8px;
+}
 
 /**************************************************************************************
 Hierarchical structure

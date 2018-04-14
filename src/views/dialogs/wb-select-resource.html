@@ -23,7 +23,8 @@
 		ng-show="pages.length"
 		flex>
 		<md-list
-			ng-if="pages.length &gt; 1">
+			ng-if="pages.length &gt; 1"
+			style="padding:0px;">
 			<md-list-item 
 				ng-repeat="page in pages | orderBy:priority"
 				ng-click="loadPage(page, $event);"
