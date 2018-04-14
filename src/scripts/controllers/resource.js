@@ -29,16 +29,9 @@ angular.module('am-wb-core')
  * @name WbResourceCtrl
  * @description # WbResourceCtrl Controller of the am-wb-core
  */
-.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, $document, 
-		$wbUtil, $q, $controller, $compile, pages, style, data) {
+.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, 
+		$wbUtil, $q, $controller, $compile, pages, style, data, $element) {
     
-    /*
-     * Sort pages 
-     */
-    pages.sort(function(a, b){
-        return a.priority > b.priority;
-    });
-
 	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
 	$scope.value = angular.copy(data);
 	$scope.style = style;
@@ -103,14 +96,14 @@ angular.module('am-wb-core')
 	 * 
 	 * @returns
 	 */
-	function loadPage(index) {
+	function loadPage(page) {
 		var widget = null;
 		var jobs = [];
 		var pages2 = [];
 
 
 		// 1- Find element
-		var target = $document.find('#' + CHILDREN_AUNCHOR);
+		var target = $element.find('#' + CHILDREN_AUNCHOR);
 
 		// 2- Clear childrens
 		target.empty();
@@ -118,7 +111,7 @@ angular.module('am-wb-core')
 
 
 		// 3- load pages
-		var page = pages[index];
+//		var page = pages[index];
 		var template = $wbUtil.getTemplateFor(page);
 		if (angular.isDefined(template)) {
 			jobs.push($q.when(template).then(function(templateSrc) {
@@ -146,17 +139,17 @@ angular.module('am-wb-core')
 		});
 	}
 	
-	$scope.$watch('pageIndex', function(value){
-		if(value >= 0){
-			loadPage(value);
-		}
-	});
-	
 	
 	$scope.pages = pages;
+	
+	$scope.loadPage = loadPage;
 	
 	$scope.hide = hide;
 	$scope.cancel = cancel;
 	$scope.answer = answer;
 	$scope.setValue = setValue;
+	
+	if(pages.length){
+	    loadPage(pages[0]);
+	}
 });

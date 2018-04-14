@@ -132,7 +132,16 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 .run(function($resource) {
     $resource.newPage({
         type : 'wb-sheet2',
+        icon: 'border_all',
         label : 'Cunstant sheet',
+        template : '<div>Random sheet: ({{x}}, {{y}})</div>',
+        controller : 'ConstSheetTestCtrl',
+        tags : [ 'data' ]
+    });
+    $resource.newPage({
+        type : 'wb-sheet3',
+        icon: 'face',
+        label : 'Cunstant sheet#3',
         template : '<div>Random sheet: ({{x}}, {{y}})</div>',
         controller : 'ConstSheetTestCtrl',
         tags : [ 'data' ]
