@@ -4235,7 +4235,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-dialog-content layout=row ng-show=pages.length flex> <div ng-show=\"pages.length &gt; 1\"> <div layout-padding layout=column> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <div> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> </div> <hr> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </div> <div class=md-whiteframe-8dp layout-padding layout=column flex> <div id=wb-select-resource-children flex> </div> <div class=md-toolbar-tools> <md-button ng-if=openHelp ng-click=openHelp($event) aria-label=\"Show help\"> <span translate>Learn more</span> </md-button> <span flex></span> <md-button class=md-primary ng-click=answer()> <span translate>Done</span> </md-button> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> </div> </div> </md-dialog-content> <md-dialog-content layout=row ng-show=!pages.length flex>  <p>Resource is not supported</p> </md-dialog-content> </md-dialog>"
+    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-dialog-content flex layout=row> <md-sidenav class=md-sidenav-left md-component-id=left md-is-locked-open=true md-whiteframe=4 layout=column ng-show=\"pages.length &gt; 1\"> <div style=\"text-align: center\"> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> <hr> <md-content> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </md-content> </md-sidenav> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> <div layout=row> <md-button ng-if=openHelp ng-click=openHelp($event) aria-label=\"Show help\"> <span translate>Learn more</span> </md-button> <span flex></span> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> <md-button class=md-primary ng-click=answer()> <span translate>Done</span> </md-button> </div> </div> </md-dialog-content> </md-dialog>"
   );
 
 
@@ -4335,16 +4335,16 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/resources/wb-sheet.html',
-    "<div flex layout=column> <hot-table settings=\"{\n" +
-    "\t\t \tcolHeaders: true, \n" +
-    "\t\t \tcontextMenu: ['row_above', 'row_below', 'remove_row', 'hsep1', 'col_left', 'col_right', 'hsep2', 'remove_row', 'remove_col', 'hsep3', 'undo', 'redo', 'make_read_only', 'alignment', 'borders'], \n" +
-    "\t\t \tafterChange: true\n" +
-    "\t\t }\" row-headers=true min-spare-rows=minSpareRows datarows=value.values height=300 width=500 flex> </hot-table> </div>"
+    "<hot-table settings=\"{\n" +
+    "\t \tcolHeaders: true, \n" +
+    "\t \tcontextMenu: ['row_above', 'row_below', 'remove_row', 'hsep1', 'col_left', 'col_right', 'hsep2', 'remove_row', 'remove_col', 'hsep3', 'undo', 'redo', 'make_read_only', 'alignment', 'borders'], \n" +
+    "\t \tafterChange: true\n" +
+    "\t }\" row-headers=true min-spare-rows=minSpareRows datarows=value.values height=300 width=500 flex> </hot-table>"
   );
 
 
   $templateCache.put('views/resources/wb-url.html',
-    "<div layout=column layout-padding> <p translate>Insert a valid URL, please.</p> <md-input-container class=\"md-icon-float md-block\"> <label translate>URL</label> <input ng-model=value> </md-input-container> </div>"
+    "<div layout=column layout-padding flex> <p translate>Insert a valid URL, please.</p> <md-input-container class=\"md-icon-float md-block\"> <label translate>URL</label> <input ng-model=value> </md-input-container> </div>"
   );
 
 

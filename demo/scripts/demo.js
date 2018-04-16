@@ -138,12 +138,14 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
         controller : 'ConstSheetTestCtrl',
         tags : [ 'data' ]
     });
-    $resource.newPage({
-        type : 'wb-sheet3',
-        icon: 'face',
-        label : 'Cunstant sheet#3',
-        template : '<div>Random sheet: ({{x}}, {{y}})</div>',
-        controller : 'ConstSheetTestCtrl',
-        tags : [ 'data' ]
-    });
+    for(var i = 0; i < 100; i++){
+        $resource.newPage({
+            type : 'wb-sheet-'+i,
+            icon: 'face',
+            label : 'Cunstant sheet#3',
+            template : '<div layout="column"><md-button ng-repeat="i in [1,2,3,4,5,6,7,8,9,10, 11,12,13,14,15,16,17,18,19,20,21]">Random sheet: ({{x}}, {{y}})</md-button></div>',
+            controller : 'ConstSheetTestCtrl',
+            tags : [ 'data' ]
+        });
+    }
 });
