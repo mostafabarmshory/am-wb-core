@@ -1,42 +1,65 @@
 <md-dialog
 	aria-label="edit action dialog"
 	ng-cloak>
-	<md-toolbar>
-		<div class="md-toolbar-tools">
-			<h2 translate>{{style.title | translate}}</h2>
-			<span flex></span>
-			<md-button
-				class="md-icon-button"
-				ng-click="answer()"> 
-				<wb-icon aria-label="done dialog">done</wb-icon> 
-			</md-button>
-			<md-button
-				class="md-icon-button"
-				ng-click="cancel()"> 
-				<wb-icon aria-label="Close dialog">close</wb-icon> 
-			</md-button>
-		</div>
-	</md-toolbar>
 
 	<md-dialog-content 
 		layout="row"
 		ng-show="pages.length"
 		flex>
-		<md-list
-			ng-if="pages.length &gt; 1"
-			style="padding:0px;">
-			<md-list-item 
-				ng-repeat="page in pages | orderBy:priority"
-				ng-click="loadPage(page, $event);"
-				md-colors="_selectedIndex===$index ? {background:'accent'} : {}">
-				<wb-icon>{{page.icon || 'attachment'}}</wb-icon>
-				<p>{{page.label | translate}}</p>
-			</md-list-item>
-		</md-list>
+		<div
+			ng-show="pages.length &gt; 1">
+			<div
+				layout-padding
+				layout="column">
+				<wb-icon size="64px" ng-if="style.icon">{{style.icon}}</wb-icon>
+				<div>
+					<h2 
+						style="text-align: center;"
+						translate>{{style.title}}</h2>
+					<p 
+						style="text-align: center;"
+						translate>{{style.description}}</p>
+				</div>
+			</div>
+			<hr/>
+			<md-list
+				style="padding:0px; margin: 0px">
+				<md-list-item 
+					ng-repeat="page in pages | orderBy:priority"
+					ng-click="loadPage(page, $event);"
+					md-colors="_selectedIndex===$index ? {background:'accent'} : {}">
+					<wb-icon>{{page.icon || 'attachment'}}</wb-icon>
+					<p>{{page.label | translate}}</p>
+				</md-list-item>
+			</md-list>
+		</div>
 		<div 
 			class="md-whiteframe-8dp"
- 			id="wb-select-resource-children"
- 			flex>
+			layout-padding
+			layout="column"
+			flex>
+			<div
+	 			id="wb-select-resource-children"
+	 			flex>
+			</div>
+			<div class="md-toolbar-tools">
+				<md-button
+					ng-if="openHelp"
+					ng-click="openHelp($event)"
+					aria-label="Show help"> 
+					<span translate>Learn more</span> 
+				</md-button>
+				<span flex></span>
+				<md-button
+					class="md-primary"
+					ng-click="answer()"> 
+					<span translate>Done</span> 
+				</md-button>
+				<md-button
+					ng-click="cancel()"> 
+					<span translate>Close</span> 
+				</md-button>
+			</div>
 		</div>
 	</md-dialog-content>
 	<md-dialog-content 

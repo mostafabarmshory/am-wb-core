@@ -42,6 +42,10 @@ angular.module('am-wb-core')
 		scope: {
 			widgets: '<'
 		},
+		/**
+		 * 
+		 * @ngInject
+		 */
 		controller: function($scope){
 			if(angular.isFunction($window.openHelp)){
 				$scope.openHelp = function(widget, $event){
