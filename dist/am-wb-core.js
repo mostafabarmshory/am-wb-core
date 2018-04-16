@@ -2545,7 +2545,9 @@ angular.module('am-wb-core')
 			function selectImage(){
 				return $resource.get('image', {
 					style: {
-						title: 'Select image'
+					    icon: 'image',
+						title: 'Select image',
+						description: 'Select image from resources.'
 					},
 					data: $scope.value
 				})//
