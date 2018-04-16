@@ -2,6 +2,7 @@
 	aria-label="edit action dialog"
 	ng-cloak>
 	<md-dialog-content
+		mb-preloading="loadingAnswer"
 		flex
 		layout="row">
 		<md-sidenav
@@ -21,7 +22,7 @@
 					style="text-align: center;"
 					translate>{{style.description}}</p>
 			</div>
-			<hr/>
+			<md-devider></md-devider>
 			<md-content>
 				<md-list
 					style="padding:0px; margin: 0px">
