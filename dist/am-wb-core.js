@@ -210,162 +210,167 @@ angular.module('am-wb-core')
 	});
 });
 
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc function
- * @name WbResourceCtrl
- * @description # WbResourceCtrl Controller of the am-wb-core
- */
-.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, 
-		$wbUtil, $q, $controller, $compile, pages, style, data, $element) {
-    
-	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
-	$scope.value = angular.copy(data);
-	$scope.style = style;
-	var currentScope = null;
-	
-	function hide() {
-		$mdDialog.hide();
-	}
-
-	function cancel() {
-		$mdDialog.cancel();
-	}
-
-	/**
-	 * Answer the dialog
-	 * 
-	 * If there is an answer function in the current page controller
-	 * then the result of the answer function will be returned as 
-	 * the main result.
-	 * 
-	 * @memberof WbResourceCtrl
-	 */
-	function answer() {
-	    $scope.loadingAnswer = true;
-	    var res = null;
-	    if(currentScope && angular.isFunction(currentScope.answer)){
-	        res =  $q.when(currentScope.answer())
-	        .then($mdDialog.hide);
-	    } else {
-	        res = $mdDialog.hide($scope.value);
-	    }
-        return res.finally(function(){
-            $scope.loadingAnswer = false;
-        });
-	}
-	
-	/**
-	 * Sets value to the real var
-	 * 
-	 */
-	function setValue(value){
-		$scope.value = value;
-	}
-
-	/**
-	 * encapsulate template srce with panel widget template.
-	 * 
-	 * @param page
-	 *            setting page config
-	 * @param tempateSrc
-	 *            setting page html template
-	 * @returns encapsulate html template
-	 */
-	function _encapsulatePanel(page, template) {
-		// TODO: maso, 2017: pass all paramter to the setting
-		// panel.
-		return template;
-	}
-
-	/**
-	 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-	 * 
-	 * @returns
-	 */
-	function loadPage(page) {
-		var widget = null;
-		var jobs = [];
-		var pages2 = [];
-
-		$scope._selectedIndex = pages.indexOf(page);
-
-		// 1- Find element
-		var target = $element.find('#' + CHILDREN_AUNCHOR);
-
-		// 2- Clear childrens
-		target.empty();
-		currentScope = null;
-
-
-		// 3- load pages
-//		var page = pages[index];
-		var template = $wbUtil.getTemplateFor(page);
-		if (angular.isDefined(template)) {
-			jobs.push($q.when(template).then(function(templateSrc) {
-				templateSrc = _encapsulatePanel(page, templateSrc);
-				var element = angular.element(templateSrc);
-				var scope = $rootScope.$new(false, $scope);
-				currentScope = scope;
-				scope.page = page;
-				scope.value = $scope.value;
-				if (angular .isDefined(page.controller)) {
-					 $controller(page.controller, {
-						$scope : scope,
-						$element : element,
-					});
-				}
-				$compile(element)(scope);
-				pages2.push(element);
-			}));
-		}
-
-		$q.all(jobs).then(function() {
-			angular.forEach(pages2, function(element) {
-				target.append(element);
-			});
-		});
-	}
-	
-	
-	$scope.pages = pages;
-	
-	$scope.loadPage = loadPage;
-	
-	$scope.hide = hide;
-	$scope.cancel = cancel;
-	$scope.answer = answer;
-	$scope.setValue = setValue;
-	
-	if(pages.length){
-	    loadPage(pages[0]);
-	}
-});
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+///**
+// * @ngdoc function
+// * @name WbResourceCtrl
+// * @description # WbResourceCtrl Controller of the am-wb-core
+// */
+//.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, 
+//		$wbUtil, $q, $controller, $compile, pages, style, data, $element, $window) {
+//    
+//	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
+//	$scope.value = angular.copy(data);
+//	$scope.style = style;
+//	var currentScope = null;
+//	
+//	function hide() {
+//		$mdDialog.hide();
+//	}
+//
+//	function cancel() {
+//		$mdDialog.cancel();
+//	}
+//
+//	/**
+//	 * Answer the dialog
+//	 * 
+//	 * If there is an answer function in the current page controller
+//	 * then the result of the answer function will be returned as 
+//	 * the main result.
+//	 * 
+//	 * @memberof WbResourceCtrl
+//	 */
+//	function answer() {
+//	    $scope.loadingAnswer = true;
+//	    var res = null;
+//	    if(currentScope && angular.isFunction(currentScope.answer)){
+//	        res =  $q.when(currentScope.answer())
+//	        .then($mdDialog.hide);
+//	    } else {
+//	        res = $mdDialog.hide($scope.value);
+//	    }
+//        return res.finally(function(){
+//            $scope.loadingAnswer = false;
+//        });
+//	}
+//	
+//	/**
+//	 * Sets value to the real var
+//	 * 
+//	 */
+//	function setValue(value){
+//		$scope.value = value;
+//	}
+//
+//	/**
+//	 * encapsulate template srce with panel widget template.
+//	 * 
+//	 * @param page
+//	 *            setting page config
+//	 * @param tempateSrc
+//	 *            setting page html template
+//	 * @returns encapsulate html template
+//	 */
+//	function _encapsulatePanel(page, template) {
+//		// TODO: maso, 2017: pass all paramter to the setting
+//		// panel.
+//		return template;
+//	}
+//
+//	/**
+//	 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+//	 * 
+//	 * @returns
+//	 */
+//	function loadPage(page) {
+//		var widget = null;
+//		var jobs = [];
+//		var pages2 = [];
+//
+//		$scope._selectedIndex = pages.indexOf(page);
+//
+//		// 1- Find element
+//		var target = $element.find('#' + CHILDREN_AUNCHOR);
+//
+//		// 2- Clear childrens
+//		target.empty();
+//		currentScope = null;
+//
+//
+//		// 3- load pages
+////		var page = pages[index];
+//		var template = $wbUtil.getTemplateFor(page);
+//		if (angular.isDefined(template)) {
+//			jobs.push($q.when(template).then(function(templateSrc) {
+//				templateSrc = _encapsulatePanel(page, templateSrc);
+//				var element = angular.element(templateSrc);
+//				var scope = $rootScope.$new(false, $scope);
+//				currentScope = scope;
+//				scope.page = page;
+//				scope.value = $scope.value;
+//				if (angular .isDefined(page.controller)) {
+//					 $controller(page.controller, {
+//						$scope : scope,
+//						$element : element,
+//					});
+//				}
+//				$compile(element)(scope);
+//				pages2.push(element);
+//			}));
+//		}
+//
+//		$q.all(jobs).then(function() {
+//			angular.forEach(pages2, function(element) {
+//				target.append(element);
+//			});
+//		});
+//	}
+//	
+//	if(angular.isFunction($window.openHelp)){
+//        $scope.openHelp = function(widget, $event){
+//            $window.openHelp(widget, $event);
+//        }
+//    }
+//	
+//	$scope.pages = pages;
+//	
+//	$scope.loadPage = loadPage;
+//	
+//	$scope.hide = hide;
+//	$scope.cancel = cancel;
+//	$scope.answer = answer;
+//	$scope.setValue = setValue;
+//	
+//	if(pages.length){
+//	    loadPage(pages[0]);
+//	}
+//});
 
 /* 
  * The MIT License (MIT)
@@ -2426,7 +2431,9 @@ angular.module('am-wb-core')
 			function editData(data) {
 				return $resource.get('data', {
 					style : {
-						title : 'Edit data source'
+					    icon: 'insert_chart',
+						title : 'Data sheet',
+						description: 'Edit data of the current sheet',
 					},
 					data : $scope.value
 				}) //
@@ -2947,6 +2954,10 @@ angular.module('am-wb-core')
 		scope: {
 			widgets: '<'
 		},
+		/**
+		 * 
+		 * @ngInject
+		 */
 		controller: function($scope){
 			if(angular.isFunction($window.openHelp)){
 				$scope.openHelp = function(widget, $event){
@@ -3357,9 +3368,144 @@ angular.module('am-wb-core')
  * @description Resource managment
  * 
  */
-.service('$resource', function($wbUi) {
+.service('$resource', function($wbUi, $rootScope) {
+    var CHILDREN_AUNCHOR = 'wb-select-resource-children';
+    var resourcePages = {};
+    /*
+     * Manages resource dialog
+     * @ngInject
+     */
+    function wbResourceCtrl($scope,  $mdDialog, $wbUtil,
+             $q, $controller, $compile, pages, style, data, $element, $window) {
+        
+        $scope.value = angular.copy(data);
+        $scope.style = style;
+        var currentScope = null;
+        
+        function hide() {
+            $mdDialog.hide();
+        }
 
-	var resourcePages = {};
+        function cancel() {
+            return $mdDialog.cancel();
+        }
+
+        /**
+         * Answer the dialog
+         * 
+         * If there is an answer function in the current page controller
+         * then the result of the answer function will be returned as 
+         * the main result.
+         * 
+         * @memberof WbResourceCtrl
+         */
+        function answer() {
+            $scope.loadingAnswer = true;
+            var res = null;
+            if(currentScope && angular.isFunction(currentScope.answer)){
+                res =  $q.when(currentScope.answer())
+                .then($mdDialog.hide);
+            } else {
+                res = $mdDialog.hide($scope.value);
+            }
+            return res.finally(function(){
+                $scope.loadingAnswer = false;
+            });
+        }
+        
+        /**
+         * Sets value to the real var
+         * 
+         */
+        function setValue(value){
+            $scope.value = value;
+        }
+
+        /**
+         * encapsulate template srce with panel widget template.
+         * 
+         * @param page
+         *            setting page config
+         * @param tempateSrc
+         *            setting page html template
+         * @returns encapsulate html template
+         */
+        function _encapsulatePanel(page, template) {
+            // TODO: maso, 2017: pass all paramter to the setting
+            // panel.
+            return template;
+        }
+
+        /**
+         * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+         * 
+         * @returns
+         */
+        function loadPage(page) {
+            var widget = null;
+            var jobs = [];
+            var pages2 = [];
+
+            $scope._selectedIndex = pages.indexOf(page);
+
+            // 1- Find element
+            var target = $element.find('#' + CHILDREN_AUNCHOR);
+
+            // 2- Clear childrens
+            target.empty();
+            currentScope = null;
+
+
+            // 3- load pages
+//          var page = pages[index];
+            var template = $wbUtil.getTemplateFor(page);
+            if (angular.isDefined(template)) {
+                jobs.push($q.when(template).then(function(templateSrc) {
+                    templateSrc = _encapsulatePanel(page, templateSrc);
+                    var element = angular.element(templateSrc);
+                    var scope = $rootScope.$new(false, $scope);
+                    currentScope = scope;
+                    scope.page = page;
+                    scope.value = $scope.value;
+                    if (angular .isDefined(page.controller)) {
+                         $controller(page.controller, {
+                            $scope : scope,
+                            $element : element,
+                        });
+                    }
+                    $compile(element)(scope);
+                    pages2.push(element);
+                }));
+            }
+
+            $q.all(jobs).then(function() {
+                angular.forEach(pages2, function(element) {
+                    target.append(element);
+                });
+            });
+        }
+        
+        if(angular.isFunction($window.openHelp)){
+            $scope.openHelp = function($event){
+                cancel().then(function(){
+                    $window.openHelp(pages[$scope._selectedIndex], $event);
+                });
+            }
+        }
+        
+        $scope.pages = pages;
+        
+        $scope.loadPage = loadPage;
+        
+        $scope.hide = hide;
+        $scope.cancel = cancel;
+        $scope.answer = answer;
+        $scope.setValue = setValue;
+        
+        if(pages.length){
+            loadPage(pages[0]);
+        }
+    }
 
 
 	/**
@@ -3416,7 +3562,7 @@ angular.module('am-wb-core')
 		}
 
 		return $wbUi.openDialog({
-			controller : 'WbResourceCtrl',
+			controller : wbResourceCtrl,
 			templateUrl : 'views/dialogs/wb-select-resource.html',
 			parent : angular.element(document.body),
 			clickOutsideToClose : true,
@@ -4087,7 +4233,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-dialog-content layout=row ng-show=pages.length flex> <div> <div> <h2 translate>{{style.title | translate}}</h2> </div> <md-list ng-if=\"pages.length &gt; 1\" style=padding:0px> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </div> <div layout=column flex> <md-content class=md-whiteframe-8dp id=wb-select-resource-children flex> </md-content> <div class=md-toolbar-tools> <md-button ng-click=answer()> <span translate>Learn more</span> </md-button> <span flex></span> <md-button class=md-primary ng-click=answer()> <span translate>Done</span> </md-button> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> </div> </div> </md-dialog-content> <md-dialog-content layout=row ng-show=!pages.length flex>  <p>Resource is not supported</p> </md-dialog-content> </md-dialog>"
+    "<md-dialog aria-label=\"edit action dialog\" ng-cloak> <md-dialog-content layout=row ng-show=pages.length flex> <div ng-show=\"pages.length &gt; 1\"> <div layout-padding layout=column> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <div> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> </div> <hr> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </div> <div class=md-whiteframe-8dp layout-padding layout=column flex> <div id=wb-select-resource-children flex> </div> <div class=md-toolbar-tools> <md-button ng-if=openHelp ng-click=openHelp($event) aria-label=\"Show help\"> <span translate>Learn more</span> </md-button> <span flex></span> <md-button class=md-primary ng-click=answer()> <span translate>Done</span> </md-button> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> </div> </div> </md-dialog-content> <md-dialog-content layout=row ng-show=!pages.length flex>  <p>Resource is not supported</p> </md-dialog-content> </md-dialog>"
   );
 
 
