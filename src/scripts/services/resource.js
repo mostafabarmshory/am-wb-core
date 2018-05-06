@@ -224,10 +224,11 @@ angular.module('am-wb-core')
 		} else {
 			pages = resourcePages;
 		}
+		var tmplUrl = pages.length > 1 ? 'views/dialogs/wb-select-resource.html' : 'views/dialogs/wb-select-resource-single-page.html'
 
 		return $wbUi.openDialog({
 			controller : wbResourceCtrl,
-			templateUrl : 'views/dialogs/wb-select-resource.html',
+			templateUrl : tmplUrl,
 			parent : angular.element(document.body),
 			clickOutsideToClose : true,
 			fullscreen : true,
