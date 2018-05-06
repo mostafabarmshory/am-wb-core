@@ -1,0 +1,8 @@
+
+/*
+ * Truncate text if overflwo
+ */
+.wb-text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

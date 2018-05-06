@@ -74,12 +74,12 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
     });
 
 
-    for(var i = 0; i < 10; i++){
+    for(var i = 0; i < 5; i++){
         // HTML text
         $widget.newWidget({
             // widget description
             type: 'HtmlText-'+i,
-            title : 'HTML text',
+            title : 'HTML text witloooooooooooong title',
             description : 'An HTML block which is used to test widgets explorer. Do not use in real usage	.',
             icon : 'wb-widget-html',
             groups: ['test', 'test'+i],
@@ -92,6 +92,25 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
             setting:['text'],
             helpId: 'test'+i
         });
+    }
+    for(var i = 0; i < 5; i++){
+    	// HTML text
+    	$widget.newWidget({
+    		// widget description
+    		type: 'HtmlText-'+i+5,
+    		title : 'HTML text ',
+    		description : 'An HTML block which<br/> is used to test widgets explorer. Do not use in<br/> real usage,real usagereal usagereal<br/> usagereal usagereal usagereal <br/>usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal <br/>usagereal usagereal<br/> usagereal<br/> usagereal usagereal usage	.',
+    		icon : 'wb-widget-html',
+    		groups: ['test', 'test'+i],
+    		model : {
+    			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+    		},
+    		// functional properties
+    		templateUrl : 'views/widgets/wb-html.html',
+    		help : 'http://dpq.co.ir',
+    		setting:['text'],
+    		helpId: 'test'+i
+    	});
     }
 
     /**

@@ -513,6 +513,14 @@ Panel contains serveral children to show a good view. Here is the structure:
 	background-size: 12px 12px;
 }
 
+
+/*
+ * Truncate text if overflwo
+ */
+.wb-text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 /**
  * css for customizing angular-material-tabs as choose button for wb-ui-choose directive
  *
