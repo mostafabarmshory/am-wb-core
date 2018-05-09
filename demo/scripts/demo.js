@@ -74,12 +74,12 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
     });
 
 
-    for(var i = 0; i < 10; i++){
+    for(var i = 0; i < 5; i++){
         // HTML text
         $widget.newWidget({
             // widget description
             type: 'HtmlText-'+i,
-            title : 'HTML text',
+            title : 'HTML text witloooooooooooong title',
             description : 'An HTML block which is used to test widgets explorer. Do not use in real usage	.',
             icon : 'wb-widget-html',
             groups: ['test', 'test'+i],
@@ -92,6 +92,25 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
             setting:['text'],
             helpId: 'test'+i
         });
+    }
+    for(var i = 0; i < 5; i++){
+    	// HTML text
+    	$widget.newWidget({
+    		// widget description
+    		type: 'HtmlText-'+i+5,
+    		title : 'HTML text ',
+    		description : 'An HTML block which<br/> is used to test widgets explorer. Do not use in<br/> real usage,real usagereal usagereal<br/> usagereal usagereal usagereal <br/>usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal <br/>usagereal usagereal<br/> usagereal<br/> usagereal usagereal usage	.',
+    		icon : 'wb-widget-html',
+    		groups: ['test', 'test'+i],
+    		model : {
+    			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+    		},
+    		// functional properties
+    		templateUrl : 'views/widgets/wb-html.html',
+    		help : 'http://dpq.co.ir',
+    		setting:['text'],
+    		helpId: 'test'+i
+    	});
     }
 
     /**
@@ -132,9 +151,20 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 .run(function($resource) {
     $resource.newPage({
         type : 'wb-sheet2',
+        icon: 'border_all',
         label : 'Cunstant sheet',
         template : '<div>Random sheet: ({{x}}, {{y}})</div>',
         controller : 'ConstSheetTestCtrl',
         tags : [ 'data' ]
     });
+    for(var i = 0; i < 100; i++){
+        $resource.newPage({
+            type : 'wb-sheet-'+i,
+            icon: 'face',
+            label : 'Cunstant sheet#3',
+            template : '<div layout="column"><md-button ng-repeat="i in [1,2,3,4,5,6,7,8,9,10, 11,12,13,14,15,16,17,18,19,20,21]">Random sheet: ({{x}}, {{y}})</md-button></div>',
+            controller : 'ConstSheetTestCtrl',
+            tags : [ 'data' ]
+        });
+    }
 });

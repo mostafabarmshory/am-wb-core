@@ -33,13 +33,24 @@ angular.module('am-wb-core')
  * This is widgets explorer list.
  * 
  */
-.directive('wbWidgetsExplorer', function($widget) {
+.directive('wbWidgetsExplorer', function($widget, $rootScope) {
 	/*
 	 * link function
 	 */
 	function postLink(scope, element, attrs, ctrls) {
+	    
 		var ngModel = ctrls[0];
 		var widgets = null;
+		
+		if($rootScope.app && $rootScope.app.setting) {
+		    // save setting in root scope
+		    if(!$rootScope.app.setting.wbWidgetExplorer){
+		        $rootScope.app.setting.wbWidgetExplorer = {};
+		    }
+		    scope.wbWidgetExplorer = $rootScope.app.setting.wbWidgetExplorer;
+		} else {
+		    scope.wbWidgetExplorer = {};
+		}
 		
 		/*
 		 * Filter widgets width the query

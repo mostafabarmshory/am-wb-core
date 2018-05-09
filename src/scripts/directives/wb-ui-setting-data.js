@@ -47,7 +47,9 @@ angular.module('am-wb-core')
 			function editData(data) {
 				return $resource.get('data', {
 					style : {
-						title : 'Edit data source'
+					    icon: 'insert_chart',
+						title : 'Data sheet',
+						description: 'Edit data of the current sheet',
 					},
 					data : $scope.value
 				}) //

@@ -31,13 +31,15 @@ angular.module('am-wb-core')
 .run(function($resource) {
 	$resource.newPage({
 		type : 'wb-url',
+		icon: 'link',
 		label : 'URL',
 		templateUrl : 'views/resources/wb-url.html',
 		controller : 'WbResourceUrlCtrl',
-		tags : [ 'image', 'audio', 'video', 'file' ]
+		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url']
 	});
 	$resource.newPage({
 		type : 'wb-sheet',
+		icon : 'border_all',
 		label : 'Sheet',
 		templateUrl : 'views/resources/wb-sheet.html',
 		controller : 'WbResourceDataCtrl',
