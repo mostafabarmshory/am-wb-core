@@ -25,7 +25,7 @@
 		"angular-animate": "1.7.x",
 		"angular-aria": "1.7.x",
 		"angular-messages": "1.7.x",
-		"angular-translate": "2.11.x",
+		"angular-translate": "2.18.x",
 		"md-color-picker": "0.2.x",
 		"angular-ui-tinymce": "latest",
 		"angular-drag-and-drop-lists": "2.0.x",
