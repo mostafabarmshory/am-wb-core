@@ -232,6 +232,7 @@ angular.module('am-wb-core')
 			parent : angular.element(document.body),
 			clickOutsideToClose : true,
 			fullscreen : true,
+            multiple:true,
 			locals : {
 				'pages' : pages,
 				'style' : option.style || {
