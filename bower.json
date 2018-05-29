@@ -28,7 +28,7 @@
 		"angular-translate": "2.18.x",
 		"md-color-picker": "0.2.x",
 		"angular-ui-tinymce": "latest",
-		"angular-drag-and-drop-lists": "2.0.x",
+		"angular-drag-and-drop-lists": "2.1.x",
 		"angular-material-expansion-panel": "0.7.x",
 		"angular-material-icons": "0.7.x",
 		"weakmap-polyfill": "2.0.x",
