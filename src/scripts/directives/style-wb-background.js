@@ -82,7 +82,7 @@ angular.module('am-wb-core')
 	}
 
 	function postLink(scope, element, attributes) {
-		return scope.$watch(attributes.wbSize, function(style){
+		return scope.$watch(attributes.wbBackground, function(style){
 			return setBackgroud(element, style);
 		}, true);
 	}
