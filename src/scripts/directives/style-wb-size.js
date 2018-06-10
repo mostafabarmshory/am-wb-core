@@ -28,20 +28,22 @@ angular.module('am-wb-core')
  * @description Apply margin into the element
  */
 .directive("wbSize", function() {
-    return {
-	restrict : 'A',
-	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbMargin, function(style) {
-		if(!style){
-		    return;
+	return {
+		restrict : 'A',
+		link : function(scope, element, attributes) {
+			return scope.$watch(attributes.wbSize, function(style) {
+				if(!style){
+					return;
+				}
+				element.css({
+					'width': !style.width ? 'auto' : style.width,
+					'height': !style.height ? 'auto' : style.height,
+					'min-width': !style.minWidth ? 'auto' : style.minWidth,
+					'min-height': !style.minHeight ? 'auto' : style.minHeight,
+					'max-width': !(style.maxWidth) ? 'none' : style.maxWidth,
+					'max-height': !(style.maxHeight) ? 'none':style.maxHeight,
+				});
+			}, true);
 		}
-		element.css({
-	            'min-width':style.minWidth,
-	            'min-height':style.minHeight,
-	            'max-width':(style.maxWidth==0) ? 'none' : style.maxWidth,
-	            'max-height':(style.maxHeight==0)?'none':style.maxHeight,
-	            });
-	    }, true);
-	}
-    };
+	};
 });

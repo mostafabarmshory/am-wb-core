@@ -28,23 +28,32 @@ angular.module('am-wb-core')
  * @description Apply margin into the element
  */
 .directive("wbMargin", function() {
-    return {
-	restrict : 'A',
-	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbMargin, function(style) {
-		if(!style){
-		    return;
+	return {
+		restrict : 'A',
+		link : function(scope, element, attributes) {
+			return scope.$watch(attributes.wbMargin, function(style) {
+				if(!style){
+					return;
+				}
+				if(!style.margin){
+					style.margin ={};
+				}
+				if (style.margin.isUniform) {
+					element.css({
+						'margin-left':style.margin.uniform,
+						'margin-right':style.margin.uniform,
+						'margin-top':style.margin.uniform,
+						'margin-bottom':style.margin.uniform,
+					});
+				} else {
+					element.css({
+						'margin-left': style.margin.left,
+						'margin-right':style.margin.right,
+						'margin-top': style.margin.top,
+						'margin-bottom': style.margin.bottom
+					});
+				}
+			}, true);
 		}
-		if(!style.margin){
-		    style.margin ={};
-		}
-		element.css({
-	            'margin-left':(style.margin.isUniform) ? style.margin.uniform : style.margin.left,
-	            'margin-right':(style.margin.isUniform) ? style.margin.uniform : style.margin.right,
-	            'margin-top':(style.margin.isUniform) ? style.margin.uniform : style.margin.top,
-	            'margin-bottom':(style.margin.isUniform) ? style.margin.uniform : style.margin.bottom
-	            });
-	    }, true);
-	}
-    };
+	};
 });

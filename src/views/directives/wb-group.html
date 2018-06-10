@@ -3,6 +3,8 @@
 	dnd-draggable="wbModel"
 	dnd-type="'wb.widget'"
 	dnd-moved="remove()"
+	wb-size="wbModel.style"
+	wb-margin="wbModel.style"
 	ng-class="{'wb-panel wb-widget-edit': wbEditable}"
 	name="{{wbModel.name}}">
     <!-- a header is added through edit-mode -->
@@ -76,9 +78,7 @@
         	class="wb-panel-container"
         	dir="{{wbModel.direction}}"
             wb-layout="wbModel.style"
-			wb-margin="wbModel.style"
 			wb-padding="wbModel.style"
-			wb-size="wbModel.style"
 			wb-background="wbModel.style"
 			wb-border="wbModel.style"
 			dnd-external-sources="true"
