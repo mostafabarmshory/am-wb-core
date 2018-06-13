@@ -1,6 +1,4 @@
-
-'karma-chrome-launcher',// Karma configuration
-// Generated on 2016-06-08
+// Karma configuration
 
 module.exports = function(config) {
   'use strict';
@@ -15,8 +13,37 @@ module.exports = function(config) {
     // testing framework to use (jasmine/mocha/qunit/...)
     // as well as any additional frameworks (requirejs/chai/sinon/...)
     frameworks: [
-      'jasmine'
+      'jasmine',
+      'detectBrowsers'
     ],
+    
+    detectBrowsers: {
+        // enable/disable, default is true
+        enabled: true,
+   
+        // enable/disable phantomjs support, default is true
+        usePhantomJS: true,
+   
+        // post processing of browsers list
+        // here you can edit the list of browsers used by karma
+        postDetection: function(availableBrowser) {
+          /* 
+           //Karma configuration with custom launchers
+            customLaunchers: {
+              IE9: {
+                base: 'IE',
+                'x-ua-compatible': 'IE=EmulateIE9'
+              }
+            }
+          */
+            //Add IE Emulation
+            var result = availableBrowser;
+            if (availableBrowser.indexOf('IE')>-1) {
+              result.push('IE9');
+            }
+            return result;
+          }
+      },
 
     // list of files / patterns to load in the browser
     files: [
@@ -42,13 +69,36 @@ module.exports = function(config) {
       'bower_components/zeroclipboard/dist/ZeroClipboard.js',
       'bower_components/handsontable/dist/handsontable.js',
       'bower_components/ngHandsontable/dist/ngHandsontable.js',
+      'bower_components/am-wb-core/dist/am-wb-core.js',
+      'bower_components/angular-xeditable/dist/js/xeditable.js',
+      'bower_components/angular-youtube-mb/src/angular-youtube-embed.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
-      'src/**/*.js',
+      'src/scripts/**/*.js',
       'test/mock/**/*.js',
       'test/spec/**/*.js'
     ],
+    
+    // coverage reporter generates the coverage
+    reporters: [
+    	'progress', 
+    	'coverage'
+    ],
+    
+    // optionally, configure the reporter
+    coverageReporter: {
+      type : 'lcovonly',
+      dir : 'coverage/',
+      file : 'lcov.info'
+    },
 
+    preprocessors: {
+      // source files, that you wanna generate coverage for
+      // do not include tests or libraries
+      // (these files will be instrumented by Istanbul)
+      'src/scripts/**/*.js': ['coverage']
+    },
+    
     // list of files / patterns to exclude
     exclude: [
     ],
@@ -56,23 +106,21 @@ module.exports = function(config) {
     // web server port
     port: 8080,
 
-    // Start these browsers, currently available:
-    // - Chrome
-    // - ChromeCanary
-    // - Firefox
-    // - Opera
-    // - Safari (only Mac)
-    // - PhantomJS
-    // - IE (only Windows)
-    browsers: [
-      'PhantomJS'
-    ],
 
     // Which plugins to enable
     plugins: [
-      'karma-phantomjs-launcher',
-      'karma-chrome-launcher',
-      'karma-jasmine'
+    	'karma-jasmine',
+    	'karma-coverage',
+    	
+        'karma-chrome-launcher',
+        'karma-edge-launcher',
+        'karma-firefox-launcher',
+        'karma-ie-launcher',
+        'karma-safari-launcher',
+        'karma-safaritechpreview-launcher',
+        'karma-opera-launcher',
+        'karma-phantomjs-launcher',
+        'karma-detect-browsers'
     ],
 
     // Continuous Integration mode
