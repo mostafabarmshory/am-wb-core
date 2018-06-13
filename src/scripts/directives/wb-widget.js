@@ -99,6 +99,10 @@ angular.module('am-wb-core')
 				var newObject = angular.copy($scope.wbModel);
 				return $scope.$parent.insertBefore($scope.wbModel, newObject);
 			}
+			
+			function setHoverDelBtn(flag){
+				$scope.hoveringDelBtn = flag;
+			}
 
 			/*
 			 * Add to scope
@@ -112,6 +116,8 @@ angular.module('am-wb-core')
 			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
 			$scope.isSelected = isSelected;
 			$scope.clone = clone;
+			
+			$scope.setHoverDelBtn = setHoverDelBtn;
 		}
 	};
 });

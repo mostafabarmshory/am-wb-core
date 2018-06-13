@@ -603,6 +603,8 @@ of a widget:
     -> widget container
 ***************************************************************************************/
 .wb-widget {
+	overflow: hide;
+	display: block;
 }
 
 .wb-widget-edit {
@@ -621,13 +623,17 @@ of a widget:
 	border: none;
 	border-bottom: 1px dashed #8f9494;
 	min-height: 24px;
+	min-width: 250px;
 }
 
 .wb-widget-body {
+	display:inline-block;
 	position: relative;
 	top: 0;
 	left: 0;
-
+	width: 100%;
+	height: 100%;
+    overflow: auto;
 }
 
 .wb-widget-overlay {
@@ -651,9 +657,8 @@ of a widget:
 	display: block;
 	top: 0;
 	left: 0;
-	width: 100%;
-	height: 100%;
-    overflow: auto;
+	width: auto;
+	height: auto;
 }
 
 

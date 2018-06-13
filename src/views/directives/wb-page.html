@@ -1,5 +1,7 @@
 <div
 	class="wb-page"
+	wb-margin="wbModel.style"
+	wb-size="wbModel.style"
 	dnd-disable-if="!wbEditable"
 	ng-class="{'wb-page-edit': wbEditable}">
     <!-- a header is added through edit-mode -->
@@ -53,9 +55,7 @@
         	class="wb-panel-container"
         	dir="{{wbModel.direction}}"
             wb-layout="wbModel.style"
-			wb-margin="wbModel.style"
 			wb-padding="wbModel.style"
-			wb-size="wbModel.style"
 			wb-background="wbModel.style"
 			wb-border="wbModel.style"
 			dnd-external-sources="true"

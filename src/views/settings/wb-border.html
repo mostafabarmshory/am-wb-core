@@ -78,7 +78,12 @@ Created by mgh.
 	<md-subheader>Style/Color/Thickness</md-subheader>
 
 	<!-- are all side have a same border? -->
-	<wb-ui-setting-on-off-switch title="All Equal?" title="All Eaual?" icon="border_all" value="wbModel.style.borderStyleColorWidth.uniform"></wb-ui-setting-on-off-switch>
+	<wb-ui-setting-on-off-switch 
+		title="All Equal?" 
+		title="All Eaual?" 
+		icon="border_all" 
+		value="wbModel.style.borderStyleColorWidth.uniform">
+	</wb-ui-setting-on-off-switch>
 	
 	<!-- border style for all situation -->
 	<wb-ui-setting-dropdown ng-show="wbModel.style.borderStyleColorWidth.uniform"
