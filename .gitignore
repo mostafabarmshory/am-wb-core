@@ -18,3 +18,7 @@
 # WebStorm and JetBrains Softwares
 .idea
 #/dist/
+/nbproject/private/
+/coverage/
+/doc/
+/package-lock.json
