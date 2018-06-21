@@ -13,7 +13,7 @@ of a widget:
 ***************************************************************************************/
 .wb-widget {
 	overflow: hide;
-	display: block;
+/* 	display: block; */
 }
 
 .wb-widget-edit {
