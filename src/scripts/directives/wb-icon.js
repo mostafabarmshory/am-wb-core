@@ -28,14 +28,6 @@ angular.module('am-wb-core')
 /**
  */
 .directive('wbIcon', function($interpolate) {
-	return {
-		restrict : 'E',
-		template : '<ng-md-icon style="height: auto;width: auto;" icon="{{iconValue}}"></ng-md-icon>',
-		replace : true,
-		transclude : true,
-		link : postLink
-	};
-
 	function postLink(scope, element, attr, ctrl, transclude) {
 		// Looking for icon
 		var attrName = attr.$normalize(attr.$attr.wbIconName || '');
@@ -64,5 +56,16 @@ angular.module('am-wb-core')
 			scope.iconValue = scope.contentValue || attr.wbIconName || '';
 		}
 	}
+	
+
+	return {
+		restrict : 'E',
+		template : '<ng-md-icon style="height: auto;width: auto;" icon="{{iconValue}}"></ng-md-icon>',
+		scope: true,
+		replace : true,
+		transclude : true,
+		link : postLink
+	};
+
 
 });
