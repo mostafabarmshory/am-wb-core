@@ -7,6 +7,8 @@
 	class="wb-widget"
 	wb-size="wbModel.style"
 	wb-margin="wbModel.style"
+	wb-background="wbModel.style"
+	wb-border="wbModel.style"
 	ng-class="{'wb-widget-edit': wbEditable}" 
 	layout="column"
 	name="{{wbModel.name}}">
@@ -54,9 +56,7 @@
 	
     <!-- body section (in non-edit mode, this area just shown -->
     <div
-    	class="wb-widget-body"
-		wb-background="wbModel.style"
-		wb-border="wbModel.style">
+    	class="wb-widget-body">
 		<div  
 			class="wb-widget-overlay"
 			ng-if="hoveringDelBtn">
