@@ -63,7 +63,26 @@
 	            <wb-icon>content_copy</wb-icon>
 	            <wb-icon>home</wb-icon>
 	            <wb-icon>face</wb-icon>
+	            
+	            <md-input-container class="md-icon-float md-block">
+					<!-- Use floating label instead of placeholder -->
+					<label>Name</label>
+					<wb-icon>person</wb-icon>
+					<input ng-model="user.name" type="text">
+				</md-input-container>
+				
+				
+				<md-input-container class="md-icon-float md-block">
+      <!-- Use floating label instead of placeholder -->
+      <label>Name</label>
+      <md-icon md-svg-src="img/icons/ic_person_24px.svg" class="name"></md-icon>
+      <input ng-model="user.name" type="text">
+    </md-input-container>
 	        </div>
+	        
+	        
+	        
+	        
             <md-button
                     ng-class="{'md-primary' : editable}"
                     class="wb-group-button left"

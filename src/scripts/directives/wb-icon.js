@@ -30,15 +30,16 @@ angular.module('am-wb-core')
 .directive('wbIcon', function($interpolate) {
 	function postLink(scope, element, attr, ctrl, transclude) {
 		// Looking for icon
-		var attrName = attr.$normalize(attr.$attr.wbIconName || '');
+		var attrName = attr.$normalize(attr.$attr.wbIconName
+				|| '');
 		var contentValue = null;
 
 		transclude(scope, function(clone) {
 			var text = clone.text();
 			if (text && text.trim()) {
-				scope.$watch(function(){
+				scope.$watch(function() {
 					return $interpolate(text.trim())(scope);
-				}, function(value){
+				}, function(value) {
 					scope.iconValue = value;
 				});
 			}
@@ -48,24 +49,64 @@ angular.module('am-wb-core')
 			attr.$observe('wbIconName', iconChange);
 		}
 
-
 		/*
 		 * change icon
 		 */
 		function iconChange() {
-			scope.iconValue = scope.contentValue || attr.wbIconName || '';
+			scope.iconValue = scope.contentValue
+			|| attr.wbIconName || '';
 		}
 	}
-	
 
 	return {
 		restrict : 'E',
 		template : '<ng-md-icon style="height: auto;width: auto;" icon="{{iconValue}}"></ng-md-icon>',
-		scope: true,
+		scope : true,
 		replace : true,
 		transclude : true,
 		link : postLink
 	};
 
+})
 
+.directive('mdIconFloat', function($mdTheming) {
+
+	var INPUT_TAGS = [ 'INPUT', 'TEXTAREA', 'SELECT',
+		'MD-SELECT' ];
+
+	var LEFT_SELECTORS = INPUT_TAGS.reduce(
+			function(selectors, isel) {
+				return selectors.concat([ 'wb-icon ~ ' + isel,
+					'.wb-icon ~ ' + isel ]);
+			}, []).join(",");
+
+	var RIGHT_SELECTORS = INPUT_TAGS.reduce(
+			function(selectors, isel) {
+				return selectors.concat([ isel + ' ~ wb-icon',
+					isel + ' ~ .wb-icon' ]);
+			}, []).join(",");
+
+	function compile(tElement) {
+		// Check for both a left & right icon
+		var leftIcon = tElement[0]
+		.querySelector(LEFT_SELECTORS);
+		var rightIcon = tElement[0]
+		.querySelector(RIGHT_SELECTORS);
+
+		if (leftIcon) {
+			tElement.addClass('md-icon-left');
+		}
+		if (rightIcon) {
+			tElement.addClass('md-icon-right');
+		}
+
+		return function postLink(scope, element) {
+			$mdTheming(element);
+		};
+	}
+
+	return {
+		restrict : 'C',
+		compile : compile,
+	};
 });
