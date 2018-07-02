@@ -56,13 +56,13 @@
         </md-button>
         <md-button
             class="md-icon-button md-mini"
-            ng-mouseenter="hoveringDelBtn=true"
-            ng-mouseleave="hoveringDelBtn=false"
+            ng-mouseenter="ctrl.setHoverDelBtn(true)"
+            ng-mouseleave="ctrl.setHoverDelBtn(false)"
             ng-click="remove()">
   			<md-tooltip>
   				<span translate>Remove current group</span>
   			</md-tooltip>
-            <wb-icon class="wb-icon-mini">delete</wb-icon>
+            <wb-icon class="wb-icon-mini">delete</wb-icon>{{_hoveringDelBtn}}
         </md-button>
     </div>
 
@@ -70,13 +70,14 @@
     <div 
     	class="wb-panel-body" 
     	id="wb-content-body">
-        <div 
-	        ng-if="wbEditable&&hoveringDelBtn" 
-	        class="wb-panel-overlay">
-	    </div>
+<!--         <div  -->
+<!-- 	        ng-if="wbEditable&&hoveringDelBtn"  -->
+<!-- 	        class="wb-panel-overlay"> -->
+<!-- 	    </div> -->
         <!-- Children are added in this part -->
         <div 
             id="wb-content-placeholder"
+            ng-class="{'wb-panel-overlay': ctrl.isHoverDelBtn()}"
         	class="wb-panel-container"
         	dir="{{wbModel.direction}}"
             wb-layout="wbModel.style"

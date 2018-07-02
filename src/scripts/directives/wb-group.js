@@ -186,7 +186,32 @@ angular.module('am-wb-core')
 		restrict : 'E',
 		replace : true,
 		transclude : true,
-		link : postLink
+		link : postLink,
+		controllerAs: 'ctrl',
+		controller : function() {
+			var _hoveringDelBtn;
+			
+			/**
+			 * Hover delete button
+			 * 
+			 * @memberof wbPanel
+			 */
+			function setHoverDelBtn(flag){
+				_hoveringDelBtn = flag;
+			}
+			
+			/**
+			 * Is hover delete button 
+			 * 
+			 * @memberof wbPanel
+			 */
+			function isHoverDelBtn(){
+				return _hoveringDelBtn;
+			}
+			
+			this.setHoverDelBtn = setHoverDelBtn;
+			this.isHoverDelBtn = isHoverDelBtn;
+		}
 	};
 });//
 
