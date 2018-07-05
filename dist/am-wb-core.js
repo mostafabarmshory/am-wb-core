@@ -3454,7 +3454,7 @@ angular.module('am-wb-core')
 	$widget.newWidget({
 		// widget description
 		type: 'Group',
-		title: 'Panel',	
+		title: 'Group',	
 		description : 'Panel contains list of widgets.',
 		icon : 'wb-widget-group',
 		groups: ['basic'],
@@ -3468,12 +3468,12 @@ angular.module('am-wb-core')
 	$widget.newWidget({
 		// widget description
 		type: 'HtmlText',
-		title : 'HTML text',
-		description : 'An HTML block text.',
+		title : 'Text',
+		description : 'An text block.',
 		icon : 'wb-widget-html',
 		groups: ['basic'],
 		model : {
-			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+			text : '<h2>Text element</h2><p>Click on the text box to edit.</p>',
 		},
 		// help id
 		help : 'http://dpq.co.ir',
@@ -4315,7 +4315,7 @@ angular.module('am-wb-core')
 				template = $templateRequest(templateUrl);
 			}
 		}
-		return template;
+		return $q.when(template);
 	}
 
 	function compile(model, parenScope){
@@ -4490,7 +4490,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widgets-module.html',
-    "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy flex=none flex-gt-sm=45 layout=column> <div layout=row layout-padding> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <h3 flex class=wb-text-truncate translate>{{widget.title}}</h3> </div> <div layout-padding flex> <p translate>{{widget.description}}</p> </div> <div ng-if=openHelp layout=row> <span flex></span> <md-button class=md-icon-button ng-click=\"openHelp(widget, $event)\"> <wb-icon>help</wb-icon> </md-button> </div> </div> </div>"
+    "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy flex=none flex-gt-sm=30 layout=column layout-align=\"start center\" layout-padding> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <p flex class=wb-text-truncate translate=\"\">{{widget.title}}</p> <md-tooltip md-delay=1000>{{widget.description | translate}}</md-tooltip> </div> </div>"
   );
 
 

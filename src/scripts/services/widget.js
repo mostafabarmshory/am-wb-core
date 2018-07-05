@@ -188,7 +188,7 @@ angular.module('am-wb-core')
 				template = $templateRequest(templateUrl);
 			}
 		}
-		return template;
+		return $q.when(template);
 	}
 
 	function compile(model, parenScope){
