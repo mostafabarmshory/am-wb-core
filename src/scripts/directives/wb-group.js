@@ -31,7 +31,7 @@ angular.module('am-wb-core')
 /**
  * 
  */
-.directive('wbPanel', function($compile, $widget, $controller, $settings, $q) {
+.directive('wbPanel', function($compile, $widget, $controller, $settings, $q, $mdTheming) {
 	function postLink(scope, element, attrs, ctrls, transclud) {
 
 		/**
@@ -77,6 +77,7 @@ angular.module('am-wb-core')
 				compilesJob.push($widget.compile(item, scope)//
 						.then(function(element) {
 							element.attr('id', scope.objectId(item));
+							$mdTheming(element);
 							elements[index] = element;
 						}));
 			});

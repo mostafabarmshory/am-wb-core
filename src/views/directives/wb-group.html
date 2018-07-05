@@ -8,7 +8,8 @@
 	wb-background="wbModel.style"
 	wb-border="wbModel.style"
 	ng-class="{'wb-panel wb-widget-edit': wbEditable}"
-	name="{{wbModel.name}}">
+	name="{{wbModel.name}}"
+	md-theme-watch="true">
     <!-- a header is added through edit-mode -->
     <div 
     	ng-if="wbEditable" 

@@ -11,13 +11,14 @@
 	class="wb-widget"
 	ng-class="{'wb-widget-edit': wbEditable}" 
 	layout="column"
-	name="{{wbModel.name}}">
+	name="{{wbModel.name}}"
+	md-theme-watch="true">
     <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
     <div 
     	ng-if="isSelected()"
          layout="row"
          class="wb-widget-header">
-		<span translate> {{wbModel.name}}</span> 
+		<span translate>{{wbModel.name}}</span> 
 		<span flex></span>
 		<!-- 
 			Extra Actions:
