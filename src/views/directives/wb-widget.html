@@ -4,20 +4,21 @@
 	dnd-draggable="wbModel"
 	dnd-type="'wb.widget'"
 	dnd-moved="movedCallback()"
-	class="wb-widget"
 	wb-size="wbModel.style"
 	wb-margin="wbModel.style"
 	wb-background="wbModel.style"
 	wb-border="wbModel.style"
+	class="wb-widget"
 	ng-class="{'wb-widget-edit': wbEditable}" 
 	layout="column"
-	name="{{wbModel.name}}">
+	name="{{wbModel.name}}"
+	md-theme-watch="true">
     <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
     <div 
     	ng-if="isSelected()"
          layout="row"
          class="wb-widget-header">
-		<span translate> {{wbModel.name}}</span> 
+		<span translate>{{wbModel.name}}</span> 
 		<span flex></span>
 		<!-- 
 			Extra Actions:
@@ -48,8 +49,8 @@
 			class="md-icon-button md-mini" 
 			ng-click="remove()"
 			ng-show="remove"
-            ng-mouseenter="setHoverDelBtn(true)"
-            ng-mouseleave="setHoverDelBtn(false)"> 
+            ng-mouseenter="ctrl.setHoverDelBtn(true)"
+            ng-mouseleave="ctrl.setHoverDelBtn(false)"> 
 			<wb-icon class="mde-icon-mini">delete</wb-icon>
 		</md-button>
     </div>
@@ -57,11 +58,11 @@
     <!-- body section (in non-edit mode, this area just shown -->
     <div
     	class="wb-widget-body">
-		<div  
-			class="wb-widget-overlay"
-			ng-if="hoveringDelBtn">
-		</div>
+<!-- 		<div   -->
+<!-- 			class="wb-widget-overlay"> -->
+<!-- 		</div> -->
 	    <wb-transclude
+    		ng-class="{'wb-widget-overlay': ctrl.isHoverDelBtn()}"
 	    	class="wb-widget-container"
     		wb-layout="wbModel.style"
 			wb-padding="wbModel.style">
