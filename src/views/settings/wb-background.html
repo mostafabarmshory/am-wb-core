@@ -9,7 +9,7 @@ a panel for background settings and opacity of a widget. these css-attributes ar
 
 Created by mgh.
 -->
-<md-list class="wb-setting-panel">
+<div layout="column">
 
     <!-- is transparent? -->
     <wb-ui-setting-on-off-switch 
@@ -62,35 +62,24 @@ Created by mgh.
         value="wbModel.style.backgroundSize"
         ng-show="_abo" >
     </wb-ui-setting-background-size>
-    <!--	<md-input-container 
-            ng-show="_abo" 
-                    class="md-icon-float md-block">
-                    <label>Background size</label>
-                    <input ng-model="wbModel.style.backgroundSize" type="text">
-            </md-input-container>-->
-    <md-input-container 
-        ng-show="_abo" 
-        class="md-icon-float md-block">
-        <label>Background repeat</label>
-        <input ng-model="wbModel.style.backgroundRepeat" type="text">
-    </md-input-container>
-    <md-input-container 
-        ng-show="_abo" 
-        class="md-icon-float md-block">
-        <label>Background position</label>
-        <input ng-model="wbModel.style.backgroundPosition" type="text">
-    </md-input-container>
-    <md-input-container 
-        ng-show="_abo" 
-        class="md-icon-float md-block">
-        <label>Background attachment</label>
-        <input ng-model="wbModel.style.backgroundAttachment" type="text">
-    </md-input-container>
-    <md-input-container 
-        ng-show="_abo" 
-        class="md-icon-float md-block">
-        <label>Background origin</label>
-        <input ng-model="wbModel.style.backgroundOrigin" type="text">
-    </md-input-container>
 
-</md-list>
+    <wb-ui-setting-background-repeat
+        value="wbModel.style.backgroundRepeat"
+        ng-show="_abo" >
+    </wb-ui-setting-background-repeat>
+    <wb-ui-setting-background-position
+        value="wbModel.style.backgroundPosition"
+        ng-show="_abo">
+    </wb-ui-setting-background-position>
+
+    <wb-ui-setting-background-attachment
+        value="wbModel.style.backgroundAttachment"
+        ng-show="_abo" >
+    </wb-ui-setting-background-attachment>
+    <wb-ui-setting-background-origin
+        value="wbModel.style.backgroundOrigin"
+        ng-show="_abo" >
+    </wb-ui-setting-background-origin>
+
+
+</div>

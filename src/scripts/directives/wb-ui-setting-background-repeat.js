@@ -5,9 +5,6 @@
  */
 
 
-/**
- * Created by mgh on 2/26/17.
- */
 angular.module('am-wb-core')
 
         /**
@@ -17,9 +14,9 @@ angular.module('am-wb-core')
          * @description a setting section to set color.
          *
          */
-        .directive('wbUiSettingBackgroundSize', function () {
+        .directive('wbUiSettingBackgroundRepeat', function () {
             return {
-                templateUrl: 'views/directives/wb-ui-setting-background-size.html',
+                templateUrl: 'views/directives/wb-ui-setting-background-repeat.html',
                 restrict: 'E',
                 scope: {
                     title: '@title',
@@ -28,10 +25,12 @@ angular.module('am-wb-core')
                 ,
                 controller: function ($scope) {
                     $scope.items = [
-                        { name: 'Automatic', value: 'auto' },
-                        { name: 'Length', value: 'length' },
-                       { name: 'Cover', value: 'coer' },
-                       { name: 'Contain', value: 'contain' },
+                        { name: 'Repeat', value: 'repeat' },
+                        { name: 'Repeat-x', value: 'repeat-x' },
+                       { name: 'Repeat-y', value: 'repeat-y' },
+                       { name: 'No-repeat', value: 'no-repeat' },
+                       { name: 'Space', value: 'space' },
+                       { name: 'Round', value: 'round' },
                        { name: 'Initial', value: 'initial' },
                        { name: 'Inherit', value: 'inherit' },
                        { name: 'Nothing', value: '' }
