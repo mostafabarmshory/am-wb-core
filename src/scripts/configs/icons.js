@@ -26,7 +26,7 @@
 /**
  * @ngdoc module
  * @name ngDonate
- * @description
+ * @description Defines icons to use every where.
  *
  */
 angular.module('am-wb-core')
