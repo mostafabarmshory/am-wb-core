@@ -26,7 +26,6 @@
 /**
  * @ngdoc module
  * @name ngDonate
- * @description
  *
  */
 angular
@@ -73,7 +72,7 @@ angular
 /**
  * @ngdoc module
  * @name ngDonate
- * @description
+ * @description Defines icons to use every where.
  *
  */
 angular.module('am-wb-core')
@@ -1076,7 +1075,7 @@ angular.module('am-wb-core')
 	}
 
 	function postLink(scope, element, attributes) {
-		return scope.$watch(attributes.wbSize, function(style){
+		return scope.$watch(attributes.wbBackground, function(style){
 			return setBackgroud(element, style);
 		}, true);
 	}
@@ -1296,25 +1295,34 @@ angular.module('am-wb-core')
  * @description Apply margin into the element
  */
 .directive("wbMargin", function() {
-    return {
-	restrict : 'A',
-	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbMargin, function(style) {
-		if(!style){
-		    return;
+	return {
+		restrict : 'A',
+		link : function(scope, element, attributes) {
+			return scope.$watch(attributes.wbMargin, function(style) {
+				if(!style){
+					return;
+				}
+				if(!style.margin){
+					style.margin ={};
+				}
+				if (style.margin.isUniform) {
+					element.css({
+						'margin-left':style.margin.uniform,
+						'margin-right':style.margin.uniform,
+						'margin-top':style.margin.uniform,
+						'margin-bottom':style.margin.uniform,
+					});
+				} else {
+					element.css({
+						'margin-left': style.margin.left,
+						'margin-right':style.margin.right,
+						'margin-top': style.margin.top,
+						'margin-bottom': style.margin.bottom
+					});
+				}
+			}, true);
 		}
-		if(!style.margin){
-		    style.margin ={};
-		}
-		element.css({
-	            'margin-left':(style.margin.isUniform) ? style.margin.uniform : style.margin.left,
-	            'margin-right':(style.margin.isUniform) ? style.margin.uniform : style.margin.right,
-	            'margin-top':(style.margin.isUniform) ? style.margin.uniform : style.margin.top,
-	            'margin-bottom':(style.margin.isUniform) ? style.margin.uniform : style.margin.bottom
-	            });
-	    }, true);
-	}
-    };
+	};
 });
 /* 
  * The MIT License (MIT)
@@ -1399,22 +1407,24 @@ angular.module('am-wb-core')
  * @description Apply margin into the element
  */
 .directive("wbSize", function() {
-    return {
-	restrict : 'A',
-	link : function(scope, element, attributes) {
-	    return scope.$watch(attributes.wbMargin, function(style) {
-		if(!style){
-		    return;
+	return {
+		restrict : 'A',
+		link : function(scope, element, attributes) {
+			return scope.$watch(attributes.wbSize, function(style) {
+				if(!style){
+					return;
+				}
+				element.css({
+					'width': !style.width ? 'auto' : style.width,
+					'height': !style.height ? 'auto' : style.height,
+					'min-width': !style.minWidth ? 'auto' : style.minWidth,
+					'min-height': !style.minHeight ? 'auto' : style.minHeight,
+					'max-width': !(style.maxWidth) ? 'none' : style.maxWidth,
+					'max-height': !(style.maxHeight) ? 'none':style.maxHeight,
+				});
+			}, true);
 		}
-		element.css({
-	            'min-width':style.minWidth,
-	            'min-height':style.minHeight,
-	            'max-width':(style.maxWidth==0) ? 'none' : style.maxWidth,
-	            'max-height':(style.maxHeight==0)?'none':style.maxHeight,
-	            });
-	    }, true);
-	}
-    };
+	};
 });
 /* 
  * The MIT License (MIT)
@@ -1449,7 +1459,7 @@ angular.module('am-wb-core')
 /**
  * 
  */
-.directive('wbPanel', function($compile, $widget, $controller, $settings, $q) {
+.directive('wbPanel', function($compile, $widget, $controller, $settings, $q, $mdTheming) {
 	function postLink(scope, element, attrs, ctrls, transclud) {
 
 		/**
@@ -1495,6 +1505,7 @@ angular.module('am-wb-core')
 				compilesJob.push($widget.compile(item, scope)//
 						.then(function(element) {
 							element.attr('id', scope.objectId(item));
+							$mdTheming(element);
 							elements[index] = element;
 						}));
 			});
@@ -1604,7 +1615,32 @@ angular.module('am-wb-core')
 		restrict : 'E',
 		replace : true,
 		transclude : true,
-		link : postLink
+		link : postLink,
+		controllerAs: 'ctrl',
+		controller : function() {
+			var _hoveringDelBtn;
+			
+			/**
+			 * Hover delete button
+			 * 
+			 * @memberof wbPanel
+			 */
+			function setHoverDelBtn(flag){
+				_hoveringDelBtn = flag;
+			}
+			
+			/**
+			 * Is hover delete button 
+			 * 
+			 * @memberof wbPanel
+			 */
+			function isHoverDelBtn(){
+				return _hoveringDelBtn;
+			}
+			
+			this.setHoverDelBtn = setHoverDelBtn;
+			this.isHoverDelBtn = isHoverDelBtn;
+		}
 	};
 });//
 
@@ -1639,25 +1675,18 @@ angular.module('am-wb-core')
 /**
  */
 .directive('wbIcon', function($interpolate) {
-	return {
-		restrict : 'E',
-		template : '<ng-md-icon style="height: auto;width: auto;" icon="{{iconValue}}"></ng-md-icon>',
-		replace : true,
-		transclude : true,
-		link : postLink
-	};
-
 	function postLink(scope, element, attr, ctrl, transclude) {
 		// Looking for icon
-		var attrName = attr.$normalize(attr.$attr.wbIconName || '');
+		var attrName = attr.$normalize(attr.$attr.wbIconName
+				|| '');
 		var contentValue = null;
 
 		transclude(scope, function(clone) {
 			var text = clone.text();
 			if (text && text.trim()) {
-				scope.$watch(function(){
+				scope.$watch(function() {
 					return $interpolate(text.trim())(scope);
-				}, function(value){
+				}, function(value) {
 					scope.iconValue = value;
 				});
 			}
@@ -1667,15 +1696,66 @@ angular.module('am-wb-core')
 			attr.$observe('wbIconName', iconChange);
 		}
 
-
 		/*
 		 * change icon
 		 */
 		function iconChange() {
-			scope.iconValue = scope.contentValue || attr.wbIconName || '';
+			scope.iconValue = scope.contentValue
+			|| attr.wbIconName || '';
 		}
 	}
 
+	return {
+		restrict : 'E',
+		template : '<ng-md-icon style="height: auto;width: auto;" icon="{{iconValue}}"></ng-md-icon>',
+		scope : true,
+		replace : true,
+		transclude : true,
+		link : postLink
+	};
+
+})
+
+.directive('mdIconFloat', function($mdTheming) {
+
+	var INPUT_TAGS = [ 'INPUT', 'TEXTAREA', 'SELECT',
+		'MD-SELECT' ];
+
+	var LEFT_SELECTORS = INPUT_TAGS.reduce(
+			function(selectors, isel) {
+				return selectors.concat([ 'wb-icon ~ ' + isel,
+					'.wb-icon ~ ' + isel ]);
+			}, []).join(",");
+
+	var RIGHT_SELECTORS = INPUT_TAGS.reduce(
+			function(selectors, isel) {
+				return selectors.concat([ isel + ' ~ wb-icon',
+					isel + ' ~ .wb-icon' ]);
+			}, []).join(",");
+
+	function compile(tElement) {
+		// Check for both a left & right icon
+		var leftIcon = tElement[0]
+		.querySelector(LEFT_SELECTORS);
+		var rightIcon = tElement[0]
+		.querySelector(RIGHT_SELECTORS);
+
+		if (leftIcon) {
+			tElement.addClass('md-icon-left');
+		}
+		if (rightIcon) {
+			tElement.addClass('md-icon-right');
+		}
+
+		return function postLink(scope, element) {
+			$mdTheming(element);
+		};
+	}
+
+	return {
+		restrict : 'C',
+		compile : compile,
+	};
 });
 
 /* 
@@ -2267,6 +2347,92 @@ angular.module('am-wb-core')
 });
 
 /* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+
+angular.module('am-wb-core')
+
+        /**
+         * @ngdoc directive
+         * @name wbUiSettingColor
+         * @memberof am-wb-core
+         * @description a setting section to set color.
+         *
+         */
+        .directive('wbUiSettingBackgroundRepeat', function () {
+            return {
+                templateUrl: 'views/directives/wb-ui-setting-background-repeat.html',
+                restrict: 'E',
+                scope: {
+                    title: '@title',
+                    value: '=value',
+                }
+                ,
+                controller: function ($scope) {
+                    $scope.items = [
+                        { name: 'Repeat', value: 'repeat' },
+                        { name: 'Repeat-x', value: 'repeat-x' },
+                       { name: 'Repeat-y', value: 'repeat-y' },
+                       { name: 'No-repeat', value: 'no-repeat' },
+                       { name: 'Space', value: 'space' },
+                       { name: 'Round', value: 'round' },
+                       { name: 'Initial', value: 'initial' },
+                       { name: 'Inherit', value: 'inherit' },
+                       { name: 'Nothing', value: '' }
+                                                                       
+                    ];
+
+                }
+            };
+        });
+/* 
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+
+/**
+ * Created by mgh on 2/26/17.
+ */
+angular.module('am-wb-core')
+
+        /**
+         * @ngdoc directive
+         * @name wbUiSettingColor
+         * @memberof am-wb-core
+         * @description a setting section to set color.
+         *
+         */
+        .directive('wbUiSettingBackgroundSize', function () {
+            return {
+                templateUrl: 'views/directives/wb-ui-setting-background-size.html',
+                restrict: 'E',
+                scope: {
+                    title: '@title',
+                    value: '=value',
+                }
+                ,
+                controller: function ($scope) {
+                    $scope.items = [
+                        { name: 'Automatic', value: 'auto' },
+                        { name: 'Length', value: 'length' },
+                       { name: 'Cover', value: 'coer' },
+                       { name: 'Contain', value: 'contain' },
+                       { name: 'Initial', value: 'initial' },
+                       { name: 'Inherit', value: 'inherit' },
+                       { name: 'Nothing', value: '' }
+                                                                       
+                    ];
+
+                }
+            };
+        });
+
+/* 
  * The MIT License (MIT)
  * 
  * Copyright (c) 2016 weburger
@@ -2561,6 +2727,61 @@ angular.module('am-wb-core')
 	};
 });
 
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc directive
+ * @name wbUiSettingLength
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @description Set length (css based)
+ * 
+ * @see https://www.w3schools.com/cssref/css_units.asp
+ */
+.directive('wbUiSettingLength', function() {
+	return {
+	    templateUrl : 'views/directives/wb-ui-setting-length.html',
+	    restrict : 'E',
+	    scope : {
+	        title : '@?',
+	        value : '=?',
+	        icon : '@?',
+	        description : '@?',
+	    },
+	    /**
+		 * 
+		 * @gnInject
+		 */
+	    controller : function($scope, $resource) {
+	    }
+	};
+});
+
 /**
  * Created by mgh on 2/26/17.
  */
@@ -2673,6 +2894,160 @@ angular.module('am-wb-core')
 	};
 });
 
+angular.module('am-wb-core')
+
+        /**
+         * @ngdoc directive
+         * @name wbUiSettingColor
+         * @memberof am-wb-core
+         * @description a setting section to set color.
+         *
+         */
+        .directive('wbUiSettingBackgroundAttachment', function () {
+            return {
+                templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
+                restrict: 'E',
+                scope: {
+                    title: '@title',
+                    value: '=value',
+                }
+                ,
+                controller: function ($scope) {
+                    $scope.items = [
+                        {name: 'Scroll', value: 'scroll'},
+                        {name: 'Fixed', value: 'fixed'},
+                        {name: 'Local', value: 'local'},
+                        {name: 'Initial', value: 'initial'},
+                        {name: 'Inherit', value: 'inherit'},
+                        {name: 'Nothing', value: ''}
+                    ];
+
+                }
+            };
+        });
+angular.module('am-wb-core')
+
+        /**
+         * @ngdoc directive
+         * @name wbUiSettingColor
+         * @memberof am-wb-core
+         * @description a setting section to set color.
+         *
+         */
+        .directive('wbUiSettingBackgroundOrigin', function () {
+            return {
+                templateUrl: 'views/directives/wb-ui-setting-background-origin.html',
+                restrict: 'E',
+                scope: {
+                    title: '@title',
+                    value: '=value',
+                }
+                ,
+                controller: function ($scope) {
+                    $scope.items = [
+                        {name: 'Padding-box', value: 'padding-box'},
+                        {name: 'Border-box', value: 'border-box'},
+                        {name: 'Content-box', value: 'content-box'},
+                        {name: 'No-repeat', value: 'no-repeat'},
+                        {name: 'Initial', value: 'initial'},
+                        {name: 'Inherit', value: 'inherit'},
+                        {name: 'Nothing', value: ''}
+                    ];
+
+                }
+            };
+        });
+angular.module('am-wb-core')
+
+        /**
+         * @ngdoc directive
+         * @name wbUiSettingColor
+         * @memberof am-wb-core
+         * @description a setting section to set color.
+         *
+         */
+        .directive('wbUiSettingBackgroundPosition', function () {
+            return {
+                templateUrl: 'views/directives/wb-ui-setting-background-position.html',
+                restrict: 'E',
+                scope: {
+                    title: '@title',
+                    value: '=value',
+                }
+                ,
+                controllerAs: 'ctrl',
+                controller: function DemoCtrl($timeout, $q) {
+                    var self = this;
+                    self.simulateQuery = false;
+                    self.isDisabled = false;
+
+                    // list of `state` value/display objects
+                    self.states = loadAll();
+                    self.querySearch = querySearch;
+                    self.newState = newState;
+
+                    function newState(state) {
+                        alert("Sorry! You'll need to create a Constitution for " + state + " first!");
+                    }
+
+                    // ******************************
+                    // Internal methods
+                    // ******************************
+
+                    /**
+                     * Search for states... use $timeout to simulate
+                     * remote dataservice call.
+                     */
+                    function querySearch(query) {
+                        var results = query ? self.states.filter(createFilterFor(query)) : self.states,
+                                deferred;
+                        if (self.simulateQuery) {
+                            deferred = $q.defer();
+                            $timeout(function () {
+                                deferred.resolve(results);
+                            }, Math.random() * 1000, false);
+                            return deferred.promise;
+                        } else {
+                            return results;
+                        }
+                    }
+
+                    /**
+                     * Build `states` list of key/value pairs
+                     */
+                    function loadAll() {
+                            return[
+                        {display: 'Left top', value: 'left top'},
+                        {display: 'Left center', value: 'left center'},
+                        {display: 'Left bottom', value: 'left bottom'},
+                        {display: 'Right top', value: 'right top'},
+                        {display: 'Right center', value: 'right center'},
+                        {display: 'Center top', value: 'center top'},
+                        {display: 'Center center', value: 'center center'},
+                        {display: 'Center bottom', value: 'center bottom'},
+                        {display: 'Initial', value: 'initial'},
+                        {display: 'Inherit', value: 'inherit'},
+                        {display: 'Nothing', value: ''}
+                    ];
+                    }
+
+                    /**
+                     * Create filter function for a query string
+                     * @param {string} query to filter items 
+                     */
+
+                    function createFilterFor(query) {
+                        var lowercaseQuery = query.toLowerCase();
+
+                        return function (state) {
+                            return (state.value.indexOf(lowercaseQuery) === 0);
+                        };
+
+                    }
+
+                }
+            };
+        });
 /* 
  * The MIT License (MIT)
  * 
@@ -2729,8 +3104,10 @@ angular.module('am-wb-core')
 		transclude : true,
 		replace : true,
 		link : postLink,
+		controllerAs: 'ctrl',
 		controller : function($scope, $element, $settings, $widget) {
 			var element = $element;
+			var _hoveringDelBtn = false;
 			/**
 			 * Remove widget from parent
 			 */
@@ -2766,13 +3143,21 @@ angular.module('am-wb-core')
 			function isSelected() {
 				return $scope.wbEditable && $settings.isCurrentModel($scope.wbModel);
 			}
-			
+
 			/**
 			 * Clone current widget
 			 */
 			function clone() {
 				var newObject = angular.copy($scope.wbModel);
 				return $scope.$parent.insertBefore($scope.wbModel, newObject);
+			}
+
+			function setHoverDelBtn(flag){
+				_hoveringDelBtn = flag;
+			}
+
+			function isHoverDelBtn(){
+				return _hoveringDelBtn;
 			}
 
 			/*
@@ -2787,6 +3172,9 @@ angular.module('am-wb-core')
 			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
 			$scope.isSelected = isSelected;
 			$scope.clone = clone;
+
+			this.setHoverDelBtn = setHoverDelBtn;
+			this.isHoverDelBtn = isHoverDelBtn;
 		}
 	};
 });
@@ -3197,9 +3585,9 @@ angular.module('am-wb-core')
 		templateUrl : 'views/settings/wb-margin-padding.html'
 	});
 	$settings.newPage({
-		type: 'minMaxSize',
-		label : 'Min/Max Size',
-		templateUrl : 'views/settings/wb-min-max-size.html'
+		type: 'size',
+		label : 'Size',
+		templateUrl : 'views/settings/wb-size.html'
 	});
 });
 
@@ -3306,7 +3694,7 @@ angular.module('am-wb-core')
 	$widget.newWidget({
 		// widget description
 		type: 'Group',
-		title: 'Panel',	
+		title: 'Group',	
 		description : 'Panel contains list of widgets.',
 		icon : 'wb-widget-group',
 		groups: ['basic'],
@@ -3320,12 +3708,12 @@ angular.module('am-wb-core')
 	$widget.newWidget({
 		// widget description
 		type: 'HtmlText',
-		title : 'HTML text',
-		description : 'An HTML block text.',
+		title : 'Text',
+		description : 'An text block.',
 		icon : 'wb-widget-html',
 		groups: ['basic'],
 		model : {
-			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+			text : '<h2>Text element</h2><p>Click on the text box to edit.</p>',
 		},
 		// help id
 		help : 'http://dpq.co.ir',
@@ -3634,9 +4022,9 @@ angular.module('am-wb-core')
 		'background', 'pageLayout', 'marginPadding'];
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
 		'background', 'pageLayout', 'selfLayout',
-		'marginPadding', 'minMaxSize' ];
+		'marginPadding', 'size' ];
 	var WB_SETTINGS_WIDGET_DEFAULT = [ 'selfLayout', 'border',
-		'background', 'marginPadding', 'minMaxSize' ];
+		'background', 'marginPadding', 'size' ];
 	/**
 	 * Setting page storage
 	 * 
@@ -4167,7 +4555,7 @@ angular.module('am-wb-core')
 				template = $templateRequest(templateUrl);
 			}
 		}
-		return template;
+		return $q.when(template);
 	}
 
 	function compile(model, parenScope){
@@ -4252,12 +4640,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-group.html',
-    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=remove() ng-class=\"{'wb-panel wb-widget-edit': wbEditable}\" name={{wbModel.name}}>  <div ng-if=wbEditable class=wb-panel-header layout=row> <span translate> {{wbModel.name}}</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Left to right direction</span> </md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Right to left direction</span> </md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Clone current group</span> </md-tooltip> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Load settings</span> </md-tooltip> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=\"hoveringDelBtn=true\" ng-mouseleave=\"hoveringDelBtn=false\" ng-click=remove()> <md-tooltip> <span translate>Remove current group</span> </md-tooltip> <wb-icon class=wb-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-if=wbEditable&&hoveringDelBtn class=wb-panel-overlay> </div>  <div id=wb-content-placeholder class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=getAllowedTypes() dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div> </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=remove() wb-size=wbModel.style wb-margin=wbModel.style wb-background=wbModel.style wb-border=wbModel.style ng-class=\"{'wb-panel wb-widget-edit': wbEditable}\" name={{wbModel.name}} md-theme-watch=true>  <div ng-if=wbEditable class=wb-panel-header layout=row> <span translate> {{wbModel.name}}</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Left to right direction</span> </md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Right to left direction</span> </md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Clone current group</span> </md-tooltip> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <md-tooltip> <span translate>Load settings</span> </md-tooltip> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-mouseenter=ctrl.setHoverDelBtn(true) ng-mouseleave=ctrl.setHoverDelBtn(false) ng-click=remove()> <md-tooltip> <span translate>Remove current group</span> </md-tooltip> <wb-icon class=wb-icon-mini>delete</wb-icon>{{_hoveringDelBtn}} </md-button> </div>  <div class=wb-panel-body id=wb-content-body>      <div id=wb-content-placeholder ng-class=\"{'wb-panel-overlay': ctrl.isHoverDelBtn()}\" class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-padding=wbModel.style dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=getAllowedTypes() dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div> </div> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-page.html',
-    "<div class=wb-page dnd-disable-if=!wbEditable ng-class=\"{'wb-page-edit': wbEditable}\">  <div ng-if=wbEditable class=wb-panel-header layout=row> <span translate> Content</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip>Left to right direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip>Right to left direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button ng-click=loadTemplate() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>photo_album</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body> <div ng-if=hoveringDelBtn class=wb-panel-overlay> </div>  <div id=wb-content-placeholder class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=getAllowedTypes() dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div> </div> </div>"
+    "<div class=wb-page wb-margin=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style dnd-disable-if=!wbEditable ng-class=\"{'wb-page-edit': wbEditable}\" md-theme-watch=true>  <div ng-if=wbEditable class=wb-panel-header layout=row> <span translate> Content</span> <span flex></span>  <md-button ng-disabled=\"wbModel.direction!='rtl'\" ng-click=\"wbModel.direction='ltr'\" class=\"md-icon-button md-mini\"> <md-tooltip>Left to right direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_l_to_r</wb-icon> </md-button> <md-button ng-disabled=\"wbModel.direction=='rtl'\" ng-click=\"wbModel.direction='rtl'\" class=\"md-icon-button md-mini\"> <md-tooltip>Right to left direction</md-tooltip> <wb-icon class=wb-icon-mini>format_textdirection_r_to_l</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=settings() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>settings</wb-icon> </md-button> <md-button ng-click=loadTemplate() class=\"md-icon-button md-mini\"> <wb-icon class=wb-icon-mini>photo_album</wb-icon> </md-button> </div>  <div class=wb-panel-body id=wb-content-body>      <div id=wb-content-placeholder ng-class=\"{'wb-panel-overlay': hoveringDelBtn}\" class=wb-panel-container dir={{wbModel.direction}} wb-layout=wbModel.style wb-padding=wbModel.style dnd-external-sources=true dnd-list=wbModel.contents dnd-allowed-types=getAllowedTypes() dnd-drop=\"dropCallback(event, index, item, external, type)\"> </div> </div> </div>"
   );
 
 
@@ -4278,6 +4666,36 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-ui-setting-audio.html',
     "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-audio</wb-icon> </md-button> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-background-.html',
+    "<md-input-container style=\"margin-right: 50px\"> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-background-attachment.html',
+    "<md-input-container style=\"margin-right: 50px\"> <label>background Position</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-background-origin.html',
+    "<md-input-container style=\"margin-right: 50px\"> <label>background Origin</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-background-position.html',
+    "<md-autocomplete md-selected-item=ctrl.selectedItem md-search-text=ctrl.searchText md-selected-item-change=ctrl.selectedItemChange(item) md-items=\"item in ctrl.querySearch(ctrl.searchText)\" md-item-text=item.display md-min-length=0 placeholder=\"background position\"> <md-item-template> <span md-highlight-text=ctrl.searchText md-highlight-flags=^i>{{item.display}}</span> </md-item-template> <md-not-found> No states matching \"{{ctrl.searchText}}\" were found.  </md-not-found> </md-autocomplete>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-background-repeat.html',
+    "<md-input-container style=\"margin-right: 50px\"> <label>background Repeat</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-background-size.html',
+    "<md-input-container style=\"margin-right: 50px\"> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
@@ -4306,6 +4724,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/directives/wb-ui-setting-length.html',
+    "<div> <md-input-container> <label ng-if=title translate=\"\">{{title}}</label> <input ng-model=\"value\"> <div class=hint ng-if=description translate=\"\">{{description}}</div> </md-input-container> </div>"
+  );
+
+
   $templateCache.put('views/directives/wb-ui-setting-number.html',
     "<md-list-item ng-show=\"slider==undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input style=\"width: 50px\" type=number ng-model=value flex> </md-input-container> </md-list-item> <md-list-item ng-show=\"slider!=undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='' || icon=='wb-blank'\">{{icon}}</wb-icon> <div ng-show=\"icon=='wb-blank'\" style=\"display: inline-block; width: 32px; opacity: 0.0\"></div> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-slider min=0 max=100 ng-model=value flex></md-slider> </md-list-item>"
   );
@@ -4322,7 +4745,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widget.html',
-    "<div dnd-disable-if=!wbEditable dnd-selected=selected() dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=movedCallback() class=wb-widget ng-class=\"{'wb-widget-edit': wbEditable}\" layout=column name={{wbModel.name}}>  <div ng-show=isSelected() layout=row class=wb-widget-header> <span translate> {{wbModel.name}}</span> <span flex></span>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-hide=item.hide() ng-disabled=item.disable() ng-click=item.action()> <wb-icon class=mde-icon-mini>{{item.icon}}</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=remove() ng-show=remove ng-mouseenter=\"ctrl.hoveringDelBtn=true\" ng-mouseleave=\"ctrl.hoveringDelBtn=false\"> <wb-icon class=mde-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-widget-body wb-padding=wbModel.style wb-size=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-margin=wbModel.style> <div class=wb-widget-overlay ng-show=ctrl.hoveringDelBtn> </div> <wb-transclude class=wb-widget-container wb-layout=wbModel.style> </wb-transclude> </div> </div>"
+    "<div dnd-disable-if=!wbEditable dnd-selected=selected() dnd-draggable=wbModel dnd-type=\"'wb.widget'\" dnd-moved=movedCallback() wb-size=wbModel.style wb-margin=wbModel.style wb-background=wbModel.style wb-border=wbModel.style class=wb-widget ng-class=\"{'wb-widget-edit': wbEditable}\" layout=column name={{wbModel.name}} md-theme-watch=true>  <div ng-if=isSelected() layout=row class=wb-widget-header> <span translate>{{wbModel.name}}</span> <span flex></span>  <md-button class=\"md-icon-button md-mini\" ng-repeat=\"item in extraActions\" ng-hide=item.hide() ng-disabled=item.disable() ng-click=item.action()> <wb-icon class=mde-icon-mini>{{item.icon}}</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-if=add ng-click=add() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>add_circle</wb-icon> </md-button> <md-button ng-click=clone() class=\"md-icon-button md-mini\"> <wb-icon class=mde-icon-mini>content_copy</wb-icon> </md-button> <md-button class=\"md-icon-button md-mini\" ng-click=remove() ng-show=remove ng-mouseenter=ctrl.setHoverDelBtn(true) ng-mouseleave=ctrl.setHoverDelBtn(false)> <wb-icon class=mde-icon-mini>delete</wb-icon> </md-button> </div>  <div class=wb-widget-body>    <wb-transclude ng-class=\"{'wb-widget-overlay': ctrl.isHoverDelBtn()}\" class=wb-widget-container wb-layout=wbModel.style wb-padding=wbModel.style> </wb-transclude> </div> </div>"
   );
 
 
@@ -4337,7 +4760,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widgets-module.html',
-    "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy flex=none flex-gt-sm=45 layout=column> <div layout=row layout-padding> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <h3 flex class=wb-text-truncate translate>{{widget.title}}</h3> </div> <div layout-padding flex> <p translate>{{widget.description}}</p> </div> <div ng-if=openHelp layout=row> <span flex></span> <md-button class=md-icon-button ng-click=\"openHelp(widget, $event)\"> <wb-icon>help</wb-icon> </md-button> </div> </div> </div>"
+    "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy flex=none flex-gt-sm=30 layout=column layout-align=\"start center\" layout-padding> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <p flex class=wb-text-truncate translate=\"\">{{widget.title}}</p> <md-tooltip md-delay=1000>{{widget.description | translate}}</md-tooltip> </div> </div>"
   );
 
 
@@ -4356,12 +4779,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-background.html',
-    " <md-list class=wb-setting-panel>  <wb-ui-setting-on-off-switch title=Transparent? icon=blur_on value=wbModel.style.isTransparent> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent title=Opacity icon=wb-opacity value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent slider=\"\" icon=wb-blank value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-image title=\"Background image\" value=wbModel.style.backgroundImage> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.backgroundColor> </wb-ui-setting-color>  <wb-ui-setting-on-off-switch title=\"Advance Background options\" value=_abo> </wb-ui-setting-on-off-switch> <md-input-container ng-show=_abo class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background> </md-input-container> <md-input-container ng-show=_abo class=\"md-icon-float md-block\"> <label>Background size</label> <input ng-model=wbModel.style.backgroundSize> </md-input-container> <md-input-container ng-show=_abo class=\"md-icon-float md-block\"> <label>Background repeat</label> <input ng-model=wbModel.style.backgroundRepeat> </md-input-container> <md-input-container ng-show=_abo class=\"md-icon-float md-block\"> <label>Background position</label> <input ng-model=wbModel.style.backgroundPosition> </md-input-container> <md-input-container ng-show=_abo class=\"md-icon-float md-block\"> <label>Background attachment</label> <input ng-model=wbModel.style.backgroundAttachment> </md-input-container> <md-input-container ng-show=_abo class=\"md-icon-float md-block\"> <label>Background origin</label> <input ng-model=wbModel.style.backgroundOrigin> </md-input-container> </md-list>"
+    " <div layout=column>  <wb-ui-setting-on-off-switch title=Transparent? icon=blur_on value=wbModel.style.isTransparent> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent title=Opacity icon=wb-opacity value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent slider=\"\" icon=wb-blank value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-image title=\"Background image\" value=wbModel.style.backgroundImage> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.backgroundColor> </wb-ui-setting-color>  <wb-ui-setting-on-off-switch title=\"Advance Background options\" value=_abo> </wb-ui-setting-on-off-switch> <md-input-container ng-show=_abo class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background> </md-input-container> <wb-ui-setting-background-size value=wbModel.style.backgroundSize ng-show=_abo> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.backgroundRepeat ng-show=_abo> </wb-ui-setting-background-repeat> <wb-ui-setting-background-position value=wbModel.style.backgroundPosition ng-show=_abo> </wb-ui-setting-background-position> <wb-ui-setting-background-attachment value=wbModel.style.backgroundAttachment ng-show=_abo> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.backgroundOrigin ng-show=_abo> </wb-ui-setting-background-origin> </div>"
   );
 
 
   $templateCache.put('views/settings/wb-border.html',
-    " <md-list class=wb-setting-panel>   <md-subheader class=md-no-sticky>Corner Radius</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" icon=full_rounded value=wbModel.style.borderRadius.uniform> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.borderRadius.uniform title=Radius icon=rounded_corner value=wbModel.style.borderRadius.all> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.borderRadius.uniform slider=\"\" icon=wb-blank value=wbModel.style.borderRadius.all> </wb-ui-setting-number>   <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Top-Left icon=corner_top_left value=wbModel.style.borderRadius.topLeft> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Top-Right icon=corner_top_right value=wbModel.style.borderRadius.topRight> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Bottom-left icon=corner_bottom_left value=wbModel.style.borderRadius.bottomLeft> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Bottom-Right icon=corner_bottom_right value=wbModel.style.borderRadius.bottomRight> </wb-ui-setting-number>  <md-divider></md-divider> <md-subheader>Style/Color/Thickness</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" title=\"All Eaual?\" icon=border_all value=wbModel.style.borderStyleColorWidth.uniform></wb-ui-setting-on-off-switch>  <wb-ui-setting-dropdown ng-show=wbModel.style.borderStyleColorWidth.uniform title=Border icon=line_style items=styles value=wbModel.style.borderStyle.all></wb-ui-setting-dropdown>  <wb-ui-setting-number ng-show=\"wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.all></wb-ui-setting-number>  <wb-ui-setting-color ng-show=\"wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.all></wb-ui-setting-color>   <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Left-Border icon=border_left items=styles value=wbModel.style.borderStyle.left></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.left></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.left></wb-ui-setting-color>  <md-divider class=wb-sub-divider ng-show=!wbModel.style.borderStyleColorWidth.uniform></md-divider> <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Right-Border icon=border_right items=styles value=wbModel.style.borderStyle.right></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.right></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.right></wb-ui-setting-color>  <md-divider class=wb-sub-divider ng-show=!wbModel.style.borderStyleColorWidth.uniform></md-divider> <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Top-Border icon=border_top items=styles value=wbModel.style.borderStyle.top></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.top></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.top></wb-ui-setting-color>  <md-divider class=wb-sub-divider ng-show=!wbModel.style.borderStyleColorWidth.uniform></md-divider> <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Bottom-Border icon=border_bottom items=styles value=wbModel.style.borderStyle.bottom></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.bottom></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.bottom></wb-ui-setting-color> </md-list>"
+    " <md-list class=wb-setting-panel>   <md-subheader class=md-no-sticky>Corner Radius</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" icon=full_rounded value=wbModel.style.borderRadius.uniform> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.borderRadius.uniform title=Radius icon=rounded_corner value=wbModel.style.borderRadius.all> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.borderRadius.uniform slider=\"\" icon=wb-blank value=wbModel.style.borderRadius.all> </wb-ui-setting-number>   <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Top-Left icon=corner_top_left value=wbModel.style.borderRadius.topLeft> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Top-Right icon=corner_top_right value=wbModel.style.borderRadius.topRight> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Bottom-left icon=corner_bottom_left value=wbModel.style.borderRadius.bottomLeft> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=!wbModel.style.borderRadius.uniform title=Bottom-Right icon=corner_bottom_right value=wbModel.style.borderRadius.bottomRight> </wb-ui-setting-number>  <md-divider></md-divider> <md-subheader>Style/Color/Thickness</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" title=\"All Eaual?\" icon=border_all value=wbModel.style.borderStyleColorWidth.uniform> </wb-ui-setting-on-off-switch>  <wb-ui-setting-dropdown ng-show=wbModel.style.borderStyleColorWidth.uniform title=Border icon=line_style items=styles value=wbModel.style.borderStyle.all></wb-ui-setting-dropdown>  <wb-ui-setting-number ng-show=\"wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.all></wb-ui-setting-number>  <wb-ui-setting-color ng-show=\"wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.all></wb-ui-setting-color>   <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Left-Border icon=border_left items=styles value=wbModel.style.borderStyle.left></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.left></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.left></wb-ui-setting-color>  <md-divider class=wb-sub-divider ng-show=!wbModel.style.borderStyleColorWidth.uniform></md-divider> <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Right-Border icon=border_right items=styles value=wbModel.style.borderStyle.right></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.right></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.right></wb-ui-setting-color>  <md-divider class=wb-sub-divider ng-show=!wbModel.style.borderStyleColorWidth.uniform></md-divider> <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Top-Border icon=border_top items=styles value=wbModel.style.borderStyle.top></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.top></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.top></wb-ui-setting-color>  <md-divider class=wb-sub-divider ng-show=!wbModel.style.borderStyleColorWidth.uniform></md-divider> <wb-ui-setting-dropdown ng-show=!wbModel.style.borderStyleColorWidth.uniform title=Bottom-Border icon=border_bottom items=styles value=wbModel.style.borderStyle.bottom></wb-ui-setting-dropdown> <wb-ui-setting-number ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'\" title=Thickness icon=line_weight value=wbModel.style.borderWidth.bottom></wb-ui-setting-number> <wb-ui-setting-color ng-show=\"(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'\" title=Color icon=format_color_fill value=wbModel.style.borderColor.bottom></wb-ui-setting-color> </md-list>"
   );
 
 
@@ -4381,17 +4804,17 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-margin-padding.html',
-    " <md-list class=wb-setting-panel>   <md-subheader class=md-no-sticky>Margin</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" icon=filter_none value=wbModel.style.margin.isUniform> </wb-ui-setting-on-off-switch>  <md-input-container ng-show=wbModel.style.margin.isUniform class=\"md-icon-float md-block\"> <label>Margin Value</label> <input ng-model=wbModel.style.margin.uniform> </md-input-container>  <wb-ui-setting-number ng-show=wbModel.style.margin.isUniform slider=\"\" icon=wb-blank value=wbModel.style.margin.uniform> </wb-ui-setting-number>  <md-input-container ng-show=!wbModel.style.margin.isUniform class=\"md-icon-float md-block\"> <label>Left Margin</label> <input ng-model=wbModel.style.margin.left> </md-input-container> <md-input-container ng-show=!wbModel.style.margin.isUniform class=\"md-icon-float md-block\"> <label>Right Margin</label> <input ng-model=wbModel.style.margin.right> </md-input-container> <md-input-container ng-show=!wbModel.style.margin.isUniform class=\"md-icon-float md-block\"> <label>Top Margin</label> <input ng-model=wbModel.style.margin.top> </md-input-container> <md-input-container ng-show=!wbModel.style.margin.isUniform class=\"md-icon-float md-block\"> <label>Bottom Margin</label> <input ng-model=wbModel.style.margin.bottom> </md-input-container>   <md-subheader class=md-no-sticky>Padding</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" icon=settings_overscan value=wbModel.style.padding.isUniform> </wb-ui-setting-on-off-switch>  <md-input-container ng-show=wbModel.style.padding.isUniform class=\"md-icon-float md-block\"> <label>Padding Value</label> <input ng-model=wbModel.style.padding.uniform> </md-input-container>  <wb-ui-setting-number ng-show=wbModel.style.padding.isUniform slider=\"\" icon=wb-blank value=wbModel.style.padding.uniform> </wb-ui-setting-number>  <md-input-container ng-show=!wbModel.style.padding.isUniform class=\"md-icon-float md-block\"> <label>Left Padding</label> <input ng-model=wbModel.style.padding.left> </md-input-container> <md-input-container ng-show=!wbModel.style.padding.isUniform class=\"md-icon-float md-block\"> <label>Right Padding</label> <input ng-model=wbModel.style.padding.right> </md-input-container> <md-input-container ng-show=!wbModel.style.padding.isUniform class=\"md-icon-float md-block\"> <label>Top Padding</label> <input ng-model=wbModel.style.padding.top> </md-input-container> <md-input-container ng-show=!wbModel.style.padding.isUniform class=\"md-icon-float md-block\"> <label>Bottom Padding</label> <input ng-model=wbModel.style.padding.bottom> </md-input-container> </md-list>"
-  );
-
-
-  $templateCache.put('views/settings/wb-min-max-size.html',
-    " <md-list class=wb-setting-panel>  <md-subheader class=md-no-sticky>Min</md-subheader>  <md-input-container class=\"md-icon-float md-block\"> <label>Min Width</label> <input ng-model=wbModel.style.minWidth> </md-input-container>  <md-input-container class=\"md-icon-float md-block\"> <label>Min Height</label> <input ng-model=wbModel.style.minHeight> </md-input-container>  <md-subheader class=md-no-sticky>Max</md-subheader>  <md-input-container class=\"md-icon-float md-block\"> <label>Max Width</label> <input ng-model=wbModel.style.maxWidth> </md-input-container>  <md-input-container class=\"md-icon-float md-block\"> <label>Max Height</label> <input ng-model=wbModel.style.maxHeight> </md-input-container> </md-list>"
+    " <md-list class=wb-setting-panel>   <md-subheader class=md-no-sticky>Margin</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" icon=filter_none value=wbModel.style.margin.isUniform> </wb-ui-setting-on-off-switch>  <md-input-container ng-show=wbModel.style.margin.isUniform class=\"md-icon-float md-block\"> <label>Margin Value</label> <input ng-model=wbModel.style.margin.uniform> </md-input-container>  <wb-ui-setting-length ng-show=wbModel.style.margin.isUniform slider=\"\" icon=wb-blank value=wbModel.style.margin.uniform> </wb-ui-setting-length>  <md-input-container ng-show=!wbModel.style.margin.isUniform class=\"md-icon-float md-block\"> <label>Left Margin</label> <input ng-model=wbModel.style.margin.left> </md-input-container> <md-input-container ng-show=!wbModel.style.margin.isUniform class=\"md-icon-float md-block\"> <label>Right Margin</label> <input ng-model=wbModel.style.margin.right> </md-input-container> <md-input-container ng-show=!wbModel.style.margin.isUniform class=\"md-icon-float md-block\"> <label>Top Margin</label> <input ng-model=wbModel.style.margin.top> </md-input-container> <md-input-container ng-show=!wbModel.style.margin.isUniform class=\"md-icon-float md-block\"> <label>Bottom Margin</label> <input ng-model=wbModel.style.margin.bottom> </md-input-container>   <md-subheader class=md-no-sticky>Padding</md-subheader>  <wb-ui-setting-on-off-switch title=\"All Equal?\" icon=settings_overscan value=wbModel.style.padding.isUniform> </wb-ui-setting-on-off-switch>  <md-input-container ng-show=wbModel.style.padding.isUniform class=\"md-icon-float md-block\"> <label>Padding Value</label> <input ng-model=wbModel.style.padding.uniform> </md-input-container>  <wb-ui-setting-length ng-show=wbModel.style.padding.isUniform slider=\"\" icon=wb-blank value=wbModel.style.padding.uniform> </wb-ui-setting-length>  <md-input-container ng-show=!wbModel.style.padding.isUniform class=\"md-icon-float md-block\"> <label>Left Padding</label> <input ng-model=wbModel.style.padding.left> </md-input-container> <md-input-container ng-show=!wbModel.style.padding.isUniform class=\"md-icon-float md-block\"> <label>Right Padding</label> <input ng-model=wbModel.style.padding.right> </md-input-container> <md-input-container ng-show=!wbModel.style.padding.isUniform class=\"md-icon-float md-block\"> <label>Top Padding</label> <input ng-model=wbModel.style.padding.top> </md-input-container> <md-input-container ng-show=!wbModel.style.padding.isUniform class=\"md-icon-float md-block\"> <label>Bottom Padding</label> <input ng-model=wbModel.style.padding.bottom> </md-input-container> </md-list>"
   );
 
 
   $templateCache.put('views/settings/wb-notfound.html',
     " <wb-icon>bug</wb-icon> <h2>Settings page not found</h2>"
+  );
+
+
+  $templateCache.put('views/settings/wb-size.html',
+    " <md-list class=wb-setting-panel> <wb-ui-setting-length title=Width value=wbModel.style.width> </wb-ui-setting-length> <wb-ui-setting-length title=Height value=wbModel.style.height> </wb-ui-setting-length>  <md-subheader class=md-no-sticky> <span translate=\"\">Min</span> </md-subheader> <wb-ui-setting-length title=\"Min width\" value=wbModel.style.minWidth> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" value=wbModel.style.minHeight> </wb-ui-setting-length>  <md-subheader class=md-no-sticky> <span translate=\"\">Max</span> </md-subheader> <wb-ui-setting-length title=\"Max width\" value=wbModel.style.maxWidth> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" value=wbModel.style.maxHeight> </wb-ui-setting-length> </md-list>"
   );
 
 

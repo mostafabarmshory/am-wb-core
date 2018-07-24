@@ -46,7 +46,7 @@ angular.module('am-wb-core')
 	$widget.newWidget({
 		// widget description
 		type: 'Group',
-		title: 'Panel',	
+		title: 'Group',	
 		description : 'Panel contains list of widgets.',
 		icon : 'wb-widget-group',
 		groups: ['basic'],
@@ -60,12 +60,12 @@ angular.module('am-wb-core')
 	$widget.newWidget({
 		// widget description
 		type: 'HtmlText',
-		title : 'HTML text',
-		description : 'An HTML block text.',
+		title : 'Text',
+		description : 'An text block.',
 		icon : 'wb-widget-html',
 		groups: ['basic'],
 		model : {
-			text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+			text : '<h2>Text element</h2><p>Click on the text box to edit.</p>',
 		},
 		// help id
 		help : 'http://dpq.co.ir',

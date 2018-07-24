@@ -31,7 +31,7 @@
  */
 angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 .controller('MyTestCtrl', function($scope, $http, $mdDialog) {
-    $http.get('examples/empty.json')
+    $http.get('examples/html.json')
     .then(function(res) {
         $scope.model = res.data;
     });

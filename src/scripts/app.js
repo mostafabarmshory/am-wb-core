@@ -26,7 +26,6 @@
 /**
  * @ngdoc module
  * @name ngDonate
- * @description
  *
  */
 angular

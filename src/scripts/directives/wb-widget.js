@@ -54,8 +54,10 @@ angular.module('am-wb-core')
 		transclude : true,
 		replace : true,
 		link : postLink,
+		controllerAs: 'ctrl',
 		controller : function($scope, $element, $settings, $widget) {
 			var element = $element;
+			var _hoveringDelBtn = false;
 			/**
 			 * Remove widget from parent
 			 */
@@ -91,13 +93,21 @@ angular.module('am-wb-core')
 			function isSelected() {
 				return $scope.wbEditable && $settings.isCurrentModel($scope.wbModel);
 			}
-			
+
 			/**
 			 * Clone current widget
 			 */
 			function clone() {
 				var newObject = angular.copy($scope.wbModel);
 				return $scope.$parent.insertBefore($scope.wbModel, newObject);
+			}
+
+			function setHoverDelBtn(flag){
+				_hoveringDelBtn = flag;
+			}
+
+			function isHoverDelBtn(){
+				return _hoveringDelBtn;
 			}
 
 			/*
@@ -112,6 +122,9 @@ angular.module('am-wb-core')
 			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
 			$scope.isSelected = isSelected;
 			$scope.clone = clone;
+
+			this.setHoverDelBtn = setHoverDelBtn;
+			this.isHoverDelBtn = isHoverDelBtn;
 		}
 	};
 });

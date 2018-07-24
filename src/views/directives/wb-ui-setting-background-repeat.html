@@ -1,0 +1,9 @@
+<md-input-container style="margin-right: 50px;">
+    <label>background Repeat</label>
+    <md-select ng-model="value">
+        <md-option 
+            ng-repeat="value in items" 
+            value="{{value.value}}"
+            translate>{{value.name}}</md-option>
+    </md-select>
+</md-input-container>

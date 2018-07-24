@@ -31,7 +31,7 @@ angular.module('am-wb-core')
 /**
  * 
  */
-.directive('wbPanel', function($compile, $widget, $controller, $settings, $q) {
+.directive('wbPanel', function($compile, $widget, $controller, $settings, $q, $mdTheming) {
 	function postLink(scope, element, attrs, ctrls, transclud) {
 
 		/**
@@ -77,6 +77,7 @@ angular.module('am-wb-core')
 				compilesJob.push($widget.compile(item, scope)//
 						.then(function(element) {
 							element.attr('id', scope.objectId(item));
+							$mdTheming(element);
 							elements[index] = element;
 						}));
 			});
@@ -186,7 +187,32 @@ angular.module('am-wb-core')
 		restrict : 'E',
 		replace : true,
 		transclude : true,
-		link : postLink
+		link : postLink,
+		controllerAs: 'ctrl',
+		controller : function() {
+			var _hoveringDelBtn;
+			
+			/**
+			 * Hover delete button
+			 * 
+			 * @memberof wbPanel
+			 */
+			function setHoverDelBtn(flag){
+				_hoveringDelBtn = flag;
+			}
+			
+			/**
+			 * Is hover delete button 
+			 * 
+			 * @memberof wbPanel
+			 */
+			function isHoverDelBtn(){
+				return _hoveringDelBtn;
+			}
+			
+			this.setHoverDelBtn = setHoverDelBtn;
+			this.isHoverDelBtn = isHoverDelBtn;
+		}
 	};
 });//
 

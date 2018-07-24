@@ -24,36 +24,31 @@
 'use strict';
 
 angular.module('am-wb-core')
+
 /**
- * @description Apply margin into the element
+ * @ngdoc directive
+ * @name wbUiSettingLength
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @description Set length (css based)
+ * 
+ * @see https://www.w3schools.com/cssref/css_units.asp
  */
-.directive("wbMargin", function() {
+.directive('wbUiSettingLength', function() {
 	return {
-		restrict : 'A',
-		link : function(scope, element, attributes) {
-			return scope.$watch(attributes.wbMargin, function(style) {
-				if(!style){
-					return;
-				}
-				if(!style.margin){
-					style.margin ={};
-				}
-				if (style.margin.isUniform) {
-					element.css({
-						'margin-left':style.margin.uniform,
-						'margin-right':style.margin.uniform,
-						'margin-top':style.margin.uniform,
-						'margin-bottom':style.margin.uniform,
-					});
-				} else {
-					element.css({
-						'margin-left': style.margin.left,
-						'margin-right':style.margin.right,
-						'margin-top': style.margin.top,
-						'margin-bottom': style.margin.bottom
-					});
-				}
-			}, true);
-		}
+	    templateUrl : 'views/directives/wb-ui-setting-length.html',
+	    restrict : 'E',
+	    scope : {
+	        title : '@?',
+	        value : '=?',
+	        icon : '@?',
+	        description : '@?',
+	    },
+	    /**
+		 * 
+		 * @gnInject
+		 */
+	    controller : function($scope, $resource) {
+	    }
 	};
 });

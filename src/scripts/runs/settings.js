@@ -85,8 +85,8 @@ angular.module('am-wb-core')
 		templateUrl : 'views/settings/wb-margin-padding.html'
 	});
 	$settings.newPage({
-		type: 'minMaxSize',
-		label : 'Min/Max Size',
-		templateUrl : 'views/settings/wb-min-max-size.html'
+		type: 'size',
+		label : 'Size',
+		templateUrl : 'views/settings/wb-size.html'
 	});
 });

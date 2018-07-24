@@ -1,49 +1,7 @@
 # Weburger
 
 
-[![pipeline status](https://gitlab.com/weburger/angular-material-weburger/badges/master/pipeline.svg)](https://gitlab.com/weburger/angular-material-weburger/commits/master)
-[![coverage report](https://gitlab.com/weburger/angular-material-weburger/badges/master/coverage.svg)](https://gitlab.com/weburger/angular-material-weburger/commits/master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4cdda1ae9f54479da9150540e2de6a42)](https://www.codacy.com/app/am-wb/am-wb-core?utm_source=gitlab.com&amp;utm_medium=referral&amp;utm_content=am-wb/am-wb-core&amp;utm_campaign=Badge_Grade)
+[![coverage report](https://gitlab.com/am-wb/am-wb-core/badges/master/coverage.svg)](https://gitlab.com/am-wb/am-wb-core/commits/master)
 
-Weburger is client side web page render engine.
-
-توی خیلی از کارها نیاز به ماژولهای گرافیکی هست که با ساختارهای داده‌ای سین کار کنه. این ماژولهای گرافیکی بر اساس بسته‌های متفاوتی مثل متریال قابل پیاده سازی هست. این بسته یه سری ماژولهای گرافیکی پرکاربر بر اساس پروتکل سین پیاده سازی کرده تا سرعت توسعه پروژه‌های متفاوت رو زیاد کنه.
-
-# نسخه‌ها
-
-## 0.1.X
-
-هدف اصلی توسعه این نسخه ارائه ابزارهای اولیه برای نمایش محتوی است. 
-
-- تنظیم‌های بردر و پس زمینه
-- ویجت‌های پایه‌ای به همراه تنظیم‌ها اضافه شده است
-- ساختارهای داده‌ای استاندراد توصیف و به کار گرفته شده است.
-- ویجت شبکه‌های اجتمائی
-- اضافه شدن پنل به عنوان در برگیرنده ماژولهای دیگر
-- ماژول برای نمایش یک متن HTML اضافه شده است
-- ماژول برای نمایش یک فهرست از اطالاعات اضاهف شده است
-
-# توسعه
-
-برای توسعه از ابزارهای زیر استفاده شده که شما هم باید اونها رو روی سیستم خودتون نصب کنید:
-
-- nodejs
-- grunt-cli
-- bower
-
-## تولید محصول
-
-دستور زیر برای تست و تولید محصول نهایی این پروژه در نظر گرفته شده است:
-
-	grunt build
-
-## اجرای برنامه نمونه
-
-یک برنامه نمونه ایجاد شده تا نمایی کلی از ویجت‌های سیستم را ایجاد کند و علاوه بر این بتواند به عنوان ابزاری برای طراحی استفاده شود. برای اجرای این برنامه دستور زیر در نظر گرفته شده است:
-
-	grunt demo
-	
-## تست
-
-در نهایت پس از اینکه پروژه ایجاد شد نیاز است که از نظر عملکردی بررسی شود. مجموعه‌ای از تست‌های عملکردی برای ماژولهای این بسته پیاده سازی شده است. برای اجرای این تست‌ها دستور زیر در نظر گرفته شده است:
-
-	grunt test
+WEBURGER is client side web page render engine.
