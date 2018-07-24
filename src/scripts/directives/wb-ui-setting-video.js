@@ -40,6 +40,7 @@ angular.module('am-wb-core')
 		restrict: 'E',
 		scope: {
 			title: '@title',
+                        lable: '@lable',
 			value: '=value',
 			icon: '@icon'
 		},
