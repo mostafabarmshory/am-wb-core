@@ -107,7 +107,8 @@ angular.module('am-wb-core')
 	.addShape('sort_center_vert', '<path d="M 3,19.428912 C 3,20.293011 3.7007772,21 4.5572828,21 H 19.442717 C 20.299223,21 21,20.29301 21,19.428912 V 4.571088 C 21,3.706989 20.299223,3 19.442717,3 H 4.5572828 C 3.7007772,3 3,3.706989 3,4.571088 Z m 1.5496789,0 0,-14.857824 H 19.451841 v 14.857824 z m 1.999831,-3.734401 c 0,0.432049 0.3503886,0.785543 0.7786414,0.785543 h 9.3436967 c 0.428253,0 0.778642,-0.353494 0.778642,-0.785543 v -2.356632 c 0,-0.432049 -0.350389,-0.785543 -0.778642,-0.785543 l -9.3436967,0 c -0.4282528,0 -0.7786414,0.353494 -0.7786414,0.785543 z m 0,-5.498807 c 0,0.432049 0.3503886,0.785544 0.7786414,0.785544 l 9.3436967,0 c 0.428253,0 0.778642,-0.353495 0.778642,-0.785544 V 7.839073 c 0,-0.43205 -0.350389,-0.785544 -0.778642,-0.785544 H 7.3281513 c -0.4282528,0 -0.7786414,0.353494 -0.7786414,0.785544 z" />')
 	.addShape('sort_start_vert', '<path d="M 3,19.428912 C 3,20.293011 3.7007772,21 4.5572828,21 H 19.442717 C 20.299223,21 21,20.29301 21,19.428912 V 4.571088 C 21,3.706989 20.299223,3 19.442717,3 H 4.5572828 C 3.7007772,3 3,3.706989 3,4.571088 Z m 1.5496789,0 0,-14.857824 H 19.451841 v 14.857824 z m 1.999831,-5.465052 c 0,0.432049 0.3503886,0.785543 0.7786414,0.785543 l 9.3436967,0 c 0.428253,0 0.778642,-0.353494 0.778642,-0.785543 v -2.356632 c 0,-0.432049 -0.350389,-0.785544 -0.778642,-0.785544 l -9.3436967,0 c -0.4282528,0 -0.7786414,0.353495 -0.7786414,0.785544 z m 0,-5.498807 c 0,0.432049 0.3503886,0.785544 0.7786414,0.785544 l 9.3436967,0 c 0.428253,0 0.778642,-0.353495 0.778642,-0.785544 V 6.108421 c 0,-0.432049 -0.350389,-0.785544 -0.778642,-0.785544 H 7.3281513 c -0.4282528,0 -0.7786414,0.353495 -0.7786414,0.785544 z" />')
 	.addShape('sort_end_vert', '<path d="M 3,19.428912 C 3,20.293011 3.7007772,21 4.5572828,21 H 19.442717 C 20.299223,21 21,20.29301 21,19.428912 V 4.571088 C 21,3.706989 20.299223,3 19.442717,3 H 4.5572828 C 3.7007772,3 3,3.706989 3,4.571088 Z m 1.5496789,0 0,-14.857824 H 19.451841 v 14.857824 z m 1.999831,-1.537333 c 0,0.432049 0.3503886,0.785543 0.7786414,0.785543 h 9.3436967 c 0.428253,0 0.778642,-0.353494 0.778642,-0.785543 v -2.356632 c 0,-0.432049 -0.350389,-0.785544 -0.778642,-0.785544 l -9.3436967,0 c -0.4282528,0 -0.7786414,0.353495 -0.7786414,0.785544 z m 0,-5.498807 c 0,0.432049 0.3503886,0.785544 0.7786414,0.785544 l 9.3436967,0 c 0.428253,0 0.778642,-0.353495 0.778642,-0.785544 V 10.03614 c 0,-0.432049 -0.350389,-0.785543 -0.778642,-0.785543 l -9.3436967,0 c -0.4282528,0 -0.7786414,0.353494 -0.7786414,0.785543 z" />')
-	
+        .addShape('download', '<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" id="Capa_1" x="0px" y="0px" width="18" height="18" viewBox="0 0 24 24" xml:space="preserve" sodipodi:docname="download11111.svg" inkscape:version="0.92.3(2405546, 2018-03-11)"><metadata id="metadata44"><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs id="defs42" /><sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-width="1366" inkscape:window-height="706" id="namedview40" showgrid="false" inkscape:zoom="6.1592508" inkscape:cx="-15.061405" inkscape:cy="1.1743357" inkscape:window-x="-8" inkscape:window-y="-8" inkscape:window-maximized="1" inkscape:current-layer="Capa_1" /><g id="g135" transform="matrix(0.06722689,0,0,0.05536332,-2.5714288,-4.45e-6)"><g id="g78"><g id="file-download"><path id="path75" d="m 395.25,153 h -102 V 0 h -153 v 153 h -102 l 178.5,178.5 z m -357,229.5 v 51 h 357 v -51 z" inkscape:connector-curvature="0" /></g></g></g></svg>')
+	.addShape('upload', '<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" id="Capa_1" x="0px" y="0px" width="18" height="18" viewBox="0 0 24 24" xml:space="preserve" sodipodi:docname="upload-button.svg" inkscape:version="0.92.3 (2405546, 2018-03-11)"><metadata id="metadata44"><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/><dc:title /></cc:Work></rdf:RDF></metadata><defs id="defs42" /><sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10"  guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-width="1366" inkscape:window-height="706" id="namedview40" showgrid="false" inkscape:zoom="2.177624" inkscape:cx="-53.237791" inkscape:cy="29.341367" inkscape:window-x="-8" inkscape:window-y="-8" inkscape:window-maximized="1" inkscape:current-layer="Capa_1" /><g id="g73" transform="matrix(0.06722689,0,0,0.05536332,-2.5714288,-4.45e-6)"><g id="g15"><g   id="file-upload-8"><polygon id="polygon10" points="140.25,178.5 140.25,331.5 293.25,331.5 293.25,178.5 395.25,178.5 216.75,0 38.25,178.5 " /><rect id="rect12" height="51" width="357" y="382.5" x="38.25" /></g></g></g></svg>')
 	// Add multiple icons
 	.addShapes({
 		'wb-opacity': '<path d="M3.55,18.54L4.96,19.95L6.76,18.16L5.34,16.74M11,22.45C11.32,22.45 13,22.45 13,22.45V19.5H11M12,5.5A6,6 0 0,0 6,11.5A6,6 0 0,0 12,17.5A6,6 0 0,0 18,11.5C18,8.18 15.31,5.5 12,5.5M20,12.5H23V10.5H20M17.24,18.16L19.04,19.95L20.45,18.54L18.66,16.74M20.45,4.46L19.04,3.05L17.24,4.84L18.66,6.26M13,0.55H11V3.5H13M4,10.5H1V12.5H4M6.76,4.84L4.96,3.05L3.55,4.46L5.34,6.26L6.76,4.84Z" />',
@@ -2366,6 +2367,7 @@ angular.module('am-wb-core')
             return {
                 templateUrl: 'views/directives/wb-ui-setting-background-repeat.html',
                 restrict: 'E',
+                replace: true,
                 scope: {
                     title: '@title',
                     value: '=value',
@@ -2411,6 +2413,7 @@ angular.module('am-wb-core')
             return {
                 templateUrl: 'views/directives/wb-ui-setting-background-size.html',
                 restrict: 'E',
+                replace: true,
                 scope: {
                     title: '@title',
                     value: '=value',
@@ -2420,7 +2423,7 @@ angular.module('am-wb-core')
                     $scope.items = [
                         { name: 'Automatic', value: 'auto' },
                         { name: 'Length', value: 'length' },
-                       { name: 'Cover', value: 'coer' },
+                       { name: 'Cover', value: 'cover' },
                        { name: 'Contain', value: 'contain' },
                        { name: 'Initial', value: 'initial' },
                        { name: 'Inherit', value: 'inherit' },
@@ -2782,6 +2785,71 @@ angular.module('am-wb-core')
 	};
 });
 
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc directive
+ * @name wbUiSettingColor
+ * @memberof am-wb-core
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingLink', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-link.html',
+		restrict: 'E',
+                replace:true,
+		scope: {
+			title: '@title',
+			url: '=url',
+			icon: '@icon'
+		},
+		controller: function($scope, $resource){
+			function selectlink(){
+				return $resource.get('link', {
+					style: {
+					    icon: 'link',
+						title: 'add url',
+						description: 'Select url from resources.'
+					},
+					data: $scope.url
+				})//
+				.then(function(value){
+					$scope.url = value;
+				});
+			}
+			
+			$scope.selectlink = selectlink;
+		}
+	};
+});
+
 /**
  * Created by mgh on 2/26/17.
  */
@@ -2873,6 +2941,7 @@ angular.module('am-wb-core')
 		restrict: 'E',
 		scope: {
 			title: '@title',
+                        lable: '@lable',
 			value: '=value',
 			icon: '@icon'
 		},
@@ -2907,6 +2976,7 @@ angular.module('am-wb-core')
             return {
                 templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
                 restrict: 'E',
+                replace: true,
                 scope: {
                     title: '@title',
                     value: '=value',
@@ -2938,6 +3008,7 @@ angular.module('am-wb-core')
             return {
                 templateUrl: 'views/directives/wb-ui-setting-background-origin.html',
                 restrict: 'E',
+                replace: true,
                 scope: {
                     title: '@title',
                     value: '=value',
@@ -4670,17 +4741,17 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-.html',
-    "<md-input-container style=\"margin-right: 50px\"> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-attachment.html',
-    "<md-input-container style=\"margin-right: 50px\"> <label>background Position</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label>background Attachment</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-origin.html',
-    "<md-input-container style=\"margin-right: 50px\"> <label>background Origin</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label>background Origin</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
@@ -4690,12 +4761,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-repeat.html',
-    "<md-input-container style=\"margin-right: 50px\"> <label>background Repeat</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label>background Repeat</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-size.html',
-    "<md-input-container style=\"margin-right: 50px\"> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
@@ -4726,6 +4797,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-ui-setting-length.html',
     "<div> <md-input-container> <label ng-if=title translate=\"\">{{title}}</label> <input ng-model=\"value\"> <div class=hint ng-if=description translate=\"\">{{description}}</div> </md-input-container> </div>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-link.html',
+    "<md-input-container class=md-icon-float> <input ng-model=url placeholder={{title}}> <wb-icon style=\"display:inline-block; cursor: pointer\">more_horiz</wb-icon> </md-input-container>"
   );
 
 
@@ -4779,7 +4855,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-background.html',
-    " <div layout=column>  <wb-ui-setting-on-off-switch title=Transparent? icon=blur_on value=wbModel.style.isTransparent> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent title=Opacity icon=wb-opacity value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent slider=\"\" icon=wb-blank value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-image title=\"Background image\" value=wbModel.style.backgroundImage> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.backgroundColor> </wb-ui-setting-color>  <wb-ui-setting-on-off-switch title=\"Advance Background options\" value=_abo> </wb-ui-setting-on-off-switch> <md-input-container ng-show=_abo class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background> </md-input-container> <wb-ui-setting-background-size value=wbModel.style.backgroundSize ng-show=_abo> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.backgroundRepeat ng-show=_abo> </wb-ui-setting-background-repeat> <wb-ui-setting-background-position value=wbModel.style.backgroundPosition ng-show=_abo> </wb-ui-setting-background-position> <wb-ui-setting-background-attachment value=wbModel.style.backgroundAttachment ng-show=_abo> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.backgroundOrigin ng-show=_abo> </wb-ui-setting-background-origin> </div>"
+    " <div layout=column layout-align=\"start stretch\">  <wb-ui-setting-on-off-switch title=Transparent? icon=blur_on value=wbModel.style.isTransparent> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent title=Opacity icon=wb-opacity value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent slider=\"\" icon=wb-blank value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-image title=\"Background image\" value=wbModel.style.backgroundImage> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.backgroundColor> </wb-ui-setting-color>  <wb-ui-setting-on-off-switch title=\"Advance Background options\" value=_abo> </wb-ui-setting-on-off-switch> <md-input-container ng-show=_abo class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background> </md-input-container> <wb-ui-setting-background-size value=wbModel.style.backgroundSize ng-show=_abo> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.backgroundRepeat ng-show=_abo> </wb-ui-setting-background-repeat> <wb-ui-setting-background-position value=wbModel.style.backgroundPosition ng-show=_abo> </wb-ui-setting-background-position> <wb-ui-setting-background-attachment value=wbModel.style.backgroundAttachment ng-show=_abo> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.backgroundOrigin ng-show=_abo> </wb-ui-setting-background-origin> </div>"
   );
 
 

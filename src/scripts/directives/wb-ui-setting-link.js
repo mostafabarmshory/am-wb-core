@@ -27,37 +27,38 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc directive
- * @name wbUiSettingVideo
+ * @name wbUiSettingColor
  * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
- * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
- * @description a setting section to select audio file.
+ * @description a setting section to set color.
  *
  */
-.directive('wbUiSettingVideo', function () {
+.directive('wbUiSettingLink', function () {
 	return {
-		templateUrl: 'views/directives/wb-ui-setting-video.html',
+		templateUrl: 'views/directives/wb-ui-setting-link.html',
 		restrict: 'E',
+                replace:true,
 		scope: {
 			title: '@title',
-                        lable: '@lable',
-			value: '=value',
+			url: '=url',
 			icon: '@icon'
 		},
 		controller: function($scope, $resource){
-			function selectVideo(){
-				return $resource.get('video', {
+			function selectlink(){
+				return $resource.get('link', {
 					style: {
-						title: 'Select audio'
+					    icon: 'link',
+						title: 'add url',
+						description: 'Select url from resources.'
 					},
-					data: $scope.value
+					data: $scope.url
 				})//
 				.then(function(value){
-					$scope.value = value;
+					$scope.url = value;
 				});
 			}
-
-			$scope.edit = selectVideo;
+			
+			$scope.selectlink = selectlink;
 		}
 	};
 });
