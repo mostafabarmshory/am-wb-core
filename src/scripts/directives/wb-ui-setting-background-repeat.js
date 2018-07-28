@@ -18,6 +18,7 @@ angular.module('am-wb-core')
             return {
                 templateUrl: 'views/directives/wb-ui-setting-background-repeat.html',
                 restrict: 'E',
+                replace: true,
                 scope: {
                     title: '@title',
                     value: '=value',
