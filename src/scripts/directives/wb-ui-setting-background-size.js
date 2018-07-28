@@ -21,6 +21,7 @@ angular.module('am-wb-core')
             return {
                 templateUrl: 'views/directives/wb-ui-setting-background-size.html',
                 restrict: 'E',
+                replace: true,
                 scope: {
                     title: '@title',
                     value: '=value',
@@ -30,7 +31,7 @@ angular.module('am-wb-core')
                     $scope.items = [
                         { name: 'Automatic', value: 'auto' },
                         { name: 'Length', value: 'length' },
-                       { name: 'Cover', value: 'coer' },
+                       { name: 'Cover', value: 'cover' },
                        { name: 'Contain', value: 'contain' },
                        { name: 'Initial', value: 'initial' },
                        { name: 'Inherit', value: 'inherit' },
