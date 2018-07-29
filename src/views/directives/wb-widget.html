@@ -1,4 +1,4 @@
-<div 
+<div
 	dnd-disable-if="!wbEditable"
 	dnd-selected="selected()"
 	dnd-draggable="wbModel"
@@ -9,63 +9,13 @@
 	wb-background="wbModel.style"
 	wb-border="wbModel.style"
 	class="wb-widget"
-	ng-class="{'wb-widget-edit': wbEditable}" 
+	ng-class="{'wb-widget-edit': wbEditable}"
 	layout="column"
 	name="{{wbModel.name}}"
-	md-theme-watch="true">
-    <!-- یک عنوان در حالت ادیت برای راهنمایی کاربر اضافه می‌کند -->
-    <div 
-    	ng-if="isSelected()"
-         layout="row"
-         class="wb-widget-header">
-		<span translate>{{wbModel.name}}</span> 
-		<span flex></span>
-		<!-- 
-			Extra Actions:
-			Widgets can contributes customized action with extraActions in
-			scope.
-		 -->
-		<md-button 
-			class="md-icon-button md-mini" 
-			ng-repeat="item in extraActions"
-			ng-hide="item.hide()"
-			ng-disabled="item.disable()"
-			ng-click="item.action()"> 
-			<wb-icon class="mde-icon-mini">{{item.icon}}</wb-icon>
-		</md-button>
-		<md-divider></md-divider>
-		<md-button 
-			ng-if="add"
-			ng-click="add()" 
-			class="md-icon-button md-mini">
-			<wb-icon class="mde-icon-mini">add_circle</wb-icon> 
-		</md-button>
-		<md-button 
-			ng-click="clone()"
-			 class="md-icon-button md-mini">
-			<wb-icon class="mde-icon-mini">content_copy</wb-icon> 
-		</md-button>
-		<md-button 
-			class="md-icon-button md-mini" 
-			ng-click="remove()"
-			ng-show="remove"
-            ng-mouseenter="ctrl.setHoverDelBtn(true)"
-            ng-mouseleave="ctrl.setHoverDelBtn(false)"> 
-			<wb-icon class="mde-icon-mini">delete</wb-icon>
-		</md-button>
-    </div>
+	md-theme-watch="true"
 	
-    <!-- body section (in non-edit mode, this area just shown -->
-    <div
-    	class="wb-widget-body">
-<!-- 		<div   -->
-<!-- 			class="wb-widget-overlay"> -->
-<!-- 		</div> -->
-	    <wb-transclude
-    		ng-class="{'wb-widget-overlay': ctrl.isHoverDelBtn()}"
-	    	class="wb-widget-container"
-    		wb-layout="wbModel.style"
-			wb-padding="wbModel.style">
-    	</wb-transclude>
-    </div>
-</div>
+	
+	ng-class="{'wb-widget-overlay': ctrl.isHoverDelBtn()}"
+	wb-layout="wbModel.style"
+	wb-padding="wbModel.style"
+></div>
