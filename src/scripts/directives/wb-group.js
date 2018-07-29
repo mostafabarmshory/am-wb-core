@@ -29,9 +29,16 @@ var placeholderElementSelector = 'div#wb-content-placeholder';
 
 angular.module('am-wb-core')
 /**
+ * @ngdoc Directives
+ * @name wb-panel
+ * @description Render a list of widget
  * 
  */
 .directive('wbPanel', function($compile, $widget, $controller, $settings, $q, $mdTheming) {
+
+	/*
+	 * Link widget view
+	 */
 	function postLink(scope, element, attrs, ctrls, transclud) {
 
 		/**
@@ -182,6 +189,36 @@ angular.module('am-wb-core')
 		reloadView();
 	}
 
+	/*
+	 * Group controller
+	 * 
+	 * FIXME: maso, 2018: add injection annotation
+	 */
+	function groupController() {
+		var _hoveringDelBtn;
+
+		/**
+		 * Hover delete button
+		 * 
+		 * @memberof wbPanel
+		 */
+		function setHoverDelBtn(flag){
+			_hoveringDelBtn = flag;
+		}
+
+		/**
+		 * Is hover delete button 
+		 * 
+		 * @memberof wbPanel
+		 */
+		function isHoverDelBtn(){
+			return _hoveringDelBtn;
+		}
+
+		this.setHoverDelBtn = setHoverDelBtn;
+		this.isHoverDelBtn = isHoverDelBtn;
+	}
+
 	return {
 		templateUrl : 'views/directives/wb-group.html',
 		restrict : 'E',
@@ -189,30 +226,7 @@ angular.module('am-wb-core')
 		transclude : true,
 		link : postLink,
 		controllerAs: 'ctrl',
-		controller : function() {
-			var _hoveringDelBtn;
-			
-			/**
-			 * Hover delete button
-			 * 
-			 * @memberof wbPanel
-			 */
-			function setHoverDelBtn(flag){
-				_hoveringDelBtn = flag;
-			}
-			
-			/**
-			 * Is hover delete button 
-			 * 
-			 * @memberof wbPanel
-			 */
-			function isHoverDelBtn(){
-				return _hoveringDelBtn;
-			}
-			
-			this.setHoverDelBtn = setHoverDelBtn;
-			this.isHoverDelBtn = isHoverDelBtn;
-		}
+		controller: groupController
 	};
 });//
 
