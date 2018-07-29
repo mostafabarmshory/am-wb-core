@@ -2367,6 +2367,7 @@ angular.module('am-wb-core')
             return {
                 templateUrl: 'views/directives/wb-ui-setting-background-repeat.html',
                 restrict: 'E',
+                replace: true,
                 scope: {
                     title: '@title',
                     value: '=value',
@@ -2412,6 +2413,7 @@ angular.module('am-wb-core')
             return {
                 templateUrl: 'views/directives/wb-ui-setting-background-size.html',
                 restrict: 'E',
+                replace: true,
                 scope: {
                     title: '@title',
                     value: '=value',
@@ -2421,7 +2423,7 @@ angular.module('am-wb-core')
                     $scope.items = [
                         { name: 'Automatic', value: 'auto' },
                         { name: 'Length', value: 'length' },
-                       { name: 'Cover', value: 'coer' },
+                       { name: 'Cover', value: 'cover' },
                        { name: 'Contain', value: 'contain' },
                        { name: 'Initial', value: 'initial' },
                        { name: 'Inherit', value: 'inherit' },
@@ -2783,6 +2785,71 @@ angular.module('am-wb-core')
 	};
 });
 
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc directive
+ * @name wbUiSettingColor
+ * @memberof am-wb-core
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingLink', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-link.html',
+		restrict: 'E',
+                replace:true,
+		scope: {
+			title: '@title',
+			url: '=url',
+			icon: '@icon'
+		},
+		controller: function($scope, $resource){
+			function selectlink(){
+				return $resource.get('link', {
+					style: {
+					    icon: 'link',
+						title: 'add url',
+						description: 'Select url from resources.'
+					},
+					data: $scope.url
+				})//
+				.then(function(value){
+					$scope.url = value;
+				});
+			}
+			
+			$scope.selectlink = selectlink;
+		}
+	};
+});
+
 /**
  * Created by mgh on 2/26/17.
  */
@@ -2909,6 +2976,7 @@ angular.module('am-wb-core')
             return {
                 templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
                 restrict: 'E',
+                replace: true,
                 scope: {
                     title: '@title',
                     value: '=value',
@@ -2940,6 +3008,7 @@ angular.module('am-wb-core')
             return {
                 templateUrl: 'views/directives/wb-ui-setting-background-origin.html',
                 restrict: 'E',
+                replace: true,
                 scope: {
                     title: '@title',
                     value: '=value',
@@ -4672,17 +4741,17 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-.html',
-    "<md-input-container style=\"margin-right: 50px\"> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-attachment.html',
-    "<md-input-container style=\"margin-right: 50px\"> <label>background Position</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label>background Attachment</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-origin.html',
-    "<md-input-container style=\"margin-right: 50px\"> <label>background Origin</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label>background Origin</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
@@ -4692,12 +4761,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-repeat.html',
-    "<md-input-container style=\"margin-right: 50px\"> <label>background Repeat</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label>background Repeat</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-size.html',
-    "<md-input-container style=\"margin-right: 50px\"> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
@@ -4728,6 +4797,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-ui-setting-length.html',
     "<div> <md-input-container> <label ng-if=title translate=\"\">{{title}}</label> <input ng-model=\"value\"> <div class=hint ng-if=description translate=\"\">{{description}}</div> </md-input-container> </div>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-link.html',
+    "<md-input-container class=md-icon-float> <input ng-model=url placeholder={{title}}> <wb-icon style=\"display:inline-block; cursor: pointer\">more_horiz</wb-icon> </md-input-container>"
   );
 
 
@@ -4781,7 +4855,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-background.html',
-    " <div layout=column>  <wb-ui-setting-on-off-switch title=Transparent? icon=blur_on value=wbModel.style.isTransparent> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent title=Opacity icon=wb-opacity value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent slider=\"\" icon=wb-blank value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-image title=\"Background image\" value=wbModel.style.backgroundImage> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.backgroundColor> </wb-ui-setting-color>  <wb-ui-setting-on-off-switch title=\"Advance Background options\" value=_abo> </wb-ui-setting-on-off-switch> <md-input-container ng-show=_abo class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background> </md-input-container> <wb-ui-setting-background-size value=wbModel.style.backgroundSize ng-show=_abo> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.backgroundRepeat ng-show=_abo> </wb-ui-setting-background-repeat> <wb-ui-setting-background-position value=wbModel.style.backgroundPosition ng-show=_abo> </wb-ui-setting-background-position> <wb-ui-setting-background-attachment value=wbModel.style.backgroundAttachment ng-show=_abo> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.backgroundOrigin ng-show=_abo> </wb-ui-setting-background-origin> </div>"
+    " <div layout=column layout-align=\"start stretch\">  <wb-ui-setting-on-off-switch title=Transparent? icon=blur_on value=wbModel.style.isTransparent> </wb-ui-setting-on-off-switch>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent title=Opacity icon=wb-opacity value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-number ng-show=wbModel.style.isTransparent slider=\"\" icon=wb-blank value=wbModel.style.opacity> </wb-ui-setting-number>  <wb-ui-setting-image title=\"Background image\" value=wbModel.style.backgroundImage> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.backgroundColor> </wb-ui-setting-color>  <wb-ui-setting-on-off-switch title=\"Advance Background options\" value=_abo> </wb-ui-setting-on-off-switch> <md-input-container ng-show=_abo class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background> </md-input-container> <wb-ui-setting-background-size value=wbModel.style.backgroundSize ng-show=_abo> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.backgroundRepeat ng-show=_abo> </wb-ui-setting-background-repeat> <wb-ui-setting-background-position value=wbModel.style.backgroundPosition ng-show=_abo> </wb-ui-setting-background-position> <wb-ui-setting-background-attachment value=wbModel.style.backgroundAttachment ng-show=_abo> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.backgroundOrigin ng-show=_abo> </wb-ui-setting-background-origin> </div>"
   );
 
 
