@@ -104,14 +104,14 @@ angular.module('am-wb-core')
 			// add widget
 			$widget.compile(item, scope)//
 			.then(function(newElement) {
-				var list = element//
-				.children(bodyElementSelector)//
-				.children(placeholderElementSelector);
+//				var list = element//
+//				.children(bodyElementSelector)//
+//				.children(placeholderElementSelector);
 				newElement.attr('id', scope.objectId(item));
-				if (index < list[0].childNodes.length) {
+				if (index < element[0].childNodes.length) {
 					newElement.insertBefore(list[0].childNodes[index]);
 				} else {
-					list.append(newElement);
+					element.append(newElement);
 				}
 				scope.wbModel.contents.splice(index, 0, item);
 			});
@@ -145,8 +145,6 @@ angular.module('am-wb-core')
 				$widget.compile(newModel, scope)//
 				.then(function(newElement) {
 					var a = element//
-					.children(bodyElementSelector)//
-					.children(placeholderElementSelector)//
 					.children('#'+scope.objectId(model));
 					newElement.insertBefore(a);
 					scope.wbModel.contents.splice(index, 0, newModel);
