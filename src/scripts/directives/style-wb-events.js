@@ -24,43 +24,36 @@
 'use strict';
 
 angular.module('am-wb-core')
-
 /**
- * Load widgets
+ * @ngdoc Directives
+ * @name wb-events
+ * @description Applies events to the current element
+ * 
+ * If there is an event section in the data model, then this directive parses
+ * and applies to the current element.
+ * 
+ * 	<div
+ * 		wb-events="events">
+ * 	</div>
  */
-.run(function($widget) {
-	
-	
-	// Group
-	$widget.newWidget({
-		// widget description
-		type: 'Group',
-		title: 'Group',	
-		description : 'Panel contains list of widgets.',
-		icon : 'wb-widget-group',
-		groups: ['basic'],
-		model: {},
-		// functional properties
-		template : '<wb-group ng-model="wbModel"></wb-group>',
-		help : 'http://dpq.co.ir/more-information-link',
-		helpId: 'wb-widget-group'
-	});
-	// HTML text
-	$widget.newWidget({
-		// widget description
-		type: 'HtmlText',
-		title : 'Text',
-		description : 'An text block.',
-		icon : 'wb-widget-html',
-		groups: ['basic'],
-		model : {
-			text : '<h2>Text element</h2><p>Click on the text box to edit.</p>',
-		},
-		// help id
-		help : 'http://dpq.co.ir',
-		helpId: 'wb-widget-html',
-		// functional properties
-		templateUrl : 'views/widgets/wb-html.html',
-		setting:['text'],
-	});
+.directive("wbEvents", function() {
+	function postLink($scope, $element, $attrs, $ctrls) {
+		// load ctrl
+		var ctrl = $ctrls[0] || $ctrls[1];
+
+		$element.on('click', function (event) {
+			// Check edit mode
+			if(ctrl && ctrl.isEditable()){
+				ctrl.setSelected(true);
+				event.stopPropagation();
+				return;
+			}
+			// TODO: maso, 2018: do actions
+		});
+	}
+	return {
+	    restrict : 'A',
+	    link : postLink,
+		require:['?wbGroup', '?wbWidget']
+	};
 });

@@ -1,21 +1,30 @@
 <div
-	dnd-disable-if="!wbEditable"
+	class="wb-group"
+	dir="{{wbModel.direction || wbModel.style.dir}}"
+	name="{{wbModel.name}}"
+	id="{{wbModel.id}}"
+	
+	dnd-disable-if="!ctrl.isEditable() || ctrl.isRoot()"
 	dnd-draggable="wbModel"
 	dnd-type="'wb.widget'"
 	dnd-moved="remove()"
-	wb-size="wbModel.style"
-	wb-margin="wbModel.style"
-	wb-background="wbModel.style"
-	wb-border="wbModel.style"
-	ng-class="{'wb-panel wb-widget-edit': wbEditable}"
-	name="{{wbModel.name}}"
-	md-theme-watch="true"
-	ng-class="{'wb-panel-overlay': ctrl.isHoverDelBtn()}"
-	class="wb-panel-container"
-	dir="{{wbModel.direction}}"
-	wb-layout="wbModel.style"
-	wb-padding="wbModel.style"
+	
 	dnd-external-sources="true"
 	dnd-list="wbModel.contents"
 	dnd-allowed-types="getAllowedTypes()"
-	dnd-drop="dropCallback(event, index, item, external, type)"></div>
+	dnd-drop="dropCallback(event, index, item, external, type)"
+	
+	wb-size="wbModel.style"
+	wb-layout="wbModel.style"
+	wb-margin="wbModel.style"
+	wb-padding="wbModel.style"
+	wb-background="wbModel.style"
+	wb-border="wbModel.style"
+	wb-events="wbModel.event"
+	
+	ng-class="{
+		'wb-group-root': ctrl.isRoot(),
+		'wb-group-edit': ctrl.isEditable(),
+		'wb-group-select': ctrl.isSelected()
+	}"
+	md-theme-watch="true"></div>

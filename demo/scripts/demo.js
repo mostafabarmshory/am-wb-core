@@ -31,10 +31,14 @@
  */
 angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 .controller('MyTestCtrl', function($scope, $http, $mdDialog) {
-    $http.get('examples/html.json')
+    $http.get('examples/groups.json')
     .then(function(res) {
         $scope.model = res.data;
     });
+    
+    $scope.alert = function(){
+    	alert('Test');
+    }
 })
 
 .config(function($mdThemingProvider) {

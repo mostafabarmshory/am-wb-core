@@ -1,19 +1,55 @@
-
 /**************************************************************************************
-Hierarchical structure
+                                     Widget layout
 
 A widget is wraped in several dive to instruct a view. Here is the hierarchial structure
 of a widget:
 
 -> widget
-  -> widget header
-  -> widget body
-    -> widget overlay
-    -> widget container
+***************************************************************************************/
+.wb-group {
+	min-width: 32px;
+	min-height: 32px;
+}
+
+.wb-group-root {
+	overflow: auto !important;
+}
+.wb-group-root.wb-group-edit {
+	margin: 8px;
+	border:1px dashed #555753;
+	
+	-webkit-box-shadow:0px 0px 8x 8px #aaaaaa ;
+	-moz-box-shadow:0px 0px 8px 8px #aaaaaa ;
+	box-shadow:0px 0px 8px 8px #aaaaaa ;
+}
+
+.wb-group-edit {
+	border:0.5px dashed #aaaaaa;
+	margin: 1px;
+}
+
+.wb-group-edit:hover {
+	border:1px dashed #555753;
+	
+	-webkit-box-shadow:0px 0px 2x 2px #aaaaaa ;
+	-moz-box-shadow:0px 0px 2px 2px #aaaaaa ;
+	box-shadow:0px 0px 2px 2px #aaaaaa ;	
+}
+
+.wb-group-select {
+	background: red;
+}
+
+/**************************************************************************************
+                                     Widget layout
+
+A widget is wraped in several dive to instruct a view. Here is the hierarchial structure
+of a widget:
+
+-> widget
 ***************************************************************************************/
 .wb-widget {
 	overflow: hide;
-/* 	display: block; */
 }
 
 .wb-widget-edit {
@@ -22,43 +58,7 @@ of a widget:
 	border: 1px dashed #8f9494;
 }
 
-.wb-widget-header {
-	background-color: rgba(120, 120, 120, 0.2);
-	background-image: repeating-linear-gradient(315deg, transparent, transparent 12px, rgba(255
-		, 255, 255, .5) 12px, rgba(255, 255, 255, .5) 24px);
-	color: black;
-	padding: 2px;
-	margin: 0px;
-	border: none;
-	border-bottom: 1px dashed #8f9494;
-	min-height: 24px;
-	min-width: 250px;
-}
-
-.wb-widget-body {
-	position: relative;
-	display: block;
-	top: 0px;
-	left: 0px;
-	right: 0px;
-	bottom: 0px;
-/* 	width: 100%; */
-/* 	height: 100%; */
-/*  overflow: auto; */
-}
-
 .wb-widget-overlay {
-/* 	position: relative; */
-/* 	display: block; */
-/* 	top: 0px; */
-/* 	left: 0px; */
-/* 	right: 0px; */
-/* 	bottom: 0px; */
-/* 	width: 100%; */
-/* 	height: 100%; */
-/* 	padding: 0px; */
-/* 	margin: 0px; */
-/* 	z-index: 9999; */
 	color: white;
 	background: radial-gradient(black 15%, transparent 16%) 0 0,
 		radial-gradient(black 15%, transparent 16%) 8px 8px,
@@ -68,20 +68,22 @@ of a widget:
 	background-size: 12px 12px;
 }
 
-/*
- * Contains user DOM
- * 
- * Fill the space to display user DOM. If user is not able to display in
- * the area, User have to add scroll inside of the widget.
- */
-.wb-widget-container {
-	position: relative;
-	display: block;
-	top: 0px;
-	left: 0px;
-	right: 0px;
-	bottom: 0px;
-/* 	width: 100%; */
-/* 	height: 100%; */
-    overflow: hidden;
+/
+*
+.md-button.md-icon-button.md-mini {
+	line-height: 1rem;
+	width: 1.5rem;
+	height: 1.5rem;
+	min-height: 1rem;
+	margin: 0px;
+	padding: 0px;
+	margin-left: 4px;
+}
+
+.wb-icon-mini {
+	padding: 0px;
+	margin: 0px;
+	font-size: 1rem;
+	line-height: 1rem;
+	min-height: 1rem;
 }

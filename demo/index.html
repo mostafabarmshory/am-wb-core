@@ -36,8 +36,6 @@
 	<link rel="stylesheet" href="styles/setting-layout.css">
 	<link rel="stylesheet" href="styles/typography.css">
 	<link rel="stylesheet" href="styles/wb-dnd.css">
-	<link rel="stylesheet" href="styles/wb-group-button.css">
-	<link rel="stylesheet" href="styles/wb-group.css">
 	<link rel="stylesheet" href="styles/wb-icon.css">
 	<link rel="stylesheet" href="styles/wb-page.css">
 	<link rel="stylesheet" href="styles/wb-text.css">
@@ -90,7 +88,10 @@
 <!--                     style="overflow: auto;"> -->
 <!--             </wb-content> -->
 			<wb-group
-				ng-model="model">
+				wb-on-model-select="alert('model is selected')"
+				wb-editable="editable"
+				ng-model="model"
+				flex>
 			</wb-group>
         </div>
     </div>
@@ -141,6 +142,7 @@
 	<script src="scripts/controllers/wb-widgetselect.js"></script>
 	<script src="scripts/directives/style-wb-background.js"></script>
 	<script src="scripts/directives/style-wb-border.js"></script>
+	<script src="scripts/directives/style-wb-events.js"></script>
 	<script src="scripts/directives/style-wb-layout.js"></script>
 	<script src="scripts/directives/style-wb-margin.js"></script>
 	<script src="scripts/directives/style-wb-padding.js"></script>

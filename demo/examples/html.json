@@ -1,219 +1,63 @@
 {
+	"type": "Group",
+	"style": {
+		"border": {},
+		"padding": {},
+		"margin": {},
+		"layout": {
+			"direction": "column",
+			"align": "stretch",
+			"justify": "start"
+		}
+	},
+	"event": {
+		"on-click":{},
+		"on-mouse-enter":{},
+		"on-mouse-exit":{}
+	},
 	"contents": [
 		{
+			"type": "HtmlText",
+			"name": "Widget",
 			"text": "<h2>HTML Text</h2>\n<p>Insert HTML text heare&nbsp;</p>\n<h2>HTML Text</h2>\n<p>Insert HTML text heare</p>",
-			"type": "HtmlText",
-			"name": "Widget",
-			"style": {
-				"borderColor": {
-					"bottom": "none"
-				},
-				"margin": {
-					"isUniform": true,
-					"uniform": "14%"
-				},
-				"borderRadius": {
-					"uniform": true,
-					"all": 40
-				},
-				"borderStyleColorWidth": {
-					"uniform": true
-				},
-				"borderStyle": {
-					"all": "solid"
-				},
-				"borderWidth": {
-					"all": 1
-				},
-				"flexAlignItem": "wb-flex-item-auto",
-				"padding": {
-					"isUniform": true,
-					"uniform": "5%"
-				}
-			}
+			"style": {},
+			"event": {}
 		},
 		{
+			"type": "HtmlText",
+			"name": "Widget",
 			"text": "<h2>HTML Text</h2>\n<p>Insert HTML text heareert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;</p>",
-			"type": "HtmlText",
-			"name": "Widget",
-			"style": {
-				"borderColor": {
-					"bottom": "none"
-				},
-				"margin": {
-					"isUniform": true,
-					"uniform": 79
-				},
-				"borderRadius": {
-					"uniform": true,
-					"all": 27
-				},
-				"borderStyleColorWidth": {
-					"uniform": true
-				},
-				"borderStyle": {
-					"all": "solid"
-				},
-				"borderWidth": {
-					"all": 1
-				},
-				"flexAlignItem": "wb-flex-item-auto",
-				"width": "",
-				"padding": {
-					"isUniform": true,
-					"uniform": 47
-				}
-			}
+			"style": {},
+			"event": {}
 		},
 		{
-			"style": {
-				"padding": {
-					
-				},
-				"margin": {
-					
-				},
-				"borderRadius": {
-					
-				},
-				"borderStyleColorWidth": {
-					
-				},
-				"borderStyle": {
-					
-				},
-				"borderWidth": {
-					
-				},
-				"borderColor": {
-					"bottom": "none"
-				},
-				"flexDirection": "wb-flex-row",
-				"alignItems": "wb-flex-align-items-stretch",
-				"justifyContent": "wb-flex-justify-content-space-around",
-				"flexAlignItem": "wb-flex-item-auto",
-				"width": "50%"
-			},
 			"type": "Group",
-			"name": "Panel",
+			"name": "Chile 1",
+			"style": {},
+			"event": {},
 			"contents": [
 				{
+					"type": "HtmlText",
+					"name": "Widget",
 					"text": "<h2>HTML Text</h2>\n<p>Insert HTML text hearsfasdf daf dsf adsf dsf ds fads fads fads fds fads fads f adsf sadf asf adsf s de</p>",
-					"type": "HtmlText",
-					"name": "Widget",
-					"style": {
-						"borderColor": {
-							"bottom": "none"
-						},
-						"margin": {
-							
-						},
-						"borderRadius": {
-							
-						},
-						"borderStyleColorWidth": {
-							
-						},
-						"borderStyle": {
-							
-						},
-						"borderWidth": {
-							
-						},
-						"flexAlignItem": "wb-flex-item-auto"
-					}
+					"style": {},
+					"event": {}
 				},
 				{
+					"type": "HtmlText",
+					"name": "Widget",
 					"text": "<h2>HTML Text</h2>\n<p>Insert HTML text he and if you continue to type o adf df ads adsf asdf ads fads fads fads fads f ads fads fas f adsf ads fds fads f asdf adsf asd fs fas f sa fadsare</p>",
-					"type": "HtmlText",
-					"name": "Widget",
-					"style": {
-						"borderColor": {
-							"bottom": "none"
-						},
-						"margin": {
-							
-						},
-						"borderRadius": {
-							
-						},
-						"borderStyleColorWidth": {
-							
-						},
-						"borderStyle": {
-							
-						},
-						"borderWidth": {
-							
-						},
-						"flexAlignItem": "wb-flex-item-auto"
-					}
+					"style": {},
+					"event": {}
 				},
 				{
-					"text": "<h2>HTML Text</h2>\n<p>Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;</p>",
 					"type": "HtmlText",
 					"name": "Widget",
-					"style": {
-						"borderColor": {
-							"bottom": "none"
-						},
-						"margin": {
-							
-						},
-						"borderRadius": {
-							
-						},
-						"borderStyleColorWidth": {
-							
-						},
-						"borderStyle": {
-							
-						},
-						"borderWidth": {
-							
-						},
-						"flexAlignItem": "wb-flex-item-auto",
-						"flexItemGrowEnabled": true,
-						"flexItemGrow": 55,
-						"width": "10%",
-						"maxWidth": "",
-						"maxHeight": "",
-						"minHeight": "",
-						"minWidth": "",
-						"height": "auto"
-					}
+					"text": "<h2>HTML Text</h2>\n<p>Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;</p>",
+					"style": {},
+					"event": {}
 				}
 			]
 		}
-	],
-	"type": "Page",
-	"style": {
-		"borderColor": {
-			"bottom": "none"
-		},
-		"padding": {
-			"isUniform": true,
-			"uniform": 11
-		},
-		"margin": {
-			"isUniform": true,
-			"uniform": 0
-		},
-		"borderRadius": {
-			
-		},
-		"borderStyleColorWidth": {
-			
-		},
-		"borderStyle": {
-			
-		},
-		"borderWidth": {
-			
-		},
-		"flexDirection": "wb-flex-column",
-		"alignItems": "wb-flex-align-items-stretch",
-		"justifyContent": "wb-flex-justify-content-start"
-	},
-	"direction": "rtl"
+	]
 }

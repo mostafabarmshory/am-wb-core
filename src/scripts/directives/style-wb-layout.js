@@ -37,6 +37,9 @@ angular.module('am-wb-core')
  * @description Apply layout into an element
  */
 .directive("wbLayout", function() {
+	var classDirectionPrefix = 'wb-flex-';
+	var classJustifyPrefix = 'wb-flex-item-';
+	var classAlignPrefix = 'wb-flex-align-items-';
 	/*
 	 * FIXME: maso, 2017: replace class with term
 	 * 
@@ -52,10 +55,14 @@ angular.module('am-wb-core')
 	 * @returns
 	 */
 	function removeLayout(element, config) {
-		// Remove old class
+		// deprecated: Remove old class
 		element.removeClass(config.flexDirection);
 		element.removeClass(config.justifyContent);
 		element.removeClass(config.alignItems);
+
+		element.removeClass(classDirectionPrefix + config.direction || 'column');
+		element.removeClass(classJustifyPrefix + config.justify || 'center');
+		element.removeClass(classAlignPrefix + config.align || 'stretch');
 	}
 
 	/**
@@ -70,6 +77,10 @@ angular.module('am-wb-core')
 		element.addClass(config.flexDirection);
 		element.addClass(config.justifyContent);
 		element.addClass(config.alignItems);
+
+		element.addClass(classDirectionPrefix + config.direction || 'column');
+		element.addClass(classJustifyPrefix + config.justify || 'center');
+		element.addClass(classAlignPrefix + config.align || 'stretch');
 	}
 
 	/**
@@ -81,8 +92,24 @@ angular.module('am-wb-core')
 	 * @param attrs
 	 * @returns
 	 */
-	function postLink(scope, element, attrs) {
-		return scope.$watch(attrs.wbLayout, function(newValue, oldValue) {
+	function postLink(scope, element, attrs/*, ctrls*/) {
+		// group
+//		var groupCtrl = ctrls[0];
+//		if(groupCtrl && groupCtrl.isRoot()){
+//			// Root element is controlled from outside
+//			return;
+//		}
+		
+		// Watch for layout
+		scope.$watch(function(){
+			if(!attrs.wbLayout || !attrs.wbLayout.layout) {
+				return null;
+			}
+			return attrs.wbLayout.layout;
+		}, function(newValue, oldValue) {
+			if(newValue===oldValue){
+				return;
+			}
 			if (oldValue) {
 				removeLayout(element, oldValue);
 			}
@@ -97,6 +124,7 @@ angular.module('am-wb-core')
 	 */
 	return {
 		restrict : 'A',
-		link : postLink
+		link : postLink,
+		require:['?wbGroup']
 	};
 });
