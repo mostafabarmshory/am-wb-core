@@ -36,18 +36,24 @@ angular.module('am-wb-core')
  * All primary actions of a widget are supported (such as remove and setting).
  */
 .directive('wbWidget', function() {
-	function postLink(scope, element, attrs, ctrl, transclude) {
+	function postLink($scope, $element, $attrs, $ctrls, $transclude) {
 		// Modify angular transclude function
 		// see:
 		// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
 		// FIXME: maso, 2017: use regular dom insted of ng-transclude
-		transclude(scope, function(clone, scope) {
-			var node = element.append(clone);
+		$transclude($scope, function(clone, $scope) {
+			var node = $element.append(clone);
 		});
+		
+		// set wbGroup
+		var group = $ctrls[1];
+		if(group) {
+			$scope.group = group;
+		}
 	}
 
 	/**
-	 * @ngdoc Directive-Controllers
+	 * @ngdoc Controllers
 	 * @name wbWidgetCtrl
 	 * @description Controller of a widget
 	 * 
@@ -55,84 +61,47 @@ angular.module('am-wb-core')
 	 * @ngInject
 	 */
 	function wbWidgetCtrl($scope, $element, $settings, $widget) {
-		var element = $element;
-		var _hoveringDelBtn = false;
-		/**
-		 * Remove widget from parent
-		 */
-		function remove() {
-			console.log('widget removed');
-			return $scope.$parent.removeChild($scope.wbModel);
+		
+		this.delete = function(){
+			alert('delete');
 		}
 
-		/**
-		 * Load widget settings
-		 * 
-		 */
-		function settings() {
-			return $settings.load({
-				wbModel : $scope.wbModel,
-				wbParent : $scope.$parent,
-			}, $scope.$parent.settingAnchor());
+		this.clone = function(){
+			alert('clone');
 		}
 
-		/**
-		 * Notify this widget is selected
-		 */
-		function selected() {
-			if (!$scope.wbEditable) {
-				return;
+		this.getModel = function(){
+			return $scope.wbModel;
+		}
+
+		this.getParent = function(){
+			return $scope.parentCtrl;
+		}
+
+		this.isEditable = function(){
+			return $scope.editable;
+		}
+
+		this.isSelected = function(){
+			return $scope.selected;
+		}
+
+		this.setSelected = function(flag) {
+			$scope.selected = flag;
+			if(flag && $scope.group) {
+				$scope.group.childSelected(this);
 			}
-			return settings();
 		}
-
-		/**
-		 * Check if the widget is selected one
-		 */
-		function isSelected() {
-			return $scope.wbEditable && $settings.isCurrentModel($scope.wbModel);
-		}
-
-		/**
-		 * Clone current widget
-		 */
-		function clone() {
-			var newObject = angular.copy($scope.wbModel);
-			return $scope.$parent.insertBefore($scope.wbModel, newObject);
-		}
-
-		function setHoverDelBtn(flag){
-			_hoveringDelBtn = flag;
-		}
-
-		function isHoverDelBtn(){
-			return _hoveringDelBtn;
-		}
-
-//		/*
-//		 * Add to scope
-//		 */
-//		$scope.remove = remove;
-//		$scope.movedCallback = remove;
-//		$scope.settings = settings;
-//		$scope.selected = selected;
-//		// Sets widget id after compile
-//		element.attr('id', $scope.objectId($scope.wbModel));
-//		$scope.wbModel.name = $scope.wbModel.name || 'Widget';
-//		$scope.isSelected = isSelected;
-//		$scope.clone = clone;
-//
-//		this.setHoverDelBtn = setHoverDelBtn;
-//		this.isHoverDelBtn = isHoverDelBtn;
 	}
 	
 	return {
 		templateUrl : 'views/directives/wb-widget.html',
 		restrict : 'E',
-		transclude : true,
 		replace : true,
+		transclude: true,
 		link : postLink,
+		controller : wbWidgetCtrl,
 		controllerAs: 'ctrl',
-		controller : wbWidgetCtrl
+		require:['wbWidget', '?^^wbGroup', 'ngModel']
 	};
 });

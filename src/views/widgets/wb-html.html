@@ -5,7 +5,7 @@
 
  -->
 <div
-	ng-hide="isSelected()"
+	ng-hide="ctrl.isSelected()"
     ng-bind-html="wbModel.text | wbunsafe">
 </div>
 <div
@@ -22,7 +22,7 @@
 		imagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'
 	}"
 	ng-model="wbModel.text"
-	ng-show="isSelected()"
-	ng-if="wbEditable"
+	ng-show="ctrl.isSelected()"
+	ng-if="ctrl.isEditable()"
 	flex>
 </div>

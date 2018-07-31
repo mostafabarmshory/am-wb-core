@@ -4,15 +4,18 @@
 	name="{{wbModel.name}}"
 	id="{{wbModel.id}}"
 	
-	dnd-disable-if="!ctrl.isEditable() || ctrl.isRoot()"
-	dnd-draggable="wbModel"
-	dnd-type="'wb.widget'"
-	dnd-moved="remove()"
+	dnd-disable-if="!ctrl.isEditable()"
 	
-	dnd-external-sources="true"
+	dnd-draggable="wbModel"
+	dnd-effect-allowed="copyMove"
+	dnd-type="'Group'"
+	dnd-moved="ctrl.delete()"
+
 	dnd-list="wbModel.contents"
 	dnd-allowed-types="ctrl.getAllowedTypes()"
-	dnd-drop="dropCallback(event, index, item, external, type)"
+	dnd-drop="dropCallback(index, item, external, type)"
+	dnd-external-sources="true"
+
 	
 	wb-size="wbModel.style"
 	wb-layout="wbModel.style"

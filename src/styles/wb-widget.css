@@ -15,12 +15,16 @@ of a widget:
 	overflow: auto !important;
 }
 .wb-group-root.wb-group-edit {
-	margin: 8px;
+	margin: 10px 80px 10px 80px;
 	border:1px dashed #555753;
 	
 	-webkit-box-shadow:0px 0px 8x 8px #aaaaaa ;
 	-moz-box-shadow:0px 0px 8px 8px #aaaaaa ;
 	box-shadow:0px 0px 8px 8px #aaaaaa ;
+}
+
+.wb-group-root.wb-group-edit:before {
+	content: 'Hi'
 }
 
 .wb-group-edit {

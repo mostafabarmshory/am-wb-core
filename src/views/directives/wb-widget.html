@@ -1,18 +1,22 @@
 <div
-	dnd-disable-if="!wbEditable"
-	dnd-selected="selected()"
+	class="wb-widget"
+	name="{{wbModel.name}}"
+
+	dnd-disable-if="!ctrl.isEditable()"
 	dnd-draggable="wbModel"
-	dnd-type="'wb.widget'"
-	dnd-moved="movedCallback()"
+	dnd-type="wbModel.type"
+
+	dnd-moved="ctrl.delete()"
+
 	wb-size="wbModel.style"
 	wb-margin="wbModel.style"
+	wb-padding="wbModel.style"
 	wb-background="wbModel.style"
 	wb-border="wbModel.style"
-	class="wb-widget"
-	ng-class="{'wb-widget-edit': wbEditable}"
-	layout="column"
-	name="{{wbModel.name}}"
+	wb-events="wbModel.event"
+
 	md-theme-watch="true"
-	ng-class="{'wb-widget-overlay': ctrl.isHoverDelBtn()}"
-	wb-layout="wbModel.style"
-	wb-padding="wbModel.style"></div>
+	ng-class="{
+		'wb-widget-edit': ctrl.isEditable()
+	}"
+	transclude></div>

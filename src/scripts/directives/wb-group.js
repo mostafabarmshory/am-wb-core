@@ -60,7 +60,7 @@ angular.module('am-wb-core')
 		function reloadView(model) {
 			$element.empty();
 			$scope.wbModel = model;
-			if(!model){
+			if(!model || !angular.isArray(model.contents)){
 				return;
 			}
 			var compilesJob = [];
@@ -98,94 +98,6 @@ angular.module('am-wb-core')
 			ctrl.childSelected(null);
 		}
 
-// /**
-// * Adds dragged widget
-// */
-// function dropCallback(event, index, item, external, type) {
-// // add widget
-// $widget.compile(item, scope)//
-// .then(function(newElement) {
-// // var list = element//
-// // .children(bodyElementSelector)//
-// // .children(placeholderElementSelector);
-// newElement.attr('id', scope.objectId(item));
-// if (index < element[0].childNodes.length) {
-// newElement.insertBefore(list[0].childNodes[index]);
-// } else {
-// element.append(newElement);
-// }
-// scope.wbModel.contents.splice(index, 0, item);
-// });
-// return true;
-// }
-
-// /**
-// * Removes a widget
-// *
-// * Data model and visual element related to the input model will be
-// * removed.
-// */
-// function removeChild(model) {
-// var index = scope.wbModel.contents.indexOf(model);
-// if (index > -1) {
-// var a = element//
-// .children(bodyElementSelector)//
-// .children(placeholderElementSelector)
-// .children('#'+scope.objectId(model));
-// a.remove();
-// scope.wbModel.contents.splice(index, 1);
-// }
-// }
-
-// /**
-// * Insert a new model before the selected model
-// */
-// function insertBefore(model, newModel){
-// var index = scope.wbModel.contents.indexOf(model);
-// if (index > -1) {
-// $widget.compile(newModel, scope)//
-// .then(function(newElement) {
-// var a = element//
-// .children('#'+scope.objectId(model));
-// newElement.insertBefore(a);
-// scope.wbModel.contents.splice(index, 0, newModel);
-// })
-// }
-// }
-
-// function settings() {
-// return $settings.load({
-// wbModel : scope.wbModel,
-// wbParent : scope.$parent
-// }, scope.$parent.settingAnchor());
-// }
-
-// /**
-// * Clone current widget
-// */
-// function clone() {
-// var newObject = angular.copy(scope.wbModel);
-// return scope.$parent.insertBefore(scope.wbModel, newObject);
-// }
-
-// // Set element ID after compile
-// element.attr('id', scope.objectId(scope.wbModel));
-// scope.wbModel.name = scope.wbModel.name || 'Panel';
-// scope.getAllowedTypes = $widget.widgetsKey;
-
-// scope.removeChild = removeChild;
-// scope.remove = remove;
-// scope.insertBefore = insertBefore;
-
-// scope.settings = settings;
-// scope.dropCallback = dropCallback;
-// scope.clone = clone;
-
-// if (!angular.isArray(scope.wbModel.contents)) {
-// scope.wbModel.contents = [];
-// return;
-// }
-// reloadView();
 
 		/*
 		 * Watch for editable
@@ -206,6 +118,10 @@ angular.module('am-wb-core')
 			// Get from parent
 			ctrl.isEditable = wbGroupCtrl.isEditable;
 			ctrl.childSelected = wbGroupCtrl.childSelected;
+		}
+		
+		$scope.dropCallback = function(index, item, external, type){
+			ctrl.addChild(index, item);
 		}
 
 	}
@@ -234,7 +150,10 @@ angular.module('am-wb-core')
 		 * @memberof wbGroupCtrl
 		 */
 		this.delete = function(){
-			// FIXME: maso, 2018: delete clone
+			if(this.isRoot()){
+				return;
+			}
+			this.removeChild(this);
 		}
 
 		/**
@@ -300,7 +219,48 @@ angular.module('am-wb-core')
 				$scope.$eval(callback);
 			}
 		}
+
+
+		/**
+		 * Removes a widget
+		 * 
+		 * Data model and visual element related to the input model will be
+		 * removed.
+		 */
+		this.removeChild = function(model) {
+			var index = $scope.wbModel.contents.indexOf(model);
+			if (index > -1) {
+				var a = $element//
+				.children(bodyElementSelector)//
+				.children(placeholderElementSelector)
+				.children('#'+scope.objectId(model));
+				a.remove();
+				scope.wbModel.contents.splice(index, 1);
+			}
+		};
 		
+
+		/**
+		 * Adds dragged widget
+		 */
+		this.addChild = function(index, item) {
+			// add widget
+			$widget.compile(item, $scope)//
+			.then(function(newElement) {
+				var nodes  = $element[0].childNodes;
+				if (index < nodes.length) {
+					newElement.insertBefore(nodes[index]);
+				} else {
+					$element.append(newElement);
+				}
+				if(!angular.isArray($scope.wbModel.contents)){
+					$scope.wbModel.contents = [];
+				}
+				$scope.wbModel.contents.splice(index, 0, item);
+			});
+			return true;
+		}
+
 		this.getAllowedTypes = function(){
 			return $scope.wbAllowedTypesl;
 		}
