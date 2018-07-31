@@ -46,6 +46,7 @@ angular.module('am-wb-core')
 			if(ctrl && ctrl.isEditable()){
 				ctrl.setSelected(true);
 				event.stopPropagation();
+				$scope.$apply();
 				return;
 			}
 			// TODO: maso, 2018: do actions

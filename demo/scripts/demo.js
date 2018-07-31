@@ -30,15 +30,22 @@
  * 
  */
 angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
-.controller('MyTestCtrl', function($scope, $http, $mdDialog) {
+.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget) {
     $http.get('examples/groups.json')
     .then(function(res) {
         $scope.model = res.data;
     });
     
-    $scope.alert = function(){
-    	alert('Test');
+    // load setting of model
+    $scope.loadSettings = function(model){
+    	$scope.selectedModel = model;
     }
+    
+    // load widgets
+    $widget.widgets()
+    .then(function(list){
+    	$scope.widgets = list.items;
+    });
 })
 
 .config(function($mdThemingProvider) {

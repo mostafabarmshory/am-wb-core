@@ -95,96 +95,97 @@ angular.module('am-wb-core')
 		 */
 		function removeEditMode(){
 			$scope.editable = false;
+			ctrl.childSelected(null);
 		}
 
-//		/**
-//		* Adds dragged widget
-//		*/
-//		function dropCallback(event, index, item, external, type) {
-//		// add widget
-//		$widget.compile(item, scope)//
-//		.then(function(newElement) {
-//		// var list = element//
-//		// .children(bodyElementSelector)//
-//		// .children(placeholderElementSelector);
-//		newElement.attr('id', scope.objectId(item));
-//		if (index < element[0].childNodes.length) {
-//		newElement.insertBefore(list[0].childNodes[index]);
-//		} else {
-//		element.append(newElement);
-//		}
-//		scope.wbModel.contents.splice(index, 0, item);
-//		});
-//		return true;
-//		}
+// /**
+// * Adds dragged widget
+// */
+// function dropCallback(event, index, item, external, type) {
+// // add widget
+// $widget.compile(item, scope)//
+// .then(function(newElement) {
+// // var list = element//
+// // .children(bodyElementSelector)//
+// // .children(placeholderElementSelector);
+// newElement.attr('id', scope.objectId(item));
+// if (index < element[0].childNodes.length) {
+// newElement.insertBefore(list[0].childNodes[index]);
+// } else {
+// element.append(newElement);
+// }
+// scope.wbModel.contents.splice(index, 0, item);
+// });
+// return true;
+// }
 
-//		/**
-//		* Removes a widget
-//		*
-//		* Data model and visual element related to the input model will be
-//		* removed.
-//		*/
-//		function removeChild(model) {
-//		var index = scope.wbModel.contents.indexOf(model);
-//		if (index > -1) {
-//		var a = element//
-//		.children(bodyElementSelector)//
-//		.children(placeholderElementSelector)
-//		.children('#'+scope.objectId(model));
-//		a.remove();
-//		scope.wbModel.contents.splice(index, 1);
-//		}
-//		}
+// /**
+// * Removes a widget
+// *
+// * Data model and visual element related to the input model will be
+// * removed.
+// */
+// function removeChild(model) {
+// var index = scope.wbModel.contents.indexOf(model);
+// if (index > -1) {
+// var a = element//
+// .children(bodyElementSelector)//
+// .children(placeholderElementSelector)
+// .children('#'+scope.objectId(model));
+// a.remove();
+// scope.wbModel.contents.splice(index, 1);
+// }
+// }
 
-//		/**
-//		* Insert a new model before the selected model
-//		*/
-//		function insertBefore(model, newModel){
-//		var index = scope.wbModel.contents.indexOf(model);
-//		if (index > -1) {
-//		$widget.compile(newModel, scope)//
-//		.then(function(newElement) {
-//		var a = element//
-//		.children('#'+scope.objectId(model));
-//		newElement.insertBefore(a);
-//		scope.wbModel.contents.splice(index, 0, newModel);
-//		})
-//		}
-//		}
+// /**
+// * Insert a new model before the selected model
+// */
+// function insertBefore(model, newModel){
+// var index = scope.wbModel.contents.indexOf(model);
+// if (index > -1) {
+// $widget.compile(newModel, scope)//
+// .then(function(newElement) {
+// var a = element//
+// .children('#'+scope.objectId(model));
+// newElement.insertBefore(a);
+// scope.wbModel.contents.splice(index, 0, newModel);
+// })
+// }
+// }
 
-//		function settings() {
-//		return $settings.load({
-//		wbModel : scope.wbModel,
-//		wbParent : scope.$parent
-//		}, scope.$parent.settingAnchor());
-//		}
+// function settings() {
+// return $settings.load({
+// wbModel : scope.wbModel,
+// wbParent : scope.$parent
+// }, scope.$parent.settingAnchor());
+// }
 
-//		/**
-//		* Clone current widget
-//		*/
-//		function clone() {
-//		var newObject = angular.copy(scope.wbModel);
-//		return scope.$parent.insertBefore(scope.wbModel, newObject);
-//		}
+// /**
+// * Clone current widget
+// */
+// function clone() {
+// var newObject = angular.copy(scope.wbModel);
+// return scope.$parent.insertBefore(scope.wbModel, newObject);
+// }
 
-//		// Set element ID after compile
-//		element.attr('id', scope.objectId(scope.wbModel));
-//		scope.wbModel.name = scope.wbModel.name || 'Panel';
-//		scope.getAllowedTypes = $widget.widgetsKey;
+// // Set element ID after compile
+// element.attr('id', scope.objectId(scope.wbModel));
+// scope.wbModel.name = scope.wbModel.name || 'Panel';
+// scope.getAllowedTypes = $widget.widgetsKey;
 
-//		scope.removeChild = removeChild;
-//		scope.remove = remove;
-//		scope.insertBefore = insertBefore;
+// scope.removeChild = removeChild;
+// scope.remove = remove;
+// scope.insertBefore = insertBefore;
 
-//		scope.settings = settings;
-//		scope.dropCallback = dropCallback;
-//		scope.clone = clone;
+// scope.settings = settings;
+// scope.dropCallback = dropCallback;
+// scope.clone = clone;
 
-//		if (!angular.isArray(scope.wbModel.contents)) {
-//		scope.wbModel.contents = [];
-//		return;
-//		}
-//		reloadView();
+// if (!angular.isArray(scope.wbModel.contents)) {
+// scope.wbModel.contents = [];
+// return;
+// }
+// reloadView();
 
 		/*
 		 * Watch for editable
@@ -287,14 +288,21 @@ angular.module('am-wb-core')
 			// maso, 2018: call the parent controller function
 			if(onModelSelectionFu) {
 				var callback = function() {
-					onModelSelectionFu($scope.$parent, {
-						'wbModel': ctrl.getModel(),
-						'model': ctrl.getModel(),
-						'ctrl': ctrl
-					});
+					var local = {};
+					if(ctrl) {
+						local = {
+								'$model': ctrl.getModel(),
+								'$ctrl': ctrl
+						};
+					}
+					onModelSelectionFu($scope.$parent, local);
 				};
-				$scope.$apply(callback);
+				$scope.$eval(callback);
 			}
+		}
+		
+		this.getAllowedTypes = function(){
+			return $scope.wbAllowedTypesl;
 		}
 	}
 
@@ -305,7 +313,8 @@ angular.module('am-wb-core')
 		transclude : false,
 		scope : {
 			wbEditable : '=?',
-			wbOnModelSelect : '@?'
+			wbOnModelSelect : '@?',
+			wbAllowedTypes: '<?'
 		},
 		link : wbGroupLink,
 		controllerAs: 'ctrl',
