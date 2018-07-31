@@ -49,7 +49,7 @@ angular.module('am-wb-core')
 	
 	return {
 		restrict : 'E',
-		templateUrl: 'views/directives/wb-setting-panel-group.html',
+		template: '<div></div>',
 		scope : {},
 		link : postLink
 	};

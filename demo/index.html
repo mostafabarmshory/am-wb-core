@@ -53,7 +53,22 @@
 <div
 	layout="row"
 	layout-fill>
-    <div layout="column" flex>
+	<md-sidenav
+		class="md-sidenav-left"
+		md-component-id="left"
+		md-is-locked-open="true"
+		md-whiteframe="4">
+<!-- 	            <wb-setting-panel-group -->
+<!-- 	            		id="main" -->
+<!-- 	                    ng-if="editable" -->
+<!-- 	                    flex="30" -->
+<!-- 	                    style="overflow: auto;"> -->
+<!-- 	            </wb-setting-panel-group> -->
+	</md-sidenav>
+            
+    <div 
+    	layout="column" 
+    	flex>
         <!-- 			Custom button group -->
         <!-- 			See: https://material.angularjs.org/latest/CSS/button#grouping-with-css-overrides -->
         <section layout="row" layout-align="center center">
@@ -71,29 +86,12 @@
             </md-button>
        </section>
         <textarea ng-show="showContent">{{model}}</textarea>
-        <div
-                layout="row"
-                flex>
-            <wb-setting-panel-group
-            		id="main"
-                    ng-if="editable"
-                    flex="30"
-                    style="overflow: auto;">
-            </wb-setting-panel-group>
-<!--             <wb-content -->
-<!--             		wb-setting-anchor="main" -->
-<!--                     wb-editable="editable" -->
-<!--                     wb-model="model" -->
-<!--                     flex -->
-<!--                     style="overflow: auto;"> -->
-<!--             </wb-content> -->
-			<wb-group
-				wb-on-model-select="alert('model is selected')"
-				wb-editable="editable"
-				ng-model="model"
-				flex>
-			</wb-group>
-        </div>
+		<wb-group
+			wb-on-model-select="loadSettings(model)"
+			wb-editable="editable"
+			ng-model="model"
+			flex>
+		</wb-group>
     </div>
 </div>
 
