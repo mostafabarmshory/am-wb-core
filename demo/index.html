@@ -82,13 +82,16 @@
                     flex="30"
                     style="overflow: auto;">
             </wb-setting-panel-group>
-            <wb-content
-            		wb-setting-anchor="main"
-                    wb-editable="editable"
-                    wb-model="model"
-                    flex
-                    style="overflow: auto;">
-            </wb-content>
+<!--             <wb-content -->
+<!--             		wb-setting-anchor="main" -->
+<!--                     wb-editable="editable" -->
+<!--                     wb-model="model" -->
+<!--                     flex -->
+<!--                     style="overflow: auto;"> -->
+<!--             </wb-content> -->
+			<wb-group
+				ng-model="model">
+			</wb-group>
         </div>
     </div>
 </div>
@@ -142,10 +145,10 @@
 	<script src="scripts/directives/style-wb-margin.js"></script>
 	<script src="scripts/directives/style-wb-padding.js"></script>
 	<script src="scripts/directives/style-wb-size.js"></script>
+	<script src="scripts/directives/wb-content.js"></script>
 	<script src="scripts/directives/wb-group.js"></script>
 	<script src="scripts/directives/wb-icon.js"></script>
 	<script src="scripts/directives/wb-infinateScroll.js"></script>
-	<script src="scripts/directives/wb-page.js"></script>
 	<script src="scripts/directives/wb-setting-panel-group.js"></script>
 	<script src="scripts/directives/wb-setting-panel.js"></script>
 	<script src="scripts/directives/wb-ui-choose.js"></script>

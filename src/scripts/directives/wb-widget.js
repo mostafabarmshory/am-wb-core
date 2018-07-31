@@ -46,6 +46,86 @@ angular.module('am-wb-core')
 		});
 	}
 
+	/**
+	 * @ngdoc Directive-Controllers
+	 * @name wbWidgetCtrl
+	 * @description Controller of a widget
+	 * 
+	 * 
+	 * @ngInject
+	 */
+	function wbWidgetCtrl($scope, $element, $settings, $widget) {
+		var element = $element;
+		var _hoveringDelBtn = false;
+		/**
+		 * Remove widget from parent
+		 */
+		function remove() {
+			console.log('widget removed');
+			return $scope.$parent.removeChild($scope.wbModel);
+		}
+
+		/**
+		 * Load widget settings
+		 * 
+		 */
+		function settings() {
+			return $settings.load({
+				wbModel : $scope.wbModel,
+				wbParent : $scope.$parent,
+			}, $scope.$parent.settingAnchor());
+		}
+
+		/**
+		 * Notify this widget is selected
+		 */
+		function selected() {
+			if (!$scope.wbEditable) {
+				return;
+			}
+			return settings();
+		}
+
+		/**
+		 * Check if the widget is selected one
+		 */
+		function isSelected() {
+			return $scope.wbEditable && $settings.isCurrentModel($scope.wbModel);
+		}
+
+		/**
+		 * Clone current widget
+		 */
+		function clone() {
+			var newObject = angular.copy($scope.wbModel);
+			return $scope.$parent.insertBefore($scope.wbModel, newObject);
+		}
+
+		function setHoverDelBtn(flag){
+			_hoveringDelBtn = flag;
+		}
+
+		function isHoverDelBtn(){
+			return _hoveringDelBtn;
+		}
+
+//		/*
+//		 * Add to scope
+//		 */
+//		$scope.remove = remove;
+//		$scope.movedCallback = remove;
+//		$scope.settings = settings;
+//		$scope.selected = selected;
+//		// Sets widget id after compile
+//		element.attr('id', $scope.objectId($scope.wbModel));
+//		$scope.wbModel.name = $scope.wbModel.name || 'Widget';
+//		$scope.isSelected = isSelected;
+//		$scope.clone = clone;
+//
+//		this.setHoverDelBtn = setHoverDelBtn;
+//		this.isHoverDelBtn = isHoverDelBtn;
+	}
+	
 	return {
 		templateUrl : 'views/directives/wb-widget.html',
 		restrict : 'E',
@@ -53,76 +133,6 @@ angular.module('am-wb-core')
 		replace : true,
 		link : postLink,
 		controllerAs: 'ctrl',
-		controller : function($scope, $element, $settings, $widget) {
-			var element = $element;
-			var _hoveringDelBtn = false;
-			/**
-			 * Remove widget from parent
-			 */
-			function remove() {
-				console.log('widget removed');
-				return $scope.$parent.removeChild($scope.wbModel);
-			}
-
-			/**
-			 * Load widget settings
-			 * 
-			 */
-			function settings() {
-				return $settings.load({
-					wbModel : $scope.wbModel,
-					wbParent : $scope.$parent,
-				}, $scope.$parent.settingAnchor());
-			}
-
-			/**
-			 * Notify this widget is selected
-			 */
-			function selected() {
-				if (!$scope.wbEditable) {
-					return;
-				}
-				return settings();
-			}
-
-			/**
-			 * Check if the widget is selected one
-			 */
-			function isSelected() {
-				return $scope.wbEditable && $settings.isCurrentModel($scope.wbModel);
-			}
-
-			/**
-			 * Clone current widget
-			 */
-			function clone() {
-				var newObject = angular.copy($scope.wbModel);
-				return $scope.$parent.insertBefore($scope.wbModel, newObject);
-			}
-
-			function setHoverDelBtn(flag){
-				_hoveringDelBtn = flag;
-			}
-
-			function isHoverDelBtn(){
-				return _hoveringDelBtn;
-			}
-
-			/*
-			 * Add to scope
-			 */
-			$scope.remove = remove;
-			$scope.movedCallback = remove;
-			$scope.settings = settings;
-			$scope.selected = selected;
-			// Sets widget id after compile
-			element.attr('id', $scope.objectId($scope.wbModel));
-			$scope.wbModel.name = $scope.wbModel.name || 'Widget';
-			$scope.isSelected = isSelected;
-			$scope.clone = clone;
-
-			this.setHoverDelBtn = setHoverDelBtn;
-			this.isHoverDelBtn = isHoverDelBtn;
-		}
+		controller : wbWidgetCtrl
 	};
 });

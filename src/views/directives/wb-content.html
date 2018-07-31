@@ -44,26 +44,7 @@
         </md-button>
     </div>
 
-    <!-- body section (in non-edit mode, this area just shown -->
-    <div 
-    	class="wb-panel-body" 
-    	id="wb-content-body">
-<!--         <div  -->
-<!-- 	        ng-if="hoveringDelBtn"  -->
-<!-- 	        class="wb-panel-overlay"> -->
-<!-- 	    </div> -->
-        <!-- تمام بچه‌ها در این قسمت اضافه می‌شن. -->
-        <div 
-            id="wb-content-placeholder"
-            ng-class="{'wb-panel-overlay': hoveringDelBtn}"
-        	class="wb-panel-container"
-        	dir="{{wbModel.direction}}"
-            wb-layout="wbModel.style"
-			wb-padding="wbModel.style"
-			dnd-external-sources="true"
-            dnd-list="wbModel.contents"
-    		dnd-allowed-types="getAllowedTypes()"
-    		dnd-drop="dropCallback(event, index, item, external, type)">
-        </div>
-    </div>
+	<wb-group
+		ng-model="wbModel">
+	</wb-group>
 </div>
