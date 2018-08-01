@@ -1,6 +1,6 @@
 
 /*
- * Truncate text if overflwo
+ * Truncate text if overflow
  */
 .wb-text-truncate {
     overflow: hidden;

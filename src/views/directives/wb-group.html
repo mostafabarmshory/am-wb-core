@@ -11,11 +11,10 @@
 	dnd-type="'Group'"
 	dnd-moved="ctrl.delete()"
 
-	dnd-list="wbModel.contents"
+	dnd-list
 	dnd-allowed-types="ctrl.getAllowedTypes()"
-	dnd-drop="dropCallback(index, item, external, type)"
 	dnd-external-sources="true"
-
+	dnd-drop="dropCallback(index, item, external, type)"
 	
 	wb-size="wbModel.style"
 	wb-layout="wbModel.style"

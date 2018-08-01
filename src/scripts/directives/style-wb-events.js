@@ -1,4 +1,4 @@
-/* 
+ /* 
  * The MIT License (MIT)
  * 
  * Copyright (c) 2016 weburger
@@ -55,6 +55,6 @@ angular.module('am-wb-core')
 	return {
 	    restrict : 'A',
 	    link : postLink,
-		require:['?wbGroup', '?wbWidget']
+		require:['?wbWidget', '?wbGroup']
 	};
 });

@@ -14,13 +14,13 @@ of a widget:
 .wb-group-root {
 	overflow: auto !important;
 }
+
 .wb-group-root.wb-group-edit {
 	margin: 10px 80px 10px 80px;
-	border:1px dashed #555753;
-	
-	-webkit-box-shadow:0px 0px 8x 8px #aaaaaa ;
-	-moz-box-shadow:0px 0px 8px 8px #aaaaaa ;
-	box-shadow:0px 0px 8px 8px #aaaaaa ;
+	border: 1px dashed #555753;
+	-webkit-box-shadow: 0px 0px 8x 8px #aaaaaa;
+	-moz-box-shadow: 0px 0px 8px 8px #aaaaaa;
+	box-shadow: 0px 0px 8px 8px #aaaaaa;
 }
 
 .wb-group-root.wb-group-edit:before {
@@ -28,16 +28,15 @@ of a widget:
 }
 
 .wb-group-edit {
-	border:0.5px dashed #aaaaaa;
+	border: 0.5px dashed #aaaaaa;
 	margin: 1px;
 }
 
 .wb-group-edit:hover {
-	border:1px dashed #555753;
-	
-	-webkit-box-shadow:0px 0px 2x 2px #aaaaaa ;
-	-moz-box-shadow:0px 0px 2px 2px #aaaaaa ;
-	box-shadow:0px 0px 2px 2px #aaaaaa ;	
+	border: 1px dashed #555753;
+	-webkit-box-shadow: 0px 0px 2x 2px #aaaaaa;
+	-moz-box-shadow: 0px 0px 2px 2px #aaaaaa;
+	box-shadow: 0px 0px 2px 2px #aaaaaa;
 }
 
 .wb-group-select {
@@ -90,4 +89,14 @@ of a widget:
 	font-size: 1rem;
 	line-height: 1rem;
 	min-height: 1rem;
+}
+
+/*
+ * Body of a widget to fill
+ */
+.wb-widget-fill {
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
 }

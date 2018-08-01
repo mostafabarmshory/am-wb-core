@@ -6,7 +6,8 @@
  -->
 <div
 	ng-hide="ctrl.isSelected()"
-    ng-bind-html="wbModel.text | wbunsafe">
+    ng-bind-html="wbModel.text | wbunsafe"
+	class="wb-widget-fill">
 </div>
 <div
 	ui-tinymce="{
@@ -24,5 +25,5 @@
 	ng-model="wbModel.text"
 	ng-show="ctrl.isSelected()"
 	ng-if="ctrl.isEditable()"
-	flex>
+	class="wb-widget-fill">
 </div>

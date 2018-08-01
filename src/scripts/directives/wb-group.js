@@ -121,7 +121,7 @@ angular.module('am-wb-core')
 		}
 		
 		$scope.dropCallback = function(index, item, external, type){
-			ctrl.addChild(index, item);
+			return ctrl.addChild(index, item);
 		}
 
 	}
@@ -153,7 +153,7 @@ angular.module('am-wb-core')
 			if(this.isRoot()){
 				return;
 			}
-			this.removeChild(this);
+			$scope.parentCtrl.removeChild($scope.wbModel);
 		}
 
 		/**
@@ -230,13 +230,11 @@ angular.module('am-wb-core')
 		this.removeChild = function(model) {
 			var index = $scope.wbModel.contents.indexOf(model);
 			if (index > -1) {
-				var a = $element//
-				.children(bodyElementSelector)//
-				.children(placeholderElementSelector)
-				.children('#'+scope.objectId(model));
-				a.remove();
-				scope.wbModel.contents.splice(index, 1);
+				$element.children(':nth-child('+(index+1)+')').remove();
+				$scope.wbModel.contents.splice(index, 1);
+				return true;
 			}
+			return false;
 		};
 		
 

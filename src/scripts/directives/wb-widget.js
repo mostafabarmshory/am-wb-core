@@ -61,9 +61,9 @@ angular.module('am-wb-core')
 	 * @ngInject
 	 */
 	function wbWidgetCtrl($scope, $element, $settings, $widget) {
-		
+
 		this.delete = function(){
-			alert('delete');
+			$scope.group.removeChild($scope.wbModel);
 		}
 
 		this.clone = function(){
@@ -79,7 +79,7 @@ angular.module('am-wb-core')
 		}
 
 		this.isEditable = function(){
-			return $scope.editable;
+			return  $scope.group && $scope.group.isEditable();
 		}
 
 		this.isSelected = function(){
@@ -92,6 +92,7 @@ angular.module('am-wb-core')
 				$scope.group.childSelected(this);
 			}
 		}
+		
 	}
 	
 	return {
