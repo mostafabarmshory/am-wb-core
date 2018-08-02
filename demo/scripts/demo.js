@@ -47,31 +47,106 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 		$scope.widgets = list.items;
 	});
 
-//	<textarea ng-show="showContent">{{model}}</textarea>
+	var headerControls = {
+			close: 'remove',
+			maximize: 'remove',
+	};
+
+	function openWidgets(){
+		var watch;
+		$wbFloat.show({
+			title: 'Widgets',
+			template:'<wb-widgets-explorer ng-model="widgets"></wb-widgets-explorer>',
+			parent: $scope,
+			controller: function($wbFloat){
+				watch = $scope.$watch('editable', function(value){
+					if(value === false) {
+						$wbFloat.hide();
+					}
+				});
+			},
+			// Extera options
+			headerControls: headerControls,
+			panelSize: '400 600',
+			position: {
+				my: 'right-top',
+				at: 'right-top',
+				autoposition: 'down',
+				offsetX: -5,
+				offsetY: 5
+			}
+		})
+		.finally(function(){
+			watch();
+		});
+	}
+
+	function openSettings(){
+		var watch;
+		$wbFloat.show({
+			title: 'Settings',
+			template:'<wb-widgets-explorer ng-model="widgets"></wb-widgets-explorer>',
+			parent: $scope,
+			controller: function($wbFloat){
+				watch = $scope.$watch('editable', function(value){
+					if(value === false) {
+						$wbFloat.hide();
+					}
+				});
+			},
+			// Extera options
+			headerControls: headerControls,
+			position: {
+				my: 'left-top',
+				at: 'left-top',
+				autoposition: 'down',
+				offsetX: -5,
+				offsetY: 5
+			}
+		})
+		.finally(function(){
+			watch();
+		});
+	}
+
+	function openContent(){
+		var watch, watch2;
+		var parent = $scope;
+		$wbFloat.show({
+			title: 'Content',
+			template:'<textarea>{{model}}</textarea>',
+			parent: parent,
+			controller: function($scope, $wbFloat){
+				watch = parent.$watch('editable', function(value){
+					if(value === false) {
+						$wbFloat.hide();
+					}
+				});
+				watch2 = parent.$watch('selectedModel', function(value){
+					$scope.model = value;
+				})
+			},
+			// Extera options
+			headerControls: headerControls,
+			position: {
+				my: 'left-top',
+				at: 'left-top',
+				autoposition: 'down',
+				offsetX: -5,
+				offsetY: 5
+			}
+		})
+		.finally(function(){
+			watch();
+			watch2();
+		});
+	}
+
 	$scope.$watch('editable', function(value) {
 		if(value){
-			var parentScpoe = $scope;
-			var watch;
-			$wbFloat.show({
-				title: 'Widgets',
-				template:'<wb-widgets-explorer ng-model="widgets"></wb-widgets-explorer>',
-				parent: $scope,
-				controller: function($wbFloat){
-					watch = $scope.$watch('editable', function(value){
-						if(value === false) {
-							$wbFloat.hide();
-						}
-					});
-				},
-				// Extera options
-				headerControls: {
-					close: 'remove',
-					maximize: 'remove',
-				}
-			})
-			.finally(function(){
-				watch();
-			});
+			openWidgets();
+			openSettings();
+			openContent();
 		}
 	});
 })

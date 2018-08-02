@@ -31,8 +31,10 @@ angular.module('am-wb-core')
  * @memberof am-wb-core
  * @description Open and manage float panels
  * 
+ * 
+ * The base of this implementation is https://jspanel.de/api.html
  */
-.service('$wbFloat', function($q, $widget, $rootScope, $compile, $controller) {
+.service('$wbFloat', function($q, $wbUtil, $rootScope, $compile, $controller) {
 
 	/**
 	 * Hide an existing float and resolve the promise returned from
@@ -102,6 +104,7 @@ angular.module('am-wb-core')
 			theme: 'primary',
 			headerTitle : optionsOrPreset.title || 'my panel #1',
 			position : optionsOrPreset.position || 'center-top 0 58',
+			panelSize : optionsOrPreset.panelSize || '400 400',
 			contentSize : optionsOrPreset.contentSize || '450 250',
 			headerControls: optionsOrPreset.headerControls || 'all',
 			content : '<div style="border-top: 1px solid;width: 100%;height: 250px;padding: 0px;pointer-events: inherit;"></div>',
@@ -109,7 +112,7 @@ angular.module('am-wb-core')
 				var parentElement = angular.element(this.content);
 
 				// 2- create element
-				return $widget.getTemplateFor(optionsOrPreset)//
+				return $wbUtil.getTemplateFor(optionsOrPreset)//
 				.then(function(template) {
 					var element = angular.element(template);
 

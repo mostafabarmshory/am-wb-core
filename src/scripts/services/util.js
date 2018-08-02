@@ -23,20 +23,24 @@
  */
 'use strict';
 
-angular
-.module('am-wb-core')
+angular.module('am-wb-core')
 
 /**
- * @ngdoc service
+ * @ngdoc Services
  * @name $wbUtil
- * @memberof am-wb-core
- * @description کدهای پایه
+ * @description Utility service of WB
  * 
  */
-.service('$wbUtil',function($rootScope, $controller, $widget, $q, $sce, $compile,
-		$document, $templateRequest) {
-	/*
-	 * get setting page template
+.service('$wbUtil', function($rootScope, $controller, $q, $sce, $compile, $document,
+		$templateRequest) {
+	/**
+	 * Loading template of the page
+	 * 
+	 * @name getTemplateFor
+	 * @memberof $wbUtil
+	 * @param page
+	 *            {object} properties of a page, widget , ..
+	 * @return promise to load template on resolve.
 	 */
 	function getTemplateFor(page) {
 		var template, templateUrl;
@@ -44,18 +48,16 @@ angular
 			if (angular.isFunction(template)) {
 				template = template(page.params);
 			}
-		} else if (angular
-				.isDefined(templateUrl = page.templateUrl)) {
+		} else if (angular.isDefined(templateUrl = page.templateUrl)) {
 			if (angular.isFunction(templateUrl)) {
 				templateUrl = templateUrl(page.params);
 			}
 			if (angular.isDefined(templateUrl)) {
-				page.loadedTemplateUrl = $sce
-				.valueOf(templateUrl);
+				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
 				template = $templateRequest(templateUrl);
 			}
 		}
-		return template;
+		return $q.when(template);
 	}
 
 	this.getTemplateFor = getTemplateFor;
