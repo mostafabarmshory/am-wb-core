@@ -231,7 +231,7 @@ angular.module('am-wb-core')
 	function widgetData(widget){
 		return angular.copy(widget.model);
 	}
-
+	
 	// widgets
 	this.newWidget = newWidget;
 	this.widget = widget;

@@ -52,11 +52,12 @@ angular.module('am-wb-core')
 		label : 'Description',
 		templateUrl : 'views/settings/wb-description.html'
 	});
+
 	$settings.newPage({
 		type: 'layout',
 		label : 'Layout',
+		description : 'Manages layout of the current item.',
 		icon: 'dashboard',
-		controller: 'WbLayoutWbSettingsCtrl',
 		templateUrl : 'views/settings/wb-layout.html'
 	});
 	$settings.newPage({
@@ -66,12 +67,177 @@ angular.module('am-wb-core')
 		controller: 'WbBorderSettingCtrl',
 		templateUrl : 'views/settings/wb-border.html'
 	});
+
+	/**
+	 * @ngdoc WB-Settings
+	 * @name pageLayout
+	 * @description Manages element layout
+	 * 
+	 * Layout part is consists of the following attributes:
+	 * 
+	 * <ul>
+	 * 	<li>direction</li>
+	 * 	<li>align</li>
+	 * 	<li>justify</li>
+	 * </ul>
+	 * 
+	 * @see wb-layout
+	 */
 	$settings.newPage({
 		type: 'pageLayout',
 		label : 'Page Layout',
 		icon: 'dashboard',
-		controller: 'WbPageLayoutWbSettingsCtrl',
-		templateUrl : 'views/settings/wb-layout-page.html'
+		templateUrl : 'views/settings/wb-layout-page.html',
+		controllerAs: 'ctrl',
+		/*
+		 * Manages setting page
+		 * @ngInject
+		 */
+		controller: function($scope) {
+//			$scope.directions = [ {
+//			title : 'row',
+//			icon : 'view_column',
+//			value : 'row'
+//			}, {
+//			title : 'column',
+//			icon : 'view_agenda',
+//			value : 'column'
+//			} ];
+
+//			$scope.align = [ {
+//			title : 'none',
+//			value : 'none'
+//			}, {
+//			title : 'start',
+//			value : 'start'
+//			}, {
+//			title : 'center',
+//			value : 'center'
+//			}, {
+//			title : 'end',
+//			value : 'end'
+//			}, {
+//			title : 'space-around',
+//			value : 'space-around'
+//			}, {
+//			title : 'space-between',
+//			value : 'space-between'
+//			} ];
+
+//			$scope.justify = [ {
+//			title : 'none',
+//			value : 'none'
+//			}, {
+//			title : 'start',
+//			value : 'start'
+//			}, {
+//			title : 'center',
+//			value : 'center'
+//			}, {
+//			title : 'end',
+//			value : 'end'
+//			}, {
+//			title : 'stretch',
+//			value : 'stretch'
+//			}, ]
+
+
+			$scope.direction = [ {
+				title : 'row',
+				icon : 'wb-vertical-boxes',
+				value : 'row'
+			}, {
+				title : 'column',
+				icon : 'wb-horizontal-boxes',
+				value : 'column'
+			} ];
+
+			$scope.justify = {
+					'row' : [ {
+						title : 'Start',
+						icon : 'sort_start_horiz',
+						value : 'start'
+					}, {
+						title : 'End',
+						icon : 'sort_end_horiz',
+						value : 'end'
+					}, {
+						title : 'Center',
+						icon : 'sort_center_horiz',
+						value : 'center'
+					}, {
+						title : 'Space Around',
+						icon : 'sort_space_around_horiz',
+						value : 'space-around'
+					}, {
+						title : 'Space Between',
+						icon : 'sort_space_between_horiz',
+						value : 'space-between'
+					} ],
+					'column' : [ {
+						title : 'Start',
+						icon : 'sort_start_vert',
+						value : 'start'
+					}, {
+						title : 'End',
+						icon : 'sort_end_vert',
+						value : 'end'
+					}, {
+						title : 'Center',
+						icon : 'sort_center_vert',
+						value : 'center'
+					}, {
+						title : 'Space Around',
+						icon : 'sort_space_around_vert',
+						value : 'space-around'
+					}, {
+						title : 'Space Between',
+						icon : 'sort_space_between_vert',
+						value : 'space-between'
+					} ]
+			};
+
+			$scope.align = {
+					'column' : [ 
+						{
+							title : 'Stretch',
+							icon : 'format_align_justify',
+							value : 'stretch'
+						}, {
+							title : 'Start',
+							icon : 'format_align_left',
+							value : 'start'
+						}, {
+							title : 'End',
+							icon : 'format_align_right',
+							value : 'end'
+						}, {
+							title : 'Center',
+							icon : 'format_align_center',
+							value : 'center'
+						} 
+						],
+						'row': [ 
+							{
+								title : 'Stretch',
+								icon : 'align_justify_vertical',
+								value : 'stretch'
+							}, {
+								title : 'Start',
+								icon : 'align_start_vertical',
+								value : 'start'
+							}, {
+								title : 'End',
+								icon : 'align_end_vertical',
+								value : 'end'
+							}, {
+								title : 'Center',
+								icon : 'align_center_vertical',
+								value : 'center'
+							} 
+							]
+			};
+		},
 	});
 	$settings.newPage({
 		type: 'selfLayout',

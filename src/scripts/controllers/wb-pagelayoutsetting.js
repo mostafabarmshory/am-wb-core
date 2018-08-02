@@ -32,10 +32,10 @@ angular
 .module('am-wb-core')
 
 .controller('WbPageLayoutWbSettingsCtrl', function($scope, $settings) {
-	var wbModel = $scope.wbModel;
-	if (!wbModel.style) {
-		wbModel.style = {};
-	}
+//	var wbModel = $scope.wbModel;
+//	if (!wbModel.style) {
+//		wbModel.style = {};
+//	}
 	$scope.flexDirection = [ {
 		title : 'row',
 		icon : 'wb-vertical-boxes',

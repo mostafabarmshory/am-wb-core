@@ -30,10 +30,11 @@
  * 
  */
 angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
-.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbFloat, $controller) {
+.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbFloat, $controller) {
 	$http.get('examples/groups.json')
 	.then(function(res) {
-		$scope.model = res.data;
+		// NOTE: maso, 2018: clean data model
+		$scope.model = $wbUtil.clean(res.data);
 	});
 
 	// load setting of model

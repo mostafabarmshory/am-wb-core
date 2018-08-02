@@ -60,5 +60,57 @@ angular.module('am-wb-core')
 		return $q.when(template);
 	}
 
+
+	function cleanEvetns(model){
+		// event
+		if(!model.event) {
+			model.event = {};
+		}
+	}
+
+	function cleanStyle(model){
+		if(!model.style) {
+			model.style = {};
+		}
+		cleanLayout(model);
+	}
+
+	function cleanLayout(model){
+		if(model.type === 'Group'){
+			return;
+		}
+		if(!model.style.layout) {
+			model.style.layout = {};
+		}
+		var layout = model.style.layout;
+		if(!layout.direction) {
+			layout.direction = 'column';
+		}
+		if(!layout.justify) {
+			layout.justify = 'center';
+		}
+		if(!layout.align) {
+			layout.align = 'stretch';
+		}
+	}
+
+	/**
+	 * Clean data model
+	 */
+	function clean(model){
+		cleanEvetns(model);
+		cleanStyle(model);
+		if(model.type == 'Group'){
+			if(model.contents.lenth){
+				for(var i = 0; i < model.contents.lenth; i++){
+					clean(model.contents[i]);
+				}
+			}
+		}
+		return model;
+	}
+
+
 	this.getTemplateFor = getTemplateFor;
+	this.clean = clean;
 });
