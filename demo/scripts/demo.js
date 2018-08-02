@@ -82,40 +82,12 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 	}
 
 	function openSettings(){
-		var watch;
-		$wbFloat.show({
-			title: 'Settings',
-			template:'<wb-widgets-explorer ng-model="widgets"></wb-widgets-explorer>',
-			parent: $scope,
-			controller: function($wbFloat){
-				watch = $scope.$watch('editable', function(value){
-					if(value === false) {
-						$wbFloat.hide();
-					}
-				});
-			},
-			// Extera options
-			headerControls: headerControls,
-			position: {
-				my: 'left-top',
-				at: 'left-top',
-				autoposition: 'down',
-				offsetX: -5,
-				offsetY: 5
-			}
-		})
-		.finally(function(){
-			watch();
-		});
-	}
-
-	function openContent(){
 		var watch, watch2;
 		var parent = $scope;
 		$wbFloat.show({
-			title: 'Content',
-			template:'<textarea>{{model}}</textarea>',
-			parent: parent,
+			title: 'Settings',
+			template:'<wb-setting-panel-group ng-model="model"></wb-setting-panel-group>',
+			parent: $scope,
 			controller: function($scope, $wbFloat){
 				watch = parent.$watch('editable', function(value){
 					if(value === false) {
@@ -124,7 +96,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 				});
 				watch2 = parent.$watch('selectedModel', function(value){
 					$scope.model = value;
-				})
+				});
 			},
 			// Extera options
 			headerControls: headerControls,
@@ -140,6 +112,39 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 			watch();
 			watch2();
 		});
+	}
+
+	function openContent(){
+//		var watch, watch2;
+//		var parent = $scope;
+//		$wbFloat.show({
+//			title: 'Content',
+//			template:'<textarea>{{model}}</textarea>',
+//			parent: parent,
+//			controller: function($scope, $wbFloat){
+//				watch = parent.$watch('editable', function(value){
+//					if(value === false) {
+//						$wbFloat.hide();
+//					}
+//				});
+//				watch2 = parent.$watch('selectedModel', function(value){
+//					$scope.model = value;
+//				});
+//			},
+//			// Extera options
+//			headerControls: headerControls,
+//			position: {
+//				my: 'left-top',
+//				at: 'left-top',
+//				autoposition: 'down',
+//				offsetX: -5,
+//				offsetY: 5
+//			}
+//		})
+//		.finally(function(){
+//			watch();
+//			watch2();
+//		});
 	}
 
 	$scope.$watch('editable', function(value) {

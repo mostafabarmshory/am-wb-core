@@ -26,31 +26,139 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
- * @name wbWidget
- * @memberof am-wb-core
- * @description Widgets container
+ * @ngdoc Directives
+ * @name wb-setting-panel-group
+ * @description Widgets settings
  * 
- * This is widget containers.
+ * Loads list of settings.
  * 
- * All primary actions of a widget are supported (such as remove and setting).
  */
-.directive('wbSettingPanelGroup', function($settings, $widget) {
-	
+.directive('wbSettingPanelGroup', function($settings, $widget, $rootScope, $wbUtil, $compile, $controller, $q) {
+
 	/**
 	 * Init settings
 	 */
-	function postLink(scope, element, attrs, ctrl, transclude) {
-		$widget.widgets()//
-		.then(function(ws){
-			scope.widgets = ws.items;
-		});
+	function postLink($scope, $element, $attrs, $ctrls) {
+
+		// Load ngModel
+		var ngModelCtrl = $ctrls[0];
+		ngModelCtrl.$render = function() {
+			if(ngModelCtrl.$viewValue) {
+				loadSetting(ngModelCtrl.$viewValue);
+			}
+		};
+
+		/**
+		 * encapsulate template srce with panel widget template.
+		 * 
+		 * @param page
+		 *            setting page config
+		 * @param tempateSrc
+		 *            setting page html template
+		 * @returns encapsulate html template
+		 */
+		function _encapsulateSettingPanel(page, templateSrc) {
+			// TODO: maso, 2017: pass all paramter to the setting
+			// panel.
+			var attr = ' ';
+			if (page.label) {
+				attr += ' label=\"' + page.label + '\"';
+			}
+			if (page.icon) {
+				attr += ' icon=\"' + page.icon + '\"';
+			}
+			if (page.description) {
+				attr += ' description=\"' + page.description + '\"';
+			}
+			return '<wb-setting-panel ' + attr + '>' + templateSrc
+			+ '</wb-setting-panel>';
+		}
+
+		function isLoaded(model){
+			// TODO: check if settings is loaded
+			return false;
+		}
+
+		var oldScope;
+
+		/**
+		 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+		 * 
+		 * @returns
+		 */
+		function loadSetting(model) {
+			var widget = null;
+			var jobs = [];
+			var pages = [];
+
+			// 0- destroy old resource
+			if(isLoaded(model)){
+				return;
+			}
+			if (angular.isDefined(oldScope)) {
+				oldScope.$destroy();
+			}
+			var scope = $rootScope.$new(true, $rootScope);
+			scope.wbModel = model;
+//			scope.wbParent = models.wbParent;
+			oldScope = scope;
+
+			// 2- Clear children
+			$element.empty();
+
+			// 3- load pages
+			$widget.widget(model)//
+			.then(function(w) {
+				widget = w;
+				var widgetSettings = $settings.getSettingsFor(w);
+				angular.forEach(widgetSettings, function(type) {
+					var page = $settings.page(type);
+					var job = $wbUtil.getTemplateFor(page)
+					.then(function(templateSrc){
+						templateSrc = _encapsulateSettingPanel(page, templateSrc);
+						var element = angular.element(templateSrc);
+						if (angular.isDefined(page.controller)) {
+							$controller(page.controller, {
+								$scope : scope,
+								$element : element,
+							});
+						}
+						$compile(element)(scope);
+						element.attr('label', page.lable);
+						pages.push(element);
+					});
+					jobs.push(job);
+				});
+			})
+			//
+			.then(function() {
+				$q.all(jobs)//
+				.then(function() {
+					pages.sort(function(a, b) {
+						if (a.attr('label') < b.attr('label'))
+							return -1;
+						if (a.attr('label') > b.attr('label'))
+							return 1;
+						return 0;
+					});
+					angular.forEach(pages, function(element) {
+						$element.append(element);
+					});
+				});
+			});
+		}
 	}
-	
+
+	function panelController(){
+	}
+
 	return {
 		restrict : 'E',
 		template: '<div></div>',
 		scope : {},
-		link : postLink
+		link : postLink,
+		controller: panelController,
+		controllerAs: 'ctrl',
+		require:['ngModel']
 	};
 });

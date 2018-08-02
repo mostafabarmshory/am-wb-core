@@ -35,13 +35,12 @@ angular.module('am-wb-core')
  */
 .service('$settings',function($rootScope, $controller, $widget, $q, $sce, $compile,
 		$document, $templateRequest, $wbUtil) {
-	var WB_SETTING_PANEL_ID = 'WB-SETTING-PANEL';
-
 	/*
 	 * Default settings
 	 */
-	var WB_SETTINGS_PAGE_DEFAULT = ['description', 'border',
-		'background', 'pageLayout', 'marginPadding'];
+//	var WB_SETTINGS_PAGE_DEFAULT = ['description', 'border',
+//	'background', 'pageLayout', 'marginPadding'];
+
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
 		'background', 'pageLayout', 'selfLayout',
 		'marginPadding', 'size' ];
@@ -57,8 +56,6 @@ angular.module('am-wb-core')
 			templateUrl : 'views/settings/wb-notfound.html'
 	};
 
-	var oldScope;
-
 	/**
 	 * Fetchs a setting page.
 	 * 
@@ -66,11 +63,11 @@ angular.module('am-wb-core')
 	 * @returns
 	 */
 	function page(type) {
-		var widget = notFound;
+		var pageResult = notFound;
 		if (type in settingPages) {
-			widget = settingPages[type];
+			pageResult = settingPages[type];
 		}
-		return widget;
+		return pageResult;
 	}
 
 	/**
@@ -97,140 +94,120 @@ angular.module('am-wb-core')
 	 * @param widget
 	 * @returns
 	 */
-	function getDefaultSettingsFor(widget) {
-		if (widget.type === 'Page') {
-			return WB_SETTINGS_PAGE_DEFAULT;
-		}
+	function getSettingsFor(widget) {
+		var widgetSettings = [];
 		if (widget.type === 'Group') {
-			return WB_SETTINGS_GROUP_DEFAULT;
+			widgetSettings = widgetSettings
+			.concat(WB_SETTINGS_GROUP_DEFAULT);
+		} else {
+			widgetSettings = widgetSettings
+			.concat(WB_SETTINGS_WIDGET_DEFAULT);
 		}
-		return WB_SETTINGS_WIDGET_DEFAULT;
+
+		if (angular.isArray(widget.setting)) {
+			widgetSettings = widgetSettings
+			.concat(widget.setting);
+		}
+		return widgetSettings;
 	}
 
-	/**
-	 * encapsulate template srce with panel widget template.
-	 * 
-	 * @param page
-	 *            setting page config
-	 * @param tempateSrc
-	 *            setting page html template
-	 * @returns encapsulate html template
-	 */
-	function _encapsulateSettingPanel(page, templateSrc) {
-		// TODO: maso, 2017: pass all paramter to the setting
-		// panel.
-		var attr = ' ';
-		if (page.label) {
-			attr += ' label=\"' + page.label + '\"';
-		}
-		if (page.icon) {
-			attr += ' icon=\"' + page.icon + '\"';
-		}
-		if (page.description) {
-			attr += ' description=\"' + page.description + '\"';
-		}
-		return '<wb-setting-panel ' + attr + '>' + templateSrc
-		+ '</wb-setting-panel>';
-	}
 
 	/**
 	 * Check if this is the current model
 	 */
 	function isLoaded(wbModel) {
-    	return oldScope && oldScope.wbModel == wbModel;
-    }
-	
-	/**
-	 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-	 * 
-	 * @returns
-	 */
-	function loadSetting(models, panelId) {
-		var widget = null;
-		var jobs = [];
-		var pages = [];
-
-		// 0- destroy old resource
-		if(isLoaded(models.wbModel)){
-			return;
-		}
-		if (angular.isDefined(oldScope)) {
-			oldScope.$destroy();
-		}
-		var scope = $rootScope.$new(true, $rootScope);
-		scope.wbModel = models.wbModel;
-		scope.wbParent = models.wbParent;
-		oldScope = scope;
-
-		// 1- Find element
-
-		var target;
-		if(panelId){
-			target = $document.find('#'+panelId).find('#' + WB_SETTING_PANEL_ID);
-		} else {
-			target = $document.find('#' + WB_SETTING_PANEL_ID);
-		}
-
-		// 2- Clear childrens
-		target.empty();
-
-		// 3- load pages
-		$widget.widget(models.wbModel)//
-		.then(function(w) {
-			widget = w;
-			var widgetSettings = getDefaultSettingsFor(w);
-			if (angular.isArray(widget.setting)) {
-				widgetSettings = widgetSettings
-				.concat(widget.setting);
-			}
-			angular.forEach(widgetSettings, function(type) {
-				var page = notFound;
-				if (type in settingPages) {
-					page = settingPages[type];
-				}
-				var template = $wbUtil.getTemplateFor(page);
-				if (angular.isDefined(template)) {
-					var job = template.then(function(templateSrc) {
-						templateSrc = _encapsulateSettingPanel(page, templateSrc);
-						var element = angular.element(templateSrc);
-						if (angular .isDefined(page.controller)) {
-							$controller(page.controller, {
-								$scope : scope,
-								$element : element,
-							});
-						}
-						$compile(element)(scope);
-						element.attr('label',page.lable);
-						pages.push(element);
-					});
-					jobs.push(job);
-				}
-			});
-
-		})
-		//
-		.then(function() {
-			$q.all(jobs)//
-			.then(function() {
-				pages.sort(function(a, b) {
-					if (a.attr('label') < b.attr('label'))
-						return -1;
-					if (a.attr('label') > b.attr('label'))
-						return 1;
-					return 0;
-				});
-				angular.forEach(pages, function(element) {
-					target
-					.append(element);
-				});
-			});
-		});
+		return oldScope && oldScope.wbModel == wbModel;
 	}
 
+//	/**
+//	* تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+//	* 
+//	* @returns
+//	*/
+//	function loadSetting(models, panelId) {
+//	var widget = null;
+//	var jobs = [];
+//	var pages = [];
+
+//	// 0- destroy old resource
+//	if(isLoaded(models.wbModel)){
+//	return;
+//	}
+//	if (angular.isDefined(oldScope)) {
+//	oldScope.$destroy();
+//	}
+//	var scope = $rootScope.$new(true, $rootScope);
+//	scope.wbModel = models.wbModel;
+//	scope.wbParent = models.wbParent;
+//	oldScope = scope;
+
+//	// 1- Find element
+
+//	var target;
+//	if(panelId){
+//	target = $document.find('#'+panelId).find('#' + WB_SETTING_PANEL_ID);
+//	} else {
+//	target = $document.find('#' + WB_SETTING_PANEL_ID);
+//	}
+
+//	// 2- Clear childrens
+//	target.empty();
+
+//	// 3- load pages
+//	$widget.widget(models.wbModel)//
+//	.then(function(w) {
+//	widget = w;
+//	var widgetSettings = getDefaultSettingsFor(w);
+//	if (angular.isArray(widget.setting)) {
+//	widgetSettings = widgetSettings
+//	.concat(widget.setting);
+//	}
+//	angular.forEach(widgetSettings, function(type) {
+//	var page = notFound;
+//	if (type in settingPages) {
+//	page = settingPages[type];
+//	}
+//	var template = $wbUtil.getTemplateFor(page);
+//	if (angular.isDefined(template)) {
+//	var job = template.then(function(templateSrc) {
+//	templateSrc = _encapsulateSettingPanel(page, templateSrc);
+//	var element = angular.element(templateSrc);
+//	if (angular .isDefined(page.controller)) {
+//	$controller(page.controller, {
+//	$scope : scope,
+//	$element : element,
+//	});
+//	}
+//	$compile(element)(scope);
+//	element.attr('label',page.lable);
+//	pages.push(element);
+//	});
+//	jobs.push(job);
+//	}
+//	});
+
+//	})
+//	//
+//	.then(function() {
+//	$q.all(jobs)//
+//	.then(function() {
+//	pages.sort(function(a, b) {
+//	if (a.attr('label') < b.attr('label'))
+//	return -1;
+//	if (a.attr('label') > b.attr('label'))
+//	return 1;
+//	return 0;
+//	});
+//	angular.forEach(pages, function(element) {
+//	target
+//	.append(element);
+//	});
+//	});
+//	});
+//	}
+
 	// تعیین سرویس‌ها
-	this.WB_SETTING_PANEL_ID = WB_SETTING_PANEL_ID;
 	this.page = page;
-	this.load = loadSetting;
 	this.newPage = newPage;
-	this.isCurrentModel = isLoaded;
+	this.getSettingsFor = getSettingsFor;
 });
