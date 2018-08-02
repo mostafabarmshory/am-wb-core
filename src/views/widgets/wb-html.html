@@ -5,7 +5,7 @@
 
  -->
 <div
-	ng-hide="ctrl.isSelected()"
+	ng-if="!ctrl.isSelected()"
     ng-bind-html="wbModel.text | wbunsafe"
 	class="wb-widget-fill">
 </div>

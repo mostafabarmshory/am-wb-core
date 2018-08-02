@@ -30,7 +30,7 @@ of a widget:
  * Added if group is selected
  */
 .wb-group-select {
-	background: red;
+/* 	background: red; */
 }
 
 /*
@@ -54,11 +54,13 @@ of a widget:
 ***************************************************************************************/
 .wb-widget {
 	overflow: hide;
+    position: relative;
+	min-width: 32px;
+	min-height: 32px;
 }
 
 .wb-widget-edit {
 	margin: 2px;
-	position: relative;
 	border: 1px dashed #8f9494;
 }
 
@@ -66,10 +68,15 @@ of a widget:
  * Body of a widget to fill
  */
 .wb-widget-fill {
+	position: relative;
 	top: 0px;
 	left: 0px;
 	right: 0px;
 	bottom: 0px;
+	width: 100%;
+	height: 100%;
+	padding: 0px;
+	margin: 0px;
 }
 
 

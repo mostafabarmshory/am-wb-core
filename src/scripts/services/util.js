@@ -73,6 +73,7 @@ angular.module('am-wb-core')
 			model.style = {};
 		}
 		cleanLayout(model);
+		cleanSize(model);
 	}
 
 	function cleanLayout(model){
@@ -93,6 +94,12 @@ angular.module('am-wb-core')
 			layout.align = 'stretch';
 		}
 	}
+	
+	function cleanSize(model){
+		if(!model.style.size) {
+			model.style.size = {};
+		}
+	}
 
 	/**
 	 * Clean data model
@@ -101,8 +108,8 @@ angular.module('am-wb-core')
 		cleanEvetns(model);
 		cleanStyle(model);
 		if(model.type == 'Group'){
-			if(model.contents.lenth){
-				for(var i = 0; i < model.contents.lenth; i++){
+			if(model.contents.length){
+				for(var i = 0; i < model.contents.length; i++){
 					clean(model.contents[i]);
 				}
 			}

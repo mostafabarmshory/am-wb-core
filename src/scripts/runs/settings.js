@@ -143,14 +143,14 @@ angular.module('am-wb-core')
 
 
 			$scope.direction = [ {
-				title : 'row',
-				icon : 'wb-vertical-boxes',
-				value : 'row'
-			}, {
 				title : 'column',
 				icon : 'wb-horizontal-boxes',
 				value : 'column'
-			} ];
+			} ,{
+				title : 'row',
+				icon : 'wb-vertical-boxes',
+				value : 'row'
+			}];
 
 			$scope.justify = {
 					'row' : [ {

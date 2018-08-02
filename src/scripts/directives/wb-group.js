@@ -34,7 +34,7 @@ angular.module('am-wb-core')
  * @description Render a list of widget
  * 
  */
-.directive('wbGroup', function($compile, $widget, $controller, $settings, $q, $mdTheming) {
+.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $q, $mdTheming) {
 
 	/*
 	 * Link widget view
@@ -242,6 +242,7 @@ angular.module('am-wb-core')
 		 * Adds dragged widget
 		 */
 		this.addChild = function(index, item) {
+			$wbUtil.clean(item);
 			// add widget
 			$widget.compile(item, $scope)//
 			.then(function(newElement) {
