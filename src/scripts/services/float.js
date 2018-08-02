@@ -99,13 +99,13 @@ angular.module('am-wb-core')
 		var childScope = optionsOrPreset.scope || parenScope.$new(false, parenScope);
 
 		var panel = jsPanel.create({
-			theme : 'primary',
+			theme: 'primary',
 			headerTitle : optionsOrPreset.title || 'my panel #1',
 			position : optionsOrPreset.position || 'center-top 0 58',
 			contentSize : optionsOrPreset.contentSize || '450 250',
-			content : '<div></div>',
+			headerControls: optionsOrPreset.headerControls || 'all',
+			content : '<div style="border-top: 1px solid;width: 100%;height: 250px;padding: 0px;pointer-events: inherit;"></div>',
 			callback : function() {
-				this.content.style.padding = '20px';
 				var parentElement = angular.element(this.content);
 
 				// 2- create element

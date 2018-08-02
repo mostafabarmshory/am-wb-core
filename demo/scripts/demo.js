@@ -62,6 +62,11 @@ angular.module('am-wb-coreTest', [ 'am-wb-core' ])//
 							$wbFloat.hide();
 						}
 					});
+				},
+				// Extera options
+				headerControls: {
+					close: 'remove',
+					maximize: 'remove',
 				}
 			})
 			.finally(function(){
