@@ -69,6 +69,7 @@ module.exports = function(config) {
       'bower_components/zeroclipboard/dist/ZeroClipboard.js',
       'bower_components/handsontable/dist/handsontable.js',
       'bower_components/ngHandsontable/dist/ngHandsontable.js',
+      'bower_components/jspanel4/dist/jspanel.js',
       'bower_components/angular-mocks/angular-mocks.js',
       // endbower
       'src/scripts/**/*.js',
