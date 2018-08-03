@@ -18,29 +18,42 @@ of a widget:
 	overflow: auto !important;
 }
 
+.wb-group-root.wb-group-edit {
+	border: 1px solid black !important;
+}
+
 /*
  * Added to a group if is in edit mode
  */
 .wb-group-edit {
-	border: 0.5px dashed #aaaaaa;
-	margin: 1px;
+	border: 1px dashed #aaaaaa;
+}
+.wb-group-edit {
+	padding: 8px;
+}
+.wb-group-edit.wb-flex-row > * {
+    margin: 0px 4px;
 }
 
-/*
- * Added if group is selected
- */
-.wb-group-select {
-	background-color: red;
+.wb-group-edit.wb-flex-column > * {
+    margin: 4px 0px;
 }
 
 /*
  * Add animation on mouse hover in edit mode
  */
 .wb-group-edit:hover {
-	border: 1px dashed #555753;
-	-webkit-box-shadow: 0px 0px 2x 2px #aaaaaa;
-	-moz-box-shadow: 0px 0px 2px 2px #aaaaaa;
-	box-shadow: 0px 0px 2px 2px #aaaaaa;
+	border: 1px dashed black;
+}
+
+/*
+ * Added if group is selected
+ */
+.wb-group-select {
+	border: 1px solid black !important;
+	-webkit-box-shadow: 0px 0px 4px 4px #aaaaaa;
+	-moz-box-shadow: 0px 0px 4px 4px #aaaaaa;
+	box-shadow: 0px 0px 4px 4px #aaaaaa;
 }
 
 
@@ -53,19 +66,25 @@ of a widget:
 -> widget
 ***************************************************************************************/
 .wb-widget {
-	overflow: hide;
+	overflow: hidden;
     position: relative;
 	min-width: 32px;
 	min-height: 32px;
 }
 
 .wb-widget-edit {
-	margin: 2px;
 	border: 1px dashed #8f9494;
 }
 
+.wb-widget-edit:hover {
+	border: 1px dashed black;
+}
+
 .wb-widget-select {
-	background-color: red;
+	border: 1px solid black !important;
+	-webkit-box-shadow: 0px 0px 4px 4px #aaaaaa;
+	-moz-box-shadow: 0px 0px 4px 4px #aaaaaa;
+	box-shadow: 0px 0px 4px 4px #aaaaaa;
 }
 
 /*
