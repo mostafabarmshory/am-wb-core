@@ -3,11 +3,13 @@
 		aria-label="Open menu with custom trigger" 
 		class="md-icon-button" 
 		style="padding: 0px; margin: 0px;"
-		ng-mouseenter="$mdMenu.open()">
+		ng-click="$mdMenu.open()">
 		<wb-icon>more_vert</wb-icon>
 	</md-button>
-	<md-menu-content width="4" ng-mouseleave="$mdMenu.close()">
-		<md-menu-item ng-repeat="item in [1, 2, 3]">
+	<md-menu-content 
+		width="4" 
+		ng-mouseleave="$mdMenu.close()">
+		<md-menu-item ng-repeat="item in ctrl.getAction()">
 			<md-button>Option {{item}}</md-button>
 		</md-menu-item>
 	</md-menu-content>

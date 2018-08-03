@@ -95,7 +95,10 @@ angular.module('am-wb-core')
 				$scope.group.childSelected(this);
 			}
 		}
-		
+
+		this.getAction = function(){
+			return [1, 2, 3];
+		}
 	}
 	
 	return {

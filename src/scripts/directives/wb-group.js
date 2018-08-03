@@ -127,7 +127,6 @@ angular.module('am-wb-core')
 		$scope.dropCallback = function(index, item, external, type){
 			return ctrl.addChild(index, item);
 		}
-
 	}
 
 	/**
@@ -266,6 +265,10 @@ angular.module('am-wb-core')
 
 		this.getAllowedTypes = function(){
 			return $scope.wbAllowedTypesl;
+		}
+		
+		this.getAction = function(){
+			return [1, 2, 3];
 		}
 	}
 
