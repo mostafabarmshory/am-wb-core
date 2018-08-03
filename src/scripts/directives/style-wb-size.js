@@ -33,6 +33,7 @@ angular.module('am-wb-core')
 		var button;
 		var dimension = {};
 		var position = {};
+		var lock = false;
 
 		// main ctrl
 		var ctrl = $ctrls[0] || $ctrls[1];
@@ -53,7 +54,7 @@ angular.module('am-wb-core')
 				$scope.wbModel.style.size.width = newDimensions.width;
 				$scope.wbModel.style.size.height = newDimensions.height;
 			}
-			bindToElement();
+			bindToElement(getBound());
 			$scope.$apply();
 			return false;
 		}
@@ -61,26 +62,36 @@ angular.module('am-wb-core')
 		function mouseup() {
 			$document.unbind('mousemove', mousemove);
 			$document.unbind('mouseup', mouseup);
+			lock = false;
 		}
 
 		function mousedown($event) {
 			$event.stopImmediatePropagation();
 			position.x = $event.clientX;
 			position.y = $event.clientY;
+			lock = true;
 			dimension.width = $element.prop('offsetWidth');
 			dimension.height = $element.prop('offsetHeight');
 			$document.bind('mousemove', mousemove);
 			$document.bind('mouseup', mouseup);
 			return false;
 		};
-
-		function bindToElement(){
+		
+		function getBound(){
 			var off = $element.offset();
 			var height = $element.innerHeight();
 			var width = $element.innerWidth();
+			return {
+				left: off.left,
+				top: off.top,
+				width: $element.innerWidth(),
+				height: $element.innerHeight()
+			}
+		}
 
-			button.css('left', off.left + width - 15 + 'px');
-			button.css('top', off.top + height - 16 + 'px');
+		function bindToElement(bound){
+			button.css('left', bound.left + bound.width - 15 + 'px');
+			button.css('top', bound.top + bound.height - 16 + 'px');
 		}
 
 		function checkButton(){
@@ -97,15 +108,25 @@ angular.module('am-wb-core')
 			button.css('cursor', 'nwse-resize');
 
 			button.on('mousedown', mousedown);
+			bindToElement(getBound());
+			$scope.$watch(getBound, function (bound) {
+				if(!bound) {
+					return;
+				}
+				bindToElement(getBound());
+	        }, true);
 		}
 
 		
 		// Watch size
 		$scope.$watch($attrs.wbSize+'.size', function(size) {
-			if(isRoot() || !size || ctrl.isSelected()){
+			if(isRoot() || !size || lock){
 				return;
 			}
 			$element.css(size);
+			if(button){
+				bindToElement(getBound());
+			}
 		}, true);
 
 		$scope.$watch(function(){
@@ -116,7 +137,6 @@ angular.module('am-wb-core')
 			}
 			if(value){
 				checkButton();
-				bindToElement();
 				button.css('visibility', 'visible');
 			} else {
 				if(button) {
