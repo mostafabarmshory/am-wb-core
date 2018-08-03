@@ -64,6 +64,9 @@ of a widget:
 	border: 1px dashed #8f9494;
 }
 
+.wb-widget-select {
+}
+
 /*
  * Body of a widget to fill
  */
