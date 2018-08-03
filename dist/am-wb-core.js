@@ -156,509 +156,6 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 /**
- * @ngdoc function
- * @name WbResourceCtrl
- * @description # WbResourceCtrl Controller of the am-wb-core
- */
-.controller('WbResourceDataCtrl', function($scope) {
-	$scope.$watch('value', function(value) {
-		if (angular.isDefined(value)) {
-			$scope.$parent.setValue(value);
-		} else {
-			$scope.$parent.setValue({
-				'key' : 'value',
-				'values' : [ [ 1, 2 ], [ 1, 2 ] ]
-			});
-		}
-	}, true);
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc function
- * @name WbResourceCtrl
- * @description # WbResourceCtrl Controller of the am-wb-core
- */
-.controller('WbResourceUrlCtrl', function($scope) {
-	$scope.$watch('value', function(value) {
-		$scope.$parent.setValue(value);
-	});
-});
-
-///* 
-// * The MIT License (MIT)
-// * 
-// * Copyright (c) 2016 weburger
-// * 
-// * Permission is hereby granted, free of charge, to any person obtaining a copy
-// * of this software and associated documentation files (the "Software"), to deal
-// * in the Software without restriction, including without limitation the rights
-// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// * copies of the Software, and to permit persons to whom the Software is
-// * furnished to do so, subject to the following conditions:
-// * 
-// * The above copyright notice and this permission notice shall be included in all
-// * copies or substantial portions of the Software.
-// * 
-// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// * SOFTWARE.
-// */
-//'use strict';
-//
-//angular.module('am-wb-core')
-///**
-// * @ngdoc function
-// * @name WbResourceCtrl
-// * @description # WbResourceCtrl Controller of the am-wb-core
-// */
-//.controller('WbResourceCtrl', function($scope, $rootScope,  $mdDialog, 
-//		$wbUtil, $q, $controller, $compile, pages, style, data, $element, $window) {
-//    
-//	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
-//	$scope.value = angular.copy(data);
-//	$scope.style = style;
-//	var currentScope = null;
-//	
-//	function hide() {
-//		$mdDialog.hide();
-//	}
-//
-//	function cancel() {
-//		$mdDialog.cancel();
-//	}
-//
-//	/**
-//	 * Answer the dialog
-//	 * 
-//	 * If there is an answer function in the current page controller
-//	 * then the result of the answer function will be returned as 
-//	 * the main result.
-//	 * 
-//	 * @memberof WbResourceCtrl
-//	 */
-//	function answer() {
-//	    $scope.loadingAnswer = true;
-//	    var res = null;
-//	    if(currentScope && angular.isFunction(currentScope.answer)){
-//	        res =  $q.when(currentScope.answer())
-//	        .then($mdDialog.hide);
-//	    } else {
-//	        res = $mdDialog.hide($scope.value);
-//	    }
-//        return res.finally(function(){
-//            $scope.loadingAnswer = false;
-//        });
-//	}
-//	
-//	/**
-//	 * Sets value to the real var
-//	 * 
-//	 */
-//	function setValue(value){
-//		$scope.value = value;
-//	}
-//
-//	/**
-//	 * encapsulate template srce with panel widget template.
-//	 * 
-//	 * @param page
-//	 *            setting page config
-//	 * @param tempateSrc
-//	 *            setting page html template
-//	 * @returns encapsulate html template
-//	 */
-//	function _encapsulatePanel(page, template) {
-//		// TODO: maso, 2017: pass all paramter to the setting
-//		// panel.
-//		return template;
-//	}
-//
-//	/**
-//	 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-//	 * 
-//	 * @returns
-//	 */
-//	function loadPage(page) {
-//		var widget = null;
-//		var jobs = [];
-//		var pages2 = [];
-//
-//		$scope._selectedIndex = pages.indexOf(page);
-//
-//		// 1- Find element
-//		var target = $element.find('#' + CHILDREN_AUNCHOR);
-//
-//		// 2- Clear childrens
-//		target.empty();
-//		currentScope = null;
-//
-//
-//		// 3- load pages
-////		var page = pages[index];
-//		var template = $wbUtil.getTemplateFor(page);
-//		if (angular.isDefined(template)) {
-//			jobs.push($q.when(template).then(function(templateSrc) {
-//				templateSrc = _encapsulatePanel(page, templateSrc);
-//				var element = angular.element(templateSrc);
-//				var scope = $rootScope.$new(false, $scope);
-//				currentScope = scope;
-//				scope.page = page;
-//				scope.value = $scope.value;
-//				if (angular .isDefined(page.controller)) {
-//					 $controller(page.controller, {
-//						$scope : scope,
-//						$element : element,
-//					});
-//				}
-//				$compile(element)(scope);
-//				pages2.push(element);
-//			}));
-//		}
-//
-//		$q.all(jobs).then(function() {
-//			angular.forEach(pages2, function(element) {
-//				target.append(element);
-//			});
-//		});
-//	}
-//	
-//	if(angular.isFunction($window.openHelp)){
-//        $scope.openHelp = function(widget, $event){
-//            $window.openHelp(widget, $event);
-//        }
-//    }
-//	
-//	$scope.pages = pages;
-//	
-//	$scope.loadPage = loadPage;
-//	
-//	$scope.hide = hide;
-//	$scope.cancel = cancel;
-//	$scope.answer = answer;
-//	$scope.setValue = setValue;
-//	
-//	if(pages.length){
-//	    loadPage(pages[0]);
-//	}
-//});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc controller
- * @name WbTemplatesSheetCtrl
- * @description # WbTemplatesSheetCtrl manages templates in sheet
- * 
- */
-.controller('WbTemplatesSheetCtrl', function($scope, $mdBottomSheet, $wbUi) {
-
-	function loadTemplate(themplate) {
-		$mdBottomSheet.hide(themplate);
-	}
-	
-	function hideTemplates($event){
-		$mdBottomSheet.hide();
-	}
-
-	// load templates
-	$wbUi.templates()
-	.then(function(page){
-		$scope.templates = page.items;
-	});
-	
-	$scope.hideTemplates = hideTemplates;
-	$scope.loadTemplate = loadTemplate;
-
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc function
- * @name WbWbDialogsCtrl
- * @description # WbWbDialogsCtrl Controller of the donateMainApp
- */
-.controller('WbDialogsCtrl', function($scope, $mdDialog, wbModel, style) {
-    function hide() {
-	$mdDialog.hide();
-    }
-
-    function cancel() {
-	$mdDialog.cancel();
-    }
-
-    function answer(response) {
-	$mdDialog.hide(response);
-    }
-
-    $scope.wbModel = wbModel;
-    $scope.style = style;
-    $scope.hide = hide;
-    $scope.cancel = cancel;
-    $scope.answer = answer;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-angular.module('am-wb-core')
-
-/**
- * Created by mgh on 8/10/2016.
- */
-.controller(
-	'WbTextSettingsCtrl',
-	function($scope) {
-	    var scope = $scope;
-	    scope.tinymceOptions = {
-		    /*
-		     * onChange: function(e) { // put logic here for
-		     * keypress and cut/paste changes },
-		     */
-		    /*
-		     * selector: 'textarea', inline: false, plugins :
-		     * 'advlist autolink link image lists charmap print
-		     * preview', skin: 'lightgray', theme : 'modern',
-		     * font_formats: 'Arial=arial,helvetica,sans-serif;'
-		     */
-		    selector : 'textarea',
-		    height : 500,
-		    theme : 'modern',
-		    plugins : [
-			'advlist autolink lists link image charmap print preview hr anchor pagebreak',
-			'searchreplace wordcount visualblocks visualchars code fullscreen',
-			'insertdatetime media nonbreaking save table contextmenu directionality',
-			'emoticons template paste textcolor colorpicker textpattern imagetools' ],
-			toolbar1 : 'fontselect fontsizeselect | insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
-			toolbar2 : 'print preview media | forecolor backcolor emoticons',
-			image_advtab : true,
-			templates : [ {
-			    title : 'Test template 1',
-			    content : 'Test 1'
-			}, {
-			    title : 'Test template 2',
-			    content : 'Test 2'
-			} ],
-			content_css : [
-			    '//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
-			    '//www.tinymce.com/css/codepen.min.css' ]
-	    };
-
-	});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc controller
- * @name WbWidgetSelectCtrl
- * @memberof am-wb-core
- * @description مدیریتی برای انتخاب ویجت‌های جدید
- * 
- * در این کنترل امکاناتی فراهم شده که کاربر بتواند از میان ویجت‌های موجودی یکی
- * را انتخاب کند.
- */
-.controller('WbWidgetSelectCtrl',
-		function($scope, $widget) {
-	var scope = $scope;
-
-	/**
-	 * ویجت‌های موجود را لود می‌کند
-	 * 
-	 * تمام ویجت‌های لود شده در متغیری به نام widgets توی اسکپ بار
-	 * می‌شود.
-	 * 
-	 */
-	function loadWidgets() {
-		$widget.widgets().then(function(widgets) {
-			scope.widgets = widgets;
-			selectWidget(widgets.items[0]);
-		});
-	}
-
-	/**
-	 * ویجت پیش فرض را تعیین می‌کند
-	 * 
-	 * با انتخاب یک ویجت به عنوان ویجت پیش فرض می‌توان نمایش خاصی از آن
-	 * را در سیستم ایجاد کرد.
-	 * 
-	 * @memberof WbWidgetSelectCtrl
-	 * @param {Widget}
-	 *                widget ویجت پیش فرض را تعیین می‌کند
-	 * @returns
-	 */
-	function selectWidget(widget) {
-		scope.cwidget = widget;
-		// TODO: bind the widget
-	}
-
-	/**
-	 * ویجت را به عنوان ویجت انتخاب شده تعیین می‌کندs
-	 * 
-	 * @memberof WbWidgetSelectCtrl
-	 * @param widget
-	 * @returns
-	 */
-	function answerWidget(widget) {
-		$scope.answer($widget.widgetData(widget));
-	}
-
-	// تعیین خصوصیت‌های اسکوپ
-	scope.selectWidget = selectWidget;
-	scope.answerWidget = answerWidget;
-	loadWidgets();
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
  * @ngdoc Directives
  * @name wb-align
  * @description Apply layout align into an element
@@ -1029,9 +526,9 @@ angular.module('am-wb-core')
 	function postLink($scope, $element, $attrs) {
 		// Watch for layout
 		$scope.$watch($attrs.wbLayout+'.layout', function(newValue, oldValue) {
-			if(newValue===oldValue){
-				return;
-			}
+//			if(newValue===oldValue){
+//				return;
+//			}
 			if (oldValue) {
 				removeLayout($element, oldValue);
 			}
@@ -1121,6 +618,177 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 /**
+ * @description Apply margin into the element
+ */
+.directive("wbSize", function($rootElement, $document) {
+
+	function postLink($scope, $element, $attrs, $ctrls){
+		// main ctrl
+		var ctrl = $ctrls[0] || $ctrls[1];
+
+
+		//
+//				function showMenu($event) {
+//					var template = '' +
+//					'<div class="menu-panel" md-whiteframe="4">' +
+//					'  <div class="menu-content">' +
+//					'    <div class="menu-item" ng-repeat="item in ctrl.items">' +
+//					'      <button class="md-button">' +
+//					'        <span>{{item}}</span>' +
+//					'      </button>' +
+//					'    </div>' +
+//					'    <md-divider></md-divider>' +
+//					'    <div class="menu-item">' +
+//					'      <button class="md-button" ng-click="ctrl.closeMenu()">' +
+//					'        <span>Close Menu</span>' +
+//					'      </button>' +
+//					'    </div>' +
+//					'  </div>' +
+//					'</div>';
+		//
+//					var position = $mdPanel.newPanelPosition()
+//					.relativeTo($event.target)
+//					.addPanelPosition(
+//							$mdPanel.xPosition.ALIGN_START,
+//							$mdPanel.yPosition.BELOW
+//					);
+		//
+//					var config = {
+//							id: 'content_',
+//							attachTo: angular.element(document.body),
+//							controller: function(){},
+//							controllerAs: 'ctrl',
+//							template: template,
+//							position: position,
+//							panelClass: 'menu-panel-container',
+//							locals: {
+//								items: []
+//							},
+//							openFrom: $event,
+//							focusOnOpen: true,
+//							zIndex: 100,
+//							propagateContainerEvents: true,
+//							clickOutsideToClose: true,
+//							groupName: 'menus'
+//					};
+		//
+//					$mdPanel.open(config);
+//				}	
+//				this.showMenu = showMenu;
+		
+//		function mousemove($event) {
+//			var deltaWidth = dimension.width - (position.x - $event.clientX);
+//			var deltaHeight = dimension.height - (position.y - $event.clientY);
+//			var newDimensions = {
+//					width:  deltaWidth + 'px',
+//					height: deltaHeight + 'px'
+//			};
+//			
+//			$element.css(newDimensions);
+//			if($scope.wbModel){
+//				$scope.wbModel.style.size.width = newDimensions.width;
+//				$scope.wbModel.style.size.height = newDimensions.height;
+//			}
+//			bindToElement();
+//			$scope.$apply();
+//			return false;
+//		}
+//
+//		function mouseup() {
+//			$document.unbind('mousemove', mousemove);
+//			$document.unbind('mouseup', mouseup);
+//		}
+//
+//		function mousedown($event) {
+//			$event.stopImmediatePropagation();
+//			position.x = $event.clientX;
+//			position.y = $event.clientY;
+//			dimension.width = $element.prop('offsetWidth');
+//			dimension.height = $element.prop('offsetHeight');
+//			$document.bind('mousemove', mousemove);
+//			$document.bind('mouseup', mouseup);
+//			return false;
+//		};
+//
+//		function bindToElement(){
+//			var off = $element.offset();
+//			var height = $element.innerHeight();
+//			var width = $element.innerWidth();
+//
+//			button.css('left', off.left + width - 15 + 'px');
+//			button.css('top', off.top + height - 16 + 'px');
+//		}
+//
+//		function checkButton(){
+//			if(button) {
+//				return;
+//			}
+//			button = angular.element('<span></span>');
+//			$rootElement.append(button);
+//			button.width('15px');
+//			button.height('15px');
+//			button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
+//			button.css('position', 'absolute');
+//			button.css('visibility', 'hidden');
+//			button.css('cursor', 'nwse-resize');
+//
+//			button.on('mousedown', mousedown);
+//		}
+//
+//		
+//		// Watch size
+//
+//		$scope.$watch(function(){
+//			return ctrl.isSelected();
+//		}, function(value){
+//			if(isRoot()){
+//				return;
+//			}
+//			if(value){
+//				checkButton();
+//				bindToElement();
+//				button.css('visibility', 'visible');
+//			} else {
+//				if(button) {
+//					button.css('visibility', 'hidden');
+//				}
+//			}
+//		});
+	}
+
+	return {
+		restrict : 'A',
+		link : postLink,
+		require:['?wbWidget', '?wbGroup']
+	};
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+/**
  * @description Apply padding into the element
  */
 .directive("wbPadding", function() {
@@ -1167,23 +835,65 @@ angular.module('am-wb-core')
 /**
  * @description Apply margin into the element
  */
-.directive("wbSize", function($rootElement, $document) {
+.directive("wbSize", function($q, $wbUtil, $rootElement, $document, $compile, $mdPanel) {
 
 	function postLink($scope, $element, $attrs, $ctrls){
 		var button;
+		var optionButton;
 		var dimension = {};
 		var position = {};
+		var lock = false;
 
 		// main ctrl
 		var ctrl = $ctrls[0] || $ctrls[1];
-		// Watch size
-		$scope.$watch($attrs.wbSize+'.size', function(size) {
-			if(!size || ctrl.isSelected()){
-				return;
-			}
-			$element.css(size);
-		}, true);
+		function isRoot(){
+			return $ctrls[1] && $ctrls[1].isRoot();
+		}
 
+		function openOptions($event) {
+			var template ='' +
+			'<div class="menu-panel" md-whiteframe="4">' +
+			'  <div class="menu-content">' +
+			'    <div class="menu-item" ng-repeat="item in ctrl.items">' +
+			'      <button class="md-button">' +
+			'        <span>{{item}}</span>' +
+			'      </button>' +
+			'    </div>' +
+			'    <md-divider></md-divider>' +
+			'    <div class="menu-item">' +
+			'      <button class="md-button" ng-click="ctrl.closeMenu()">' +
+			'        <span>Close Menu</span>' +
+			'      </button>' +
+			'    </div>' +
+			'  </div>' +
+			'</div>';
+
+			var position = $mdPanel.newPanelPosition()
+			.relativeTo($event.target)
+			.addPanelPosition(
+					$mdPanel.xPosition.ALIGN_START,
+					$mdPanel.yPosition.BELOW
+			);
+
+			var config = {
+					id: 'toolbar_',
+					attachTo: $rootElement,
+					controller: function(){},
+					controllerAs: 'ctrl',
+					template: template,
+					position: position,
+					panelClass: 'menu-panel-container',
+					locals: {
+						items: []
+					},
+					openFrom: $event,
+					focusOnOpen: false,
+//					zIndex: 100,
+					propagateContainerEvents: true,
+			};
+
+			$mdPanel.open(config);
+		}
 
 		function mousemove($event) {
 			var deltaWidth = dimension.width - (position.x - $event.clientX);
@@ -1192,13 +902,13 @@ angular.module('am-wb-core')
 					width:  deltaWidth + 'px',
 					height: deltaHeight + 'px'
 			};
-			
+
 			$element.css(newDimensions);
 			if($scope.wbModel){
 				$scope.wbModel.style.size.width = newDimensions.width;
 				$scope.wbModel.style.size.height = newDimensions.height;
 			}
-			bindToElement();
+			bindToElement(getBound());
 			$scope.$apply();
 			return false;
 		}
@@ -1206,12 +916,14 @@ angular.module('am-wb-core')
 		function mouseup() {
 			$document.unbind('mousemove', mousemove);
 			$document.unbind('mouseup', mouseup);
+			lock = false;
 		}
 
 		function mousedown($event) {
 			$event.stopImmediatePropagation();
 			position.x = $event.clientX;
 			position.y = $event.clientY;
+			lock = true;
 			dimension.width = $element.prop('offsetWidth');
 			dimension.height = $element.prop('offsetHeight');
 			$document.bind('mousemove', mousemove);
@@ -1219,46 +931,97 @@ angular.module('am-wb-core')
 			return false;
 		};
 
-		function bindToElement(){
+		function getBound(){
 			var off = $element.offset();
 			var height = $element.innerHeight();
 			var width = $element.innerWidth();
+			return {
+				left: off.left,
+				top: off.top,
+				width: $element.innerWidth(),
+				height: $element.innerHeight()
+			}
+		}
 
-			button.css('left', off.left + width - 15 + 'px');
-			button.css('top', off.top + height - 16 + 'px');
+		function bindToElement(bound){
+			button.css('left', bound.left + bound.width - 15 + 'px');
+			button.css('top', bound.top + bound.height - 16 + 'px');
+
+			optionButton.css('left', bound.left + 'px');
+			optionButton.css('top', bound.top + 'px');
 		}
 
 		function checkButton(){
 			if(button) {
-				return;
+				return $q.resolve();
 			}
 			button = angular.element('<span></span>');
 			$rootElement.append(button);
-			button.width('15px');
-			button.height('15px');
+			button.css({
+				width: '15px',
+				height: '15px',
+				position: 'absolute',
+				visibility: 'hidden',
+				cursor: 'nwse-resize'
+			});
 			button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-			button.css('position', 'absolute');
-			button.css('visibility', 'hidden');
-			button.css('cursor', 'nwse-resize');
-
 			button.on('mousedown', mousedown);
-		}
 
-		if($ctrls[1] && !$ctrls[1].isRoot() || $ctrls[0]) {
-			$scope.$watch(function(){
-				return ctrl.isSelected();
-			}, function(value){
-				if(value){
-					checkButton();
-					bindToElement();
-					button.css('visibility', 'visible');
-				} else {
-					if(button) {
-						button.css('visibility', 'hidden');
+			var oj = $wbUtil.getTemplateFor({
+				templateUrl: 'views/dialogs/wb-widget-options.html'
+			}).then(function(template){
+				optionButton = angular.element(template);
+				$rootElement.append(optionButton);
+				optionButton.css({
+					position: 'absolute',
+					visibility: 'hidden',
+				});
+				$scope.openOptions = openOptions;
+				$compile(optionButton)($scope);
+				bindToElement(getBound());
+			});
+
+			return $q.all([oj]).then(function(){
+				$scope.$watch(getBound, function (bound) {
+					if(!bound) {
+						return;
 					}
-				}
+					bindToElement(getBound());
+				}, true);
+
 			});
 		}
+
+
+		// Watch size
+		$scope.$watch($attrs.wbSize+'.size', function(size) {
+			if(isRoot() || !size || lock){
+				return;
+			}
+			$element.css(size);
+			if(optionButton){
+				bindToElement(getBound());
+			}
+		}, true);
+
+		$scope.$watch(function(){
+			return ctrl.isSelected();
+		}, function(value){
+			if(isRoot()){
+				return;
+			}
+			if(value){
+				checkButton().then(function(){
+					button.css('visibility', 'visible');
+					optionButton.css('visibility', 'visible');
+				});
+			} else {
+				if(optionButton) {
+					button.css('visibility', 'hidden');
+					optionButton.css('visibility', 'hidden');
+				}
+			}
+		});
 	}
 
 	return {
@@ -1387,12 +1150,15 @@ angular.module('am-wb-core')
 			// Get from parent
 			ctrl.isEditable = wbGroupCtrl.isEditable;
 			ctrl.childSelected = wbGroupCtrl.childSelected;
+			ctrl.isChildSelected = wbGroupCtrl.isChildSelected;
+			ctrl.isSelected = function(){
+				return wbGroupCtrl.isChildSelected(ctrl);
+			}
 		}
 		
 		$scope.dropCallback = function(index, item, external, type){
 			return ctrl.addChild(index, item);
 		}
-
 	}
 
 	/**
@@ -1459,18 +1225,18 @@ angular.module('am-wb-core')
 		}
 
 		this.setSelected = function(flag) {
-			$scope.selected = flag;
 			if(flag) {
 				this.childSelected(this);
 			}
+		}
+		
+		this.isChildSelected = function(ctrl){
+			return ctrl === $scope.lastSelectedItem;
 		}
 
 		this.childSelected = function(ctrl) {
 			if(ctrl === $scope.lastSelectedItem) {
 				return;
-			}
-			if($scope.lastSelectedItem){
-				$scope.lastSelectedItem.setSelected(false);
 			}
 			$scope.lastSelectedItem = ctrl;
 			// maso, 2018: call the parent controller function
@@ -1531,6 +1297,10 @@ angular.module('am-wb-core')
 
 		this.getAllowedTypes = function(){
 			return $scope.wbAllowedTypesl;
+		}
+		
+		this.getAction = function(){
+			return [1, 2, 3];
 		}
 	}
 
@@ -2135,44 +1905,57 @@ angular.module('am-wb-core')
  * and open the template in the editor.
  */
 
-
 /**
  * Created by mgh on 2/26/17.
  */
 angular.module('am-wb-core')
 
-        /**
-         * @ngdoc directive
-         * @name wbUiSettingColor
-         * @memberof am-wb-core
-         * @description a setting section to set color.
-         *
-         */
-        .directive('wbUiSettingBackgroundSize', function () {
-            return {
-                templateUrl: 'views/directives/wb-ui-setting-background-size.html',
-                restrict: 'E',
-                replace: true,
-                scope: {
-                    title: '@title',
-                    value: '=value',
-                }
-                ,
-                controller: function ($scope) {
-                    $scope.items = [
-                        { name: 'Automatic', value: 'auto' },
-                        { name: 'Length', value: 'length' },
-                       { name: 'Cover', value: 'cover' },
-                       { name: 'Contain', value: 'contain' },
-                       { name: 'Initial', value: 'initial' },
-                       { name: 'Inherit', value: 'inherit' },
-                       { name: 'Nothing', value: '' }
-                                                                       
-                    ];
+/**
+ * @ngdoc directive
+ * @name wbUiSettingColor
+ * @memberof am-wb-core
+ * @description a setting section to set color.
+ * 
+ */
+.directive('wbUiSettingBackgroundSize', function() {
+	return {
+	    templateUrl : 'views/directives/wb-ui-setting-background-size.html',
+	    restrict : 'E',
+	    replace : true,
+	    scope : {
+	        title : '@title',
+	        value : '=value',
+	    },
+	    /*
+	     * @ngInject
+	     */
+	    controller : function($scope) {
+		    $scope.items = [ {
+		        name : 'Automatic',
+		        value : 'auto'
+		    }, {
+		        name : 'Length',
+		        value : 'length'
+		    }, {
+		        name : 'Cover',
+		        value : 'cover'
+		    }, {
+		        name : 'Contain',
+		        value : 'contain'
+		    }, {
+		        name : 'Initial',
+		        value : 'initial'
+		    }, {
+		        name : 'Inherit',
+		        value : 'inherit'
+		    }, {
+		        name : 'Nothing',
+		        value : ''
+		    }];
 
-                }
-            };
-        });
+	    }
+	};
+});
 
 /* 
  * The MIT License (MIT)
@@ -2433,11 +2216,12 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
- * @name wbUiSettingColor
- * @memberof am-wb-core
- * @author maso<mostafa.barmshory@dpq.co.ir>
- * @description a setting section to set color.
+ * @ngdoc Directives
+ * @name wbUiSettingImage
+ * @author maso(mostafa.barmshory@dpq.co.ir)
+ * @description Set an image into a value
+ * 
+ * URL of the image is set as result.
  *
  */
 .directive('wbUiSettingImage', function () {
@@ -2446,9 +2230,21 @@ angular.module('am-wb-core')
 		restrict: 'E',
 		scope: {
 			title: '@title',
-			value: '=value',
 			icon: '@icon'
 		},
+		require:['ngModel'],
+		link: function($scope, $element, $attrs, $ctrl){
+			var ngModelCtrl = $ctrl[0];
+			ngModelCtrl.$render = function(){
+				$scope.value = ngModelCtrl.$viewValue;
+			}
+			$scope.$watch('value', function(value){
+				ngModelCtrl.$setViewValue(value);
+			});
+		},
+		/*
+		 * @ngInject
+		 */
 		controller: function($scope, $resource){
 			function selectImage(){
 				return $resource.get('image', {
@@ -2910,6 +2706,9 @@ angular.module('am-wb-core')
 		var group = $ctrls[1];
 		if(group) {
 			$scope.group = group;
+			$ctrls[0].isSelected = function(){
+				return group.isChildSelected($ctrls[0]);
+			}
 		}
 	}
 
@@ -2953,7 +2752,10 @@ angular.module('am-wb-core')
 				$scope.group.childSelected(this);
 			}
 		}
-		
+
+		this.getAction = function(){
+			return [1, 2, 3];
+		}
 	}
 	
 	return {
@@ -3274,7 +3076,15 @@ angular.module('am-wb-core')
 		icon: 'link',
 		label : 'URL',
 		templateUrl : 'views/resources/wb-url.html',
-		controller : 'WbResourceUrlCtrl',
+		/*
+		 * @ngInject
+		 */
+		controller : function($scope) {
+			$scope.$watch('value', function(value) {
+				$scope.$parent.setValue(value);
+			});
+		},
+		controllerAs: 'ctrl',
 		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url']
 	});
 	$resource.newPage({
@@ -3282,7 +3092,22 @@ angular.module('am-wb-core')
 		icon : 'border_all',
 		label : 'Sheet',
 		templateUrl : 'views/resources/wb-sheet.html',
-		controller : 'WbResourceDataCtrl',
+		/*
+		 * @ngInject
+		 */
+		controller : function($scope) {
+			$scope.$watch('value', function(value) {
+				if (angular.isDefined(value)) {
+					$scope.$parent.setValue(value);
+				} else {
+					$scope.$parent.setValue({
+						'key' : 'value',
+						'values' : [ [ 1, 2 ], [ 1, 2 ] ]
+					});
+				}
+			}, true);
+		},
+		controllerAs: 'ctrl',
 		tags : [ 'data' ]
 	});
 });
@@ -3333,7 +3158,46 @@ angular.module('am-wb-core')
 	$settings.newPage({
 	    type : 'text',
 	    label : 'Frontend text',
-	    controller : 'WbTextSettingsCtrl',
+	    /*
+	     * @ngInject
+	     */
+	    controller : function($scope) {
+		    var scope = $scope;
+		    scope.tinymceOptions = {
+			    /*
+			     * onChange: function(e) { // put logic here for
+			     * keypress and cut/paste changes },
+			     */
+			    /*
+			     * selector: 'textarea', inline: false, plugins :
+			     * 'advlist autolink link image lists charmap print
+			     * preview', skin: 'lightgray', theme : 'modern',
+			     * font_formats: 'Arial=arial,helvetica,sans-serif;'
+			     */
+			    selector : 'textarea',
+			    height : 500,
+			    theme : 'modern',
+			    plugins : [
+				'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+				'searchreplace wordcount visualblocks visualchars code fullscreen',
+				'insertdatetime media nonbreaking save table contextmenu directionality',
+				'emoticons template paste textcolor colorpicker textpattern imagetools' ],
+				toolbar1 : 'fontselect fontsizeselect | insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+				toolbar2 : 'print preview media | forecolor backcolor emoticons',
+				image_advtab : true,
+				templates : [ {
+				    title : 'Test template 1',
+				    content : 'Test 1'
+				}, {
+				    title : 'Test template 2',
+				    content : 'Test 2'
+				} ],
+				content_css : [
+				    '//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
+				    '//www.tinymce.com/css/codepen.min.css' ]
+		    };
+
+		},
 	    templateUrl : 'views/settings/wb-text.html'
 	});
 	$settings.newPage({
@@ -4474,7 +4338,7 @@ angular.module('am-wb-core')
 	}
 
 	function cleanLayout(model){
-		if(model.type === 'Group'){
+		if(model.type !== 'Group'){
 			return;
 		}
 		if(!model.style.layout) {
@@ -4807,13 +4671,13 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/dialogs/wb-selectwidget.html',
-    "<md-dialog aria-label=\"Select widget\" ng-controller=WbWidgetSelectCtrl ng-cloak>  <md-toolbar> <div class=md-toolbar-tools> <h2 translate>Widget list</h2> <span flex></span> <md-button class=md-icon-button ng-click=cancel()> <wb-icon aria-label=\"Close dialog\">close</wb-icon> </md-button> </div> </md-toolbar>    <md-dialog-content> <md-content class=\"md-padding md-dialog-content\" layout-xs=column layout=row layout-wrap>    <md-card ng-repeat=\"widget in widgets.items\" flex-xs flex-gt-xs=45 md-theme-watch> <md-card-title> <md-card-title-text> <span class=md-headline>{{widget.label}}</span> <span class=md-subhead>{{widget.description}}</span> </md-card-title-text> <md-card-title-media> <img ng-show=widget.image src=\"{{widget.image}}\"> <wb-icon ng-show=!widget.image&&widget.icon wb-icon-size=64>{{widget.icon}}</wb-icon> </md-card-title-media> </md-card-title> <md-card-actions layout=row layout-align=\"end center\"> <md-button ng-click=answerWidget(widget)> <wb-icon>add</wb-icon> {{ 'Add' | translate }} </md-button>  </md-card-actions> </md-card> </md-content> </md-dialog-content> </md-dialog>"
+  $templateCache.put('views/dialogs/wb-widget-options.html',
+    "<md-menu> <md-button aria-label=\"Open menu with custom trigger\" class=md-icon-button style=\"padding: 0px; margin: 0px\" ng-click=$mdMenu.open()> <wb-icon>more_vert</wb-icon> </md-button> <md-menu-content width=4 ng-mouseleave=$mdMenu.close()> <md-menu-item ng-repeat=\"item in ctrl.getAction()\"> <md-button>Option {{item}}</md-button> </md-menu-item> </md-menu-content> </md-menu>"
   );
 
 
   $templateCache.put('views/directives/wb-group.html',
-    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"dropCallback(index, item, external, type)\" wb-size=wbModel.style wb-layout=wbModel.style wb-align=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event ng-class=\"{\n" +
+    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"dropCallback(index, item, external, type)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" wb-size=wbModel.style wb-layout=wbModel.style wb-align=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event ng-class=\"{\n" +
     "\t\t'wb-group-root': ctrl.isRoot(),\n" +
     "\t\t'wb-group-edit': ctrl.isEditable(),\n" +
     "\t\t'wb-group-select': ctrl.isSelected()\n" +
@@ -4892,7 +4756,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-image.html',
-    "<div layout-align=\"center center\" layout=row class=wb-ui-setting-image> <img ng-click=selectImage() ng-src={{value}} md-colors=\"{borderColor: 'primary-hue1'}\" class=\"wb-ui-setting-image-preview\"> <md-input-container flex> <label ng-if=\"title==undefined || title==null || title==''\"> {{title | translate}} </label> <input ng-model=value> </md-input-container> </div>"
+    "<div layout-align=\"center center\" layout=row class=wb-ui-setting-image> <img ng-click=selectImage() ng-src={{value}} md-colors=\"{'borderColor': 'accent'}\" class=wb-ui-setting-image-preview style=\"border-size: 1px; border-style: solid\"> <md-input-container class=md-icon-float flex> <label ng-if=title translate=\"\">{{title}}</label> <input ng-model=value> <wb-icon ng-click=selectImage()>more_horiz</wb-icon> </md-input-container> </div>"
   );
 
 
@@ -4923,7 +4787,8 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-widget.html',
     "<div class=wb-widget name={{wbModel.name}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-type=wbModel.type dnd-effect-allowed=copyMove dnd-callback=1 dnd-moved=ctrl.delete() wb-size=wbModel.style wb-align=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event md-theme-watch=true ng-class=\"{\n" +
-    "\t\t'wb-widget-edit': ctrl.isEditable()\n" +
+    "\t\t'wb-widget-edit': ctrl.isEditable(),\n" +
+    "\t\t'wb-widget-select': ctrl.isSelected()\n" +
     "\t}\" transclude></div>"
   );
 
@@ -4958,7 +4823,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-background.html',
-    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" value=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
+    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
   );
 
 
@@ -4968,7 +4833,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-description.html',
-    " <div layout=column style=width:100%> <md-input-container> <label translate>Lable</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate>Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate>Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=Cover value=wbModel.cover> </wb-ui-setting-image> </div>"
+    " <md-input-container> <label translate>Lable</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate>Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate>Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=\"{{Cover | translate}}\" ng-model=wbModel.cover> </wb-ui-setting-image>"
   );
 
 
@@ -4998,7 +4863,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-size.html',
-    " <md-list class=wb-setting-panel> <wb-ui-setting-length title=Width value=wbModel.style.width> </wb-ui-setting-length> <wb-ui-setting-length title=Height value=wbModel.style.height> </wb-ui-setting-length>  <md-subheader class=md-no-sticky> <span translate=\"\">Min</span> </md-subheader> <wb-ui-setting-length title=\"Min width\" value=wbModel.style.minWidth> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" value=wbModel.style.minHeight> </wb-ui-setting-length>  <md-subheader class=md-no-sticky> <span translate=\"\">Max</span> </md-subheader> <wb-ui-setting-length title=\"Max width\" value=wbModel.style.maxWidth> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" value=wbModel.style.maxHeight> </wb-ui-setting-length> </md-list>"
+    " <wb-ui-setting-length title=Width value=wbModel.style.size.width> </wb-ui-setting-length> <wb-ui-setting-length title=Height value=wbModel.style.size.height> </wb-ui-setting-length>  <md-subheader class=md-no-sticky> <span translate=\"\">Min</span> </md-subheader> <wb-ui-setting-length title=\"Min width\" value=\"wbModel.style.size['min-width']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" value=\"wbModel.style.size['min-height']\"> </wb-ui-setting-length>  <md-subheader class=md-no-sticky> <span translate=\"\">Max</span> </md-subheader> <wb-ui-setting-length title=\"Max width\" value=\"wbModel.style.size['max-width']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" value=\"wbModel.style.size['max-height']\"> </wb-ui-setting-length>"
   );
 
 
