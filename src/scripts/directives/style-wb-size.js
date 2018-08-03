@@ -36,14 +36,9 @@ angular.module('am-wb-core')
 
 		// main ctrl
 		var ctrl = $ctrls[0] || $ctrls[1];
-		// Watch size
-		$scope.$watch($attrs.wbSize+'.size', function(size) {
-			if(!size || ctrl.isSelected()){
-				return;
-			}
-			$element.css(size);
-		}, true);
-
+		function isRoot(){
+			return $ctrls[1] && $ctrls[1].isRoot();
+		}
 
 		function mousemove($event) {
 			var deltaWidth = dimension.width - (position.x - $event.clientX);
@@ -104,21 +99,31 @@ angular.module('am-wb-core')
 			button.on('mousedown', mousedown);
 		}
 
-		if($ctrls[1] && !$ctrls[1].isRoot() || $ctrls[0]) {
-			$scope.$watch(function(){
-				return ctrl.isSelected();
-			}, function(value){
-				if(value){
-					checkButton();
-					bindToElement();
-					button.css('visibility', 'visible');
-				} else {
-					if(button) {
-						button.css('visibility', 'hidden');
-					}
+		
+		// Watch size
+		$scope.$watch($attrs.wbSize+'.size', function(size) {
+			if(isRoot() || !size || ctrl.isSelected()){
+				return;
+			}
+			$element.css(size);
+		}, true);
+
+		$scope.$watch(function(){
+			return ctrl.isSelected();
+		}, function(value){
+			if(isRoot()){
+				return;
+			}
+			if(value){
+				checkButton();
+				bindToElement();
+				button.css('visibility', 'visible');
+			} else {
+				if(button) {
+					button.css('visibility', 'hidden');
 				}
-			});
-		}
+			}
+		});
 	}
 
 	return {

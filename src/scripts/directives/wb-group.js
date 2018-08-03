@@ -118,6 +118,10 @@ angular.module('am-wb-core')
 			// Get from parent
 			ctrl.isEditable = wbGroupCtrl.isEditable;
 			ctrl.childSelected = wbGroupCtrl.childSelected;
+			ctrl.isChildSelected = wbGroupCtrl.isChildSelected;
+			ctrl.isSelected = function(){
+				return wbGroupCtrl.isChildSelected(ctrl);
+			}
 		}
 		
 		$scope.dropCallback = function(index, item, external, type){
@@ -190,18 +194,18 @@ angular.module('am-wb-core')
 		}
 
 		this.setSelected = function(flag) {
-			$scope.selected = flag;
 			if(flag) {
 				this.childSelected(this);
 			}
+		}
+		
+		this.isChildSelected = function(ctrl){
+			return ctrl === $scope.lastSelectedItem;
 		}
 
 		this.childSelected = function(ctrl) {
 			if(ctrl === $scope.lastSelectedItem) {
 				return;
-			}
-			if($scope.lastSelectedItem){
-				$scope.lastSelectedItem.setSelected(false);
 			}
 			$scope.lastSelectedItem = ctrl;
 			// maso, 2018: call the parent controller function

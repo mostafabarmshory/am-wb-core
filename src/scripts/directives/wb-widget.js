@@ -49,6 +49,9 @@ angular.module('am-wb-core')
 		var group = $ctrls[1];
 		if(group) {
 			$scope.group = group;
+			$ctrls[0].isSelected = function(){
+				return group.isChildSelected($ctrls[0]);
+			}
 		}
 	}
 
