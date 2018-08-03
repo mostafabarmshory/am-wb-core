@@ -75,6 +75,7 @@ angular.module('am-wb-core')
 		cleanLayout(model);
 		cleanSize(model);
 		cleanBackground(model);
+		cleanBorder(model);
 	}
 
 	function cleanLayout(model){
@@ -105,6 +106,13 @@ angular.module('am-wb-core')
 	function cleanBackground(model) {
 		if(!model.style.background) {
 			model.style.background = {};
+		}
+	}
+	
+
+	function cleanBorder(model){
+		if(!model.style.border) {
+			model.style.border = {};
 		}
 	}
 

@@ -9,142 +9,32 @@ a panel for setting a border for a widget. for each left/right/top/bottom proper
 
 
 Created by mgh.
+@author maso(mostafa.barmshory@dpq.co.ir)
+
+@version 2.x All settings are rewrite based on new data model of the border
 -->
-<md-list class="wb-setting-panel"> <!-- corner radius section -->
-
-	<!-- SECTION: uniform corner radius section-->
-	<md-subheader class="md-no-sticky">Corner Radius</md-subheader>
-
-	<!-- are all corners have equal border? -->
-	<wb-ui-setting-on-off-switch 
-		title="All Equal?" 
-		icon="full_rounded" 
-		value="wbModel.style.borderRadius.uniform">
-	</wb-ui-setting-on-off-switch>
-
-	<!-- uniform corner radius as a text-box -->
-	<wb-ui-setting-number 
-		ng-show="wbModel.style.borderRadius.uniform" 
-		title="Radius" 
-		icon="rounded_corner"  
-		value="wbModel.style.borderRadius.all">
-	</wb-ui-setting-number>
-
-	<!-- uniform corner radius as a slider -->
-	<wb-ui-setting-number 
-		ng-show="wbModel.style.borderRadius.uniform" 
-		slider="" 
-		icon="wb-blank" 
-		value="wbModel.style.borderRadius.all">
-	</wb-ui-setting-number>
-	
-	<!-- 4 sliders for left-right-bottom-up corner radius -->
-	<!-- top-left radius -->
-	<wb-ui-setting-number 
-		ng-show="!wbModel.style.borderRadius.uniform" 
-		title="Top-Left" 
-		icon="corner_top_left"  
-		value="wbModel.style.borderRadius.topLeft">
-	</wb-ui-setting-number>
-
-	<!-- top-right radius -->
-	<wb-ui-setting-number 
-		ng-show="!wbModel.style.borderRadius.uniform" 
-		title="Top-Right" 
-		icon="corner_top_right"  
-		value="wbModel.style.borderRadius.topRight">
-	</wb-ui-setting-number>
-
-	<!-- bottom-left radius -->
-	<wb-ui-setting-number 
-		ng-show="!wbModel.style.borderRadius.uniform" 
-		title="Bottom-left" 
-		icon="corner_bottom_left"  
-		value="wbModel.style.borderRadius.bottomLeft">
-	</wb-ui-setting-number>
-	
-	<!-- bottom-right radius -->
-	<wb-ui-setting-number 
-		ng-show="!wbModel.style.borderRadius.uniform" 
-		title="Bottom-Right" 
-		icon="corner_bottom_right"  
-		value="wbModel.style.borderRadius.bottomRight">
-	</wb-ui-setting-number>
-
-
-
-	<!-- SECTION: style and width and color -->
-	<md-divider></md-divider>
-	<md-subheader>Style/Color/Thickness</md-subheader>
-
-	<!-- are all side have a same border? -->
-	<wb-ui-setting-on-off-switch 
-		title="All Equal?" 
-		title="All Eaual?" 
-		icon="border_all" 
-		value="wbModel.style.borderStyleColorWidth.uniform">
-	</wb-ui-setting-on-off-switch>
-	
-	<!-- border style for all situation -->
-	<wb-ui-setting-dropdown ng-show="wbModel.style.borderStyleColorWidth.uniform"
-							title="Border" icon="line_style" items="styles" value="wbModel.style.borderStyle.all"></wb-ui-setting-dropdown>
-	
-	<!-- border thickness for all situation -->
-	<wb-ui-setting-number ng-show="wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'"
-						  title="Thickness" icon="line_weight"  value="wbModel.style.borderWidth.all"></wb-ui-setting-number>
-
-	<!-- border color for all situation -->
-	<wb-ui-setting-color ng-show="wbModel.style.borderStyleColorWidth.uniform && wbModel.style.borderStyle.all!='none'"
-						 title="Color" icon="format_color_fill" value="wbModel.style.borderColor.all"></wb-ui-setting-color>
-
-
-	<!-- for left/right/top/bottom border -->
-	<!-- left -->
-	<wb-ui-setting-dropdown ng-show="!wbModel.style.borderStyleColorWidth.uniform" title="Left-Border" icon="border_left"
-						  items="styles" value="wbModel.style.borderStyle.left"></wb-ui-setting-dropdown>
-
-	<wb-ui-setting-number ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'"
-						  title="Thickness" icon="line_weight"  value="wbModel.style.borderWidth.left"></wb-ui-setting-number>
-
-	<wb-ui-setting-color ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.left!='none'"
-						  title="Color" icon="format_color_fill"  value="wbModel.style.borderColor.left"></wb-ui-setting-color>
-
-	<!-- Right -->
-	<md-divider class="wb-sub-divider" ng-show="!wbModel.style.borderStyleColorWidth.uniform"></md-divider>
-
-	<wb-ui-setting-dropdown ng-show="!wbModel.style.borderStyleColorWidth.uniform" title="Right-Border" icon="border_right"
-							items="styles" value="wbModel.style.borderStyle.right"></wb-ui-setting-dropdown>
-
-	<wb-ui-setting-number ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'"
-						  title="Thickness" icon="line_weight"  value="wbModel.style.borderWidth.right"></wb-ui-setting-number>
-
-	<wb-ui-setting-color ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.right!='none'"
-						 title="Color" icon="format_color_fill"  value="wbModel.style.borderColor.right"></wb-ui-setting-color>
-
-
-	<!-- Top -->
-	<md-divider class="wb-sub-divider" ng-show="!wbModel.style.borderStyleColorWidth.uniform"></md-divider>
-
-	<wb-ui-setting-dropdown ng-show="!wbModel.style.borderStyleColorWidth.uniform" title="Top-Border" icon="border_top"
-							items="styles" value="wbModel.style.borderStyle.top"></wb-ui-setting-dropdown>
-
-	<wb-ui-setting-number ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'"
-						  title="Thickness" icon="line_weight"  value="wbModel.style.borderWidth.top"></wb-ui-setting-number>
-
-	<wb-ui-setting-color ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.top!='none'"
-						 title="Color" icon="format_color_fill"  value="wbModel.style.borderColor.top"></wb-ui-setting-color>
-
-
-	<!-- Bottom -->
-	<md-divider class="wb-sub-divider" ng-show="!wbModel.style.borderStyleColorWidth.uniform"></md-divider>
-
-	<wb-ui-setting-dropdown ng-show="!wbModel.style.borderStyleColorWidth.uniform" title="Bottom-Border" icon="border_bottom"
-							items="styles" value="wbModel.style.borderStyle.bottom"></wb-ui-setting-dropdown>
-
-	<wb-ui-setting-number ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'"
-						  title="Thickness" icon="line_weight"  value="wbModel.style.borderWidth.bottom"></wb-ui-setting-number>
-
-	<wb-ui-setting-color ng-show="(!wbModel.style.borderStyleColorWidth.uniform) && wbModel.style.borderStyle.bottom!='none'"
-						 title="Color" icon="format_color_fill"  value="wbModel.style.borderColor.bottom"></wb-ui-setting-color>
-
-</md-list>
+<!-- TODO: maso, 2018: add a UI editor for these attributes -->
+<wb-ui-setting-length
+	title="{{'Style' | translate}}"
+	slider=""
+	icon="wb-blank"
+	value="wbModel.style.border.style"
+> </wb-ui-setting-length>
+<wb-ui-setting-length
+	title="{{'Width' | translate}}"
+	slider=""
+	icon="wb-blank"
+	value="wbModel.style.border.width"
+> </wb-ui-setting-length>
+<wb-ui-setting-length
+	title="{{'Color' | translate}}"
+	slider=""
+	icon="wb-blank"
+	value="wbModel.style.border.color"
+> </wb-ui-setting-length>
+<wb-ui-setting-length
+	title="{{'Radius' | translate}}"
+	slider=""
+	icon="wb-blank"
+	value="wbModel.style.border.radius"
+> </wb-ui-setting-length>
