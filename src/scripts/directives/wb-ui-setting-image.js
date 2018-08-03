@@ -26,11 +26,12 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
- * @name wbUiSettingColor
- * @memberof am-wb-core
- * @author maso<mostafa.barmshory@dpq.co.ir>
- * @description a setting section to set color.
+ * @ngdoc Directives
+ * @name wbUiSettingImage
+ * @author maso(mostafa.barmshory@dpq.co.ir)
+ * @description Set an image into a value
+ * 
+ * URL of the image is set as result.
  *
  */
 .directive('wbUiSettingImage', function () {
@@ -39,9 +40,21 @@ angular.module('am-wb-core')
 		restrict: 'E',
 		scope: {
 			title: '@title',
-			value: '=value',
 			icon: '@icon'
 		},
+		require:['ngModel'],
+		link: function($scope, $element, $attrs, $ctrl){
+			var ngModelCtrl = $ctrl[0];
+			ngModelCtrl.$render = function(){
+				$scope.value = ngModelCtrl.$viewValue;
+			}
+			$scope.$watch('value', function(value){
+				ngModelCtrl.$setViewValue(value);
+			});
+		},
+		/*
+		 * @ngInject
+		 */
 		controller: function($scope, $resource){
 			function selectImage(){
 				return $resource.get('image', {

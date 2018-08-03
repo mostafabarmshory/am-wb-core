@@ -5,16 +5,19 @@
 	<img 
 		ng-click="selectImage()"
 		ng-src="{{value}}" 
-		md-colors="{borderColor: 'primary-hue1'}"
-		class="wb-ui-setting-image-preview"/>
+		md-colors="{'borderColor': 'accent'}"
+		class="wb-ui-setting-image-preview"
+		style="border-size: 1px; border-style: solid;"/>
 	<md-input-container
+		class="md-icon-float"
 		flex>
 		<label 
-			ng-if="title==undefined || title==null || title==''">
-				{{title | translate}}
-		</label>
+			ng-if="title"
+			translate="">{{title}}</label>
 		<input
 			type="text"
 			ng-model="value" >
+		<wb-icon
+			ng-click="selectImage()">more_horiz</wb-icon>
 	</md-input-container>
 </div>
