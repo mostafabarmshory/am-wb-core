@@ -76,6 +76,8 @@ angular.module('am-wb-core')
 		cleanSize(model);
 		cleanBackground(model);
 		cleanBorder(model);
+		cleanSpace(model);
+		cleanAlign(model);
 	}
 
 	function cleanLayout(model){
@@ -115,6 +117,16 @@ angular.module('am-wb-core')
 			model.style.border = {};
 		}
 	}
+	
+	function cleanSpace(model){
+		// Margin and padding
+	}
+	
+	function cleanAlign(model){
+		if(!model.style.align) {
+			model.style.align = {};
+		}
+	}
 
 	/**
 	 * Clean data model
@@ -123,6 +135,9 @@ angular.module('am-wb-core')
 		cleanEvetns(model);
 		cleanStyle(model);
 		if(model.type == 'Group'){
+			if(!model.contents){
+				model.contents = [];
+			}
 			if(model.contents.length){
 				for(var i = 0; i < model.contents.length; i++){
 					clean(model.contents[i]);

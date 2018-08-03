@@ -29,25 +29,16 @@ angular.module('am-wb-core')
  */
 .directive("wbPadding", function() {
 	return {
-		restrict : 'A',
-		link : function(scope, element, attributes) {
-			return scope.$watch(attributes.wbPadding, function(style) {
-				if(!style || !style.padding){
-					return;
-				}
-				if(style.padding.isUniform){
-					element.css({
-						'padding': style.padding.uniform
-					});
-				} else {
-					element.css({
-						'padding-left':style.padding.left,
-						'padding-right':style.padding.right,
-						'padding-top':style.padding.top,
-						'padding-bottom':style.padding.bottom
-					});
-				}
-			}, true);
-		}
+	    restrict : 'A',
+	    link : function(scope, element, attributes) {
+		    return scope.$watch(attributes.wbPadding, function(style) {
+			    if (!style) {
+				    return;
+			    }
+			    if (style.padding) {
+				    element.css('padding', style.padding);
+			    }
+		    }, true);
+	    }
 	};
 });

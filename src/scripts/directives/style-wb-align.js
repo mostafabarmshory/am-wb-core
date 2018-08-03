@@ -25,55 +25,59 @@
 
 angular.module('am-wb-core')
 /**
- * @ngdoc function
- * @name WbBorderSettingCtrl
- * @description # WbBorderSettingCtrl Controller of the am-wb-core
+ * @ngdoc Directives
+ * @name wb-align
+ * @description Apply layout align into an element
+ * 
  */
-.controller(
-	'WbBorderSettingCtrl',
-	function($scope) {
-	    var scope = $scope;
-	    if (!$scope.wbModel.style) {
-		$scope.wbModel.style = {
+.directive("wbAlign", function() {
+	var classPrefix = 'wb-flex-item-';
+	
+	function removeLayout(element, config) {
+		element.removeClass(classPrefix + config.align);
+	}
 
-		};
-	    }
-	    if (!$scope.wbModel.style.borderColor) {
-		$scope.wbModel.style.borderColor = {
-		    bottom : 'none'
-		};
-	    }
-	    if ($scope.wbModel.style.borderColor.bottom == null
-		    || $scope.wbModel.style.borderColor.bottom == undefined) {
-		$scope.wbModel.style.borderColor.bottom = 'none';
-	    }
+	/**
+	 * Adds layout config into the element
+	 * 
+	 * @param element
+	 * @param config
+	 * @returns
+	 */
+	function addLayout(element, config) {
+		element.addClass(classPrefix + config.align);
+	}
 
-	    scope.styles = [ {
-		title : 'No Border',
-		value : 'none'
-	    }, {
-		title : 'Solid',
-		value : 'solid'
-	    }, {
-		title : 'Dotted',
-		value : 'dotted'
-	    }, {
-		title : 'Dashed',
-		value : 'dashed'
-	    }, {
-		title : 'Double',
-		value : 'double'
-	    }, {
-		title : 'Groove',
-		value : 'groove'
-	    }, {
-		title : 'Ridge',
-		value : 'ridge'
-	    }, {
-		title : 'Inset',
-		value : 'inset'
-	    }, {
-		title : 'Outset',
-		value : 'outset'
-	    } ];
-	});
+	/**
+	 * Link view with attributes
+	 * 
+	 * 
+	 * @param scope
+	 * @param element
+	 * @param attrs
+	 * @returns
+	 */
+	function postLink($scope, $element, $attrs) {
+		// Watch for layout
+		$scope.$watch($attrs.wbLayout+'.align', function(newValue, oldValue) {
+			if(newValue===oldValue){
+				return;
+			}
+			if (oldValue) {
+				removeLayout($element, oldValue);
+			}
+			if (newValue) {
+				addLayout($element, newValue);
+			}
+		}, true);
+	}
+
+	/*
+	 * Directive
+	 */
+	return {
+		restrict : 'A',
+		link : postLink,
+		require:[]
+	};
+});
