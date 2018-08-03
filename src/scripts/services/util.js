@@ -81,7 +81,7 @@ angular.module('am-wb-core')
 	}
 
 	function cleanLayout(model){
-		if(model.type === 'Group'){
+		if(model.type !== 'Group'){
 			return;
 		}
 		if(!model.style.layout) {
