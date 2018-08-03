@@ -27,10 +27,11 @@ angular.module('am-wb-core')
 /**
  * @description Apply margin into the element
  */
-.directive("wbSize", function($rootElement, $document) {
+.directive("wbSize", function($rootElement, $document, $compile, $mdPanel) {
 
 	function postLink($scope, $element, $attrs, $ctrls){
 		var button;
+		var optionButton;
 		var dimension = {};
 		var position = {};
 		var lock = false;
@@ -41,6 +42,51 @@ angular.module('am-wb-core')
 			return $ctrls[1] && $ctrls[1].isRoot();
 		}
 
+		function openOptions($event) {
+			var template ='' +
+			'<div class="menu-panel" md-whiteframe="4">' +
+			'  <div class="menu-content">' +
+			'    <div class="menu-item" ng-repeat="item in ctrl.items">' +
+			'      <button class="md-button">' +
+			'        <span>{{item}}</span>' +
+			'      </button>' +
+			'    </div>' +
+			'    <md-divider></md-divider>' +
+			'    <div class="menu-item">' +
+			'      <button class="md-button" ng-click="ctrl.closeMenu()">' +
+			'        <span>Close Menu</span>' +
+			'      </button>' +
+			'    </div>' +
+			'  </div>' +
+			'</div>';
+
+			var position = $mdPanel.newPanelPosition()
+			.relativeTo($event.target)
+			.addPanelPosition(
+					$mdPanel.xPosition.ALIGN_START,
+					$mdPanel.yPosition.BELOW
+			);
+
+			var config = {
+					id: 'toolbar_',
+					attachTo: $rootElement,
+					controller: function(){},
+					controllerAs: 'ctrl',
+					template: template,
+					position: position,
+					panelClass: 'menu-panel-container',
+					locals: {
+						items: []
+					},
+					openFrom: $event,
+					focusOnOpen: false,
+//					zIndex: 100,
+					propagateContainerEvents: true,
+			};
+
+			$mdPanel.open(config);
+		}
+
 		function mousemove($event) {
 			var deltaWidth = dimension.width - (position.x - $event.clientX);
 			var deltaHeight = dimension.height - (position.y - $event.clientY);
@@ -48,7 +94,7 @@ angular.module('am-wb-core')
 					width:  deltaWidth + 'px',
 					height: deltaHeight + 'px'
 			};
-			
+
 			$element.css(newDimensions);
 			if($scope.wbModel){
 				$scope.wbModel.style.size.width = newDimensions.width;
@@ -76,7 +122,7 @@ angular.module('am-wb-core')
 			$document.bind('mouseup', mouseup);
 			return false;
 		};
-		
+
 		function getBound(){
 			var off = $element.offset();
 			var height = $element.innerHeight();
@@ -92,6 +138,9 @@ angular.module('am-wb-core')
 		function bindToElement(bound){
 			button.css('left', bound.left + bound.width - 15 + 'px');
 			button.css('top', bound.top + bound.height - 16 + 'px');
+
+			optionButton.css('left', bound.left + 'px');
+			optionButton.css('top', bound.top + 'px');
 		}
 
 		function checkButton(){
@@ -100,24 +149,35 @@ angular.module('am-wb-core')
 			}
 			button = angular.element('<span></span>');
 			$rootElement.append(button);
-			button.width('15px');
-			button.height('15px');
+			button.css({
+				width: '15px',
+				height: '15px',
+				position: 'absolute',
+				visibility: 'hidden',
+				cursor: 'nwse-resize'
+			});
 			button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-			button.css('position', 'absolute');
-			button.css('visibility', 'hidden');
-			button.css('cursor', 'nwse-resize');
-
 			button.on('mousedown', mousedown);
+
+			optionButton = angular.element('<md-button ng-click="openOptions($event)" class="md-icon-button" aria-label="More"><wb-icon>more_vert</md-icon></md-button>');
+			$rootElement.append(optionButton);
+			optionButton.css({
+				position: 'absolute',
+				visibility: 'hidden',
+			});
+			$scope.openOptions = openOptions;
+			$compile(optionButton)($scope);
+
 			bindToElement(getBound());
 			$scope.$watch(getBound, function (bound) {
 				if(!bound) {
 					return;
 				}
 				bindToElement(getBound());
-	        }, true);
+			}, true);
 		}
 
-		
+
 		// Watch size
 		$scope.$watch($attrs.wbSize+'.size', function(size) {
 			if(isRoot() || !size || lock){
@@ -138,9 +198,11 @@ angular.module('am-wb-core')
 			if(value){
 				checkButton();
 				button.css('visibility', 'visible');
+				optionButton.css('visibility', 'visible');
 			} else {
 				if(button) {
 					button.css('visibility', 'hidden');
+					optionButton.css('visibility', 'hidden');
 				}
 			}
 		});
