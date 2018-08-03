@@ -14,30 +14,32 @@ Created by mgh.
 <md-input-container 
     class="md-icon-float md-block">
     <label>Background</label>
-    <input ng-model="wbModel.style.background" type="text">
+    <input 
+    	ng-model="wbModel.style.background.background" 
+    	type="text">
 </md-input-container>
 <wb-ui-setting-image
     title="Background image" 
-    value="wbModel.style.backgroundImage">
+    value="wbModel.style.background.image">
 </wb-ui-setting-image>
 <wb-ui-setting-color 
     title="Background Color" 
     icon="format_color_fill" 
-    value="wbModel.style.backgroundColor">
+    value="wbModel.style.background.color">
 </wb-ui-setting-color>
 <wb-ui-setting-background-size
-    value="wbModel.style.backgroundSize">
+    value="wbModel.style.background.size">
 </wb-ui-setting-background-size>
 <wb-ui-setting-background-repeat
-    value="wbModel.style.backgroundRepeat">
+    value="wbModel.style.background.repeat">
 </wb-ui-setting-background-repeat>
 <wb-ui-setting-background-attachment
-    value="wbModel.style.backgroundAttachment">
+    value="wbModel.style.background.attachment">
 </wb-ui-setting-background-attachment>
 <wb-ui-setting-background-origin
-    value="wbModel.style.backgroundOrigin">
+    value="wbModel.style.background.origin">
 </wb-ui-setting-background-origin>
 <wb-ui-setting-background-position
-    value="wbModel.style.backgroundPosition">
+    value="wbModel.style.background.position">
 </wb-ui-setting-background-position>
 
