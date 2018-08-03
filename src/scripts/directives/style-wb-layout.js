@@ -83,9 +83,9 @@ angular.module('am-wb-core')
 	function postLink($scope, $element, $attrs) {
 		// Watch for layout
 		$scope.$watch($attrs.wbLayout+'.layout', function(newValue, oldValue) {
-			if(newValue===oldValue){
-				return;
-			}
+//			if(newValue===oldValue){
+//				return;
+//			}
 			if (oldValue) {
 				removeLayout($element, oldValue);
 			}
