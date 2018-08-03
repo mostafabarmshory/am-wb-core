@@ -94,54 +94,6 @@ angular.module('am-wb-core')
 		 * @ngInject
 		 */
 		controller: function($scope) {
-//			$scope.directions = [ {
-//			title : 'row',
-//			icon : 'view_column',
-//			value : 'row'
-//			}, {
-//			title : 'column',
-//			icon : 'view_agenda',
-//			value : 'column'
-//			} ];
-
-//			$scope.align = [ {
-//			title : 'none',
-//			value : 'none'
-//			}, {
-//			title : 'start',
-//			value : 'start'
-//			}, {
-//			title : 'center',
-//			value : 'center'
-//			}, {
-//			title : 'end',
-//			value : 'end'
-//			}, {
-//			title : 'space-around',
-//			value : 'space-around'
-//			}, {
-//			title : 'space-between',
-//			value : 'space-between'
-//			} ];
-
-//			$scope.justify = [ {
-//			title : 'none',
-//			value : 'none'
-//			}, {
-//			title : 'start',
-//			value : 'start'
-//			}, {
-//			title : 'center',
-//			value : 'center'
-//			}, {
-//			title : 'end',
-//			value : 'end'
-//			}, {
-//			title : 'stretch',
-//			value : 'stretch'
-//			}, ]
-
-
 			$scope.direction = [ {
 				title : 'column',
 				icon : 'wb-horizontal-boxes',
