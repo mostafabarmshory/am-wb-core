@@ -9,6 +9,10 @@
 		border-radius: 0;
 	}
 }
+
+.jsPanel {
+	z-index: 10 !important;
+}
 /**
  * Flex css utility (cross browser)
  *
@@ -16,134 +20,137 @@
  * Updated by maso on 2017-05-30 (adding layout in small devices)
  */
 .wb-flex, .wb-flex-row, .wb-flex-column {
-	display: -ms-flexbox;
-	display: -webkit-flex;
-	display: flex;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
 }
 
 .wb-flex-row {
-	-webkit-flex-direction: row;
-	-ms-flex-direction: row;
-	flex-direction: row;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
 }
 
 .wb-flex-column {
-	-webkit-flex-direction: column;
-	-ms-flex-direction: column;
-	flex-direction: column;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
 }
 
 .wb-flex-wrap {
-	-webkit-flex-wrap: wrap;
-	-ms-flex-wrap: wrap;
-	flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
 }
 
 .wb-flex-nowrap {
-	-webkit-flex-wrap: nowrap;
-	-ms-flex-wrap: nowrap;
-	flex-wrap: nowrap;
+    -webkit-flex-wrap: nowrap;
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap;
 }
 
 /*
  * Layout in small devices
  */
- 
+
 @media ( max-width : 959px) {
-	.wb-flex-row {
-		-webkit-flex-direction: column;
-		-ms-flex-direction: column;
-		flex-direction: column;
-	}
-	.wb-flex-column{}
-	.wb-flex-wrap {}
-	.wb-flex-nowrap {}
+    .wb-flex-row {
+        -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        -webkit-align-items: stretch;
+        -ms-flex-align: stretch;
+        align-items: stretch;
+    }
+    .wb-flex-column{}
+    .wb-flex-wrap {}
+    .wb-flex-nowrap {}
 }
 
 /* justify-content */
 .wb-flex-justify-content-start {
-	-webkit-justify-content: flex-start;
-	-ms-flex-pack: start;
-	justify-content: flex-start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
 }
 
 .wb-flex-justify-content-end {
-	-webkit-justify-content: flex-end;
-	-ms-flex-pack: end;
-	justify-content: flex-end;
+    -webkit-justify-content: flex-end;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
 }
 
 .wb-flex-justify-content-center {
-	-webkit-justify-content: center;
-	-ms-flex-pack: center;
-	justify-content: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
 }
 
 .wb-flex-justify-content-space-between {
-	-webkit-justify-content: space-between;
-	-ms-flex-pack: justify;
-	justify-content: space-between;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
 }
 
 .wb-flex-justify-content-space-around {
-	-webkit-justify-content: space-around;
-	-ms-flex-pack: distribute;
-	justify-content: space-around;
+    -webkit-justify-content: space-around;
+    -ms-flex-pack: distribute;
+    justify-content: space-around;
 }
 
 /* align-items */
 .wb-flex-align-items-start {
-	-webkit-align-items: flex-start;
-	-ms-flex-align: start;
-	align-items: flex-start;
+    -webkit-align-items: flex-start;
+    -ms-flex-align: start;
+    align-items: flex-start;
 }
 
 .wb-flex-align-items-end {
-	-webkit-align-items: flex-end;
-	-ms-flex-align: end;
-	align-items: flex-end;
+    -webkit-align-items: flex-end;
+    -ms-flex-align: end;
+    align-items: flex-end;
 }
 
 .wb-flex-align-items-center {
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
 }
 
 .wb-flex-align-items-stretch {
-	-webkit-align-items: stretch;
-	-ms-flex-align: stretch;
-	align-items: stretch;
+    -webkit-align-items: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
 }
 
 .wb-flex-item-auto {
-	-webkit-align-self: auto;
-	-ms-flex-item-align: auto;
-	align-self: auto;
+    -webkit-align-self: auto;
+    -ms-flex-item-align: auto;
+    align-self: auto;
 }
 
 .wb-flex-item-start {
-	-webkit-align-self: flex-start;
-	-ms-flex-item-align: start;
-	align-self: flex-start;
+    -webkit-align-self: flex-start;
+    -ms-flex-item-align: start;
+    align-self: flex-start;
 }
 
 .wb-flex-item-end {
-	-webkit-align-self: flex-end;
-	-ms-flex-item-align: end;
-	align-self: flex-end;
+    -webkit-align-self: flex-end;
+    -ms-flex-item-align: end;
+    align-self: flex-end;
 }
 
 .wb-flex-item-stretch {
-	-webkit-align-self: stretch;
-	-ms-flex-item-align: stretch;
-	align-self: stretch;
+    -webkit-align-self: stretch;
+    -ms-flex-item-align: stretch;
+    align-self: stretch;
 }
 
 .wb-flex-item-center {
-	-webkit-align-self: center;
-	-ms-flex-item-align: center;
-	align-self: center;
+    -webkit-align-self: center;
+    -ms-flex-item-align: center;
+    align-self: center;
 }
 /*
 Rules for sizing the icon.
@@ -245,9 +252,6 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
  * child element with dndPlaceholder class.
  */
 .dndPlaceholder {
-	/*
-	background: red;
-    */
 	list-style: none;
 	min-width: 36px;
 	min-height: 36px;
@@ -282,139 +286,8 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
  * position, and not the "element" that the user is dragging with his mouse pointer
  */
 .dndDraggingSource {
-    display: none;
+    /* display: none; */
 }
-/*
-.wb-group-button {
-    font-size: 16px;
-    margin: 20px 0;
-    padding: 3px 15px 3px 15px;
-    color: rgb(49, 46, 46);
-    background-color: rgba(224, 224, 224, 0.96);
-    text-transform: none;
-    font-weight: 400;
-    min-width:100px;
-}
-
-.md-button.left {
-    border-radius: 10px 0 0 10px;
-}
-
-.md-button.middle {
-    border-radius: 0;
-    border-left: 1px solid rgba(230, 230, 230, 0.96);
-    border-right: 1px solid rgba(230, 230, 230, 0.96);
-}
-
-.md-button.right {
-    border-radius: 0 10px 10px 0;
-}
-
-.md-button:not([disabled]):hover {
-    background-color: rgba(193, 193, 193, 0.96);
-    color: rgba(44, 65, 164, 0.96);
-    transition: 0.3s;
-}
-*/
-/*
-.md-button.md-icon-button.md-mini {
-	line-height: 1rem;
-	width: 1.5rem;
-	height: 1.5rem;
-	min-height: 1rem;
-	margin: 0px;
-	padding: 0px;
-	margin-left: 4px;
-}
-
-.wb-icon-mini {
-	padding: 0px;
-	margin: 0px;
-	font-size: 1rem;
-	line-height: 1rem;
-	min-height: 1rem;
-}
-
-!**************************************************************************************
-Hierarchical structure
-
-Panel contains serveral children to show a good view. Here is the structure:
-
--> wb-panel 
-  -> wb-panel-body 
-     -> overlay
-     -> wb-panel-container
-***************************************************************************************!
-.wb-page:hover .wb-widget-in-edit-mode{
-	zoom: 1;
-	filter: alpha(opacity=45);
-	opacity: 0.45;
-	-webkit-transition: opacity .5s ease-in-out;
-	-moz-transition: opacity .5s ease-in-out;
-	-ms-transition: opacity .5s ease-in-out;
-	-o-transition: opacity .5s ease-in-out;
-	transition: opacity .5s ease-in-out;
-}
-.wb-page .wb-widget-in-edit-mode:hover{
-	box-shadow: 3px 3px 15px #666;
-	cursor: pointer;
-
-	!*Opacity*!
-	zoom: 1;
-	filter: alpha(opacity=100);
-	opacity: 1;
-}
-!* === *!
-.wb-panel {
-	margin: 2px;
-	border: 1px dashed #039BE5;
-}
-
-.wb-panel-body {
-	position: relative;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: auto;
-}
-
-.wb-panel-container {
-	position: relative;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	min-height: 30px;
-}
-
-.wb-panel-header {
-	background-color: rgba(3, 155, 229, 0.2);
-	background-image: repeating-linear-gradient(315deg, transparent, transparent 16px, rgba(255
-		, 255, 255, .5) 16px, rgba(255, 255, 255, .5) 32px);
-	color: black;
-	padding: 0px;
-	border: none;
-	border-bottom: 1px dashed rgb(3, 155, 229);
-	min-height: 30px;
-}
-
-.wb-panel-overlay {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 9999;
-	color: white;
-	background: radial-gradient(black 15%, transparent 16%) 0 0,
-		radial-gradient(black 15%, transparent 16%) 8px 8px,
-		radial-gradient(rgba(255, 255, 255, .1) 15%, transparent 20%) 0 1px,
-		radial-gradient(rgba(255, 255, 255, .1) 15%, transparent 20%) 8px 9px;
-	background-color: #282828;
-	background-size: 12px 12px;
-}
-*/
-
 /*
 md-input-container.md-icon-float {
 	-webkit-transition: margin-top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -633,7 +506,7 @@ Panel contains serveral children to show a good view. Here is the structure:
 
 
 /*
- * Truncate text if overflwo
+ * Truncate text if overflow
  */
 .wb-text-truncate {
     overflow: hidden;
@@ -707,94 +580,114 @@ Panel contains serveral children to show a good view. Here is the structure:
 	/* margin */
 	margin-left: 8px;
 }
-
 /**************************************************************************************
-Hierarchical structure
+                                     Widget layout
 
 A widget is wraped in several dive to instruct a view. Here is the hierarchial structure
 of a widget:
 
 -> widget
-  -> widget header
-  -> widget body
-    -> widget overlay
-    -> widget container
+***************************************************************************************/
+.wb-group {
+	min-width: 32px;
+	min-height: 32px;
+}
+
+/*
+ * Added to a group if is the root element
+ */
+.wb-group-root {
+	overflow: auto !important;
+}
+
+/*
+ * Added to a group if is in edit mode
+ */
+.wb-group-edit {
+	border: 0.5px dashed #aaaaaa;
+	margin: 1px;
+}
+
+/*
+ * Added if group is selected
+ */
+.wb-group-select {
+/* 	background: red; */
+}
+
+/*
+ * Add animation on mouse hover in edit mode
+ */
+.wb-group-edit:hover {
+	border: 1px dashed #555753;
+	-webkit-box-shadow: 0px 0px 2x 2px #aaaaaa;
+	-moz-box-shadow: 0px 0px 2px 2px #aaaaaa;
+	box-shadow: 0px 0px 2px 2px #aaaaaa;
+}
+
+
+/**************************************************************************************
+                                     Widget layout
+
+A widget is wraped in several dive to instruct a view. Here is the hierarchial structure
+of a widget:
+
+-> widget
 ***************************************************************************************/
 .wb-widget {
 	overflow: hide;
-/* 	display: block; */
+    position: relative;
+	min-width: 32px;
+	min-height: 32px;
 }
 
 .wb-widget-edit {
 	margin: 2px;
-	position: relative;
 	border: 1px dashed #8f9494;
 }
 
-.wb-widget-header {
-	background-color: rgba(120, 120, 120, 0.2);
-	background-image: repeating-linear-gradient(315deg, transparent, transparent 12px, rgba(255
-		, 255, 255, .5) 12px, rgba(255, 255, 255, .5) 24px);
-	color: black;
-	padding: 2px;
-	margin: 0px;
-	border: none;
-	border-bottom: 1px dashed #8f9494;
-	min-height: 24px;
-	min-width: 250px;
-}
-
-.wb-widget-body {
-	position: relative;
-	display: block;
-	top: 0px;
-	left: 0px;
-	right: 0px;
-	bottom: 0px;
-/* 	width: 100%; */
-/* 	height: 100%; */
-/*  overflow: auto; */
-}
-
-.wb-widget-overlay {
-/* 	position: relative; */
-/* 	display: block; */
-/* 	top: 0px; */
-/* 	left: 0px; */
-/* 	right: 0px; */
-/* 	bottom: 0px; */
-/* 	width: 100%; */
-/* 	height: 100%; */
-/* 	padding: 0px; */
-/* 	margin: 0px; */
-/* 	z-index: 9999; */
-	color: white;
-	background: radial-gradient(black 15%, transparent 16%) 0 0,
-		radial-gradient(black 15%, transparent 16%) 8px 8px,
-		radial-gradient(rgba(255, 255, 255, .1) 15%, transparent 20%) 0 1px,
-		radial-gradient(rgba(255, 255, 255, .1) 15%, transparent 20%) 8px 9px;
-	background-color: #282828;
-	background-size: 12px 12px;
-}
-
 /*
- * Contains user DOM
- * 
- * Fill the space to display user DOM. If user is not able to display in
- * the area, User have to add scroll inside of the widget.
+ * Body of a widget to fill
  */
-.wb-widget-container {
+.wb-widget-fill {
 	position: relative;
-	display: block;
 	top: 0px;
 	left: 0px;
 	right: 0px;
 	bottom: 0px;
-/* 	width: 100%; */
-/* 	height: 100%; */
-    overflow: hidden;
+	width: 100%;
+	height: 100%;
+	padding: 0px;
+	margin: 0px;
 }
 
+
+
+
+
+
+
+
+
+
+
+.md-button.md-icon-button.md-mini {
+	line-height: 1rem;
+	width: 1.5rem;
+	height: 1.5rem;
+	min-height: 1rem;
+	margin: 0px;
+	padding: 0px;
+	margin-left: 4px;
+}
+
+.wb-icon-mini {
+	padding: 0px;
+	margin: 0px;
+	font-size: 1rem;
+	line-height: 1rem;
+	min-height: 1rem;
+}
 
 .wb-widgets-module {
 	padding: 8px;
