@@ -186,6 +186,7 @@ angular.module('am-wb-core')
 	return {
 		restrict : 'A',
 		link : postLink,
-		require:['wbGroup']
+		priority: 1,
+		require:['^wbGroup']
 	};
 });

@@ -181,6 +181,6 @@ angular.module('am-wb-core')
 	return {
 		restrict : 'A',
 		link : postLink,
-		require:['wbWidget']
+		require:['^wbWidget']
 	};
 });
