@@ -28,12 +28,12 @@
     "angular-translate": "2.18.x",
     "md-color-picker": "0.2.x",
     "angular-ui-tinymce": "latest",
-    "angular-drag-and-drop-lists": "https://github.com/mostafabarmshory/angular-drag-and-drop-lists.git#2.1.x",
     "angular-material-expansion-panel": "0.7.x",
     "angular-material-icons": "0.7.x",
     "weakmap-polyfill": "2.0.x",
     "ngHandsontable": "0.13.x",
-    "jspanel4": "^4.0.0"
+    "angular-drag-and-drop-lists": "https://github.com/mostafabarmshory/angular-drag-and-drop-lists.git#2.1.x",
+    "jspanel4": "https://github.com/mostafabarmshory/jsPanel4.git#patch-1"
   },
   "devDependencies": {
     "angular-mocks": "1.7.x",

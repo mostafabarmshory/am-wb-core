@@ -41,52 +41,26 @@ angular.module('am-wb-core')
 		function isRoot(){
 			return $ctrls[1] && $ctrls[1].isRoot();
 		}
-
-		function openOptions($event) {
-			var template ='' +
-			'<div class="menu-panel" md-whiteframe="4">' +
-			'  <div class="menu-content">' +
-			'    <div class="menu-item" ng-repeat="item in ctrl.items">' +
-			'      <button class="md-button">' +
-			'        <span>{{item}}</span>' +
-			'      </button>' +
-			'    </div>' +
-			'    <md-divider></md-divider>' +
-			'    <div class="menu-item">' +
-			'      <button class="md-button" ng-click="ctrl.closeMenu()">' +
-			'        <span>Close Menu</span>' +
-			'      </button>' +
-			'    </div>' +
-			'  </div>' +
-			'</div>';
-
-			var position = $mdPanel.newPanelPosition()
-			.relativeTo($event.target)
-			.addPanelPosition(
-					$mdPanel.xPosition.ALIGN_START,
-					$mdPanel.yPosition.BELOW
-			);
-
-			var config = {
-					id: 'toolbar_',
-					attachTo: $rootElement,
-					controller: function(){},
-					controllerAs: 'ctrl',
-					template: template,
-					position: position,
-					panelClass: 'menu-panel-container',
-					locals: {
-						items: []
-					},
-					openFrom: $event,
-					focusOnOpen: false,
-//					zIndex: 100,
-					propagateContainerEvents: true,
-			};
-
-			$mdPanel.open(config);
+		
+		if($ctrls[0]){
+			$ctrls[0].on('delete', distroy);
+		}
+		if($ctrls[1]){
+			$ctrls[1].on('delete', distroy);
 		}
 
+		function distroy(){
+			watchSize();
+			watchSelection();
+			
+			if(button){
+				button.remove();
+			}
+			if(optionButton){
+				optionButton.remove();
+			}
+		}
+		
 		function mousemove($event) {
 			var deltaWidth = dimension.width - (position.x - $event.clientX);
 			var deltaHeight = dimension.height - (position.y - $event.clientY);
@@ -160,7 +134,7 @@ angular.module('am-wb-core')
 			button.on('mousedown', mousedown);
 
 			var oj = $wbUtil.getTemplateFor({
-				templateUrl: 'views/dialogs/wb-widget-options.html'
+				templateUrl: 'views/partials/wb-widget-options.html'
 			}).then(function(template){
 				optionButton = angular.element(template);
 				$rootElement.append(optionButton);
@@ -168,7 +142,6 @@ angular.module('am-wb-core')
 					position: 'absolute',
 					visibility: 'hidden',
 				});
-				$scope.openOptions = openOptions;
 				$compile(optionButton)($scope);
 				bindToElement(getBound());
 			});
@@ -186,7 +159,7 @@ angular.module('am-wb-core')
 
 
 		// Watch size
-		$scope.$watch($attrs.wbSize+'.size', function(size) {
+		var watchSize = $scope.$watch($attrs.wbSize+'.size', function(size) {
 			if(isRoot() || !size || lock){
 				return;
 			}
@@ -196,15 +169,15 @@ angular.module('am-wb-core')
 			}
 		}, true);
 
-		$scope.$watch(function(){
+		var watchSelection = $scope.$watch(function(){
 			return ctrl.isSelected();
 		}, function(value){
-			if(isRoot()){
-				return;
-			}
 			if(value){
-				checkButton().then(function(){
-					button.css('visibility', 'visible');
+				checkButton()
+				.then(function(){
+					if(!isRoot()){
+						button.css('visibility', 'visible');
+					}
 					optionButton.css('visibility', 'visible');
 				});
 			} else {

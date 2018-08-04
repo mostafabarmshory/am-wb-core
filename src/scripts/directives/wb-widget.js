@@ -35,7 +35,7 @@ angular.module('am-wb-core')
  * 
  * All primary actions of a widget are supported (such as remove and setting).
  */
-.directive('wbWidget', function() {
+.directive('wbWidget', function($wbUtil, $settings, $widget) {
 	function postLink($scope, $element, $attrs, $ctrls, $transclude) {
 		// Modify angular transclude function
 		// see:
@@ -63,41 +63,76 @@ angular.module('am-wb-core')
 	 * 
 	 * @ngInject
 	 */
-	function wbWidgetCtrl($scope, $element, $settings, $widget) {
+	function wbWidgetCtrl($scope, $element) {
+		var callbacks = {};
+		var ctrl = this;
 
-		this.delete = function(){
+		function fire(type){
+			if(angular.isDefined(callbacks[type])){
+				for(var i = 0; i < callbacks[type].length; i++){
+					try{
+						callbacks[type][i]();
+					} catch (error){
+						console.log(error);
+					}
+				}
+			}
+		}
+		
+		ctrl.delete = function(){
+			fire('delete');
 			$scope.group.removeChild($scope.wbModel);
+			callbacks = {};
 		}
 
-		this.clone = function(){
-			alert('clone');
+		ctrl.clone = function(){
+			return $wbUtil.clean(angular.copy($scope.wbModel));
 		}
 
-		this.getModel = function(){
+		ctrl.getModel = function(){
 			return $scope.wbModel;
 		}
 
-		this.getParent = function(){
+		ctrl.getParent = function(){
 			return $scope.parentCtrl;
 		}
 
-		this.isEditable = function(){
+		ctrl.isEditable = function(){
 			return  $scope.group && $scope.group.isEditable();
 		}
 
-		this.isSelected = function(){
+		ctrl.isSelected = function(){
 			return $scope.selected;
 		}
 
-		this.setSelected = function(flag) {
+		ctrl.setSelected = function(flag) {
 			$scope.selected = flag;
 			if(flag && $scope.group) {
 				$scope.group.childSelected(this);
 			}
 		}
 
-		this.getAction = function(){
-			return [1, 2, 3];
+		ctrl.getActions = function(){
+			return [{
+				title: 'Delete',
+				icon: 'delete',
+				action: ctrl.delete
+			},{
+				title: 'Clone',
+				icon: 'copy',
+				action: function(){
+					var model = $wbUtil.clean(angular.copy($scope.wbModel));
+					var index = $scope.group.indexOfChild($scope.wbModel);
+					$scope.group.addChild(index, model);
+				}
+			}];
+		}
+		
+		ctrl.on = function(type, callback){
+			if(!angular.isArray(callbacks[type])){
+				callbacks[type] = [];
+			}
+			callbacks[type].push(callback);
 		}
 	}
 	

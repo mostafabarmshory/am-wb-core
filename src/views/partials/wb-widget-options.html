@@ -8,9 +8,11 @@
 	</md-button>
 	<md-menu-content 
 		width="4" 
+		ng-init="_actions = ctrl.getActions()"
 		ng-mouseleave="$mdMenu.close()">
-		<md-menu-item ng-repeat="item in ctrl.getAction()">
-			<md-button>Option {{item}}</md-button>
+		<md-menu-item ng-repeat="action in _actions">
+			<md-button
+				ng-click="action.action()">{{action.title}}</md-button>
 		</md-menu-item>
 	</md-menu-content>
 </md-menu>

@@ -34,7 +34,7 @@ angular.module('am-wb-core')
  * @description Render a list of widget
  * 
  */
-.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $q, $mdTheming) {
+.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $q, $mdTheming, $parse) {
 
 	/*
 	 * Link widget view
@@ -123,7 +123,7 @@ angular.module('am-wb-core')
 				return wbGroupCtrl.isChildSelected(ctrl);
 			}
 		}
-		
+
 		$scope.dropCallback = function(index, item, external, type){
 			return ctrl.addChild(index, item);
 		}
@@ -138,13 +138,25 @@ angular.module('am-wb-core')
 	 * 
 	 * FIXME: maso, 2018: add injection annotation
 	 */
-	function wbGroupCtrl($scope, $element, $widget, $parse) {
-
+	function wbGroupCtrl($scope, $element) {
+		var ctrl = this;
+		var callbacks = {};
 		var onModelSelectionFu = null;
 		if($scope.wbOnModelSelect) {
 			onModelSelectionFu = $parse($scope.wbOnModelSelect);
 		}
 
+		function fire(type){
+			if(angular.isDefined(callbacks[type])){
+				for(var i = 0; i < callbacks[type].length; i++){
+					try{
+						callbacks[type][i]();
+					} catch (error){
+						console.log(error);
+					}
+				}
+			}
+		}
 
 		/**
 		 * Delete data model and widget display
@@ -152,11 +164,13 @@ angular.module('am-wb-core')
 		 * @name delete
 		 * @memberof wbGroupCtrl
 		 */
-		this.delete = function(){
-			if(this.isRoot()){
+		ctrl.delete = function(){
+			if(ctrl.isRoot()){
+				// TODO: mao, 2018: clear all elements
 				return;
 			}
 			$scope.parentCtrl.removeChild($scope.wbModel);
+			fire('delete');
 		}
 
 		/**
@@ -168,41 +182,41 @@ angular.module('am-wb-core')
 		 * @memberof wbGroupCtrl
 		 * @return model {Object} which is cloned from the current one
 		 */
-		this.clone = function(){
-			return $widget.cleanModel(angular.copy($scope.wbModel));
+		ctrl.clone = function(){
+			return $wbUtil.clean(angular.copy($scope.wbModel));
 		}
 
-		this.getModel = function(){
+		ctrl.getModel = function(){
 			return $scope.wbModel;
 		}
 
-		this.getParent = function(){
+		ctrl.getParent = function(){
 			return $scope.parentCtrl;
 		}
 
-		this.isRoot = function(){
+		ctrl.isRoot = function(){
 			return $scope.root;
 		}
 
-		this.isEditable = function(){
+		ctrl.isEditable = function(){
 			return $scope.editable;
 		}
 
-		this.isSelected = function(){
-			return $scope.selected;
+		ctrl.isSelected = function(){
+			return ctrl.isChildSelected(ctrl);
 		}
 
-		this.setSelected = function(flag) {
+		ctrl.setSelected = function(flag) {
 			if(flag) {
 				this.childSelected(this);
 			}
 		}
-		
-		this.isChildSelected = function(ctrl){
+
+		ctrl.isChildSelected = function(ctrl){
 			return ctrl === $scope.lastSelectedItem;
 		}
 
-		this.childSelected = function(ctrl) {
+		ctrl.childSelected = function(ctrl) {
 			if(ctrl === $scope.lastSelectedItem) {
 				return;
 			}
@@ -230,8 +244,8 @@ angular.module('am-wb-core')
 		 * Data model and visual element related to the input model will be
 		 * removed.
 		 */
-		this.removeChild = function(model) {
-			var index = $scope.wbModel.contents.indexOf(model);
+		ctrl.removeChild = function(model) {
+			var index = ctrl.indexOfChild(model);
 			if (index > -1) {
 				$element.children(':nth-child('+(index+1)+')').remove();
 				$scope.wbModel.contents.splice(index, 1);
@@ -239,12 +253,12 @@ angular.module('am-wb-core')
 			}
 			return false;
 		};
-		
+
 
 		/**
 		 * Adds dragged widget
 		 */
-		this.addChild = function(index, item) {
+		ctrl.addChild = function(index, item) {
 			$wbUtil.clean(item);
 			// add widget
 			$widget.compile(item, $scope)//
@@ -262,13 +276,39 @@ angular.module('am-wb-core')
 			});
 			return true;
 		}
+		
+		ctrl.indexOfChild = function(item) {
+			return $scope.wbModel.contents.indexOf(item);
+		}
 
-		this.getAllowedTypes = function(){
+		ctrl.getAllowedTypes = function(){
 			return $scope.wbAllowedTypesl;
 		}
-		
-		this.getAction = function(){
-			return [1, 2, 3];
+
+		ctrl.on = function(type, callback){
+			if(!angular.isArray(callbacks[type])){
+				callbacks[type] = [];
+			}
+			callbacks[type].push(callback);
+		}
+
+		ctrl.getActions = function(){
+			return [{
+				title: 'Delete',
+				icon: 'delete',
+				action: ctrl.delete
+			},{
+				title: 'Clone',
+				icon: 'copy',
+				action: function(){
+					if(ctrl.isRoot()){
+						return;
+					}
+					var model = ctrl.clone();
+					var index = $scope.parentCtrl.indexOfChild($scope.wbModel);
+					$scope.parentCtrl.addChild(index, model);
+				}
+			}];
 		}
 	}
 
