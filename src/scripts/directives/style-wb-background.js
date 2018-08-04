@@ -25,19 +25,16 @@
 
 angular.module('am-wb-core')
 /**
- * @ngdoc directive
- * @memberof am-wb-core
+ * @ngdoc Directives
+ * @name wb-background
  * @description Apply background into the element
  */
 .directive("wbBackground", function() {
-	/**
+	/*
 	 * Sets background attributes into element
 	 * 
-	 * @param element
-	 * @param style
-	 * @returns
 	 */
-	function setBackgroud(element, style){
+	function setBackgroud($element, style){
 		if (!style) {
 			return;
 		}
@@ -45,45 +42,45 @@ angular.module('am-wb-core')
 		if(style.background){
 			cssValue['background'] = style.background;
 		}
-		if(style.backgroundImage){
-			cssValue['background-image'] = 'url(\''+style.backgroundImage+'\')';
+		if(style.image){
+			cssValue['background-image'] = 'url(\''+style.image+'\')';
 		}
 
-		if(style.backgroundColor){
-			cssValue['background-color'] = style.backgroundColor;
+		if(style.color){
+			cssValue['background-color'] = style.color;
 		}
-		if(style.backgroundSize) {
-			cssValue['background-size'] = style.backgroundSize;
+		if(style.size) {
+			cssValue['background-size'] = style.size;
 		}
-		if(style.backgroundRepeat) {
-			cssValue['background-repeat'] = style.backgroundRepeat;
+		if(style.repeat) {
+			cssValue['background-repeat'] = style.repeat;
 		}
-		if(style.backgroundPosition){
-			cssValue['background-position'] = style.backgroundPosition;
+		if(style.position){
+			cssValue['background-position'] = style.position;
 		}
-		if(style.backgroundAttachment){
-			cssValue['background-attachment'] = style.backgroundAttachment;
+		if(style.attachment){
+			cssValue['background-attachment'] = style.attachment;
 		}
-		if(style.backgroundOrigin){
-			cssValue['background-origin'] = style.backgroundOrigin;
+		if(style.origin){
+			cssValue['background-origin'] = style.origin;
 		}
-		if(style.backgroundClip){
-			cssValue['background-clip'] = style.backgroundClip;
+		if(style.clip){
+			cssValue['background-clip'] = style.clip;
 		}
 		
-		// FIXME: maso, 1395: thies are not background parameter
-		if(style.color){
-			cssValue['color'] = style.color;
-		}
-		if(style.opacity){
-			cssValue['opacity'] = (style.isTransparent) ? style.opacity/100 : 1;
-		}
-		element.css(cssValue);
+//		// FIXME: maso, 1395: thies are not background parameter
+//		if(style.color){
+//			cssValue['color'] = style.color;
+//		}
+//		if(style.opacity){
+//			cssValue['opacity'] = (style.isTransparent) ? style.opacity/100 : 1;
+//		}
+		$element.css(cssValue);
 	}
 
-	function postLink(scope, element, attributes) {
-		return scope.$watch(attributes.wbBackground, function(style){
-			return setBackgroud(element, style);
+	function postLink($scope, $element, $attrs) {
+		return $scope.$watch($attrs.wbBackground + '.background', function(config){
+			return setBackgroud($element, config);
 		}, true);
 	}
 

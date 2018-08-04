@@ -30,17 +30,6 @@ angular.module('am-wb-core')
  */
 .run(function($widget) {
 	
-	// Widget 
-
-//	type : 'http-get',
-//	title : 'GET',
-//	description : 'Requests a representation of the specified resource',
-//	groups: ['http'],
-//	icon : 'wb-widget-group',
-//	iconUrl: '/link/to/image',
-//	groups: ['basic'],
-//	model:{},
-	
 	
 	// Group
 	$widget.newWidget({
@@ -52,7 +41,7 @@ angular.module('am-wb-core')
 		groups: ['basic'],
 		model: {},
 		// functional properties
-		template : '<wb-panel></wb-panel>',
+		template : '<wb-group ng-model="wbModel"></wb-group>',
 		help : 'http://dpq.co.ir/more-information-link',
 		helpId: 'wb-widget-group'
 	});

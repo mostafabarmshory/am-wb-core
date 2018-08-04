@@ -29,31 +29,16 @@ angular.module('am-wb-core')
  */
 .directive("wbMargin", function() {
 	return {
-		restrict : 'A',
-		link : function(scope, element, attributes) {
-			return scope.$watch(attributes.wbMargin, function(style) {
-				if(!style){
-					return;
-				}
-				if(!style.margin){
-					style.margin ={};
-				}
-				if (style.margin.isUniform) {
-					element.css({
-						'margin-left':style.margin.uniform,
-						'margin-right':style.margin.uniform,
-						'margin-top':style.margin.uniform,
-						'margin-bottom':style.margin.uniform,
-					});
-				} else {
-					element.css({
-						'margin-left': style.margin.left,
-						'margin-right':style.margin.right,
-						'margin-top': style.margin.top,
-						'margin-bottom': style.margin.bottom
-					});
-				}
-			}, true);
-		}
+	    restrict : 'A',
+	    link : function(scope, element, attributes) {
+		    return scope.$watch(attributes.wbMargin, function(style) {
+			    if (!style) {
+				    return;
+			    }
+			    if (style.margin) {
+				    element.css('margin', style.margin);
+			    }
+		    }, true);
+	    }
 	};
 });

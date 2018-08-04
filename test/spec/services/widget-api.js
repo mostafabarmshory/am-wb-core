@@ -25,22 +25,22 @@
 
 describe('Service $widget', function () {
 
-    // load the service's module
-    beforeEach(module('am-wb-core'));
+	// load the service's module
+	beforeEach(module('am-wb-core'));
 
-    // instantiate service
-    var $widget;
-    beforeEach(inject(function (_$widget_) {
-	$widget = _$widget_;
-    }));
+	// instantiate service
+	var $widget;
+	beforeEach(inject(function (_$widget_) {
+		$widget = _$widget_;
+	}));
 
-    it('should add a new widget', function () {
-	expect(angular.isFunction($widget.newWidget)).toBe(true);
-    });
-    it('should find a related widget for a model', function () {
-	expect(angular.isFunction($widget.widget)).toBe(true);
-    });
-    it('should list all widget', function () {
-	expect(angular.isFunction($widget.widgets)).toBe(true);
-    });
+	it('should add a new widget', function () {
+		expect(angular.isFunction($widget.newWidget)).toBe(true);
+	});
+	it('should find a related widget for a model', function () {
+		expect(angular.isFunction($widget.widget)).toBe(true);
+	});
+	it('should list all widget', function () {
+		expect(angular.isFunction($widget.widgets)).toBe(true);
+	});
 });

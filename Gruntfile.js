@@ -361,6 +361,7 @@ module.exports = function(grunt) {
 		 */
 		wiredep : {
 			app : {
+				devDependencies : true,
 				src : [ 'demo/index.html' ],
 				ignorePath : /\.\.\//
 			},

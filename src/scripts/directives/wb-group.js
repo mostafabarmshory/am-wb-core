@@ -30,93 +30,213 @@ var placeholderElementSelector = 'div#wb-content-placeholder';
 angular.module('am-wb-core')
 /**
  * @ngdoc Directives
- * @name wb-panel
+ * @name wb-group
  * @description Render a list of widget
  * 
  */
-.directive('wbPanel', function($compile, $widget, $controller, $settings, $q, $mdTheming) {
+.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $q, $mdTheming, $parse) {
 
 	/*
 	 * Link widget view
 	 */
-	function postLink(scope, element, attrs, ctrls, transclud) {
+	function wbGroupLink($scope, $element, $attrs, $ctrls, transclud) {
 
-		/**
-		 * Remove panel from parent
-		 */
-		function remove() {
-			return scope.$parent.removeChild(scope.wbModel);
-		}
+		// Loads wbGroup
+		var ctrl = $ctrls[0];
 
-		/**
-		 * Empty view
-		 * 
-		 * Remove all widgets from the view.
-		 */
-		function cleanView() {
-			element//
-			.children(bodyElementSelector)//
-			.children(placeholderElementSelector)//
-			.empty();
-		}
+		// Loads wbGroup
+		var wbGroupCtrl = $ctrls[1];
+		$scope.parentCtrl = wbGroupCtrl;
 
-		/**
-		 * Find aunchor
-		 * 
-		 * Find and return anchor element.
-		 */
-		function getAnchor() {
-			return element//
-			.children(bodyElementSelector)//
-			.children(placeholderElementSelector);
-		}
+		// Load ngModel
+		var ngModelCtrl = $ctrls[2];
+		ngModelCtrl.$render = function() {
+			reloadView(ngModelCtrl.$viewValue);
+		};
 
-		/**
-		 * Relaod view
+		/*
+		 * Loads view
 		 */
-		function reloadView() {
-			cleanView();
-			var anchor = getAnchor();
+		function reloadView(model) {
+			$element.empty();
+			$scope.wbModel = model;
+			if(!model || !angular.isArray(model.contents)){
+				return;
+			}
 			var compilesJob = [];
 			var elements = [];
-			scope.wbModel.contents.forEach(function(item, index) {
-				scope.objectId(item);
-				compilesJob.push($widget.compile(item, scope)//
+			model.contents.forEach(function(item, index) {
+				compilesJob.push($widget.compile(item, $scope)//
 						.then(function(element) {
-							element.attr('id', scope.objectId(item));
 							$mdTheming(element);
 							elements[index] = element;
 						}));
 			});
 			return $q.all(compilesJob)//
 			.then(function() {
-				var anchor = getAnchor();
-				elements.forEach(function(item) {
-					anchor.append(item);
+				elements.forEach(function(element) {
+					$element.append(element);
 				});
 			});
 		}
 
-		/**
-		 * Adds dragged widget
+		/*
+		 * Load edit mode
 		 */
-		function dropCallback(event, index, item, external, type) {
-			// add widget
-			$widget.compile(item, scope)//
-			.then(function(newElement) {
-				var list = element//
-				.children(bodyElementSelector)//
-				.children(placeholderElementSelector);
-				newElement.attr('id', scope.objectId(item));
-				if (index < list[0].childNodes.length) {
-					newElement.insertBefore(list[0].childNodes[index]);
-				} else {
-					list.append(newElement);
-				}
-				scope.wbModel.contents.splice(index, 0, item);
-			});
-			return true;
+		function loadEditMode(){
+			$scope.editable = true;
+			if(ctrl.isRoot()) {
+				delete $scope.lastSelectedItem;
+			}
 		}
+
+		/*
+		 * Removes edit mode
+		 */
+		function removeEditMode(){
+			$scope.editable = false;
+			ctrl.childSelected(null);
+		}
+
+
+		/*
+		 * Watch for editable
+		 */
+		if(!wbGroupCtrl){
+			$scope.$watch('wbEditable', function(value, old){
+				if(value === old){
+					return;
+				}
+				if(value){
+					loadEditMode();
+				} else {
+					removeEditMode();
+				}
+			});
+			$scope.root = true;
+		} else {
+			// Get from parent
+			ctrl.isEditable = wbGroupCtrl.isEditable;
+			ctrl.childSelected = wbGroupCtrl.childSelected;
+			ctrl.isChildSelected = wbGroupCtrl.isChildSelected;
+			ctrl.isSelected = function(){
+				return wbGroupCtrl.isChildSelected(ctrl);
+			}
+		}
+
+		$scope.dropCallback = function(index, item, external, type){
+			return ctrl.addChild(index, item);
+		}
+	}
+
+	/**
+	 * @ngdoc Controllers
+	 * @name wbGroupCtrl
+	 * @description Adding basic functionality into a widget.
+	 * 
+	 * Manages model data of a widget.
+	 * 
+	 * FIXME: maso, 2018: add injection annotation
+	 */
+	function wbGroupCtrl($scope, $element) {
+		var ctrl = this;
+		var callbacks = {};
+		var onModelSelectionFu = null;
+		if($scope.wbOnModelSelect) {
+			onModelSelectionFu = $parse($scope.wbOnModelSelect);
+		}
+
+		function fire(type){
+			if(angular.isDefined(callbacks[type])){
+				for(var i = 0; i < callbacks[type].length; i++){
+					try{
+						callbacks[type][i]();
+					} catch (error){
+						console.log(error);
+					}
+				}
+			}
+		}
+
+		/**
+		 * Delete data model and widget display
+		 * 
+		 * @name delete
+		 * @memberof wbGroupCtrl
+		 */
+		ctrl.delete = function(){
+			if(ctrl.isRoot()){
+				// TODO: mao, 2018: clear all elements
+				return;
+			}
+			$scope.parentCtrl.removeChild($scope.wbModel);
+			fire('delete');
+		}
+
+		/**
+		 * Clone and return a new model from the current one
+		 * 
+		 * NOTE: this is a deep clone of the current widget.
+		 * 
+		 * @name cloneModel
+		 * @memberof wbGroupCtrl
+		 * @return model {Object} which is cloned from the current one
+		 */
+		ctrl.clone = function(){
+			return $wbUtil.clean(angular.copy($scope.wbModel));
+		}
+
+		ctrl.getModel = function(){
+			return $scope.wbModel;
+		}
+
+		ctrl.getParent = function(){
+			return $scope.parentCtrl;
+		}
+
+		ctrl.isRoot = function(){
+			return $scope.root;
+		}
+
+		ctrl.isEditable = function(){
+			return $scope.editable;
+		}
+
+		ctrl.isSelected = function(){
+			return ctrl.isChildSelected(ctrl);
+		}
+
+		ctrl.setSelected = function(flag) {
+			if(flag) {
+				this.childSelected(this);
+			}
+		}
+
+		ctrl.isChildSelected = function(ctrl){
+			return ctrl === $scope.lastSelectedItem;
+		}
+
+		ctrl.childSelected = function(ctrl) {
+			if(ctrl === $scope.lastSelectedItem) {
+				return;
+			}
+			$scope.lastSelectedItem = ctrl;
+			// maso, 2018: call the parent controller function
+			if(onModelSelectionFu) {
+				var callback = function() {
+					var local = {};
+					if(ctrl) {
+						local = {
+								'$model': ctrl.getModel(),
+								'$ctrl': ctrl
+						};
+					}
+					onModelSelectionFu($scope.$parent, local);
+				};
+				$scope.$eval(callback);
+			}
+		}
+
 
 		/**
 		 * Removes a widget
@@ -124,109 +244,87 @@ angular.module('am-wb-core')
 		 * Data model and visual element related to the input model will be
 		 * removed.
 		 */
-		function removeChild(model) {
-			var index = scope.wbModel.contents.indexOf(model);
+		ctrl.removeChild = function(model) {
+			var index = ctrl.indexOfChild(model);
 			if (index > -1) {
-				var a = element//
-				.children(bodyElementSelector)//
-				.children(placeholderElementSelector)
-				.children('#'+scope.objectId(model));
-				a.remove();
-				scope.wbModel.contents.splice(index, 1);
+				$element.children(':nth-child('+(index+1)+')').remove();
+				$scope.wbModel.contents.splice(index, 1);
+				return true;
 			}
-		}
+			return false;
+		};
+
 
 		/**
-		 * Insert new model befor selecte model
+		 * Adds dragged widget
 		 */
-		function insertBefore(model, newModel){
-			var index = scope.wbModel.contents.indexOf(model);
-			if (index > -1) {
-				$widget.compile(newModel, scope)//
-				.then(function(newElement) {
-					var a = element//
-					.children(bodyElementSelector)//
-					.children(placeholderElementSelector)//
-					.children('#'+scope.objectId(model));
-					newElement.insertBefore(a);
-					scope.wbModel.contents.splice(index, 0, newModel);
-				})
+		ctrl.addChild = function(index, item) {
+			$wbUtil.clean(item);
+			// add widget
+			$widget.compile(item, $scope)//
+			.then(function(newElement) {
+				var nodes  = $element[0].childNodes;
+				if (index < nodes.length) {
+					newElement.insertBefore(nodes[index]);
+				} else {
+					$element.append(newElement);
+				}
+				if(!angular.isArray($scope.wbModel.contents)){
+					$scope.wbModel.contents = [];
+				}
+				$scope.wbModel.contents.splice(index, 0, item);
+			});
+			return true;
+		}
+		
+		ctrl.indexOfChild = function(item) {
+			return $scope.wbModel.contents.indexOf(item);
+		}
+
+		ctrl.getAllowedTypes = function(){
+			return $scope.wbAllowedTypesl;
+		}
+
+		ctrl.on = function(type, callback){
+			if(!angular.isArray(callbacks[type])){
+				callbacks[type] = [];
 			}
+			callbacks[type].push(callback);
 		}
 
-		function settings() {
-			return $settings.load({
-				wbModel : scope.wbModel,
-				wbParent : scope.$parent
-			}, scope.$parent.settingAnchor());
+		ctrl.getActions = function(){
+			return [{
+				title: 'Delete',
+				icon: 'delete',
+				action: ctrl.delete
+			},{
+				title: 'Clone',
+				icon: 'copy',
+				action: function(){
+					if(ctrl.isRoot()){
+						return;
+					}
+					var model = ctrl.clone();
+					var index = $scope.parentCtrl.indexOfChild($scope.wbModel);
+					$scope.parentCtrl.addChild(index, model);
+				}
+			}];
 		}
-
-		/**
-		 * Clone current widget
-		 */
-		function clone() {
-			var newObject = angular.copy(scope.wbModel);
-			return scope.$parent.insertBefore(scope.wbModel, newObject);
-		}
-
-		// Set element ID after compile
-		element.attr('id', scope.objectId(scope.wbModel));
-		scope.wbModel.name = scope.wbModel.name || 'Panel';
-		scope.getAllowedTypes = $widget.widgetsKey;
-
-		scope.removeChild = removeChild;
-		scope.remove = remove;
-		scope.insertBefore = insertBefore;
-
-		scope.settings = settings;
-		scope.dropCallback = dropCallback;
-		scope.clone = clone;
-
-		if (!angular.isArray(scope.wbModel.contents)) {
-			scope.wbModel.contents = [];
-			return;
-		}
-		reloadView();
-	}
-
-	/*
-	 * Group controller
-	 * 
-	 * FIXME: maso, 2018: add injection annotation
-	 */
-	function groupController() {
-		var _hoveringDelBtn;
-
-		/**
-		 * Hover delete button
-		 * 
-		 * @memberof wbPanel
-		 */
-		function setHoverDelBtn(flag){
-			_hoveringDelBtn = flag;
-		}
-
-		/**
-		 * Is hover delete button 
-		 * 
-		 * @memberof wbPanel
-		 */
-		function isHoverDelBtn(){
-			return _hoveringDelBtn;
-		}
-
-		this.setHoverDelBtn = setHoverDelBtn;
-		this.isHoverDelBtn = isHoverDelBtn;
 	}
 
 	return {
 		templateUrl : 'views/directives/wb-group.html',
 		restrict : 'E',
 		replace : true,
-		transclude : true,
-		link : postLink,
+		transclude : false,
+		scope : {
+			wbEditable : '=?',
+			wbOnModelSelect : '@?',
+			wbAllowedTypes: '<?'
+		},
+		link : wbGroupLink,
 		controllerAs: 'ctrl',
-		controller: groupController
+		controller: wbGroupCtrl,
+		require:['wbGroup', '?^^wbGroup', 'ngModel']
 	};
-});//
-
+});
