@@ -37,8 +37,6 @@ module.exports = function(grunt) {
 	 * توی ساخت ایجاد می‌کنه اگر می‌خواهید ساخت با سرعت بیشتری انجام ب
 	 */
 	require('time-grunt')(grunt);
-	//MODIFIED: add require for connect-modewrite
-	var modRewrite = require('connect-modrewrite');
 
 	/*
 	 * به صورت خودکار تمام افزونه‌های مورد نیاز بار گذاری می‌شود. در صورتی که
@@ -48,7 +46,6 @@ module.exports = function(grunt) {
 	require('jit-grunt')(grunt, {
 		useminPrepare : 'grunt-usemin',
 		ngtemplates : 'grunt-angular-templates',
-		configureProxies : 'grunt-connect-proxy',
 	});
 
 	/*
@@ -146,24 +143,12 @@ module.exports = function(grunt) {
 				hostname : 'localhost',
 				livereload : 35729
 			},
-			proxies : [ {
-				context : '/', // the context of the data service
-				// wherever the data service is running
-				host : '<%= yeoman.pkg.backend.host %>',
-				// the port that the data service is running on
-				port : '<%= yeoman.pkg.backend.port %>',
-				changeOrigin : true,
-				headers : {
-					host : '<%= yeoman.pkg.backend.host %>'
-				}
-			} ],
 			livereload : {
 				options : {
 					open : true,
 					middleware : function(connect, options) {
 						var middlewares = [];
 						//Matches everything that does not contain a '.' (period)
-						middlewares.push(modRewrite([ '!/api/.*|^.*\\..*$ /index.html [L]' ]));
 						middlewares.push(connect.static('.tmp'));
 						middlewares.push(
 							connect()
@@ -179,10 +164,6 @@ module.exports = function(grunt) {
 						if (!Array.isArray(options.base)) {
 							options.base = [ options.base ];
 						}
-
-						// Setup the proxy
-						middlewares
-							.push(require('grunt-connect-proxy/lib/utils').proxyRequest);
 
 						// Serve static files
 						options.base.forEach(function(base) {
@@ -661,8 +642,6 @@ module.exports = function(grunt) {
 		function(target) {
 			if (target === 'dist') {
 				return grunt.task.run([ 'build', //
-					// added just before connect
-					'configureProxies:server', //
 					'connect:dist:keepalive' //
 				]);
 			}
@@ -673,7 +652,6 @@ module.exports = function(grunt) {
 				'injector', //
 				'concurrent:server', //
 				'postcss:server', //
-				'configureProxies:server', // added just before connect
 				'connect:livereload', //
 				'watch' //
 			]);
