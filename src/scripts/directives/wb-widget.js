@@ -47,12 +47,7 @@ angular.module('am-wb-core')
 		
 		// set wbGroup
 		var group = $ctrls[1];
-		if(group) {
-			$scope.group = group;
-			$ctrls[0].isSelected = function(){
-				return group.isChildSelected($ctrls[0]);
-			}
-		}
+		$scope.group = group;
 	}
 
 	/**
@@ -94,20 +89,19 @@ angular.module('am-wb-core')
 		}
 
 		ctrl.getParent = function(){
-			return $scope.parentCtrl;
+			return $scope.group;
 		}
 
 		ctrl.isEditable = function(){
-			return  $scope.group && $scope.group.isEditable();
+			return  $scope.group.isEditable();
 		}
 
 		ctrl.isSelected = function(){
-			return $scope.selected;
+			return $scope.group.isChildSelected(ctrl);
 		}
 
 		ctrl.setSelected = function(flag) {
-			$scope.selected = flag;
-			if(flag && $scope.group) {
+			if(flag) {
 				$scope.group.childSelected(this);
 			}
 		}
@@ -144,6 +138,6 @@ angular.module('am-wb-core')
 		link : postLink,
 		controller : wbWidgetCtrl,
 		controllerAs: 'ctrl',
-		require:['wbWidget', '?^^wbGroup', 'ngModel']
+		require:['wbWidget', '^^wbGroup', 'ngModel']
 	};
 });

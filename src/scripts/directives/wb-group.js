@@ -66,7 +66,7 @@ angular.module('am-wb-core')
 			var compilesJob = [];
 			var elements = [];
 			model.contents.forEach(function(item, index) {
-				compilesJob.push($widget.compile(item, $scope)//
+				compilesJob.push($widget.compile(item, $scope, $element)//
 						.then(function(element) {
 							$mdTheming(element);
 							elements[index] = element;
@@ -114,14 +114,6 @@ angular.module('am-wb-core')
 				}
 			});
 			$scope.root = true;
-		} else {
-			// Get from parent
-			ctrl.isEditable = wbGroupCtrl.isEditable;
-			ctrl.childSelected = wbGroupCtrl.childSelected;
-			ctrl.isChildSelected = wbGroupCtrl.isChildSelected;
-			ctrl.isSelected = function(){
-				return wbGroupCtrl.isChildSelected(ctrl);
-			}
 		}
 
 		$scope.dropCallback = function(index, item, external, type){
@@ -157,7 +149,7 @@ angular.module('am-wb-core')
 				}
 			}
 		}
-
+		
 		/**
 		 * Delete data model and widget display
 		 * 
@@ -195,10 +187,13 @@ angular.module('am-wb-core')
 		}
 
 		ctrl.isRoot = function(){
-			return $scope.root;
+			return !$scope.parentCtrl;
 		}
 
 		ctrl.isEditable = function(){
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.isEditable();
+			}
 			return $scope.editable;
 		}
 
@@ -207,8 +202,11 @@ angular.module('am-wb-core')
 		}
 
 		ctrl.setSelected = function(flag) {
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.childSelected(ctrl);
+			}
 			if(flag) {
-				this.childSelected(this);
+				ctrl.childSelected(ctrl);
 			}
 		}
 
@@ -316,7 +314,6 @@ angular.module('am-wb-core')
 		templateUrl : 'views/directives/wb-group.html',
 		restrict : 'E',
 		replace : true,
-		transclude : false,
 		scope : {
 			wbEditable : '=?',
 			wbOnModelSelect : '@?',

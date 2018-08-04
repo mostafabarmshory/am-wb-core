@@ -1252,7 +1252,7 @@ angular.module('am-wb-core')
 			var compilesJob = [];
 			var elements = [];
 			model.contents.forEach(function(item, index) {
-				compilesJob.push($widget.compile(item, $scope)//
+				compilesJob.push($widget.compile(item, $scope, $element)//
 						.then(function(element) {
 							$mdTheming(element);
 							elements[index] = element;
@@ -1300,14 +1300,6 @@ angular.module('am-wb-core')
 				}
 			});
 			$scope.root = true;
-		} else {
-			// Get from parent
-			ctrl.isEditable = wbGroupCtrl.isEditable;
-			ctrl.childSelected = wbGroupCtrl.childSelected;
-			ctrl.isChildSelected = wbGroupCtrl.isChildSelected;
-			ctrl.isSelected = function(){
-				return wbGroupCtrl.isChildSelected(ctrl);
-			}
 		}
 
 		$scope.dropCallback = function(index, item, external, type){
@@ -1343,7 +1335,7 @@ angular.module('am-wb-core')
 				}
 			}
 		}
-
+		
 		/**
 		 * Delete data model and widget display
 		 * 
@@ -1381,10 +1373,13 @@ angular.module('am-wb-core')
 		}
 
 		ctrl.isRoot = function(){
-			return $scope.root;
+			return !$scope.parentCtrl;
 		}
 
 		ctrl.isEditable = function(){
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.isEditable();
+			}
 			return $scope.editable;
 		}
 
@@ -1393,8 +1388,11 @@ angular.module('am-wb-core')
 		}
 
 		ctrl.setSelected = function(flag) {
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.childSelected(ctrl);
+			}
 			if(flag) {
-				this.childSelected(this);
+				ctrl.childSelected(ctrl);
 			}
 		}
 
@@ -1502,7 +1500,6 @@ angular.module('am-wb-core')
 		templateUrl : 'views/directives/wb-group.html',
 		restrict : 'E',
 		replace : true,
-		transclude : false,
 		scope : {
 			wbEditable : '=?',
 			wbOnModelSelect : '@?',
@@ -2898,12 +2895,7 @@ angular.module('am-wb-core')
 		
 		// set wbGroup
 		var group = $ctrls[1];
-		if(group) {
-			$scope.group = group;
-			$ctrls[0].isSelected = function(){
-				return group.isChildSelected($ctrls[0]);
-			}
-		}
+		$scope.group = group;
 	}
 
 	/**
@@ -2945,20 +2937,19 @@ angular.module('am-wb-core')
 		}
 
 		ctrl.getParent = function(){
-			return $scope.parentCtrl;
+			return $scope.group;
 		}
 
 		ctrl.isEditable = function(){
-			return  $scope.group && $scope.group.isEditable();
+			return  $scope.group.isEditable();
 		}
 
 		ctrl.isSelected = function(){
-			return $scope.selected;
+			return $scope.group.isChildSelected(ctrl);
 		}
 
 		ctrl.setSelected = function(flag) {
-			$scope.selected = flag;
-			if(flag && $scope.group) {
+			if(flag) {
 				$scope.group.childSelected(this);
 			}
 		}
@@ -2995,7 +2986,7 @@ angular.module('am-wb-core')
 		link : postLink,
 		controller : wbWidgetCtrl,
 		controllerAs: 'ctrl',
-		require:['wbWidget', '?^^wbGroup', 'ngModel']
+		require:['wbWidget', '^^wbGroup', 'ngModel']
 	};
 });
 /* 
@@ -4824,7 +4815,7 @@ angular.module('am-wb-core')
 	 * @param parenScope
 	 * @return promise A promise that resolve created element
 	 */
-	function compile(model, parenScope){
+	function compile(model, parenScope, parentElement){
 		var widget = _widget(model);
 		var childScope = null;
 		var element = null;
@@ -4840,7 +4831,9 @@ angular.module('am-wb-core')
 				template = '<wb-widget ng-model="wbModel">' + template + '</wb-widget>';
 			}
 			element = angular.element(template);
-
+			if(parentElement) {
+				parentElement.append(element);
+			}
 			// 3- bind controller
 			var link = $compile(element);
 			if (angular.isDefined(widget.controller)) {
