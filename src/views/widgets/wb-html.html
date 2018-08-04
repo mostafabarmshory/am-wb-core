@@ -5,8 +5,9 @@
 
  -->
 <div
-	ng-hide="isSelected()"
-    ng-bind-html="wbModel.text | wbunsafe">
+	ng-if="!ctrl.isSelected()"
+    ng-bind-html="wbModel.text | wbunsafe"
+	class="wb-widget-fill">
 </div>
 <div
 	ui-tinymce="{
@@ -22,7 +23,7 @@
 		imagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'
 	}"
 	ng-model="wbModel.text"
-	ng-show="isSelected()"
-	ng-if="wbEditable"
-	flex>
+	ng-show="ctrl.isSelected()"
+	ng-if="ctrl.isEditable()"
+	class="wb-widget-fill">
 </div>

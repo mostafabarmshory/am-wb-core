@@ -1,92 +1,34 @@
-<div 
-	dnd-disable-if="!wbEditable"
+<div
+	class="wb-group"
+	dir="{{wbModel.direction || wbModel.style.dir}}"
+	name="{{wbModel.name}}"
+	id="{{wbModel.id}}"
+	
+	dnd-disable-if="!ctrl.isEditable()"
+	
 	dnd-draggable="wbModel"
-	dnd-type="'wb.widget'"
-	dnd-moved="remove()"
+	dnd-effect-allowed="copyMove"
+	dnd-type="'Group'"
+	dnd-moved="ctrl.delete()"
+
+	dnd-list="wbModel.contents"
+	dnd-allowed-types="ctrl.getAllowedTypes()"
+	dnd-external-sources="true"
+	dnd-drop="dropCallback(index, item, external, type)"
+	dnd-horizontal-list="wbModel.style.layout.direction==='row'"
+	
 	wb-size="wbModel.style"
+	wb-layout="wbModel.style"
+	wb-align="wbModel.style"
 	wb-margin="wbModel.style"
+	wb-padding="wbModel.style"
 	wb-background="wbModel.style"
 	wb-border="wbModel.style"
-	ng-class="{'wb-panel wb-widget-edit': wbEditable}"
-	name="{{wbModel.name}}"
-	md-theme-watch="true">
-    <!-- a header is added through edit-mode -->
-    <div 
-    	ng-if="wbEditable" 
-    	class="wb-panel-header" 
-    	layout="row">
-        <span translate> {{wbModel.name}}</span>
-        <span flex></span>
-        
-		<!-- Direction setting -->
-        <md-button
-        	ng-disabled="wbModel.direction!='rtl'"
-            ng-click="wbModel.direction='ltr'"
-            class="md-icon-button md-mini">
-  			<md-tooltip>
-  				<span translate>Left to right direction</span>
-  			</md-tooltip>
-            <wb-icon class="wb-icon-mini">format_textdirection_l_to_r</wb-icon>
-        </md-button>
-        <md-button
-        	ng-disabled="wbModel.direction=='rtl'"
-            ng-click="wbModel.direction='rtl'"
-            class="md-icon-button md-mini">
-  			<md-tooltip>
-  				<span translate>Right to left direction</span>
-  			</md-tooltip>
-            <wb-icon class="wb-icon-mini">format_textdirection_r_to_l</wb-icon>
-        </md-button>
-        <md-divider></md-divider>
-        
-		<md-button 
-			ng-click="clone()"
-			 class="md-icon-button md-mini">
-  			<md-tooltip>
-  				<span translate>Clone current group</span>
-  			</md-tooltip>
-			<wb-icon class="mde-icon-mini">content_copy</wb-icon> 
-		</md-button>
-        <md-button
-            ng-click="settings()"
-            class="md-icon-button md-mini">
-  			<md-tooltip>
-  				<span translate>Load settings</span>
-  			</md-tooltip>
-            <wb-icon class="wb-icon-mini">settings</wb-icon>
-        </md-button>
-        <md-button
-            class="md-icon-button md-mini"
-            ng-mouseenter="ctrl.setHoverDelBtn(true)"
-            ng-mouseleave="ctrl.setHoverDelBtn(false)"
-            ng-click="remove()">
-  			<md-tooltip>
-  				<span translate>Remove current group</span>
-  			</md-tooltip>
-            <wb-icon class="wb-icon-mini">delete</wb-icon>{{_hoveringDelBtn}}
-        </md-button>
-    </div>
-
-    <!-- body section (in non-edit mode, this area just shown -->
-    <div 
-    	class="wb-panel-body" 
-    	id="wb-content-body">
-<!--         <div  -->
-<!-- 	        ng-if="wbEditable&&hoveringDelBtn"  -->
-<!-- 	        class="wb-panel-overlay"> -->
-<!-- 	    </div> -->
-        <!-- Children are added in this part -->
-        <div 
-            id="wb-content-placeholder"
-            ng-class="{'wb-panel-overlay': ctrl.isHoverDelBtn()}"
-        	class="wb-panel-container"
-        	dir="{{wbModel.direction}}"
-            wb-layout="wbModel.style"
-			wb-padding="wbModel.style"
-			dnd-external-sources="true"
-            dnd-list="wbModel.contents"
-    		dnd-allowed-types="getAllowedTypes()"
-    		dnd-drop="dropCallback(event, index, item, external, type)">
-        </div>
-    </div>
-</div>
+	wb-events="wbModel.event"
+	
+	ng-class="{
+		'wb-group-root': ctrl.isRoot(),
+		'wb-group-edit': ctrl.isEditable(),
+		'wb-group-select': ctrl.isSelected()
+	}"
+	md-theme-watch="true"></div>

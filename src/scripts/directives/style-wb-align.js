@@ -25,12 +25,59 @@
 
 angular.module('am-wb-core')
 /**
- * @ngdoc function
- * @name WbResourceCtrl
- * @description # WbResourceCtrl Controller of the am-wb-core
+ * @ngdoc Directives
+ * @name wb-align
+ * @description Apply layout align into an element
+ * 
  */
-.controller('WbResourceUrlCtrl', function($scope) {
-	$scope.$watch('value', function(value) {
-		$scope.$parent.setValue(value);
-	});
+.directive("wbAlign", function() {
+	var classPrefix = 'wb-flex-item-';
+	
+	function removeLayout(element, config) {
+		element.removeClass(classPrefix + config.align);
+	}
+
+	/**
+	 * Adds layout config into the element
+	 * 
+	 * @param element
+	 * @param config
+	 * @returns
+	 */
+	function addLayout(element, config) {
+		element.addClass(classPrefix + config.align);
+	}
+
+	/**
+	 * Link view with attributes
+	 * 
+	 * 
+	 * @param scope
+	 * @param element
+	 * @param attrs
+	 * @returns
+	 */
+	function postLink($scope, $element, $attrs) {
+		// Watch for layout
+		$scope.$watch($attrs.wbLayout+'.align', function(newValue, oldValue) {
+			if(newValue===oldValue){
+				return;
+			}
+			if (oldValue) {
+				removeLayout($element, oldValue);
+			}
+			if (newValue) {
+				addLayout($element, newValue);
+			}
+		}, true);
+	}
+
+	/*
+	 * Directive
+	 */
+	return {
+		restrict : 'A',
+		link : postLink,
+		require:[]
+	};
 });

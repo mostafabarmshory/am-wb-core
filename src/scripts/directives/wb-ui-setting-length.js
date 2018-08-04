@@ -38,6 +38,7 @@ angular.module('am-wb-core')
 	return {
 	    templateUrl : 'views/directives/wb-ui-setting-length.html',
 	    restrict : 'E',
+	    replace: true,
 	    scope : {
 	        title : '@?',
 	        value : '=?',

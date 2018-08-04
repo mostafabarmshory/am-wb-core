@@ -1,1 +1,17 @@
-{}
+{
+	"type": "Group",
+	"name": "Group main",
+	"comment": "This is an emplty group",
+	"style": {
+		"border": {},
+		"padding": {},
+		"margin": {},
+		"layout": {}
+	},
+	"event": {
+		"on-click":{},
+		"on-mouse-enter":{},
+		"on-mouse-exit":{}
+	},
+	"contents": []
+}

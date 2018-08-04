@@ -1,4 +1,4 @@
-/* 
+ /* 
  * The MIT License (MIT)
  * 
  * Copyright (c) 2016 weburger
@@ -25,55 +25,36 @@
 
 angular.module('am-wb-core')
 /**
- * @ngdoc function
- * @name WbBorderSettingCtrl
- * @description # WbBorderSettingCtrl Controller of the am-wb-core
+ * @ngdoc Directives
+ * @name wb-events
+ * @description Applies events to the current element
+ * 
+ * If there is an event section in the data model, then this directive parses
+ * and applies to the current element.
+ * 
+ * 	<div
+ * 		wb-events="events">
+ * 	</div>
  */
-.controller(
-	'WbBorderSettingCtrl',
-	function($scope) {
-	    var scope = $scope;
-	    if (!$scope.wbModel.style) {
-		$scope.wbModel.style = {
+.directive("wbEvents", function() {
+	function postLink($scope, $element, $attrs, $ctrls) {
+		// load ctrl
+		var ctrl = $ctrls[0] || $ctrls[1];
 
-		};
-	    }
-	    if (!$scope.wbModel.style.borderColor) {
-		$scope.wbModel.style.borderColor = {
-		    bottom : 'none'
-		};
-	    }
-	    if ($scope.wbModel.style.borderColor.bottom == null
-		    || $scope.wbModel.style.borderColor.bottom == undefined) {
-		$scope.wbModel.style.borderColor.bottom = 'none';
-	    }
-
-	    scope.styles = [ {
-		title : 'No Border',
-		value : 'none'
-	    }, {
-		title : 'Solid',
-		value : 'solid'
-	    }, {
-		title : 'Dotted',
-		value : 'dotted'
-	    }, {
-		title : 'Dashed',
-		value : 'dashed'
-	    }, {
-		title : 'Double',
-		value : 'double'
-	    }, {
-		title : 'Groove',
-		value : 'groove'
-	    }, {
-		title : 'Ridge',
-		value : 'ridge'
-	    }, {
-		title : 'Inset',
-		value : 'inset'
-	    }, {
-		title : 'Outset',
-		value : 'outset'
-	    } ];
-	});
+		$element.on('click', function (event) {
+			// Check edit mode
+			if(ctrl && ctrl.isEditable()){
+				ctrl.setSelected(true);
+				event.stopPropagation();
+				$scope.$apply();
+				return;
+			}
+			// TODO: maso, 2018: do actions
+		});
+	}
+	return {
+	    restrict : 'A',
+	    link : postLink,
+		require:['?wbWidget', '?wbGroup']
+	};
+});

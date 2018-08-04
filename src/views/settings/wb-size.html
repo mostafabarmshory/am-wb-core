@@ -5,42 +5,39 @@ Set size for widgets size
 @author mgh.
 @author maso<mostafa.barmshory@dpq.co.ir>
 -->
-<md-list class="wb-setting-panel">
+<wb-ui-setting-length
+	title="Width" 
+	value="wbModel.style.size.width">
+</wb-ui-setting-length>
+<wb-ui-setting-length
+	title="Height" 
+	value="wbModel.style.size.height">
+</wb-ui-setting-length>
 
-    <wb-ui-setting-length
-    	title="Width" 
-    	value="wbModel.style.width">
-    </wb-ui-setting-length>
-    <wb-ui-setting-length
-    	title="Height" 
-    	value="wbModel.style.height">
-    </wb-ui-setting-length>
+<!-- SECTION: Min -->
+<md-subheader 
+	class="md-no-sticky">
+	<span translate="">Min</span>
+</md-subheader>
+<wb-ui-setting-length
+	title="Min width" 
+	value="wbModel.style.size['min-width']">
+</wb-ui-setting-length>
+<wb-ui-setting-length
+	title="Min height" 
+	value="wbModel.style.size['min-height']">
+</wb-ui-setting-length>
 
-    <!-- SECTION: Min -->
-    <md-subheader 
-    	class="md-no-sticky">
-    	<span translate="">Min</span>
-    </md-subheader>
-    <wb-ui-setting-length
-    	title="Min width" 
-    	value="wbModel.style.minWidth">
-    </wb-ui-setting-length>
-    <wb-ui-setting-length
-    	title="Min height" 
-    	value="wbModel.style.minHeight">
-    </wb-ui-setting-length>
-
-    <!-- SECTION: Max -->
-    <md-subheader 
-    	class="md-no-sticky">
-    	<span translate="">Max</span>
-    </md-subheader>
-    <wb-ui-setting-length
-    	title="Max width" 
-    	value="wbModel.style.maxWidth">
-    </wb-ui-setting-length>
-    <wb-ui-setting-length
-    	title="Max height" 
-    	value="wbModel.style.maxHeight">
-    </wb-ui-setting-length>
-</md-list>
+<!-- SECTION: Max -->
+<md-subheader 
+	class="md-no-sticky">
+	<span translate="">Max</span>
+</md-subheader>
+<wb-ui-setting-length
+	title="Max width" 
+	value="wbModel.style.size['max-width']">
+</wb-ui-setting-length>
+<wb-ui-setting-length
+	title="Max height" 
+	value="wbModel.style.size['max-height']">
+</wb-ui-setting-length>

@@ -9,32 +9,30 @@ these attributes. Here is list of attributes:
 
 These attributes are usefull in SEO.
 -->
-<div 
-	layout="column"
-	style="width:100%">
-	<md-input-container>
-	  <label translate>Lable</label>
-	  <input 
-	  	type="text" 
-	  	ng-model="wbModel.label">
-	</md-input-container>
-	<md-input-container>
-	  <label translate>Description</label>
-	  <input 
-	  	type="text" 
-	  	ng-model="wbModel.description">
-	</md-input-container>
-	<md-input-container>
-	  <label translate>Keywords</label>
-	  <input 
-	  	type="text" 
-	  	ng-model="wbModel.keywords">
-	</md-input-container>
+<md-input-container>
+  <label translate>Lable</label>
+  <input 
+  	type="text" 
+  	ng-model="wbModel.label">
+</md-input-container>
+
+<md-input-container>
+  <label translate>Description</label>
+  <input 
+  	type="text" 
+  	ng-model="wbModel.description">
+</md-input-container>
+
+<md-input-container>
+  <label translate>Keywords</label>
+  <input 
+  	type="text" 
+  	ng-model="wbModel.keywords">
+</md-input-container>
+
+
+<wb-ui-setting-image
+	title="{{Cover | translate}}" 
+	ng-model="wbModel.cover">
+</wb-ui-setting-image>
 	
-	
-    <wb-ui-setting-image
-    	title="Cover" 
-        value="wbModel.cover">
-	</wb-ui-setting-image>
-	
-</div>

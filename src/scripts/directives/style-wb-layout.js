@@ -25,18 +25,19 @@
 
 angular.module('am-wb-core')
 /**
- * Apply layout into an element
+ * @ngdoc Directives
+ * @name wb-layout
+ * @description Apply layout into an element
  * 
  * Group and page are the main goles of this directive. By adding the wbLayout,
  * widget are able to manages it layout automatically.
  * 
  * Note that, in smal screen devices, the colume layout apply as default.
- * 
- * @ngdoc directive
- * @memberof am-wb-core
- * @description Apply layout into an element
  */
 .directive("wbLayout", function() {
+	var classDirectionPrefix = 'wb-flex-';
+	var classJustifyPrefix = 'wb-flex-justify-content-';
+	var classAlignPrefix = 'wb-flex-align-items-';
 	/*
 	 * FIXME: maso, 2017: replace class with term
 	 * 
@@ -45,17 +46,16 @@ angular.module('am-wb-core')
 	 * as soon as posible.
 	 */
 	/**
-	 * Remove layout config from element
+	 * Remove layout configuration from element
 	 * 
 	 * @param element
 	 * @param config
 	 * @returns
 	 */
 	function removeLayout(element, config) {
-		// Remove old class
-		element.removeClass(config.flexDirection);
-		element.removeClass(config.justifyContent);
-		element.removeClass(config.alignItems);
+		element.removeClass(classDirectionPrefix + config.direction);
+		element.removeClass(classJustifyPrefix + config.justify);
+		element.removeClass(classAlignPrefix + config.align);
 	}
 
 	/**
@@ -66,10 +66,9 @@ angular.module('am-wb-core')
 	 * @returns
 	 */
 	function addLayout(element, config) {
-		// Add new class
-		element.addClass(config.flexDirection);
-		element.addClass(config.justifyContent);
-		element.addClass(config.alignItems);
+		element.addClass(classDirectionPrefix + config.direction);
+		element.addClass(classJustifyPrefix + config.justify);
+		element.addClass(classAlignPrefix + config.align);
 	}
 
 	/**
@@ -81,13 +80,17 @@ angular.module('am-wb-core')
 	 * @param attrs
 	 * @returns
 	 */
-	function postLink(scope, element, attrs) {
-		return scope.$watch(attrs.wbLayout, function(newValue, oldValue) {
+	function postLink($scope, $element, $attrs) {
+		// Watch for layout
+		$scope.$watch($attrs.wbLayout+'.layout', function(newValue, oldValue) {
+//			if(newValue===oldValue){
+//				return;
+//			}
 			if (oldValue) {
-				removeLayout(element, oldValue);
+				removeLayout($element, oldValue);
 			}
 			if (newValue) {
-				addLayout(element, newValue);
+				addLayout($element, newValue);
 			}
 		}, true);
 	}
@@ -97,6 +100,7 @@ angular.module('am-wb-core')
 	 */
 	return {
 		restrict : 'A',
-		link : postLink
+		link : postLink,
+		require:[]
 	};
 });

@@ -11,9 +11,6 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
  * child element with dndPlaceholder class.
  */
 .dndPlaceholder {
-	/*
-	background: red;
-    */
 	list-style: none;
 	min-width: 36px;
 	min-height: 36px;
@@ -48,5 +45,5 @@ See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
  * position, and not the "element" that the user is dragging with his mouse pointer
  */
 .dndDraggingSource {
-    display: none;
+    /* display: none; */
 }

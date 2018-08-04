@@ -34,7 +34,15 @@ angular.module('am-wb-core')
 		icon: 'link',
 		label : 'URL',
 		templateUrl : 'views/resources/wb-url.html',
-		controller : 'WbResourceUrlCtrl',
+		/*
+		 * @ngInject
+		 */
+		controller : function($scope) {
+			$scope.$watch('value', function(value) {
+				$scope.$parent.setValue(value);
+			});
+		},
+		controllerAs: 'ctrl',
 		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url']
 	});
 	$resource.newPage({
@@ -42,7 +50,22 @@ angular.module('am-wb-core')
 		icon : 'border_all',
 		label : 'Sheet',
 		templateUrl : 'views/resources/wb-sheet.html',
-		controller : 'WbResourceDataCtrl',
+		/*
+		 * @ngInject
+		 */
+		controller : function($scope) {
+			$scope.$watch('value', function(value) {
+				if (angular.isDefined(value)) {
+					$scope.$parent.setValue(value);
+				} else {
+					$scope.$parent.setValue({
+						'key' : 'value',
+						'values' : [ [ 1, 2 ], [ 1, 2 ] ]
+					});
+				}
+			}, true);
+		},
+		controllerAs: 'ctrl',
 		tags : [ 'data' ]
 	});
 });

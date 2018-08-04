@@ -26,7 +26,7 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc service
+ * @ngdoc Services
  * @name $widget
  * @memberof am-wb-core
  * @description مدیریت ویجت‌های سیستم
@@ -34,6 +34,7 @@ angular.module('am-wb-core')
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$widget', function(
+		$wbUtil,
 		$q, $sce, $templateRequest, $compile, $controller, $rootScope,
 		$timeout, $mdDialog) {
 
@@ -92,8 +93,9 @@ angular.module('am-wb-core')
 	 * 
 	 * NotFoundElement widget is returned if the widget type is not found.
 	 * 
-	 * @param model
-	 * @returns
+	 * @memberof $widget
+	 * @param model to find a widget
+	 * @returns promise to find a widget
 	 */
 	function widget(model) {
 		return $q.when(_widget(model));
@@ -102,7 +104,8 @@ angular.module('am-wb-core')
 	/**
 	 * Returns list of all registerd widgets.
 	 * 
-	 * @returns
+	 * @memberof $widget
+	 * @returns promise to load all widgets
 	 */
 	function widgets() {
 		var widgets = {};
@@ -131,9 +134,9 @@ angular.module('am-wb-core')
 	 * 
 	 *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
 	 * 
-	 * @param type
-	 * @param model
-	 * @returns
+	 * @memberof $widget
+	 * @param widget to add
+	 * @return the service
 	 */
 	function newWidget(widget) {
 		if (widget.type in contentElementAsso) {
@@ -147,50 +150,40 @@ angular.module('am-wb-core')
 		
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);
+		return this;
 	}
 
 	/**
-	 * Selects a widgetd
+	 * Compile element 
 	 * 
-	 * This is an utility method to help a user to select a widget.
-	 * 
-	 * @param locals
-	 * @returns
+	 * @name show
+	 * @memberof $wbFloat
+	 * @param optionsOrPreset
+	 *            {object}
+	 *            <ul>
+	 *            <li>templateUrl - {string=}: The URL of a template that will
+	 *            be used as the content of the dialog.</li>
+	 *            <li>template- {string=}: HTML template to show in the dialog.
+	 *            This must be trusted HTML with respect to Angular's $sce
+	 *            service. This template should never be constructed with any
+	 *            kind of user input or user data.</li>
+	 *            <li>contentElement:</li>
+	 *            <li>scope - {object=}: the scope to link the template
+	 *            controller to. If none is specified, it will create a new
+	 *            isolate scope. This scope will be destroyed when the dialog is
+	 *            removed unless preserveScope is set to true.</li>
+	 *            <li>controller - {function|string=}: The controller to
+	 *            associate with the dialog. The controller will be injected
+	 *            with the local $mdDialog, which passes along a scope for the
+	 *            dialog.</li>
+	 *            <li>controllerAs - {string=}: An alias to assign the
+	 *            controller to on the scope.</li>
+	 *            <li>parent - {element=}: The element to append the dialog to.
+	 *            Defaults to appending to the root element of the application.</li>
+	 *            </ul>
+	 * @param parenScope
+	 * @return promise A promise that resolve created element
 	 */
-	function select(locals) {
-		// TODO: maso, 1394: just prepare data for view
-		return $mdDialog.show({
-			controller : 'WbDialogsCtrl',
-			templateUrl : 'views/dialogs/wb-selectwidget.html',
-			parent : angular.element(document.body),
-			clickOutsideToClose : true,
-			fullscreen : true,
-			locals : locals,
-		});
-	}
-
-
-	/*
-	 * get setting page template
-	 */
-	function getTemplateFor(widget) {
-		var template, templateUrl;
-		if (angular.isDefined(template = widget.template)) {
-			if (angular.isFunction(template)) {
-				template = template(widget.params);
-			}
-		} else if (angular.isDefined(templateUrl = widget.templateUrl)) {
-			if (angular.isFunction(templateUrl)) {
-				templateUrl = templateUrl(widget.params);
-			}
-			if (angular.isDefined(templateUrl)) {
-				widget.loadedTemplateUrl = $sce.valueOf(templateUrl);
-				template = $templateRequest(templateUrl);
-			}
-		}
-		return $q.when(template);
-	}
-
 	function compile(model, parenScope){
 		var widget = _widget(model);
 		var childScope = null;
@@ -201,10 +194,10 @@ angular.module('am-wb-core')
 		childScope.wbModel = model;
 
 		// 2- create element
-		return $q.when(getTemplateFor(widget))//
+		return $q.when($wbUtil.getTemplateFor(widget))//
 		.then(function(template) {
 			if (model.type != 'Group') {
-				template = '<wb-widget>' + template + '</wb-widget>';
+				template = '<wb-widget ng-model="wbModel">' + template + '</wb-widget>';
 			}
 			element = angular.element(template);
 
@@ -230,13 +223,15 @@ angular.module('am-wb-core')
 	
 	/**
 	 * Creates new serialized data of widget
+	 * 
+	 * @memberof $wbFloat
 	 * @param widget
 	 * @returns
 	 */
 	function widgetData(widget){
 		return angular.copy(widget.model);
 	}
-
+	
 	// widgets
 	this.newWidget = newWidget;
 	this.widget = widget;
@@ -249,7 +244,5 @@ angular.module('am-wb-core')
 	this.newGroup = _newGroup;
 	
 	// utils
-	this.select = select;
-	this.getTemplateFor = getTemplateFor;
 	this.compile = compile;
 });
