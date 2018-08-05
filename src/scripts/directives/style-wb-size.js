@@ -157,6 +157,11 @@ angular.module('am-wb-core')
 			if(isRoot() || !size || lock){
 				return;
 			}
+//			$element.css({
+//				'width': size.width || 'auto',
+//				'hieght': size.hieght || 'auto',
+//				'hieght': size.hieght || 'auto',
+//			})
 			$element.css(size);
 			if(optionButton){
 				bindToElement(getBound());

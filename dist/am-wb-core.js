@@ -965,6 +965,11 @@ angular.module('am-wb-core')
 			if(isRoot() || !size || lock){
 				return;
 			}
+//			$element.css({
+//				'width': size.width || 'auto',
+//				'hieght': size.hieght || 'auto',
+//				'hieght': size.hieght || 'auto',
+//			})
 			$element.css(size);
 			if(optionButton){
 				bindToElement(getBound());
@@ -1150,7 +1155,7 @@ angular.module('am-wb-core')
 
 
 		// Watch size
-		var watchSize = $scope.$watch($attrs.wbSize+'.size', function(size) {
+		var watchSize = $scope.$watch($attrs.wbWidgetSize+'.size', function(size) {
 			if(!size || lock){
 				return;
 			}
@@ -1397,10 +1402,16 @@ angular.module('am-wb-core')
 		}
 
 		ctrl.isChildSelected = function(ctrl){
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.isChildSelected(ctrl);
+			}
 			return ctrl === $scope.lastSelectedItem;
 		}
 
 		ctrl.childSelected = function(ctrl) {
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.childSelected(ctrl);
+			}
 			if(ctrl === $scope.lastSelectedItem) {
 				return;
 			}

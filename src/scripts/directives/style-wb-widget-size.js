@@ -150,7 +150,7 @@ angular.module('am-wb-core')
 
 
 		// Watch size
-		var watchSize = $scope.$watch($attrs.wbSize+'.size', function(size) {
+		var watchSize = $scope.$watch($attrs.wbWidgetSize+'.size', function(size) {
 			if(!size || lock){
 				return;
 			}

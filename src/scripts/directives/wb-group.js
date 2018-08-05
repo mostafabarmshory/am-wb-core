@@ -211,10 +211,16 @@ angular.module('am-wb-core')
 		}
 
 		ctrl.isChildSelected = function(ctrl){
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.isChildSelected(ctrl);
+			}
 			return ctrl === $scope.lastSelectedItem;
 		}
 
 		ctrl.childSelected = function(ctrl) {
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.childSelected(ctrl);
+			}
 			if(ctrl === $scope.lastSelectedItem) {
 				return;
 			}
