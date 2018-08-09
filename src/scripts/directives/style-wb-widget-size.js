@@ -27,7 +27,7 @@ angular.module('am-wb-core')
 /**
  * @description Apply margin into the element
  */
-.directive("wbSize", function($q, $wbUtil, $rootElement, $document, $compile, $mdPanel) {
+.directive("wbWidgetSize", function($q, $wbUtil, $rootElement, $document, $compile, $mdPanel) {
 
 	function postLink($scope, $element, $attrs, $ctrls){
 		var button;
@@ -38,15 +38,12 @@ angular.module('am-wb-core')
 
 		// main ctrl
 		var ctrl = $ctrls[0];
-		function isRoot(){
-			return ctrl.isRoot();
-		}
 		ctrl.on('delete', distroy);
 
 		function distroy(){
 			watchSize();
 			watchSelection();
-			
+
 			if(button){
 				button.remove();
 			}
@@ -54,7 +51,7 @@ angular.module('am-wb-core')
 				optionButton.remove();
 			}
 		}
-		
+
 		function mousemove($event) {
 			var deltaWidth = dimension.width - (position.x - $event.clientX);
 			var deltaHeight = dimension.height - (position.y - $event.clientY);
@@ -153,15 +150,10 @@ angular.module('am-wb-core')
 
 
 		// Watch size
-		var watchSize = $scope.$watch($attrs.wbSize+'.size', function(size) {
-			if(isRoot() || !size || lock){
+		var watchSize = $scope.$watch($attrs.wbWidgetSize+'.size', function(size) {
+			if(!size || lock){
 				return;
 			}
-//			$element.css({
-//				'width': size.width || 'auto',
-//				'hieght': size.hieght || 'auto',
-//				'hieght': size.hieght || 'auto',
-//			})
 			$element.css(size);
 			if(optionButton){
 				bindToElement(getBound());
@@ -174,9 +166,7 @@ angular.module('am-wb-core')
 			if(value){
 				checkButton()
 				.then(function(){
-					if(!isRoot()){
-						button.css('visibility', 'visible');
-					}
+					button.css('visibility', 'visible');
 					optionButton.css('visibility', 'visible');
 				});
 			} else {
@@ -191,7 +181,6 @@ angular.module('am-wb-core')
 	return {
 		restrict : 'A',
 		link : postLink,
-		priority: 1,
-		require:['^wbGroup']
+		require:['^wbWidget']
 	};
 });

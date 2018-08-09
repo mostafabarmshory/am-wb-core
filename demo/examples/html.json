@@ -1,61 +1,42 @@
 {
 	"type": "Group",
-	"style": {
-		"border": {},
-		"padding": {},
-		"margin": {},
-		"layout": {
-			"direction": "column",
-			"align": "stretch",
-			"justify": "start"
-		}
-	},
-	"event": {
-		"on-click":{},
-		"on-mouse-enter":{},
-		"on-mouse-exit":{}
-	},
+	"name": "Root",
 	"contents": [
 		{
 			"type": "HtmlText",
 			"name": "Widget",
-			"text": "<h2>HTML Text</h2>\n<p>Insert HTML text heare&nbsp;</p>\n<h2>HTML Text</h2>\n<p>Insert HTML text heare</p>",
-			"style": {},
-			"event": {}
-		},
-		{
-			"type": "HtmlText",
-			"name": "Widget",
-			"text": "<h2>HTML Text</h2>\n<p>Insert HTML text heareert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;</p>",
-			"style": {},
-			"event": {}
+			"text": "<h2>HTML Text 1</h2>"
 		},
 		{
 			"type": "Group",
 			"name": "Chile 1",
-			"style": {},
-			"event": {},
 			"contents": [
 				{
 					"type": "HtmlText",
 					"name": "Widget",
-					"text": "<h2>HTML Text</h2>\n<p>Insert HTML text hearsfasdf daf dsf adsf dsf ds fads fads fads fds fads fads f adsf sadf asf adsf s de</p>",
-					"style": {},
-					"event": {}
+					"text": "<h2>HTML Text 2</h2>"
 				},
 				{
-					"type": "HtmlText",
-					"name": "Widget",
-					"text": "<h2>HTML Text</h2>\n<p>Insert HTML text he and if you continue to type o adf df ads adsf asdf ads fads fads fads fads f ads fads fas f adsf ads fds fads f asdf adsf asd fs fas f sa fadsare</p>",
-					"style": {},
-					"event": {}
-				},
-				{
-					"type": "HtmlText",
-					"name": "Widget",
-					"text": "<h2>HTML Text</h2>\n<p>Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;Insert HTML text heare&nbsp;</p>",
-					"style": {},
-					"event": {}
+					"type": "Group",
+					"name": "Chile 2",
+					"contents": [
+						{
+							"type": "HtmlText",
+							"name": "Widget",
+							"text": "<h2>HTML Text 3</h2>"
+						},
+						{
+							"type": "Group",
+							"name": "Chile 3",
+							"contents": [
+								{
+									"type": "HtmlText",
+									"name": "Widget",
+									"text": "<h2>HTML Text 4</h2>"
+								}
+							]
+						}
+					]
 				}
 			]
 		}

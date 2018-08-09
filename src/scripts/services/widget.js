@@ -184,7 +184,7 @@ angular.module('am-wb-core')
 	 * @param parenScope
 	 * @return promise A promise that resolve created element
 	 */
-	function compile(model, parenScope){
+	function compile(model, parenScope, parentElement){
 		var widget = _widget(model);
 		var childScope = null;
 		var element = null;
@@ -200,7 +200,9 @@ angular.module('am-wb-core')
 				template = '<wb-widget ng-model="wbModel">' + template + '</wb-widget>';
 			}
 			element = angular.element(template);
-
+			if(parentElement) {
+				parentElement.append(element);
+			}
 			// 3- bind controller
 			var link = $compile(element);
 			if (angular.isDefined(widget.controller)) {

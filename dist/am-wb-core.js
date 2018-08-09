@@ -845,54 +845,216 @@ angular.module('am-wb-core')
 		var lock = false;
 
 		// main ctrl
-		var ctrl = $ctrls[0] || $ctrls[1];
+		var ctrl = $ctrls[0];
 		function isRoot(){
-			return $ctrls[1] && $ctrls[1].isRoot();
+			return ctrl.isRoot();
 		}
+		ctrl.on('delete', distroy);
 
-		function openOptions($event) {
-			var template ='' +
-			'<div class="menu-panel" md-whiteframe="4">' +
-			'  <div class="menu-content">' +
-			'    <div class="menu-item" ng-repeat="item in ctrl.items">' +
-			'      <button class="md-button">' +
-			'        <span>{{item}}</span>' +
-			'      </button>' +
-			'    </div>' +
-			'    <md-divider></md-divider>' +
-			'    <div class="menu-item">' +
-			'      <button class="md-button" ng-click="ctrl.closeMenu()">' +
-			'        <span>Close Menu</span>' +
-			'      </button>' +
-			'    </div>' +
-			'  </div>' +
-			'</div>';
-
-			var position = $mdPanel.newPanelPosition()
-			.relativeTo($event.target)
-			.addPanelPosition(
-					$mdPanel.xPosition.ALIGN_START,
-					$mdPanel.yPosition.BELOW
-			);
-
-			var config = {
-					id: 'toolbar_',
-					attachTo: $rootElement,
-					controller: function(){},
-					controllerAs: 'ctrl',
-					template: template,
-					position: position,
-					panelClass: 'menu-panel-container',
-					locals: {
-						items: []
-					},
-					openFrom: $event,
-					focusOnOpen: false,
-//					zIndex: 100,
-					propagateContainerEvents: true,
+		function distroy(){
+			watchSize();
+			watchSelection();
+			
+			if(button){
+				button.remove();
+			}
+			if(optionButton){
+				optionButton.remove();
+			}
+		}
+		
+		function mousemove($event) {
+			var deltaWidth = dimension.width - (position.x - $event.clientX);
+			var deltaHeight = dimension.height - (position.y - $event.clientY);
+			var newDimensions = {
+					width:  deltaWidth + 'px',
+					height: deltaHeight + 'px'
 			};
 
-			$mdPanel.open(config);
+			$element.css(newDimensions);
+			if($scope.wbModel){
+				$scope.wbModel.style.size.width = newDimensions.width;
+				$scope.wbModel.style.size.height = newDimensions.height;
+			}
+			bindToElement(getBound());
+			$scope.$apply();
+			return false;
+		}
+
+		function mouseup() {
+			$document.unbind('mousemove', mousemove);
+			$document.unbind('mouseup', mouseup);
+			lock = false;
+		}
+
+		function mousedown($event) {
+			$event.stopImmediatePropagation();
+			position.x = $event.clientX;
+			position.y = $event.clientY;
+			lock = true;
+			dimension.width = $element.prop('offsetWidth');
+			dimension.height = $element.prop('offsetHeight');
+			$document.bind('mousemove', mousemove);
+			$document.bind('mouseup', mouseup);
+			return false;
+		};
+
+		function getBound(){
+			var off = $element.offset();
+			var height = $element.innerHeight();
+			var width = $element.innerWidth();
+			return {
+				left: off.left,
+				top: off.top,
+				width: $element.innerWidth(),
+				height: $element.innerHeight()
+			}
+		}
+
+		function bindToElement(bound){
+			button.css('left', bound.left + bound.width - 15 + 'px');
+			button.css('top', bound.top + bound.height - 16 + 'px');
+
+			optionButton.css('left', bound.left + 'px');
+			optionButton.css('top', bound.top + 'px');
+		}
+
+		function checkButton(){
+			if(button) {
+				return $q.resolve();
+			}
+			button = angular.element('<span></span>');
+			$rootElement.append(button);
+			button.css({
+				width: '15px',
+				height: '15px',
+				position: 'absolute',
+				visibility: 'hidden',
+				cursor: 'nwse-resize'
+			});
+			button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
+			button.on('mousedown', mousedown);
+
+			var oj = $wbUtil.getTemplateFor({
+				templateUrl: 'views/partials/wb-widget-options.html'
+			}).then(function(template){
+				optionButton = angular.element(template);
+				$rootElement.append(optionButton);
+				optionButton.css({
+					position: 'absolute',
+					visibility: 'hidden',
+				});
+				$compile(optionButton)($scope);
+				bindToElement(getBound());
+			});
+
+			return $q.all([oj]).then(function(){
+				$scope.$watch(getBound, function (bound) {
+					if(!bound) {
+						return;
+					}
+					bindToElement(getBound());
+				}, true);
+
+			});
+		}
+
+
+		// Watch size
+		var watchSize = $scope.$watch($attrs.wbSize+'.size', function(size) {
+			if(isRoot() || !size || lock){
+				return;
+			}
+//			$element.css({
+//				'width': size.width || 'auto',
+//				'hieght': size.hieght || 'auto',
+//				'hieght': size.hieght || 'auto',
+//			})
+			$element.css(size);
+			if(optionButton){
+				bindToElement(getBound());
+			}
+		}, true);
+
+		var watchSelection = $scope.$watch(function(){
+			return ctrl.isSelected();
+		}, function(value){
+			if(value){
+				checkButton()
+				.then(function(){
+					if(!isRoot()){
+						button.css('visibility', 'visible');
+					}
+					optionButton.css('visibility', 'visible');
+				});
+			} else {
+				if(optionButton) {
+					button.css('visibility', 'hidden');
+					optionButton.css('visibility', 'hidden');
+				}
+			}
+		});
+	}
+
+	return {
+		restrict : 'A',
+		link : postLink,
+		priority: 1,
+		require:['^wbGroup']
+	};
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+/**
+ * @description Apply margin into the element
+ */
+.directive("wbWidgetSize", function($q, $wbUtil, $rootElement, $document, $compile, $mdPanel) {
+
+	function postLink($scope, $element, $attrs, $ctrls){
+		var button;
+		var optionButton;
+		var dimension = {};
+		var position = {};
+		var lock = false;
+
+		// main ctrl
+		var ctrl = $ctrls[0];
+		ctrl.on('delete', distroy);
+
+		function distroy(){
+			watchSize();
+			watchSelection();
+
+			if(button){
+				button.remove();
+			}
+			if(optionButton){
+				optionButton.remove();
+			}
 		}
 
 		function mousemove($event) {
@@ -968,7 +1130,7 @@ angular.module('am-wb-core')
 			button.on('mousedown', mousedown);
 
 			var oj = $wbUtil.getTemplateFor({
-				templateUrl: 'views/dialogs/wb-widget-options.html'
+				templateUrl: 'views/partials/wb-widget-options.html'
 			}).then(function(template){
 				optionButton = angular.element(template);
 				$rootElement.append(optionButton);
@@ -976,7 +1138,6 @@ angular.module('am-wb-core')
 					position: 'absolute',
 					visibility: 'hidden',
 				});
-				$scope.openOptions = openOptions;
 				$compile(optionButton)($scope);
 				bindToElement(getBound());
 			});
@@ -994,8 +1155,8 @@ angular.module('am-wb-core')
 
 
 		// Watch size
-		$scope.$watch($attrs.wbSize+'.size', function(size) {
-			if(isRoot() || !size || lock){
+		var watchSize = $scope.$watch($attrs.wbWidgetSize+'.size', function(size) {
+			if(!size || lock){
 				return;
 			}
 			$element.css(size);
@@ -1004,14 +1165,12 @@ angular.module('am-wb-core')
 			}
 		}, true);
 
-		$scope.$watch(function(){
+		var watchSelection = $scope.$watch(function(){
 			return ctrl.isSelected();
 		}, function(value){
-			if(isRoot()){
-				return;
-			}
 			if(value){
-				checkButton().then(function(){
+				checkButton()
+				.then(function(){
 					button.css('visibility', 'visible');
 					optionButton.css('visibility', 'visible');
 				});
@@ -1027,7 +1186,7 @@ angular.module('am-wb-core')
 	return {
 		restrict : 'A',
 		link : postLink,
-		require:['?wbWidget', '?wbGroup']
+		require:['^wbWidget']
 	};
 });
 /* 
@@ -1066,7 +1225,7 @@ angular.module('am-wb-core')
  * @description Render a list of widget
  * 
  */
-.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $q, $mdTheming) {
+.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $q, $mdTheming, $parse) {
 
 	/*
 	 * Link widget view
@@ -1098,7 +1257,7 @@ angular.module('am-wb-core')
 			var compilesJob = [];
 			var elements = [];
 			model.contents.forEach(function(item, index) {
-				compilesJob.push($widget.compile(item, $scope)//
+				compilesJob.push($widget.compile(item, $scope, $element)//
 						.then(function(element) {
 							$mdTheming(element);
 							elements[index] = element;
@@ -1146,19 +1305,11 @@ angular.module('am-wb-core')
 				}
 			});
 			$scope.root = true;
-		} else {
-			// Get from parent
-			ctrl.isEditable = wbGroupCtrl.isEditable;
-			ctrl.childSelected = wbGroupCtrl.childSelected;
-			ctrl.isChildSelected = wbGroupCtrl.isChildSelected;
-			ctrl.isSelected = function(){
-				return wbGroupCtrl.isChildSelected(ctrl);
-			}
 		}
-		
+
 		$scope.dropCallback = function(index, item, external, type){
 			return ctrl.addChild(index, item);
-		}
+		};
 	}
 
 	/**
@@ -1170,26 +1321,40 @@ angular.module('am-wb-core')
 	 * 
 	 * FIXME: maso, 2018: add injection annotation
 	 */
-	function wbGroupCtrl($scope, $element, $widget, $parse) {
-
+	function wbGroupCtrl($scope, $element) {
+		var ctrl = this;
+		var callbacks = {};
 		var onModelSelectionFu = null;
 		if($scope.wbOnModelSelect) {
 			onModelSelectionFu = $parse($scope.wbOnModelSelect);
 		}
 
-
+		function fire(type){
+			if(angular.isDefined(callbacks[type])){
+				for(var i = 0; i < callbacks[type].length; i++){
+					try{
+						callbacks[type][i]();
+					} catch (error){
+						console.log(error);
+					}
+				}
+			}
+		}
+		
 		/**
 		 * Delete data model and widget display
 		 * 
 		 * @name delete
 		 * @memberof wbGroupCtrl
 		 */
-		this.delete = function(){
-			if(this.isRoot()){
+		ctrl.delete = function(){
+			if(ctrl.isRoot()){
+				// TODO: mao, 2018: clear all elements
 				return;
 			}
 			$scope.parentCtrl.removeChild($scope.wbModel);
-		}
+			fire('delete');
+		};
 
 		/**
 		 * Clone and return a new model from the current one
@@ -1200,41 +1365,53 @@ angular.module('am-wb-core')
 		 * @memberof wbGroupCtrl
 		 * @return model {Object} which is cloned from the current one
 		 */
-		this.clone = function(){
-			return $widget.cleanModel(angular.copy($scope.wbModel));
-		}
+		ctrl.clone = function(){
+			return $wbUtil.clean(angular.copy($scope.wbModel));
+		};
 
-		this.getModel = function(){
+		ctrl.getModel = function(){
 			return $scope.wbModel;
-		}
+		};
 
-		this.getParent = function(){
+		ctrl.getParent = function(){
 			return $scope.parentCtrl;
-		}
+		};
 
-		this.isRoot = function(){
-			return $scope.root;
-		}
+		ctrl.isRoot = function(){
+			return !$scope.parentCtrl;
+		};
 
-		this.isEditable = function(){
-			return $scope.editable;
-		}
-
-		this.isSelected = function(){
-			return $scope.selected;
-		}
-
-		this.setSelected = function(flag) {
-			if(flag) {
-				this.childSelected(this);
+		ctrl.isEditable = function(){
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.isEditable();
 			}
-		}
-		
-		this.isChildSelected = function(ctrl){
-			return ctrl === $scope.lastSelectedItem;
-		}
+			return $scope.editable;
+		};
 
-		this.childSelected = function(ctrl) {
+		ctrl.isSelected = function(){
+			return ctrl.isChildSelected(ctrl);
+		};
+
+		ctrl.setSelected = function(flag) {
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.childSelected(ctrl);
+			}
+			if(flag) {
+				ctrl.childSelected(ctrl);
+			}
+		};
+
+		ctrl.isChildSelected = function(ctrl){
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.isChildSelected(ctrl);
+			}
+			return ctrl === $scope.lastSelectedItem;
+		};
+
+		ctrl.childSelected = function(ctrl) {
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.childSelected(ctrl);
+			}
 			if(ctrl === $scope.lastSelectedItem) {
 				return;
 			}
@@ -1253,7 +1430,7 @@ angular.module('am-wb-core')
 				};
 				$scope.$eval(callback);
 			}
-		}
+		};
 
 
 		/**
@@ -1262,8 +1439,8 @@ angular.module('am-wb-core')
 		 * Data model and visual element related to the input model will be
 		 * removed.
 		 */
-		this.removeChild = function(model) {
-			var index = $scope.wbModel.contents.indexOf(model);
+		ctrl.removeChild = function(model) {
+			var index = ctrl.indexOfChild(model);
 			if (index > -1) {
 				$element.children(':nth-child('+(index+1)+')').remove();
 				$scope.wbModel.contents.splice(index, 1);
@@ -1271,12 +1448,12 @@ angular.module('am-wb-core')
 			}
 			return false;
 		};
-		
+
 
 		/**
 		 * Adds dragged widget
 		 */
-		this.addChild = function(index, item) {
+		ctrl.addChild = function(index, item) {
 			$wbUtil.clean(item);
 			// add widget
 			$widget.compile(item, $scope)//
@@ -1293,22 +1470,47 @@ angular.module('am-wb-core')
 				$scope.wbModel.contents.splice(index, 0, item);
 			});
 			return true;
-		}
-
-		this.getAllowedTypes = function(){
-			return $scope.wbAllowedTypesl;
-		}
+		};
 		
-		this.getAction = function(){
-			return [1, 2, 3];
-		}
+		ctrl.indexOfChild = function(item) {
+			return $scope.wbModel.contents.indexOf(item);
+		};
+
+		ctrl.getAllowedTypes = function(){
+			return $scope.wbAllowedTypesl;
+		};
+
+		ctrl.on = function(type, callback){
+			if(!angular.isArray(callbacks[type])){
+				callbacks[type] = [];
+			}
+			callbacks[type].push(callback);
+		};
+
+		ctrl.getActions = function(){
+			return [{
+				title: 'Delete',
+				icon: 'delete',
+				action: ctrl.delete
+			},{
+				title: 'Clone',
+				icon: 'copy',
+				action: function(){
+					if(ctrl.isRoot()){
+						return;
+					}
+					var model = ctrl.clone();
+					var index = $scope.parentCtrl.indexOfChild($scope.wbModel);
+					$scope.parentCtrl.addChild(index, model);
+				}
+			}];
+		};
 	}
 
 	return {
 		templateUrl : 'views/directives/wb-group.html',
 		restrict : 'E',
 		replace : true,
-		transclude : false,
 		scope : {
 			wbEditable : '=?',
 			wbOnModelSelect : '@?',
@@ -2692,7 +2894,7 @@ angular.module('am-wb-core')
  * 
  * All primary actions of a widget are supported (such as remove and setting).
  */
-.directive('wbWidget', function() {
+.directive('wbWidget', function($wbUtil, $settings, $widget) {
 	function postLink($scope, $element, $attrs, $ctrls, $transclude) {
 		// Modify angular transclude function
 		// see:
@@ -2704,12 +2906,7 @@ angular.module('am-wb-core')
 		
 		// set wbGroup
 		var group = $ctrls[1];
-		if(group) {
-			$scope.group = group;
-			$ctrls[0].isSelected = function(){
-				return group.isChildSelected($ctrls[0]);
-			}
-		}
+		$scope.group = group;
 	}
 
 	/**
@@ -2720,41 +2917,75 @@ angular.module('am-wb-core')
 	 * 
 	 * @ngInject
 	 */
-	function wbWidgetCtrl($scope, $element, $settings, $widget) {
+	function wbWidgetCtrl($scope, $element) {
+		var callbacks = {};
+		var ctrl = this;
 
-		this.delete = function(){
+		function fire(type){
+			if(angular.isDefined(callbacks[type])){
+				for(var i = 0; i < callbacks[type].length; i++){
+					try{
+						callbacks[type][i]();
+					} catch (error){
+						console.log(error);
+					}
+				}
+			}
+		}
+		
+		ctrl.delete = function(){
+			fire('delete');
 			$scope.group.removeChild($scope.wbModel);
+			callbacks = {};
 		}
 
-		this.clone = function(){
-			alert('clone');
+		ctrl.clone = function(){
+			return $wbUtil.clean(angular.copy($scope.wbModel));
 		}
 
-		this.getModel = function(){
+		ctrl.getModel = function(){
 			return $scope.wbModel;
 		}
 
-		this.getParent = function(){
-			return $scope.parentCtrl;
+		ctrl.getParent = function(){
+			return $scope.group;
 		}
 
-		this.isEditable = function(){
-			return  $scope.group && $scope.group.isEditable();
+		ctrl.isEditable = function(){
+			return  $scope.group.isEditable();
 		}
 
-		this.isSelected = function(){
-			return $scope.selected;
+		ctrl.isSelected = function(){
+			return $scope.group.isChildSelected(ctrl);
 		}
 
-		this.setSelected = function(flag) {
-			$scope.selected = flag;
-			if(flag && $scope.group) {
+		ctrl.setSelected = function(flag) {
+			if(flag) {
 				$scope.group.childSelected(this);
 			}
 		}
 
-		this.getAction = function(){
-			return [1, 2, 3];
+		ctrl.getActions = function(){
+			return [{
+				title: 'Delete',
+				icon: 'delete',
+				action: ctrl.delete
+			},{
+				title: 'Clone',
+				icon: 'copy',
+				action: function(){
+					var model = $wbUtil.clean(angular.copy($scope.wbModel));
+					var index = $scope.group.indexOfChild($scope.wbModel);
+					$scope.group.addChild(index, model);
+				}
+			}];
+		}
+		
+		ctrl.on = function(type, callback){
+			if(!angular.isArray(callbacks[type])){
+				callbacks[type] = [];
+			}
+			callbacks[type].push(callback);
 		}
 	}
 	
@@ -2766,7 +2997,7 @@ angular.module('am-wb-core')
 		link : postLink,
 		controller : wbWidgetCtrl,
 		controllerAs: 'ctrl',
-		require:['wbWidget', '?^^wbGroup', 'ngModel']
+		require:['wbWidget', '^^wbGroup', 'ngModel']
 	};
 });
 /* 
@@ -4595,7 +4826,7 @@ angular.module('am-wb-core')
 	 * @param parenScope
 	 * @return promise A promise that resolve created element
 	 */
-	function compile(model, parenScope){
+	function compile(model, parenScope, parentElement){
 		var widget = _widget(model);
 		var childScope = null;
 		var element = null;
@@ -4611,7 +4842,9 @@ angular.module('am-wb-core')
 				template = '<wb-widget ng-model="wbModel">' + template + '</wb-widget>';
 			}
 			element = angular.element(template);
-
+			if(parentElement) {
+				parentElement.append(element);
+			}
 			// 3- bind controller
 			var link = $compile(element);
 			if (angular.isDefined(widget.controller)) {
@@ -4668,11 +4901,6 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
     "<md-dialog aria-label=\"Select item/items\" style=\"width:70%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <md-sidenav class=md-sidenav-left md-component-id=left md-is-locked-open=true md-whiteframe=4 layout=column ng-hide=\"pages.length === 1\"> <div style=\"text-align: center\"> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> <md-devider></md-devider> <md-content> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </md-content> </md-sidenav> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <md-button ng-if=openHelp ng-click=openHelp($event) aria-label=\"Show help\"> <span translate>Learn more</span> </md-button> <span flex></span> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> <md-button class=md-primary ng-click=answer()> <span translate>OK</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
-  );
-
-
-  $templateCache.put('views/dialogs/wb-widget-options.html',
-    "<md-menu> <md-button aria-label=\"Open menu with custom trigger\" class=md-icon-button style=\"padding: 0px; margin: 0px\" ng-click=$mdMenu.open()> <wb-icon>more_vert</wb-icon> </md-button> <md-menu-content width=4 ng-mouseleave=$mdMenu.close()> <md-menu-item ng-repeat=\"item in ctrl.getAction()\"> <md-button>Option {{item}}</md-button> </md-menu-item> </md-menu-content> </md-menu>"
   );
 
 
@@ -4786,7 +5014,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widget.html',
-    "<div class=wb-widget name={{wbModel.name}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-type=wbModel.type dnd-effect-allowed=copyMove dnd-callback=1 dnd-moved=ctrl.delete() wb-size=wbModel.style wb-align=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event md-theme-watch=true ng-class=\"{\n" +
+    "<div class=wb-widget name={{wbModel.name}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-type=wbModel.type dnd-effect-allowed=copyMove dnd-callback=1 dnd-moved=ctrl.delete() wb-widget-size=wbModel.style wb-align=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event md-theme-watch=true ng-class=\"{\n" +
     "\t\t'wb-widget-edit': ctrl.isEditable(),\n" +
     "\t\t'wb-widget-select': ctrl.isSelected()\n" +
     "\t}\" transclude></div>"
@@ -4805,6 +5033,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-widgets-module.html',
     "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy flex=none flex-gt-sm=30 layout=column layout-align=\"start center\" layout-padding> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <p flex class=wb-text-truncate translate=\"\">{{widget.title}}</p> <md-tooltip md-delay=1000>{{widget.description | translate}}</md-tooltip> </div> </div>"
+  );
+
+
+  $templateCache.put('views/partials/wb-widget-options.html',
+    "<md-menu> <md-button aria-label=\"Open menu with custom trigger\" class=md-icon-button style=\"padding: 0px; margin: 0px\" ng-click=$mdMenu.open()> <wb-icon>more_vert</wb-icon> </md-button> <md-menu-content width=4 ng-init=\"_actions = ctrl.getActions()\" ng-mouseleave=$mdMenu.close()> <md-menu-item ng-repeat=\"action in _actions\"> <md-button ng-click=action.action()>{{action.title}}</md-button> </md-menu-item> </md-menu-content> </md-menu>"
   );
 
 

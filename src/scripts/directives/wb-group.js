@@ -66,7 +66,7 @@ angular.module('am-wb-core')
 			var compilesJob = [];
 			var elements = [];
 			model.contents.forEach(function(item, index) {
-				compilesJob.push($widget.compile(item, $scope)//
+				compilesJob.push($widget.compile(item, $scope, $element)//
 						.then(function(element) {
 							$mdTheming(element);
 							elements[index] = element;
@@ -114,19 +114,11 @@ angular.module('am-wb-core')
 				}
 			});
 			$scope.root = true;
-		} else {
-			// Get from parent
-			ctrl.isEditable = wbGroupCtrl.isEditable;
-			ctrl.childSelected = wbGroupCtrl.childSelected;
-			ctrl.isChildSelected = wbGroupCtrl.isChildSelected;
-			ctrl.isSelected = function(){
-				return wbGroupCtrl.isChildSelected(ctrl);
-			}
 		}
 
 		$scope.dropCallback = function(index, item, external, type){
 			return ctrl.addChild(index, item);
-		}
+		};
 	}
 
 	/**
@@ -157,7 +149,7 @@ angular.module('am-wb-core')
 				}
 			}
 		}
-
+		
 		/**
 		 * Delete data model and widget display
 		 * 
@@ -171,7 +163,7 @@ angular.module('am-wb-core')
 			}
 			$scope.parentCtrl.removeChild($scope.wbModel);
 			fire('delete');
-		}
+		};
 
 		/**
 		 * Clone and return a new model from the current one
@@ -184,39 +176,51 @@ angular.module('am-wb-core')
 		 */
 		ctrl.clone = function(){
 			return $wbUtil.clean(angular.copy($scope.wbModel));
-		}
+		};
 
 		ctrl.getModel = function(){
 			return $scope.wbModel;
-		}
+		};
 
 		ctrl.getParent = function(){
 			return $scope.parentCtrl;
-		}
+		};
 
 		ctrl.isRoot = function(){
-			return $scope.root;
-		}
+			return !$scope.parentCtrl;
+		};
 
 		ctrl.isEditable = function(){
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.isEditable();
+			}
 			return $scope.editable;
-		}
+		};
 
 		ctrl.isSelected = function(){
 			return ctrl.isChildSelected(ctrl);
-		}
+		};
 
 		ctrl.setSelected = function(flag) {
-			if(flag) {
-				this.childSelected(this);
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.childSelected(ctrl);
 			}
-		}
+			if(flag) {
+				ctrl.childSelected(ctrl);
+			}
+		};
 
 		ctrl.isChildSelected = function(ctrl){
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.isChildSelected(ctrl);
+			}
 			return ctrl === $scope.lastSelectedItem;
-		}
+		};
 
 		ctrl.childSelected = function(ctrl) {
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.childSelected(ctrl);
+			}
 			if(ctrl === $scope.lastSelectedItem) {
 				return;
 			}
@@ -235,7 +239,7 @@ angular.module('am-wb-core')
 				};
 				$scope.$eval(callback);
 			}
-		}
+		};
 
 
 		/**
@@ -275,22 +279,22 @@ angular.module('am-wb-core')
 				$scope.wbModel.contents.splice(index, 0, item);
 			});
 			return true;
-		}
+		};
 		
 		ctrl.indexOfChild = function(item) {
 			return $scope.wbModel.contents.indexOf(item);
-		}
+		};
 
 		ctrl.getAllowedTypes = function(){
 			return $scope.wbAllowedTypesl;
-		}
+		};
 
 		ctrl.on = function(type, callback){
 			if(!angular.isArray(callbacks[type])){
 				callbacks[type] = [];
 			}
 			callbacks[type].push(callback);
-		}
+		};
 
 		ctrl.getActions = function(){
 			return [{
@@ -309,14 +313,13 @@ angular.module('am-wb-core')
 					$scope.parentCtrl.addChild(index, model);
 				}
 			}];
-		}
+		};
 	}
 
 	return {
 		templateUrl : 'views/directives/wb-group.html',
 		restrict : 'E',
 		replace : true,
-		transclude : false,
 		scope : {
 			wbEditable : '=?',
 			wbOnModelSelect : '@?',
