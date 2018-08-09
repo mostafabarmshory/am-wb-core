@@ -1309,7 +1309,7 @@ angular.module('am-wb-core')
 
 		$scope.dropCallback = function(index, item, external, type){
 			return ctrl.addChild(index, item);
-		}
+		};
 	}
 
 	/**
@@ -1464,7 +1464,7 @@ angular.module('am-wb-core')
 				} else {
 					$element.append(newElement);
 				}
-				if(!$scope.wbModel.contents || !angular.isArray($scope.wbModel.contents)){
+				if(!angular.isArray($scope.wbModel.contents)){
 					$scope.wbModel.contents = [];
 				}
 				$scope.wbModel.contents.splice(index, 0, item);
