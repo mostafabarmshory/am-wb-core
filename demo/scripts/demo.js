@@ -241,7 +241,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 	 */
 	$window.openHelp = function (object){
 		alert('Adding openHelp to $window to display help:'+object.helpId);
-	}
+	};
 })
 
 

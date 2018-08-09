@@ -1354,7 +1354,7 @@ angular.module('am-wb-core')
 			}
 			$scope.parentCtrl.removeChild($scope.wbModel);
 			fire('delete');
-		}
+		};
 
 		/**
 		 * Clone and return a new model from the current one
@@ -1367,30 +1367,30 @@ angular.module('am-wb-core')
 		 */
 		ctrl.clone = function(){
 			return $wbUtil.clean(angular.copy($scope.wbModel));
-		}
+		};
 
 		ctrl.getModel = function(){
 			return $scope.wbModel;
-		}
+		};
 
 		ctrl.getParent = function(){
 			return $scope.parentCtrl;
-		}
+		};
 
 		ctrl.isRoot = function(){
 			return !$scope.parentCtrl;
-		}
+		};
 
 		ctrl.isEditable = function(){
 			if($scope.parentCtrl){
 				return $scope.parentCtrl.isEditable();
 			}
 			return $scope.editable;
-		}
+		};
 
 		ctrl.isSelected = function(){
 			return ctrl.isChildSelected(ctrl);
-		}
+		};
 
 		ctrl.setSelected = function(flag) {
 			if($scope.parentCtrl){
@@ -1399,14 +1399,14 @@ angular.module('am-wb-core')
 			if(flag) {
 				ctrl.childSelected(ctrl);
 			}
-		}
+		};
 
 		ctrl.isChildSelected = function(ctrl){
 			if($scope.parentCtrl){
 				return $scope.parentCtrl.isChildSelected(ctrl);
 			}
 			return ctrl === $scope.lastSelectedItem;
-		}
+		};
 
 		ctrl.childSelected = function(ctrl) {
 			if($scope.parentCtrl){
@@ -1430,7 +1430,7 @@ angular.module('am-wb-core')
 				};
 				$scope.$eval(callback);
 			}
-		}
+		};
 
 
 		/**
@@ -1464,28 +1464,28 @@ angular.module('am-wb-core')
 				} else {
 					$element.append(newElement);
 				}
-				if(!angular.isArray($scope.wbModel.contents)){
+				if(!$scope.wbModel.contents || !angular.isArray($scope.wbModel.contents)){
 					$scope.wbModel.contents = [];
 				}
 				$scope.wbModel.contents.splice(index, 0, item);
 			});
 			return true;
-		}
+		};
 		
 		ctrl.indexOfChild = function(item) {
 			return $scope.wbModel.contents.indexOf(item);
-		}
+		};
 
 		ctrl.getAllowedTypes = function(){
 			return $scope.wbAllowedTypesl;
-		}
+		};
 
 		ctrl.on = function(type, callback){
 			if(!angular.isArray(callbacks[type])){
 				callbacks[type] = [];
 			}
 			callbacks[type].push(callback);
-		}
+		};
 
 		ctrl.getActions = function(){
 			return [{
@@ -1504,7 +1504,7 @@ angular.module('am-wb-core')
 					$scope.parentCtrl.addChild(index, model);
 				}
 			}];
-		}
+		};
 	}
 
 	return {
