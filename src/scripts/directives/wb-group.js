@@ -303,7 +303,7 @@ angular.module('am-wb-core')
 				action: ctrl.delete
 			},{
 				title: 'Clone',
-				icon: 'copy',
+				icon: 'content_copy',
 				action: function(){
 					if(ctrl.isRoot()){
 						return;
