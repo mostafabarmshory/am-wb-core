@@ -38,7 +38,7 @@ angular.module('am-wb-core')
 	    type : 'background',
 	    label : 'Background',
 	    icon : 'image',
-	    description : 'manage',
+	    description : '',
 	    templateUrl : 'views/settings/wb-background.html'
 	});
 	$settings.newPage({
