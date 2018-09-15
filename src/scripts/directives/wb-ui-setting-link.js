@@ -45,7 +45,7 @@ angular.module('am-wb-core')
 		},
 		controller: function($scope, $resource){
 			function selectlink(){
-				return $resource.get('link', {
+				return $resource.get('url', {
 					style: {
 					    icon: 'link',
 						title: 'add url',

@@ -2570,7 +2570,7 @@ angular.module('am-wb-core')
 		},
 		controller: function($scope, $resource){
 			function selectlink(){
-				return $resource.get('link', {
+				return $resource.get('url', {
 					style: {
 					    icon: 'link',
 						title: 'add url',
@@ -3316,7 +3316,7 @@ angular.module('am-wb-core')
 			});
 		},
 		controllerAs: 'ctrl',
-		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url']
+		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url','link']
 	});
 	$resource.newPage({
 		type : 'wb-sheet',
@@ -4994,7 +4994,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-link.html',
-    "<md-input-container class=md-icon-float> <input ng-model=url placeholder={{title}}> <wb-icon style=\"display:inline-block; cursor: pointer\">more_horiz</wb-icon> </md-input-container>"
+    "<md-input-container class=md-icon-float> <input ng-model=url placeholder={{title}}> <wb-icon ng-click=selectlink() style=\"display:inline-block; cursor: pointer\">more_horiz</wb-icon> </md-input-container>"
   );
 
 
