@@ -1,9 +1,10 @@
 <md-expansion-panel>
     <md-expansion-panel-collapsed>
-        <div class="md-title">{{label}}</div>
-        <div class="md-summary" ng-show="description">{{description}}</div>
-        <div class="md-title">{{label}}</div>
-        <div class="md-summary"></div>
+        <div class="md-title">{{label}}
+            <md-tooltip md-direction="bottom" md-delay="300" ng-show="description">{{description}}</md-tooltip>
+        </div>
+        <!--<div class="md-summary" ng-show="description">{{description}}</div>-->
+        <!--<div class="md-summary"></div>-->
         <md-expansion-panel-icon></md-expansion-panel-icon>
     </md-expansion-panel-collapsed>
     <md-expansion-panel-expanded>

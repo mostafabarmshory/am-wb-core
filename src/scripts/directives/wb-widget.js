@@ -78,56 +78,58 @@ angular.module('am-wb-core')
 			fire('delete');
 			$scope.group.removeChild($scope.wbModel);
 			callbacks = {};
-		}
+		};
 
 		ctrl.clone = function(){
 			return $wbUtil.clean(angular.copy($scope.wbModel));
-		}
+		};
 
 		ctrl.getModel = function(){
 			return $scope.wbModel;
-		}
+		};
 
 		ctrl.getParent = function(){
 			return $scope.group;
-		}
+		};
 
 		ctrl.isEditable = function(){
 			return  $scope.group.isEditable();
-		}
+		};;
 
 		ctrl.isSelected = function(){
 			return $scope.group.isChildSelected(ctrl);
-		}
+		};
 
 		ctrl.setSelected = function(flag) {
 			if(flag) {
 				$scope.group.childSelected(this);
 			}
-		}
+		};
 
 		ctrl.getActions = function(){
 			return [{
 				title: 'Delete',
 				icon: 'delete',
-				action: ctrl.delete
+				action: ctrl.delete,
+                                description: 'Delete widget'
 			},{
 				title: 'Clone',
-				icon: 'copy',
+				icon: 'content_copy',
 				action: function(){
 					var model = $wbUtil.clean(angular.copy($scope.wbModel));
 					var index = $scope.group.indexOfChild($scope.wbModel);
 					$scope.group.addChild(index, model);
-				}
+				},
+                                description: 'Duplicate widget'
 			}];
-		}
+		};
 		
 		ctrl.on = function(type, callback){
 			if(!angular.isArray(callbacks[type])){
 				callbacks[type] = [];
 			}
 			callbacks[type].push(callback);
-		}
+		};
 	}
 	
 	return {

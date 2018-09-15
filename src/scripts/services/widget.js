@@ -196,7 +196,7 @@ angular.module('am-wb-core')
 		// 2- create element
 		return $q.when($wbUtil.getTemplateFor(widget))//
 		.then(function(template) {
-			if (model.type != 'Group') {
+			if (model.type !== 'Group') {
 				template = '<wb-widget ng-model="wbModel">' + template + '</wb-widget>';
 			}
 			element = angular.element(template);

@@ -131,11 +131,14 @@ angular.module('am-wb-core')
                     currentScope = scope;
                     scope.page = page;
                     scope.value = $scope.value;
-                    if (angular .isDefined(page.controller)) {
-                         $controller(page.controller, {
+                    if (angular.isDefined(page.controller)) {
+                         var controller = $controller(page.controller, {
                             $scope : scope,
                             $element : element,
                         });
+                         if (page.controllerAs) {
+                        	 scope[page.controllerAs] = controller;
+                         }
                     }
                     $compile(element)(scope);
                     pages2.push(element);
