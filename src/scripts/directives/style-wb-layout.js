@@ -34,7 +34,7 @@ angular.module('am-wb-core')
  * 
  * Note that, in smal screen devices, the colume layout apply as default.
  */
-.directive("wbLayout", function() {
+.directive('wbLayout', function() {
 	var classDirectionPrefix = 'wb-flex-';
 	var classJustifyPrefix = 'wb-flex-justify-content-';
 	var classAlignPrefix = 'wb-flex-align-items-';
@@ -83,9 +83,6 @@ angular.module('am-wb-core')
 	function postLink($scope, $element, $attrs) {
 		// Watch for layout
 		$scope.$watch($attrs.wbLayout+'.layout', function(newValue, oldValue) {
-//			if(newValue===oldValue){
-//				return;
-//			}
 			if (oldValue) {
 				removeLayout($element, oldValue);
 			}

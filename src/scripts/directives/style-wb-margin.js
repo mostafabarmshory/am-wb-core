@@ -27,18 +27,18 @@ angular.module('am-wb-core')
 /**
  * @description Apply margin into the element
  */
-.directive("wbMargin", function() {
+.directive('wbMargin', function() {
 	return {
-	    restrict : 'A',
-	    link : function(scope, element, attributes) {
-		    return scope.$watch(attributes.wbMargin, function(style) {
-			    if (!style) {
-				    return;
-			    }
-			    if (style.margin) {
-				    element.css('margin', style.margin);
-			    }
-		    }, true);
-	    }
+		restrict : 'A',
+		link : function(scope, element, attributes) {
+			return scope.$watch(attributes.wbMargin, function(style) {
+				if (!style) {
+					return;
+				}
+				if (style.margin) {
+					element.css('margin', style.margin);
+				}
+			}, true);
+		}
 	};
 });

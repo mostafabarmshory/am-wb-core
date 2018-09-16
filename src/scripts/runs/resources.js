@@ -43,7 +43,7 @@ angular.module('am-wb-core')
 			});
 		},
 		controllerAs: 'ctrl',
-		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url']
+		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url','link']
 	});
 	$resource.newPage({
 		type : 'wb-sheet',

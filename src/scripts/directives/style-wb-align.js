@@ -30,9 +30,9 @@ angular.module('am-wb-core')
  * @description Apply layout align into an element
  * 
  */
-.directive("wbAlign", function() {
+.directive('wbAlign', function() {
 	var classPrefix = 'wb-flex-item-';
-	
+
 	function removeLayout(element, config) {
 		element.removeClass(classPrefix + config.align);
 	}

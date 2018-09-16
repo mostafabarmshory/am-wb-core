@@ -23,10 +23,6 @@
  */
 'use strict';
 
-var dragClass = 'wb-content-dragenter';
-var bodyElementSelector = 'div#wb-content-body';
-var placeholderElementSelector = 'div#wb-content-placeholder';
-
 angular.module('am-wb-core')
 /**
  * @ngdoc Directives
@@ -39,7 +35,7 @@ angular.module('am-wb-core')
 	/*
 	 * Link widget view
 	 */
-	function wbGroupLink($scope, $element, $attrs, $ctrls, transclud) {
+	function wbGroupLink($scope, $element, $attrs, $ctrls) {
 
 		// Loads wbGroup
 		var ctrl = $ctrls[0];
@@ -116,7 +112,7 @@ angular.module('am-wb-core')
 			$scope.root = true;
 		}
 
-		$scope.dropCallback = function(index, item, external, type){
+		$scope.dropCallback = function(index, item/*, external, type*/){
 			return ctrl.addChild(index, item);
 		};
 	}
@@ -128,7 +124,7 @@ angular.module('am-wb-core')
 	 * 
 	 * Manages model data of a widget.
 	 * 
-	 * FIXME: maso, 2018: add injection annotation
+	 * @ngInject
 	 */
 	function wbGroupCtrl($scope, $element) {
 		var ctrl = this;
@@ -143,8 +139,8 @@ angular.module('am-wb-core')
 				for(var i = 0; i < callbacks[type].length; i++){
 					try{
 						callbacks[type][i]();
-					} catch (error){
-						console.log(error);
+					} catch (e){
+						/*console.log(error);*/
 					}
 				}
 			}
@@ -303,7 +299,7 @@ angular.module('am-wb-core')
 				action: ctrl.delete
 			},{
 				title: 'Clone',
-				icon: 'copy',
+				icon: 'content_copy',
 				action: function(){
 					if(ctrl.isRoot()){
 						return;

@@ -29,17 +29,17 @@
  *
  */
 angular
-    .module('am-wb-core', [
-        'ngMessages',//
-        'ngAnimate',//
-        'ngAria',//
-        'ngMaterial',//
-        'pascalprecht.translate',//
-        'mdColorPicker',//
-        //'ngMaterialWysiwyg',
-        'ui.tinymce', //
-        'dndLists',//
-        'material.components.expansionPanels',//
-        'ngMdIcons', // Material icons
-        'ngHandsontable',
-    ]);
+.module('am-wb-core', [
+	'ngMessages',//
+	'ngAnimate',//
+	'ngAria',//
+	'ngMaterial',//
+	'pascalprecht.translate',//
+	'mdColorPicker',//
+	//'ngMaterialWysiwyg',
+	'ui.tinymce', //
+	'dndLists',//
+	'material.components.expansionPanels',//
+	'ngMdIcons', // Material icons
+	'ngHandsontable'
+]);

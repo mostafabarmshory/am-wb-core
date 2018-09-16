@@ -34,58 +34,53 @@ angular.module('am-wb-core')
  */
 .directive('wbUiSettingChoose', function ($mdTheming, $mdUtil) {
 
-    // **********************************************************
-    // Private Methods
-    // **********************************************************
-    function postLink(scope, element, attr, ctrls) {
-//	scope.xitems = scope.$eval(attr.items);
-//	attr.$observe('title', function(title){
-//	    scope.title = title;
-//	});
-//	attr.$observe('icon', function(icon){
-//	    scope.icon = icon;
-//	});
-	var ngModelCtrl = ctrls[0] || $mdUtil.fakeNgModel();
-	var unregisterWatch = null;
-	$mdTheming(element);
+	function postLink(scope, element, attr, ctrls) {
+		var ngModelCtrl = ctrls[0] || $mdUtil.fakeNgModel();
+		$mdTheming(element);
 
-	ngModelCtrl.$render = render;
-
-	scope.$watch('selectedIndex', function () {
-	    if(angular.isDefined(scope.selectedIndex)){
-		ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
-	    }
-	});
-
-	function render() {
-	    scope.selectedIndex = toIndex(ngModelCtrl.$modelValue);
-	    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
-	}
-	
-	function toIndex (value){
-	    for (var index = 0; index < scope.xitems.length; index++) {
-		if (scope.xitems[index].value == value){
-		    return index;
+		/*
+		 * convert to index
+		 */
+		function toIndex (value){
+			for (var index = 0; index < scope.xitems.length; index++) {
+				if (scope.xitems[index].value === value){
+					return index;
+				}
+			}
+			// TODO: maso, 2017: update default value.
+			return 0;
 		}
-	    }
-	    // TODO: maso, 2017: update default value.
-	    return 0;
-	}
-    }
 
-    /*
-     * Directive info
-     */
-    return {
-	templateUrl: 'views/directives/wb-ui-setting-choose.html',
-	restrict: 'E',
-	scope: {
-		icon: '@',
-		title: '@',
-		xitems: '<items'
-	},
-	require: ['?ngModel'],
-	priority: 210, // Run before ngAria
-	link: postLink
-    };
+		/*
+		 * render the data
+		 */
+		function render() {
+			scope.selectedIndex = toIndex(ngModelCtrl.$modelValue);
+			ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+		}
+
+		ngModelCtrl.$render = render;
+
+		scope.$watch('selectedIndex', function () {
+			if(angular.isDefined(scope.selectedIndex)){
+				ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+			}
+		});
+	}
+
+	/*
+	 * Directive info
+	 */
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-choose.html',
+		restrict: 'E',
+		scope: {
+			icon: '@',
+			title: '@',
+			xitems: '<items'
+		},
+		require: ['?ngModel'],
+		priority: 210, // Run before ngAria
+		link: postLink
+	};
 });

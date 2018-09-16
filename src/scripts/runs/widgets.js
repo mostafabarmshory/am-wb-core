@@ -29,8 +29,8 @@ angular.module('am-wb-core')
  * Load widgets
  */
 .run(function($widget) {
-	
-	
+
+
 	// Group
 	$widget.newWidget({
 		// widget description
@@ -54,13 +54,13 @@ angular.module('am-wb-core')
 		icon : 'wb-widget-html',
 		groups: ['basic'],
 		model : {
-			text : '<h2>Text element</h2><p>Click on the text box to edit.</p>',
+			text : '<h2>Text element</h2><p>Click on the text box to edit.</p>'
 		},
 		// help id
 		help : 'http://dpq.co.ir',
 		helpId: 'wb-widget-html',
 		// functional properties
 		templateUrl : 'views/widgets/wb-html.html',
-		setting:['text'],
+		setting:['text']
 	});
 });

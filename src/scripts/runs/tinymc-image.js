@@ -9,8 +9,7 @@
  */
 
 /*global tinymce:true */
-
-
+'use strict';
 angular.module('am-wb-core')
 
 /**
@@ -21,16 +20,16 @@ angular.module('am-wb-core')
 	function imageTool(editor) {
 
 		function insertImage(url){
-	          editor.insertContent('<img src="' + url + '" >');
+			editor.insertContent('<img src="' + url + '" >');
 		}
-		
+
 		function showDialog(){
 			$resource.get('image')//
 			.then(function(value){
 				insertImage(value);
 			});
 		}
-		
+
 		editor.addButton('image', {
 			icon: 'image',
 			tooltip: 'Insert/edit image',
@@ -50,5 +49,4 @@ angular.module('am-wb-core')
 	}
 
 	tinymce.PluginManager.add('image', imageTool);
-
 });
