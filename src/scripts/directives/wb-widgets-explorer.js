@@ -38,20 +38,20 @@ angular.module('am-wb-core')
 	 * link function
 	 */
 	function postLink(scope, element, attrs, ctrls) {
-	    
+
 		var ngModel = ctrls[0];
 		var widgets = null;
-		
+
 		if($rootScope.app && $rootScope.app.setting) {
-		    // save setting in root scope
-		    if(!$rootScope.app.setting.wbWidgetExplorer){
-		        $rootScope.app.setting.wbWidgetExplorer = {};
-		    }
-		    scope.wbWidgetExplorer = $rootScope.app.setting.wbWidgetExplorer;
+			// save setting in root scope
+			if(!$rootScope.app.setting.wbWidgetExplorer){
+				$rootScope.app.setting.wbWidgetExplorer = {};
+			}
+			scope.wbWidgetExplorer = $rootScope.app.setting.wbWidgetExplorer;
 		} else {
-		    scope.wbWidgetExplorer = {};
+			scope.wbWidgetExplorer = {};
 		}
-		
+
 		/*
 		 * Filter widgets width the query
 		 */
@@ -64,7 +64,7 @@ angular.module('am-wb-core')
 			}
 			return widgets;
 		}
-		
+
 		/*
 		 * Load widgets in groups
 		 */
@@ -85,12 +85,12 @@ angular.module('am-wb-core')
 			}
 			return groups;
 		}
-		
-		function _runQuery(query, $event){
+
+		function _runQuery(/*query, $event*/){
 			scope.widgets = _loadQuery(scope.query, widgets);
 			scope.groups = _loadGroups(scope.widgets);
 		}
-		
+
 		function _load(){
 			if(!widgets){
 				scope.widgets = [];
@@ -101,13 +101,13 @@ angular.module('am-wb-core')
 			scope.widgets = _loadQuery(scope.query, widgets);
 			scope.groups = _loadGroups(scope.widgets);
 		}
-		
+
 		// Load models
 		ngModel.$render = function(){
 			widgets = ngModel.$modelValue;
 			_load();
-		}
-		
+		};
+
 		scope.runQuery = _runQuery;
 	}
 
@@ -117,6 +117,6 @@ angular.module('am-wb-core')
 		replace : true,
 		scope: {},
 		require: ['ngModel'],
-		link : postLink,
+		link : postLink
 	};
 });

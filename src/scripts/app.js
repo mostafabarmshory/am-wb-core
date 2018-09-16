@@ -41,5 +41,5 @@ angular
         'dndLists',//
         'material.components.expansionPanels',//
         'ngMdIcons', // Material icons
-        'ngHandsontable',
+        'ngHandsontable'
     ]);

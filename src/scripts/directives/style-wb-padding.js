@@ -27,18 +27,18 @@ angular.module('am-wb-core')
 /**
  * @description Apply padding into the element
  */
-.directive("wbPadding", function() {
+.directive('wbPadding', function() {
 	return {
-	    restrict : 'A',
-	    link : function(scope, element, attributes) {
-		    return scope.$watch(attributes.wbPadding, function(style) {
-			    if (!style) {
-				    return;
-			    }
-			    if (style.padding) {
-				    element.css('padding', style.padding);
-			    }
-		    }, true);
-	    }
+		restrict : 'A',
+		link : function(scope, element, attributes) {
+			return scope.$watch(attributes.wbPadding, function(style) {
+				if (!style) {
+					return;
+				}
+				if (style.padding) {
+					element.css('padding', style.padding);
+				}
+			}, true);
+		}
 	};
 });

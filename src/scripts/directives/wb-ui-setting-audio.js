@@ -47,7 +47,7 @@ angular.module('am-wb-core')
 			function selectAudio(){
 				return $resource.get('audio', {
 					style: {
-						title: 'Select Audio',
+						title: 'Select Audio'
 					},
 					data: $scope.value
 				})//
@@ -55,7 +55,7 @@ angular.module('am-wb-core')
 					$scope.value = value;
 				});
 			}
-			
+
 			$scope.edit = selectAudio;
 		}
 	};

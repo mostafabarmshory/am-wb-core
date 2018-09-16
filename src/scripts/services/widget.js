@@ -35,8 +35,7 @@ angular.module('am-wb-core')
  */
 .service('$widget', function(
 		$wbUtil,
-		$q, $sce, $templateRequest, $compile, $controller, $rootScope,
-		$timeout, $mdDialog) {
+		$q, $sce, $templateRequest, $compile, $controller) {
 
 	var _group_repo = [];
 	var contentElementAsso = [];
@@ -45,23 +44,18 @@ angular.module('am-wb-core')
 	var notFoundWidget = {
 			templateUrl : 'views/widgets/wb-notfound.html',
 			label : 'Not found',
-			description : 'Element not found',
+			description : 'Element not found'
 	};
 	var container = {
 			type : 'Page',
 			label : 'Page',
 			description : 'Panel contains list of widgets.',
-			image : 'images/wb/content.svg',
+			image : 'images/wb/content.svg'
 	};
-	
-	function _newGroup(group){
-		var g = _group(group.id);
-		angular.extend(g, group);
-	}
 	
 	function _group(groupId){
 		for(var i = 0; i < _group_repo.length; i++){
-			if(_group_repo[i].id == groupId){
+			if(_group_repo[i].id === groupId){
 				return _group_repo[i];
 			}
 		}
@@ -70,6 +64,11 @@ angular.module('am-wb-core')
 		};
 		_group_repo.push(group);
 		return group;
+	}
+
+	function _newGroup(group){
+		var g = _group(group.id);
+		angular.extend(g, group);
 	}
 	
 	function _groups(){
@@ -123,7 +122,7 @@ angular.module('am-wb-core')
 	 * @memberof $widget
 	 * @returns keys {array} list of all keys
 	 */
-	function widgetsKey(){
+	function getWidgetsKey(){
 		return elementKey;
 	}
 
@@ -207,10 +206,10 @@ angular.module('am-wb-core')
 			var link = $compile(element);
 			if (angular.isDefined(widget.controller)) {
 				var locals = {
-						$scope : childScope,
-						$element : element,
 						// TODO: maso, 2017: bind wbModel, wbParent,
 						// and wbEditable
+						$scope : childScope,
+						$element : element
 				};
 				var controller = $controller(widget.controller, locals);
 				if (widget.controllerAs) {
@@ -239,6 +238,7 @@ angular.module('am-wb-core')
 	this.widget = widget;
 	this.widgets = widgets;
 	this.widgetData = widgetData;
+	this.getWidgetsKey = getWidgetsKey;
 	
 	// widget groups
 	this.group = _group;

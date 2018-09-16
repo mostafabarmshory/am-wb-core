@@ -37,7 +37,7 @@ angular.module('am-wb-core')
 	return {
 		templateUrl: 'views/directives/wb-ui-setting-link.html',
 		restrict: 'E',
-                replace:true,
+		replace:true,
 		scope: {
 			title: '@title',
 			url: '=url',
@@ -47,7 +47,7 @@ angular.module('am-wb-core')
 			function selectlink(){
 				return $resource.get('url', {
 					style: {
-					    icon: 'link',
+						icon: 'link',
 						title: 'add url',
 						description: 'Select url from resources.'
 					},
@@ -57,7 +57,7 @@ angular.module('am-wb-core')
 					$scope.url = value;
 				});
 			}
-			
+
 			$scope.selectlink = selectlink;
 		}
 	};

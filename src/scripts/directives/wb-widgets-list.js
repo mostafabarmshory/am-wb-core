@@ -39,18 +39,17 @@ angular.module('am-wb-core')
 		templateUrl : 'views/directives/wb-widgets-list.html',
 		restrict : 'E',
 		replace : true,
-		scope: {
-			widgets: '<'
+		scope : {
+			widgets : '<'
 		},
-		/**
-		 * 
+		/*
 		 * @ngInject
 		 */
-		controller: function($scope){
-			if(angular.isFunction($window.openHelp)){
-				$scope.openHelp = function(widget, $event){
+		controller : function($scope) {
+			if (angular.isFunction($window.openHelp)) {
+				$scope.openHelp = function(widget, $event) {
 					$window.openHelp(widget, $event);
-				}
+				};
 			}
 		}
 	};

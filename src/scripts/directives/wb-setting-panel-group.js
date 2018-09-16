@@ -42,11 +42,6 @@ angular.module('am-wb-core')
 
 		// Load ngModel
 		var ngModelCtrl = $ctrls[0];
-		ngModelCtrl.$render = function() {
-			if(ngModelCtrl.$viewValue) {
-				loadSetting(ngModelCtrl.$viewValue);
-			}
-		};
 
 		/**
 		 * encapsulate template srce with panel widget template.
@@ -70,11 +65,10 @@ angular.module('am-wb-core')
 			if (page.description) {
 				attr += ' description=\"' + page.description + '\"';
 			}
-			return '<wb-setting-panel ' + attr + '>' + templateSrc
-			+ '</wb-setting-panel>';
+			return '<wb-setting-panel ' + attr + '>' + templateSrc + '</wb-setting-panel>';
 		}
 
-		function isLoaded(model){
+		function isLoaded(){
 			// TODO: check if settings is loaded
 			return false;
 		}
@@ -87,7 +81,6 @@ angular.module('am-wb-core')
 		 * @returns
 		 */
 		function loadSetting(model) {
-			var widget = null;
 			var jobs = [];
 			var pages = [];
 
@@ -100,7 +93,6 @@ angular.module('am-wb-core')
 			}
 			var scope = $rootScope.$new(true, $rootScope);
 			scope.wbModel = model;
-//			scope.wbParent = models.wbParent;
 			oldScope = scope;
 
 			// 2- Clear children
@@ -109,7 +101,6 @@ angular.module('am-wb-core')
 			// 3- load pages
 			$widget.widget(model)//
 			.then(function(w) {
-				widget = w;
 				var widgetSettings = $settings.getSettingsFor(w);
 				angular.forEach(widgetSettings, function(type) {
 					var page = $settings.page(type);
@@ -120,7 +111,7 @@ angular.module('am-wb-core')
 						if (angular.isDefined(page.controller)) {
 							$controller(page.controller, {
 								$scope : scope,
-								$element : element,
+								$element : element
 							});
 						}
 						$compile(element)(scope);
@@ -135,10 +126,12 @@ angular.module('am-wb-core')
 				$q.all(jobs)//
 				.then(function() {
 					pages.sort(function(a, b) {
-						if (a.attr('label') < b.attr('label'))
+						if (a.attr('label') < b.attr('label')){
 							return -1;
-						if (a.attr('label') > b.attr('label'))
+						}
+						if (a.attr('label') > b.attr('label')){
 							return 1;
+						}
 						return 0;
 					});
 					angular.forEach(pages, function(element) {
@@ -147,6 +140,13 @@ angular.module('am-wb-core')
 				});
 			});
 		}
+		
+
+		ngModelCtrl.$render = function() {
+			if(ngModelCtrl.$viewValue) {
+				loadSetting(ngModelCtrl.$viewValue);
+			}
+		};
 	}
 
 	function panelController(){

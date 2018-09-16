@@ -118,7 +118,7 @@ angular.module('am-wb-core')
 		}
 	}
 	
-	function cleanSpace(model){
+	function cleanSpace(/*model*/){
 		// Margin and padding
 	}
 	

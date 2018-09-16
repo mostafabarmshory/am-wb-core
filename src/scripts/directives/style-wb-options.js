@@ -27,14 +27,11 @@ angular.module('am-wb-core')
 /**
  * @description Apply margin into the element
  */
-.directive("wbSize", function($rootElement, $document) {
+.directive('wbSize', function(/* $rootElement, $document */) {
 
-	function postLink($scope, $element, $attrs, $ctrls){
+	function postLink(/*$scope, $element, $attrs, $ctrls*/){
 		// main ctrl
-		var ctrl = $ctrls[0] || $ctrls[1];
-
-
-		//
+//		var ctrl = $ctrls[0] || $ctrls[1];
 //				function showMenu($event) {
 //					var template = '' +
 //					'<div class="menu-panel" md-whiteframe="4">' +

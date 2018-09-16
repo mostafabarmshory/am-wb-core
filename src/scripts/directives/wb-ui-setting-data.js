@@ -44,12 +44,12 @@ angular.module('am-wb-core')
 			icon : '@icon'
 		},
 		controller : function($scope, $resource) {
-			function editData(data) {
+			function editData(/*data*/) {
 				return $resource.get('data', {
 					style : {
-					    icon: 'insert_chart',
+						icon: 'insert_chart',
 						title : 'Data sheet',
-						description: 'Edit data of the current sheet',
+						description: 'Edit data of the current sheet'
 					},
 					data : $scope.value
 				}) //
