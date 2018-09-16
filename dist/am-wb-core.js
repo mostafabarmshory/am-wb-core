@@ -1378,12 +1378,14 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
+ * @ngdoc Directives
+ * @name wb-icon
+ * @description Icon for WB
  */
 .directive('wbIcon', function($interpolate) {
 	function postLink(scope, element, attr, ctrl, transclude) {
 		// Looking for icon
-		var attrName = attr.$normalize(attr.$attr.wbIconName
-				|| '');
+		var attrName = attr.$normalize(attr.$attr.wbIconName || '');
 		transclude(scope, function(clone) {
 			var text = clone.text();
 			if (text && text.trim()) {
@@ -1490,9 +1492,10 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wbInfinateScroll
- * @description
- *  # wbInfinateScroll
+ * @name wb-infinate-scroll
+ * @description wbInfinateScroll
+ * 
+ * This is deprecated please use mb-infinate-scroll
  */
 .directive('wbInfinateScroll', function($q, $timeout) {
 
@@ -2524,7 +2527,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Directives
  * @name wbUiSettingOnOffSwitch
- * @memberof am-wb-core
  * @description a setting section for on/off switch.
  *
  */
@@ -2570,7 +2572,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Directives
  * @name wbUiSettingVideo
- * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
  * @description a setting section to select audio file.
@@ -2634,7 +2635,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Directives
  * @name wbUiSettingColor
- * @memberof am-wb-core
  * @description a setting section to set color.
  *
  */
@@ -2691,7 +2691,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Directives
  * @name wbUiSettingColor
- * @memberof am-wb-core
  * @description a setting section to set color.
  *
  */
@@ -2749,7 +2748,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Directives
  * @name wbUiSettingColor
- * @memberof am-wb-core
  * @description a setting section to set color.
  *
  */
@@ -2864,7 +2862,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Directives
  * @name wbWidget
- * @memberof am-wb-core
  * @description Widgets container
  * 
  * This is widget containers.
@@ -3778,7 +3775,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Services
  * @name $wbFloat
- * @memberof am-wb-core
  * @description Open and manage float panels
  * 
  * 
@@ -3940,7 +3936,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Services
  * @name $widget
- * @memberof am-wb-core
  * @description Resource managment
  * 
  */
@@ -4194,7 +4189,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Services
  * @name $widget
- * @memberof am-wb-core
  * @description مدیریت ویجت‌های سیستم
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
@@ -4315,7 +4309,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Services
  * @name $widget
- * @memberof am-wb-core
  * @description Resource managment
  * 
  */
@@ -4558,7 +4551,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Services
  * @name $widget
- * @memberof am-wb-core
  * @description مدیریت ویجت‌های سیستم
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
