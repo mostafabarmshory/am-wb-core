@@ -79,6 +79,6 @@ angular.module('am-wb-core')
 		'wb-object-data': ngMdIconServiceProvider.getShape('storage'),
 		
 		'wb-widget-group': ngMdIconServiceProvider.getShape('pages'),
-		'wb-widget-html': ngMdIconServiceProvider.getShape('settings_ethernet'),
+		'wb-widget-html': ngMdIconServiceProvider.getShape('settings_ethernet')
 	});
 }]);
