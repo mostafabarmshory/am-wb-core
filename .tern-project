@@ -1,7 +1,17 @@
 {
   "ecmaVersion": 6,
+  "ide": {
+    "scriptPaths": [
+      {
+        "type": "FOLDER",
+        "path": "src"
+      }
+    ]
+  },
   "plugins": {
-    "es_modules": {},
+    "es_modules": {
+      
+    },
     "doc_comment": {
       "strong": true
     },
@@ -14,7 +24,9 @@
     "jshint": {
       "configFile": ".jshintrc"
     },
-    "angular1": {}
+    "angular1": {
+      
+    }
   },
   "libs": [
     "browser"
