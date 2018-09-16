@@ -26,7 +26,7 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc service
+ * @ngdoc Services
  * @name $widget
  * @memberof am-wb-core
  * @description مدیریت ویجت‌های سیستم

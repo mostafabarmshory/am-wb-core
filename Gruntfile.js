@@ -86,7 +86,7 @@ module.exports = function(grunt) {
 			js : {
 				files : [
 					'<%= yeoman.app %>/scripts/**/*.js',
-					'<%= yeoman.demo %>/scripts/**/*.js',
+					'<%= yeoman.demo %>/scripts/**/*.js'
 					],
 					tasks : [
 						'injector',
@@ -108,7 +108,7 @@ module.exports = function(grunt) {
 			styles : {
 				files : [
 					'<%= yeoman.app %>/styles/**/*.css',
-					'<%= yeoman.demo %>/styles/**/*.css' ,
+					'<%= yeoman.demo %>/styles/**/*.css'
 					],
 					tasks : [
 						'injector',
@@ -319,8 +319,8 @@ module.exports = function(grunt) {
 					template : 'node_modules/angular-jsdoc/default',
 					tutorial : 'tutorials',
 					readme : 'README.md'
-				},
-			},
+				}
+			}
 		},
 
 		/*

@@ -156,7 +156,7 @@ angular.module('am-wb-core')
 	 * Compile element 
 	 * 
 	 * @name show
-	 * @memberof $wbFloat
+	 * @memberof $widget
 	 * @param optionsOrPreset
 	 *            {object}
 	 *            <ul>
@@ -225,7 +225,7 @@ angular.module('am-wb-core')
 	/**
 	 * Creates new serialized data of widget
 	 * 
-	 * @memberof $wbFloat
+	 * @memberof $widget
 	 * @param widget
 	 * @returns
 	 */
