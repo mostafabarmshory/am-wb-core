@@ -26,7 +26,7 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wb-widgets-explorer
  * @description Widgets explorers
  * 

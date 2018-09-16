@@ -28,7 +28,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Services
  * @name $widget
- * @memberof am-wb-core
  * @description مدیریت ویجت‌های سیستم
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
@@ -156,7 +155,7 @@ angular.module('am-wb-core')
 	 * Compile element 
 	 * 
 	 * @name show
-	 * @memberof $wbFloat
+	 * @memberof $widget
 	 * @param optionsOrPreset
 	 *            {object}
 	 *            <ul>
@@ -225,7 +224,7 @@ angular.module('am-wb-core')
 	/**
 	 * Creates new serialized data of widget
 	 * 
-	 * @memberof $wbFloat
+	 * @memberof $widget
 	 * @param widget
 	 * @returns
 	 */

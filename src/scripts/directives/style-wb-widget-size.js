@@ -25,6 +25,8 @@
 
 angular.module('am-wb-core')
 /**
+ * @ngdoc Directives
+ * @name wb-widget-size
  * @description Apply margin into the element
  */
 .directive('wbWidgetSize', function($q, $wbUtil, $rootElement, $document, $compile) {

@@ -26,10 +26,11 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
- * @name wbInfinateScroll
- * @description
- *  # wbInfinateScroll
+ * @ngdoc Directives
+ * @name wb-infinate-scroll
+ * @description wbInfinateScroll
+ * 
+ * This is deprecated please use mb-infinate-scroll
  */
 .directive('wbInfinateScroll', function($q, $timeout) {
 

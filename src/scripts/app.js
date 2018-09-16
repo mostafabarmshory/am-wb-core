@@ -23,13 +23,7 @@
  */
 'use strict';
 
-/**
- * @ngdoc module
- * @name ngDonate
- *
- */
-angular
-.module('am-wb-core', [
+angular.module('am-wb-core', [
 	'ngMessages',//
 	'ngAnimate',//
 	'ngAria',//

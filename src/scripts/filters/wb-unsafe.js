@@ -29,7 +29,7 @@ angular.module('am-wb-core')
  * @ngdoc filter
  * @name wbunsafe
  * @function
- * @description # unsafe Filter in the digidociMainApp.
+ * @description # unsafe Filter
  */
 .filter('wbunsafe', function($sce) {
 	return function(val) {

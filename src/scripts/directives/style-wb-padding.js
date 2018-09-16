@@ -25,6 +25,8 @@
 
 angular.module('am-wb-core')
 /**
+ * @ngdoc Directives
+ * @name wb-padding
  * @description Apply padding into the element
  */
 .directive('wbPadding', function() {
