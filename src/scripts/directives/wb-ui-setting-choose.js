@@ -26,9 +26,8 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingChoose
- * @memberof am-wb-core
  * @description a setting section for choosing values.
  *
  */

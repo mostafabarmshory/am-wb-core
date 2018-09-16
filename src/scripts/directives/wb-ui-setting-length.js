@@ -26,7 +26,7 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingLength
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>

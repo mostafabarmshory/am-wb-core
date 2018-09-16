@@ -29,7 +29,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Directives
  * @name wbUiSettingColor
- * @memberof am-wb-core
  * @description a setting section to set color.
  *
  */

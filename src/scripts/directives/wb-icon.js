@@ -26,12 +26,14 @@
 angular.module('am-wb-core')
 
 /**
+ * @ngdoc Directives
+ * @name wb-icon
+ * @description Icon for WB
  */
 .directive('wbIcon', function($interpolate) {
 	function postLink(scope, element, attr, ctrl, transclude) {
 		// Looking for icon
-		var attrName = attr.$normalize(attr.$attr.wbIconName
-				|| '');
+		var attrName = attr.$normalize(attr.$attr.wbIconName || '');
 		transclude(scope, function(clone) {
 			var text = clone.text();
 			if (text && text.trim()) {

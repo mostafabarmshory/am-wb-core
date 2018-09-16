@@ -28,7 +28,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Services
  * @name $wbFloat
- * @memberof am-wb-core
  * @description Open and manage float panels
  * 
  * 

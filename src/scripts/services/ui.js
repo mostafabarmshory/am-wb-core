@@ -28,7 +28,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Services
  * @name $widget
- * @memberof am-wb-core
  * @description Resource managment
  * 
  */

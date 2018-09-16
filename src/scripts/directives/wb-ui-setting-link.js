@@ -26,9 +26,8 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingColor
- * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @description a setting section to set color.
  *

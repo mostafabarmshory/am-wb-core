@@ -26,9 +26,8 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbWidget
- * @memberof am-wb-core
  * @description Widgets container
  * 
  * This is widget containers.

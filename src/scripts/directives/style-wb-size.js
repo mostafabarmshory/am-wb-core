@@ -25,6 +25,8 @@
 
 angular.module('am-wb-core')
 /**
+ * @ngdoc Directives
+ * @name wb-size
  * @description Apply margin into the element
  */
 .directive('wbSize', function($q, $wbUtil, $rootElement, $document, $compile) {

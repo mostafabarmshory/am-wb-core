@@ -571,6 +571,8 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 /**
+ * @ngdoc Directives
+ * @name wb-margin
  * @description Apply margin into the element
  */
 .directive('wbMargin', function() {
@@ -615,174 +617,8 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 /**
- * @description Apply margin into the element
- */
-.directive('wbSize', function(/* $rootElement, $document */) {
-
-	function postLink(/*$scope, $element, $attrs, $ctrls*/){
-		// main ctrl
-//		var ctrl = $ctrls[0] || $ctrls[1];
-//				function showMenu($event) {
-//					var template = '' +
-//					'<div class="menu-panel" md-whiteframe="4">' +
-//					'  <div class="menu-content">' +
-//					'    <div class="menu-item" ng-repeat="item in ctrl.items">' +
-//					'      <button class="md-button">' +
-//					'        <span>{{item}}</span>' +
-//					'      </button>' +
-//					'    </div>' +
-//					'    <md-divider></md-divider>' +
-//					'    <div class="menu-item">' +
-//					'      <button class="md-button" ng-click="ctrl.closeMenu()">' +
-//					'        <span>Close Menu</span>' +
-//					'      </button>' +
-//					'    </div>' +
-//					'  </div>' +
-//					'</div>';
-		//
-//					var position = $mdPanel.newPanelPosition()
-//					.relativeTo($event.target)
-//					.addPanelPosition(
-//							$mdPanel.xPosition.ALIGN_START,
-//							$mdPanel.yPosition.BELOW
-//					);
-		//
-//					var config = {
-//							id: 'content_',
-//							attachTo: angular.element(document.body),
-//							controller: function(){},
-//							controllerAs: 'ctrl',
-//							template: template,
-//							position: position,
-//							panelClass: 'menu-panel-container',
-//							locals: {
-//								items: []
-//							},
-//							openFrom: $event,
-//							focusOnOpen: true,
-//							zIndex: 100,
-//							propagateContainerEvents: true,
-//							clickOutsideToClose: true,
-//							groupName: 'menus'
-//					};
-		//
-//					$mdPanel.open(config);
-//				}	
-//				this.showMenu = showMenu;
-		
-//		function mousemove($event) {
-//			var deltaWidth = dimension.width - (position.x - $event.clientX);
-//			var deltaHeight = dimension.height - (position.y - $event.clientY);
-//			var newDimensions = {
-//					width:  deltaWidth + 'px',
-//					height: deltaHeight + 'px'
-//			};
-//			
-//			$element.css(newDimensions);
-//			if($scope.wbModel){
-//				$scope.wbModel.style.size.width = newDimensions.width;
-//				$scope.wbModel.style.size.height = newDimensions.height;
-//			}
-//			bindToElement();
-//			$scope.$apply();
-//			return false;
-//		}
-//
-//		function mouseup() {
-//			$document.unbind('mousemove', mousemove);
-//			$document.unbind('mouseup', mouseup);
-//		}
-//
-//		function mousedown($event) {
-//			$event.stopImmediatePropagation();
-//			position.x = $event.clientX;
-//			position.y = $event.clientY;
-//			dimension.width = $element.prop('offsetWidth');
-//			dimension.height = $element.prop('offsetHeight');
-//			$document.bind('mousemove', mousemove);
-//			$document.bind('mouseup', mouseup);
-//			return false;
-//		};
-//
-//		function bindToElement(){
-//			var off = $element.offset();
-//			var height = $element.innerHeight();
-//			var width = $element.innerWidth();
-//
-//			button.css('left', off.left + width - 15 + 'px');
-//			button.css('top', off.top + height - 16 + 'px');
-//		}
-//
-//		function checkButton(){
-//			if(button) {
-//				return;
-//			}
-//			button = angular.element('<span></span>');
-//			$rootElement.append(button);
-//			button.width('15px');
-//			button.height('15px');
-//			button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-//			button.css('position', 'absolute');
-//			button.css('visibility', 'hidden');
-//			button.css('cursor', 'nwse-resize');
-//
-//			button.on('mousedown', mousedown);
-//		}
-//
-//		
-//		// Watch size
-//
-//		$scope.$watch(function(){
-//			return ctrl.isSelected();
-//		}, function(value){
-//			if(isRoot()){
-//				return;
-//			}
-//			if(value){
-//				checkButton();
-//				bindToElement();
-//				button.css('visibility', 'visible');
-//			} else {
-//				if(button) {
-//					button.css('visibility', 'hidden');
-//				}
-//			}
-//		});
-	}
-
-	return {
-		restrict : 'A',
-		link : postLink,
-		require:['?wbWidget', '?wbGroup']
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
+ * @ngdoc Directives
+ * @name wb-padding
  * @description Apply padding into the element
  */
 .directive('wbPadding', function() {
@@ -827,6 +663,8 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 /**
+ * @ngdoc Directives
+ * @name wb-size
  * @description Apply margin into the element
  */
 .directive('wbSize', function($q, $wbUtil, $rootElement, $document, $compile) {
@@ -1021,6 +859,8 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 /**
+ * @ngdoc Directives
+ * @name wb-widget-size
  * @description Apply margin into the element
  */
 .directive('wbWidgetSize', function($q, $wbUtil, $rootElement, $document, $compile) {
@@ -1649,7 +1489,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbInfinateScroll
  * @description
  *  # wbInfinateScroll
@@ -1887,9 +1727,8 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbWidget
- * @memberof am-wb-core
  * @description Widgets container
  * 
  * This is widget containers.
@@ -1938,9 +1777,8 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbWidget
- * @memberof am-wb-core
  * @description Widgets container
  * 
  * This is widget containers.
@@ -2003,9 +1841,8 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingAudio
- * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
  * @description a setting section to select audio file.
@@ -2066,9 +1903,8 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingColor
- * @memberof am-wb-core
  * @description a setting section to set color.
  *
  */
@@ -2126,9 +1962,8 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingColor
- * @memberof am-wb-core
  * @description a setting section to set color.
  * 
  */
@@ -2200,9 +2035,8 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingChoose
- * @memberof am-wb-core
  * @description a setting section for choosing values.
  *
  */
@@ -2287,9 +2121,8 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingColor
- * @memberof am-wb-core
  * @description a setting section to set color.
  *
  */
@@ -2333,9 +2166,8 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingData
- * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
  * @description a setting section to manage data.
@@ -2401,9 +2233,8 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
     /**
-     * @ngdoc directive
+     * @ngdoc Directives
      * @name wbUiSettingDropdown
-     * @memberof am-wb-core
      * @description a setting section for choosing values.
      *
      */
@@ -2525,7 +2356,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingLength
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
@@ -2581,9 +2412,8 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingColor
- * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @description a setting section to set color.
  *
@@ -2646,9 +2476,8 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingNumber
- * @memberof am-wb-core
  * @description a setting section to set a number.
  *
  */
@@ -2693,7 +2522,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingOnOffSwitch
  * @memberof am-wb-core
  * @description a setting section for on/off switch.
@@ -2739,7 +2568,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingVideo
  * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
@@ -2803,7 +2632,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingColor
  * @memberof am-wb-core
  * @description a setting section to set color.
@@ -2918,7 +2747,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingColor
  * @memberof am-wb-core
  * @description a setting section to set color.
@@ -3033,7 +2862,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbWidget
  * @memberof am-wb-core
  * @description Widgets container
@@ -3178,7 +3007,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wb-widgets-explorer
  * @description Widgets explorers
  * 
@@ -3300,7 +3129,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wb-widgets-list
  * @description Widgets explorers
  * 
@@ -3356,7 +3185,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wb-widgets-module
  * @description Widgets explorers
  * 
@@ -4109,7 +3938,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc service
+ * @ngdoc Services
  * @name $widget
  * @memberof am-wb-core
  * @description Resource managment
@@ -4363,7 +4192,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc service
+ * @ngdoc Services
  * @name $widget
  * @memberof am-wb-core
  * @description مدیریت ویجت‌های سیستم
@@ -4484,7 +4313,7 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 
 /**
- * @ngdoc service
+ * @ngdoc Services
  * @name $widget
  * @memberof am-wb-core
  * @description Resource managment
@@ -4857,7 +4686,7 @@ angular.module('am-wb-core')
 	 * Compile element 
 	 * 
 	 * @name show
-	 * @memberof $wbFloat
+	 * @memberof $widget
 	 * @param optionsOrPreset
 	 *            {object}
 	 *            <ul>
@@ -4926,7 +4755,7 @@ angular.module('am-wb-core')
 	/**
 	 * Creates new serialized data of widget
 	 * 
-	 * @memberof $wbFloat
+	 * @memberof $widget
 	 * @param widget
 	 * @returns
 	 */
