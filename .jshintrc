@@ -13,6 +13,7 @@
   "-W100": true,
   "globals": {
     "angular": false,
-    "jsPanel": false
+    "jsPanel": false,
+    "_": false
   }
 }
