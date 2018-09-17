@@ -1574,134 +1574,139 @@ angular.module('am-wb-core')
  * Loads list of settings.
  * 
  */
-.directive('wbSettingPanelGroup', function($settings, $widget, $rootScope, $wbUtil, $compile, $controller, $q) {
+.directive('wbSettingPanelGroup', function($settings, $widget, $rootScope, $wbUtil, $compile, $mdTheming, $controller, $q) {
 
-	/**
-	 * Init settings
-	 */
-	function postLink($scope, $element, $attrs, $ctrls) {
+    /**
+     * Init settings
+     */
+    function postLink($scope, $element, $attrs, $ctrls) {
 
-		// Load ngModel
-		var ngModelCtrl = $ctrls[0];
+        // Load ngModel
+        var ngModelCtrl = $ctrls[0];
 
-		/**
-		 * encapsulate template srce with panel widget template.
-		 * 
-		 * @param page
-		 *            setting page config
-		 * @param tempateSrc
-		 *            setting page html template
-		 * @returns encapsulate html template
-		 */
-		function _encapsulateSettingPanel(page, templateSrc) {
-			// TODO: maso, 2017: pass all paramter to the setting
-			// panel.
-			var attr = ' ';
-			if (page.label) {
-				attr += ' label=\"' + page.label + '\"';
-			}
-			if (page.icon) {
-				attr += ' icon=\"' + page.icon + '\"';
-			}
-			if (page.description) {
-				attr += ' description=\"' + page.description + '\"';
-			}
-			return '<wb-setting-panel ' + attr + '>' + templateSrc + '</wb-setting-panel>';
-		}
+        /**
+         * encapsulate template srce with panel widget template.
+         * 
+         * @param page
+         *            setting page config
+         * @param tempateSrc
+         *            setting page html template
+         * @returns encapsulate html template
+         */
+        function _encapsulateSettingPanel(page, templateSrc) {
+            // TODO: maso, 2017: pass all paramter to the setting
+            // panel.
+            var attr = ' ';
+            if (page.label) {
+                attr += ' label=\"' + page.label + '\"';
+            }
+            if (page.icon) {
+                attr += ' icon=\"' + page.icon + '\"';
+            }
+            if (page.description) {
+                attr += ' description=\"' + page.description + '\"';
+            }
+            return '<wb-setting-panel ' + attr + '>' + templateSrc + '</wb-setting-panel>';
+        }
 
-		function isLoaded(){
-			// TODO: check if settings is loaded
-			return false;
-		}
+        function isLoaded(){
+            // TODO: check if settings is loaded
+            return false;
+        }
 
-		var oldScope;
+        var oldScope;
 
-		/**
-		 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-		 * 
-		 * @returns
-		 */
-		function loadSetting(model) {
-			var jobs = [];
-			var pages = [];
+        /**
+         * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+         * 
+         * @returns
+         */
+        function loadSetting(model) {
+            var jobs = [];
+            var pages = [];
 
-			// 0- destroy old resource
-			if(isLoaded(model)){
-				return;
-			}
-			if (angular.isDefined(oldScope)) {
-				oldScope.$destroy();
-			}
-			var scope = $rootScope.$new(true, $rootScope);
-			scope.wbModel = model;
-			oldScope = scope;
+            // 0- destroy old resource
+            if(isLoaded(model)){
+                return;
+            }
+            if (angular.isDefined(oldScope)) {
+                oldScope.$destroy();
+            }
+            var scope = $rootScope.$new(true, $rootScope);
+            scope.wbModel = model;
+            oldScope = scope;
 
-			// 2- Clear children
-			$element.empty();
+            // 2- Clear children
+            $element.empty();
 
-			// 3- load pages
-			$widget.widget(model)//
-			.then(function(w) {
-				var widgetSettings = $settings.getSettingsFor(w);
-				angular.forEach(widgetSettings, function(type) {
-					var page = $settings.page(type);
-					var job = $wbUtil.getTemplateFor(page)
-					.then(function(templateSrc){
-						templateSrc = _encapsulateSettingPanel(page, templateSrc);
-						var element = angular.element(templateSrc);
-						if (angular.isDefined(page.controller)) {
-							$controller(page.controller, {
-								$scope : scope,
-								$element : element
-							});
-						}
-						$compile(element)(scope);
-						element.attr('label', page.lable);
-						pages.push(element);
-					});
-					jobs.push(job);
-				});
-			})
-			//
-			.then(function() {
-				$q.all(jobs)//
-				.then(function() {
-					pages.sort(function(a, b) {
-						if (a.attr('label') < b.attr('label')){
-							return -1;
-						}
-						if (a.attr('label') > b.attr('label')){
-							return 1;
-						}
-						return 0;
-					});
-					angular.forEach(pages, function(element) {
-						$element.append(element);
-					});
-				});
-			});
-		}
-		
+            // 3- load pages
+            $widget.widget(model)//
+            .then(function(w) {
+                var widgetSettings = $settings.getSettingsFor(w);
+                angular.forEach(widgetSettings, function(type) {
+                    var page = $settings.page(type);
+                    var job = $wbUtil.getTemplateFor(page)
+                    .then(function(templateSrc){
+                        templateSrc = _encapsulateSettingPanel(page, templateSrc);
+                        var element = angular.element(templateSrc);
+                        if (angular.isDefined(page.controller)) {
+                            var controller = $controller(page.controller, {
+                                $scope : scope,
+                                $element : element
+                            });
+                            if (page.controllerAs) {
+                                scope[page.controllerAs] = controller;
+                            }
+                            element.data('$ngControllerController', controller);
+                        }
+                        $compile(element)(scope);
+                        element.attr('label', page.lable);
+                        $mdTheming(element);
+                        pages.push(element);
+                    });
+                    jobs.push(job);
+                });
+            })
+            //
+            .then(function() {
+                $q.all(jobs)//
+                .then(function() {
+                    pages.sort(function(a, b) {
+                        if (a.attr('label') < b.attr('label')){
+                            return -1;
+                        }
+                        if (a.attr('label') > b.attr('label')){
+                            return 1;
+                        }
+                        return 0;
+                    });
+                    angular.forEach(pages, function(element) {
+                        $element.append(element);
+                    });
+                });
+            });
+        }
 
-		ngModelCtrl.$render = function() {
-			if(ngModelCtrl.$viewValue) {
-				loadSetting(ngModelCtrl.$viewValue);
-			}
-		};
-	}
 
-	function panelController(){
-	}
+        ngModelCtrl.$render = function() {
+            if(ngModelCtrl.$viewValue) {
+                loadSetting(ngModelCtrl.$viewValue);
+            }
+        };
+    }
 
-	return {
-		restrict : 'E',
-		template: '<div></div>',
-		scope : {},
-		link : postLink,
-		controller: panelController,
-		controllerAs: 'ctrl',
-		require:['ngModel']
-	};
+    function panelController(){
+    }
+
+    return {
+        restrict : 'E',
+        template: '<div></div>',
+        scope : {},
+        link : postLink,
+        controller: panelController,
+        controllerAs: 'ctrl',
+        require:['ngModel']
+    };
 });
 
 /* 
