@@ -150,6 +150,13 @@ angular.module('am-wb-core')
                 if (!model.style.size) {
                     model.style.size = {};
                 }
+                var newStyle = model.style.size;
+                var oldStyle = model.style;
+                var map = [
+                    ['width', 'width'],
+                    ['height', 'height']
+                ];
+                cleanMap(oldStyle, newStyle, map);
             }
 
             function cleanBackground(model) {
@@ -174,8 +181,34 @@ angular.module('am-wb-core')
                 }
             }
 
-            function cleanSpace(/*model*/) {
+            function cleanSpace(model) {
                 // Margin and padding
+                if(model.style.padding && angular.isObject(model.style.padding)){
+                    var padding = '';
+                    if(model.style.padding.isUniform){
+                        padding = model.style.padding.uniform;
+                    } else {
+                        padding = model.style.padding.top || '0px' + ' ' +
+                                model.style.padding.right || '0px' + ' ' +
+                                model.style.padding.bottom || '0px' + ' ' +
+                                model.style.padding.left || '0px' + ' ';
+                    }
+                    model.style.padding = padding;
+                }
+                
+                if(model.style.margin && angular.isObject(model.style.margin)){
+                    var margin = '';
+                    if(model.style.margin.isUniform){
+                        margin = model.style.margin.uniform;
+                    } else {
+                        margin = model.style.margin.top || '0px' + ' ' +
+                                model.style.margin.right || '0px' + ' ' +
+                                model.style.margin.bottom || '0px' + ' ' +
+                                model.style.margin.left || '0px' + ' ';
+                    }
+                    model.style.margin = margin;
+                }
+                
             }
 
             function cleanAlign(model) {
