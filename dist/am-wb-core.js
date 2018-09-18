@@ -23,26 +23,20 @@
  */
 'use strict';
 
-/**
- * @ngdoc module
- * @name ngDonate
- *
- */
-angular
-    .module('am-wb-core', [
-        'ngMessages',//
-        'ngAnimate',//
-        'ngAria',//
-        'ngMaterial',//
-        'pascalprecht.translate',//
-        'mdColorPicker',//
-        //'ngMaterialWysiwyg',
-        'ui.tinymce', //
-        'dndLists',//
-        'material.components.expansionPanels',//
-        'ngMdIcons', // Material icons
-        'ngHandsontable',
-    ]);
+angular.module('am-wb-core', [
+	'ngMessages',//
+	'ngAnimate',//
+	'ngAria',//
+	'ngMaterial',//
+	'pascalprecht.translate',//
+	'mdColorPicker',//
+	//'ngMaterialWysiwyg',
+	'ui.tinymce', //
+	'dndLists',//
+	'material.components.expansionPanels',//
+	'ngMdIcons', // Material icons
+	'ngHandsontable'
+]);
 
 /* 
  * The MIT License (MIT)
@@ -381,7 +375,7 @@ angular.module('am-wb-core')
 		}
 	};
 });
- /* 
+/* 
  * The MIT License (MIT)
  * 
  * Copyright (c) 2016 weburger
@@ -575,186 +569,7 @@ angular.module('am-wb-core')
  * @name wb-margin
  * @description Apply margin into the element
  */
-.directive("wbMargin", function() {
-	return {
-	    restrict : 'A',
-	    link : function(scope, element, attributes) {
-		    return scope.$watch(attributes.wbMargin, function(style) {
-			    if (!style) {
-				    return;
-			    }
-			    if (style.margin) {
-				    element.css('margin', style.margin);
-			    }
-		    }, true);
-	    }
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @description Apply margin into the element
- */
-.directive("wbSize", function($rootElement, $document) {
-
-	function postLink($scope, $element, $attrs, $ctrls){
-		// main ctrl
-		var ctrl = $ctrls[0] || $ctrls[1];
-
-
-		//
-//				function showMenu($event) {
-//					var template = '' +
-//					'<div class="menu-panel" md-whiteframe="4">' +
-//					'  <div class="menu-content">' +
-//					'    <div class="menu-item" ng-repeat="item in ctrl.items">' +
-//					'      <button class="md-button">' +
-//					'        <span>{{item}}</span>' +
-//					'      </button>' +
-//					'    </div>' +
-//					'    <md-divider></md-divider>' +
-//					'    <div class="menu-item">' +
-//					'      <button class="md-button" ng-click="ctrl.closeMenu()">' +
-//					'        <span>Close Menu</span>' +
-//					'      </button>' +
-//					'    </div>' +
-//					'  </div>' +
-//					'</div>';
-		//
-//					var position = $mdPanel.newPanelPosition()
-//					.relativeTo($event.target)
-//					.addPanelPosition(
-//							$mdPanel.xPosition.ALIGN_START,
-//							$mdPanel.yPosition.BELOW
-//					);
-		//
-//					var config = {
-//							id: 'content_',
-//							attachTo: angular.element(document.body),
-//							controller: function(){},
-//							controllerAs: 'ctrl',
-//							template: template,
-//							position: position,
-//							panelClass: 'menu-panel-container',
-//							locals: {
-//								items: []
-//							},
-//							openFrom: $event,
-//							focusOnOpen: true,
-//							zIndex: 100,
-//							propagateContainerEvents: true,
-//							clickOutsideToClose: true,
-//							groupName: 'menus'
-//					};
-		//
-//					$mdPanel.open(config);
-//				}	
-//				this.showMenu = showMenu;
-		
-//		function mousemove($event) {
-//			var deltaWidth = dimension.width - (position.x - $event.clientX);
-//			var deltaHeight = dimension.height - (position.y - $event.clientY);
-//			var newDimensions = {
-//					width:  deltaWidth + 'px',
-//					height: deltaHeight + 'px'
-//			};
-//			
-//			$element.css(newDimensions);
-//			if($scope.wbModel){
-//				$scope.wbModel.style.size.width = newDimensions.width;
-//				$scope.wbModel.style.size.height = newDimensions.height;
-//			}
-//			bindToElement();
-//			$scope.$apply();
-//			return false;
-//		}
-//
-//		function mouseup() {
-//			$document.unbind('mousemove', mousemove);
-//			$document.unbind('mouseup', mouseup);
-//		}
-//
-//		function mousedown($event) {
-//			$event.stopImmediatePropagation();
-//			position.x = $event.clientX;
-//			position.y = $event.clientY;
-//			dimension.width = $element.prop('offsetWidth');
-//			dimension.height = $element.prop('offsetHeight');
-//			$document.bind('mousemove', mousemove);
-//			$document.bind('mouseup', mouseup);
-//			return false;
-//		};
-//
-//		function bindToElement(){
-//			var off = $element.offset();
-//			var height = $element.innerHeight();
-//			var width = $element.innerWidth();
-//
-//			button.css('left', off.left + width - 15 + 'px');
-//			button.css('top', off.top + height - 16 + 'px');
-//		}
-//
-//		function checkButton(){
-//			if(button) {
-//				return;
-//			}
-//			button = angular.element('<span></span>');
-//			$rootElement.append(button);
-//			button.width('15px');
-//			button.height('15px');
-//			button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-//			button.css('position', 'absolute');
-//			button.css('visibility', 'hidden');
-//			button.css('cursor', 'nwse-resize');
-//
-//			button.on('mousedown', mousedown);
-//		}
-//
-//		
-//		// Watch size
-//
-//		$scope.$watch(function(){
-//			return ctrl.isSelected();
-//		}, function(value){
-//			if(isRoot()){
-//				return;
-//			}
-//			if(value){
-//				checkButton();
-//				bindToElement();
-//				button.css('visibility', 'visible');
-//			} else {
-//				if(button) {
-//					button.css('visibility', 'hidden');
-//				}
-//			}
-//		});
-	}
-
+.directive('wbMargin', function() {
 	return {
 		restrict : 'A',
 		link : function(scope, element, attributes) {
@@ -2048,72 +1863,6 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-    /**
-     * @ngdoc directive
-     * @name wbWidget
-     * @memberof am-wb-core
-     * @description Widgets container
-     *
-     * This is widget containers.
-     *
-     * All primary actions of a widget are supported (such as remove and setting).
-     */
-    .directive('wbUiChoose', function () {
-        return {
-            templateUrl: 'views/directives/wb-ui-choose.html',
-            restrict: 'E',
-            scope: {
-                items: '=items',
-                selected: '=selected'
-            },
-            link: function (scope, element, attrs, ctrl, transclude) {
-
-            },
-            controller: function ($scope, $element, $settings, $widget) {
-                $scope.selectedIndex = 0;
-                if ($scope.selected != null)
-                    for (var item in $scope.items) {
-                        if (item.value == $scope.selected)
-                            $scope.selectedIndex = $scope.items.indexOf(item);
-                    }
-                else
-                    $scope.selected = $scope.items[0].value;
-
-                // listen to active tab and update selected attribute.
-                $scope.$watch('selectedIndex', function (current, old) {
-                    $scope.selected = $scope.items[current].value;
-                });
-            }
-        };
-    });
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
 /**
  * @ngdoc Directives
  * @name wbUiSettingAudio
@@ -2175,46 +1924,6 @@ angular.module('am-wb-core')
 'use strict';
 
 angular.module('am-wb-core')
-
-        /**
-         * @ngdoc directive
-         * @name wbUiSettingColor
-         * @memberof am-wb-core
-         * @description a setting section to set color.
-         *
-         */
-        .directive('wbUiSettingBackgroundRepeat', function () {
-            return {
-                templateUrl: 'views/directives/wb-ui-setting-background-repeat.html',
-                restrict: 'E',
-                replace: true,
-                scope: {
-                    title: '@title',
-                    value: '=value',
-                }
-                ,
-                controller: function ($scope) {
-                    $scope.items = [
-                        { name: 'Repeat', value: 'repeat' },
-                        { name: 'Repeat-x', value: 'repeat-x' },
-                       { name: 'Repeat-y', value: 'repeat-y' },
-                       { name: 'No-repeat', value: 'no-repeat' },
-                       { name: 'Space', value: 'space' },
-                       { name: 'Round', value: 'round' },
-                       { name: 'Initial', value: 'initial' },
-                       { name: 'Inherit', value: 'inherit' },
-                       { name: 'Nothing', value: '' }
-                                                                       
-                    ];
-
-                }
-            };
-        });
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  * @ngdoc Directives
@@ -2406,30 +2115,6 @@ angular.module('am-wb-core')
 		link: postLink
 	};
 });
-
-/**
- * Created by mgh on 2/26/17.
- */
-angular.module('am-wb-core')
-
-    /**
-     * @ngdoc directive
-     * @name wbUiSettingColor
-     * @memberof am-wb-core
-     * @description a setting section to set color.
-     *
-     */
-    .directive('wbUiSettingColor', function () {
-        return {
-            templateUrl: 'views/directives/wb-ui-setting-color.html',
-            restrict: 'E',
-            scope: {
-                title: '@title',
-                value: '=value',
-                icon: '@icon'
-            }
-        };
-    });
 
 /* 
  * The MIT License (MIT)
@@ -2786,55 +2471,6 @@ angular.module('am-wb-core')
 	};
 });
 
-/**
- * Created by mgh on 2/26/17.
- */
-angular.module('am-wb-core')
-
-    /**
-     * @ngdoc directive
-     * @name wbUiSettingNumber
-     * @memberof am-wb-core
-     * @description a setting section to set a number.
-     *
-     */
-    .directive('wbUiSettingNumber', function () {
-        return {
-            templateUrl: 'views/directives/wb-ui-setting-number.html',
-            restrict: 'E',
-            scope: {
-                title: '@title',
-                value: '=value',
-                icon: '@icon',
-                slider:'@slider'
-            }
-        };
-    });
-
-/**
- * Created by mgh on 2/26/17.
- */
-angular.module('am-wb-core')
-
-    /**
-     * @ngdoc directive
-     * @name wbUiSettingOnOffSwitch
-     * @memberof am-wb-core
-     * @description a setting section for on/off switch.
-     *
-     */
-    .directive('wbUiSettingOnOffSwitch', function () {
-        return {
-            templateUrl: 'views/directives/wb-ui-setting-on-off-switch.html',
-            restrict: 'E',
-            scope: {
-                title: '@title',
-                value: '=value',
-                icon: '@icon'
-            }
-        };
-    });
-
 /* 
  * The MIT License (MIT)
  * 
@@ -2989,162 +2625,6 @@ angular.module('am-wb-core')
 	};
 });
 
-angular.module('am-wb-core')
-
-        /**
-         * @ngdoc directive
-         * @name wbUiSettingColor
-         * @memberof am-wb-core
-         * @description a setting section to set color.
-         *
-         */
-        .directive('wbUiSettingBackgroundAttachment', function () {
-            return {
-                templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
-                restrict: 'E',
-                replace: true,
-                scope: {
-                    title: '@title',
-                    value: '=value',
-                }
-                ,
-                controller: function ($scope) {
-                    $scope.items = [
-                        {name: 'Scroll', value: 'scroll'},
-                        {name: 'Fixed', value: 'fixed'},
-                        {name: 'Local', value: 'local'},
-                        {name: 'Initial', value: 'initial'},
-                        {name: 'Inherit', value: 'inherit'},
-                        {name: 'Nothing', value: ''}
-                    ];
-
-                }
-            };
-        });
-angular.module('am-wb-core')
-
-        /**
-         * @ngdoc directive
-         * @name wbUiSettingColor
-         * @memberof am-wb-core
-         * @description a setting section to set color.
-         *
-         */
-        .directive('wbUiSettingBackgroundOrigin', function () {
-            return {
-                templateUrl: 'views/directives/wb-ui-setting-background-origin.html',
-                restrict: 'E',
-                replace: true,
-                scope: {
-                    title: '@title',
-                    value: '=value',
-                }
-                ,
-                controller: function ($scope) {
-                    $scope.items = [
-                        {name: 'Padding-box', value: 'padding-box'},
-                        {name: 'Border-box', value: 'border-box'},
-                        {name: 'Content-box', value: 'content-box'},
-                        {name: 'No-repeat', value: 'no-repeat'},
-                        {name: 'Initial', value: 'initial'},
-                        {name: 'Inherit', value: 'inherit'},
-                        {name: 'Nothing', value: ''}
-                    ];
-
-                }
-            };
-        });
-angular.module('am-wb-core')
-
-        /**
-         * @ngdoc directive
-         * @name wbUiSettingColor
-         * @memberof am-wb-core
-         * @description a setting section to set color.
-         *
-         */
-        .directive('wbUiSettingBackgroundPosition', function () {
-            return {
-                templateUrl: 'views/directives/wb-ui-setting-background-position.html',
-                restrict: 'E',
-                scope: {
-                    title: '@title',
-                    value: '=value',
-                }
-                ,
-                controllerAs: 'ctrl',
-                controller: function DemoCtrl($timeout, $q) {
-                    var self = this;
-                    self.simulateQuery = false;
-                    self.isDisabled = false;
-
-                    // list of `state` value/display objects
-                    self.states = loadAll();
-                    self.querySearch = querySearch;
-                    self.newState = newState;
-
-                    function newState(state) {
-                        alert("Sorry! You'll need to create a Constitution for " + state + " first!");
-                    }
-
-                    // ******************************
-                    // Internal methods
-                    // ******************************
-
-                    /**
-                     * Search for states... use $timeout to simulate
-                     * remote dataservice call.
-                     */
-                    function querySearch(query) {
-                        var results = query ? self.states.filter(createFilterFor(query)) : self.states,
-                                deferred;
-                        if (self.simulateQuery) {
-                            deferred = $q.defer();
-                            $timeout(function () {
-                                deferred.resolve(results);
-                            }, Math.random() * 1000, false);
-                            return deferred.promise;
-                        } else {
-                            return results;
-                        }
-                    }
-
-                    /**
-                     * Build `states` list of key/value pairs
-                     */
-                    function loadAll() {
-                            return[
-                        {display: 'Left top', value: 'left top'},
-                        {display: 'Left center', value: 'left center'},
-                        {display: 'Left bottom', value: 'left bottom'},
-                        {display: 'Right top', value: 'right top'},
-                        {display: 'Right center', value: 'right center'},
-                        {display: 'Center top', value: 'center top'},
-                        {display: 'Center center', value: 'center center'},
-                        {display: 'Center bottom', value: 'center bottom'},
-                        {display: 'Initial', value: 'initial'},
-                        {display: 'Inherit', value: 'inherit'},
-                        {display: 'Nothing', value: ''}
-                    ];
-                    }
-
-                    /**
-                     * Create filter function for a query string
-                     * @param {string} query to filter items 
-                     */
-
-                    function createFilterFor(query) {
-                        var lowercaseQuery = query.toLowerCase();
-
-                        return function (state) {
-                            return (state.value.indexOf(lowercaseQuery) === 0);
-                        };
-
-                    }
-
-                }
-            };
-        });
 /* 
  * The MIT License (MIT)
  * 
@@ -5414,7 +4894,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-link.html',
-    "<md-input-container class=md-icon-float> <input ng-model=url placeholder={{title}}> <wb-icon style=\"display:inline-block; cursor: pointer\">more_horiz</wb-icon> </md-input-container>"
+    "<md-input-container class=md-icon-float> <input ng-model=url placeholder={{title}}> <wb-icon ng-click=selectlink() style=\"display:inline-block; cursor: pointer\">more_horiz</wb-icon> </md-input-container>"
   );
 
 
