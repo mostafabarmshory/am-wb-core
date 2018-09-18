@@ -26,40 +26,37 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
- * @name wbInfinateScroll
- * @description
- *  # wbInfinateScroll
+ * @ngdoc Directives
+ * @name wb-infinate-scroll
+ * @description wbInfinateScroll
+ * 
+ * This is deprecated please use mb-infinate-scroll
  */
 .directive('wbInfinateScroll', function($q, $timeout) {
 
-	function postLink(scope, elem, attrs) {
+	function postLink(scope, elem) {
 		var raw = elem[0];
 
-		/**
-		 * 
-		 */
 		function loadNextPage() {
-		  var value = scope.loadPage();
+			var value = scope.loadPage();
 			return $q.when(value)//
 			.then(checkScroll);
 		}
 
 		function checkScroll(value) {
-		  if(value){
-  			return $timeout(function(){
-  				if(raw.scrollHeight <= raw.offsetHeight){
-  					return loadNextPage();
-  				}
-  			}, 100);
-		  }
+			if(value){
+				return $timeout(function(){
+					if(raw.scrollHeight <= raw.offsetHeight){
+						return loadNextPage();
+					}
+				}, 100);
+			}
 		}
 
-		function scrollChange(evt) {
-			if (!(raw.scrollTop + raw.offsetHeight + 5 >= raw.scrollHeight)) {
-				return;
+		function scrollChange() {
+			if (raw.scrollTop + raw.offsetHeight + 5 >= raw.scrollHeight) {
+				loadNextPage();
 			}
-			loadNextPage();
 		}
 
 		elem.on('scroll', scrollChange);

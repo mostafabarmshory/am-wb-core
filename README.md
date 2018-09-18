@@ -5,3 +5,6 @@
 [![coverage report](https://gitlab.com/am-wb/am-wb-core/badges/master/coverage.svg)](https://gitlab.com/am-wb/am-wb-core/commits/master)
 
 WEBURGER is client side web page render engine.
+
+
+See more details in [technical document](https://am-wb.gitlab.io/am-wb-core/doc/index.html).

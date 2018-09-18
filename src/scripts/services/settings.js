@@ -26,15 +26,13 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc service
+ * @ngdoc Services
  * @name $widget
- * @memberof am-wb-core
  * @description مدیریت ویجت‌های سیستم
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$settings',function($rootScope, $controller, $widget, $q, $sce, $compile,
-		$document, $templateRequest, $wbUtil) {
+.service('$settings',function() {
 	/*
 	 * Default settings
 	 */
@@ -112,102 +110,10 @@ angular.module('am-wb-core')
 	}
 
 
-	/**
-	 * Check if this is the current model
-	 */
-	function isLoaded(wbModel) {
-		return oldScope && oldScope.wbModel == wbModel;
-	}
-
-//	/**
-//	* تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-//	* 
-//	* @returns
-//	*/
-//	function loadSetting(models, panelId) {
-//	var widget = null;
-//	var jobs = [];
-//	var pages = [];
-
-//	// 0- destroy old resource
-//	if(isLoaded(models.wbModel)){
-//	return;
-//	}
-//	if (angular.isDefined(oldScope)) {
-//	oldScope.$destroy();
-//	}
-//	var scope = $rootScope.$new(true, $rootScope);
-//	scope.wbModel = models.wbModel;
-//	scope.wbParent = models.wbParent;
-//	oldScope = scope;
-
-//	// 1- Find element
-
-//	var target;
-//	if(panelId){
-//	target = $document.find('#'+panelId).find('#' + WB_SETTING_PANEL_ID);
-//	} else {
-//	target = $document.find('#' + WB_SETTING_PANEL_ID);
-//	}
-
-//	// 2- Clear childrens
-//	target.empty();
-
-//	// 3- load pages
-//	$widget.widget(models.wbModel)//
-//	.then(function(w) {
-//	widget = w;
-//	var widgetSettings = getDefaultSettingsFor(w);
-//	if (angular.isArray(widget.setting)) {
-//	widgetSettings = widgetSettings
-//	.concat(widget.setting);
-//	}
-//	angular.forEach(widgetSettings, function(type) {
-//	var page = notFound;
-//	if (type in settingPages) {
-//	page = settingPages[type];
-//	}
-//	var template = $wbUtil.getTemplateFor(page);
-//	if (angular.isDefined(template)) {
-//	var job = template.then(function(templateSrc) {
-//	templateSrc = _encapsulateSettingPanel(page, templateSrc);
-//	var element = angular.element(templateSrc);
-//	if (angular .isDefined(page.controller)) {
-//	$controller(page.controller, {
-//	$scope : scope,
-//	$element : element,
-//	});
-//	}
-//	$compile(element)(scope);
-//	element.attr('label',page.lable);
-//	pages.push(element);
-//	});
-//	jobs.push(job);
-//	}
-//	});
-
-//	})
-//	//
-//	.then(function() {
-//	$q.all(jobs)//
-//	.then(function() {
-//	pages.sort(function(a, b) {
-//	if (a.attr('label') < b.attr('label'))
-//	return -1;
-//	if (a.attr('label') > b.attr('label'))
-//	return 1;
-//	return 0;
-//	});
-//	angular.forEach(pages, function(element) {
-//	target
-//	.append(element);
-//	});
-//	});
-//	});
-//	}
-
 	// تعیین سرویس‌ها
 	this.page = page;
+	this.getPage = page;
+	this.getPages = pages;
 	this.newPage = newPage;
 	this.getSettingsFor = getSettingsFor;
 });

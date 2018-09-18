@@ -26,7 +26,7 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingLength
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
@@ -36,20 +36,20 @@ angular.module('am-wb-core')
  */
 .directive('wbUiSettingLength', function() {
 	return {
-	    templateUrl : 'views/directives/wb-ui-setting-length.html',
-	    restrict : 'E',
-	    replace: true,
-	    scope : {
-	        title : '@?',
-	        value : '=?',
-	        icon : '@?',
-	        description : '@?',
-	    },
-	    /**
-		 * 
+		templateUrl : 'views/directives/wb-ui-setting-length.html',
+		restrict : 'E',
+		replace: true,
+		scope : {
+			title : '@?',
+			value : '=?',
+			icon : '@?',
+			description : '@?'
+		},
+		/*
 		 * @gnInject
 		 */
-	    controller : function($scope, $resource) {
-	    }
+		controller : function(/*$scope, $resource*/) {
+		},
+		controllerAs: 'ctrl'
 	};
 });

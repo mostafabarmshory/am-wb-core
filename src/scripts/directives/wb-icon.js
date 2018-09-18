@@ -26,14 +26,14 @@
 angular.module('am-wb-core')
 
 /**
+ * @ngdoc Directives
+ * @name wb-icon
+ * @description Icon for WB
  */
 .directive('wbIcon', function($interpolate) {
 	function postLink(scope, element, attr, ctrl, transclude) {
 		// Looking for icon
-		var attrName = attr.$normalize(attr.$attr.wbIconName
-				|| '');
-		var contentValue = null;
-
+		var attrName = attr.$normalize(attr.$attr.wbIconName || '');
 		transclude(scope, function(clone) {
 			var text = clone.text();
 			if (text && text.trim()) {
@@ -78,13 +78,13 @@ angular.module('am-wb-core')
 			function(selectors, isel) {
 				return selectors.concat([ 'wb-icon ~ ' + isel,
 					'.wb-icon ~ ' + isel ]);
-			}, []).join(",");
+			}, []).join(',');
 
 	var RIGHT_SELECTORS = INPUT_TAGS.reduce(
 			function(selectors, isel) {
 				return selectors.concat([ isel + ' ~ wb-icon',
 					isel + ' ~ .wb-icon' ]);
-			}, []).join(",");
+			}, []).join(',');
 
 	function compile(tElement) {
 		// Check for both a left & right icon
@@ -107,6 +107,6 @@ angular.module('am-wb-core')
 
 	return {
 		restrict : 'C',
-		compile : compile,
+		compile : compile
 	};
 });

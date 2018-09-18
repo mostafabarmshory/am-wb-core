@@ -12,6 +12,8 @@
   "unused": true,
   "-W100": true,
   "globals": {
-    "angular": false
+    "angular": false,
+    "jsPanel": false,
+    "_": false
   }
 }

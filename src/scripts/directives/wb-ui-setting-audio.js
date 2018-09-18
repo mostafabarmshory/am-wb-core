@@ -26,9 +26,8 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingAudio
- * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
  * @description a setting section to select audio file.
@@ -47,7 +46,7 @@ angular.module('am-wb-core')
 			function selectAudio(){
 				return $resource.get('audio', {
 					style: {
-						title: 'Select Audio',
+						title: 'Select Audio'
 					},
 					data: $scope.value
 				})//
@@ -55,7 +54,7 @@ angular.module('am-wb-core')
 					$scope.value = value;
 				});
 			}
-			
+
 			$scope.edit = selectAudio;
 		}
 	};

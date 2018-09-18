@@ -28,15 +28,13 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Services
  * @name $widget
- * @memberof am-wb-core
  * @description مدیریت ویجت‌های سیستم
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$widget', function(
 		$wbUtil,
-		$q, $sce, $templateRequest, $compile, $controller, $rootScope,
-		$timeout, $mdDialog) {
+		$q, $sce, $templateRequest, $compile, $controller) {
 
 	var _group_repo = [];
 	var contentElementAsso = [];
@@ -45,23 +43,18 @@ angular.module('am-wb-core')
 	var notFoundWidget = {
 			templateUrl : 'views/widgets/wb-notfound.html',
 			label : 'Not found',
-			description : 'Element not found',
+			description : 'Element not found'
 	};
 	var container = {
 			type : 'Page',
 			label : 'Page',
 			description : 'Panel contains list of widgets.',
-			image : 'images/wb/content.svg',
+			image : 'images/wb/content.svg'
 	};
-	
-	function _newGroup(group){
-		var g = _group(group.id);
-		angular.extend(g, group);
-	}
 	
 	function _group(groupId){
 		for(var i = 0; i < _group_repo.length; i++){
-			if(_group_repo[i].id == groupId){
+			if(_group_repo[i].id === groupId){
 				return _group_repo[i];
 			}
 		}
@@ -70,6 +63,11 @@ angular.module('am-wb-core')
 		};
 		_group_repo.push(group);
 		return group;
+	}
+
+	function _newGroup(group){
+		var g = _group(group.id);
+		angular.extend(g, group);
 	}
 	
 	function _groups(){
@@ -123,7 +121,7 @@ angular.module('am-wb-core')
 	 * @memberof $widget
 	 * @returns keys {array} list of all keys
 	 */
-	function widgetsKey(){
+	function getWidgetsKey(){
 		return elementKey;
 	}
 
@@ -157,7 +155,7 @@ angular.module('am-wb-core')
 	 * Compile element 
 	 * 
 	 * @name show
-	 * @memberof $wbFloat
+	 * @memberof $widget
 	 * @param optionsOrPreset
 	 *            {object}
 	 *            <ul>
@@ -184,7 +182,7 @@ angular.module('am-wb-core')
 	 * @param parenScope
 	 * @return promise A promise that resolve created element
 	 */
-	function compile(model, parenScope, parentElement){
+	function compile(model, parenScope, parentElement, locals){
 		var widget = _widget(model);
 		var childScope = null;
 		var element = null;
@@ -206,13 +204,13 @@ angular.module('am-wb-core')
 			// 3- bind controller
 			var link = $compile(element);
 			if (angular.isDefined(widget.controller)) {
-				var locals = {
-						$scope : childScope,
-						$element : element,
+				var wlocals = _.merge({
 						// TODO: maso, 2017: bind wbModel, wbParent,
 						// and wbEditable
-				};
-				var controller = $controller(widget.controller, locals);
+						$scope : childScope,
+						$element : element
+				}, locals || {});
+				var controller = $controller(widget.controller, wlocals);
 				if (widget.controllerAs) {
 					childScope[widget.controllerAs] = controller;
 				}
@@ -226,7 +224,7 @@ angular.module('am-wb-core')
 	/**
 	 * Creates new serialized data of widget
 	 * 
-	 * @memberof $wbFloat
+	 * @memberof $widget
 	 * @param widget
 	 * @returns
 	 */
@@ -239,6 +237,7 @@ angular.module('am-wb-core')
 	this.widget = widget;
 	this.widgets = widgets;
 	this.widgetData = widgetData;
+	this.getWidgetsKey = getWidgetsKey;
 	
 	// widget groups
 	this.group = _group;

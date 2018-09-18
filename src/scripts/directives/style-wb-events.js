@@ -1,4 +1,4 @@
- /* 
+/* 
  * The MIT License (MIT)
  * 
  * Copyright (c) 2016 weburger
@@ -36,7 +36,7 @@ angular.module('am-wb-core')
  * 		wb-events="events">
  * 	</div>
  */
-.directive("wbEvents", function() {
+.directive('wbEvents', function() {
 	function postLink($scope, $element, $attrs, $ctrls) {
 		// load ctrl
 		var ctrl = $ctrls[0] || $ctrls[1];
@@ -53,8 +53,8 @@ angular.module('am-wb-core')
 		});
 	}
 	return {
-	    restrict : 'A',
-	    link : postLink,
+		restrict : 'A',
+		link : postLink,
 		require:['?wbWidget', '?wbGroup']
 	};
 });

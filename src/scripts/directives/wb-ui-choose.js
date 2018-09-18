@@ -25,41 +25,39 @@
 
 angular.module('am-wb-core')
 
-    /**
-     * @ngdoc directive
-     * @name wbWidget
-     * @memberof am-wb-core
-     * @description Widgets container
-     *
-     * This is widget containers.
-     *
-     * All primary actions of a widget are supported (such as remove and setting).
-     */
-    .directive('wbUiChoose', function () {
-        return {
-            templateUrl: 'views/directives/wb-ui-choose.html',
-            restrict: 'E',
-            scope: {
-                items: '=items',
-                selected: '=selected'
-            },
-            link: function (scope, element, attrs, ctrl, transclude) {
+/**
+ * @ngdoc Directives
+ * @name wbWidget
+ * @description Widgets container
+ * 
+ * This is widget containers.
+ * 
+ * All primary actions of a widget are supported (such as remove and setting).
+ */
+.directive('wbUiChoose', function() {
+	return {
+		templateUrl : 'views/directives/wb-ui-choose.html',
+		restrict : 'E',
+		scope : {
+			items : '=items',
+			selected : '=selected'
+		},
+		controller : function($scope) {
+			$scope.selectedIndex = 0;
+			if ($scope.selected !== null) {
+				for ( var item in $scope.items) {
+					if (item.value === $scope.selected) {
+						$scope.selectedIndex = $scope.items.indexOf(item);
+					}
+				}
+			} else {
+				$scope.selected = $scope.items[0].value;
+			}
 
-            },
-            controller: function ($scope, $element, $settings, $widget) {
-                $scope.selectedIndex = 0;
-                if ($scope.selected != null)
-                    for (var item in $scope.items) {
-                        if (item.value == $scope.selected)
-                            $scope.selectedIndex = $scope.items.indexOf(item);
-                    }
-                else
-                    $scope.selected = $scope.items[0].value;
-
-                // listen to active tab and update selected attribute.
-                $scope.$watch('selectedIndex', function (current, old) {
-                    $scope.selected = $scope.items[current].value;
-                });
-            }
-        };
-    });
+			// listen to active tab and update selected attribute.
+			$scope.$watch('selectedIndex', function(current) {
+				$scope.selected = $scope.items[current].value;
+			});
+		}
+	};
+});

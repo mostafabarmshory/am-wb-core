@@ -26,9 +26,8 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingColor
- * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @description a setting section to set color.
  *
@@ -37,7 +36,7 @@ angular.module('am-wb-core')
 	return {
 		templateUrl: 'views/directives/wb-ui-setting-link.html',
 		restrict: 'E',
-                replace:true,
+		replace:true,
 		scope: {
 			title: '@title',
 			url: '=url',
@@ -45,9 +44,9 @@ angular.module('am-wb-core')
 		},
 		controller: function($scope, $resource){
 			function selectlink(){
-				return $resource.get('link', {
+				return $resource.get('url', {
 					style: {
-					    icon: 'link',
+						icon: 'link',
 						title: 'add url',
 						description: 'Select url from resources.'
 					},
@@ -57,7 +56,7 @@ angular.module('am-wb-core')
 					$scope.url = value;
 				});
 			}
-			
+
 			$scope.selectlink = selectlink;
 		}
 	};
