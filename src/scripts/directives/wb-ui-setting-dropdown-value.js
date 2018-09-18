@@ -23,17 +23,17 @@
  */
 'use strict';
 
-angular.module('am-wb-core')
+angular.module('am-wb-chart')
 
 /**
  * @ngdoc Directives
- * @name wbUiSettingDropdown
+ * @name wb-ui-setting-dropdown
  * @description a setting section for choosing values.
  *
  */
-.directive('wbUiSettingDropdown', function () {
+.directive('wbUiSettingDropdownValue', function () {
 	return {
-		templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
+		templateUrl: 'views/directives/wb-ui-setting-dropdown-value.html',
 		restrict: 'E',
 		scope: {
 			title: '@title',

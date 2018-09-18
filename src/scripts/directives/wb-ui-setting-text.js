@@ -27,19 +27,18 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wbUiSettingDropdown
- * @description a setting section for choosing values.
+ * @name wb-ui-setting-text
+ * @description Setting for a text
  *
  */
-.directive('wbUiSettingDropdown', function () {
+.directive('wbUiSettingText', function () {
 	return {
-		templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
+		templateUrl: 'views/directives/wb-ui-setting-text.html',
 		restrict: 'E',
 		scope: {
 			title: '@title',
 			value: '=value',
-			icon: '@icon',
-			items:'=items'
+			icon: '@icon'
 		}
 	};
 });
