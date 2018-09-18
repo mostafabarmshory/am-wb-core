@@ -98,13 +98,18 @@ angular.module('am-wb-core')
                 // convert
                 var newStyle = model.style.layout;
                 var oldStyle = model.style;
-                
-                if (oldStyle.flexDirection && oldStyle.flexDirection === 'wb-flex-row') {
-                    newStyle.direction = 'row';
-                } else {
+
+                if (oldStyle.flexDirection) {
+                    if (oldStyle.flexDirection === 'wb-flex-row') {
+                        newStyle.direction = 'row';
+                    } else {
+                        newStyle.direction = 'column';
+                    }
+                    delete oldStyle.flexDirection;
+                }
+                if (!newStyle.direction) {
                     newStyle.direction = 'column';
                 }
-                delete oldStyle.flexDirection;
 
                 switch (oldStyle.flexAlignItem) {
                     case 'wb-flex-align-items-center':
@@ -183,9 +188,9 @@ angular.module('am-wb-core')
 
             function cleanSpace(model) {
                 // Margin and padding
-                if(model.style.padding && angular.isObject(model.style.padding)){
+                if (model.style.padding && angular.isObject(model.style.padding)) {
                     var padding = '';
-                    if(model.style.padding.isUniform){
+                    if (model.style.padding.isUniform) {
                         padding = model.style.padding.uniform;
                     } else {
                         padding = model.style.padding.top || '0px' + ' ' +
@@ -195,10 +200,10 @@ angular.module('am-wb-core')
                     }
                     model.style.padding = padding;
                 }
-                
-                if(model.style.margin && angular.isObject(model.style.margin)){
+
+                if (model.style.margin && angular.isObject(model.style.margin)) {
                     var margin = '';
-                    if(model.style.margin.isUniform){
+                    if (model.style.margin.isUniform) {
                         margin = model.style.margin.uniform;
                     } else {
                         margin = model.style.margin.top || '0px' + ' ' +
@@ -208,7 +213,7 @@ angular.module('am-wb-core')
                     }
                     model.style.margin = margin;
                 }
-                
+
             }
 
             function cleanAlign(model) {
