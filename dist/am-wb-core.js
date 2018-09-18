@@ -2242,24 +2242,70 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-    /**
-     * @ngdoc Directives
-     * @name wbUiSettingDropdown
-     * @description a setting section for choosing values.
-     *
-     */
-    .directive('wbUiSettingDropdown', function () {
-        return {
-            templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
-            restrict: 'E',
-            scope: {
-                title: '@title',
-                value: '=value',
-                icon: '@icon',
-                items:'=items'
-            }
-        };
-    });
+/**
+ * @ngdoc Directives
+ * @name wb-ui-setting-dropdown
+ * @description a setting section for choosing values.
+ *
+ */
+.directive('wbUiSettingDropdownValue', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-dropdown-value.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon',
+			items:'=items'
+		}
+	};
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingDropdown
+ * @description a setting section for choosing values.
+ *
+ */
+.directive('wbUiSettingDropdown', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon',
+			items:'=items'
+		}
+	};
+});
 
 /* 
  * The MIT License (MIT)
@@ -2540,6 +2586,51 @@ angular.module('am-wb-core')
 .directive('wbUiSettingOnOffSwitch', function () {
 	return {
 		templateUrl: 'views/directives/wb-ui-setting-on-off-switch.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon'
+		}
+	};
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wb-ui-setting-text
+ * @description Setting for a text
+ *
+ */
+.directive('wbUiSettingText', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-text.html',
 		restrict: 'E',
 		scope: {
 			title: '@title',
@@ -4865,6 +4956,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/directives/wb-ui-setting-dropdown-value.html',
+    " <md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-select style=\"margin: 0px\" ng-model=value> <md-option ng-repeat=\"item in items\" ng-value=item.value> {{item.title}} </md-option> </md-select> </md-list-item>"
+  );
+
+
   $templateCache.put('views/directives/wb-ui-setting-dropdown.html',
     "<md-list-item> <wb-icon ng-hide=\"icon === undefined || icon === null || icon === ''\">{{icon}}</wb-icon> <p ng-hide=\"title === undefined || title === null || title === ''\">{{title}}</p> <md-select style=\"margin: 0px\" ng-model=value> <md-option ng-repeat=\"item in items\" value={{item.value}}> {{item.title}} </md-option> </md-select> </md-list-item>"
   );
@@ -4892,6 +4988,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-ui-setting-on-off-switch.html',
     "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-switch class=md-secondary ng-model=value></md-switch> </md-list-item>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-text.html',
+    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input style=\"width: 200px\" ng-model=value flex> </md-input-container> </md-list-item>"
   );
 
 

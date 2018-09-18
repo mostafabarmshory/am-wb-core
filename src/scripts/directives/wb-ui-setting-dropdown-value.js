@@ -23,7 +23,7 @@
  */
 'use strict';
 
-angular.module('am-wb-chart')
+angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
