@@ -1308,25 +1308,12 @@ angular.module('am-wb-core')
             return $scope.wbAllowedTypesl;
         };
 
-		ctrl.getActions = function(){
-			return [{
-				title: 'Delete',
-				icon: 'delete',
-				action: ctrl.delete
-			},{
-				title: 'Clone',
-				icon: 'content_copy',
-				action: function(){
-					if(ctrl.isRoot()){
-						return;
-					}
-					var model = ctrl.clone();
-					var index = $scope.parentCtrl.indexOfChild($scope.wbModel);
-					$scope.parentCtrl.addChild(index, model);
-				}
-			}];
-		};
-	}
+        ctrl.on = function(type, callback){
+            if(!angular.isArray(callbacks[type])){
+                callbacks[type] = [];
+            }
+            callbacks[type].push(callback);
+        };
 
         ctrl.getActions = function(){
             return [{
@@ -1898,6 +1885,233 @@ angular.module('am-wb-core')
 	};
 });
 
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingBackgroundAttachment', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
+		restrict: 'E',
+		replace: true,
+		scope: {
+			title: '@title',
+			value: '=value'
+		},
+		controller: function ($scope) {
+			$scope.items = [
+				{name: 'Scroll', value: 'scroll'},
+				{name: 'Fixed', value: 'fixed'},
+				{name: 'Local', value: 'local'},
+				{name: 'Initial', value: 'initial'},
+				{name: 'Inherit', value: 'inherit'},
+				{name: 'Nothing', value: ''}
+				];
+
+		}
+	};
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingBackgroundOrigin', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-background-origin.html',
+		restrict: 'E',
+		replace: true,
+		scope: {
+			title: '@title',
+			value: '=value'
+		},
+		controller: function ($scope) {
+			$scope.items = [
+				{name: 'Padding-box', value: 'padding-box'},
+				{name: 'Border-box', value: 'border-box'},
+				{name: 'Content-box', value: 'content-box'},
+				{name: 'No-repeat', value: 'no-repeat'},
+				{name: 'Initial', value: 'initial'},
+				{name: 'Inherit', value: 'inherit'},
+				{name: 'Nothing', value: ''}
+				];
+
+		}
+	};
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingBackgroundPosition', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-background-position.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value'
+		},
+		controllerAs: 'ctrl',
+		controller: function DemoCtrl($timeout, $q) {
+			var self = this;
+			self.simulateQuery = false;
+			self.isDisabled = false;
+
+			// list of `state` value/display objects
+			self.states = loadAll();
+			self.querySearch = querySearch;
+
+			function newState(state) {
+				alert('Sorry! You`ll need to create a Constitution for ' + state + ' first!');
+			}
+			self.newState = newState;
+
+			// ******************************
+			// Internal methods
+			// ******************************
+
+			/**
+			 * Search for states... use $timeout to simulate
+			 * remote dataservice call.
+			 */
+			function querySearch(query) {
+				var results = query ? self.states.filter(createFilterFor(query)) : self.states,
+						deferred;
+				if (self.simulateQuery) {
+					deferred = $q.defer();
+					$timeout(function () {
+						deferred.resolve(results);
+					}, Math.random() * 1000, false);
+					return deferred.promise;
+				} else {
+					return results;
+				}
+			}
+
+			/**
+			 * Build `states` list of key/value pairs
+			 */
+			function loadAll() {
+				return[
+					{display: 'Left top', value: 'left top'},
+					{display: 'Left center', value: 'left center'},
+					{display: 'Left bottom', value: 'left bottom'},
+					{display: 'Right top', value: 'right top'},
+					{display: 'Right center', value: 'right center'},
+					{display: 'Center top', value: 'center top'},
+					{display: 'Center center', value: 'center center'},
+					{display: 'Center bottom', value: 'center bottom'},
+					{display: 'Initial', value: 'initial'},
+					{display: 'Inherit', value: 'inherit'},
+					{display: 'Nothing', value: ''}
+					];
+			}
+
+			/**
+			 * Create filter function for a query string
+			 * @param {string} query to filter items 
+			 */
+
+			function createFilterFor(query) {
+				var lowercaseQuery = query.toLowerCase();
+
+				return function (state) {
+					return (state.value.indexOf(lowercaseQuery) === 0);
+				};
+
+			}
+
+		}
+	};
+});
 /* 
  * The MIT License (MIT)
  * 
@@ -2654,233 +2868,6 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingBackgroundAttachment', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
-		restrict: 'E',
-		replace: true,
-		scope: {
-			title: '@title',
-			value: '=value'
-		},
-		controller: function ($scope) {
-			$scope.items = [
-				{name: 'Scroll', value: 'scroll'},
-				{name: 'Fixed', value: 'fixed'},
-				{name: 'Local', value: 'local'},
-				{name: 'Initial', value: 'initial'},
-				{name: 'Inherit', value: 'inherit'},
-				{name: 'Nothing', value: ''}
-				];
-
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingBackgroundOrigin', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-background-origin.html',
-		restrict: 'E',
-		replace: true,
-		scope: {
-			title: '@title',
-			value: '=value'
-		},
-		controller: function ($scope) {
-			$scope.items = [
-				{name: 'Padding-box', value: 'padding-box'},
-				{name: 'Border-box', value: 'border-box'},
-				{name: 'Content-box', value: 'content-box'},
-				{name: 'No-repeat', value: 'no-repeat'},
-				{name: 'Initial', value: 'initial'},
-				{name: 'Inherit', value: 'inherit'},
-				{name: 'Nothing', value: ''}
-				];
-
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingBackgroundPosition', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-background-position.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value'
-		},
-		controllerAs: 'ctrl',
-		controller: function DemoCtrl($timeout, $q) {
-			var self = this;
-			self.simulateQuery = false;
-			self.isDisabled = false;
-
-			// list of `state` value/display objects
-			self.states = loadAll();
-			self.querySearch = querySearch;
-
-			function newState(state) {
-				alert('Sorry! You`ll need to create a Constitution for ' + state + ' first!');
-			}
-			self.newState = newState;
-
-			// ******************************
-			// Internal methods
-			// ******************************
-
-			/**
-			 * Search for states... use $timeout to simulate
-			 * remote dataservice call.
-			 */
-			function querySearch(query) {
-				var results = query ? self.states.filter(createFilterFor(query)) : self.states,
-						deferred;
-				if (self.simulateQuery) {
-					deferred = $q.defer();
-					$timeout(function () {
-						deferred.resolve(results);
-					}, Math.random() * 1000, false);
-					return deferred.promise;
-				} else {
-					return results;
-				}
-			}
-
-			/**
-			 * Build `states` list of key/value pairs
-			 */
-			function loadAll() {
-				return[
-					{display: 'Left top', value: 'left top'},
-					{display: 'Left center', value: 'left center'},
-					{display: 'Left bottom', value: 'left bottom'},
-					{display: 'Right top', value: 'right top'},
-					{display: 'Right center', value: 'right center'},
-					{display: 'Center top', value: 'center top'},
-					{display: 'Center center', value: 'center center'},
-					{display: 'Center bottom', value: 'center bottom'},
-					{display: 'Initial', value: 'initial'},
-					{display: 'Inherit', value: 'inherit'},
-					{display: 'Nothing', value: ''}
-					];
-			}
-
-			/**
-			 * Create filter function for a query string
-			 * @param {string} query to filter items 
-			 */
-
-			function createFilterFor(query) {
-				var lowercaseQuery = query.toLowerCase();
-
-				return function (state) {
-					return (state.value.indexOf(lowercaseQuery) === 0);
-				};
-
-			}
-
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
  * @name wbWidget
  * @description Widgets container
  * 
@@ -2947,7 +2934,7 @@ angular.module('am-wb-core')
 
 		ctrl.isEditable = function(){
 			return  $scope.group.isEditable();
-		};;
+		};
 
 		ctrl.isSelected = function(){
 			return $scope.group.isChildSelected(ctrl);
@@ -2964,7 +2951,7 @@ angular.module('am-wb-core')
 				title: 'Delete',
 				icon: 'delete',
 				action: ctrl.delete,
-                                description: 'Delete widget'
+				description: 'Delete widget'
 			},{
 				title: 'Clone',
 				icon: 'content_copy',
@@ -2973,10 +2960,10 @@ angular.module('am-wb-core')
 					var index = $scope.group.indexOfChild($scope.wbModel);
 					$scope.group.addChild(index, model);
 				},
-                                description: 'Duplicate widget'
+				description: 'Duplicate widget'
 			}];
 		};
-		
+
 		ctrl.on = function(type, callback){
 			if(!angular.isArray(callbacks[type])){
 				callbacks[type] = [];
@@ -3378,11 +3365,11 @@ angular.module('am-wb-core')
 		templateUrl : 'views/settings/wb-general.html'
 	});
 	$settings.newPage({
-	    type : 'background',
-	    label : 'Background',
-	    icon : 'image',
-	    description : '',
-	    templateUrl : 'views/settings/wb-background.html'
+		type : 'background',
+		label : 'Background',
+		icon : 'image',
+		description : '',
+		templateUrl : 'views/settings/wb-background.html'
 	});
 	$settings.newPage({
 		type : 'text',
@@ -4420,125 +4407,142 @@ angular.module('am-wb-core')
  * @description Utility service of WB
  * 
  */
-.service('$wbUtil', function($rootScope, $controller, $q, $sce, $compile, $document,
-		$templateRequest) {
-	/**
-	 * Loading template of the page
-	 * 
-	 * @name getTemplateFor
-	 * @memberof $wbUtil
-	 * @param page
-	 *            {object} properties of a page, widget , ..
-	 * @return promise to load template on resolve.
-	 */
-	function getTemplateFor(page) {
-		var template, templateUrl;
-		if (angular.isDefined(template = page.template)) {
-			if (angular.isFunction(template)) {
-				template = template(page.params);
-			}
-		} else if (angular.isDefined(templateUrl = page.templateUrl)) {
-			if (angular.isFunction(templateUrl)) {
-				templateUrl = templateUrl(page.params);
-			}
-			if (angular.isDefined(templateUrl)) {
-				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
-				template = $templateRequest(templateUrl);
-			}
-		}
-		return $q.when(template);
-	}
+.service('$wbUtil', function ($q, $sce, $templateRequest) {
+
+    function cleanMap(oldStyle, newStyle, map) {
+        for (var i = 0; i < map.length; i++) {
+            if (oldStyle[map[i][0]]) {
+                newStyle[map[i][1]] = oldStyle[map[i][0]];
+                delete oldStyle[map[i][0]];
+            }
+        }
+    }
+    /**
+     * Loading template of the page
+     * 
+     * @name getTemplateFor
+     * @memberof $wbUtil
+     * @param page
+     *            {object} properties of a page, widget , ..
+     * @return promise to load template on resolve.
+     */
+    function getTemplateFor(page) {
+        var template, templateUrl;
+        if (angular.isDefined(template = page.template)) {
+            if (angular.isFunction(template)) {
+                template = template(page.params);
+            }
+        } else if (angular.isDefined(templateUrl = page.templateUrl)) {
+            if (angular.isFunction(templateUrl)) {
+                templateUrl = templateUrl(page.params);
+            }
+            if (angular.isDefined(templateUrl)) {
+                page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+                template = $templateRequest(templateUrl);
+            }
+        }
+        return $q.when(template);
+    }
 
 
-	function cleanEvetns(model){
-		// event
-		if(!model.event) {
-			model.event = {};
-		}
-	}
+    function cleanEvetns(model) {
+        // event
+        if (!model.event) {
+            model.event = {};
+        }
+    }
 
-	function cleanStyle(model){
-		if(!model.style) {
-			model.style = {};
-		}
-		cleanLayout(model);
-		cleanSize(model);
-		cleanBackground(model);
-		cleanBorder(model);
-		cleanSpace(model);
-		cleanAlign(model);
-	}
+    function cleanStyle(model) {
+        if (!model.style) {
+            model.style = {};
+        }
+        cleanLayout(model);
+        cleanSize(model);
+        cleanBackground(model);
+        cleanBorder(model);
+        cleanSpace(model);
+        cleanAlign(model);
+    }
 
-	function cleanLayout(model){
-		if(model.type !== 'Group'){
-			return;
-		}
-		if(!model.style.layout) {
-			model.style.layout = {};
-		}
-		var layout = model.style.layout;
-		if(!layout.direction) {
-			layout.direction = 'column';
-		}
-		if(!layout.justify) {
-			layout.justify = 'center';
-		}
-		if(!layout.align) {
-			layout.align = 'stretch';
-		}
-	}
-	
-	function cleanSize(model){
-		if(!model.style.size) {
-			model.style.size = {};
-		}
-	}
-	
-	function cleanBackground(model) {
-		if(!model.style.background) {
-			model.style.background = {};
-		}
-	}
-	
+    function cleanLayout(model) {
+        if (model.type !== 'Group') {
+            return;
+        }
+        if (!model.style.layout) {
+            model.style.layout = {};
+        }
+        var layout = model.style.layout;
+        if (!layout.direction) {
+            layout.direction = 'column';
+        }
+        if (!layout.justify) {
+            layout.justify = 'center';
+        }
+        if (!layout.align) {
+            layout.align = 'stretch';
+        }
+    }
 
-	function cleanBorder(model){
-		if(!model.style.border) {
-			model.style.border = {};
-		}
-	}
-	
-	function cleanSpace(/*model*/){
-		// Margin and padding
-	}
-	
-	function cleanAlign(model){
-		if(!model.style.align) {
-			model.style.align = {};
-		}
-	}
+    function cleanSize(model) {
+        if (!model.style.size) {
+            model.style.size = {};
+        }
+    }
 
-	/**
-	 * Clean data model
-	 */
-	function clean(model){
-		cleanEvetns(model);
-		cleanStyle(model);
-		if(model.type == 'Group'){
-			if(!model.contents){
-				model.contents = [];
-			}
-			if(model.contents.length){
-				for(var i = 0; i < model.contents.length; i++){
-					clean(model.contents[i]);
-				}
-			}
-		}
-		return model;
-	}
+    function cleanBackground(model) {
+        if (!model.style.background) {
+            model.style.background = {};
+        }
+        var newStyle = model.style.background;
+        var oldStyle = model.style;
+        var map = [
+            ['backgroundImage', 'image'],
+            ['backgroundSize', 'size'],
+            ['backgroundRepeat', 'repeat'],
+            ['backgroundPosition', 'position']
+        ];
+        cleanMap(oldStyle, newStyle, map);
+    }
 
 
-	this.getTemplateFor = getTemplateFor;
-	this.clean = clean;
+    function cleanBorder(model) {
+        if (!model.style.border) {
+            model.style.border = {};
+        }
+    }
+
+    function cleanSpace(/*model*/) {
+        // Margin and padding
+    }
+
+    function cleanAlign(model) {
+        if (!model.style.align) {
+            model.style.align = {};
+        }
+    }
+
+    /**
+     * Clean data model
+     */
+    function clean(model) {
+        cleanEvetns(model);
+        cleanStyle(model);
+        if (model.type === 'Group' || model.type === 'Page') {
+            if (!model.contents) {
+                model.contents = [];
+            }
+            if (model.contents.length) {
+                for (var i = 0; i < model.contents.length; i++) {
+                    clean(model.contents[i]);
+                }
+            }
+        }
+        return model;
+    }
+
+
+    this.getTemplateFor = getTemplateFor;
+    this.clean = clean;
 });
 
 /* 
