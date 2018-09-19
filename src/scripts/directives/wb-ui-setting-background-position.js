@@ -41,74 +41,24 @@ angular.module('am-wb-core')
 			value: '=value'
 		},
 		controllerAs: 'ctrl',
-		controller: function DemoCtrl($timeout, $q) {
-			var self = this;
-			self.simulateQuery = false;
-			self.isDisabled = false;
-
-			// list of `state` value/display objects
-			self.states = loadAll();
-			self.querySearch = querySearch;
-
-			function newState(state) {
-				alert('Sorry! You`ll need to create a Constitution for ' + state + ' first!');
-			}
-			self.newState = newState;
-
-			// ******************************
-			// Internal methods
-			// ******************************
-
-			/**
-			 * Search for states... use $timeout to simulate
-			 * remote dataservice call.
-			 */
-			function querySearch(query) {
-				var results = query ? self.states.filter(createFilterFor(query)) : self.states,
-						deferred;
-				if (self.simulateQuery) {
-					deferred = $q.defer();
-					$timeout(function () {
-						deferred.resolve(results);
-					}, Math.random() * 1000, false);
-					return deferred.promise;
-				} else {
-					return results;
-				}
-			}
-
-			/**
-			 * Build `states` list of key/value pairs
-			 */
-			function loadAll() {
-				return[
-					{display: 'Left top', value: 'left top'},
-					{display: 'Left center', value: 'left center'},
-					{display: 'Left bottom', value: 'left bottom'},
-					{display: 'Right top', value: 'right top'},
-					{display: 'Right center', value: 'right center'},
-					{display: 'Center top', value: 'center top'},
-					{display: 'Center center', value: 'center center'},
-					{display: 'Center bottom', value: 'center bottom'},
-					{display: 'Initial', value: 'initial'},
-					{display: 'Inherit', value: 'inherit'},
-					{display: 'Nothing', value: ''}
-					];
-			}
-
-			/**
-			 * Create filter function for a query string
-			 * @param {string} query to filter items 
-			 */
-
-			function createFilterFor(query) {
-				var lowercaseQuery = query.toLowerCase();
-
-				return function (state) {
-					return (state.value.indexOf(lowercaseQuery) === 0);
-				};
-
-			}
+		/*
+		 * 
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+			$scope.items = [
+				{title: 'Left top', value: 'left top'},
+				{title: 'Left center', value: 'left center'},
+				{title: 'Left bottom', value: 'left bottom'},
+				{title: 'Right top', value: 'right top'},
+				{title: 'Right center', value: 'right center'},
+				{title: 'Center top', value: 'center top'},
+				{title: 'Center center', value: 'center center'},
+				{title: 'Center bottom', value: 'center bottom'},
+				{title: 'Initial', value: 'initial'},
+				{title: 'Inherit', value: 'inherit'},
+				{title: 'Nothing', value: ''}
+				];
 
 		}
 	};
