@@ -1,0 +1,20 @@
+<div>
+	<md-tabs 
+		md-dynamic-height
+		md-border-bottom>
+		<md-tab 
+			ng-repeat="setting in settings | orderBy:priority track by setting.type"
+			ng-show="setting.visible"
+			id="{{setting.key}}">
+			<md-tab-label>
+				{{setting.title}}
+			</md-tab-label>
+	        <md-tab-body>
+		        <wb-setting-page
+					ng-model="wbModel"
+					wb-type="{{setting.type}}">
+				</wb-setting-page>
+			</md-tab-body>
+		</md-tab>
+	</md-tabs>
+</div>

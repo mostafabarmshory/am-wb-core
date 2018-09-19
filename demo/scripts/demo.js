@@ -87,7 +87,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 		var parent = $scope;
 		$wbFloat.show({
 			title: 'Settings',
-			template:'<wb-setting-panel-group ng-model="model"></wb-setting-panel-group>',
+			template:'<wb-setting-panel-group wb-tab-mode ng-model="model"></wb-setting-panel-group>',
 			parent: $scope,
 			controller: function($scope, $wbFloat){
 				watch = parent.$watch('editable', function(value){

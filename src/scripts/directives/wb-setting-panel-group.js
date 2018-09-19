@@ -87,7 +87,15 @@ angular.module('am-wb-core')
 	return {
 		restrict : 'E',
 		replace: true,
-		templateUrl: 'views/directives/wb-setting-panel-expansion.html',
+		templateUrl: function($element, $attr){
+			var link = 'views/directives/wb-setting-panel-';
+			if(angular.isDefined($attr.wbTabMode)){
+				link += 'tabs.html';
+			} else {
+				link += 'expansion.html';
+			}
+			return link;
+		},
 		scope : {},
 		link : postLink,
 		require:['ngModel']

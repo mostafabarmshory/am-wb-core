@@ -1,7 +1,7 @@
 <div 
 	id="WB-SETTING-PANEL">
 	<md-expansion-panel
-		ng-repeat="setting in settings track by setting.type"
+		ng-repeat="setting in settings | orderBy:priority track by setting.type"
 		ng-show="setting.visible">
 	    <md-expansion-panel-collapsed>
 	        <div class="md-title">{{setting.label}}</div>
