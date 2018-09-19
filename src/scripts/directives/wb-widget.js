@@ -75,7 +75,7 @@ angular.module('am-wb-core')
 
 		ctrl.delete = function(){
 			fire('delete');
-			$scope.group.removeChild($scope.wbModel);
+			$scope.group.removeChild($scope.wbModel, ctrl);
 			callbacks = {};
 		};
 

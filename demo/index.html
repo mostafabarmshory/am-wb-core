@@ -66,9 +66,14 @@
 	                    ng-click="editable=!editable">
 	                <wb-icon>edit</wb-icon>
 	            </md-button>
+	            <md-button
+	            	ng-repeat="action in actions"
+	            	ng-click="runAction(action)">
+	                <wb-icon>{{action.icon}}</wb-icon>
+	            </md-button>
 	       </section>
 			<wb-group
-				wb-on-model-select="loadSettings($model)"
+				wb-on-model-select="loadSettings($model, $ctrl)"
 				wb-editable="editable"
 				ng-model="model"
 				flex>
