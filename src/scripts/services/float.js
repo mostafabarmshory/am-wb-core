@@ -163,7 +163,7 @@ angular.module('am-wb-core')
 		// create scopse
 		var parenScope = optionsOrPreset.parent || $rootScope;
 		var childScope = optionsOrPreset.scope || parenScope.$new(false, parenScope);
-		var parentElement = null;
+		
 
 		var panel = jsPanel.create({
 			theme: 'primary',
@@ -174,7 +174,7 @@ angular.module('am-wb-core')
 			headerControls: optionsOrPreset.headerControls || 'all',
 			content : '<div style="border-top: 1px solid;width: 100%;height: 250px;padding: 0px;pointer-events: inherit;"></div>',
 			callback : function() {
-				parentElement = angular.element(this.content);
+				var parentElement = angular.element(this.content);
 
 				// 2- create element
 				return $wbUtil.getTemplateFor(optionsOrPreset)//
@@ -211,9 +211,10 @@ angular.module('am-wb-core')
 			}
 		});
 
+		var rootElement = angular.element(panel);
 		panel.setVisible = function(flag){
 			this._isVisible = flag;
-			parentElement.css('visibility', this._isVisible ? 'visible' : 'hidden');
+			rootElement.css('visibility', this._isVisible ? 'visible' : 'hidden');
 		};
 
 		panel.isVisible = function(){
