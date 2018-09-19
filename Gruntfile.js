@@ -37,8 +37,6 @@ module.exports = function(grunt) {
 	 * توی ساخت ایجاد می‌کنه اگر می‌خواهید ساخت با سرعت بیشتری انجام ب
 	 */
 	require('time-grunt')(grunt);
-	//MODIFIED: add require for connect-modewrite
-	var modRewrite = require('connect-modrewrite');
 
 	/*
 	 * به صورت خودکار تمام افزونه‌های مورد نیاز بار گذاری می‌شود. در صورتی که
@@ -48,7 +46,6 @@ module.exports = function(grunt) {
 	require('jit-grunt')(grunt, {
 		useminPrepare : 'grunt-usemin',
 		ngtemplates : 'grunt-angular-templates',
-		configureProxies : 'grunt-connect-proxy',
 		uglify: 'grunt-contrib-uglify-es'
 	});
 
@@ -57,10 +54,10 @@ module.exports = function(grunt) {
 	 * شده در پرونده bower.json تعیین می‌شود.
 	 */
 	var appConfig = {
-			app : require('./bower.json').appPath || 'src',
-			demo : require('./bower.json').demoPath || 'demo',
-			dist : 'dist',
-			pkg : require('./bower.json')
+		app : require('./bower.json').appPath || 'src',
+		demo : require('./bower.json').demoPath || 'demo',
+		dist : 'dist',
+		pkg : require('./bower.json')
 	};
 
 	// تنظیم تمام وظایف مورد نیاز در پروژه
@@ -86,16 +83,16 @@ module.exports = function(grunt) {
 			js : {
 				files : [
 					'<%= yeoman.app %>/scripts/**/*.js',
-					'<%= yeoman.demo %>/scripts/**/*.js'
-					],
-					tasks : [
-						'injector',
-						'newer:jshint:all',
-						'newer:jscs:all'
-						],
-						options : {
-							livereload : '<%= connect.options.livereload %>'
-						}
+					'<%= yeoman.demo %>/scripts/**/*.js',
+				],
+				tasks : [
+					'injector',
+					'newer:jshint:all',
+					'newer:jscs:all'
+				],
+				options : {
+					livereload : '<%= connect.options.livereload %>'
+				}
 			},
 			jsTest : {
 				files : [ 'test/spec/{,*/}*.js' ],
@@ -108,13 +105,13 @@ module.exports = function(grunt) {
 			styles : {
 				files : [
 					'<%= yeoman.app %>/styles/**/*.css',
-					'<%= yeoman.demo %>/styles/**/*.css'
-					],
-					tasks : [
-						'injector',
-						'newer:copy:styles', 
-						'postcss'
-						]
+					'<%= yeoman.demo %>/styles/**/*.css' ,
+				],
+				tasks : [
+					'injector',
+					'newer:copy:styles', 
+					'postcss'
+				]
 			},
 			gruntfile : {
 				files : [ 'Gruntfile.js' ]
@@ -129,7 +126,7 @@ module.exports = function(grunt) {
 					'.tmp/styles/{,*/}*.css',
 					'<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
 					'<%= yeoman.demo %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
-					]
+				]
 			}
 		},
 
@@ -147,30 +144,18 @@ module.exports = function(grunt) {
 				hostname : 'localhost',
 				livereload : 35729
 			},
-			proxies : [ {
-				context : '/', // the context of the data service
-				// wherever the data service is running
-				host : '<%= yeoman.pkg.backend.host %>',
-				// the port that the data service is running on
-				port : '<%= yeoman.pkg.backend.port %>',
-				changeOrigin : true,
-				headers : {
-					host : '<%= yeoman.pkg.backend.host %>'
-				}
-			} ],
 			livereload : {
 				options : {
 					open : true,
 					middleware : function(connect, options) {
 						var middlewares = [];
 						//Matches everything that does not contain a '.' (period)
-						middlewares.push(modRewrite([ '!/api/.*|^.*\\..*$ /index.html [L]' ]));
 						middlewares.push(connect.static('.tmp'));
 						middlewares.push(
-								connect()
+							connect()
 								.use('/bower_components', connect.static('./bower_components')));
 						middlewares.push(
-								connect()
+							connect()
 								.use('/app/styles', connect.static('./app/styles')));
 						middlewares.push(connect.static('demo'));
 						middlewares.push(connect.static(appConfig.app));
@@ -180,10 +165,6 @@ module.exports = function(grunt) {
 						if (!Array.isArray(options.base)) {
 							options.base = [ options.base ];
 						}
-
-						// Setup the proxy
-						middlewares
-						.push(require('grunt-connect-proxy/lib/utils').proxyRequest);
 
 						// Serve static files
 						options.base.forEach(function(base) {
@@ -319,8 +300,8 @@ module.exports = function(grunt) {
 					template : 'node_modules/angular-jsdoc/default',
 					tutorial : 'tutorials',
 					readme : 'README.md'
-				}
-			}
+				},
+			},
 		},
 
 		/*
@@ -343,7 +324,7 @@ module.exports = function(grunt) {
 					src : [ //
 						'.tmp', '<%= yeoman.dist %>/{,*/}*', //
 						'!<%= yeoman.dist %>/.git{,*/}*' //
-						]
+					]
 				} ]
 			},
 			server : '.tmp'
@@ -362,6 +343,7 @@ module.exports = function(grunt) {
 		 */
 		wiredep : {
 			app : {
+				devDependencies : true,
 				src : [ 'demo/index.html' ],
 				ignorePath : /\.\.\//
 			},
@@ -395,7 +377,7 @@ module.exports = function(grunt) {
 				files : {
 					'<%= yeoman.dist %>/<%= yeoman.pkg.name %>.min.css' : [ //
 						'.tmp/styles/{,*/}*.css' //
-						]
+					]
 				}
 			}
 		},
@@ -404,7 +386,7 @@ module.exports = function(grunt) {
 				files : {
 					'<%= yeoman.dist %>/<%= yeoman.pkg.name %>.min.js' : [ //
 						'.tmp/{,*/}*.js' //
-						]
+					]
 				}
 			}
 		},
@@ -518,16 +500,12 @@ module.exports = function(grunt) {
 		 * مشاهد کنید:
 		 * 
 		 * https://github.com/mgol/grunt-ng-annotate
-		 * https://github.com/olov/ng-annotate
 		 * 
 		 * این کار روی پرونده‌هایی انجام می‌شه که توی مسیر .tmp ایجاد شده اند و
 		 * همگی پرونده‌های موقت هستن. به این ترتیب می‌تونیم تمام پرونده‌های
 		 * موجود در این مسیر رو کامل به هم بریزیم.
 		 */
 		ngAnnotate : {
-			options: {
-				singleQuotes: true 
-			}, 
 			dist : {
 				files : [ {
 					expand : true,
@@ -569,7 +547,7 @@ module.exports = function(grunt) {
 				cwd : '<%= yeoman.app %>/styles',
 				dest : '.tmp/styles/',
 				src : '{,*/}*.css'
-			},
+			}
 		},
 
 		// Add vendor prefixed styles
@@ -602,7 +580,7 @@ module.exports = function(grunt) {
 
 		// Run some tasks in parallel to speed up the build process
 		concurrent : {
-			server : [ 'copy:styles', ],
+			server : [ 'copy:styles'],
 			test : [ 'copy:styles' ],
 			dist : [ 'copy:styles', 'concat:tmp', 'imagemin', 'svgmin' ]
 		},
@@ -646,7 +624,7 @@ module.exports = function(grunt) {
 				ignorePath : [
 					'../<%= yeoman.app %>/',
 					'<%= yeoman.demo %>/'
-					]
+				]
 			},
 			project_files : {
 				files : {
@@ -655,40 +633,30 @@ module.exports = function(grunt) {
 						'<%= yeoman.app %>/styles/**/*.css',
 						'<%= yeoman.demo %>/scripts/**/*.js',
 						'<%= yeoman.demo %>/styles/**/*.css'
-						],
+					],
 				}
 			}
 		},
 	});
 
 	grunt.registerTask('demo', 'Compile then start a connect web server',
-			function(target) {
-		if (target === 'dist') {
-			return grunt.task.run([ 'build', //
-				// added just before connect
-				'configureProxies:server', //
-				'connect:dist:keepalive' //
+		function(target) {
+			if (target === 'dist') {
+				return grunt.task.run([ 'build', //
+					'connect:dist:keepalive' //
 				]);
-		}
+			}
 
-		grunt.task.run([ //
-			'clean:server', //
-			'wiredep', //
-			'injector', //
-			'concurrent:server', //
-			'postcss:server', //
-			'configureProxies:server', // added just before connect
-			'connect:livereload', //
-			'watch' //
+			grunt.task.run([ //
+				'clean:server', //
+				'wiredep', //
+				'injector', //
+				'concurrent:server', //
+				'postcss:server', //
+				'connect:livereload', //
+				'watch' //
 			]);
-	});
-
-	grunt.registerTask('setversion', function(arg1) {
-		console.log('Attempting to update version to ' + arg1);
-		var parsedJson= grunt.file.readJSON('bower.json');//read in the current
-		parsedJson.version = arg1; //set the top level version field to arg1
-		grunt.file.write('bower.json', JSON.stringify(parsedJson, null, 2));
-	});
+		});
 
 	grunt.registerTask('test', [ //
 		'clean', //
@@ -697,7 +665,7 @@ module.exports = function(grunt) {
 		'concurrent:test', //
 		'postcss:server', //
 		'karma:unit' //
-		]);
+	]);
 
 	grunt.registerTask('debug', [ //
 		'clean', //
@@ -706,7 +674,7 @@ module.exports = function(grunt) {
 		'concurrent:server', //
 		'postcss', //
 		'karma:debug' //
-		]);
+	]);
 
 	grunt.registerTask('build', [ //
 		'wiredep', //
@@ -721,7 +689,7 @@ module.exports = function(grunt) {
 		'copy:dist', //
 		'uglify', //
 		'cssmin' //
-		]);
+	]);
 
 	grunt.registerTask('default', [ //
 		'newer:jshint', //
@@ -729,10 +697,10 @@ module.exports = function(grunt) {
 		'newer:eslint', //
 		'test', //
 		'build' //
-		]);
+	]);
 
 	grunt.registerTask('release', [ //
 		'default', //
 		'jsdoc'
-		]);
+	]);
 };
