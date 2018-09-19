@@ -7,9 +7,11 @@
 			ng-show="setting.visible"
 			id="{{setting.key}}">
 			<md-tab-label>
-				{{setting.title}}
+				<span ng-if="!setting.icon" translate>{{setting.label}}</span>
+				<wb-icon ng-if="setting.icon">{{setting.icon}}</wb-icon>
 			</md-tab-label>
-	        <md-tab-body>
+	        <md-tab-body
+	        	layout-margin>
 		        <wb-setting-page
 					ng-model="wbModel"
 					wb-type="{{setting.type}}">
