@@ -1568,6 +1568,99 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
+ * @name wb-setting-page
+ * @description Display a setting of a model
+ * 
+ */
+.directive('wbSettingPage', function($widget, $settings, $wbUtil, $controller, $compile, $mdTheming) {
+	function postLink($scope, $element, $attrs, $ctrls) {
+
+
+		function loadSetting(page){
+            $wbUtil.getTemplateFor(page)
+            .then(function(templateSrc){
+                var element = angular.element(templateSrc);
+                var scope = $scope.$new();
+                if (angular.isDefined(page.controller)) {
+                    var controller = $controller(page.controller, {
+                        $scope : scope,
+                        $element : element
+                    });
+                    if (page.controllerAs) {
+                        scope[page.controllerAs] = controller;
+                    }
+                    element.data('$ngControllerController', controller);
+                }
+                $compile(element)(scope);
+                $mdTheming(element);
+                $element.empty();
+                $element.append(element);
+            });
+		}
+
+		function loadModel(model) {
+			$scope.wbModel = model;
+		}
+		
+		$scope.$watch('type',  function(type) {
+			if (!type) {
+				return;
+			}
+			var setting = $settings.page(type);
+			loadSetting(setting);
+		});
+
+		// Load ngModel
+		var ngModelCtrl = $ctrls[0];
+		ngModelCtrl.$render = function() {
+			if (ngModelCtrl.$viewValue) {
+				loadModel(ngModelCtrl.$viewValue);
+			}
+		};
+	}
+
+	// create directive
+	return {
+		restrict : 'E',
+		replace : true,
+		template : '<div layout="column"></div>',
+		link : postLink,
+		scope : {
+			type : '@wbType'
+		},
+		require : [ 'ngModel' ]
+	};
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
  * @name wb-setting-panel-group
  * @description Widgets settings
  * 
@@ -2469,7 +2562,6 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-<<<<<<< HEAD
 /**
  * @ngdoc Directives
  * @name wb-ui-setting-dropdown
@@ -2535,27 +2627,6 @@ angular.module('am-wb-core')
 	};
 });
 
-=======
-    /**
-     * @ngdoc Directives
-     * @name wbUiSettingDropdown
-     * @description a setting section for choosing values.
-     *
-     */
-    .directive('wbUiSettingDropdown', function () {
-        return {
-            templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
-            restrict: 'E',
-            scope: {
-                title: '@title',
-                value: '=value',
-                icon: '@icon',
-                items:'=items'
-            }
-        };
-    });
-
->>>>>>> 4dbb28697ba77378ffe8bcc23e2e381ae71dfbc5
 /* 
  * The MIT License (MIT)
  * 
@@ -4776,7 +4847,7 @@ angular.module('am-wb-core')
 	var _group_repo = [];
 	var contentElementAsso = [];
 	var elementKey = [];
-	
+
 	var notFoundWidget = {
 			templateUrl : 'views/widgets/wb-notfound.html',
 			label : 'Not found',
@@ -4788,7 +4859,7 @@ angular.module('am-wb-core')
 			description : 'Panel contains list of widgets.',
 			image : 'images/wb/content.svg'
 	};
-	
+
 	function _group(groupId){
 		for(var i = 0; i < _group_repo.length; i++){
 			if(_group_repo[i].id === groupId){
@@ -4806,7 +4877,7 @@ angular.module('am-wb-core')
 		var g = _group(group.id);
 		angular.extend(g, group);
 	}
-	
+
 	function _groups(){
 		return _group_repo;
 	}
@@ -4851,7 +4922,7 @@ angular.module('am-wb-core')
 		});
 		return $q.when(widgets);
 	}
-	
+
 	/**
 	 * List of all registered widgets
 	 * 
@@ -4882,7 +4953,7 @@ angular.module('am-wb-core')
 		widget.model = widget.model || {style:{}};
 		widget.model.type = widget.type;
 		widget.model.name = widget.model.name || widget.title; 
-		
+
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);
 		return this;
@@ -4942,10 +5013,10 @@ angular.module('am-wb-core')
 			var link = $compile(element);
 			if (angular.isDefined(widget.controller)) {
 				var wlocals = _.merge({
-						// TODO: maso, 2017: bind wbModel, wbParent,
-						// and wbEditable
-						$scope : childScope,
-						$element : element
+					// TODO: maso, 2017: bind wbModel, wbParent,
+					// and wbEditable
+					$scope : childScope,
+					$element : element
 				}, locals || {});
 				var controller = $controller(widget.controller, wlocals);
 				if (widget.controllerAs) {
@@ -4957,7 +5028,7 @@ angular.module('am-wb-core')
 			return element;
 		});
 	}
-	
+
 	/**
 	 * Creates new serialized data of widget
 	 * 
@@ -4968,25 +5039,36 @@ angular.module('am-wb-core')
 	function widgetData(widget){
 		return angular.copy(widget.model);
 	}
-	
+
 	// widgets
 	this.newWidget = newWidget;
 	this.widget = widget;
 	this.widgets = widgets;
 	this.widgetData = widgetData;
 	this.getWidgetsKey = getWidgetsKey;
-	
+
+	// new api
+	this.getWidget = _widget;
+	this.getWidgets =  function(){
+		var widgets = {};
+		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+		widgets.items = [];
+		elementKey.forEach(function(type) {
+			widgets.items.push(contentElementAsso[type]);
+		});
+		return widgets;
+	};
+
 	// widget groups
 	this.group = _group;
 	this.groups = _groups;
 	this.newGroup = _newGroup;
-	
+
 	// utils
 	this.compile = compile;
 });
 
 angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
-<<<<<<< HEAD
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource-single-page.html',
@@ -4995,7 +5077,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"Select item/items\" style=\"width:70%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <md-sidenav class=md-sidenav-left md-component-id=left md-is-locked-open=true md-whiteframe=4 layout=column ng-hide=\"pages.length === 1\"> <div style=\"text-align: center\"> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> <md-devider></md-devider> <md-content> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </md-content> </md-sidenav> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <md-button ng-if=openHelp ng-click=openHelp($event) aria-label=\"Show help\"> <span translate>Learn more</span> </md-button> <span flex></span> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> <md-button class=md-primary ng-click=answer()> <span translate>OK</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
+    "<md-dialog aria-label=\"Select item/items\" style=\"width:70%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <md-sidenav class=md-sidenav-left md-component-id=left md-is-locked-open=true md-whiteframe=4 layout=column ng-hide=\"pages.length === 1\"> <div style=\"text-align: center\"> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> <md-devider></md-devider> <md-content> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </md-content> </md-sidenav> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <span flex></span> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> <md-button class=md-primary ng-click=answer()> <span translate>OK</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
   );
 
 
@@ -5014,7 +5096,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-setting-panel.html',
-    "<md-expansion-panel> <md-expansion-panel-collapsed> <div class=md-title>{{label}} <md-tooltip md-direction=bottom md-delay=300 ng-show=description>{{description}}</md-tooltip> </div>   <md-expansion-panel-icon></md-expansion-panel-icon> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <div class=md-title>{{label}}</div> <div class=md-summary></div> <md-expansion-panel-icon ng-click=$panel.collapse()></md-expansion-panel-icon> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <ng-transclude layout=column> </ng-transclude> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel>"
+    "<md-expansion-panel> <md-expansion-panel-collapsed> <div class=md-title>{{label}} <md-tooltip md-direction=bottom md-delay=300 ng-show=description>{{description}}</md-tooltip> </div> <md-expansion-panel-icon></md-expansion-panel-icon> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <div class=md-title>{{label}}</div> <div class=md-summary></div> <md-expansion-panel-icon ng-click=$panel.collapse()></md-expansion-panel-icon> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <ng-transclude layout=column> </ng-transclude> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel>"
   );
 
 
@@ -5245,255 +5327,5 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   $templateCache.put('views/widgets/wb-notfound.html',
     "<div ng-show=wbEditable> Unsuported widget?! </div>"
   );
-=======
-  'use strict';
-
-  $templateCache.put('views/dialogs/wb-select-resource-single-page.html',
-    "<md-dialog aria-label=\"Select item/items\" style=\"width:50%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <md-button ng-if=openHelp ng-click=openHelp($event) aria-label=\"Show help\"> <span translate>Learn more</span> </md-button> <span flex></span> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> <md-button class=md-primary ng-click=answer()> <span translate>OK</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
-  );
-
-
-  $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"Select item/items\" style=\"width:70%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <md-sidenav class=md-sidenav-left md-component-id=left md-is-locked-open=true md-whiteframe=4 layout=column ng-hide=\"pages.length === 1\"> <div style=\"text-align: center\"> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> <md-devider></md-devider> <md-content> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </md-content> </md-sidenav> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <span flex></span> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> <md-button class=md-primary ng-click=answer()> <span translate>OK</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
-  );
-
-
-  $templateCache.put('views/directives/wb-group.html',
-    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"dropCallback(index, item, external, type)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" wb-size=wbModel.style wb-layout=wbModel.style wb-align=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event ng-class=\"{\n" +
-    "\t\t'wb-group-root': ctrl.isRoot(),\n" +
-    "\t\t'wb-group-edit': ctrl.isEditable(),\n" +
-    "\t\t'wb-group-select': ctrl.isSelected()\n" +
-    "\t}\" md-theme-watch=true></div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-setting-panel-group.html',
-    "<div id=WB-SETTING-PANEL> </div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-setting-panel.html',
-    "<md-expansion-panel> <md-expansion-panel-collapsed> <div class=md-title>{{label}} <md-tooltip md-direction=bottom md-delay=300 ng-show=description>{{description}}</md-tooltip> </div>   <md-expansion-panel-icon></md-expansion-panel-icon> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <div class=md-title>{{label}}</div> <div class=md-summary></div> <md-expansion-panel-icon ng-click=$panel.collapse()></md-expansion-panel-icon> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <ng-transclude layout=column> </ng-transclude> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-choose.html',
-    "<md-tabs class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in items\"> <md-tab-label> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-audio.html',
-    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-audio</wb-icon> </md-button> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-background-attachment.html',
-    "<md-input-container> <label>background Attachment</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-background-origin.html',
-    "<md-input-container> <label>background Origin</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-background-position.html',
-    "<md-autocomplete md-selected-item=ctrl.selectedItem md-search-text=ctrl.searchText md-selected-item-change=ctrl.selectedItemChange(item) md-items=\"item in ctrl.querySearch(ctrl.searchText)\" md-item-text=item.display md-min-length=0 placeholder=\"background position\"> <md-item-template> <span md-highlight-text=ctrl.searchText md-highlight-flags=^i>{{item.display}}</span> </md-item-template> <md-not-found> No states matching \"{{ctrl.searchText}}\" were found.  </md-not-found> </md-autocomplete>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-background-repeat.html',
-    "<md-input-container> <label>background Repeat</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-background-size.html',
-    "<md-input-container> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-background.html',
-    "<md-input-container> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-choose.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon === undefined || icon === null || icon === ''\" wb-icon-name={{icon}}> </wb-icon> <p ng-hide=\"title === undefined || title === null || title === ''\">{{title}}</p> <md-tabs flex=100 class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in xitems\"> <md-tab-label> <md-tooltip ng-show=item.title>{{item.title | translate}}</md-tooltip> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs> </md-list-item> "
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-color.html',
-    "<div layout=row> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='title'\" layout-padding>{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\" flex>{{title}}</p> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false ng-model=value> </md-color-picker> </div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-data.html',
-    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>{{icon || 'wb-object-data'}}</wb-icon> </md-button> <md-input-container> <input ng-model=value.key> </md-input-container> </md-list-item>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-dropdown.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon === undefined || icon === null || icon === ''\">{{icon}}</wb-icon> <p ng-hide=\"title === undefined || title === null || title === ''\">{{title}}</p> <md-select style=\"margin: 0px\" ng-model=value> <md-option ng-repeat=\"item in items\" value={{item.value}}> {{item.title}} </md-option> </md-select> </md-list-item>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-image.html',
-    "<div layout-align=\"center center\" layout=row class=wb-ui-setting-image> <img ng-click=selectImage() ng-src={{value}} md-colors=\"{'borderColor': 'accent'}\" class=wb-ui-setting-image-preview style=\"border-size: 1px; border-style: solid\"> <md-input-container class=md-icon-float flex> <label ng-if=title translate=\"\">{{title}}</label> <input ng-model=value> <wb-icon ng-click=selectImage()>more_horiz</wb-icon> </md-input-container> </div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-length.html',
-    "<md-input-container> <label ng-if=title translate=\"\">{{title}}</label> <input ng-model=\"value\"> <div class=hint ng-if=description translate=\"\">{{description}}</div> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-link.html',
-    "<md-input-container class=md-icon-float> <input ng-model=url placeholder={{title}}> <wb-icon ng-click=selectlink() style=\"display:inline-block; cursor: pointer\">more_horiz</wb-icon> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-number.html',
-    "<md-list-item ng-show=\"slider==undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input style=\"width: 50px\" type=number ng-model=value flex> </md-input-container> </md-list-item> <md-list-item ng-show=\"slider!=undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='' || icon=='wb-blank'\">{{icon}}</wb-icon> <div ng-show=\"icon=='wb-blank'\" style=\"display: inline-block; width: 32px; opacity: 0.0\"></div> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-slider min=0 max=100 ng-model=value flex></md-slider> </md-list-item>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-on-off-switch.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-switch class=md-secondary ng-model=value></md-switch> </md-list-item>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-video.html',
-    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-video</wb-icon> </md-button> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
-  );
-
-
-  $templateCache.put('views/directives/wb-widget.html',
-    "<div class=wb-widget name={{wbModel.name}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-type=wbModel.type dnd-effect-allowed=copyMove dnd-callback=1 dnd-moved=ctrl.delete() wb-widget-size=wbModel.style wb-align=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event md-theme-watch=true ng-class=\"{\n" +
-    "\t\t'wb-widget-edit': ctrl.isEditable(),\n" +
-    "\t\t'wb-widget-select': ctrl.isSelected()\n" +
-    "\t}\" transclude></div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-widgets-explorer.html',
-    "<div> <script src=../../scripts/directives/wb-widgets-explorer.js></script> <div layout=column>  <md-toolbar ng-show=!(showSearch||showSort||showState)> <div class=md-toolbar-tools> <h3 flex translate>Widgets</h3> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=\"wbWidgetExplorer._view_list=!wbWidgetExplorer._view_list\" class=md-icon-button aria-label=\"View mode\"> <wb-icon>{{wbWidgetExplorer._view_list ? 'view_module' : 'view_list'}}</wb-icon> </md-button> <md-button ng-click=\"wbWidgetExplorer._tree_mode=!wbWidgetExplorer._tree_mode\" class=md-icon-button aria-label=\"Tree mode\"> <wb-icon>{{wbWidgetExplorer._tree_mode? 'list' : 'list_tree'}}</wb-icon> </md-button> </div> </md-toolbar>  <md-toolbar class=md-hue-1 ng-show=showSearch> <div class=md-toolbar-tools> <md-button class=md-icon-button ng-click=\"showSearch = !showSearch\" aria-label=Back> <wb-icon>arrow_back</wb-icon> </md-button> <md-input-container md-theme=input flex> <label>&nbsp;</label> <input ng-model=query ng-keyup=\"runQuery(query, $event)\"> </md-input-container> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> </div> </md-toolbar> <md-expansion-panel-group ng-if=wbWidgetExplorer._tree_mode> <md-expansion-panel ng-repeat=\"group in groups\"> <md-expansion-panel-collapsed> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-header> <md-expansion-panel-content style=\"padding: 0px; margin: 0px\"> <wb-widgets-list ng-if=wbWidgetExplorer._view_list widgets=group.widgets> </wb-widgets-list> <wb-widgets-module ng-if=!wbWidgetExplorer._view_list widgets=group.widgets> </wb-widgets-module> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </md-expansion-panel-group> <wb-widgets-list ng-if=\"!wbWidgetExplorer._tree_mode &amp;&amp; wbWidgetExplorer._view_list\" widgets=widgets> </wb-widgets-list> <wb-widgets-module ng-if=\"!wbWidgetExplorer._tree_mode &amp;&amp; !wbWidgetExplorer._view_list\" widgets=widgets> </wb-widgets-module> </div> </div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-widgets-list.html',
-    "<md-list flex> <md-list-item class=md-2-line ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy> <wb-icon wb-icon-name={{widget.icon}}></wb-icon> <div class=md-list-item-text layout=column> <h3 translate>{{widget.title}}</h3> <p translate>{{widget.description}}</p> </div> <wb-icon ng-if=openHelp class=md-secondary ng-click=\"openHelp(widget, $event)\" aria-label=\"Show help\">help</wb-icon> </md-list-item> </md-list>"
-  );
-
-
-  $templateCache.put('views/directives/wb-widgets-module.html',
-    "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy flex=none flex-gt-sm=30 layout=column layout-align=\"start center\" layout-padding> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <p flex class=wb-text-truncate translate=\"\">{{widget.title}}</p> <md-tooltip md-delay=1000>{{widget.description | translate}}</md-tooltip> </div> </div>"
-  );
-
-
-  $templateCache.put('views/partials/wb-widget-options.html',
-    ""
-  );
-
-
-  $templateCache.put('views/resources/wb-sheet.html',
-    "<hot-table settings=\"{\n" +
-    "\t \tcolHeaders: true, \n" +
-    "\t \tcontextMenu: ['row_above', 'row_below', 'remove_row', 'hsep1', 'col_left', 'col_right', 'hsep2', 'remove_row', 'remove_col', 'hsep3', 'undo', 'redo', 'make_read_only', 'alignment', 'borders'], \n" +
-    "\t \tafterChange: true\n" +
-    "\t }\" row-headers=true min-spare-rows=minSpareRows datarows=value.values height=300 width=500 flex> </hot-table>"
-  );
-
-
-  $templateCache.put('views/resources/wb-url.html',
-    "<div layout=column layout-padding flex> <p translate>Insert a valid URL, please.</p> <md-input-container class=\"md-icon-float md-block\"> <label translate>URL</label> <input ng-model=value> </md-input-container> </div>"
-  );
-
-
-  $templateCache.put('views/settings/wb-background.html',
-    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
-  );
-
-
-  $templateCache.put('views/settings/wb-border.html',
-    " <wb-ui-setting-length title=\"{{'Style' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.style> </wb-ui-setting-length> <wb-ui-setting-length title=\"{{'Width' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.width> </wb-ui-setting-length> <wb-ui-setting-length title=\"{{'Color' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.color> </wb-ui-setting-length> <wb-ui-setting-length title=\"{{'Radius' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.radius> </wb-ui-setting-length>"
-  );
-
-
-  $templateCache.put('views/settings/wb-description.html',
-    " <md-input-container> <label translate>Lable</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate>Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate>Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=\"{{Cover | translate}}\" ng-model=wbModel.cover> </wb-ui-setting-image>"
-  );
-
-
-  $templateCache.put('views/settings/wb-general.html',
-    ""
-  );
-
-
-  $templateCache.put('views/settings/wb-layout-page.html',
-    " <wb-ui-setting-choose title=Direction icon=wb-direction items=direction ng-model=wbModel.style.layout.direction> </wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction=='row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.layout.direction=='row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}\" items=align[wbModel.style.layout.direction] ng-model=wbModel.style.layout.align> </wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction!='row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.layout.direction!='row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}\" items=justify[wbModel.style.layout.direction] ng-model=wbModel.style.layout.justify> </wb-ui-setting-choose>"
-  );
-
-
-  $templateCache.put('views/settings/wb-layout-self.html',
-    " <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction!='row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.layout.direction!='row')?'swap_vert':'swap_horiz'}}\" items=selfAlign ng-model=wbModel.style.align.align> </wb-ui-setting-choose>"
-  );
-
-
-  $templateCache.put('views/settings/wb-margin-padding.html',
-    " <wb-ui-setting-length title=\"{{'Margin' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.margin> </wb-ui-setting-length> <wb-ui-setting-length title=\"{{'Padding' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.padding> </wb-ui-setting-length>"
-  );
-
-
-  $templateCache.put('views/settings/wb-notfound.html',
-    " <wb-icon>bug</wb-icon> <h2>Settings page not found</h2>"
-  );
-
-
-  $templateCache.put('views/settings/wb-size.html',
-    " <wb-ui-setting-length title=Width value=wbModel.style.size.width> </wb-ui-setting-length> <wb-ui-setting-length title=Height value=wbModel.style.size.height> </wb-ui-setting-length>  <md-subheader class=md-no-sticky> <span translate=\"\">Min</span> </md-subheader> <wb-ui-setting-length title=\"Min width\" value=\"wbModel.style.size['min-width']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" value=\"wbModel.style.size['min-height']\"> </wb-ui-setting-length>  <md-subheader class=md-no-sticky> <span translate=\"\">Max</span> </md-subheader> <wb-ui-setting-length title=\"Max width\" value=\"wbModel.style.size['max-width']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" value=\"wbModel.style.size['max-height']\"> </wb-ui-setting-length>"
-  );
-
-
-  $templateCache.put('views/settings/wb-text.html',
-    " <textarea ui-tinymce=\"{\n" +
-    "\t\t plugins : 'directionality contextmenu table link paste hr emoticons advlist autolink link lists advlist charmap print preview code anchor image imagetools visualchars',\n" +
-    "\t\t toolbar: [\n" +
-    "\t\t \t'undo redo visualchars | styleselect | link image emoticons | hr ',\n" +
-    "\t\t \t'alignleft aligncenter alignright | ltr rtl | bold italic | numlist bullist ',\n" +
-    "\t\t ],\n" +
-    "\t\t contextmenu: 'link image inserttable | cell row column deletetable',\n" +
-    "\t\t elementpath: true,\n" +
-    "\t\t branding: false,\n" +
-    "\t\t image_advtab: false\n" +
-    "\t}\" ng-model=wbModel.text flex>\n" +
-    "</textarea>"
-  );
-
-
-  $templateCache.put('views/sheets/wb-themplates.html',
-    "<md-bottom-sheet class=\"md-list md-has-header\" md-colors=\"{backgroundColor: 'background-900'}\"> <div style=\"padding: 16px\">  <div layout=row layout-align=\"start center\" style=\"padding: 0px 8px; margin: 0px\"> <span translate>Start a new page</span> <span flex></span> <span translate>Template gallery</span> <md-divider></md-divider> <md-button aria-label=\"Hide template sheet\" class=md-icon-button ng-click=hideTemplates($event)> <wb-icon>keyboard_arrow_down </wb-icon></md-button> <md-menu> <md-button aria-label=\"Open them interactions menu\" class=md-icon-button ng-click=$mdMenu.open($event)> <wb-icon>more_vert </wb-icon></md-button> <md-menu-content width=4 md-colors=\"{backgroundColor: 'background'}\"> <md-menu-item> <md-button ng-click=hideTemplates($event)> <span translate>Hide templates</span> </md-button> </md-menu-item> </md-menu-content> </md-menu> </div>  <md-content layout=row md-colors=\"{backgroundColor: 'background-900'}\"> <div layout=column ng-repeat=\"template in templates\" ng-click=loadTemplate(template) layout-padding style=\"cursor: pointer\"> <img width=215px height=152px ng-src={{template.thumbnail}} style=\"border-bottom-width: 1px; border: solid\"> {{template.name}} </div> </md-content> </div> </md-bottom-sheet>"
-  );
-
-
-  $templateCache.put('views/widgets/wb-html.html',
-    " <div ng-if=!ctrl.isSelected() ng-bind-html=\"wbModel.text | wbunsafe\" class=wb-widget-fill> </div> <div ui-tinymce=\"{\n" +
-    "\t\tselector : 'div.tinymce',\n" +
-    "\t\ttheme : 'inlite',\n" +
-    "\t\tplugins : 'directionality contextmenu table link paste image imagetools hr textpattern autolink textcolor colorpicker',\n" +
-    "\t\tinsert_toolbar : 'quickimage quicktable',\n" +
-    "\t\tselection_toolbar : 'bold italic | quicklink h1 h2 h3 blockquote | ltr rtl | forecolor',\n" +
-    "\t\tinsert_button_items: 'image link | inserttable | hr',\n" +
-    "\t\tinline : true,\n" +
-    "\t\tpaste_data_images : true,\n" +
-    "\t\tbranding: false,\n" +
-    "\t\timagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'\n" +
-    "\t}\" ng-model=wbModel.text ng-show=ctrl.isSelected() ng-if=ctrl.isEditable() class=wb-widget-fill> </div>"
-  );
-
-
-  $templateCache.put('views/widgets/wb-notfound.html',
-    "<div ng-show=wbEditable> Unsuported widget?! </div>"
-  );
->>>>>>> 4dbb28697ba77378ffe8bcc23e2e381ae71dfbc5
 
 }]);
