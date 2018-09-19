@@ -23,65 +23,78 @@
  */
 'use strict';
 
-angular.module('am-wb-core')
-
 /**
  * @ngdoc Services
  * @name $widget
  * @description Resource managment
  * 
  */
-.service('$wbUi', function($mdDialog, $q, $http) {
+class WbUi {
 
-	var _templates = [];
+	constructor($mdDialog, $q, $http)
+	{
+		this.$mdDialog = $mdDialog;
+		this.$q = $q;
+		this.$http = $http;
+		this.templates = [];
+	}
+
 
 	/**
 	 * Opens dialog
 	 * @returns
 	 */
-	function openDialog(dialogData){
-		return $mdDialog.show(dialogData);
+	openDialog(dialogData){
+		return this.$mdDialog.show(dialogData);
 	}
+
 
 	/**
 	 * Get list of registered templates
 	 * 
 	 * @memberof $wbUi
 	 */
-	function templates(){
-		return $q.when({
-			items: _templates
+	templates(){
+		return this.$q.when({
+			items: this.templates
 		});
 	}
-	
+
+	getTemplates(){
+		return this.templates;
+	}
+
 	/**
 	 * Adds new template
 	 * 
 	 * @memberof $wbUi
 	 */
-	function newTemplate(template){
-		_templates.push(template);
+	newTemplate(template){
+		this.templates.push(template);
 		return this;
 	}
-	
+
+
 	/**
 	 * Load a template
 	 * 
 	 * @memberof $wbUi
 	 */
-	function loadTemplate(template){
+	loadTemplate(template){
 		// TODO: maso, 2018: check if template is a function
 		if(angular.isDefined(template.template)){
-			return $q.when(JSON.parse(template.template));
+			return this.$q.when(JSON.parse(template.template));
 		}
-		return $http.get(template.templateUrl)
+		return this.$http.get(template.templateUrl)
 		.then(function(res){
 			return res.data;
 		});
 	}
+}
 
-	this.openDialog = openDialog;
-	this.templates = templates;
-	this.newTemplate = newTemplate;
-	this.loadTemplate = loadTemplate;
-});
+/*
+ * Add to angularjs
+ */
+WbUi.$inject=['$mdDialog', '$q', '$http'];
+angular.module('am-wb-core')
+.service('$wbUi', WbUi);
