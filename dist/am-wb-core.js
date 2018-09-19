@@ -1667,188 +1667,72 @@ angular.module('am-wb-core')
  * Loads list of settings.
  * 
  */
-.directive('wbSettingPanelGroup', function($settings, $widget, $rootScope, $wbUtil, $compile, $mdTheming, $controller, $q) {
+.directive('wbSettingPanelGroup', function($settings, $widget) {
 
-    /**
-     * Init settings
-     */
-    function postLink($scope, $element, $attrs, $ctrls) {
+	/**
+	 * Init settings
+	 */
+	function postLink($scope, $element, $attrs, $ctrls) {
 
-        // Load ngModel
-        var ngModelCtrl = $ctrls[0];
+		// Load ngModel
+		var ngModelCtrl = $ctrls[0];
+		var settingMap = [];
+		$scope.settings = [];
 
-        /**
-         * encapsulate template srce with panel widget template.
-         * 
-         * @param page
-         *            setting page config
-         * @param tempateSrc
-         *            setting page html template
-         * @returns encapsulate html template
-         */
-        function _encapsulateSettingPanel(page, templateSrc) {
-            // TODO: maso, 2017: pass all paramter to the setting
-            // panel.
-            var attr = ' ';
-            if (page.label) {
-                attr += ' label=\"' + page.label + '\"';
-            }
-            if (page.icon) {
-                attr += ' icon=\"' + page.icon + '\"';
-            }
-            if (page.description) {
-                attr += ' description=\"' + page.description + '\"';
-            }
-            return '<wb-setting-panel ' + attr + '>' + templateSrc + '</wb-setting-panel>';
-        }
+		/**
+		 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+		 * 
+		 * @returns
+		 */
+		function loadSetting(model) {
+			// load pages
+			var widget = $widget.getWidget(model);
+			var settingKeys = $settings.getSettingsFor(widget);
 
-        function isLoaded(){
-            // TODO: check if settings is loaded
-            return false;
-        }
+			// hide all settings
+			var i;
+			for(i = 0; i < $scope.settings.length; i++){
+				$scope.settings[i].visible = false;
+			}
 
-        var oldScope;
-
-        /**
-         * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-         * 
-         * @returns
-         */
-        function loadSetting(model) {
-            var jobs = [];
-            var pages = [];
-
-            // 0- destroy old resource
-            if(isLoaded(model)){
-                return;
-            }
-            if (angular.isDefined(oldScope)) {
-                oldScope.$destroy();
-            }
-            var scope = $rootScope.$new(true, $rootScope);
-            scope.wbModel = model;
-            oldScope = scope;
-
-            // 2- Clear children
-            $element.empty();
-
-            // 3- load pages
-            $widget.widget(model)//
-            .then(function(w) {
-                var widgetSettings = $settings.getSettingsFor(w);
-                angular.forEach(widgetSettings, function(type) {
-                    var page = $settings.page(type);
-                    var job = $wbUtil.getTemplateFor(page)
-                    .then(function(templateSrc){
-                        templateSrc = _encapsulateSettingPanel(page, templateSrc);
-                        var element = angular.element(templateSrc);
-                        if (angular.isDefined(page.controller)) {
-                            var controller = $controller(page.controller, {
-                                $scope : scope,
-                                $element : element
-                            });
-                            if (page.controllerAs) {
-                                scope[page.controllerAs] = controller;
-                            }
-                            element.data('$ngControllerController', controller);
-                        }
-                        $compile(element)(scope);
-                        element.attr('label', page.lable);
-                        $mdTheming(element);
-                        pages.push(element);
-                    });
-                    jobs.push(job);
-                });
-            })
-            //
-            .then(function() {
-                $q.all(jobs)//
-                .then(function() {
-                    pages.sort(function(a, b) {
-                        if (a.attr('label') < b.attr('label')){
-                            return -1;
-                        }
-                        if (a.attr('label') > b.attr('label')){
-                            return 1;
-                        }
-                        return 0;
-                    });
-                    angular.forEach(pages, function(element) {
-                        $element.append(element);
-                    });
-                });
-            });
-        }
+			// visible new ones
+			for(i = 0; i < settingKeys.length; i++){
+				var key = settingKeys[i];
+				if(!settingMap[key]){
+					var setting = $settings.getPage(key);
+					settingMap[key] = angular.copy(setting);
+					$scope.settings.push(settingMap[key]);
+				}
+				settingMap[key].visible = true;
+			}
+			
+			// set model in view
+			$scope.wbModel = model;
+		}
 
 
-        ngModelCtrl.$render = function() {
-            if(ngModelCtrl.$viewValue) {
-                loadSetting(ngModelCtrl.$viewValue);
-            }
-        };
-    }
-
-    function panelController(){
-    }
-
-    return {
-        restrict : 'E',
-        template: '<div></div>',
-        scope : {},
-        link : postLink,
-        controller: panelController,
-        controllerAs: 'ctrl',
-        require:['ngModel']
-    };
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbWidget
- * @description Widgets container
- * 
- * This is widget containers.
- * 
- * All primary actions of a widget are supported (such as remove and setting).
- */
-.directive('wbSettingPanel', function() {
+		ngModelCtrl.$render = function() {
+			if(ngModelCtrl.$viewValue) {
+				loadSetting(ngModelCtrl.$viewValue);
+			}
+		};
+	}
+	
 	return {
 		restrict : 'E',
-		transclude : true,
-		templateUrl : 'views/directives/wb-setting-panel.html',
-		// This create an isolated scope
-		scope : {
-			label : '@label',
-			description : '@?',
-			icon : '@?'
-		}
+		replace: true,
+		templateUrl: function($element, $attr){
+			var link = 'views/directives/wb-setting-panel-';
+			if(angular.isDefined($attr.wbTabMode)){
+				link += 'tabs.html';
+			} else {
+				link += 'expansion.html';
+			}
+			return link;
+		},
+		scope : {},
+		link : postLink,
+		require:['ngModel']
 	};
 });
 
@@ -3557,7 +3441,8 @@ angular.module('am-wb-core')
 	});
 	$settings.newPage({
 		type : 'text',
-		label : 'Frontend text',
+		label : 'Text',
+		icon: 'text_fields',
 		/*
 		 * @ngInject
 		 */
@@ -3600,6 +3485,7 @@ angular.module('am-wb-core')
 		},
 		templateUrl : 'views/settings/wb-text.html'
 	});
+	
 	$settings.newPage({
 		type : 'description',
 		label : 'Description',
@@ -3772,46 +3658,48 @@ angular.module('am-wb-core')
 			};
 		}
 	});
-	$settings.newPage({
-		type : 'selfLayout',
-		label : 'Self Layout',
-		controllerAs : 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			$scope.selfAlign = [ {
-				title : 'auto',
-				icon : 'looks_one',
-				value : 'auto'
-			}, {
-				title : 'Start',
-				icon : 'looks_two',
-				value : 'start'
-			}, {
-				title : 'End',
-				icon : 'looks_3',
-				value : 'end'
-			}, {
-				title : 'Center',
-				icon : 'looks_4',
-				value : 'center'
-			}, {
-				title : 'stretch',
-				icon : 'looks_5',
-				value : 'stretch'
-			} ];
-		},
-		templateUrl : 'views/settings/wb-layout-self.html'
-	});
+//	$settings.newPage({
+//		type : 'selfLayout',
+//		label : 'Self Layout',
+//		controllerAs : 'ctrl',
+//		/*
+//		 * @ngInject
+//		 */
+//		controller : function($scope) {
+//			$scope.selfAlign = [ {
+//				title : 'auto',
+//				icon : 'looks_one',
+//				value : 'auto'
+//			}, {
+//				title : 'Start',
+//				icon : 'looks_two',
+//				value : 'start'
+//			}, {
+//				title : 'End',
+//				icon : 'looks_3',
+//				value : 'end'
+//			}, {
+//				title : 'Center',
+//				icon : 'looks_4',
+//				value : 'center'
+//			}, {
+//				title : 'stretch',
+//				icon : 'looks_5',
+//				value : 'stretch'
+//			} ];
+//		},
+//		templateUrl : 'views/settings/wb-layout-self.html'
+//	});
 	$settings.newPage({
 		type : 'marginPadding',
 		label : 'Margin/Padding',
+		icon: 'border_clear',
 		templateUrl : 'views/settings/wb-margin-padding.html'
 	});
 	$settings.newPage({
 		type : 'size',
 		label : 'Size',
+		icon: 'photo_size_select_large',
 		templateUrl : 'views/settings/wb-size.html'
 	});
 });
@@ -4392,9 +4280,9 @@ angular.module('am-wb-core')
 //	'background', 'pageLayout', 'marginPadding'];
 
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
-		'background', 'pageLayout', 'selfLayout',
+		'background', 'pageLayout',
 		'marginPadding', 'size' ];
-	var WB_SETTINGS_WIDGET_DEFAULT = [ 'selfLayout', 'border',
+	var WB_SETTINGS_WIDGET_DEFAULT = [ 'border',
 		'background', 'marginPadding', 'size' ];
 	/**
 	 * Setting page storage
@@ -5090,13 +4978,13 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/directives/wb-setting-panel-group.html',
-    "<div id=WB-SETTING-PANEL> </div>"
+  $templateCache.put('views/directives/wb-setting-panel-expansion.html',
+    "<div id=WB-SETTING-PANEL> <md-expansion-panel ng-repeat=\"setting in settings | orderBy:priority track by setting.type\" ng-show=setting.visible> <md-expansion-panel-collapsed> <div class=md-title>{{setting.label}}</div> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header ng-click=$panel.collapse()> <div class=md-title>{{setting.label}}</div> <div class=md-summary>{{setting.description}}</div> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </div>"
   );
 
 
-  $templateCache.put('views/directives/wb-setting-panel.html',
-    "<md-expansion-panel> <md-expansion-panel-collapsed> <div class=md-title>{{label}} <md-tooltip md-direction=bottom md-delay=300 ng-show=description>{{description}}</md-tooltip> </div> <md-expansion-panel-icon></md-expansion-panel-icon> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <div class=md-title>{{label}}</div> <div class=md-summary></div> <md-expansion-panel-icon ng-click=$panel.collapse()></md-expansion-panel-icon> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <ng-transclude layout=column> </ng-transclude> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel>"
+  $templateCache.put('views/directives/wb-setting-panel-tabs.html',
+    "<div> <md-tabs md-dynamic-height md-border-bottom> <md-tab ng-repeat=\"setting in settings | orderBy:priority track by setting.type\" ng-show=setting.visible id={{setting.key}}> <md-tab-label> <span ng-if=!setting.icon translate>{{setting.label}}</span> <wb-icon ng-if=setting.icon>{{setting.icon}}</wb-icon> </md-tab-label> <md-tab-body layout-margin> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-tab-body> </md-tab> </md-tabs> </div>"
   );
 
 

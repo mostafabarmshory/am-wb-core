@@ -10,9 +10,7 @@
 	}
 }
 
-.jsPanel {
-	z-index: 10 !important;
-}
+
 /**
  * Flex css utility (cross browser)
  *
@@ -203,6 +201,13 @@ Rules for sizing the icon.
 .wb-s128 {
 	width: 128px;
 	height: 128px;
+}
+
+/*
+ * Set position ot the panel
+ */
+.jsPanel {
+	z-index: 70 !important;
 }
 .wb-setting-panel{
     padding: 0px;
