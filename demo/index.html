@@ -25,6 +25,7 @@
 	<link rel="stylesheet" href="bower_components/pikaday/css/pikaday.css" />
 	<link rel="stylesheet" href="bower_components/handsontable/dist/handsontable.css" />
 	<link rel="stylesheet" href="bower_components/jspanel4/dist/jspanel.css" />
+	<link rel="stylesheet" href="bower_components/json-formatter/dist/json-formatter.css" />
 	<!-- endbower -->
 	<!-- endbuild -->
 	
@@ -34,6 +35,7 @@
 	<link rel="stylesheet" href="styles/flex-util.css">
 	<link rel="stylesheet" href="styles/font-icon.css">
 	<link rel="stylesheet" href="styles/font-svg.css">
+	<link rel="stylesheet" href="styles/jsPanel.css">
 	<link rel="stylesheet" href="styles/setting-layout.css">
 	<link rel="stylesheet" href="styles/typography.css">
 	<link rel="stylesheet" href="styles/wb-dnd.css">
@@ -64,9 +66,14 @@
 	                    ng-click="editable=!editable">
 	                <wb-icon>edit</wb-icon>
 	            </md-button>
+	            <md-button
+	            	ng-repeat="action in actions"
+	            	ng-click="runAction(action)">
+	                <wb-icon>{{action.icon}}</wb-icon>
+	            </md-button>
 	       </section>
 			<wb-group
-				wb-on-model-select="loadSettings($model)"
+				wb-on-model-select="loadSettings($model, $ctrl)"
 				wb-editable="editable"
 				ng-model="model"
 				flex>
@@ -101,6 +108,9 @@
 	<script src="bower_components/ngHandsontable/dist/ngHandsontable.js"></script>
 	<script src="bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
 	<script src="bower_components/jspanel4/dist/jspanel.js"></script>
+	<script src="bower_components/lodash/lodash.js"></script>
+	<script src="bower_components/angular-mocks/angular-mocks.js"></script>
+	<script src="bower_components/json-formatter/dist/json-formatter.js"></script>
 	<!-- endbower -->
 	<!-- endbuild -->
 
@@ -120,25 +130,27 @@
 	<script src="scripts/directives/wb-group.js"></script>
 	<script src="scripts/directives/wb-icon.js"></script>
 	<script src="scripts/directives/wb-infinateScroll.js"></script>
+	<script src="scripts/directives/wb-setting-page.js"></script>
 	<script src="scripts/directives/wb-setting-panel-group.js"></script>
-	<script src="scripts/directives/wb-setting-panel.js"></script>
 	<script src="scripts/directives/wb-ui-choose.js"></script>
 	<script src="scripts/directives/wb-ui-setting-audio.js"></script>
+	<script src="scripts/directives/wb-ui-setting-background-attachment.js"></script>
+	<script src="scripts/directives/wb-ui-setting-background-origin.js"></script>
+	<script src="scripts/directives/wb-ui-setting-background-position.js"></script>
 	<script src="scripts/directives/wb-ui-setting-background-repeat.js"></script>
 	<script src="scripts/directives/wb-ui-setting-background-size.js"></script>
 	<script src="scripts/directives/wb-ui-setting-choose.js"></script>
 	<script src="scripts/directives/wb-ui-setting-color.js"></script>
 	<script src="scripts/directives/wb-ui-setting-data.js"></script>
+	<script src="scripts/directives/wb-ui-setting-dropdown-value.js"></script>
 	<script src="scripts/directives/wb-ui-setting-dropdown.js"></script>
 	<script src="scripts/directives/wb-ui-setting-image.js"></script>
 	<script src="scripts/directives/wb-ui-setting-length.js"></script>
 	<script src="scripts/directives/wb-ui-setting-link.js"></script>
 	<script src="scripts/directives/wb-ui-setting-number.js"></script>
 	<script src="scripts/directives/wb-ui-setting-on-off-switch.js"></script>
+	<script src="scripts/directives/wb-ui-setting-text.js"></script>
 	<script src="scripts/directives/wb-ui-setting-video.js"></script>
-	<script src="scripts/directives/wb-ui-settting-background-attachment.js"></script>
-	<script src="scripts/directives/wb-ui-settting-background-origin.js"></script>
-	<script src="scripts/directives/wb-ui-settting-background-position.js"></script>
 	<script src="scripts/directives/wb-widget.js"></script>
 	<script src="scripts/directives/wb-widgets-explorer.js"></script>
 	<script src="scripts/directives/wb-widgets-list.js"></script>

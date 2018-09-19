@@ -1,0 +1,14 @@
+<!-- TODO: mgh, 1396: add ng-value to the 'wb-ui-setting-dropdown' parameters for two way binding and remove this directive-->
+<md-list-item>
+    <wb-icon ng-hide="icon==undefined || icon==null || icon==''">{{icon}}</wb-icon>
+    <p ng-hide="title==undefined || title==null || title==''">{{title}}</p>
+    <md-select
+            style="margin: 0px"
+            ng-model="value">
+        <md-option
+                ng-repeat="item in items"
+                ng-value="item.value">
+            {{item.title}}
+        </md-option>
+    </md-select>
+</md-list-item>

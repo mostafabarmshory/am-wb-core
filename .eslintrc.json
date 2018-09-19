@@ -10,7 +10,8 @@
 		"alert": true,
 		"toast": true,
 		"prompt": true,
-		"jsPanel": true
+		"jsPanel": true,
+		"_": true
 	},
 	"extends": "eslint:recommended",
 	"parserOptions": {

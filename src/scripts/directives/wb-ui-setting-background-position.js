@@ -23,23 +23,43 @@
  */
 'use strict';
 
+
 angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wbUiSettingDropdown
- * @description a setting section for choosing values.
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
  *
  */
-.directive('wbUiSettingDropdown', function () {
+.directive('wbUiSettingBackgroundPosition', function () {
 	return {
-		templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
+		templateUrl: 'views/directives/wb-ui-setting-background-position.html',
 		restrict: 'E',
 		scope: {
 			title: '@title',
-			value: '=value',
-			icon: '@icon',
-			items:'=items'
+			value: '=value'
+		},
+		controllerAs: 'ctrl',
+		/*
+		 * 
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+			$scope.items = [
+				{title: 'Left top', value: 'left top'},
+				{title: 'Left center', value: 'left center'},
+				{title: 'Left bottom', value: 'left bottom'},
+				{title: 'Right top', value: 'right top'},
+				{title: 'Right center', value: 'right center'},
+				{title: 'Center top', value: 'center top'},
+				{title: 'Center center', value: 'center center'},
+				{title: 'Center bottom', value: 'center bottom'},
+				{title: 'Initial', value: 'initial'},
+				{title: 'Inherit', value: 'inherit'},
+				{title: 'Nothing', value: ''}
+				];
+
 		}
 	};
 });

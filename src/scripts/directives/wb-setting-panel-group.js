@@ -33,7 +33,7 @@ angular.module('am-wb-core')
  * Loads list of settings.
  * 
  */
-.directive('wbSettingPanelGroup', function($settings, $widget, $rootScope, $wbUtil, $compile, $controller, $q) {
+.directive('wbSettingPanelGroup', function($settings, $widget) {
 
 	/**
 	 * Init settings
@@ -42,38 +42,8 @@ angular.module('am-wb-core')
 
 		// Load ngModel
 		var ngModelCtrl = $ctrls[0];
-
-		/**
-		 * encapsulate template srce with panel widget template.
-		 * 
-		 * @param page
-		 *            setting page config
-		 * @param tempateSrc
-		 *            setting page html template
-		 * @returns encapsulate html template
-		 */
-		function _encapsulateSettingPanel(page, templateSrc) {
-			// TODO: maso, 2017: pass all paramter to the setting
-			// panel.
-			var attr = ' ';
-			if (page.label) {
-				attr += ' label=\"' + page.label + '\"';
-			}
-			if (page.icon) {
-				attr += ' icon=\"' + page.icon + '\"';
-			}
-			if (page.description) {
-				attr += ' description=\"' + page.description + '\"';
-			}
-			return '<wb-setting-panel ' + attr + '>' + templateSrc + '</wb-setting-panel>';
-		}
-
-		function isLoaded(){
-			// TODO: check if settings is loaded
-			return false;
-		}
-
-		var oldScope;
+		var settingMap = [];
+		$scope.settings = [];
 
 		/**
 		 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
@@ -81,66 +51,31 @@ angular.module('am-wb-core')
 		 * @returns
 		 */
 		function loadSetting(model) {
-			var jobs = [];
-			var pages = [];
+			// load pages
+			var widget = $widget.getWidget(model);
+			var settingKeys = $settings.getSettingsFor(widget);
 
-			// 0- destroy old resource
-			if(isLoaded(model)){
-				return;
+			// hide all settings
+			var i;
+			for(i = 0; i < $scope.settings.length; i++){
+				$scope.settings[i].visible = false;
 			}
-			if (angular.isDefined(oldScope)) {
-				oldScope.$destroy();
+
+			// visible new ones
+			for(i = 0; i < settingKeys.length; i++){
+				var key = settingKeys[i];
+				if(!settingMap[key]){
+					var setting = $settings.getPage(key);
+					settingMap[key] = angular.copy(setting);
+					$scope.settings.push(settingMap[key]);
+				}
+				settingMap[key].visible = true;
 			}
-			var scope = $rootScope.$new(true, $rootScope);
-			scope.wbModel = model;
-			oldScope = scope;
-
-			// 2- Clear children
-			$element.empty();
-
-			// 3- load pages
-			$widget.widget(model)//
-			.then(function(w) {
-				var widgetSettings = $settings.getSettingsFor(w);
-				angular.forEach(widgetSettings, function(type) {
-					var page = $settings.page(type);
-					var job = $wbUtil.getTemplateFor(page)
-					.then(function(templateSrc){
-						templateSrc = _encapsulateSettingPanel(page, templateSrc);
-						var element = angular.element(templateSrc);
-						if (angular.isDefined(page.controller)) {
-							$controller(page.controller, {
-								$scope : scope,
-								$element : element
-							});
-						}
-						$compile(element)(scope);
-						element.attr('label', page.lable);
-						pages.push(element);
-					});
-					jobs.push(job);
-				});
-			})
-			//
-			.then(function() {
-				$q.all(jobs)//
-				.then(function() {
-					pages.sort(function(a, b) {
-						if (a.attr('label') < b.attr('label')){
-							return -1;
-						}
-						if (a.attr('label') > b.attr('label')){
-							return 1;
-						}
-						return 0;
-					});
-					angular.forEach(pages, function(element) {
-						$element.append(element);
-					});
-				});
-			});
+			
+			// set model in view
+			$scope.wbModel = model;
 		}
-		
+
 
 		ngModelCtrl.$render = function() {
 			if(ngModelCtrl.$viewValue) {
@@ -148,17 +83,21 @@ angular.module('am-wb-core')
 			}
 		};
 	}
-
-	function panelController(){
-	}
-
+	
 	return {
 		restrict : 'E',
-		template: '<div></div>',
+		replace: true,
+		templateUrl: function($element, $attr){
+			var link = 'views/directives/wb-setting-panel-';
+			if(angular.isDefined($attr.wbTabMode)){
+				link += 'tabs.html';
+			} else {
+				link += 'expansion.html';
+			}
+			return link;
+		},
 		scope : {},
 		link : postLink,
-		controller: panelController,
-		controllerAs: 'ctrl',
 		require:['ngModel']
 	};
 });

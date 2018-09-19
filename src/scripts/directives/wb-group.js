@@ -61,8 +61,9 @@ angular.module('am-wb-core')
 			}
 			var compilesJob = [];
 			var elements = [];
+			var locals = ctrl.getLocals();
 			model.contents.forEach(function(item, index) {
-				compilesJob.push($widget.compile(item, $scope, $element)//
+				compilesJob.push($widget.compile(item, $scope, $element, locals)//
 						.then(function(element) {
 							$mdTheming(element);
 							elements[index] = element;
@@ -145,7 +146,7 @@ angular.module('am-wb-core')
 				}
 			}
 		}
-		
+
 		/**
 		 * Delete data model and widget display
 		 * 
@@ -157,7 +158,7 @@ angular.module('am-wb-core')
 				// TODO: mao, 2018: clear all elements
 				return;
 			}
-			$scope.parentCtrl.removeChild($scope.wbModel);
+			$scope.parentCtrl.removeChild($scope.wbModel, ctrl);
 			fire('delete');
 		};
 
@@ -244,9 +245,13 @@ angular.module('am-wb-core')
 		 * Data model and visual element related to the input model will be
 		 * removed.
 		 */
-		ctrl.removeChild = function(model) {
+		ctrl.removeChild = function(model, childCtrl) {
 			var index = ctrl.indexOfChild(model);
 			if (index > -1) {
+				if(ctrl.isChildSelected(childCtrl)){
+					ctrl.childSelected(null);
+					// delete controller
+				}
 				$element.children(':nth-child('+(index+1)+')').remove();
 				$scope.wbModel.contents.splice(index, 1);
 				return true;
@@ -254,6 +259,12 @@ angular.module('am-wb-core')
 			return false;
 		};
 
+		ctrl.getLocals = function(){
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.getLocals();
+			}
+			return $scope.wbLocals;
+		};
 
 		/**
 		 * Adds dragged widget
@@ -261,7 +272,7 @@ angular.module('am-wb-core')
 		ctrl.addChild = function(index, item) {
 			$wbUtil.clean(item);
 			// add widget
-			$widget.compile(item, $scope)//
+			$widget.compile(item, $scope, null, ctrl.getLocals())//
 			.then(function(newElement) {
 				var nodes  = $element[0].childNodes;
 				if (index < nodes.length) {
@@ -276,7 +287,7 @@ angular.module('am-wb-core')
 			});
 			return true;
 		};
-		
+
 		ctrl.indexOfChild = function(item) {
 			return $scope.wbModel.contents.indexOf(item);
 		};
@@ -319,7 +330,8 @@ angular.module('am-wb-core')
 		scope : {
 			wbEditable : '=?',
 			wbOnModelSelect : '@?',
-			wbAllowedTypes: '<?'
+			wbAllowedTypes: '<?',
+			wbLocals: '<?'
 		},
 		link : wbGroupLink,
 		controllerAs: 'ctrl',

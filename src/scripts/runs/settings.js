@@ -43,7 +43,8 @@ angular.module('am-wb-core')
 	});
 	$settings.newPage({
 		type : 'text',
-		label : 'Frontend text',
+		label : 'Text',
+		icon: 'text_fields',
 		/*
 		 * @ngInject
 		 */
@@ -86,6 +87,7 @@ angular.module('am-wb-core')
 		},
 		templateUrl : 'views/settings/wb-text.html'
 	});
+	
 	$settings.newPage({
 		type : 'description',
 		label : 'Description',
@@ -258,46 +260,48 @@ angular.module('am-wb-core')
 			};
 		}
 	});
-	$settings.newPage({
-		type : 'selfLayout',
-		label : 'Self Layout',
-		controllerAs : 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			$scope.selfAlign = [ {
-				title : 'auto',
-				icon : 'looks_one',
-				value : 'auto'
-			}, {
-				title : 'Start',
-				icon : 'looks_two',
-				value : 'start'
-			}, {
-				title : 'End',
-				icon : 'looks_3',
-				value : 'end'
-			}, {
-				title : 'Center',
-				icon : 'looks_4',
-				value : 'center'
-			}, {
-				title : 'stretch',
-				icon : 'looks_5',
-				value : 'stretch'
-			} ];
-		},
-		templateUrl : 'views/settings/wb-layout-self.html'
-	});
+//	$settings.newPage({
+//		type : 'selfLayout',
+//		label : 'Self Layout',
+//		controllerAs : 'ctrl',
+//		/*
+//		 * @ngInject
+//		 */
+//		controller : function($scope) {
+//			$scope.selfAlign = [ {
+//				title : 'auto',
+//				icon : 'looks_one',
+//				value : 'auto'
+//			}, {
+//				title : 'Start',
+//				icon : 'looks_two',
+//				value : 'start'
+//			}, {
+//				title : 'End',
+//				icon : 'looks_3',
+//				value : 'end'
+//			}, {
+//				title : 'Center',
+//				icon : 'looks_4',
+//				value : 'center'
+//			}, {
+//				title : 'stretch',
+//				icon : 'looks_5',
+//				value : 'stretch'
+//			} ];
+//		},
+//		templateUrl : 'views/settings/wb-layout-self.html'
+//	});
 	$settings.newPage({
 		type : 'marginPadding',
 		label : 'Margin/Padding',
+		icon: 'border_clear',
 		templateUrl : 'views/settings/wb-margin-padding.html'
 	});
 	$settings.newPage({
 		type : 'size',
 		label : 'Size',
+		icon: 'photo_size_select_large',
 		templateUrl : 'views/settings/wb-size.html'
 	});
 });

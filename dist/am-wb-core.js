@@ -23,13 +23,7 @@
  */
 'use strict';
 
-/**
- * @ngdoc module
- * @name ngDonate
- *
- */
-angular
-.module('am-wb-core', [
+angular.module('am-wb-core', [
 	'ngMessages',//
 	'ngAnimate',//
 	'ngAria',//
@@ -1083,8 +1077,9 @@ angular.module('am-wb-core')
 			}
 			var compilesJob = [];
 			var elements = [];
+			var locals = ctrl.getLocals();
 			model.contents.forEach(function(item, index) {
-				compilesJob.push($widget.compile(item, $scope, $element)//
+				compilesJob.push($widget.compile(item, $scope, $element, locals)//
 						.then(function(element) {
 							$mdTheming(element);
 							elements[index] = element;
@@ -1167,7 +1162,7 @@ angular.module('am-wb-core')
 				}
 			}
 		}
-		
+
 		/**
 		 * Delete data model and widget display
 		 * 
@@ -1179,7 +1174,7 @@ angular.module('am-wb-core')
 				// TODO: mao, 2018: clear all elements
 				return;
 			}
-			$scope.parentCtrl.removeChild($scope.wbModel);
+			$scope.parentCtrl.removeChild($scope.wbModel, ctrl);
 			fire('delete');
 		};
 
@@ -1266,9 +1261,13 @@ angular.module('am-wb-core')
 		 * Data model and visual element related to the input model will be
 		 * removed.
 		 */
-		ctrl.removeChild = function(model) {
+		ctrl.removeChild = function(model, childCtrl) {
 			var index = ctrl.indexOfChild(model);
 			if (index > -1) {
+				if(ctrl.isChildSelected(childCtrl)){
+					ctrl.childSelected(null);
+					// delete controller
+				}
 				$element.children(':nth-child('+(index+1)+')').remove();
 				$scope.wbModel.contents.splice(index, 1);
 				return true;
@@ -1276,6 +1275,12 @@ angular.module('am-wb-core')
 			return false;
 		};
 
+		ctrl.getLocals = function(){
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.getLocals();
+			}
+			return $scope.wbLocals;
+		};
 
 		/**
 		 * Adds dragged widget
@@ -1283,7 +1288,7 @@ angular.module('am-wb-core')
 		ctrl.addChild = function(index, item) {
 			$wbUtil.clean(item);
 			// add widget
-			$widget.compile(item, $scope)//
+			$widget.compile(item, $scope, null, ctrl.getLocals())//
 			.then(function(newElement) {
 				var nodes  = $element[0].childNodes;
 				if (index < nodes.length) {
@@ -1298,7 +1303,7 @@ angular.module('am-wb-core')
 			});
 			return true;
 		};
-		
+
 		ctrl.indexOfChild = function(item) {
 			return $scope.wbModel.contents.indexOf(item);
 		};
@@ -1341,7 +1346,8 @@ angular.module('am-wb-core')
 		scope : {
 			wbEditable : '=?',
 			wbOnModelSelect : '@?',
-			wbAllowedTypes: '<?'
+			wbAllowedTypes: '<?',
+			wbLocals: '<?'
 		},
 		link : wbGroupLink,
 		controllerAs: 'ctrl',
@@ -1566,139 +1572,67 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wb-setting-panel-group
- * @description Widgets settings
- * 
- * Loads list of settings.
+ * @name wb-setting-page
+ * @description Display a setting of a model
  * 
  */
-.directive('wbSettingPanelGroup', function($settings, $widget, $rootScope, $wbUtil, $compile, $controller, $q) {
-
-	/**
-	 * Init settings
-	 */
+.directive('wbSettingPage', function($widget, $settings, $wbUtil, $controller, $compile, $mdTheming) {
 	function postLink($scope, $element, $attrs, $ctrls) {
+
+
+		function loadSetting(page){
+            $wbUtil.getTemplateFor(page)
+            .then(function(templateSrc){
+                var element = angular.element(templateSrc);
+                var scope = $scope.$new();
+                if (angular.isDefined(page.controller)) {
+                    var controller = $controller(page.controller, {
+                        $scope : scope,
+                        $element : element
+                    });
+                    if (page.controllerAs) {
+                        scope[page.controllerAs] = controller;
+                    }
+                    element.data('$ngControllerController', controller);
+                }
+                $compile(element)(scope);
+                $mdTheming(element);
+                $element.empty();
+                $element.append(element);
+            });
+		}
+
+		function loadModel(model) {
+			$scope.wbModel = model;
+		}
+		
+		$scope.$watch('type',  function(type) {
+			if (!type) {
+				return;
+			}
+			var setting = $settings.page(type);
+			loadSetting(setting);
+		});
 
 		// Load ngModel
 		var ngModelCtrl = $ctrls[0];
-
-		/**
-		 * encapsulate template srce with panel widget template.
-		 * 
-		 * @param page
-		 *            setting page config
-		 * @param tempateSrc
-		 *            setting page html template
-		 * @returns encapsulate html template
-		 */
-		function _encapsulateSettingPanel(page, templateSrc) {
-			// TODO: maso, 2017: pass all paramter to the setting
-			// panel.
-			var attr = ' ';
-			if (page.label) {
-				attr += ' label=\"' + page.label + '\"';
-			}
-			if (page.icon) {
-				attr += ' icon=\"' + page.icon + '\"';
-			}
-			if (page.description) {
-				attr += ' description=\"' + page.description + '\"';
-			}
-			return '<wb-setting-panel ' + attr + '>' + templateSrc + '</wb-setting-panel>';
-		}
-
-		function isLoaded(){
-			// TODO: check if settings is loaded
-			return false;
-		}
-
-		var oldScope;
-
-		/**
-		 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-		 * 
-		 * @returns
-		 */
-		function loadSetting(model) {
-			var jobs = [];
-			var pages = [];
-
-			// 0- destroy old resource
-			if(isLoaded(model)){
-				return;
-			}
-			if (angular.isDefined(oldScope)) {
-				oldScope.$destroy();
-			}
-			var scope = $rootScope.$new(true, $rootScope);
-			scope.wbModel = model;
-			oldScope = scope;
-
-			// 2- Clear children
-			$element.empty();
-
-			// 3- load pages
-			$widget.widget(model)//
-			.then(function(w) {
-				var widgetSettings = $settings.getSettingsFor(w);
-				angular.forEach(widgetSettings, function(type) {
-					var page = $settings.page(type);
-					var job = $wbUtil.getTemplateFor(page)
-					.then(function(templateSrc){
-						templateSrc = _encapsulateSettingPanel(page, templateSrc);
-						var element = angular.element(templateSrc);
-						if (angular.isDefined(page.controller)) {
-							$controller(page.controller, {
-								$scope : scope,
-								$element : element
-							});
-						}
-						$compile(element)(scope);
-						element.attr('label', page.lable);
-						pages.push(element);
-					});
-					jobs.push(job);
-				});
-			})
-			//
-			.then(function() {
-				$q.all(jobs)//
-				.then(function() {
-					pages.sort(function(a, b) {
-						if (a.attr('label') < b.attr('label')){
-							return -1;
-						}
-						if (a.attr('label') > b.attr('label')){
-							return 1;
-						}
-						return 0;
-					});
-					angular.forEach(pages, function(element) {
-						$element.append(element);
-					});
-				});
-			});
-		}
-		
-
 		ngModelCtrl.$render = function() {
-			if(ngModelCtrl.$viewValue) {
-				loadSetting(ngModelCtrl.$viewValue);
+			if (ngModelCtrl.$viewValue) {
+				loadModel(ngModelCtrl.$viewValue);
 			}
 		};
 	}
 
-	function panelController(){
-	}
-
+	// create directive
 	return {
 		restrict : 'E',
-		template: '<div></div>',
-		scope : {},
+		replace : true,
+		template : '<div layout="column"></div>',
 		link : postLink,
-		controller: panelController,
-		controllerAs: 'ctrl',
-		require:['ngModel']
+		scope : {
+			type : '@wbType'
+		},
+		require : [ 'ngModel' ]
 	};
 });
 
@@ -1731,24 +1665,78 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wbWidget
- * @description Widgets container
+ * @name wb-setting-panel-group
+ * @description Widgets settings
  * 
- * This is widget containers.
+ * Loads list of settings.
  * 
- * All primary actions of a widget are supported (such as remove and setting).
  */
-.directive('wbSettingPanel', function() {
+.directive('wbSettingPanelGroup', function($settings, $widget) {
+
+	/**
+	 * Init settings
+	 */
+	function postLink($scope, $element, $attrs, $ctrls) {
+
+		// Load ngModel
+		var ngModelCtrl = $ctrls[0];
+		var settingMap = [];
+		$scope.settings = [];
+
+		/**
+		 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+		 * 
+		 * @returns
+		 */
+		function loadSetting(model) {
+			// load pages
+			var widget = $widget.getWidget(model);
+			var settingKeys = $settings.getSettingsFor(widget);
+
+			// hide all settings
+			var i;
+			for(i = 0; i < $scope.settings.length; i++){
+				$scope.settings[i].visible = false;
+			}
+
+			// visible new ones
+			for(i = 0; i < settingKeys.length; i++){
+				var key = settingKeys[i];
+				if(!settingMap[key]){
+					var setting = $settings.getPage(key);
+					settingMap[key] = angular.copy(setting);
+					$scope.settings.push(settingMap[key]);
+				}
+				settingMap[key].visible = true;
+			}
+			
+			// set model in view
+			$scope.wbModel = model;
+		}
+
+
+		ngModelCtrl.$render = function() {
+			if(ngModelCtrl.$viewValue) {
+				loadSetting(ngModelCtrl.$viewValue);
+			}
+		};
+	}
+	
 	return {
 		restrict : 'E',
-		transclude : true,
-		templateUrl : 'views/directives/wb-setting-panel.html',
-		// This create an isolated scope
-		scope : {
-			label : '@label',
-			description : '@?',
-			icon : '@?'
-		}
+		replace: true,
+		templateUrl: function($element, $attr){
+			var link = 'views/directives/wb-setting-panel-';
+			if(angular.isDefined($attr.wbTabMode)){
+				link += 'tabs.html';
+			} else {
+				link += 'expansion.html';
+			}
+			return link;
+		},
+		scope : {},
+		link : postLink,
+		require:['ngModel']
 	};
 });
 
@@ -1878,6 +1866,183 @@ angular.module('am-wb-core')
 	};
 });
 
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingBackgroundAttachment', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
+		restrict: 'E',
+		replace: true,
+		scope: {
+			title: '@title',
+			value: '=value'
+		},
+		controller: function ($scope) {
+			$scope.items = [
+				{name: 'Scroll', value: 'scroll'},
+				{name: 'Fixed', value: 'fixed'},
+				{name: 'Local', value: 'local'},
+				{name: 'Initial', value: 'initial'},
+				{name: 'Inherit', value: 'inherit'},
+				{name: 'Nothing', value: ''}
+				];
+
+		}
+	};
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingBackgroundOrigin', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-background-origin.html',
+		restrict: 'E',
+		replace: true,
+		scope: {
+			title: '@title',
+			value: '=value'
+		},
+		controller: function ($scope) {
+			$scope.items = [
+				{name: 'Padding-box', value: 'padding-box'},
+				{name: 'Border-box', value: 'border-box'},
+				{name: 'Content-box', value: 'content-box'},
+				{name: 'No-repeat', value: 'no-repeat'},
+				{name: 'Initial', value: 'initial'},
+				{name: 'Inherit', value: 'inherit'},
+				{name: 'Nothing', value: ''}
+				];
+
+		}
+	};
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingBackgroundPosition', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-background-position.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value'
+		},
+		controllerAs: 'ctrl',
+		/*
+		 * 
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+			$scope.items = [
+				{title: 'Left top', value: 'left top'},
+				{title: 'Left center', value: 'left center'},
+				{title: 'Left bottom', value: 'left bottom'},
+				{title: 'Right top', value: 'right top'},
+				{title: 'Right center', value: 'right center'},
+				{title: 'Center top', value: 'center top'},
+				{title: 'Center center', value: 'center center'},
+				{title: 'Center bottom', value: 'center bottom'},
+				{title: 'Initial', value: 'initial'},
+				{title: 'Inherit', value: 'inherit'},
+				{title: 'Nothing', value: ''}
+				];
+
+		}
+	};
+});
 /* 
  * The MIT License (MIT)
  * 
@@ -2235,24 +2400,70 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-    /**
-     * @ngdoc Directives
-     * @name wbUiSettingDropdown
-     * @description a setting section for choosing values.
-     *
-     */
-    .directive('wbUiSettingDropdown', function () {
-        return {
-            templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
-            restrict: 'E',
-            scope: {
-                title: '@title',
-                value: '=value',
-                icon: '@icon',
-                items:'=items'
-            }
-        };
-    });
+/**
+ * @ngdoc Directives
+ * @name wb-ui-setting-dropdown
+ * @description a setting section for choosing values.
+ *
+ */
+.directive('wbUiSettingDropdownValue', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-dropdown-value.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon',
+			items:'=items'
+		}
+	};
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingDropdown
+ * @description a setting section for choosing values.
+ *
+ */
+.directive('wbUiSettingDropdown', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon',
+			items:'=items'
+		}
+	};
+});
 
 /* 
  * The MIT License (MIT)
@@ -2571,6 +2782,51 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
+ * @name wb-ui-setting-text
+ * @description Setting for a text
+ *
+ */
+.directive('wbUiSettingText', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-text.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon'
+		}
+	};
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
  * @name wbUiSettingVideo
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
@@ -2605,233 +2861,6 @@ angular.module('am-wb-core')
 	};
 });
 
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingBackgroundAttachment', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
-		restrict: 'E',
-		replace: true,
-		scope: {
-			title: '@title',
-			value: '=value'
-		},
-		controller: function ($scope) {
-			$scope.items = [
-				{name: 'Scroll', value: 'scroll'},
-				{name: 'Fixed', value: 'fixed'},
-				{name: 'Local', value: 'local'},
-				{name: 'Initial', value: 'initial'},
-				{name: 'Inherit', value: 'inherit'},
-				{name: 'Nothing', value: ''}
-				];
-
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingBackgroundOrigin', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-background-origin.html',
-		restrict: 'E',
-		replace: true,
-		scope: {
-			title: '@title',
-			value: '=value'
-		},
-		controller: function ($scope) {
-			$scope.items = [
-				{name: 'Padding-box', value: 'padding-box'},
-				{name: 'Border-box', value: 'border-box'},
-				{name: 'Content-box', value: 'content-box'},
-				{name: 'No-repeat', value: 'no-repeat'},
-				{name: 'Initial', value: 'initial'},
-				{name: 'Inherit', value: 'inherit'},
-				{name: 'Nothing', value: ''}
-				];
-
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingBackgroundPosition', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-background-position.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value'
-		},
-		controllerAs: 'ctrl',
-		controller: function DemoCtrl($timeout, $q) {
-			var self = this;
-			self.simulateQuery = false;
-			self.isDisabled = false;
-
-			// list of `state` value/display objects
-			self.states = loadAll();
-			self.querySearch = querySearch;
-
-			function newState(state) {
-				alert('Sorry! You`ll need to create a Constitution for ' + state + ' first!');
-			}
-			self.newState = newState;
-
-			// ******************************
-			// Internal methods
-			// ******************************
-
-			/**
-			 * Search for states... use $timeout to simulate
-			 * remote dataservice call.
-			 */
-			function querySearch(query) {
-				var results = query ? self.states.filter(createFilterFor(query)) : self.states,
-						deferred;
-				if (self.simulateQuery) {
-					deferred = $q.defer();
-					$timeout(function () {
-						deferred.resolve(results);
-					}, Math.random() * 1000, false);
-					return deferred.promise;
-				} else {
-					return results;
-				}
-			}
-
-			/**
-			 * Build `states` list of key/value pairs
-			 */
-			function loadAll() {
-				return[
-					{display: 'Left top', value: 'left top'},
-					{display: 'Left center', value: 'left center'},
-					{display: 'Left bottom', value: 'left bottom'},
-					{display: 'Right top', value: 'right top'},
-					{display: 'Right center', value: 'right center'},
-					{display: 'Center top', value: 'center top'},
-					{display: 'Center center', value: 'center center'},
-					{display: 'Center bottom', value: 'center bottom'},
-					{display: 'Initial', value: 'initial'},
-					{display: 'Inherit', value: 'inherit'},
-					{display: 'Nothing', value: ''}
-					];
-			}
-
-			/**
-			 * Create filter function for a query string
-			 * @param {string} query to filter items 
-			 */
-
-			function createFilterFor(query) {
-				var lowercaseQuery = query.toLowerCase();
-
-				return function (state) {
-					return (state.value.indexOf(lowercaseQuery) === 0);
-				};
-
-			}
-
-		}
-	};
-});
 /* 
  * The MIT License (MIT)
  * 
@@ -2909,7 +2938,7 @@ angular.module('am-wb-core')
 
 		ctrl.delete = function(){
 			fire('delete');
-			$scope.group.removeChild($scope.wbModel);
+			$scope.group.removeChild($scope.wbModel, ctrl);
 			callbacks = {};
 		};
 
@@ -3366,7 +3395,8 @@ angular.module('am-wb-core')
 	});
 	$settings.newPage({
 		type : 'text',
-		label : 'Frontend text',
+		label : 'Text',
+		icon: 'text_fields',
 		/*
 		 * @ngInject
 		 */
@@ -3409,6 +3439,7 @@ angular.module('am-wb-core')
 		},
 		templateUrl : 'views/settings/wb-text.html'
 	});
+	
 	$settings.newPage({
 		type : 'description',
 		label : 'Description',
@@ -3581,46 +3612,48 @@ angular.module('am-wb-core')
 			};
 		}
 	});
-	$settings.newPage({
-		type : 'selfLayout',
-		label : 'Self Layout',
-		controllerAs : 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			$scope.selfAlign = [ {
-				title : 'auto',
-				icon : 'looks_one',
-				value : 'auto'
-			}, {
-				title : 'Start',
-				icon : 'looks_two',
-				value : 'start'
-			}, {
-				title : 'End',
-				icon : 'looks_3',
-				value : 'end'
-			}, {
-				title : 'Center',
-				icon : 'looks_4',
-				value : 'center'
-			}, {
-				title : 'stretch',
-				icon : 'looks_5',
-				value : 'stretch'
-			} ];
-		},
-		templateUrl : 'views/settings/wb-layout-self.html'
-	});
+//	$settings.newPage({
+//		type : 'selfLayout',
+//		label : 'Self Layout',
+//		controllerAs : 'ctrl',
+//		/*
+//		 * @ngInject
+//		 */
+//		controller : function($scope) {
+//			$scope.selfAlign = [ {
+//				title : 'auto',
+//				icon : 'looks_one',
+//				value : 'auto'
+//			}, {
+//				title : 'Start',
+//				icon : 'looks_two',
+//				value : 'start'
+//			}, {
+//				title : 'End',
+//				icon : 'looks_3',
+//				value : 'end'
+//			}, {
+//				title : 'Center',
+//				icon : 'looks_4',
+//				value : 'center'
+//			}, {
+//				title : 'stretch',
+//				icon : 'looks_5',
+//				value : 'stretch'
+//			} ];
+//		},
+//		templateUrl : 'views/settings/wb-layout-self.html'
+//	});
 	$settings.newPage({
 		type : 'marginPadding',
 		label : 'Margin/Padding',
+		icon: 'border_clear',
 		templateUrl : 'views/settings/wb-margin-padding.html'
 	});
 	$settings.newPage({
 		type : 'size',
 		label : 'Size',
+		icon: 'photo_size_select_large',
 		templateUrl : 'views/settings/wb-size.html'
 	});
 });
@@ -3904,6 +3937,75 @@ angular.module('am-wb-core')
 		});
 		return deferred.promise;
 	};
+
+
+	this.create = function(optionsOrPreset) {
+		// create scopse
+		var parenScope = optionsOrPreset.parent || $rootScope;
+		var childScope = optionsOrPreset.scope || parenScope.$new(false, parenScope);
+		
+
+		var panel = jsPanel.create({
+			theme: 'primary',
+			headerTitle : optionsOrPreset.title || 'my panel #1',
+			position : optionsOrPreset.position || 'center-top 0 58',
+			panelSize : optionsOrPreset.panelSize || '400 400',
+			contentSize : optionsOrPreset.contentSize || '450 250',
+			headerControls: optionsOrPreset.headerControls || 'all',
+			content : '<div style="border-top: 1px solid;width: 100%;height: 250px;padding: 0px;pointer-events: inherit;"></div>',
+			callback : function() {
+				var parentElement = angular.element(this.content);
+
+				// 2- create element
+				return $wbUtil.getTemplateFor(optionsOrPreset)//
+				.then(function(template) {
+					var element = angular.element(template);
+
+					// 3- bind controller
+					var link = $compile(element);
+					if (angular.isDefined(optionsOrPreset.controller)) {
+						var locals = {
+								$scope : childScope,
+								$element : element
+						};
+						var controller = $controller(optionsOrPreset.controller, locals);
+						if (optionsOrPreset.controllerAs) {
+							childScope[optionsOrPreset.controllerAs] = controller;
+						}
+						element.data('$ngControllerController', controller);
+					}
+					link(childScope);
+					parentElement.children('div').append(element);
+					return element;
+				});
+			},
+			onclosed: function(){
+				/*
+				 * Remove scope
+				 * 
+				 * NOTE: if there is a $watch, then this return an error
+				 */
+				if(!optionsOrPreset.scope){
+					childScope.$destroy();
+				}
+			}
+		});
+
+		var rootElement = angular.element(panel);
+		panel.setVisible = function(flag){
+			this._isVisible = flag;
+			rootElement.css('visibility', this._isVisible ? 'visible' : 'hidden');
+		};
+
+		panel.isVisible = function(){
+			return this._isVisible;
+		};
+
+		return panel;
+	};
+
+
+
 });
 
 /* 
@@ -4201,9 +4303,9 @@ angular.module('am-wb-core')
 //	'background', 'pageLayout', 'marginPadding'];
 
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
-		'background', 'pageLayout', 'selfLayout',
+		'background', 'pageLayout',
 		'marginPadding', 'size' ];
-	var WB_SETTINGS_WIDGET_DEFAULT = [ 'selfLayout', 'border',
+	var WB_SETTINGS_WIDGET_DEFAULT = [ 'border',
 		'background', 'marginPadding', 'size' ];
 	/**
 	 * Setting page storage
@@ -4400,8 +4502,16 @@ angular.module('am-wb-core')
  * @description Utility service of WB
  * 
  */
-.service('$wbUtil', function($rootScope, $controller, $q, $sce, $compile, $document,
-		$templateRequest) {
+.service('$wbUtil', function ($q, $sce, $templateRequest) {
+
+	function cleanMap(oldStyle, newStyle, map) {
+		for (var i = 0; i < map.length; i++) {
+			if (oldStyle[map[i][0]]) {
+				newStyle[map[i][1]] = oldStyle[map[i][0]];
+				delete oldStyle[map[i][0]];
+			}
+		}
+	}
 	/**
 	 * Loading template of the page
 	 * 
@@ -4430,15 +4540,150 @@ angular.module('am-wb-core')
 	}
 
 
-	function cleanEvetns(model){
+	function cleanEvetns(model) {
 		// event
-		if(!model.event) {
+		if (!model.event) {
 			model.event = {};
 		}
 	}
 
-	function cleanStyle(model){
-		if(!model.style) {
+
+	function cleanLayout(model) {
+		if (model.type !== 'Group' && model.type !== 'Page') {
+			return;
+		}
+		if (!model.style.layout) {
+			model.style.layout = {};
+		}
+		// convert
+		var newStyle = model.style.layout;
+		var oldStyle = model.style;
+
+		if (oldStyle.flexDirection) {
+			if (oldStyle.flexDirection === 'wb-flex-row') {
+				newStyle.direction = 'row';
+			} else {
+				newStyle.direction = 'column';
+			}
+			delete oldStyle.flexDirection;
+		}
+		if (!newStyle.direction) {
+			newStyle.direction = 'column';
+		}
+
+		switch (oldStyle.flexAlignItem) {
+			case 'wb-flex-align-items-center':
+				newStyle.align = 'center';
+				break;
+			case 'wb-flex-align-items-end':
+				newStyle.align = 'end';
+				break;
+			case 'wb-flex-align-items-start':
+				newStyle.align = 'start';
+				break;
+			case 'wb-flex-align-items-stretch':
+				newStyle.align = 'stretch';
+				break;
+			default:
+				newStyle.align = 'stretch';
+		}
+		delete oldStyle.flexAlignItem;
+
+		switch (oldStyle.justifyContent) {
+			case 'wb-flex-justify-content-center':
+				newStyle.justify = 'center';
+				break;
+			case 'wb-flex-justify-content-end':
+				newStyle.justify = 'end';
+				break;
+			case 'wb-flex-justify-content-start':
+				newStyle.justify = 'start';
+				break;
+			case 'wb-flex-justify-content-space-between':
+				newStyle.justify = 'space-between';
+				break;
+			case 'wb-flex-justify-content-space-around':
+				newStyle.justify = 'space-around';
+				break;
+			default:
+				newStyle.justify = 'center';
+		}
+		delete oldStyle.justifyContent;
+	}
+
+	function cleanSize(model) {
+		if (!model.style.size) {
+			model.style.size = {};
+		}
+		var newStyle = model.style.size;
+		var oldStyle = model.style;
+		var map = [
+			['width', 'width'],
+			['height', 'height']
+			];
+		cleanMap(oldStyle, newStyle, map);
+	}
+
+	function cleanBackground(model) {
+		if (!model.style.background) {
+			model.style.background = {};
+		}
+		var newStyle = model.style.background;
+		var oldStyle = model.style;
+		var map = [
+			['backgroundImage', 'image'],
+			['backgroundSize', 'size'],
+			['backgroundRepeat', 'repeat'],
+			['backgroundPosition', 'position']
+			];
+		cleanMap(oldStyle, newStyle, map);
+	}
+
+
+	function cleanBorder(model) {
+		if (!model.style.border) {
+			model.style.border = {};
+		}
+	}
+
+	function cleanSpace(model) {
+		// Margin and padding
+		if (model.style.padding && angular.isObject(model.style.padding)) {
+			var padding = '';
+			if (model.style.padding.isUniform) {
+				padding = model.style.padding.uniform;
+			} else {
+				padding = model.style.padding.top || '0px' + ' ' +
+				model.style.padding.right || '0px' + ' ' +
+				model.style.padding.bottom || '0px' + ' ' +
+				model.style.padding.left || '0px' + ' ';
+			}
+			model.style.padding = padding;
+		}
+
+		if (model.style.margin && angular.isObject(model.style.margin)) {
+			var margin = '';
+			if (model.style.margin.isUniform) {
+				margin = model.style.margin.uniform;
+			} else {
+				margin = model.style.margin.top || '0px' + ' ' +
+				model.style.margin.right || '0px' + ' ' +
+				model.style.margin.bottom || '0px' + ' ' +
+				model.style.margin.left || '0px' + ' ';
+			}
+			model.style.margin = margin;
+		}
+
+	}
+
+	function cleanAlign(model) {
+		if (!model.style.align) {
+			model.style.align = {};
+		}
+	}
+
+	function cleanStyle(model) {
+		if (!model.style) {
 			model.style = {};
 		}
 		cleanLayout(model);
@@ -4448,67 +4693,19 @@ angular.module('am-wb-core')
 		cleanSpace(model);
 		cleanAlign(model);
 	}
-
-	function cleanLayout(model){
-		if(model.type !== 'Group'){
-			return;
-		}
-		if(!model.style.layout) {
-			model.style.layout = {};
-		}
-		var layout = model.style.layout;
-		if(!layout.direction) {
-			layout.direction = 'column';
-		}
-		if(!layout.justify) {
-			layout.justify = 'center';
-		}
-		if(!layout.align) {
-			layout.align = 'stretch';
-		}
-	}
 	
-	function cleanSize(model){
-		if(!model.style.size) {
-			model.style.size = {};
-		}
-	}
-	
-	function cleanBackground(model) {
-		if(!model.style.background) {
-			model.style.background = {};
-		}
-	}
-	
-
-	function cleanBorder(model){
-		if(!model.style.border) {
-			model.style.border = {};
-		}
-	}
-	
-	function cleanSpace(/*model*/){
-		// Margin and padding
-	}
-	
-	function cleanAlign(model){
-		if(!model.style.align) {
-			model.style.align = {};
-		}
-	}
-
 	/**
 	 * Clean data model
 	 */
-	function clean(model){
+	function clean(model) {
 		cleanEvetns(model);
 		cleanStyle(model);
-		if(model.type == 'Group'){
-			if(!model.contents){
+		if (model.type === 'Group' || model.type === 'Page') {
+			if (!model.contents) {
 				model.contents = [];
 			}
-			if(model.contents.length){
-				for(var i = 0; i < model.contents.length; i++){
+			if (model.contents.length) {
+				for (var i = 0; i < model.contents.length; i++) {
 					clean(model.contents[i]);
 				}
 			}
@@ -4562,7 +4759,7 @@ angular.module('am-wb-core')
 	var _group_repo = [];
 	var contentElementAsso = [];
 	var elementKey = [];
-	
+
 	var notFoundWidget = {
 			templateUrl : 'views/widgets/wb-notfound.html',
 			label : 'Not found',
@@ -4574,7 +4771,7 @@ angular.module('am-wb-core')
 			description : 'Panel contains list of widgets.',
 			image : 'images/wb/content.svg'
 	};
-	
+
 	function _group(groupId){
 		for(var i = 0; i < _group_repo.length; i++){
 			if(_group_repo[i].id === groupId){
@@ -4592,7 +4789,7 @@ angular.module('am-wb-core')
 		var g = _group(group.id);
 		angular.extend(g, group);
 	}
-	
+
 	function _groups(){
 		return _group_repo;
 	}
@@ -4637,7 +4834,7 @@ angular.module('am-wb-core')
 		});
 		return $q.when(widgets);
 	}
-	
+
 	/**
 	 * List of all registered widgets
 	 * 
@@ -4668,7 +4865,7 @@ angular.module('am-wb-core')
 		widget.model = widget.model || {style:{}};
 		widget.model.type = widget.type;
 		widget.model.name = widget.model.name || widget.title; 
-		
+
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);
 		return this;
@@ -4705,7 +4902,7 @@ angular.module('am-wb-core')
 	 * @param parenScope
 	 * @return promise A promise that resolve created element
 	 */
-	function compile(model, parenScope, parentElement){
+	function compile(model, parenScope, parentElement, locals){
 		var widget = _widget(model);
 		var childScope = null;
 		var element = null;
@@ -4727,13 +4924,13 @@ angular.module('am-wb-core')
 			// 3- bind controller
 			var link = $compile(element);
 			if (angular.isDefined(widget.controller)) {
-				var locals = {
-						// TODO: maso, 2017: bind wbModel, wbParent,
-						// and wbEditable
-						$scope : childScope,
-						$element : element
-				};
-				var controller = $controller(widget.controller, locals);
+				var wlocals = _.merge({
+					// TODO: maso, 2017: bind wbModel, wbParent,
+					// and wbEditable
+					$scope : childScope,
+					$element : element
+				}, locals || {});
+				var controller = $controller(widget.controller, wlocals);
 				if (widget.controllerAs) {
 					childScope[widget.controllerAs] = controller;
 				}
@@ -4743,7 +4940,7 @@ angular.module('am-wb-core')
 			return element;
 		});
 	}
-	
+
 	/**
 	 * Creates new serialized data of widget
 	 * 
@@ -4754,19 +4951,31 @@ angular.module('am-wb-core')
 	function widgetData(widget){
 		return angular.copy(widget.model);
 	}
-	
+
 	// widgets
 	this.newWidget = newWidget;
 	this.widget = widget;
 	this.widgets = widgets;
 	this.widgetData = widgetData;
 	this.getWidgetsKey = getWidgetsKey;
-	
+
+	// new api
+	this.getWidget = _widget;
+	this.getWidgets =  function(){
+		var widgets = {};
+		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+		widgets.items = [];
+		elementKey.forEach(function(type) {
+			widgets.items.push(contentElementAsso[type]);
+		});
+		return widgets;
+	};
+
 	// widget groups
 	this.group = _group;
 	this.groups = _groups;
 	this.newGroup = _newGroup;
-	
+
 	// utils
 	this.compile = compile;
 });
@@ -4780,7 +4989,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"Select item/items\" style=\"width:70%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <md-sidenav class=md-sidenav-left md-component-id=left md-is-locked-open=true md-whiteframe=4 layout=column ng-hide=\"pages.length === 1\"> <div style=\"text-align: center\"> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> <md-devider></md-devider> <md-content> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </md-content> </md-sidenav> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <md-button ng-if=openHelp ng-click=openHelp($event) aria-label=\"Show help\"> <span translate>Learn more</span> </md-button> <span flex></span> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> <md-button class=md-primary ng-click=answer()> <span translate>OK</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
+    "<md-dialog aria-label=\"Select item/items\" style=\"width:70%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <md-sidenav class=md-sidenav-left md-component-id=left md-is-locked-open=true md-whiteframe=4 layout=column ng-hide=\"pages.length === 1\"> <div style=\"text-align: center\"> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> <md-devider></md-devider> <md-content> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </md-content> </md-sidenav> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <span flex></span> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> <md-button class=md-primary ng-click=answer()> <span translate>OK</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
   );
 
 
@@ -4793,13 +5002,13 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/directives/wb-setting-panel-group.html',
-    "<div id=WB-SETTING-PANEL> </div>"
+  $templateCache.put('views/directives/wb-setting-panel-expansion.html',
+    "<div id=WB-SETTING-PANEL> <md-expansion-panel ng-repeat=\"setting in settings | orderBy:priority track by setting.type\" ng-show=setting.visible> <md-expansion-panel-collapsed> <div class=md-title>{{setting.label}}</div> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header ng-click=$panel.collapse()> <div class=md-title>{{setting.label}}</div> <div class=md-summary>{{setting.description}}</div> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </div>"
   );
 
 
-  $templateCache.put('views/directives/wb-setting-panel.html',
-    "<md-expansion-panel> <md-expansion-panel-collapsed> <div class=md-title>{{label}} <md-tooltip md-direction=bottom md-delay=300 ng-show=description>{{description}}</md-tooltip> </div>   <md-expansion-panel-icon></md-expansion-panel-icon> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <div class=md-title>{{label}}</div> <div class=md-summary></div> <md-expansion-panel-icon ng-click=$panel.collapse()></md-expansion-panel-icon> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <ng-transclude layout=column> </ng-transclude> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel>"
+  $templateCache.put('views/directives/wb-setting-panel-tabs.html',
+    "<div> <md-tabs md-dynamic-height md-border-bottom> <md-tab ng-repeat=\"setting in settings | orderBy:priority track by setting.type\" ng-show=setting.visible id={{setting.key}}> <md-tab-label> <span ng-if=!setting.icon translate>{{setting.label}}</span> <wb-icon ng-if=setting.icon>{{setting.icon}}</wb-icon> </md-tab-label> <md-tab-body layout-margin> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-tab-body> </md-tab> </md-tabs> </div>"
   );
 
 
@@ -4814,32 +5023,32 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-attachment.html',
-    "<md-input-container> <label>background Attachment</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label translate=\"\">Background attachment</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate=\"\">{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-origin.html',
-    "<md-input-container> <label>background Origin</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label translate=\"\">Background origin</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate=\"\">{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-position.html',
-    "<md-autocomplete md-selected-item=ctrl.selectedItem md-search-text=ctrl.searchText md-selected-item-change=ctrl.selectedItemChange(item) md-items=\"item in ctrl.querySearch(ctrl.searchText)\" md-item-text=item.display md-min-length=0 placeholder=\"background position\"> <md-item-template> <span md-highlight-text=ctrl.searchText md-highlight-flags=^i>{{item.display}}</span> </md-item-template> <md-not-found> No states matching \"{{ctrl.searchText}}\" were found.  </md-not-found> </md-autocomplete>"
+    "<md-input-container> <label translate=\"\">Background position</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate=\"\">{{value.title}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-repeat.html',
-    "<md-input-container> <label>background Repeat</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label translate=\"\">Background repeat</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate=\"\">{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-size.html',
-    "<md-input-container> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label translate=\"\">Background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate=\"\">{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background.html',
-    "<md-input-container> <label>background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate>{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label translate=\"\">Background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate=\"\">{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
@@ -4855,6 +5064,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-ui-setting-data.html',
     "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>{{icon || 'wb-object-data'}}</wb-icon> </md-button> <md-input-container> <input ng-model=value.key> </md-input-container> </md-list-item>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-dropdown-value.html',
+    " <md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-select style=\"margin: 0px\" ng-model=value> <md-option ng-repeat=\"item in items\" ng-value=item.value> {{item.title}} </md-option> </md-select> </md-list-item>"
   );
 
 
@@ -4885,6 +5099,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-ui-setting-on-off-switch.html',
     "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-switch class=md-secondary ng-model=value></md-switch> </md-list-item>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-text.html',
+    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input style=\"width: 200px\" ng-model=value flex> </md-input-container> </md-list-item>"
   );
 
 

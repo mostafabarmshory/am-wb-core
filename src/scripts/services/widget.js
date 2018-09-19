@@ -39,7 +39,7 @@ angular.module('am-wb-core')
 	var _group_repo = [];
 	var contentElementAsso = [];
 	var elementKey = [];
-	
+
 	var notFoundWidget = {
 			templateUrl : 'views/widgets/wb-notfound.html',
 			label : 'Not found',
@@ -51,7 +51,7 @@ angular.module('am-wb-core')
 			description : 'Panel contains list of widgets.',
 			image : 'images/wb/content.svg'
 	};
-	
+
 	function _group(groupId){
 		for(var i = 0; i < _group_repo.length; i++){
 			if(_group_repo[i].id === groupId){
@@ -69,7 +69,7 @@ angular.module('am-wb-core')
 		var g = _group(group.id);
 		angular.extend(g, group);
 	}
-	
+
 	function _groups(){
 		return _group_repo;
 	}
@@ -114,7 +114,7 @@ angular.module('am-wb-core')
 		});
 		return $q.when(widgets);
 	}
-	
+
 	/**
 	 * List of all registered widgets
 	 * 
@@ -145,7 +145,7 @@ angular.module('am-wb-core')
 		widget.model = widget.model || {style:{}};
 		widget.model.type = widget.type;
 		widget.model.name = widget.model.name || widget.title; 
-		
+
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);
 		return this;
@@ -182,7 +182,7 @@ angular.module('am-wb-core')
 	 * @param parenScope
 	 * @return promise A promise that resolve created element
 	 */
-	function compile(model, parenScope, parentElement){
+	function compile(model, parenScope, parentElement, locals){
 		var widget = _widget(model);
 		var childScope = null;
 		var element = null;
@@ -204,13 +204,13 @@ angular.module('am-wb-core')
 			// 3- bind controller
 			var link = $compile(element);
 			if (angular.isDefined(widget.controller)) {
-				var locals = {
-						// TODO: maso, 2017: bind wbModel, wbParent,
-						// and wbEditable
-						$scope : childScope,
-						$element : element
-				};
-				var controller = $controller(widget.controller, locals);
+				var wlocals = _.merge({
+					// TODO: maso, 2017: bind wbModel, wbParent,
+					// and wbEditable
+					$scope : childScope,
+					$element : element
+				}, locals || {});
+				var controller = $controller(widget.controller, wlocals);
 				if (widget.controllerAs) {
 					childScope[widget.controllerAs] = controller;
 				}
@@ -220,7 +220,7 @@ angular.module('am-wb-core')
 			return element;
 		});
 	}
-	
+
 	/**
 	 * Creates new serialized data of widget
 	 * 
@@ -231,19 +231,31 @@ angular.module('am-wb-core')
 	function widgetData(widget){
 		return angular.copy(widget.model);
 	}
-	
+
 	// widgets
 	this.newWidget = newWidget;
 	this.widget = widget;
 	this.widgets = widgets;
 	this.widgetData = widgetData;
 	this.getWidgetsKey = getWidgetsKey;
-	
+
+	// new api
+	this.getWidget = _widget;
+	this.getWidgets =  function(){
+		var widgets = {};
+		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+		widgets.items = [];
+		elementKey.forEach(function(type) {
+			widgets.items.push(contentElementAsso[type]);
+		});
+		return widgets;
+	};
+
 	// widget groups
 	this.group = _group;
 	this.groups = _groups;
 	this.newGroup = _newGroup;
-	
+
 	// utils
 	this.compile = compile;
 });
