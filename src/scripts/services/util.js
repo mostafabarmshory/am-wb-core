@@ -167,6 +167,7 @@ class WbUtil {
 		var oldStyle = model.style;
 		var map = [
 			['backgroundImage', 'image'],
+			['backgroundColor', 'color'],
 			['backgroundSize', 'size'],
 			['backgroundRepeat', 'repeat'],
 			['backgroundPosition', 'position']
@@ -179,6 +180,21 @@ class WbUtil {
 		if (!model.style.border) {
 			model.style.border = {};
 		}
+		var oldStyle = model.style;
+		var newStyle = model.style.border;
+		
+		if(oldStyle.borderRadius){
+			if(oldStyle.borderRadius.uniform){
+				newStyle.radius = oldStyle.borderRadius.all + 'px';
+			}
+			// TODO: maso, 2018: support other models
+		}
+		// delete old values
+		delete model.style.borderColor;
+		delete model.style.borderRadius;
+		delete model.style.borderStyleColorWidth;
+		delete model.style.borderStyle;
+		delete model.style.borderWidth;
 	}
 
 	cleanSpace(model) {
@@ -229,10 +245,7 @@ class WbUtil {
 		this.cleanAlign(model);
 	}
 
-	/**
-	 * Clean data model
-	 */
-	clean(model) {
+	cleanInternal(model) {
 		this.cleanEvetns(model);
 		this.cleanStyle(model);
 		if (model.type === 'Group' || model.type === 'Page') {
@@ -241,11 +254,23 @@ class WbUtil {
 			}
 			if (model.contents.length) {
 				for (var i = 0; i < model.contents.length; i++) {
-					this.clean(model.contents[i]);
+					this.cleanInternal(model.contents[i]);
 				}
 			}
 		}
 		return model;
+	}
+	
+	/**
+	 * Clean data model
+	 */
+	clean(model, force) {
+		if(model.version === 'wb1' && !force){
+			return model;
+		}
+		var newModel = this.cleanInternal(model);
+		newModel.version = 'wb1';
+		return newModel;
 	}
 
 

@@ -23,71 +23,116 @@
  */
 'use strict';
 var testData = {
-    'features': [{
-            'title': 'Title',
-            'text': 'This is a sample link to a site',
-            'icon': 'todo',
-            'action': {
-                'type': 'link',
-                'link': 'http://google.com'
-            },
-            '$$hashKey': 'object:291'
-        }, {
-            'title': 'Title',
-            'text': 'This is a sample link to a site',
-            'icon': 'todo',
-            'action': {
-                'type': 'link',
-                'link': 'http://google.com'
-            },
-            '$$hashKey': 'object:292'
-        }],
-    'type': 'CommonActionCall',
-    'name': 'Action call',
-    'style': {
-        'borderColor': {
-            'bottom': 'none'
-        },
-        'margin': {},
-        'borderRadius': {},
-        'borderStyleColorWidth': {},
-        'borderStyle': {},
-        'borderWidth': {},
-        'flexAlignItem': 'wb-flex-item-auto',
-        'height': '90vh',
-        'backgroundImage': 'resources/templates/chershoee/bg/bg1.jpg',
-        'padding': {
-            'top': '100px'
-        },
-        'backgroundSize': 'cover',
-        'backgroundRepeat': 'no-repeat',
-        'backgroundPosition': 'center'
-    },
-    'label': 'Viverra Massa Malesuada',
-    'description': 'Consectetur in dolor vitae consectetur maecenas id ultrices'
+		'features': [{
+			'title': 'Title',
+			'text': 'This is a sample link to a site',
+			'icon': 'todo',
+			'action': {
+				'type': 'link',
+				'link': 'http://google.com'
+			},
+			'$$hashKey': 'object:291'
+		}, {
+			'title': 'Title',
+			'text': 'This is a sample link to a site',
+			'icon': 'todo',
+			'action': {
+				'type': 'link',
+				'link': 'http://google.com'
+			},
+			'$$hashKey': 'object:292'
+		}],
+		'type': 'CommonActionCall',
+		'name': 'Action call',
+		'style': {
+			'borderColor': {
+				'bottom': 'none'
+			},
+			'height': '90vh',
+			'minHeight':'300px',
+			'maxHeight':'800px',
+			'margin': {},
+			'padding': {
+				'top': '100px'
+			},
+			'borderRadius': {},
+			'borderStyleColorWidth': {},
+			'borderStyle': {},
+			'borderWidth': {},
+			'flexAlignItem': 'wb-flex-item-auto',
+			'backgroundColor':'#e1860b',
+			'backgroundImage': 'resources/templates/chershoee/bg/bg1.jpg',
+			'backgroundSize': 'cover',
+			'backgroundRepeat': 'no-repeat',
+			'backgroundPosition': 'center'
+		},
+		'label': 'Viverra Massa Malesuada',
+		'description': 'Consectetur in dolor vitae consectetur maecenas id ultrices'
 };
 describe('Service $wbUtil', function () {
-    // instantiate service
-    var $wbUtil;
-    
-    
-    // load the service's module
-    beforeEach(module('am-wb-core'));
-    beforeEach(inject(function (_$wbUtil_) {
-        $wbUtil = _$wbUtil_;
-    }));
+	// instantiate service
+	var $wbUtil;
 
-    it('should add a clean function', function () {
-        expect(angular.isFunction($wbUtil.clean)).toBe(true);
-    });
-    it('should clean backgroundImage', function () {
-        var clone = {};
-        angular.copy(testData, clone);
-        
-        clone = $wbUtil.clean(clone);
-        
-        expect(angular.isDefined(clone.style.backgroundImage)).toBe(false);
-        expect(angular.isDefined(clone.style.background.image)).toBe(true);
-        expect(clone.style.background.image).toBe(testData.style.backgroundImage);
-    });
+
+	// load the service's module
+	beforeEach(module('am-wb-core'));
+	beforeEach(inject(function (_$wbUtil_) {
+		$wbUtil = _$wbUtil_;
+	}));
+
+	it('should add a clean function', function () {
+		expect(angular.isFunction($wbUtil.clean)).toBe(true);
+	});
+
+	it('should clean background', function () {
+		var clone = {};
+		angular.copy(testData, clone);
+
+		clone = $wbUtil.clean(clone);
+
+		expect(angular.isDefined(clone.style.backgroundImage)).toBe(false);
+		expect(angular.isDefined(clone.style.background.image)).toBe(true);
+		expect(clone.style.background.image).toBe(testData.style.backgroundImage);
+	});
+
+	it('should clean border', function () {
+		var dataList =  [{
+			type: 'Component',
+			style: {
+				borderColor: {},
+				borderRadius: {
+					uniform:true,
+					all:18
+				},
+				borderStyleColorWidth: {},
+				borderStyle: {},
+				borderWidth: {}
+			}
+		}];
+		var expDataList =  [{
+			type: 'Component',
+			style: {
+				border: {
+					radius: '18px'
+				}
+			}
+		}];
+
+		for(var i = 0; i < dataList.length; i++){
+			var data = dataList[i];
+			var clone = $wbUtil.clean(data);
+
+			expect(clone.version).toBe('wb1');
+
+			expect(angular.isDefined(clone.style.borderColor)).toBe(false);
+			expect(angular.isDefined(clone.style.borderRadius)).toBe(false);
+			expect(angular.isDefined(clone.style.borderStyleColorWidth)).toBe(false);
+			expect(angular.isDefined(clone.style.borderStyle)).toBe(false);
+			expect(angular.isDefined(clone.style.borderWidth)).toBe(false);
+
+			var expData = expDataList[i];
+			expect(angular.isDefined(clone.style.border)).toBe(true);
+			expect(clone.style.border.radius).toBe(expData.style.border.radius);
+		}
+	});
 });
