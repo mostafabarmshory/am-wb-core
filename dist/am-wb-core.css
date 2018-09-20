@@ -631,3 +631,12 @@ of a widget:
 .wb-widgets-module> p {
 	font-size: 14px;
 }
+
+/*
+ * Hide if the tab is disabled. 
+ *
+ * This is replacement
+ */
+#am-wb-widget-setting .md-tab.md-disabled{
+	display: none;
+}
