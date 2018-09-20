@@ -33,7 +33,7 @@
     "weakmap-polyfill": "2.0.x",
     "ngHandsontable": "0.13.x",
     "angular-drag-and-drop-lists": "https://github.com/mostafabarmshory/angular-drag-and-drop-lists.git#2.1.x",
-    "jspanel4": "https://github.com/Flyer53/jsPanel4.git#4.2.x",
+    "jspanel4x": "master",
     "lodash": "3.x"
   },
   "devDependencies": {

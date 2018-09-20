@@ -50,7 +50,7 @@ module.exports = function(config) {
 			'bower_components/handsontable/dist/handsontable.js',
 			'bower_components/ngHandsontable/dist/ngHandsontable.js',
 			'bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js',
-			'bower_components/jspanel4/dist/jspanel.js',
+			'bower_components/jspanel4x/dist/jspanel.js',
 			'bower_components/lodash/lodash.js',
 			'bower_components/angular-mocks/angular-mocks.js',
 			'bower_components/json-formatter/dist/json-formatter.js',
