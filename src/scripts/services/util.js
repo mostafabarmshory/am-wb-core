@@ -21,19 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
-
-angular.module('am-wb-core')
 
 /**
- * @ngdoc Services
- * @name $wbUtil
- * @description Utility service of WB
- * 
+ * Utility class of WB
  */
-.service('$wbUtil', function ($q, $sce, $templateRequest) {
+class WbUtil {
 
-	function cleanMap(oldStyle, newStyle, map) {
+	constructor($q, $sce, $templateRequest) {
+		this.$q = $q;
+		this.$sce = $sce; 
+		this.$templateRequest = $templateRequest;
+	}
+	
+	cleanMap(oldStyle, newStyle, map) {
 		for (var i = 0; i < map.length; i++) {
 			if (oldStyle[map[i][0]]) {
 				newStyle[map[i][1]] = oldStyle[map[i][0]];
@@ -41,6 +41,7 @@ angular.module('am-wb-core')
 			}
 		}
 	}
+	
 	/**
 	 * Loading template of the page
 	 * 
@@ -50,8 +51,13 @@ angular.module('am-wb-core')
 	 *            {object} properties of a page, widget , ..
 	 * @return promise to load template on resolve.
 	 */
-	function getTemplateFor(page) {
-		var template, templateUrl;
+	getTemplateFor(page) {
+		return this.$q.when(this.getTemplateOf(page));
+	}
+	
+	getTemplateOf(page) {
+		var template;
+		var templateUrl;
 		if (angular.isDefined(template = page.template)) {
 			if (angular.isFunction(template)) {
 				template = template(page.params);
@@ -61,15 +67,15 @@ angular.module('am-wb-core')
 				templateUrl = templateUrl(page.params);
 			}
 			if (angular.isDefined(templateUrl)) {
-				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
-				template = $templateRequest(templateUrl);
+				page.loadedTemplateUrl = this.$sce.valueOf(templateUrl);
+				template = this.$templateRequest(templateUrl);
 			}
 		}
-		return $q.when(template);
+		return template;
 	}
 
 
-	function cleanEvetns(model) {
+	cleanEvetns(model) {
 		// event
 		if (!model.event) {
 			model.event = {};
@@ -77,7 +83,7 @@ angular.module('am-wb-core')
 	}
 
 
-	function cleanLayout(model) {
+	cleanLayout(model) {
 		if (model.type !== 'Group' && model.type !== 'Page') {
 			return;
 		}
@@ -140,7 +146,7 @@ angular.module('am-wb-core')
 		delete oldStyle.justifyContent;
 	}
 
-	function cleanSize(model) {
+	cleanSize(model) {
 		if (!model.style.size) {
 			model.style.size = {};
 		}
@@ -150,10 +156,10 @@ angular.module('am-wb-core')
 			['width', 'width'],
 			['height', 'height']
 			];
-		cleanMap(oldStyle, newStyle, map);
+		this.cleanMap(oldStyle, newStyle, map);
 	}
 
-	function cleanBackground(model) {
+	cleanBackground(model) {
 		if (!model.style.background) {
 			model.style.background = {};
 		}
@@ -161,21 +167,37 @@ angular.module('am-wb-core')
 		var oldStyle = model.style;
 		var map = [
 			['backgroundImage', 'image'],
+			['backgroundColor', 'color'],
 			['backgroundSize', 'size'],
 			['backgroundRepeat', 'repeat'],
 			['backgroundPosition', 'position']
 			];
-		cleanMap(oldStyle, newStyle, map);
+		this.cleanMap(oldStyle, newStyle, map);
 	}
 
 
-	function cleanBorder(model) {
+	cleanBorder(model) {
 		if (!model.style.border) {
 			model.style.border = {};
 		}
+		var oldStyle = model.style;
+		var newStyle = model.style.border;
+		
+		if(oldStyle.borderRadius){
+			if(oldStyle.borderRadius.uniform){
+				newStyle.radius = oldStyle.borderRadius.all + 'px';
+			}
+			// TODO: maso, 2018: support other models
+		}
+		// delete old values
+		delete model.style.borderColor;
+		delete model.style.borderRadius;
+		delete model.style.borderStyleColorWidth;
+		delete model.style.borderStyle;
+		delete model.style.borderWidth;
 	}
 
-	function cleanSpace(model) {
+	cleanSpace(model) {
 		// Margin and padding
 		if (model.style.padding && angular.isObject(model.style.padding)) {
 			var padding = '';
@@ -205,44 +227,58 @@ angular.module('am-wb-core')
 
 	}
 
-	function cleanAlign(model) {
+	cleanAlign(model) {
 		if (!model.style.align) {
 			model.style.align = {};
 		}
 	}
 
-	function cleanStyle(model) {
+	cleanStyle(model) {
 		if (!model.style) {
 			model.style = {};
 		}
-		cleanLayout(model);
-		cleanSize(model);
-		cleanBackground(model);
-		cleanBorder(model);
-		cleanSpace(model);
-		cleanAlign(model);
+		this.cleanLayout(model);
+		this.cleanSize(model);
+		this.cleanBackground(model);
+		this.cleanBorder(model);
+		this.cleanSpace(model);
+		this.cleanAlign(model);
 	}
-	
-	/**
-	 * Clean data model
-	 */
-	function clean(model) {
-		cleanEvetns(model);
-		cleanStyle(model);
+
+	cleanInternal(model) {
+		this.cleanEvetns(model);
+		this.cleanStyle(model);
 		if (model.type === 'Group' || model.type === 'Page') {
 			if (!model.contents) {
 				model.contents = [];
 			}
 			if (model.contents.length) {
 				for (var i = 0; i < model.contents.length; i++) {
-					clean(model.contents[i]);
+					this.cleanInternal(model.contents[i]);
 				}
 			}
 		}
 		return model;
 	}
+	
+	/**
+	 * Clean data model
+	 */
+	clean(model, force) {
+		if(model.version === 'wb1' && !force){
+			return model;
+		}
+		var newModel = this.cleanInternal(model);
+		newModel.version = 'wb1';
+		return newModel;
+	}
 
 
-	this.getTemplateFor = getTemplateFor;
-	this.clean = clean;
-});
+}
+
+/*
+ * Add to angular
+ */
+WbUtil.$inject=['$q', '$sce', '$templateRequest'];
+angular.module('am-wb-core')
+	.service('$wbUtil', WbUtil);

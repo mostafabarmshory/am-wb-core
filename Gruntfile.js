@@ -54,10 +54,10 @@ module.exports = function(grunt) {
 	 * شده در پرونده bower.json تعیین می‌شود.
 	 */
 	var appConfig = {
-		app : require('./bower.json').appPath || 'src',
-		demo : require('./bower.json').demoPath || 'demo',
-		dist : 'dist',
-		pkg : require('./bower.json')
+			app : require('./bower.json').appPath || 'src',
+			demo : require('./bower.json').demoPath || 'demo',
+			dist : 'dist',
+			pkg : require('./bower.json')
 	};
 
 	// تنظیم تمام وظایف مورد نیاز در پروژه
@@ -83,16 +83,16 @@ module.exports = function(grunt) {
 			js : {
 				files : [
 					'<%= yeoman.app %>/scripts/**/*.js',
-					'<%= yeoman.demo %>/scripts/**/*.js',
-				],
-				tasks : [
-					'injector',
-					'newer:jshint:all',
-					'newer:jscs:all'
-				],
-				options : {
-					livereload : '<%= connect.options.livereload %>'
-				}
+					'<%= yeoman.demo %>/scripts/**/*.js'
+					],
+					tasks : [
+						'injector',
+						'newer:jshint:all',
+						'newer:jscs:all'
+						],
+						options : {
+							livereload : '<%= connect.options.livereload %>'
+						}
 			},
 			jsTest : {
 				files : [ 'test/spec/{,*/}*.js' ],
@@ -105,13 +105,13 @@ module.exports = function(grunt) {
 			styles : {
 				files : [
 					'<%= yeoman.app %>/styles/**/*.css',
-					'<%= yeoman.demo %>/styles/**/*.css' ,
-				],
-				tasks : [
-					'injector',
-					'newer:copy:styles', 
-					'postcss'
-				]
+					'<%= yeoman.demo %>/styles/**/*.css'
+					],
+					tasks : [
+						'injector',
+						'newer:copy:styles', 
+						'postcss'
+						]
 			},
 			gruntfile : {
 				files : [ 'Gruntfile.js' ]
@@ -125,8 +125,8 @@ module.exports = function(grunt) {
 					'<%= yeoman.app %>/views/**/*.html',
 					'.tmp/styles/{,*/}*.css',
 					'<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
-					'<%= yeoman.demo %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
-				]
+					'<%= yeoman.demo %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+					]
 			}
 		},
 
@@ -152,10 +152,10 @@ module.exports = function(grunt) {
 						//Matches everything that does not contain a '.' (period)
 						middlewares.push(connect.static('.tmp'));
 						middlewares.push(
-							connect()
+								connect()
 								.use('/bower_components', connect.static('./bower_components')));
 						middlewares.push(
-							connect()
+								connect()
 								.use('/app/styles', connect.static('./app/styles')));
 						middlewares.push(connect.static('demo'));
 						middlewares.push(connect.static(appConfig.app));
@@ -300,8 +300,8 @@ module.exports = function(grunt) {
 					template : 'node_modules/angular-jsdoc/default',
 					tutorial : 'tutorials',
 					readme : 'README.md'
-				},
-			},
+				}
+			}
 		},
 
 		/*
@@ -324,7 +324,7 @@ module.exports = function(grunt) {
 					src : [ //
 						'.tmp', '<%= yeoman.dist %>/{,*/}*', //
 						'!<%= yeoman.dist %>/.git{,*/}*' //
-					]
+						]
 				} ]
 			},
 			server : '.tmp'
@@ -349,19 +349,22 @@ module.exports = function(grunt) {
 			},
 			test : {
 				devDependencies : true,
-				src : '<%= karma.unit.configFile %>',
-				ignorePath : /\.\.\//,
-				fileTypes : {
-					js : {
-						block : /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
-						detect : {
-							js : /'(.*\.js)'/gi
-						},
-						replace : {
-							js : '\'{{filePath}}\','
+				src : [
+					'<%= karma.unit.configFile %>',
+					'<%= karma.build.configFile %>'
+					],
+					ignorePath : /\.\.\//,
+					fileTypes : {
+						js : {
+							block : /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
+							detect : {
+								js : /'(.*\.js)'/gi
+							},
+							replace : {
+								js : '\'{{filePath}}\','
+							}
 						}
 					}
-				}
 			}
 		},
 
@@ -377,7 +380,7 @@ module.exports = function(grunt) {
 				files : {
 					'<%= yeoman.dist %>/<%= yeoman.pkg.name %>.min.css' : [ //
 						'.tmp/styles/{,*/}*.css' //
-					]
+						]
 				}
 			}
 		},
@@ -386,7 +389,7 @@ module.exports = function(grunt) {
 				files : {
 					'<%= yeoman.dist %>/<%= yeoman.pkg.name %>.min.js' : [ //
 						'.tmp/{,*/}*.js' //
-					]
+						]
 				}
 			}
 		},
@@ -599,7 +602,11 @@ module.exports = function(grunt) {
 		 */
 		karma : {
 			unit : {
-				configFile : 'test/karma.conf.js',
+				configFile : 'test/karma.unit.conf.js',
+				singleRun : true
+			},
+			build : {
+				configFile : 'test/karma.build.conf.js',
 				singleRun : true
 			},
 			debug : {
@@ -624,7 +631,7 @@ module.exports = function(grunt) {
 				ignorePath : [
 					'../<%= yeoman.app %>/',
 					'<%= yeoman.demo %>/'
-				]
+					]
 			},
 			project_files : {
 				files : {
@@ -633,30 +640,30 @@ module.exports = function(grunt) {
 						'<%= yeoman.app %>/styles/**/*.css',
 						'<%= yeoman.demo %>/scripts/**/*.js',
 						'<%= yeoman.demo %>/styles/**/*.css'
-					],
+						]
 				}
 			}
-		},
+		}
 	});
 
 	grunt.registerTask('demo', 'Compile then start a connect web server',
-		function(target) {
-			if (target === 'dist') {
-				return grunt.task.run([ 'build', //
-					'connect:dist:keepalive' //
+			function(target) {
+		if (target === 'dist') {
+			return grunt.task.run([ 'build', //
+				'connect:dist:keepalive' //
 				]);
-			}
+		}
 
-			grunt.task.run([ //
-				'clean:server', //
-				'wiredep', //
-				'injector', //
-				'concurrent:server', //
-				'postcss:server', //
-				'connect:livereload', //
-				'watch' //
+		grunt.task.run([ //
+			'clean:server', //
+			'wiredep', //
+			'injector', //
+			'concurrent:server', //
+			'postcss:server', //
+			'connect:livereload', //
+			'watch' //
 			]);
-		});
+	});
 
 	grunt.registerTask('test', [ //
 		'clean', //
@@ -665,7 +672,7 @@ module.exports = function(grunt) {
 		'concurrent:test', //
 		'postcss:server', //
 		'karma:unit' //
-	]);
+		]);
 
 	grunt.registerTask('debug', [ //
 		'clean', //
@@ -674,7 +681,7 @@ module.exports = function(grunt) {
 		'concurrent:server', //
 		'postcss', //
 		'karma:debug' //
-	]);
+		]);
 
 	grunt.registerTask('build', [ //
 		'wiredep', //
@@ -689,18 +696,19 @@ module.exports = function(grunt) {
 		'copy:dist', //
 		'uglify', //
 		'cssmin' //
-	]);
+		]);
 
 	grunt.registerTask('default', [ //
 		'newer:jshint', //
 		'newer:jscs', //
 		'newer:eslint', //
 		'test', //
-		'build' //
-	]);
+		'build'
+		]);
 
-	grunt.registerTask('release', [ //
-		'default', //
+	grunt.registerTask('release', [
+		'default',
+		'karma:build',
 		'jsdoc'
-	]);
+		]);
 };
