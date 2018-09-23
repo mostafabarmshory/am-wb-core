@@ -5270,18 +5270,57 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/widgets/wb-html.html',
-    " <div ng-if=!ctrl.isSelected() ng-bind-html=\"wbModel.text | wbunsafe\" class=wb-widget-fill> </div> <div ui-tinymce=\"{\n" +
+    " <div ng-if=!ctrl.isEditable() ng-bind-html=\"wbModel.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
     "\t\tselector : 'div.tinymce',\n" +
-    "\t\ttheme : 'inlite',\n" +
-    "\t\tplugins : 'directionality contextmenu table link paste image imagetools hr textpattern autolink textcolor colorpicker',\n" +
-    "\t\tinsert_toolbar : 'quickimage quicktable',\n" +
-    "\t\tselection_toolbar : 'bold italic | quicklink h1 h2 h3 blockquote | ltr rtl | forecolor',\n" +
-    "\t\tinsert_button_items: 'image link | inserttable | hr',\n" +
-    "\t\tinline : true,\n" +
-    "\t\tpaste_data_images : true,\n" +
-    "\t\tbranding: false,\n" +
-    "\t\timagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'\n" +
-    "\t}\" ng-model=wbModel.text ng-show=ctrl.isSelected() ng-if=ctrl.isEditable() class=wb-widget-fill> </div>"
+    "\t\tmenubar: true,\n" +
+    "\t    inline: true,\n" +
+    "\t    theme: 'modern',\n" +
+    "\t\tplugins : [\n" +
+    "\t\t\t'advlist',\n" +
+    "\t\t\t'autolink',\n" +
+    "\t\t\t'autoresize',\n" +
+    "\t\t\t'autosave',\n" +
+    "\t\t\t'bbcode',\n" +
+    "\t\t\t'charmap',\n" +
+    "\t\t\t'code',\n" +
+    "\t\t\t'codesample',\n" +
+    "\t\t\t'colorpicker',\n" +
+    "\t\t\t'contextmenu',\n" +
+    "\t\t\t'directionality',\n" +
+    "\t\t\t'emoticons',\n" +
+    "\t\t\t'fullscreen',\n" +
+    "\t\t\t'hr',\n" +
+    "\t\t\t'image',\n" +
+    "\t\t\t'imagetools',\n" +
+    "\t\t\t'importcss',\n" +
+    "\t\t\t'insertdatetime',\n" +
+    "\t\t\t'legacyoutput',\n" +
+    "\t\t\t'link',\n" +
+    "\t\t\t'lists',\n" +
+    "\t\t\t'media',\n" +
+    "\t\t\t'nonbreaking',\n" +
+    "\t\t\t'noneditable',\n" +
+    "\t\t\t'paste',\n" +
+    "\t\t\t'save',\n" +
+    "\t\t\t'searchreplace',\n" +
+    "\t\t\t'spellchecker',\n" +
+    "\t\t\t'tabfocus',\n" +
+    "\t\t\t'table',\n" +
+    "\t\t\t'template',\n" +
+    "\t\t\t'textcolor',\n" +
+    "\t\t\t'textpattern',\n" +
+    "\t\t\t'toc',\n" +
+    "\t\t\t'visualblocks',\n" +
+    "\t\t\t'wordcount'\n" +
+    "\t\t\t\n" +
+    "\t\t],\n" +
+    "\t\ttoolbar: [\n" +
+    "      \t\t'fullscreen | undo redo | bold italic underline | fontselect fontsizeselect | visualblocks',\n" +
+    "      \t\t'forecolor backcolor | ltr rtl |alignleft aligncenter alignright alignfull | numlist bullist outdent indent'\n" +
+    "    \t],\n" +
+    "\t    powerpaste_word_import: 'clean',\n" +
+    "\t    powerpaste_html_import: 'clean'\n" +
+    "\t}\" ng-model=wbModel.text class=\"wb-widget-fill tinymce wb-widget-text\"> </div>"
   );
 
 
