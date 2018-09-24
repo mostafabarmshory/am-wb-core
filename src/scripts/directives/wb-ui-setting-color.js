@@ -35,7 +35,7 @@ angular.module('am-wb-core')
 
 
             function postLink(scope, element, attr, ctrls) {
-                var ngModelCtrl = ctrls[0] || $mdUtil.fakeNgModel();
+                var ngModelCtrl = ctrls[0];
                 $mdTheming(element);
 
                 /*
@@ -60,7 +60,7 @@ angular.module('am-wb-core')
                     title: '@title',
                     icon: '@icon'
                 },
-                require: ['?ngModel'],
+                require: ['ngModel'],
                 link: postLink
 
             };
