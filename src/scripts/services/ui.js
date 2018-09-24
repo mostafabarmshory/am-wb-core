@@ -25,27 +25,22 @@
 
 /**
  * @ngdoc Services
- * @name $widget
- * @description Resource managment
+ * @name $wbUi
+ * @description UI utilities management
  * 
  */
-class WbUi {
+angular.module('am-wb-core').service('$wbUi', function($mdDialog, $q, $http) {
 
-	constructor($mdDialog, $q, $http)
-	{
-		this.$mdDialog = $mdDialog;
-		this.$q = $q;
-		this.$http = $http;
-		this.templates = [];
-	}
+	var _templates = [];
+	var service = this;
 
 
 	/**
 	 * Opens dialog
 	 * @returns
 	 */
-	openDialog(dialogData){
-		return this.$mdDialog.show(dialogData);
+	function openDialog(dialogData){
+		return $mdDialog.show(dialogData);
 	}
 
 
@@ -54,14 +49,17 @@ class WbUi {
 	 * 
 	 * @memberof $wbUi
 	 */
-	templates(){
-		return this.$q.when({
-			items: this.templates
+	function templates(){
+		return $q.when({
+			items: _templates
 		});
 	}
 
-	getTemplates(){
-		return this.templates;
+	/**
+	 * Gets list of templates
+	 */
+	function getTemplates(){
+		return _templates;
 	}
 
 	/**
@@ -69,9 +67,9 @@ class WbUi {
 	 * 
 	 * @memberof $wbUi
 	 */
-	newTemplate(template){
-		this.templates.push(template);
-		return this;
+	function newTemplate(template){
+		_templates.push(template);
+		return service;
 	}
 
 
@@ -80,21 +78,20 @@ class WbUi {
 	 * 
 	 * @memberof $wbUi
 	 */
-	loadTemplate(template){
+	function loadTemplate(template){
 		// TODO: maso, 2018: check if template is a function
-		if(angular.isDefined(template.template)){
-			return this.$q.when(JSON.parse(template.template));
+		if(angular.isDefined(_templates.template)){
+			return $q.when(JSON.parse(_templates.template));
 		}
-		return this.$http.get(template.templateUrl)
+		return $http.get(template.templateUrl)
 		.then(function(res){
 			return res.data;
 		});
 	}
-}
-
-/*
- * Add to angularjs
- */
-WbUi.$inject=['$mdDialog', '$q', '$http'];
-angular.module('am-wb-core')
-.service('$wbUi', WbUi);
+	
+	service.openDialog = openDialog;
+	service.templates = templates;
+	service.getTemplates = getTemplates;
+	service.newTemplate = newTemplate;
+	service.loadTemplate = loadTemplate;
+});

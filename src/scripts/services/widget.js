@@ -39,6 +39,7 @@ angular.module('am-wb-core')
 	var _group_repo = [];
 	var contentElementAsso = [];
 	var elementKey = [];
+	var service = this;
 
 	var notFoundWidget = {
 			templateUrl : 'views/widgets/wb-notfound.html',
@@ -148,7 +149,7 @@ angular.module('am-wb-core')
 
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);
-		return this;
+		return service;
 	}
 
 	/**
@@ -233,15 +234,15 @@ angular.module('am-wb-core')
 	}
 
 	// widgets
-	this.newWidget = newWidget;
-	this.widget = widget;
-	this.widgets = widgets;
-	this.widgetData = widgetData;
-	this.getWidgetsKey = getWidgetsKey;
+	service.newWidget = newWidget;
+	service.widget = widget;
+	service.widgets = widgets;
+	service.widgetData = widgetData;
+	service.getWidgetsKey = getWidgetsKey;
 
 	// new api
-	this.getWidget = _widget;
-	this.getWidgets =  function(){
+	service.getWidget = _widget;
+	service.getWidgets =  function(){
 		var widgets = {};
 		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
 		widgets.items = [];
@@ -252,10 +253,10 @@ angular.module('am-wb-core')
 	};
 
 	// widget groups
-	this.group = _group;
-	this.groups = _groups;
-	this.newGroup = _newGroup;
+	service.group = _group;
+	service.groups = _groups;
+	service.newGroup = _newGroup;
 
 	// utils
-	this.compile = compile;
+	service.compile = compile;
 });
