@@ -37,8 +37,6 @@ module.exports = function(grunt) {
 	 * توی ساخت ایجاد می‌کنه اگر می‌خواهید ساخت با سرعت بیشتری انجام ب
 	 */
 	require('time-grunt')(grunt);
-	//MODIFIED: add require for connect-modewrite
-	var modRewrite = require('connect-modrewrite');
 
 	/*
 	 * به صورت خودکار تمام افزونه‌های مورد نیاز بار گذاری می‌شود. در صورتی که
@@ -48,8 +46,7 @@ module.exports = function(grunt) {
 	require('jit-grunt')(grunt, {
 		useminPrepare : 'grunt-usemin',
 		ngtemplates : 'grunt-angular-templates',
-		configureProxies : 'grunt-connect-proxy',
-		uglify: 'grunt-contrib-uglify-es',
+		uglify: 'grunt-contrib-uglify-es'
 	});
 
 	/*
@@ -86,7 +83,7 @@ module.exports = function(grunt) {
 			js : {
 				files : [
 					'<%= yeoman.app %>/scripts/**/*.js',
-					'<%= yeoman.demo %>/scripts/**/*.js',
+					'<%= yeoman.demo %>/scripts/**/*.js'
 					],
 					tasks : [
 						'injector',
@@ -108,7 +105,7 @@ module.exports = function(grunt) {
 			styles : {
 				files : [
 					'<%= yeoman.app %>/styles/**/*.css',
-					'<%= yeoman.demo %>/styles/**/*.css' ,
+					'<%= yeoman.demo %>/styles/**/*.css'
 					],
 					tasks : [
 						'injector',
@@ -128,7 +125,7 @@ module.exports = function(grunt) {
 					'<%= yeoman.app %>/views/**/*.html',
 					'.tmp/styles/{,*/}*.css',
 					'<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
-					'<%= yeoman.demo %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
+					'<%= yeoman.demo %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
 					]
 			}
 		},
@@ -147,24 +144,12 @@ module.exports = function(grunt) {
 				hostname : 'localhost',
 				livereload : 35729
 			},
-			proxies : [ {
-				context : '/', // the context of the data service
-				// wherever the data service is running
-				host : '<%= yeoman.pkg.backend.host %>',
-				// the port that the data service is running on
-				port : '<%= yeoman.pkg.backend.port %>',
-				changeOrigin : true,
-				headers : {
-					host : '<%= yeoman.pkg.backend.host %>'
-				}
-			} ],
 			livereload : {
 				options : {
 					open : true,
 					middleware : function(connect, options) {
 						var middlewares = [];
 						//Matches everything that does not contain a '.' (period)
-						middlewares.push(modRewrite([ '!/api/.*|^.*\\..*$ /index.html [L]' ]));
 						middlewares.push(connect.static('.tmp'));
 						middlewares.push(
 								connect()
@@ -180,10 +165,6 @@ module.exports = function(grunt) {
 						if (!Array.isArray(options.base)) {
 							options.base = [ options.base ];
 						}
-
-						// Setup the proxy
-						middlewares
-						.push(require('grunt-connect-proxy/lib/utils').proxyRequest);
 
 						// Serve static files
 						options.base.forEach(function(base) {
@@ -319,8 +300,8 @@ module.exports = function(grunt) {
 					template : 'node_modules/angular-jsdoc/default',
 					tutorial : 'tutorials',
 					readme : 'README.md'
-				},
-			},
+				}
+			}
 		},
 
 		/*
@@ -362,24 +343,28 @@ module.exports = function(grunt) {
 		 */
 		wiredep : {
 			app : {
+				devDependencies : true,
 				src : [ 'demo/index.html' ],
 				ignorePath : /\.\.\//
 			},
 			test : {
 				devDependencies : true,
-				src : '<%= karma.unit.configFile %>',
-				ignorePath : /\.\.\//,
-				fileTypes : {
-					js : {
-						block : /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
-						detect : {
-							js : /'(.*\.js)'/gi
-						},
-						replace : {
-							js : '\'{{filePath}}\','
+				src : [
+					'<%= karma.unit.configFile %>',
+					'<%= karma.build.configFile %>'
+					],
+					ignorePath : /\.\.\//,
+					fileTypes : {
+						js : {
+							block : /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
+							detect : {
+								js : /'(.*\.js)'/gi
+							},
+							replace : {
+								js : '\'{{filePath}}\','
+							}
 						}
 					}
-				}
 			}
 		},
 
@@ -518,16 +503,12 @@ module.exports = function(grunt) {
 		 * مشاهد کنید:
 		 * 
 		 * https://github.com/mgol/grunt-ng-annotate
-		 * https://github.com/olov/ng-annotate
 		 * 
 		 * این کار روی پرونده‌هایی انجام می‌شه که توی مسیر .tmp ایجاد شده اند و
 		 * همگی پرونده‌های موقت هستن. به این ترتیب می‌تونیم تمام پرونده‌های
 		 * موجود در این مسیر رو کامل به هم بریزیم.
 		 */
 		ngAnnotate : {
-			options: {
-				singleQuotes: true 
-			}, 
 			dist : {
 				files : [ {
 					expand : true,
@@ -569,7 +550,7 @@ module.exports = function(grunt) {
 				cwd : '<%= yeoman.app %>/styles',
 				dest : '.tmp/styles/',
 				src : '{,*/}*.css'
-			},
+			}
 		},
 
 		// Add vendor prefixed styles
@@ -602,7 +583,7 @@ module.exports = function(grunt) {
 
 		// Run some tasks in parallel to speed up the build process
 		concurrent : {
-			server : [ 'copy:styles', ],
+			server : [ 'copy:styles'],
 			test : [ 'copy:styles' ],
 			dist : [ 'copy:styles', 'concat:tmp', 'imagemin', 'svgmin' ]
 		},
@@ -621,7 +602,11 @@ module.exports = function(grunt) {
 		 */
 		karma : {
 			unit : {
-				configFile : 'test/karma.conf.js',
+				configFile : 'test/karma.unit.conf.js',
+				singleRun : true
+			},
+			build : {
+				configFile : 'test/karma.build.conf.js',
 				singleRun : true
 			},
 			debug : {
@@ -655,18 +640,16 @@ module.exports = function(grunt) {
 						'<%= yeoman.app %>/styles/**/*.css',
 						'<%= yeoman.demo %>/scripts/**/*.js',
 						'<%= yeoman.demo %>/styles/**/*.css'
-						],
+						]
 				}
 			}
-		},
+		}
 	});
 
 	grunt.registerTask('demo', 'Compile then start a connect web server',
 			function(target) {
 		if (target === 'dist') {
 			return grunt.task.run([ 'build', //
-				// added just before connect
-				'configureProxies:server', //
 				'connect:dist:keepalive' //
 				]);
 		}
@@ -677,17 +660,9 @@ module.exports = function(grunt) {
 			'injector', //
 			'concurrent:server', //
 			'postcss:server', //
-			'configureProxies:server', // added just before connect
 			'connect:livereload', //
 			'watch' //
 			]);
-	});
-
-	grunt.registerTask('setversion', function(arg1) {
-		console.log('Attempting to update version to ' + arg1);
-		var parsedJson= grunt.file.readJSON('bower.json');//read in the current
-		parsedJson.version = arg1; //set the top level version field to arg1
-		grunt.file.write('bower.json', JSON.stringify(parsedJson, null, 2));
 	});
 
 	grunt.registerTask('test', [ //
@@ -728,11 +703,12 @@ module.exports = function(grunt) {
 		'newer:jscs', //
 		'newer:eslint', //
 		'test', //
-		'build' //
+		'build'
 		]);
 
-	grunt.registerTask('release', [ //
-		'default', //
+	grunt.registerTask('release', [
+		'default',
+		'karma:build',
 		'jsdoc'
 		]);
 };

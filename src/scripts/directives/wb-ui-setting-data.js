@@ -26,9 +26,8 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wbUiSettingData
- * @memberof am-wb-core
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
  * @description a setting section to manage data.
@@ -44,12 +43,12 @@ angular.module('am-wb-core')
 			icon : '@icon'
 		},
 		controller : function($scope, $resource) {
-			function editData(data) {
+			function editData(/*data*/) {
 				return $resource.get('data', {
 					style : {
-					    icon: 'insert_chart',
+						icon: 'insert_chart',
 						title : 'Data sheet',
-						description: 'Edit data of the current sheet',
+						description: 'Edit data of the current sheet'
 					},
 					data : $scope.value
 				}) //

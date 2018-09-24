@@ -30,7 +30,7 @@
  * 
  */
 angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
-.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbFloat, $controller) {
+.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbFloat) {
 	$http.get('examples/html.json')
 	.then(function(res) {
 		// NOTE: maso, 2018: clean data model
@@ -38,9 +38,20 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 	});
 
 	// load setting of model
-	$scope.loadSettings = function(model){
+	$scope.loadSettings = function(model, ctrl){
 		$scope.selectedModel = model;
-	}
+		$scope.selectedCtrl = ctrl;
+		if(ctrl){
+			$scope.actions = ctrl.getActions();
+		}else {
+			$scope.actions = [];
+		}
+	};
+	
+	
+	$scope.runAction= function(action){
+		action.action();
+	};
 
 	// load widgets
 	$widget.widgets()
@@ -50,7 +61,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 
 	var headerControls = {
 			close: 'remove',
-			maximize: 'remove',
+			maximize: 'remove'
 	};
 
 	function openWidgets(){
@@ -87,7 +98,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 		var parent = $scope;
 		$wbFloat.show({
 			title: 'Settings',
-			template:'<wb-setting-panel-group ng-model="model"></wb-setting-panel-group>',
+			template:'<wb-setting-panel-group wb-tab-mode ng-model="model"></wb-setting-panel-group>',
 			parent: $scope,
 			controller: function($scope, $wbFloat){
 				watch = parent.$watch('editable', function(value){
@@ -157,14 +168,6 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 	});
 })
 
-.config(function($mdThemingProvider) {
-//	$mdThemingProvider.theme('default')
-//	.backgroundPalette('blue')
-//	.warnPalette('red')
-//	.primaryPalette('pink')
-//	.accentPalette('orange');
-})
-
 
 /**
  * Load widgets
@@ -204,7 +207,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 			icon : 'wb-widget-html',
 			groups: ['test', 'test'+i],
 			model : {
-				text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+				text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>'
 			},
 			// functional properties
 			templateUrl : 'views/widgets/wb-html.html',
@@ -213,7 +216,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 			helpId: 'test'+i
 		});
 	}
-	for(var i = 0; i < 5; i++){
+	for(i = 0; i < 5; i++){
 		// HTML text
 		$widget.newWidget({
 			// widget description
@@ -223,7 +226,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 			icon : 'wb-widget-html',
 			groups: ['test', 'test'+i],
 			model : {
-				text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>',
+				text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>'
 			},
 			// functional properties
 			templateUrl : 'views/widgets/wb-html.html',
@@ -258,7 +261,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 		return {
 			key: 'constant sheet',
 			values:values
-		}
+		};
 	}
 
 	$scope.x = 4; 

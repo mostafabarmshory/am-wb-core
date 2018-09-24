@@ -50,29 +50,29 @@ angular.module('am-wb-core')
  * 
  * @see https://www.w3schools.com/css/css_border.asp
  */
-.directive("wbBorder", function() {
+.directive('wbBorder', function() {
 	return {
-	    restrict : 'A',
-	    link : function($scope, $element, $attrs) {
-		    $scope.$watch($attrs.wbBorder + '.border', function(style) {
-			    if (!style) {
-				    return;
-			    }
-			    var conf = {};
-			    if (style.style) {
-				    conf['border-style'] = style.style;
-			    }
-			    if (style.width) {
-				    conf['border-width'] = style.width;
-			    }
-			    if (style.color) {
-				    conf['border-color'] = style.color;
-			    }
-			    if (style.radius) {
-				    conf['border-radius'] = style.radius;
-			    }
-			    $element.css(conf);
-		    }, true);
-	    }
+		restrict : 'A',
+		link : function($scope, $element, $attrs) {
+			$scope.$watch($attrs.wbBorder + '.border', function(style) {
+				if (!style) {
+					return;
+				}
+				var conf = {};
+				if (style.style) {
+					conf['border-style'] = style.style;
+				}
+				if (style.width) {
+					conf['border-width'] = style.width;
+				}
+				if (style.color) {
+					conf['border-color'] = style.color;
+				}
+				if (style.radius) {
+					conf['border-radius'] = style.radius;
+				}
+				$element.css(conf);
+			}, true);
+		}
 	};
 });

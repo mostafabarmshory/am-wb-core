@@ -26,25 +26,20 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
- * @name wbWidget
- * @memberof am-wb-core
- * @description Widgets container
- * 
- * This is widget containers.
- * 
- * All primary actions of a widget are supported (such as remove and setting).
+ * @ngdoc Directives
+ * @name wb-ui-setting-dropdown
+ * @description a setting section for choosing values.
+ *
  */
-.directive('wbSettingPanel', function($settings) {
-    return {
-	restrict : 'E',
-	transclude : true,
-	templateUrl : 'views/directives/wb-setting-panel.html',
-	// This create an isolated scope
-	scope : {
-	    label : '@label',
-	    description : '@?',
-	    icon : '@?',
-	},
-    };
+.directive('wbUiSettingDropdownValue', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-dropdown-value.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon',
+			items:'=items'
+		}
+	};
 });

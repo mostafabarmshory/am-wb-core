@@ -25,22 +25,21 @@
 
 angular.module('am-wb-core')
 
-    /**
-     * @ngdoc directive
-     * @name wbUiSettingDropdown
-     * @memberof am-wb-core
-     * @description a setting section for choosing values.
-     *
-     */
-    .directive('wbUiSettingDropdown', function () {
-        return {
-            templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
-            restrict: 'E',
-            scope: {
-                title: '@title',
-                value: '=value',
-                icon: '@icon',
-                items:'=items'
-            }
-        };
-    });
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingDropdown
+ * @description a setting section for choosing values.
+ *
+ */
+.directive('wbUiSettingDropdown', function () {
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			value: '=value',
+			icon: '@icon',
+			items:'=items'
+		}
+	};
+});

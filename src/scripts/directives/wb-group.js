@@ -23,10 +23,6 @@
  */
 'use strict';
 
-var dragClass = 'wb-content-dragenter';
-var bodyElementSelector = 'div#wb-content-body';
-var placeholderElementSelector = 'div#wb-content-placeholder';
-
 angular.module('am-wb-core')
 /**
  * @ngdoc Directives
@@ -39,7 +35,7 @@ angular.module('am-wb-core')
 	/*
 	 * Link widget view
 	 */
-	function wbGroupLink($scope, $element, $attrs, $ctrls, transclud) {
+	function wbGroupLink($scope, $element, $attrs, $ctrls) {
 
 		// Loads wbGroup
 		var ctrl = $ctrls[0];
@@ -65,8 +61,9 @@ angular.module('am-wb-core')
 			}
 			var compilesJob = [];
 			var elements = [];
+			var locals = ctrl.getLocals();
 			model.contents.forEach(function(item, index) {
-				compilesJob.push($widget.compile(item, $scope, $element)//
+				compilesJob.push($widget.compile(item, $scope, $element, locals)//
 						.then(function(element) {
 							$mdTheming(element);
 							elements[index] = element;
@@ -116,7 +113,7 @@ angular.module('am-wb-core')
 			$scope.root = true;
 		}
 
-		$scope.dropCallback = function(index, item, external, type){
+		$scope.dropCallback = function(index, item/*, external, type*/){
 			return ctrl.addChild(index, item);
 		};
 	}
@@ -128,7 +125,7 @@ angular.module('am-wb-core')
 	 * 
 	 * Manages model data of a widget.
 	 * 
-	 * FIXME: maso, 2018: add injection annotation
+	 * @ngInject
 	 */
 	function wbGroupCtrl($scope, $element) {
 		var ctrl = this;
@@ -143,13 +140,13 @@ angular.module('am-wb-core')
 				for(var i = 0; i < callbacks[type].length; i++){
 					try{
 						callbacks[type][i]();
-					} catch (error){
-						console.log(error);
+					} catch (e){
+						/*console.log(error);*/
 					}
 				}
 			}
 		}
-		
+
 		/**
 		 * Delete data model and widget display
 		 * 
@@ -161,7 +158,7 @@ angular.module('am-wb-core')
 				// TODO: mao, 2018: clear all elements
 				return;
 			}
-			$scope.parentCtrl.removeChild($scope.wbModel);
+			$scope.parentCtrl.removeChild($scope.wbModel, ctrl);
 			fire('delete');
 		};
 
@@ -248,9 +245,13 @@ angular.module('am-wb-core')
 		 * Data model and visual element related to the input model will be
 		 * removed.
 		 */
-		ctrl.removeChild = function(model) {
+		ctrl.removeChild = function(model, childCtrl) {
 			var index = ctrl.indexOfChild(model);
 			if (index > -1) {
+				if(ctrl.isChildSelected(childCtrl)){
+					ctrl.childSelected(null);
+					// delete controller
+				}
 				$element.children(':nth-child('+(index+1)+')').remove();
 				$scope.wbModel.contents.splice(index, 1);
 				return true;
@@ -258,6 +259,12 @@ angular.module('am-wb-core')
 			return false;
 		};
 
+		ctrl.getLocals = function(){
+			if($scope.parentCtrl){
+				return $scope.parentCtrl.getLocals();
+			}
+			return $scope.wbLocals;
+		};
 
 		/**
 		 * Adds dragged widget
@@ -265,7 +272,7 @@ angular.module('am-wb-core')
 		ctrl.addChild = function(index, item) {
 			$wbUtil.clean(item);
 			// add widget
-			$widget.compile(item, $scope)//
+			$widget.compile(item, $scope, null, ctrl.getLocals())//
 			.then(function(newElement) {
 				var nodes  = $element[0].childNodes;
 				if (index < nodes.length) {
@@ -280,7 +287,7 @@ angular.module('am-wb-core')
 			});
 			return true;
 		};
-		
+
 		ctrl.indexOfChild = function(item) {
 			return $scope.wbModel.contents.indexOf(item);
 		};
@@ -323,7 +330,8 @@ angular.module('am-wb-core')
 		scope : {
 			wbEditable : '=?',
 			wbOnModelSelect : '@?',
-			wbAllowedTypes: '<?'
+			wbAllowedTypes: '<?',
+			wbLocals: '<?'
 		},
 		link : wbGroupLink,
 		controllerAs: 'ctrl',

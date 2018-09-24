@@ -28,40 +28,33 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Services
  * @name $widget
- * @memberof am-wb-core
  * @description مدیریت ویجت‌های سیستم
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$widget', function(
 		$wbUtil,
-		$q, $sce, $templateRequest, $compile, $controller, $rootScope,
-		$timeout, $mdDialog) {
+		$q, $sce, $templateRequest, $compile, $controller) {
 
 	var _group_repo = [];
 	var contentElementAsso = [];
 	var elementKey = [];
-	
+
 	var notFoundWidget = {
 			templateUrl : 'views/widgets/wb-notfound.html',
 			label : 'Not found',
-			description : 'Element not found',
+			description : 'Element not found'
 	};
 	var container = {
 			type : 'Page',
 			label : 'Page',
 			description : 'Panel contains list of widgets.',
-			image : 'images/wb/content.svg',
+			image : 'images/wb/content.svg'
 	};
-	
-	function _newGroup(group){
-		var g = _group(group.id);
-		angular.extend(g, group);
-	}
-	
+
 	function _group(groupId){
 		for(var i = 0; i < _group_repo.length; i++){
-			if(_group_repo[i].id == groupId){
+			if(_group_repo[i].id === groupId){
 				return _group_repo[i];
 			}
 		}
@@ -71,7 +64,12 @@ angular.module('am-wb-core')
 		_group_repo.push(group);
 		return group;
 	}
-	
+
+	function _newGroup(group){
+		var g = _group(group.id);
+		angular.extend(g, group);
+	}
+
 	function _groups(){
 		return _group_repo;
 	}
@@ -116,14 +114,14 @@ angular.module('am-wb-core')
 		});
 		return $q.when(widgets);
 	}
-	
+
 	/**
 	 * List of all registered widgets
 	 * 
 	 * @memberof $widget
 	 * @returns keys {array} list of all keys
 	 */
-	function widgetsKey(){
+	function getWidgetsKey(){
 		return elementKey;
 	}
 
@@ -147,7 +145,7 @@ angular.module('am-wb-core')
 		widget.model = widget.model || {style:{}};
 		widget.model.type = widget.type;
 		widget.model.name = widget.model.name || widget.title; 
-		
+
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);
 		return this;
@@ -157,7 +155,7 @@ angular.module('am-wb-core')
 	 * Compile element 
 	 * 
 	 * @name show
-	 * @memberof $wbFloat
+	 * @memberof $widget
 	 * @param optionsOrPreset
 	 *            {object}
 	 *            <ul>
@@ -184,7 +182,7 @@ angular.module('am-wb-core')
 	 * @param parenScope
 	 * @return promise A promise that resolve created element
 	 */
-	function compile(model, parenScope, parentElement){
+	function compile(model, parenScope, parentElement, locals){
 		var widget = _widget(model);
 		var childScope = null;
 		var element = null;
@@ -206,13 +204,13 @@ angular.module('am-wb-core')
 			// 3- bind controller
 			var link = $compile(element);
 			if (angular.isDefined(widget.controller)) {
-				var locals = {
-						$scope : childScope,
-						$element : element,
-						// TODO: maso, 2017: bind wbModel, wbParent,
-						// and wbEditable
-				};
-				var controller = $controller(widget.controller, locals);
+				var wlocals = _.merge({
+					// TODO: maso, 2017: bind wbModel, wbParent,
+					// and wbEditable
+					$scope : childScope,
+					$element : element
+				}, locals || {});
+				var controller = $controller(widget.controller, wlocals);
 				if (widget.controllerAs) {
 					childScope[widget.controllerAs] = controller;
 				}
@@ -222,29 +220,42 @@ angular.module('am-wb-core')
 			return element;
 		});
 	}
-	
+
 	/**
 	 * Creates new serialized data of widget
 	 * 
-	 * @memberof $wbFloat
+	 * @memberof $widget
 	 * @param widget
 	 * @returns
 	 */
 	function widgetData(widget){
 		return angular.copy(widget.model);
 	}
-	
+
 	// widgets
 	this.newWidget = newWidget;
 	this.widget = widget;
 	this.widgets = widgets;
 	this.widgetData = widgetData;
-	
+	this.getWidgetsKey = getWidgetsKey;
+
+	// new api
+	this.getWidget = _widget;
+	this.getWidgets =  function(){
+		var widgets = {};
+		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+		widgets.items = [];
+		elementKey.forEach(function(type) {
+			widgets.items.push(contentElementAsso[type]);
+		});
+		return widgets;
+	};
+
 	// widget groups
 	this.group = _group;
 	this.groups = _groups;
 	this.newGroup = _newGroup;
-	
+
 	// utils
 	this.compile = compile;
 });

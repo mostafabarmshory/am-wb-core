@@ -47,7 +47,7 @@ angular.module('am-wb-core')
 			var ngModelCtrl = $ctrl[0];
 			ngModelCtrl.$render = function(){
 				$scope.value = ngModelCtrl.$viewValue;
-			}
+			};
 			$scope.$watch('value', function(value){
 				ngModelCtrl.$setViewValue(value);
 			});
@@ -59,7 +59,7 @@ angular.module('am-wb-core')
 			function selectImage(){
 				return $resource.get('image', {
 					style: {
-					    icon: 'image',
+						icon: 'image',
 						title: 'Select image',
 						description: 'Select image from resources.'
 					},
@@ -69,7 +69,7 @@ angular.module('am-wb-core')
 					$scope.value = value;
 				});
 			}
-			
+
 			$scope.selectImage = selectImage;
 		}
 	};

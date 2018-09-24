@@ -28,7 +28,6 @@ angular.module('am-wb-core')
 /**
  * @ngdoc Services
  * @name $wbFloat
- * @memberof am-wb-core
  * @description Open and manage float panels
  * 
  * 
@@ -158,4 +157,73 @@ angular.module('am-wb-core')
 		});
 		return deferred.promise;
 	};
+
+
+	this.create = function(optionsOrPreset) {
+		// create scopse
+		var parenScope = optionsOrPreset.parent || $rootScope;
+		var childScope = optionsOrPreset.scope || parenScope.$new(false, parenScope);
+		
+
+		var panel = jsPanel.create({
+			theme: 'primary',
+			headerTitle : optionsOrPreset.title || 'my panel #1',
+			position : optionsOrPreset.position || 'center-top 0 58',
+			panelSize : optionsOrPreset.panelSize || '400 400',
+			contentSize : optionsOrPreset.contentSize || '450 250',
+			headerControls: optionsOrPreset.headerControls || 'all',
+			content : '<div style="border-top: 1px solid;width: 100%;height: 250px;padding: 0px;pointer-events: inherit;"></div>',
+			callback : function() {
+				var parentElement = angular.element(this.content);
+
+				// 2- create element
+				return $wbUtil.getTemplateFor(optionsOrPreset)//
+				.then(function(template) {
+					var element = angular.element(template);
+
+					// 3- bind controller
+					var link = $compile(element);
+					if (angular.isDefined(optionsOrPreset.controller)) {
+						var locals = {
+								$scope : childScope,
+								$element : element
+						};
+						var controller = $controller(optionsOrPreset.controller, locals);
+						if (optionsOrPreset.controllerAs) {
+							childScope[optionsOrPreset.controllerAs] = controller;
+						}
+						element.data('$ngControllerController', controller);
+					}
+					link(childScope);
+					parentElement.children('div').append(element);
+					return element;
+				});
+			},
+			onclosed: function(){
+				/*
+				 * Remove scope
+				 * 
+				 * NOTE: if there is a $watch, then this return an error
+				 */
+				if(!optionsOrPreset.scope){
+					childScope.$destroy();
+				}
+			}
+		});
+
+		var rootElement = angular.element(panel);
+		panel.setVisible = function(flag){
+			this._isVisible = flag;
+			rootElement.css('visibility', this._isVisible ? 'visible' : 'hidden');
+		};
+
+		panel.isVisible = function(){
+			return this._isVisible;
+		};
+
+		return panel;
+	};
+
+
+
 });

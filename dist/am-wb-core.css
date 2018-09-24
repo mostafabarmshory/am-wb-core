@@ -10,9 +10,7 @@
 	}
 }
 
-.jsPanel {
-	z-index: 10 !important;
-}
+
 /**
  * Flex css utility (cross browser)
  *
@@ -203,6 +201,13 @@ Rules for sizing the icon.
 .wb-s128 {
 	width: 128px;
 	height: 128px;
+}
+
+/*
+ * Set position ot the panel
+ */
+.jsPanel {
+	z-index: 70 !important;
 }
 .wb-setting-panel{
     padding: 0px;
@@ -625,4 +630,31 @@ of a widget:
 
 .wb-widgets-module> p {
 	font-size: 14px;
+}
+
+/*
+ * Hide if the tab is disabled. 
+ *
+ * This is replacement
+ */
+#am-wb-widget-setting .md-tab.md-disabled{
+	display: none;
+}
+
+
+div.tinymce {
+}
+
+/*
+ * First child is an special and we should remove
+ * top margin and padding
+ */
+.wb-widget-text :first-child  {
+	margin-top: 0px  !important;
+	padding-top: 0px !important;
+}
+
+.wb-widget-text :last-child {
+	margin-bottom: 0px  !important;
+	padding-bottom: 0px !important;
 }

@@ -26,7 +26,7 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc directive
+ * @ngdoc Directives
  * @name wb-widgets-module
  * @description Widgets explorers
  * 
@@ -42,11 +42,14 @@ angular.module('am-wb-core')
 		scope: {
 			widgets: '<'
 		},
+		/*
+		 * @ngInject
+		 */
 		controller: function($scope){
 			if(angular.isFunction($window.openHelp)){
 				$scope.openHelp = function(widget, $event){
 					$window.openHelp(widget, $event);
-				}
+				};
 			}
 		}
 	};

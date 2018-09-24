@@ -21,18 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
-
-angular.module('am-wb-core')
 
 /**
- * @ngdoc Services
- * @name $wbUtil
- * @description Utility service of WB
- * 
+ * Utility class of WB
  */
-.service('$wbUtil', function($rootScope, $controller, $q, $sce, $compile, $document,
-		$templateRequest) {
+class WbUtil {
+
+	constructor($q, $sce, $templateRequest) {
+		this.$q = $q;
+		this.$sce = $sce; 
+		this.$templateRequest = $templateRequest;
+	}
+	
+	cleanMap(oldStyle, newStyle, map) {
+		for (var i = 0; i < map.length; i++) {
+			if (oldStyle[map[i][0]]) {
+				newStyle[map[i][1]] = oldStyle[map[i][0]];
+				delete oldStyle[map[i][0]];
+			}
+		}
+	}
+	
 	/**
 	 * Loading template of the page
 	 * 
@@ -42,8 +51,13 @@ angular.module('am-wb-core')
 	 *            {object} properties of a page, widget , ..
 	 * @return promise to load template on resolve.
 	 */
-	function getTemplateFor(page) {
-		var template, templateUrl;
+	getTemplateFor(page) {
+		return this.$q.when(this.getTemplateOf(page));
+	}
+	
+	getTemplateOf(page) {
+		var template;
+		var templateUrl;
 		if (angular.isDefined(template = page.template)) {
 			if (angular.isFunction(template)) {
 				template = template(page.params);
@@ -53,101 +67,218 @@ angular.module('am-wb-core')
 				templateUrl = templateUrl(page.params);
 			}
 			if (angular.isDefined(templateUrl)) {
-				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
-				template = $templateRequest(templateUrl);
+				page.loadedTemplateUrl = this.$sce.valueOf(templateUrl);
+				template = this.$templateRequest(templateUrl);
 			}
 		}
-		return $q.when(template);
+		return template;
 	}
 
 
-	function cleanEvetns(model){
+	cleanEvetns(model) {
 		// event
-		if(!model.event) {
+		if (!model.event) {
 			model.event = {};
 		}
 	}
 
-	function cleanStyle(model){
-		if(!model.style) {
-			model.style = {};
-		}
-		cleanLayout(model);
-		cleanSize(model);
-		cleanBackground(model);
-		cleanBorder(model);
-		cleanSpace(model);
-		cleanAlign(model);
-	}
 
-	function cleanLayout(model){
-		if(model.type !== 'Group'){
+	cleanLayout(model) {
+		if (model.type !== 'Group' && model.type !== 'Page') {
 			return;
 		}
-		if(!model.style.layout) {
+		if (!model.style.layout) {
 			model.style.layout = {};
 		}
-		var layout = model.style.layout;
-		if(!layout.direction) {
-			layout.direction = 'column';
+		// convert
+		var newStyle = model.style.layout;
+		var oldStyle = model.style;
+
+		if (oldStyle.flexDirection) {
+			if (oldStyle.flexDirection === 'wb-flex-row') {
+				newStyle.direction = 'row';
+			} else {
+				newStyle.direction = 'column';
+			}
+			delete oldStyle.flexDirection;
 		}
-		if(!layout.justify) {
-			layout.justify = 'center';
+		if (!newStyle.direction) {
+			newStyle.direction = 'column';
 		}
-		if(!layout.align) {
-			layout.align = 'stretch';
+
+		switch (oldStyle.flexAlignItem) {
+			case 'wb-flex-align-items-center':
+				newStyle.align = 'center';
+				break;
+			case 'wb-flex-align-items-end':
+				newStyle.align = 'end';
+				break;
+			case 'wb-flex-align-items-start':
+				newStyle.align = 'start';
+				break;
+			case 'wb-flex-align-items-stretch':
+				newStyle.align = 'stretch';
+				break;
+			default:
+				newStyle.align = 'stretch';
 		}
+		delete oldStyle.flexAlignItem;
+
+		switch (oldStyle.justifyContent) {
+			case 'wb-flex-justify-content-center':
+				newStyle.justify = 'center';
+				break;
+			case 'wb-flex-justify-content-end':
+				newStyle.justify = 'end';
+				break;
+			case 'wb-flex-justify-content-start':
+				newStyle.justify = 'start';
+				break;
+			case 'wb-flex-justify-content-space-between':
+				newStyle.justify = 'space-between';
+				break;
+			case 'wb-flex-justify-content-space-around':
+				newStyle.justify = 'space-around';
+				break;
+			default:
+				newStyle.justify = 'center';
+		}
+		delete oldStyle.justifyContent;
 	}
-	
-	function cleanSize(model){
-		if(!model.style.size) {
+
+	cleanSize(model) {
+		if (!model.style.size) {
 			model.style.size = {};
 		}
+		var newStyle = model.style.size;
+		var oldStyle = model.style;
+		var map = [
+			['width', 'width'],
+			['height', 'height']
+			];
+		this.cleanMap(oldStyle, newStyle, map);
 	}
-	
-	function cleanBackground(model) {
-		if(!model.style.background) {
+
+	cleanBackground(model) {
+		if (!model.style.background) {
 			model.style.background = {};
 		}
+		var newStyle = model.style.background;
+		var oldStyle = model.style;
+		var map = [
+			['backgroundImage', 'image'],
+			['backgroundColor', 'color'],
+			['backgroundSize', 'size'],
+			['backgroundRepeat', 'repeat'],
+			['backgroundPosition', 'position']
+			];
+		this.cleanMap(oldStyle, newStyle, map);
 	}
-	
 
-	function cleanBorder(model){
-		if(!model.style.border) {
+
+	cleanBorder(model) {
+		if (!model.style.border) {
 			model.style.border = {};
 		}
+		var oldStyle = model.style;
+		var newStyle = model.style.border;
+		
+		if(oldStyle.borderRadius){
+			if(oldStyle.borderRadius.uniform){
+				newStyle.radius = oldStyle.borderRadius.all + 'px';
+			}
+			// TODO: maso, 2018: support other models
+		}
+		// delete old values
+		delete model.style.borderColor;
+		delete model.style.borderRadius;
+		delete model.style.borderStyleColorWidth;
+		delete model.style.borderStyle;
+		delete model.style.borderWidth;
 	}
-	
-	function cleanSpace(model){
+
+	cleanSpace(model) {
 		// Margin and padding
+		if (model.style.padding && angular.isObject(model.style.padding)) {
+			var padding = '';
+			if (model.style.padding.isUniform) {
+				padding = model.style.padding.uniform;
+			} else {
+				padding = model.style.padding.top || '0px' + ' ' +
+				model.style.padding.right || '0px' + ' ' +
+				model.style.padding.bottom || '0px' + ' ' +
+				model.style.padding.left || '0px' + ' ';
+			}
+			model.style.padding = padding;
+		}
+
+		if (model.style.margin && angular.isObject(model.style.margin)) {
+			var margin = '';
+			if (model.style.margin.isUniform) {
+				margin = model.style.margin.uniform;
+			} else {
+				margin = model.style.margin.top || '0px' + ' ' +
+				model.style.margin.right || '0px' + ' ' +
+				model.style.margin.bottom || '0px' + ' ' +
+				model.style.margin.left || '0px' + ' ';
+			}
+			model.style.margin = margin;
+		}
+
 	}
-	
-	function cleanAlign(model){
-		if(!model.style.align) {
+
+	cleanAlign(model) {
+		if (!model.style.align) {
 			model.style.align = {};
 		}
 	}
 
-	/**
-	 * Clean data model
-	 */
-	function clean(model){
-		cleanEvetns(model);
-		cleanStyle(model);
-		if(model.type == 'Group'){
-			if(!model.contents){
+	cleanStyle(model) {
+		if (!model.style) {
+			model.style = {};
+		}
+		this.cleanLayout(model);
+		this.cleanSize(model);
+		this.cleanBackground(model);
+		this.cleanBorder(model);
+		this.cleanSpace(model);
+		this.cleanAlign(model);
+	}
+
+	cleanInternal(model) {
+		this.cleanEvetns(model);
+		this.cleanStyle(model);
+		if (model.type === 'Group' || model.type === 'Page') {
+			if (!model.contents) {
 				model.contents = [];
 			}
-			if(model.contents.length){
-				for(var i = 0; i < model.contents.length; i++){
-					clean(model.contents[i]);
+			if (model.contents.length) {
+				for (var i = 0; i < model.contents.length; i++) {
+					this.cleanInternal(model.contents[i]);
 				}
 			}
 		}
 		return model;
 	}
+	
+	/**
+	 * Clean data model
+	 */
+	clean(model, force) {
+		if(model.version === 'wb1' && !force){
+			return model;
+		}
+		var newModel = this.cleanInternal(model);
+		newModel.version = 'wb1';
+		return newModel;
+	}
 
 
-	this.getTemplateFor = getTemplateFor;
-	this.clean = clean;
-});
+}
+
+/*
+ * Add to angular
+ */
+WbUtil.$inject=['$q', '$sce', '$templateRequest'];
+angular.module('am-wb-core')
+	.service('$wbUtil', WbUtil);

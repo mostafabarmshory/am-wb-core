@@ -25,9 +25,11 @@
 
 angular.module('am-wb-core')
 /**
+ * @ngdoc Directives
+ * @name wb-size
  * @description Apply margin into the element
  */
-.directive("wbSize", function($q, $wbUtil, $rootElement, $document, $compile, $mdPanel) {
+.directive('wbSize', function($q, $wbUtil, $rootElement, $document, $compile) {
 
 	function postLink($scope, $element, $attrs, $ctrls){
 		var button;
@@ -35,18 +37,21 @@ angular.module('am-wb-core')
 		var dimension = {};
 		var position = {};
 		var lock = false;
+		var watchSelection = null;
+		var watchSize = null;
 
 		// main ctrl
 		var ctrl = $ctrls[0];
+		
+		
 		function isRoot(){
 			return ctrl.isRoot();
 		}
-		ctrl.on('delete', distroy);
 
 		function distroy(){
 			watchSize();
 			watchSelection();
-			
+
 			if(button){
 				button.remove();
 			}
@@ -54,7 +59,25 @@ angular.module('am-wb-core')
 				optionButton.remove();
 			}
 		}
-		
+
+		function getBound(){
+			var off = $element.offset();
+			return {
+				left: off.left,
+				top: off.top,
+				width: $element.innerWidth(),
+				height: $element.innerHeight()
+			};
+		}
+
+		function bindToElement(bound){
+			button.css('left', bound.left + bound.width - 15 + 'px');
+			button.css('top', bound.top + bound.height - 16 + 'px');
+
+			optionButton.css('left', bound.left + 'px');
+			optionButton.css('top', bound.top + 'px');
+		}
+
 		function mousemove($event) {
 			var deltaWidth = dimension.width - (position.x - $event.clientX);
 			var deltaHeight = dimension.height - (position.y - $event.clientY);
@@ -89,26 +112,6 @@ angular.module('am-wb-core')
 			$document.bind('mousemove', mousemove);
 			$document.bind('mouseup', mouseup);
 			return false;
-		};
-
-		function getBound(){
-			var off = $element.offset();
-			var height = $element.innerHeight();
-			var width = $element.innerWidth();
-			return {
-				left: off.left,
-				top: off.top,
-				width: $element.innerWidth(),
-				height: $element.innerHeight()
-			}
-		}
-
-		function bindToElement(bound){
-			button.css('left', bound.left + bound.width - 15 + 'px');
-			button.css('top', bound.top + bound.height - 16 + 'px');
-
-			optionButton.css('left', bound.left + 'px');
-			optionButton.css('top', bound.top + 'px');
 		}
 
 		function checkButton(){
@@ -134,7 +137,7 @@ angular.module('am-wb-core')
 				$rootElement.append(optionButton);
 				optionButton.css({
 					position: 'absolute',
-					visibility: 'hidden',
+					visibility: 'hidden'
 				});
 				$compile(optionButton)($scope);
 				bindToElement(getBound());
@@ -153,22 +156,18 @@ angular.module('am-wb-core')
 
 
 		// Watch size
-		var watchSize = $scope.$watch($attrs.wbSize+'.size', function(size) {
+		watchSize = $scope.$watch($attrs.wbSize+'.size', function(size) {
 			if(isRoot() || !size || lock){
 				return;
 			}
-//			$element.css({
-//				'width': size.width || 'auto',
-//				'hieght': size.hieght || 'auto',
-//				'hieght': size.hieght || 'auto',
-//			})
 			$element.css(size);
 			if(optionButton){
 				bindToElement(getBound());
 			}
 		}, true);
 
-		var watchSelection = $scope.$watch(function(){
+		ctrl.on('delete', distroy);
+		watchSelection = $scope.$watch(function(){
 			return ctrl.isSelected();
 		}, function(value){
 			if(value){

@@ -29,7 +29,7 @@ angular.module('am-wb-core')
  * @name wb-background
  * @description Apply background into the element
  */
-.directive("wbBackground", function() {
+.directive('wbBackground', function() {
 	/*
 	 * Sets background attributes into element
 	 * 
@@ -40,7 +40,7 @@ angular.module('am-wb-core')
 		}
 		var cssValue = {};
 		if(style.background){
-			cssValue['background'] = style.background;
+			cssValue.background = style.background;
 		}
 		if(style.image){
 			cssValue['background-image'] = 'url(\''+style.image+'\')';
