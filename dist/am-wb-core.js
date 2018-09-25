@@ -254,35 +254,14 @@ angular.module('am-wb-core')
 			cssValue['background-image'] = 'url(\''+style.image+'\')';
 		}
 
-		if(style.color){
-			cssValue['background-color'] = style.color;
-		}
-		if(style.size) {
-			cssValue['background-size'] = style.size;
-		}
-		if(style.repeat) {
-			cssValue['background-repeat'] = style.repeat;
-		}
-		if(style.position){
-			cssValue['background-position'] = style.position;
-		}
-		if(style.attachment){
-			cssValue['background-attachment'] = style.attachment;
-		}
-		if(style.origin){
-			cssValue['background-origin'] = style.origin;
-		}
-		if(style.clip){
-			cssValue['background-clip'] = style.clip;
-		}
+		cssValue['background-color'] = style.color || 'initial';
+		cssValue['background-size'] = style.size || 'auto';
+		cssValue['background-repeat'] = style.repeat || 'repeat';
+		cssValue['background-position'] = style.position || '0px 0px';
+		cssValue['background-attachment'] = style.attachment || 'scroll';
+		cssValue['background-origin'] = style.origin || 'padding-box';
+		cssValue['background-clip'] = style.clip || 'border-box';
 		
-//		// FIXME: maso, 1395: thies are not background parameter
-//		if(style.color){
-//			cssValue['color'] = style.color;
-//		}
-//		if(style.opacity){
-//			cssValue['opacity'] = (style.isTransparent) ? style.opacity/100 : 1;
-//		}
 		$element.css(cssValue);
 	}
 
@@ -2288,23 +2267,46 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingColor', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-color.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon'
-		}
-	};
-});
+        /**
+         * @ngdoc Directives
+         * @name wbUiSettingColor
+         * @description a setting section to set color.
+         *
+         */
+        .directive('wbUiSettingColor', function ($mdTheming){
+
+
+            function postLink(scope, element, attr, ctrls) {
+                var ngModelCtrl = ctrls[0];
+                $mdTheming(element);
+
+                /*
+                 * convert to index
+                 */
+
+
+
+                ngModelCtrl.$render = function () {
+                    scope.valueColor = ngModelCtrl.$modelValue;
+                };
+
+                scope.$watch('valueColor', function (newValue) {
+                    ngModelCtrl.$setViewValue(newValue);
+                });
+            }
+
+            return {
+                templateUrl: 'views/directives/wb-ui-setting-color.html',
+                restrict: 'E',
+                scope: {
+                    title: '@title',
+                    icon: '@icon'
+                },
+                require: ['ngModel'],
+                link: postLink
+
+            };
+        });
 
 /* 
  * The MIT License (MIT)
@@ -4408,27 +4410,22 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Services
- * @name $widget
- * @description Resource managment
+ * @name $wbUi
+ * @description UI utilities management
  * 
  */
-class WbUi {
+angular.module('am-wb-core').service('$wbUi', function($mdDialog, $q, $http) {
 
-	constructor($mdDialog, $q, $http)
-	{
-		this.$mdDialog = $mdDialog;
-		this.$q = $q;
-		this.$http = $http;
-		this.templates = [];
-	}
+	var _templates = [];
+	var service = this;
 
 
 	/**
 	 * Opens dialog
 	 * @returns
 	 */
-	openDialog(dialogData){
-		return this.$mdDialog.show(dialogData);
+	function openDialog(dialogData){
+		return $mdDialog.show(dialogData);
 	}
 
 
@@ -4437,14 +4434,17 @@ class WbUi {
 	 * 
 	 * @memberof $wbUi
 	 */
-	templates(){
-		return this.$q.when({
-			items: this.templates
+	function templates(){
+		return $q.when({
+			items: _templates
 		});
 	}
 
-	getTemplates(){
-		return this.templates;
+	/**
+	 * Gets list of templates
+	 */
+	function getTemplates(){
+		return _templates;
 	}
 
 	/**
@@ -4452,9 +4452,9 @@ class WbUi {
 	 * 
 	 * @memberof $wbUi
 	 */
-	newTemplate(template){
-		this.templates.push(template);
-		return this;
+	function newTemplate(template){
+		_templates.push(template);
+		return service;
 	}
 
 
@@ -4463,24 +4463,23 @@ class WbUi {
 	 * 
 	 * @memberof $wbUi
 	 */
-	loadTemplate(template){
+	function loadTemplate(template){
 		// TODO: maso, 2018: check if template is a function
-		if(angular.isDefined(template.template)){
-			return this.$q.when(JSON.parse(template.template));
+		if(angular.isDefined(_templates.template)){
+			return $q.when(JSON.parse(_templates.template));
 		}
-		return this.$http.get(template.templateUrl)
+		return $http.get(template.templateUrl)
 		.then(function(res){
 			return res.data;
 		});
 	}
-}
-
-/*
- * Add to angularjs
- */
-WbUi.$inject=['$mdDialog', '$q', '$http'];
-angular.module('am-wb-core')
-.service('$wbUi', WbUi);
+	
+	service.openDialog = openDialog;
+	service.templates = templates;
+	service.getTemplates = getTemplates;
+	service.newTemplate = newTemplate;
+	service.loadTemplate = loadTemplate;
+});
 
 /* 
  * The MIT License (MIT)
@@ -4509,15 +4508,11 @@ angular.module('am-wb-core')
 /**
  * Utility class of WB
  */
-class WbUtil {
+angular.module('am-wb-core').service('$wbUtil', function($q, $templateRequest, $sce) {
+	'use strict';
+	var service = this;
 
-	constructor($q, $sce, $templateRequest) {
-		this.$q = $q;
-		this.$sce = $sce; 
-		this.$templateRequest = $templateRequest;
-	}
-	
-	cleanMap(oldStyle, newStyle, map) {
+	function cleanMap(oldStyle, newStyle, map) {
 		for (var i = 0; i < map.length; i++) {
 			if (oldStyle[map[i][0]]) {
 				newStyle[map[i][1]] = oldStyle[map[i][0]];
@@ -4525,7 +4520,28 @@ class WbUtil {
 			}
 		}
 	}
-	
+
+	function getTemplateOf(page)
+	{
+		var template;
+		var templateUrl;
+		if (angular.isDefined(template = page.template)) {
+			if (angular.isFunction(template)) {
+				template = template(page.params);
+			}
+		} else if (angular
+				.isDefined(templateUrl = page.templateUrl)) {
+			if (angular.isFunction(templateUrl)) {
+				templateUrl = templateUrl(page.params);
+			}
+			if (angular.isDefined(templateUrl)) {
+				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+				template = $templateRequest(templateUrl);
+			}
+		}
+		return template;
+	}
+
 	/**
 	 * Loading template of the page
 	 * 
@@ -4535,39 +4551,21 @@ class WbUtil {
 	 *            {object} properties of a page, widget , ..
 	 * @return promise to load template on resolve.
 	 */
-	getTemplateFor(page) {
-		return this.$q.when(this.getTemplateOf(page));
-	}
-	
-	getTemplateOf(page) {
-		var template;
-		var templateUrl;
-		if (angular.isDefined(template = page.template)) {
-			if (angular.isFunction(template)) {
-				template = template(page.params);
-			}
-		} else if (angular.isDefined(templateUrl = page.templateUrl)) {
-			if (angular.isFunction(templateUrl)) {
-				templateUrl = templateUrl(page.params);
-			}
-			if (angular.isDefined(templateUrl)) {
-				page.loadedTemplateUrl = this.$sce.valueOf(templateUrl);
-				template = this.$templateRequest(templateUrl);
-			}
-		}
-		return template;
+	function getTemplateFor(page)
+	{
+		return $q.when(getTemplateOf(page));
 	}
 
-
-	cleanEvetns(model) {
+	function cleanEvetns(model)
+	{
 		// event
 		if (!model.event) {
 			model.event = {};
 		}
 	}
 
-
-	cleanLayout(model) {
+	function cleanLayout(model)
+	{
 		if (model.type !== 'Group' && model.type !== 'Page') {
 			return;
 		}
@@ -4630,45 +4628,43 @@ class WbUtil {
 		delete oldStyle.justifyContent;
 	}
 
-	cleanSize(model) {
+	function cleanSize(model)
+	{
 		if (!model.style.size) {
 			model.style.size = {};
 		}
 		var newStyle = model.style.size;
 		var oldStyle = model.style;
-		var map = [
-			['width', 'width'],
-			['height', 'height']
-			];
-		this.cleanMap(oldStyle, newStyle, map);
+		var map = [ [ 'width', 'width' ],
+			[ 'height', 'height' ] ];
+		cleanMap(oldStyle, newStyle, map);
 	}
 
-	cleanBackground(model) {
+	function cleanBackground(model)
+	{
 		if (!model.style.background) {
 			model.style.background = {};
 		}
 		var newStyle = model.style.background;
 		var oldStyle = model.style;
-		var map = [
-			['backgroundImage', 'image'],
-			['backgroundColor', 'color'],
-			['backgroundSize', 'size'],
-			['backgroundRepeat', 'repeat'],
-			['backgroundPosition', 'position']
-			];
-		this.cleanMap(oldStyle, newStyle, map);
+		var map = [ [ 'backgroundImage', 'image' ],
+			[ 'backgroundColor', 'color' ],
+			[ 'backgroundSize', 'size' ],
+			[ 'backgroundRepeat', 'repeat' ],
+			[ 'backgroundPosition', 'position' ] ];
+		cleanMap(oldStyle, newStyle, map);
 	}
 
-
-	cleanBorder(model) {
+	function cleanBorder(model)
+	{
 		if (!model.style.border) {
 			model.style.border = {};
 		}
 		var oldStyle = model.style;
 		var newStyle = model.style.border;
-		
-		if(oldStyle.borderRadius){
-			if(oldStyle.borderRadius.uniform){
+
+		if (oldStyle.borderRadius) {
+			if (oldStyle.borderRadius.uniform) {
 				newStyle.radius = oldStyle.borderRadius.all + 'px';
 			}
 			// TODO: maso, 2018: support other models
@@ -4681,16 +4677,17 @@ class WbUtil {
 		delete model.style.borderWidth;
 	}
 
-	cleanSpace(model) {
+	function cleanSpace(model)
+	{
 		// Margin and padding
 		if (model.style.padding && angular.isObject(model.style.padding)) {
 			var padding = '';
 			if (model.style.padding.isUniform) {
 				padding = model.style.padding.uniform;
 			} else {
-				padding = model.style.padding.top || '0px' + ' ' +
-				model.style.padding.right || '0px' + ' ' +
-				model.style.padding.bottom || '0px' + ' ' +
+				padding = model.style.padding.top || '0px' + ' ' + 
+				model.style.padding.right || '0px' + ' ' + 
+				model.style.padding.bottom || '0px' + ' ' + 
 				model.style.padding.left || '0px' + ' ';
 			}
 			model.style.padding = padding;
@@ -4701,9 +4698,9 @@ class WbUtil {
 			if (model.style.margin.isUniform) {
 				margin = model.style.margin.uniform;
 			} else {
-				margin = model.style.margin.top || '0px' + ' ' +
-				model.style.margin.right || '0px' + ' ' +
-				model.style.margin.bottom || '0px' + ' ' +
+				margin = model.style.margin.top || '0px' + ' ' + 
+				model.style.margin.right || '0px' + ' ' + 
+				model.style.margin.bottom || '0px' + ' ' + 
 				model.style.margin.left || '0px' + ' ';
 			}
 			model.style.margin = margin;
@@ -4711,61 +4708,71 @@ class WbUtil {
 
 	}
 
-	cleanAlign(model) {
+	function cleanAlign(model)
+	{
 		if (!model.style.align) {
 			model.style.align = {};
 		}
 	}
 
-	cleanStyle(model) {
+	function cleanStyle(model)
+	{
 		if (!model.style) {
 			model.style = {};
 		}
-		this.cleanLayout(model);
-		this.cleanSize(model);
-		this.cleanBackground(model);
-		this.cleanBorder(model);
-		this.cleanSpace(model);
-		this.cleanAlign(model);
+		cleanLayout(model);
+		cleanSize(model);
+		cleanBackground(model);
+		cleanBorder(model);
+		cleanSpace(model);
+		cleanAlign(model);
 	}
 
-	cleanInternal(model) {
-		this.cleanEvetns(model);
-		this.cleanStyle(model);
+	function cleanInternal(model)
+	{
+		cleanEvetns(model);
+		cleanStyle(model);
 		if (model.type === 'Group' || model.type === 'Page') {
 			if (!model.contents) {
 				model.contents = [];
 			}
 			if (model.contents.length) {
 				for (var i = 0; i < model.contents.length; i++) {
-					this.cleanInternal(model.contents[i]);
+					cleanInternal(model.contents[i]);
 				}
 			}
 		}
 		return model;
 	}
-	
+
 	/**
 	 * Clean data model
 	 */
-	clean(model, force) {
-		if(model.version === 'wb1' && !force){
+	function clean(model, force)
+	{
+		if (model.version === 'wb1' && !force) {
 			return model;
 		}
-		var newModel = this.cleanInternal(model);
+		var newModel = cleanInternal(model);
 		newModel.version = 'wb1';
 		return newModel;
 	}
 
+	service.cleanMap = cleanMap;
+	service.clean = clean;
+	service.cleanInternal = cleanInternal;
+	service.cleanStyle = cleanStyle;
+	service.cleanAlign = cleanAlign;
+	service.cleanSpace = cleanSpace;
+	service.cleanBorder = cleanBorder;
+	service.cleanBackground = cleanBackground;
+	service.cleanSize = cleanSize;
+	service.cleanLayout = cleanLayout;
+	service.cleanEvetns = cleanEvetns;
 
-}
-
-/*
- * Add to angular
- */
-WbUtil.$inject=['$q', '$sce', '$templateRequest'];
-angular.module('am-wb-core')
-	.service('$wbUtil', WbUtil);
+	service.getTemplateFor = getTemplateFor;
+	service.getTemplateOf = getTemplateOf;
+});
 
 /* 
  * The MIT License (MIT)
@@ -4808,6 +4815,7 @@ angular.module('am-wb-core')
 	var _group_repo = [];
 	var contentElementAsso = [];
 	var elementKey = [];
+	var service = this;
 
 	var notFoundWidget = {
 			templateUrl : 'views/widgets/wb-notfound.html',
@@ -4917,7 +4925,7 @@ angular.module('am-wb-core')
 
 		contentElementAsso[widget.type] = widget;
 		elementKey.push(widget.type);
-		return this;
+		return service;
 	}
 
 	/**
@@ -5002,15 +5010,15 @@ angular.module('am-wb-core')
 	}
 
 	// widgets
-	this.newWidget = newWidget;
-	this.widget = widget;
-	this.widgets = widgets;
-	this.widgetData = widgetData;
-	this.getWidgetsKey = getWidgetsKey;
+	service.newWidget = newWidget;
+	service.widget = widget;
+	service.widgets = widgets;
+	service.widgetData = widgetData;
+	service.getWidgetsKey = getWidgetsKey;
 
 	// new api
-	this.getWidget = _widget;
-	this.getWidgets =  function(){
+	service.getWidget = _widget;
+	service.getWidgets =  function(){
 		var widgets = {};
 		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
 		widgets.items = [];
@@ -5021,12 +5029,12 @@ angular.module('am-wb-core')
 	};
 
 	// widget groups
-	this.group = _group;
-	this.groups = _groups;
-	this.newGroup = _newGroup;
+	service.group = _group;
+	service.groups = _groups;
+	service.newGroup = _newGroup;
 
 	// utils
-	this.compile = compile;
+	service.compile = compile;
 });
 
 angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
@@ -5107,7 +5115,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-color.html',
-    "<div layout=row> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='title'\" layout-padding>{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\" flex>{{title}}</p> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false ng-model=value> </md-color-picker> </div>"
+    "<div layout=row> <wb-icon ng-if=icon layout-padding>{{icon}}</wb-icon> <div md-color-picker ng-model=valueColor label={{title}} default md-color-picker random=true md-color-clear-button=true md-color-generic-palette=false md-color-history=false flex></div> </div>"
   );
 
 
@@ -5204,7 +5212,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-background.html',
-    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
+    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill ng-model=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
   );
 
 
@@ -5270,18 +5278,57 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/widgets/wb-html.html',
-    " <div ng-if=!ctrl.isSelected() ng-bind-html=\"wbModel.text | wbunsafe\" class=wb-widget-fill> </div> <div ui-tinymce=\"{\n" +
+    " <div ng-if=!ctrl.isEditable() ng-bind-html=\"wbModel.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
     "\t\tselector : 'div.tinymce',\n" +
-    "\t\ttheme : 'inlite',\n" +
-    "\t\tplugins : 'directionality contextmenu table link paste image imagetools hr textpattern autolink textcolor colorpicker',\n" +
-    "\t\tinsert_toolbar : 'quickimage quicktable',\n" +
-    "\t\tselection_toolbar : 'bold italic | quicklink h1 h2 h3 blockquote | ltr rtl | forecolor',\n" +
-    "\t\tinsert_button_items: 'image link | inserttable | hr',\n" +
-    "\t\tinline : true,\n" +
-    "\t\tpaste_data_images : true,\n" +
-    "\t\tbranding: false,\n" +
-    "\t\timagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'\n" +
-    "\t}\" ng-model=wbModel.text ng-show=ctrl.isSelected() ng-if=ctrl.isEditable() class=wb-widget-fill> </div>"
+    "\t\tmenubar: true,\n" +
+    "\t    inline: true,\n" +
+    "\t    theme: 'modern',\n" +
+    "\t\tplugins : [\n" +
+    "\t\t\t'advlist',\n" +
+    "\t\t\t'autolink',\n" +
+    "\t\t\t'autoresize',\n" +
+    "\t\t\t'autosave',\n" +
+    "\t\t\t'bbcode',\n" +
+    "\t\t\t'charmap',\n" +
+    "\t\t\t'code',\n" +
+    "\t\t\t'codesample',\n" +
+    "\t\t\t'colorpicker',\n" +
+    "\t\t\t'contextmenu',\n" +
+    "\t\t\t'directionality',\n" +
+    "\t\t\t'emoticons',\n" +
+    "\t\t\t'fullscreen',\n" +
+    "\t\t\t'hr',\n" +
+    "\t\t\t'image',\n" +
+    "\t\t\t'imagetools',\n" +
+    "\t\t\t'importcss',\n" +
+    "\t\t\t'insertdatetime',\n" +
+    "\t\t\t'legacyoutput',\n" +
+    "\t\t\t'link',\n" +
+    "\t\t\t'lists',\n" +
+    "\t\t\t'media',\n" +
+    "\t\t\t'nonbreaking',\n" +
+    "\t\t\t'noneditable',\n" +
+    "\t\t\t'paste',\n" +
+    "\t\t\t'save',\n" +
+    "\t\t\t'searchreplace',\n" +
+    "\t\t\t'spellchecker',\n" +
+    "\t\t\t'tabfocus',\n" +
+    "\t\t\t'table',\n" +
+    "\t\t\t'template',\n" +
+    "\t\t\t'textcolor',\n" +
+    "\t\t\t'textpattern',\n" +
+    "\t\t\t'toc',\n" +
+    "\t\t\t'visualblocks',\n" +
+    "\t\t\t'wordcount'\n" +
+    "\t\t\t\n" +
+    "\t\t],\n" +
+    "\t\ttoolbar: [\n" +
+    "      \t\t'fullscreen | undo redo | bold italic underline | fontselect fontsizeselect | visualblocks',\n" +
+    "      \t\t'forecolor backcolor | ltr rtl |alignleft aligncenter alignright alignfull | numlist bullist outdent indent'\n" +
+    "    \t],\n" +
+    "\t    powerpaste_word_import: 'clean',\n" +
+    "\t    powerpaste_html_import: 'clean'\n" +
+    "\t}\" ng-model=wbModel.text class=\"wb-widget-fill tinymce wb-widget-text\"> </div>"
   );
 
 

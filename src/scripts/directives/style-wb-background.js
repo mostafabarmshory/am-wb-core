@@ -46,35 +46,14 @@ angular.module('am-wb-core')
 			cssValue['background-image'] = 'url(\''+style.image+'\')';
 		}
 
-		if(style.color){
-			cssValue['background-color'] = style.color;
-		}
-		if(style.size) {
-			cssValue['background-size'] = style.size;
-		}
-		if(style.repeat) {
-			cssValue['background-repeat'] = style.repeat;
-		}
-		if(style.position){
-			cssValue['background-position'] = style.position;
-		}
-		if(style.attachment){
-			cssValue['background-attachment'] = style.attachment;
-		}
-		if(style.origin){
-			cssValue['background-origin'] = style.origin;
-		}
-		if(style.clip){
-			cssValue['background-clip'] = style.clip;
-		}
+		cssValue['background-color'] = style.color || 'initial';
+		cssValue['background-size'] = style.size || 'auto';
+		cssValue['background-repeat'] = style.repeat || 'repeat';
+		cssValue['background-position'] = style.position || '0px 0px';
+		cssValue['background-attachment'] = style.attachment || 'scroll';
+		cssValue['background-origin'] = style.origin || 'padding-box';
+		cssValue['background-clip'] = style.clip || 'border-box';
 		
-//		// FIXME: maso, 1395: thies are not background parameter
-//		if(style.color){
-//			cssValue['color'] = style.color;
-//		}
-//		if(style.opacity){
-//			cssValue['opacity'] = (style.isTransparent) ? style.opacity/100 : 1;
-//		}
 		$element.css(cssValue);
 	}
 

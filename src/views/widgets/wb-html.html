@@ -5,25 +5,63 @@
 
  -->
 <div
-	ng-if="!ctrl.isSelected()"
+	ng-if="!ctrl.isEditable()"
     ng-bind-html="wbModel.text | wbunsafe"
-	class="wb-widget-fill">
+	class="wb-widget-fill wb-widget-text">
 </div>
 <div
+	ng-if="ctrl.isEditable()"
 	ui-tinymce="{
 		selector : 'div.tinymce',
-		theme : 'inlite',
-		plugins : 'directionality contextmenu table link paste image imagetools hr textpattern autolink textcolor colorpicker',
-		insert_toolbar : 'quickimage quicktable',
-		selection_toolbar : 'bold italic | quicklink h1 h2 h3 blockquote | ltr rtl | forecolor',
-		insert_button_items: 'image link | inserttable | hr',
-		inline : true,
-		paste_data_images : true,
-		branding: false,
-		imagetools_toolbar: 'rotateleft rotateright | flipv fliph | editimage imageoptions'
+		menubar: true,
+	    inline: true,
+	    theme: 'modern',
+		plugins : [
+			'advlist',
+			'autolink',
+			'autoresize',
+			'autosave',
+			'bbcode',
+			'charmap',
+			'code',
+			'codesample',
+			'colorpicker',
+			'contextmenu',
+			'directionality',
+			'emoticons',
+			'fullscreen',
+			'hr',
+			'image',
+			'imagetools',
+			'importcss',
+			'insertdatetime',
+			'legacyoutput',
+			'link',
+			'lists',
+			'media',
+			'nonbreaking',
+			'noneditable',
+			'paste',
+			'save',
+			'searchreplace',
+			'spellchecker',
+			'tabfocus',
+			'table',
+			'template',
+			'textcolor',
+			'textpattern',
+			'toc',
+			'visualblocks',
+			'wordcount'
+			
+		],
+		toolbar: [
+      		'fullscreen | undo redo | bold italic underline | fontselect fontsizeselect | visualblocks',
+      		'forecolor backcolor | ltr rtl |alignleft aligncenter alignright alignfull | numlist bullist outdent indent'
+    	],
+	    powerpaste_word_import: 'clean',
+	    powerpaste_html_import: 'clean'
 	}"
 	ng-model="wbModel.text"
-	ng-show="ctrl.isSelected()"
-	ng-if="ctrl.isEditable()"
-	class="wb-widget-fill">
+	class="wb-widget-fill tinymce wb-widget-text">
 </div>

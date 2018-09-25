@@ -25,20 +25,43 @@
 
 angular.module('am-wb-core')
 
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingColor', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-color.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon'
-		}
-	};
-});
+        /**
+         * @ngdoc Directives
+         * @name wbUiSettingColor
+         * @description a setting section to set color.
+         *
+         */
+        .directive('wbUiSettingColor', function ($mdTheming){
+
+
+            function postLink(scope, element, attr, ctrls) {
+                var ngModelCtrl = ctrls[0];
+                $mdTheming(element);
+
+                /*
+                 * convert to index
+                 */
+
+
+
+                ngModelCtrl.$render = function () {
+                    scope.valueColor = ngModelCtrl.$modelValue;
+                };
+
+                scope.$watch('valueColor', function (newValue) {
+                    ngModelCtrl.$setViewValue(newValue);
+                });
+            }
+
+            return {
+                templateUrl: 'views/directives/wb-ui-setting-color.html',
+                restrict: 'E',
+                scope: {
+                    title: '@title',
+                    icon: '@icon'
+                },
+                require: ['ngModel'],
+                link: postLink
+
+            };
+        });
