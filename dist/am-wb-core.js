@@ -254,35 +254,14 @@ angular.module('am-wb-core')
 			cssValue['background-image'] = 'url(\''+style.image+'\')';
 		}
 
-		if(style.color){
-			cssValue['background-color'] = style.color;
-		}
-		if(style.size) {
-			cssValue['background-size'] = style.size;
-		}
-		if(style.repeat) {
-			cssValue['background-repeat'] = style.repeat;
-		}
-		if(style.position){
-			cssValue['background-position'] = style.position;
-		}
-		if(style.attachment){
-			cssValue['background-attachment'] = style.attachment;
-		}
-		if(style.origin){
-			cssValue['background-origin'] = style.origin;
-		}
-		if(style.clip){
-			cssValue['background-clip'] = style.clip;
-		}
+		cssValue['background-color'] = style.color || 'initial';
+		cssValue['background-size'] = style.size || 'auto';
+		cssValue['background-repeat'] = style.repeat || 'repeat';
+		cssValue['background-position'] = style.position || '0px 0px';
+		cssValue['background-attachment'] = style.attachment || 'scroll';
+		cssValue['background-origin'] = style.origin || 'padding-box';
+		cssValue['background-clip'] = style.clip || 'border-box';
 		
-//		// FIXME: maso, 1395: thies are not background parameter
-//		if(style.color){
-//			cssValue['color'] = style.color;
-//		}
-//		if(style.opacity){
-//			cssValue['opacity'] = (style.isTransparent) ? style.opacity/100 : 1;
-//		}
 		$element.css(cssValue);
 	}
 
@@ -2288,23 +2267,46 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingColor', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-color.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon'
-		}
-	};
-});
+        /**
+         * @ngdoc Directives
+         * @name wbUiSettingColor
+         * @description a setting section to set color.
+         *
+         */
+        .directive('wbUiSettingColor', function ($mdTheming){
+
+
+            function postLink(scope, element, attr, ctrls) {
+                var ngModelCtrl = ctrls[0];
+                $mdTheming(element);
+
+                /*
+                 * convert to index
+                 */
+
+
+
+                ngModelCtrl.$render = function () {
+                    scope.valueColor = ngModelCtrl.$modelValue;
+                };
+
+                scope.$watch('valueColor', function (newValue) {
+                    ngModelCtrl.$setViewValue(newValue);
+                });
+            }
+
+            return {
+                templateUrl: 'views/directives/wb-ui-setting-color.html',
+                restrict: 'E',
+                scope: {
+                    title: '@title',
+                    icon: '@icon'
+                },
+                require: ['ngModel'],
+                link: postLink
+
+            };
+        });
 
 /* 
  * The MIT License (MIT)
@@ -5113,7 +5115,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-color.html',
-    "<div layout=row> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='title'\" layout-padding>{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\" flex>{{title}}</p> <md-color-picker class=color-picker-hide-textbox md-color-clear-button=false ng-model=value> </md-color-picker> </div>"
+    "<div layout=row> <wb-icon ng-if=icon layout-padding>{{icon}}</wb-icon> <div md-color-picker ng-model=valueColor label={{title}} default md-color-picker random=true md-color-clear-button=true md-color-generic-palette=false md-color-history=false flex></div> </div>"
   );
 
 
@@ -5210,7 +5212,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-background.html',
-    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill value=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
+    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill ng-model=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
   );
 
 
