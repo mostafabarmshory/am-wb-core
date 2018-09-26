@@ -640,3 +640,21 @@ of a widget:
 #am-wb-widget-setting .md-tab.md-disabled{
 	display: none;
 }
+
+
+div.tinymce {
+}
+
+/*
+ * First child is an special and we should remove
+ * top margin and padding
+ */
+.wb-widget-text :first-child  {
+	margin-top: 0px  !important;
+	padding-top: 0px !important;
+}
+
+.wb-widget-text :last-child {
+	margin-bottom: 0px  !important;
+	padding-bottom: 0px !important;
+}
