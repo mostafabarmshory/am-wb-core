@@ -3756,7 +3756,8 @@ angular.module('am-wb-core')
 		// functional properties
 		template : '<wb-group ng-model="wbModel"></wb-group>',
 		help : 'http://dpq.co.ir/more-information-link',
-		helpId: 'wb-widget-group'
+		helpId: 'wb-widget-group',
+                setting: ['description']
 	});
 	// HTML text
 	$widget.newWidget({
@@ -4302,11 +4303,11 @@ angular.module('am-wb-core')
 //	var WB_SETTINGS_PAGE_DEFAULT = ['description', 'border',
 //	'background', 'pageLayout', 'marginPadding'];
 
-	var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
+	var WB_SETTINGS_GROUP_DEFAULT = [ 'border',
 		'background', 'pageLayout',
 		'marginPadding', 'size' ];
-	var WB_SETTINGS_WIDGET_DEFAULT = [ 'border',
-		'background', 'marginPadding', 'size' ];
+	var WB_SETTINGS_WIDGET_DEFAULT = [ 'description', 'border',
+		'background', 'pageLayout', 'marginPadding', 'size' ];
 	/**
 	 * Setting page storage
 	 * 
@@ -5052,12 +5053,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-setting-panel-expansion.html',
-    "<div id=WB-SETTING-PANEL> <md-expansion-panel ng-repeat=\"setting in settings | orderBy:priority track by setting.type\" ng-show=setting.visible> <md-expansion-panel-collapsed> <div class=md-title>{{setting.label}}</div> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header ng-click=$panel.collapse()> <div class=md-title>{{setting.label}}</div> <div class=md-summary>{{setting.description}}</div> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </div>"
+    "<div id=WB-SETTING-PANEL> <md-expansion-panel ng-repeat=\"setting in settings| orderBy:priority track by setting.type\" ng-show=setting.visible> <md-expansion-panel-collapsed> <div class=md-title>{{setting.label}}</div> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header ng-click=$panel.collapse()> <div class=md-title>{{setting.label}}</div> <div class=md-summary>{{setting.description}}</div> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-setting-panel-tabs.html',
-    "<div id=am-wb-widget-setting> <md-tabs md-dynamic-height md-border-bottom> <md-tab ng-repeat=\"setting in settings | orderBy:priority track by setting.type\" ng-disabled=!setting.visible id={{setting.key}}> <md-tab-label> <span ng-if=!setting.icon translate=\"\">{{setting.label}}</span> <wb-icon ng-if=setting.icon>{{setting.icon}}</wb-icon> </md-tab-label> <md-tab-body layout-margin> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-tab-body> </md-tab> </md-tabs> </div>"
+    "<div id=am-wb-widget-setting> <md-tabs md-dynamic-height md-border-bottom> <md-tab ng-repeat=\"setting in settings| orderBy:priority track by setting.type\" ng-disabled=!setting.visible id={{setting.key}}> <md-tab-label> <span ng-if=!setting.icon translate=\"\">{{setting.label}}</span> <wb-icon ng-if=setting.icon>{{setting.icon}}</wb-icon> </md-tab-label> <md-tab-body layout-margin> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-tab-body> </md-tab> </md-tabs> </div>"
   );
 
 

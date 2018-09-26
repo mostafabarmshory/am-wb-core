@@ -39,11 +39,11 @@ angular.module('am-wb-core')
 //	var WB_SETTINGS_PAGE_DEFAULT = ['description', 'border',
 //	'background', 'pageLayout', 'marginPadding'];
 
-	var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
+	var WB_SETTINGS_GROUP_DEFAULT = [ 'border',
 		'background', 'pageLayout',
 		'marginPadding', 'size' ];
-	var WB_SETTINGS_WIDGET_DEFAULT = [ 'border',
-		'background', 'marginPadding', 'size' ];
+	var WB_SETTINGS_WIDGET_DEFAULT = [ 'description', 'border',
+		'background', 'pageLayout', 'marginPadding', 'size' ];
 	/**
 	 * Setting page storage
 	 * 
