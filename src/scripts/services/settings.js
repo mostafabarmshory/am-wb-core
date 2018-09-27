@@ -40,10 +40,9 @@ angular.module('am-wb-core')
 //	'background', 'pageLayout', 'marginPadding'];
 
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
-		'background', 'pageLayout',
-		'marginPadding', 'size' ];
+		'background', 'layout', 'marginPadding', 'size' ];
 	var WB_SETTINGS_WIDGET_DEFAULT = [ 'border',
-		'background', 'marginPadding', 'size' ];
+		'background', 'marginPadding', 'layout', 'size' ];
 	/**
 	 * Setting page storage
 	 * 
