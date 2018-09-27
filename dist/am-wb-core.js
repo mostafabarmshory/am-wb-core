@@ -151,89 +151,6 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 /**
  * @ngdoc Directives
- * @name wb-align
- * @description Apply layout align into an element
- * 
- */
-.directive('wbAlign', function() {
-	var classPrefix = 'wb-flex-item-';
-
-	function removeLayout(element, config) {
-		element.removeClass(classPrefix + config.align);
-	}
-
-	/**
-	 * Adds layout config into the element
-	 * 
-	 * @param element
-	 * @param config
-	 * @returns
-	 */
-	function addLayout(element, config) {
-		element.addClass(classPrefix + config.align);
-	}
-
-	/**
-	 * Link view with attributes
-	 * 
-	 * 
-	 * @param scope
-	 * @param element
-	 * @param attrs
-	 * @returns
-	 */
-	function postLink($scope, $element, $attrs) {
-		// Watch for layout
-		$scope.$watch($attrs.wbLayout+'.align', function(newValue, oldValue) {
-			if(newValue===oldValue){
-				return;
-			}
-			if (oldValue) {
-				removeLayout($element, oldValue);
-			}
-			if (newValue) {
-				addLayout($element, newValue);
-			}
-		}, true);
-	}
-
-	/*
-	 * Directive
-	 */
-	return {
-		restrict : 'A',
-		link : postLink,
-		require:[]
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
  * @name wb-background
  * @description Apply background into the element
  */
@@ -451,71 +368,183 @@ angular.module('am-wb-core')
  * Note that, in smal screen devices, the colume layout apply as default.
  */
 .directive('wbLayout', function() {
-	var classDirectionPrefix = 'wb-flex-';
-	var classJustifyPrefix = 'wb-flex-justify-content-';
-	var classAlignPrefix = 'wb-flex-align-items-';
-	/*
-	 * FIXME: maso, 2017: replace class with term
-	 * 
-	 * It is hard to port final design, while it is fulle tied into the
-	 * CSS classes. We must replace layout CSS classes with general terms
-	 * as soon as posible.
-	 */
-	/**
-	 * Remove layout configuration from element
-	 * 
-	 * @param element
-	 * @param config
-	 * @returns
-	 */
-	function removeLayout(element, config) {
-		element.removeClass(classDirectionPrefix + config.direction);
-		element.removeClass(classJustifyPrefix + config.justify);
-		element.removeClass(classAlignPrefix + config.align);
-	}
 
-	/**
-	 * Adds layout config into the element
-	 * 
-	 * @param element
-	 * @param config
-	 * @returns
-	 */
-	function addLayout(element, config) {
-		element.addClass(classDirectionPrefix + config.direction);
-		element.addClass(classJustifyPrefix + config.justify);
-		element.addClass(classAlignPrefix + config.align);
-	}
+    /**
+     * Adds layout config into the element
+     * 
+     * @param element
+     * @param config
+     * @returns
+     */
+    function applyLayout(element, layout) {
+        var flexLayout = {};
 
-	/**
-	 * Link view with attributes
-	 * 
-	 * 
-	 * @param scope
-	 * @param element
-	 * @param attrs
-	 * @returns
-	 */
-	function postLink($scope, $element, $attrs) {
-		// Watch for layout
-		$scope.$watch($attrs.wbLayout+'.layout', function(newValue, oldValue) {
-			if (oldValue) {
-				removeLayout($element, oldValue);
-			}
-			if (newValue) {
-				addLayout($element, newValue);
-			}
-		}, true);
-	}
+        /*
+         * Group
+         * 
+         * check if is group apply flex flow
+         */
+        {
+            flexLayout.display = 'flex';
+            // row
+            if(layout.direction === 'row'){
+                flexLayout['flex-direction'] =  layout.direction_reverse? 'row-reverse' : 'row'; 
+                flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
+                flexLayout['overflow-y'] = 'visible';
+            } else {
+                flexLayout['flex-direction'] =  layout.direction_reverse? 'column-reverse' : 'column'; 
+                flexLayout['overflow-x'] = 'visible';
+                flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+            }
+            
+            // wrap
+            if(layout.wrap){
+                flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
+                // wrap align
+                var alignContent;
+                switch(layout.wrap_align){
+                case 'start':
+                    alignContent = 'flex-start';
+                    break;
+                case 'end':
+                    alignContent = 'flex-end';
+                    break;
+                case 'center':
+                    alignContent = 'center';
+                    break;
+                case 'space-between':
+                    alignContent = 'space-between';
+                    break;
+                case 'space-around':
+                    alignContent = 'space-around';
+                    break;
+                case 'stretch':
+                    alignContent = 'stretch';
+                    break;
+                default:
+                    alignContent = 'stretch';
+                }
+                flexLayout['align-content']= alignContent;
+            } else {
+                flexLayout['flex-wrap'] = 'nowrap';
+            }
+            
 
-	/*
-	 * Directive
-	 */
-	return {
-		restrict : 'A',
-		link : postLink,
-		require:[]
-	};
+            // justify
+            var justify;
+            switch(layout.justify){
+            case 'start':
+                justify = 'flex-start';
+                break;
+            case 'end':
+                justify = 'flex-end';
+                break;
+            case 'center':
+                justify = 'center';
+                break;
+            case 'space-between':
+                justify = 'space-between';
+                break;
+            case 'space-around':
+                justify = 'space-around';
+                break;
+            case 'space-evenly':
+                justify = 'space-evenly';
+                break;
+            default:
+                justify = 'flex-start';
+            }
+            flexLayout['justify-content']= justify;
+
+            // align
+            var align;
+            switch(layout.align){
+            case 'start':
+                align = 'flex-start';
+                break;
+            case 'end':
+                align = 'flex-end';
+                break;
+            case 'center':
+                align = 'center';
+                break;
+            case 'baseline':
+                align = 'baseline';
+                break;
+            case 'stretch':
+                align = 'stretch';
+                break;
+            default:
+                align = 'stretch';
+            }
+            flexLayout['align-items']= align;
+        }
+
+        /*
+         * Widget
+         */
+        {
+            flexLayout.order = layout.order >= 0? layout.order : 0;
+            flexLayout['flex-grow'] = layout.grow >= 0? layout.grow : 0;
+            flexLayout['flex-shrink'] = layout.shrink >= 0? layout.shrink : 1;
+            // TODO: maso, 2018: compute based on size
+            flexLayout['flex-basis'] = 'auto';
+            
+            // align-self
+            // auto | flex-start | flex-end | center | baseline | stretch;
+            var alignSelf;
+            switch(layout.align_self){
+            case 'start':
+                alignSelf = 'flex-start';
+                break;
+            case 'end':
+                alignSelf = 'flex-end';
+                break;
+            case 'center':
+                alignSelf = 'center';
+                break;
+            case 'baseline':
+                alignSelf = 'baseline';
+                break;
+            case 'stretch':
+                alignSelf = 'stretch';
+                break;
+            default:
+                alignSelf = 'auto';
+            }
+            flexLayout['align-self']= alignSelf;
+        }
+        
+        // apply to element
+        element.css(flexLayout);
+    }
+
+    /**
+     * Link view with attributes
+     * 
+     * 
+     * @param scope
+     * @param element
+     * @param attrs
+     * @returns
+     */
+    function postLink($scope, $element, $attrs) {
+        // Watch for layout
+        $scope.$watch($attrs.wbLayout+'.layout', function(layout) {
+            if(layout){
+                applyLayout($element, layout);
+            }
+        }, true);
+    }
+
+    /*
+     * Directive
+     */
+    return {
+        restrict : 'A',
+        link : postLink,
+        require:[]
+    };
 });
 /* 
  * The MIT License (MIT)
@@ -804,6 +833,117 @@ angular.module('am-wb-core')
 		priority: 1,
 		require:['^wbGroup']
 	};
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc Directives
+ * @name wb-layout
+ * @description Apply layout into an element
+ * 
+ * Group and page are the main goles of this directive. By adding the wbLayout,
+ * widget are able to manages it layout automatically.
+ * 
+ * Note that, in smal screen devices, the colume layout apply as default.
+ */
+.directive('wbWidgetLayout', function() {
+
+    /**
+     * Adds layout config into the element
+     * 
+     * @param element
+     * @param config
+     * @returns
+     */
+    function applyLayout(element, layout) {
+        var flexLayout = {};
+        /*
+         * Widget
+         */
+        flexLayout.order = layout.order >= 0? layout.order : 0;
+        flexLayout['flex-grow'] = layout.grow >= 0? layout.grow : 0;
+        flexLayout['flex-shrink'] = layout.shrink >= 0? layout.shrink : 1;
+        // TODO: maso, 2018: compute based on size
+        flexLayout['flex-basis'] = 'auto';
+
+        // align-self
+        // auto | flex-start | flex-end | center | baseline | stretch;
+        var alignSelf;
+        switch(layout.align_self){
+        case 'start':
+            alignSelf = 'flex-start';
+            break;
+        case 'end':
+            alignSelf = 'flex-end';
+            break;
+        case 'center':
+            alignSelf = 'center';
+            break;
+        case 'baseline':
+            alignSelf = 'baseline';
+            break;
+        case 'stretch':
+            alignSelf = 'stretch';
+            break;
+        default:
+            alignSelf = 'auto';
+        }
+        flexLayout['align-self']= alignSelf;
+
+        // apply to element
+        element.css(flexLayout);
+    }
+
+    /**
+     * Link view with attributes
+     * 
+     * 
+     * @param scope
+     * @param element
+     * @param attrs
+     * @returns
+     */
+    function postLink($scope, $element, $attrs) {
+        // Watch for layout
+        $scope.$watch($attrs.wbWidgetLayout+'.layout', function(layout) {
+            if(layout){
+                applyLayout($element, layout);
+            }
+        }, true);
+    }
+
+    /*
+     * Directive
+     */
+    return {
+        restrict : 'A',
+        link : postLink,
+        require:[]
+    };
 });
 /* 
  * The MIT License (MIT)
@@ -3383,281 +3523,300 @@ angular.module('am-wb-core')
  * Load widgets
  */
 .run(function($settings) {
-	$settings.newPage({
-		type : 'general',
-		label : 'general',
-		templateUrl : 'views/settings/wb-general.html'
-	});
-	$settings.newPage({
-		type : 'background',
-		label : 'Background',
-		icon : 'image',
-		description : '',
-		templateUrl : 'views/settings/wb-background.html'
-	});
-	$settings.newPage({
-		type : 'text',
-		label : 'Text',
-		icon: 'text_fields',
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			var scope = $scope;
-			scope.tinymceOptions = {
-					/*
-					 * onChange: function(e) { // put logic here for
-					 * keypress and cut/paste changes },
-					 */
-					/*
-					 * selector: 'textarea', inline: false, plugins :
-					 * 'advlist autolink link image lists charmap print
-					 * preview', skin: 'lightgray', theme : 'modern',
-					 * font_formats: 'Arial=arial,helvetica,sans-serif;'
-					 */
-					selector : 'textarea',
-					height : 500,
-					theme : 'modern',
-					plugins : [
-						'advlist autolink lists link image charmap print preview hr anchor pagebreak',
-						'searchreplace wordcount visualblocks visualchars code fullscreen',
-						'insertdatetime media nonbreaking save table contextmenu directionality',
-						'emoticons template paste textcolor colorpicker textpattern imagetools' ],
-						toolbar1 : 'fontselect fontsizeselect | insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
-						toolbar2 : 'print preview media | forecolor backcolor emoticons',
-						image_advtab : true,
-						templates : [ {
-							title : 'Test template 1',
-							content : 'Test 1'
-						}, {
-							title : 'Test template 2',
-							content : 'Test 2'
-						} ],
-						content_css : [
-							'//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
-							'//www.tinymce.com/css/codepen.min.css' ]
-			};
 
-		},
-		templateUrl : 'views/settings/wb-text.html'
-	});
-	
-	$settings.newPage({
-		type : 'description',
-		label : 'Description',
-		templateUrl : 'views/settings/wb-description.html'
-	});
 
-	$settings.newPage({
-		type : 'layout',
-		label : 'Layout',
-		description : 'Manages layout of the current item.',
-		icon : 'dashboard',
-		templateUrl : 'views/settings/wb-layout.html'
-	});
-	$settings.newPage({
-		type : 'border',
-		label : 'Border',
-		icon : 'border_all',
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			var scope = $scope;
-			scope.styles = [ {
-				title : 'No Border',
-				value : 'none'
-			}, {
-				title : 'Solid',
-				value : 'solid'
-			}, {
-				title : 'Dotted',
-				value : 'dotted'
-			}, {
-				title : 'Dashed',
-				value : 'dashed'
-			}, {
-				title : 'Double',
-				value : 'double'
-			}, {
-				title : 'Groove',
-				value : 'groove'
-			}, {
-				title : 'Ridge',
-				value : 'ridge'
-			}, {
-				title : 'Inset',
-				value : 'inset'
-			}, {
-				title : 'Outset',
-				value : 'outset'
-			} ];
-		},
-		templateUrl : 'views/settings/wb-border.html'
-	});
+    $settings.newPage({
+        type : 'background',
+        label : 'Background',
+        icon : 'image',
+        description : '',
+        templateUrl : 'views/settings/wb-background.html'
+    });
 
-	/**
-	 * @ngdoc WB-Settings
-	 * @name pageLayout
-	 * @description Manages element layout
-	 * 
-	 * Layout part is consists of the following attributes:
-	 * 
-	 * <ul>
-	 * <li>direction</li>
-	 * <li>align</li>
-	 * <li>justify</li>
-	 * </ul>
-	 * 
-	 * @see wb-layout
-	 */
-	$settings.newPage({
-		type : 'pageLayout',
-		label : 'Page Layout',
-		icon : 'dashboard',
-		templateUrl : 'views/settings/wb-layout-page.html',
-		controllerAs : 'ctrl',
-		/*
-		 * Manages setting page @ngInject
-		 */
-		controller : function($scope) {
-			$scope.direction = [ {
-				title : 'column',
-				icon : 'wb-horizontal-boxes',
-				value : 'column'
-			}, {
-				title : 'row',
-				icon : 'wb-vertical-boxes',
-				value : 'row'
-			} ];
+    $settings.newPage({
+        type : 'text',
+        label : 'Text',
+        icon: 'text_fields',
+        /*
+         * @ngInject
+         */
+        controller : function($scope) {
+            var scope = $scope;
+            scope.tinymceOptions = {
+                    /*
+                     * onChange: function(e) { // put logic here for
+                     * keypress and cut/paste changes },
+                     */
+                    /*
+                     * selector: 'textarea', inline: false, plugins :
+                     * 'advlist autolink link image lists charmap print
+                     * preview', skin: 'lightgray', theme : 'modern',
+                     * font_formats: 'Arial=arial,helvetica,sans-serif;'
+                     */
+                    selector : 'textarea',
+                    height : 500,
+                    theme : 'modern',
+                    plugins : [
+                        'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+                        'searchreplace wordcount visualblocks visualchars code fullscreen',
+                        'insertdatetime media nonbreaking save table contextmenu directionality',
+                        'emoticons template paste textcolor colorpicker textpattern imagetools' ],
+                        toolbar1 : 'fontselect fontsizeselect | insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+                        toolbar2 : 'print preview media | forecolor backcolor emoticons',
+                        image_advtab : true,
+                        templates : [ {
+                            title : 'Test template 1',
+                            content : 'Test 1'
+                        }, {
+                            title : 'Test template 2',
+                            content : 'Test 2'
+                        } ],
+                        content_css : [
+                            '//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
+                            '//www.tinymce.com/css/codepen.min.css' ]
+            };
 
-			$scope.justify = {
-					'row' : [ {
-						title : 'Start',
-						icon : 'sort_start_horiz',
-						value : 'start'
-					}, {
-						title : 'End',
-						icon : 'sort_end_horiz',
-						value : 'end'
-					}, {
-						title : 'Center',
-						icon : 'sort_center_horiz',
-						value : 'center'
-					}, {
-						title : 'Space Around',
-						icon : 'sort_space_around_horiz',
-						value : 'space-around'
-					}, {
-						title : 'Space Between',
-						icon : 'sort_space_between_horiz',
-						value : 'space-between'
-					} ],
-					'column' : [ {
-						title : 'Start',
-						icon : 'sort_start_vert',
-						value : 'start'
-					}, {
-						title : 'End',
-						icon : 'sort_end_vert',
-						value : 'end'
-					}, {
-						title : 'Center',
-						icon : 'sort_center_vert',
-						value : 'center'
-					}, {
-						title : 'Space Around',
-						icon : 'sort_space_around_vert',
-						value : 'space-around'
-					}, {
-						title : 'Space Between',
-						icon : 'sort_space_between_vert',
-						value : 'space-between'
-					} ]
-			};
+        },
+        templateUrl : 'views/settings/wb-text.html'
+    });
 
-			$scope.align = {
-					'column' : [ {
-						title : 'Stretch',
-						icon : 'format_align_justify',
-						value : 'stretch'
-					}, {
-						title : 'Start',
-						icon : 'format_align_left',
-						value : 'start'
-					}, {
-						title : 'End',
-						icon : 'format_align_right',
-						value : 'end'
-					}, {
-						title : 'Center',
-						icon : 'format_align_center',
-						value : 'center'
-					} ],
-					'row' : [ {
-						title : 'Stretch',
-						icon : 'align_justify_vertical',
-						value : 'stretch'
-					}, {
-						title : 'Start',
-						icon : 'align_start_vertical',
-						value : 'start'
-					}, {
-						title : 'End',
-						icon : 'align_end_vertical',
-						value : 'end'
-					}, {
-						title : 'Center',
-						icon : 'align_center_vertical',
-						value : 'center'
-					} ]
-			};
-		}
-	});
-//	$settings.newPage({
-//		type : 'selfLayout',
-//		label : 'Self Layout',
-//		controllerAs : 'ctrl',
-//		/*
-//		 * @ngInject
-//		 */
-//		controller : function($scope) {
-//			$scope.selfAlign = [ {
-//				title : 'auto',
-//				icon : 'looks_one',
-//				value : 'auto'
-//			}, {
-//				title : 'Start',
-//				icon : 'looks_two',
-//				value : 'start'
-//			}, {
-//				title : 'End',
-//				icon : 'looks_3',
-//				value : 'end'
-//			}, {
-//				title : 'Center',
-//				icon : 'looks_4',
-//				value : 'center'
-//			}, {
-//				title : 'stretch',
-//				icon : 'looks_5',
-//				value : 'stretch'
-//			} ];
-//		},
-//		templateUrl : 'views/settings/wb-layout-self.html'
-//	});
-	$settings.newPage({
-		type : 'marginPadding',
-		label : 'Margin/Padding',
-		icon: 'border_clear',
-		templateUrl : 'views/settings/wb-margin-padding.html'
-	});
-	$settings.newPage({
-		type : 'size',
-		label : 'Size',
-		icon: 'photo_size_select_large',
-		templateUrl : 'views/settings/wb-size.html'
-	});
+    $settings.newPage({
+        type : 'description',
+        label : 'Description',
+        templateUrl : 'views/settings/wb-description.html'
+    });
+
+    $settings.newPage({
+        type : 'layout',
+        label : 'Layout',
+        description : 'Manages layout of the current item.',
+        icon : 'dashboard',
+        templateUrl : 'views/settings/wb-layout.html'
+    });
+    $settings.newPage({
+        type : 'border',
+        label : 'Border',
+        icon : 'border_all',
+        /*
+         * @ngInject
+         */
+        controller : function($scope) {
+            var scope = $scope;
+            scope.styles = [ {
+                title : 'No Border',
+                value : 'none'
+            }, {
+                title : 'Solid',
+                value : 'solid'
+            }, {
+                title : 'Dotted',
+                value : 'dotted'
+            }, {
+                title : 'Dashed',
+                value : 'dashed'
+            }, {
+                title : 'Double',
+                value : 'double'
+            }, {
+                title : 'Groove',
+                value : 'groove'
+            }, {
+                title : 'Ridge',
+                value : 'ridge'
+            }, {
+                title : 'Inset',
+                value : 'inset'
+            }, {
+                title : 'Outset',
+                value : 'outset'
+            } ];
+        },
+        templateUrl : 'views/settings/wb-border.html'
+    });
+
+    /**
+     * @ngdoc Widget Settings
+     * @name layout
+     * @description Manages element layout
+     * 
+     * Layout is consists of the following attributes for a group:
+     * 
+     * <ul>
+     *     <li>direction</li>
+     *     <li>direction-inverse</li>
+     *     <li>wrap</li>
+     *     <li>wrap-inverse</li>
+     *     <li>align</li>
+     *     <li>justify</li>
+     * </ul>
+     * 
+     * and following ones for a widget (or group):
+     * 
+     * <ul>
+     *     <li>grow</li>
+     *     <li>shrink</li>
+     *     <li>order</li>
+     * </ul>
+     * 
+     * See the layout documents for more details.
+     * 
+     * @see wb-layout
+     */
+    $settings.newPage({
+        type : 'layout',
+        label : 'Layout',
+        icon : 'dashboard',
+        templateUrl : 'views/settings/wb-layout.html',
+        controllerAs : 'ctrl',
+        /*
+         * Manages setting page 
+         * 
+         * @ngInject
+         */
+        controller : function($scope) {
+            $scope.direction = [ {
+                title : 'column',
+                icon : 'wb-horizontal-boxes',
+                value : 'column'
+            }, {
+                title : 'row',
+                icon : 'wb-vertical-boxes',
+                value : 'row'
+            } ];
+
+            $scope.justify = {
+                    'row' : [ {
+                        title : 'Start',
+                        icon : 'sort_start_horiz',
+                        value : 'start'
+                    }, {
+                        title : 'End',
+                        icon : 'sort_end_horiz',
+                        value : 'end'
+                    }, {
+                        title : 'Center',
+                        icon : 'sort_center_horiz',
+                        value : 'center'
+                    }, {
+                        title : 'Space Around',
+                        icon : 'sort_space_around_horiz',
+                        value : 'space-around'
+                    }, {
+                        title : 'Space Between',
+                        icon : 'sort_space_between_horiz',
+                        value : 'space-between'
+                    } ],
+                    'column' : [ {
+                        title : 'Start',
+                        icon : 'sort_start_vert',
+                        value : 'start'
+                    }, {
+                        title : 'End',
+                        icon : 'sort_end_vert',
+                        value : 'end'
+                    }, {
+                        title : 'Center',
+                        icon : 'sort_center_vert',
+                        value : 'center'
+                    }, {
+                        title : 'Space Around',
+                        icon : 'sort_space_around_vert',
+                        value : 'space-around'
+                    }, {
+                        title : 'Space Between',
+                        icon : 'sort_space_between_vert',
+                        value : 'space-between'
+                    } ]
+            };
+
+            $scope.align = {
+                    'column' : [ {
+                        title : 'Stretch',
+                        icon : 'format_align_justify',
+                        value : 'stretch'
+                    }, {
+                        title : 'Start',
+                        icon : 'format_align_left',
+                        value : 'start'
+                    }, {
+                        title : 'End',
+                        icon : 'format_align_right',
+                        value : 'end'
+                    }, {
+                        title : 'Center',
+                        icon : 'format_align_center',
+                        value : 'center'
+                    } ],
+                    'row' : [ {
+                        title : 'Stretch',
+                        icon : 'align_justify_vertical',
+                        value : 'stretch'
+                    }, {
+                        title : 'Start',
+                        icon : 'align_start_vertical',
+                        value : 'start'
+                    }, {
+                        title : 'End',
+                        icon : 'align_end_vertical',
+                        value : 'end'
+                    }, {
+                        title : 'Center',
+                        icon : 'align_center_vertical',
+                        value : 'center'
+                    } ]
+            };
+
+            $scope.selfAlign ={
+                    'column' : [ {
+                        title : 'Stretch',
+                        icon : 'format_align_justify',
+                        value : 'stretch'
+                    }, {
+                        title : 'Start',
+                        icon : 'format_align_left',
+                        value : 'start'
+                    }, {
+                        title : 'End',
+                        icon : 'format_align_right',
+                        value : 'end'
+                    }, {
+                        title : 'Center',
+                        icon : 'format_align_center',
+                        value : 'center'
+                    } ],
+                    'row' : [ {
+                        title : 'Stretch',
+                        icon : 'align_justify_vertical',
+                        value : 'stretch'
+                    }, {
+                        title : 'Start',
+                        icon : 'align_start_vertical',
+                        value : 'start'
+                    }, {
+                        title : 'End',
+                        icon : 'align_end_vertical',
+                        value : 'end'
+                    }, {
+                        title : 'Center',
+                        icon : 'align_center_vertical',
+                        value : 'center'
+                    } ]
+            };
+        }
+    });
+
+    $settings.newPage({
+        type : 'marginPadding',
+        label : 'Margin/Padding',
+        icon: 'border_clear',
+        templateUrl : 'views/settings/wb-margin-padding.html'
+    });
+    $settings.newPage({
+        type : 'size',
+        label : 'Size',
+        icon: 'photo_size_select_large',
+        templateUrl : 'views/settings/wb-size.html'
+    });
 });
 
 /**
@@ -4305,10 +4464,9 @@ angular.module('am-wb-core')
 //	'background', 'pageLayout', 'marginPadding'];
 
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
-		'background', 'pageLayout',
-		'marginPadding', 'size' ];
+		'background', 'layout', 'marginPadding', 'size' ];
 	var WB_SETTINGS_WIDGET_DEFAULT = [ 'border',
-		'background', 'marginPadding', 'size' ];
+		'background', 'marginPadding', 'layout', 'size' ];
 	/**
 	 * Setting page storage
 	 * 
@@ -4509,269 +4667,268 @@ angular.module('am-wb-core').service('$wbUi', function($mdDialog, $q, $http) {
  * Utility class of WB
  */
 angular.module('am-wb-core').service('$wbUtil', function($q, $templateRequest, $sce) {
-	'use strict';
-	var service = this;
+    'use strict';
+    var service = this;
 
-	function cleanMap(oldStyle, newStyle, map) {
-		for (var i = 0; i < map.length; i++) {
-			if (oldStyle[map[i][0]]) {
-				newStyle[map[i][1]] = oldStyle[map[i][0]];
-				delete oldStyle[map[i][0]];
-			}
-		}
-	}
+    function cleanMap(oldStyle, newStyle, map) {
+        for (var i = 0; i < map.length; i++) {
+            if (oldStyle[map[i][0]]) {
+                newStyle[map[i][1]] = oldStyle[map[i][0]];
+                delete oldStyle[map[i][0]];
+            }
+        }
+    }
 
-	function getTemplateOf(page)
-	{
-		var template;
-		var templateUrl;
-		if (angular.isDefined(template = page.template)) {
-			if (angular.isFunction(template)) {
-				template = template(page.params);
-			}
-		} else if (angular
-				.isDefined(templateUrl = page.templateUrl)) {
-			if (angular.isFunction(templateUrl)) {
-				templateUrl = templateUrl(page.params);
-			}
-			if (angular.isDefined(templateUrl)) {
-				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
-				template = $templateRequest(templateUrl);
-			}
-		}
-		return template;
-	}
+    function getTemplateOf(page)
+    {
+        var template;
+        var templateUrl;
+        if (angular.isDefined(template = page.template)) {
+            if (angular.isFunction(template)) {
+                template = template(page.params);
+            }
+        } else if (angular
+                .isDefined(templateUrl = page.templateUrl)) {
+            if (angular.isFunction(templateUrl)) {
+                templateUrl = templateUrl(page.params);
+            }
+            if (angular.isDefined(templateUrl)) {
+                page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+                template = $templateRequest(templateUrl);
+            }
+        }
+        return template;
+    }
 
-	/**
-	 * Loading template of the page
-	 * 
-	 * @name getTemplateFor
-	 * @memberof $wbUtil
-	 * @param page
-	 *            {object} properties of a page, widget , ..
-	 * @return promise to load template on resolve.
-	 */
-	function getTemplateFor(page)
-	{
-		return $q.when(getTemplateOf(page));
-	}
+    /**
+     * Loading template of the page
+     * 
+     * @name getTemplateFor
+     * @memberof $wbUtil
+     * @param page
+     *            {object} properties of a page, widget , ..
+     * @return promise to load template on resolve.
+     */
+    function getTemplateFor(page)
+    {
+        return $q.when(getTemplateOf(page));
+    }
 
-	function cleanEvetns(model)
-	{
-		// event
-		if (!model.event) {
-			model.event = {};
-		}
-	}
+    function cleanEvetns(model)
+    {
+        // event
+        if (!model.event) {
+            model.event = {};
+        }
+    }
 
-	function cleanLayout(model)
-	{
-		if (model.type !== 'Group' && model.type !== 'Page') {
-			return;
-		}
-		if (!model.style.layout) {
-			model.style.layout = {};
-		}
-		// convert
-		var newStyle = model.style.layout;
-		var oldStyle = model.style;
+    function cleanLayout(model)
+    {
+        if (!model.style.layout) {
+            model.style.layout = {};
+        }
+        if (model.type === 'Group' || model.type === 'Page') {
+            // convert
+            var newStyle = model.style.layout;
+            var oldStyle = model.style;
 
-		if (oldStyle.flexDirection) {
-			if (oldStyle.flexDirection === 'wb-flex-row') {
-				newStyle.direction = 'row';
-			} else {
-				newStyle.direction = 'column';
-			}
-			delete oldStyle.flexDirection;
-		}
-		if (!newStyle.direction) {
-			newStyle.direction = 'column';
-		}
+            if (oldStyle.flexDirection) {
+                if (oldStyle.flexDirection === 'wb-flex-row') {
+                    newStyle.direction = 'row';
+                } else {
+                    newStyle.direction = 'column';
+                }
+                delete oldStyle.flexDirection;
+            }
+            if (!newStyle.direction) {
+                newStyle.direction = 'column';
+            }
 
-		switch (oldStyle.flexAlignItem) {
-			case 'wb-flex-align-items-center':
-				newStyle.align = 'center';
-				break;
-			case 'wb-flex-align-items-end':
-				newStyle.align = 'end';
-				break;
-			case 'wb-flex-align-items-start':
-				newStyle.align = 'start';
-				break;
-			case 'wb-flex-align-items-stretch':
-				newStyle.align = 'stretch';
-				break;
-			default:
-				newStyle.align = 'stretch';
-		}
-		delete oldStyle.flexAlignItem;
+            switch (oldStyle.flexAlignItem) {
+            case 'wb-flex-align-items-center':
+                newStyle.align = 'center';
+                break;
+            case 'wb-flex-align-items-end':
+                newStyle.align = 'end';
+                break;
+            case 'wb-flex-align-items-start':
+                newStyle.align = 'start';
+                break;
+            case 'wb-flex-align-items-stretch':
+                newStyle.align = 'stretch';
+                break;
+            default:
+                newStyle.align = 'stretch';
+            }
+            delete oldStyle.flexAlignItem;
 
-		switch (oldStyle.justifyContent) {
-			case 'wb-flex-justify-content-center':
-				newStyle.justify = 'center';
-				break;
-			case 'wb-flex-justify-content-end':
-				newStyle.justify = 'end';
-				break;
-			case 'wb-flex-justify-content-start':
-				newStyle.justify = 'start';
-				break;
-			case 'wb-flex-justify-content-space-between':
-				newStyle.justify = 'space-between';
-				break;
-			case 'wb-flex-justify-content-space-around':
-				newStyle.justify = 'space-around';
-				break;
-			default:
-				newStyle.justify = 'center';
-		}
-		delete oldStyle.justifyContent;
-	}
+            switch (oldStyle.justifyContent) {
+            case 'wb-flex-justify-content-center':
+                newStyle.justify = 'center';
+                break;
+            case 'wb-flex-justify-content-end':
+                newStyle.justify = 'end';
+                break;
+            case 'wb-flex-justify-content-start':
+                newStyle.justify = 'start';
+                break;
+            case 'wb-flex-justify-content-space-between':
+                newStyle.justify = 'space-between';
+                break;
+            case 'wb-flex-justify-content-space-around':
+                newStyle.justify = 'space-around';
+                break;
+            default:
+                newStyle.justify = 'center';
+            }
+            delete oldStyle.justifyContent;
+        }
+    }
 
-	function cleanSize(model)
-	{
-		if (!model.style.size) {
-			model.style.size = {};
-		}
-		var newStyle = model.style.size;
-		var oldStyle = model.style;
-		var map = [ [ 'width', 'width' ],
-			[ 'height', 'height' ] ];
-		cleanMap(oldStyle, newStyle, map);
-	}
+    function cleanSize(model)
+    {
+        if (!model.style.size) {
+            model.style.size = {};
+        }
+        var newStyle = model.style.size;
+        var oldStyle = model.style;
+        var map = [ [ 'width', 'width' ],
+            [ 'height', 'height' ] ];
+        cleanMap(oldStyle, newStyle, map);
+    }
 
-	function cleanBackground(model)
-	{
-		if (!model.style.background) {
-			model.style.background = {};
-		}
-		var newStyle = model.style.background;
-		var oldStyle = model.style;
-		var map = [ [ 'backgroundImage', 'image' ],
-			[ 'backgroundColor', 'color' ],
-			[ 'backgroundSize', 'size' ],
-			[ 'backgroundRepeat', 'repeat' ],
-			[ 'backgroundPosition', 'position' ] ];
-		cleanMap(oldStyle, newStyle, map);
-	}
+    function cleanBackground(model)
+    {
+        if (!model.style.background) {
+            model.style.background = {};
+        }
+        var newStyle = model.style.background;
+        var oldStyle = model.style;
+        var map = [ [ 'backgroundImage', 'image' ],
+            [ 'backgroundColor', 'color' ],
+            [ 'backgroundSize', 'size' ],
+            [ 'backgroundRepeat', 'repeat' ],
+            [ 'backgroundPosition', 'position' ] ];
+        cleanMap(oldStyle, newStyle, map);
+    }
 
-	function cleanBorder(model)
-	{
-		if (!model.style.border) {
-			model.style.border = {};
-		}
-		var oldStyle = model.style;
-		var newStyle = model.style.border;
+    function cleanBorder(model)
+    {
+        if (!model.style.border) {
+            model.style.border = {};
+        }
+        var oldStyle = model.style;
+        var newStyle = model.style.border;
 
-		if (oldStyle.borderRadius) {
-			if (oldStyle.borderRadius.uniform) {
-				newStyle.radius = oldStyle.borderRadius.all + 'px';
-			}
-			// TODO: maso, 2018: support other models
-		}
-		// delete old values
-		delete model.style.borderColor;
-		delete model.style.borderRadius;
-		delete model.style.borderStyleColorWidth;
-		delete model.style.borderStyle;
-		delete model.style.borderWidth;
-	}
+        if (oldStyle.borderRadius) {
+            if (oldStyle.borderRadius.uniform) {
+                newStyle.radius = oldStyle.borderRadius.all + 'px';
+            }
+            // TODO: maso, 2018: support other models
+        }
+        // delete old values
+        delete model.style.borderColor;
+        delete model.style.borderRadius;
+        delete model.style.borderStyleColorWidth;
+        delete model.style.borderStyle;
+        delete model.style.borderWidth;
+    }
 
-	function cleanSpace(model)
-	{
-		// Margin and padding
-		if (model.style.padding && angular.isObject(model.style.padding)) {
-			var padding = '';
-			if (model.style.padding.isUniform) {
-				padding = model.style.padding.uniform;
-			} else {
-				padding = model.style.padding.top || '0px' + ' ' + 
-				model.style.padding.right || '0px' + ' ' + 
-				model.style.padding.bottom || '0px' + ' ' + 
-				model.style.padding.left || '0px' + ' ';
-			}
-			model.style.padding = padding;
-		}
+    function cleanSpace(model)
+    {
+        // Margin and padding
+        if (model.style.padding && angular.isObject(model.style.padding)) {
+            var padding = '';
+            if (model.style.padding.isUniform) {
+                padding = model.style.padding.uniform;
+            } else {
+                padding = model.style.padding.top || '0px' + ' ' + 
+                model.style.padding.right || '0px' + ' ' + 
+                model.style.padding.bottom || '0px' + ' ' + 
+                model.style.padding.left || '0px' + ' ';
+            }
+            model.style.padding = padding;
+        }
 
-		if (model.style.margin && angular.isObject(model.style.margin)) {
-			var margin = '';
-			if (model.style.margin.isUniform) {
-				margin = model.style.margin.uniform;
-			} else {
-				margin = model.style.margin.top || '0px' + ' ' + 
-				model.style.margin.right || '0px' + ' ' + 
-				model.style.margin.bottom || '0px' + ' ' + 
-				model.style.margin.left || '0px' + ' ';
-			}
-			model.style.margin = margin;
-		}
+        if (model.style.margin && angular.isObject(model.style.margin)) {
+            var margin = '';
+            if (model.style.margin.isUniform) {
+                margin = model.style.margin.uniform;
+            } else {
+                margin = model.style.margin.top || '0px' + ' ' + 
+                model.style.margin.right || '0px' + ' ' + 
+                model.style.margin.bottom || '0px' + ' ' + 
+                model.style.margin.left || '0px' + ' ';
+            }
+            model.style.margin = margin;
+        }
 
-	}
+    }
 
-	function cleanAlign(model)
-	{
-		if (!model.style.align) {
-			model.style.align = {};
-		}
-	}
+    function cleanAlign(model)
+    {
+        if (!model.style.align) {
+            model.style.align = {};
+        }
+    }
 
-	function cleanStyle(model)
-	{
-		if (!model.style) {
-			model.style = {};
-		}
-		cleanLayout(model);
-		cleanSize(model);
-		cleanBackground(model);
-		cleanBorder(model);
-		cleanSpace(model);
-		cleanAlign(model);
-	}
+    function cleanStyle(model)
+    {
+        if (!model.style) {
+            model.style = {};
+        }
+        cleanLayout(model);
+        cleanSize(model);
+        cleanBackground(model);
+        cleanBorder(model);
+        cleanSpace(model);
+        cleanAlign(model);
+    }
 
-	function cleanInternal(model)
-	{
-		cleanEvetns(model);
-		cleanStyle(model);
-		if (model.type === 'Group' || model.type === 'Page') {
-			if (!model.contents) {
-				model.contents = [];
-			}
-			if (model.contents.length) {
-				for (var i = 0; i < model.contents.length; i++) {
-					cleanInternal(model.contents[i]);
-				}
-			}
-		}
-		return model;
-	}
+    function cleanInternal(model)
+    {
+        cleanEvetns(model);
+        cleanStyle(model);
+        if (model.type === 'Group' || model.type === 'Page') {
+            if (!model.contents) {
+                model.contents = [];
+            }
+            if (model.contents.length) {
+                for (var i = 0; i < model.contents.length; i++) {
+                    cleanInternal(model.contents[i]);
+                }
+            }
+        }
+        return model;
+    }
 
-	/**
-	 * Clean data model
-	 */
-	function clean(model, force)
-	{
-		if (model.version === 'wb1' && !force) {
-			return model;
-		}
-		var newModel = cleanInternal(model);
-		newModel.version = 'wb1';
-		return newModel;
-	}
+    /**
+     * Clean data model
+     */
+    function clean(model, force)
+    {
+        if (model.version === 'wb1' && !force) {
+            return model;
+        }
+        var newModel = cleanInternal(model);
+        newModel.version = 'wb1';
+        return newModel;
+    }
 
-	service.cleanMap = cleanMap;
-	service.clean = clean;
-	service.cleanInternal = cleanInternal;
-	service.cleanStyle = cleanStyle;
-	service.cleanAlign = cleanAlign;
-	service.cleanSpace = cleanSpace;
-	service.cleanBorder = cleanBorder;
-	service.cleanBackground = cleanBackground;
-	service.cleanSize = cleanSize;
-	service.cleanLayout = cleanLayout;
-	service.cleanEvetns = cleanEvetns;
+    service.cleanMap = cleanMap;
+    service.clean = clean;
+    service.cleanInternal = cleanInternal;
+    service.cleanStyle = cleanStyle;
+    service.cleanAlign = cleanAlign;
+    service.cleanSpace = cleanSpace;
+    service.cleanBorder = cleanBorder;
+    service.cleanBackground = cleanBackground;
+    service.cleanSize = cleanSize;
+    service.cleanLayout = cleanLayout;
+    service.cleanEvetns = cleanEvetns;
 
-	service.getTemplateFor = getTemplateFor;
-	service.getTemplateOf = getTemplateOf;
+    service.getTemplateFor = getTemplateFor;
+    service.getTemplateOf = getTemplateOf;
 });
 
 /* 
@@ -5170,7 +5327,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widget.html',
-    "<div class=wb-widget name={{wbModel.name}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-type=wbModel.type dnd-effect-allowed=copyMove dnd-callback=1 dnd-moved=ctrl.delete() wb-widget-size=wbModel.style wb-align=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event md-theme-watch=true ng-class=\"{\n" +
+    "<div class=wb-widget name={{wbModel.name}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-type=wbModel.type dnd-effect-allowed=copyMove dnd-callback=1 dnd-moved=ctrl.delete() wb-widget-size=wbModel.style wb-widget-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event md-theme-watch=true ng-class=\"{\n" +
     "\t\t'wb-widget-edit': ctrl.isEditable(),\n" +
     "\t\t'wb-widget-select': ctrl.isSelected()\n" +
     "\t}\" transclude></div>"
@@ -5222,22 +5379,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-description.html',
-    " <md-input-container> <label translate>Lable</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate>Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate>Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=\"{{Cover | translate}}\" ng-model=wbModel.cover> </wb-ui-setting-image>"
+    " <md-input-container> <label translate=\"\">Label</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate=\"\">Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate=\"\">Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=\"{{Cover | translate}}\" ng-model=wbModel.cover> </wb-ui-setting-image>"
   );
 
 
-  $templateCache.put('views/settings/wb-general.html',
-    ""
-  );
-
-
-  $templateCache.put('views/settings/wb-layout-page.html',
-    " <wb-ui-setting-choose title=Direction icon=wb-direction items=direction ng-model=wbModel.style.layout.direction> </wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction=='row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.layout.direction=='row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}\" items=align[wbModel.style.layout.direction] ng-model=wbModel.style.layout.align> </wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction!='row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.layout.direction!='row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}\" items=justify[wbModel.style.layout.direction] ng-model=wbModel.style.layout.justify> </wb-ui-setting-choose>"
-  );
-
-
-  $templateCache.put('views/settings/wb-layout-self.html',
-    " <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction!='row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.layout.direction!='row')?'swap_vert':'swap_horiz'}}\" items=selfAlign ng-model=wbModel.style.align.align> </wb-ui-setting-choose>"
+  $templateCache.put('views/settings/wb-layout.html',
+    " <wb-ui-setting-choose ng-if=\"wbModel.type==='Group'\" title=Direction icon=wb-direction items=direction ng-model=wbModel.style.layout.direction> </wb-ui-setting-choose>  <md-switch ng-if=\"wbModel.type==='Group'\" ng-model=wbModel.style.layout.wrap aria-label=\"Layout wrap\"> <span ng-if=\"wbModel.style.layout.direction==='row'\" translate=\"\">Multi row</span> <span ng-if=\"wbModel.style.layout.direction!=='row'\" translate=\"\">Multi column</span> </md-switch>  <wb-ui-setting-choose ng-if=\"wbModel.type==='Group'\" title=\"{{(wbModel.style.layout.direction=='row')?'Vert.':'Horz.'}}\" items=align[wbModel.style.layout.direction] ng-model=wbModel.style.layout.align> </wb-ui-setting-choose>  <wb-ui-setting-choose ng-if=\"wbModel.type==='Group'\" title=\"{{(wbModel.style.layout.direction!='row')?'Vert.':'Horz.'}}\" items=justify[wbModel.style.layout.direction] ng-model=wbModel.style.layout.justify> </wb-ui-setting-choose>   <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction!='row')?'Self Vert.':'Self Horz.'}}\" items=\"selfAlign['row']\" ng-model=wbModel.style.layout.align_self> </wb-ui-setting-choose>"
   );
 
 
