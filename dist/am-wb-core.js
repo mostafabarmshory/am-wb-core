@@ -451,62 +451,67 @@ angular.module('am-wb-core')
  * Note that, in smal screen devices, the colume layout apply as default.
  */
 .directive('wbLayout', function() {
-	var classDirectionPrefix = 'wb-flex-';
-	var classJustifyPrefix = 'wb-flex-justify-content-';
-	var classAlignPrefix = 'wb-flex-align-items-';
-	/*
-	 * FIXME: maso, 2017: replace class with term
-	 * 
-	 * It is hard to port final design, while it is fulle tied into the
-	 * CSS classes. We must replace layout CSS classes with general terms
-	 * as soon as posible.
-	 */
-	/**
-	 * Remove layout configuration from element
-	 * 
-	 * @param element
-	 * @param config
-	 * @returns
-	 */
-	function removeLayout(element, config) {
-		element.removeClass(classDirectionPrefix + config.direction);
-		element.removeClass(classJustifyPrefix + config.justify);
-		element.removeClass(classAlignPrefix + config.align);
-	}
 
-	/**
-	 * Adds layout config into the element
-	 * 
-	 * @param element
-	 * @param config
-	 * @returns
-	 */
-	function addLayout(element, config) {
-		element.addClass(classDirectionPrefix + config.direction);
-		element.addClass(classJustifyPrefix + config.justify);
-		element.addClass(classAlignPrefix + config.align);
-	}
+    /**
+     * Adds layout config into the element
+     * 
+     * @param element
+     * @param config
+     * @returns
+     */
+    function applyLayout(element, layout) {
+        var flexLayout = {};
 
-	/**
-	 * Link view with attributes
-	 * 
-	 * 
-	 * @param scope
-	 * @param element
-	 * @param attrs
-	 * @returns
-	 */
-	function postLink($scope, $element, $attrs) {
-		// Watch for layout
-		$scope.$watch($attrs.wbLayout+'.layout', function(newValue, oldValue) {
-			if (oldValue) {
-				removeLayout($element, oldValue);
-			}
-			if (newValue) {
-				addLayout($element, newValue);
-			}
-		}, true);
-	}
+        /*
+         * Group
+         * 
+         * check if is group apply flex flow
+         */
+        {
+            flexLayout.display = 'flex';
+            // row
+            if(layout.direction === 'row'){
+                flexLayout['flex-direction'] =  layout.direction_reverse? 'row-reverse' : 'row'; 
+                flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
+                flexLayout['overflow-y'] = 'visible';
+            } else {
+                flexLayout['flex-direction'] =  layout.direction_reverse? 'column-reverse' : 'column'; 
+                flexLayout['overflow-x'] = 'visible';
+                flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+            }
+            
+            // wrap
+            if(layout.wrap){
+                flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
+                // wrap align
+                var alignContent;
+                switch(layout.wrap_align){
+                case 'start':
+                    alignContent = 'flex-start';
+                    break;
+                case 'end':
+                    alignContent = 'flex-end';
+                    break;
+                case 'center':
+                    alignContent = 'center';
+                    break;
+                case 'space-between':
+                    alignContent = 'space-between';
+                    break;
+                case 'space-around':
+                    alignContent = 'space-around';
+                    break;
+                case 'stretch':
+                    alignContent = 'stretch';
+                    break;
+                default:
+                    alignContent = 'stretch';
+                }
+                flexLayout['align-content']= alignContent;
+            } else {
+                flexLayout['flex-wrap'] = 'nowrap';
+            }
+            
 
 	/*
 	 * Directive
@@ -3519,281 +3524,300 @@ angular.module('am-wb-core')
  * Load widgets
  */
 .run(function($settings) {
-	$settings.newPage({
-		type : 'general',
-		label : 'general',
-		templateUrl : 'views/settings/wb-general.html'
-	});
-	$settings.newPage({
-		type : 'background',
-		label : 'Background',
-		icon : 'image',
-		description : '',
-		templateUrl : 'views/settings/wb-background.html'
-	});
-	$settings.newPage({
-		type : 'text',
-		label : 'Text',
-		icon: 'text_fields',
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			var scope = $scope;
-			scope.tinymceOptions = {
-					/*
-					 * onChange: function(e) { // put logic here for
-					 * keypress and cut/paste changes },
-					 */
-					/*
-					 * selector: 'textarea', inline: false, plugins :
-					 * 'advlist autolink link image lists charmap print
-					 * preview', skin: 'lightgray', theme : 'modern',
-					 * font_formats: 'Arial=arial,helvetica,sans-serif;'
-					 */
-					selector : 'textarea',
-					height : 500,
-					theme : 'modern',
-					plugins : [
-						'advlist autolink lists link image charmap print preview hr anchor pagebreak',
-						'searchreplace wordcount visualblocks visualchars code fullscreen',
-						'insertdatetime media nonbreaking save table contextmenu directionality',
-						'emoticons template paste textcolor colorpicker textpattern imagetools' ],
-						toolbar1 : 'fontselect fontsizeselect | insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
-						toolbar2 : 'print preview media | forecolor backcolor emoticons',
-						image_advtab : true,
-						templates : [ {
-							title : 'Test template 1',
-							content : 'Test 1'
-						}, {
-							title : 'Test template 2',
-							content : 'Test 2'
-						} ],
-						content_css : [
-							'//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
-							'//www.tinymce.com/css/codepen.min.css' ]
-			};
 
-		},
-		templateUrl : 'views/settings/wb-text.html'
-	});
-	
-	$settings.newPage({
-		type : 'description',
-		label : 'Description',
-		templateUrl : 'views/settings/wb-description.html'
-	});
 
-	$settings.newPage({
-		type : 'layout',
-		label : 'Layout',
-		description : 'Manages layout of the current item.',
-		icon : 'dashboard',
-		templateUrl : 'views/settings/wb-layout.html'
-	});
-	$settings.newPage({
-		type : 'border',
-		label : 'Border',
-		icon : 'border_all',
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			var scope = $scope;
-			scope.styles = [ {
-				title : 'No Border',
-				value : 'none'
-			}, {
-				title : 'Solid',
-				value : 'solid'
-			}, {
-				title : 'Dotted',
-				value : 'dotted'
-			}, {
-				title : 'Dashed',
-				value : 'dashed'
-			}, {
-				title : 'Double',
-				value : 'double'
-			}, {
-				title : 'Groove',
-				value : 'groove'
-			}, {
-				title : 'Ridge',
-				value : 'ridge'
-			}, {
-				title : 'Inset',
-				value : 'inset'
-			}, {
-				title : 'Outset',
-				value : 'outset'
-			} ];
-		},
-		templateUrl : 'views/settings/wb-border.html'
-	});
+    $settings.newPage({
+        type : 'background',
+        label : 'Background',
+        icon : 'image',
+        description : '',
+        templateUrl : 'views/settings/wb-background.html'
+    });
 
-	/**
-	 * @ngdoc WB-Settings
-	 * @name pageLayout
-	 * @description Manages element layout
-	 * 
-	 * Layout part is consists of the following attributes:
-	 * 
-	 * <ul>
-	 * <li>direction</li>
-	 * <li>align</li>
-	 * <li>justify</li>
-	 * </ul>
-	 * 
-	 * @see wb-layout
-	 */
-	$settings.newPage({
-		type : 'pageLayout',
-		label : 'Page Layout',
-		icon : 'dashboard',
-		templateUrl : 'views/settings/wb-layout-page.html',
-		controllerAs : 'ctrl',
-		/*
-		 * Manages setting page @ngInject
-		 */
-		controller : function($scope) {
-			$scope.direction = [ {
-				title : 'column',
-				icon : 'wb-horizontal-boxes',
-				value : 'column'
-			}, {
-				title : 'row',
-				icon : 'wb-vertical-boxes',
-				value : 'row'
-			} ];
+    $settings.newPage({
+        type : 'text',
+        label : 'Text',
+        icon: 'text_fields',
+        /*
+         * @ngInject
+         */
+        controller : function($scope) {
+            var scope = $scope;
+            scope.tinymceOptions = {
+                    /*
+                     * onChange: function(e) { // put logic here for
+                     * keypress and cut/paste changes },
+                     */
+                    /*
+                     * selector: 'textarea', inline: false, plugins :
+                     * 'advlist autolink link image lists charmap print
+                     * preview', skin: 'lightgray', theme : 'modern',
+                     * font_formats: 'Arial=arial,helvetica,sans-serif;'
+                     */
+                    selector : 'textarea',
+                    height : 500,
+                    theme : 'modern',
+                    plugins : [
+                        'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+                        'searchreplace wordcount visualblocks visualchars code fullscreen',
+                        'insertdatetime media nonbreaking save table contextmenu directionality',
+                        'emoticons template paste textcolor colorpicker textpattern imagetools' ],
+                        toolbar1 : 'fontselect fontsizeselect | insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+                        toolbar2 : 'print preview media | forecolor backcolor emoticons',
+                        image_advtab : true,
+                        templates : [ {
+                            title : 'Test template 1',
+                            content : 'Test 1'
+                        }, {
+                            title : 'Test template 2',
+                            content : 'Test 2'
+                        } ],
+                        content_css : [
+                            '//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
+                            '//www.tinymce.com/css/codepen.min.css' ]
+            };
 
-			$scope.justify = {
-					'row' : [ {
-						title : 'Start',
-						icon : 'sort_start_horiz',
-						value : 'start'
-					}, {
-						title : 'End',
-						icon : 'sort_end_horiz',
-						value : 'end'
-					}, {
-						title : 'Center',
-						icon : 'sort_center_horiz',
-						value : 'center'
-					}, {
-						title : 'Space Around',
-						icon : 'sort_space_around_horiz',
-						value : 'space-around'
-					}, {
-						title : 'Space Between',
-						icon : 'sort_space_between_horiz',
-						value : 'space-between'
-					} ],
-					'column' : [ {
-						title : 'Start',
-						icon : 'sort_start_vert',
-						value : 'start'
-					}, {
-						title : 'End',
-						icon : 'sort_end_vert',
-						value : 'end'
-					}, {
-						title : 'Center',
-						icon : 'sort_center_vert',
-						value : 'center'
-					}, {
-						title : 'Space Around',
-						icon : 'sort_space_around_vert',
-						value : 'space-around'
-					}, {
-						title : 'Space Between',
-						icon : 'sort_space_between_vert',
-						value : 'space-between'
-					} ]
-			};
+        },
+        templateUrl : 'views/settings/wb-text.html'
+    });
 
-			$scope.align = {
-					'column' : [ {
-						title : 'Stretch',
-						icon : 'format_align_justify',
-						value : 'stretch'
-					}, {
-						title : 'Start',
-						icon : 'format_align_left',
-						value : 'start'
-					}, {
-						title : 'End',
-						icon : 'format_align_right',
-						value : 'end'
-					}, {
-						title : 'Center',
-						icon : 'format_align_center',
-						value : 'center'
-					} ],
-					'row' : [ {
-						title : 'Stretch',
-						icon : 'align_justify_vertical',
-						value : 'stretch'
-					}, {
-						title : 'Start',
-						icon : 'align_start_vertical',
-						value : 'start'
-					}, {
-						title : 'End',
-						icon : 'align_end_vertical',
-						value : 'end'
-					}, {
-						title : 'Center',
-						icon : 'align_center_vertical',
-						value : 'center'
-					} ]
-			};
-		}
-	});
-//	$settings.newPage({
-//		type : 'selfLayout',
-//		label : 'Self Layout',
-//		controllerAs : 'ctrl',
-//		/*
-//		 * @ngInject
-//		 */
-//		controller : function($scope) {
-//			$scope.selfAlign = [ {
-//				title : 'auto',
-//				icon : 'looks_one',
-//				value : 'auto'
-//			}, {
-//				title : 'Start',
-//				icon : 'looks_two',
-//				value : 'start'
-//			}, {
-//				title : 'End',
-//				icon : 'looks_3',
-//				value : 'end'
-//			}, {
-//				title : 'Center',
-//				icon : 'looks_4',
-//				value : 'center'
-//			}, {
-//				title : 'stretch',
-//				icon : 'looks_5',
-//				value : 'stretch'
-//			} ];
-//		},
-//		templateUrl : 'views/settings/wb-layout-self.html'
-//	});
-	$settings.newPage({
-		type : 'marginPadding',
-		label : 'Margin/Padding',
-		icon: 'border_clear',
-		templateUrl : 'views/settings/wb-margin-padding.html'
-	});
-	$settings.newPage({
-		type : 'size',
-		label : 'Size',
-		icon: 'photo_size_select_large',
-		templateUrl : 'views/settings/wb-size.html'
-	});
+    $settings.newPage({
+        type : 'description',
+        label : 'Description',
+        templateUrl : 'views/settings/wb-description.html'
+    });
+
+    $settings.newPage({
+        type : 'layout',
+        label : 'Layout',
+        description : 'Manages layout of the current item.',
+        icon : 'dashboard',
+        templateUrl : 'views/settings/wb-layout.html'
+    });
+    $settings.newPage({
+        type : 'border',
+        label : 'Border',
+        icon : 'border_all',
+        /*
+         * @ngInject
+         */
+        controller : function($scope) {
+            var scope = $scope;
+            scope.styles = [ {
+                title : 'No Border',
+                value : 'none'
+            }, {
+                title : 'Solid',
+                value : 'solid'
+            }, {
+                title : 'Dotted',
+                value : 'dotted'
+            }, {
+                title : 'Dashed',
+                value : 'dashed'
+            }, {
+                title : 'Double',
+                value : 'double'
+            }, {
+                title : 'Groove',
+                value : 'groove'
+            }, {
+                title : 'Ridge',
+                value : 'ridge'
+            }, {
+                title : 'Inset',
+                value : 'inset'
+            }, {
+                title : 'Outset',
+                value : 'outset'
+            } ];
+        },
+        templateUrl : 'views/settings/wb-border.html'
+    });
+
+    /**
+     * @ngdoc Widget Settings
+     * @name layout
+     * @description Manages element layout
+     * 
+     * Layout is consists of the following attributes for a group:
+     * 
+     * <ul>
+     *     <li>direction</li>
+     *     <li>direction-inverse</li>
+     *     <li>wrap</li>
+     *     <li>wrap-inverse</li>
+     *     <li>align</li>
+     *     <li>justify</li>
+     * </ul>
+     * 
+     * and following ones for a widget (or group):
+     * 
+     * <ul>
+     *     <li>grow</li>
+     *     <li>shrink</li>
+     *     <li>order</li>
+     * </ul>
+     * 
+     * See the layout documents for more details.
+     * 
+     * @see wb-layout
+     */
+    $settings.newPage({
+        type : 'layout',
+        label : 'Layout',
+        icon : 'dashboard',
+        templateUrl : 'views/settings/wb-layout.html',
+        controllerAs : 'ctrl',
+        /*
+         * Manages setting page 
+         * 
+         * @ngInject
+         */
+        controller : function($scope) {
+            $scope.direction = [ {
+                title : 'column',
+                icon : 'wb-horizontal-boxes',
+                value : 'column'
+            }, {
+                title : 'row',
+                icon : 'wb-vertical-boxes',
+                value : 'row'
+            } ];
+
+            $scope.justify = {
+                    'row' : [ {
+                        title : 'Start',
+                        icon : 'sort_start_horiz',
+                        value : 'start'
+                    }, {
+                        title : 'End',
+                        icon : 'sort_end_horiz',
+                        value : 'end'
+                    }, {
+                        title : 'Center',
+                        icon : 'sort_center_horiz',
+                        value : 'center'
+                    }, {
+                        title : 'Space Around',
+                        icon : 'sort_space_around_horiz',
+                        value : 'space-around'
+                    }, {
+                        title : 'Space Between',
+                        icon : 'sort_space_between_horiz',
+                        value : 'space-between'
+                    } ],
+                    'column' : [ {
+                        title : 'Start',
+                        icon : 'sort_start_vert',
+                        value : 'start'
+                    }, {
+                        title : 'End',
+                        icon : 'sort_end_vert',
+                        value : 'end'
+                    }, {
+                        title : 'Center',
+                        icon : 'sort_center_vert',
+                        value : 'center'
+                    }, {
+                        title : 'Space Around',
+                        icon : 'sort_space_around_vert',
+                        value : 'space-around'
+                    }, {
+                        title : 'Space Between',
+                        icon : 'sort_space_between_vert',
+                        value : 'space-between'
+                    } ]
+            };
+
+            $scope.align = {
+                    'column' : [ {
+                        title : 'Stretch',
+                        icon : 'format_align_justify',
+                        value : 'stretch'
+                    }, {
+                        title : 'Start',
+                        icon : 'format_align_left',
+                        value : 'start'
+                    }, {
+                        title : 'End',
+                        icon : 'format_align_right',
+                        value : 'end'
+                    }, {
+                        title : 'Center',
+                        icon : 'format_align_center',
+                        value : 'center'
+                    } ],
+                    'row' : [ {
+                        title : 'Stretch',
+                        icon : 'align_justify_vertical',
+                        value : 'stretch'
+                    }, {
+                        title : 'Start',
+                        icon : 'align_start_vertical',
+                        value : 'start'
+                    }, {
+                        title : 'End',
+                        icon : 'align_end_vertical',
+                        value : 'end'
+                    }, {
+                        title : 'Center',
+                        icon : 'align_center_vertical',
+                        value : 'center'
+                    } ]
+            };
+
+            $scope.selfAlign ={
+                    'column' : [ {
+                        title : 'Stretch',
+                        icon : 'format_align_justify',
+                        value : 'stretch'
+                    }, {
+                        title : 'Start',
+                        icon : 'format_align_left',
+                        value : 'start'
+                    }, {
+                        title : 'End',
+                        icon : 'format_align_right',
+                        value : 'end'
+                    }, {
+                        title : 'Center',
+                        icon : 'format_align_center',
+                        value : 'center'
+                    } ],
+                    'row' : [ {
+                        title : 'Stretch',
+                        icon : 'align_justify_vertical',
+                        value : 'stretch'
+                    }, {
+                        title : 'Start',
+                        icon : 'align_start_vertical',
+                        value : 'start'
+                    }, {
+                        title : 'End',
+                        icon : 'align_end_vertical',
+                        value : 'end'
+                    }, {
+                        title : 'Center',
+                        icon : 'align_center_vertical',
+                        value : 'center'
+                    } ]
+            };
+        }
+    });
+
+    $settings.newPage({
+        type : 'marginPadding',
+        label : 'Margin/Padding',
+        icon: 'border_clear',
+        templateUrl : 'views/settings/wb-margin-padding.html'
+    });
+    $settings.newPage({
+        type : 'size',
+        label : 'Size',
+        icon: 'photo_size_select_large',
+        templateUrl : 'views/settings/wb-size.html'
+    });
 });
 
 /**
@@ -4437,14 +4461,11 @@ angular.module('am-wb-core')
 	/*
 	 * Default settings
 	 */
-//	var WB_SETTINGS_PAGE_DEFAULT = ['description', 'border',
-//	'background', 'pageLayout', 'marginPadding'];
+	var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
+		'background', 'layout', 'marginPadding', 'size' ];
+	var WB_SETTINGS_WIDGET_DEFAULT = [ 'border',
+		'background', 'marginPadding', 'layout', 'size' ];
 
-	var WB_SETTINGS_GROUP_DEFAULT = [ 'border',
-		'background', 'pageLayout',
-		'marginPadding', 'size' ];
-	var WB_SETTINGS_WIDGET_DEFAULT = [ 'description', 'border',
-		'background', 'pageLayout', 'marginPadding', 'size' ];
 	/**
 	 * Setting page storage
 	 * 
@@ -4645,269 +4666,268 @@ angular.module('am-wb-core').service('$wbUi', function($mdDialog, $q, $http) {
  * Utility class of WB
  */
 angular.module('am-wb-core').service('$wbUtil', function($q, $templateRequest, $sce) {
-	'use strict';
-	var service = this;
+    'use strict';
+    var service = this;
 
-	function cleanMap(oldStyle, newStyle, map) {
-		for (var i = 0; i < map.length; i++) {
-			if (oldStyle[map[i][0]]) {
-				newStyle[map[i][1]] = oldStyle[map[i][0]];
-				delete oldStyle[map[i][0]];
-			}
-		}
-	}
+    function cleanMap(oldStyle, newStyle, map) {
+        for (var i = 0; i < map.length; i++) {
+            if (oldStyle[map[i][0]]) {
+                newStyle[map[i][1]] = oldStyle[map[i][0]];
+                delete oldStyle[map[i][0]];
+            }
+        }
+    }
 
-	function getTemplateOf(page)
-	{
-		var template;
-		var templateUrl;
-		if (angular.isDefined(template = page.template)) {
-			if (angular.isFunction(template)) {
-				template = template(page.params);
-			}
-		} else if (angular
-				.isDefined(templateUrl = page.templateUrl)) {
-			if (angular.isFunction(templateUrl)) {
-				templateUrl = templateUrl(page.params);
-			}
-			if (angular.isDefined(templateUrl)) {
-				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
-				template = $templateRequest(templateUrl);
-			}
-		}
-		return template;
-	}
+    function getTemplateOf(page)
+    {
+        var template;
+        var templateUrl;
+        if (angular.isDefined(template = page.template)) {
+            if (angular.isFunction(template)) {
+                template = template(page.params);
+            }
+        } else if (angular
+                .isDefined(templateUrl = page.templateUrl)) {
+            if (angular.isFunction(templateUrl)) {
+                templateUrl = templateUrl(page.params);
+            }
+            if (angular.isDefined(templateUrl)) {
+                page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+                template = $templateRequest(templateUrl);
+            }
+        }
+        return template;
+    }
 
-	/**
-	 * Loading template of the page
-	 * 
-	 * @name getTemplateFor
-	 * @memberof $wbUtil
-	 * @param page
-	 *            {object} properties of a page, widget , ..
-	 * @return promise to load template on resolve.
-	 */
-	function getTemplateFor(page)
-	{
-		return $q.when(getTemplateOf(page));
-	}
+    /**
+     * Loading template of the page
+     * 
+     * @name getTemplateFor
+     * @memberof $wbUtil
+     * @param page
+     *            {object} properties of a page, widget , ..
+     * @return promise to load template on resolve.
+     */
+    function getTemplateFor(page)
+    {
+        return $q.when(getTemplateOf(page));
+    }
 
-	function cleanEvetns(model)
-	{
-		// event
-		if (!model.event) {
-			model.event = {};
-		}
-	}
+    function cleanEvetns(model)
+    {
+        // event
+        if (!model.event) {
+            model.event = {};
+        }
+    }
 
-	function cleanLayout(model)
-	{
-		if (model.type !== 'Group' && model.type !== 'Page') {
-			return;
-		}
-		if (!model.style.layout) {
-			model.style.layout = {};
-		}
-		// convert
-		var newStyle = model.style.layout;
-		var oldStyle = model.style;
+    function cleanLayout(model)
+    {
+        if (!model.style.layout) {
+            model.style.layout = {};
+        }
+        if (model.type === 'Group' || model.type === 'Page') {
+            // convert
+            var newStyle = model.style.layout;
+            var oldStyle = model.style;
 
-		if (oldStyle.flexDirection) {
-			if (oldStyle.flexDirection === 'wb-flex-row') {
-				newStyle.direction = 'row';
-			} else {
-				newStyle.direction = 'column';
-			}
-			delete oldStyle.flexDirection;
-		}
-		if (!newStyle.direction) {
-			newStyle.direction = 'column';
-		}
+            if (oldStyle.flexDirection) {
+                if (oldStyle.flexDirection === 'wb-flex-row') {
+                    newStyle.direction = 'row';
+                } else {
+                    newStyle.direction = 'column';
+                }
+                delete oldStyle.flexDirection;
+            }
+            if (!newStyle.direction) {
+                newStyle.direction = 'column';
+            }
 
-		switch (oldStyle.flexAlignItem) {
-			case 'wb-flex-align-items-center':
-				newStyle.align = 'center';
-				break;
-			case 'wb-flex-align-items-end':
-				newStyle.align = 'end';
-				break;
-			case 'wb-flex-align-items-start':
-				newStyle.align = 'start';
-				break;
-			case 'wb-flex-align-items-stretch':
-				newStyle.align = 'stretch';
-				break;
-			default:
-				newStyle.align = 'stretch';
-		}
-		delete oldStyle.flexAlignItem;
+            switch (oldStyle.flexAlignItem) {
+            case 'wb-flex-align-items-center':
+                newStyle.align = 'center';
+                break;
+            case 'wb-flex-align-items-end':
+                newStyle.align = 'end';
+                break;
+            case 'wb-flex-align-items-start':
+                newStyle.align = 'start';
+                break;
+            case 'wb-flex-align-items-stretch':
+                newStyle.align = 'stretch';
+                break;
+            default:
+                newStyle.align = 'stretch';
+            }
+            delete oldStyle.flexAlignItem;
 
-		switch (oldStyle.justifyContent) {
-			case 'wb-flex-justify-content-center':
-				newStyle.justify = 'center';
-				break;
-			case 'wb-flex-justify-content-end':
-				newStyle.justify = 'end';
-				break;
-			case 'wb-flex-justify-content-start':
-				newStyle.justify = 'start';
-				break;
-			case 'wb-flex-justify-content-space-between':
-				newStyle.justify = 'space-between';
-				break;
-			case 'wb-flex-justify-content-space-around':
-				newStyle.justify = 'space-around';
-				break;
-			default:
-				newStyle.justify = 'center';
-		}
-		delete oldStyle.justifyContent;
-	}
+            switch (oldStyle.justifyContent) {
+            case 'wb-flex-justify-content-center':
+                newStyle.justify = 'center';
+                break;
+            case 'wb-flex-justify-content-end':
+                newStyle.justify = 'end';
+                break;
+            case 'wb-flex-justify-content-start':
+                newStyle.justify = 'start';
+                break;
+            case 'wb-flex-justify-content-space-between':
+                newStyle.justify = 'space-between';
+                break;
+            case 'wb-flex-justify-content-space-around':
+                newStyle.justify = 'space-around';
+                break;
+            default:
+                newStyle.justify = 'center';
+            }
+            delete oldStyle.justifyContent;
+        }
+    }
 
-	function cleanSize(model)
-	{
-		if (!model.style.size) {
-			model.style.size = {};
-		}
-		var newStyle = model.style.size;
-		var oldStyle = model.style;
-		var map = [ [ 'width', 'width' ],
-			[ 'height', 'height' ] ];
-		cleanMap(oldStyle, newStyle, map);
-	}
+    function cleanSize(model)
+    {
+        if (!model.style.size) {
+            model.style.size = {};
+        }
+        var newStyle = model.style.size;
+        var oldStyle = model.style;
+        var map = [ [ 'width', 'width' ],
+            [ 'height', 'height' ] ];
+        cleanMap(oldStyle, newStyle, map);
+    }
 
-	function cleanBackground(model)
-	{
-		if (!model.style.background) {
-			model.style.background = {};
-		}
-		var newStyle = model.style.background;
-		var oldStyle = model.style;
-		var map = [ [ 'backgroundImage', 'image' ],
-			[ 'backgroundColor', 'color' ],
-			[ 'backgroundSize', 'size' ],
-			[ 'backgroundRepeat', 'repeat' ],
-			[ 'backgroundPosition', 'position' ] ];
-		cleanMap(oldStyle, newStyle, map);
-	}
+    function cleanBackground(model)
+    {
+        if (!model.style.background) {
+            model.style.background = {};
+        }
+        var newStyle = model.style.background;
+        var oldStyle = model.style;
+        var map = [ [ 'backgroundImage', 'image' ],
+            [ 'backgroundColor', 'color' ],
+            [ 'backgroundSize', 'size' ],
+            [ 'backgroundRepeat', 'repeat' ],
+            [ 'backgroundPosition', 'position' ] ];
+        cleanMap(oldStyle, newStyle, map);
+    }
 
-	function cleanBorder(model)
-	{
-		if (!model.style.border) {
-			model.style.border = {};
-		}
-		var oldStyle = model.style;
-		var newStyle = model.style.border;
+    function cleanBorder(model)
+    {
+        if (!model.style.border) {
+            model.style.border = {};
+        }
+        var oldStyle = model.style;
+        var newStyle = model.style.border;
 
-		if (oldStyle.borderRadius) {
-			if (oldStyle.borderRadius.uniform) {
-				newStyle.radius = oldStyle.borderRadius.all + 'px';
-			}
-			// TODO: maso, 2018: support other models
-		}
-		// delete old values
-		delete model.style.borderColor;
-		delete model.style.borderRadius;
-		delete model.style.borderStyleColorWidth;
-		delete model.style.borderStyle;
-		delete model.style.borderWidth;
-	}
+        if (oldStyle.borderRadius) {
+            if (oldStyle.borderRadius.uniform) {
+                newStyle.radius = oldStyle.borderRadius.all + 'px';
+            }
+            // TODO: maso, 2018: support other models
+        }
+        // delete old values
+        delete model.style.borderColor;
+        delete model.style.borderRadius;
+        delete model.style.borderStyleColorWidth;
+        delete model.style.borderStyle;
+        delete model.style.borderWidth;
+    }
 
-	function cleanSpace(model)
-	{
-		// Margin and padding
-		if (model.style.padding && angular.isObject(model.style.padding)) {
-			var padding = '';
-			if (model.style.padding.isUniform) {
-				padding = model.style.padding.uniform;
-			} else {
-				padding = model.style.padding.top || '0px' + ' ' + 
-				model.style.padding.right || '0px' + ' ' + 
-				model.style.padding.bottom || '0px' + ' ' + 
-				model.style.padding.left || '0px' + ' ';
-			}
-			model.style.padding = padding;
-		}
+    function cleanSpace(model)
+    {
+        // Margin and padding
+        if (model.style.padding && angular.isObject(model.style.padding)) {
+            var padding = '';
+            if (model.style.padding.isUniform) {
+                padding = model.style.padding.uniform;
+            } else {
+                padding = model.style.padding.top || '0px' + ' ' + 
+                model.style.padding.right || '0px' + ' ' + 
+                model.style.padding.bottom || '0px' + ' ' + 
+                model.style.padding.left || '0px' + ' ';
+            }
+            model.style.padding = padding;
+        }
 
-		if (model.style.margin && angular.isObject(model.style.margin)) {
-			var margin = '';
-			if (model.style.margin.isUniform) {
-				margin = model.style.margin.uniform;
-			} else {
-				margin = model.style.margin.top || '0px' + ' ' + 
-				model.style.margin.right || '0px' + ' ' + 
-				model.style.margin.bottom || '0px' + ' ' + 
-				model.style.margin.left || '0px' + ' ';
-			}
-			model.style.margin = margin;
-		}
+        if (model.style.margin && angular.isObject(model.style.margin)) {
+            var margin = '';
+            if (model.style.margin.isUniform) {
+                margin = model.style.margin.uniform;
+            } else {
+                margin = model.style.margin.top || '0px' + ' ' + 
+                model.style.margin.right || '0px' + ' ' + 
+                model.style.margin.bottom || '0px' + ' ' + 
+                model.style.margin.left || '0px' + ' ';
+            }
+            model.style.margin = margin;
+        }
 
-	}
+    }
 
-	function cleanAlign(model)
-	{
-		if (!model.style.align) {
-			model.style.align = {};
-		}
-	}
+    function cleanAlign(model)
+    {
+        if (!model.style.align) {
+            model.style.align = {};
+        }
+    }
 
-	function cleanStyle(model)
-	{
-		if (!model.style) {
-			model.style = {};
-		}
-		cleanLayout(model);
-		cleanSize(model);
-		cleanBackground(model);
-		cleanBorder(model);
-		cleanSpace(model);
-		cleanAlign(model);
-	}
+    function cleanStyle(model)
+    {
+        if (!model.style) {
+            model.style = {};
+        }
+        cleanLayout(model);
+        cleanSize(model);
+        cleanBackground(model);
+        cleanBorder(model);
+        cleanSpace(model);
+        cleanAlign(model);
+    }
 
-	function cleanInternal(model)
-	{
-		cleanEvetns(model);
-		cleanStyle(model);
-		if (model.type === 'Group' || model.type === 'Page') {
-			if (!model.contents) {
-				model.contents = [];
-			}
-			if (model.contents.length) {
-				for (var i = 0; i < model.contents.length; i++) {
-					cleanInternal(model.contents[i]);
-				}
-			}
-		}
-		return model;
-	}
+    function cleanInternal(model)
+    {
+        cleanEvetns(model);
+        cleanStyle(model);
+        if (model.type === 'Group' || model.type === 'Page') {
+            if (!model.contents) {
+                model.contents = [];
+            }
+            if (model.contents.length) {
+                for (var i = 0; i < model.contents.length; i++) {
+                    cleanInternal(model.contents[i]);
+                }
+            }
+        }
+        return model;
+    }
 
-	/**
-	 * Clean data model
-	 */
-	function clean(model, force)
-	{
-		if (model.version === 'wb1' && !force) {
-			return model;
-		}
-		var newModel = cleanInternal(model);
-		newModel.version = 'wb1';
-		return newModel;
-	}
+    /**
+     * Clean data model
+     */
+    function clean(model, force)
+    {
+        if (model.version === 'wb1' && !force) {
+            return model;
+        }
+        var newModel = cleanInternal(model);
+        newModel.version = 'wb1';
+        return newModel;
+    }
 
-	service.cleanMap = cleanMap;
-	service.clean = clean;
-	service.cleanInternal = cleanInternal;
-	service.cleanStyle = cleanStyle;
-	service.cleanAlign = cleanAlign;
-	service.cleanSpace = cleanSpace;
-	service.cleanBorder = cleanBorder;
-	service.cleanBackground = cleanBackground;
-	service.cleanSize = cleanSize;
-	service.cleanLayout = cleanLayout;
-	service.cleanEvetns = cleanEvetns;
+    service.cleanMap = cleanMap;
+    service.clean = clean;
+    service.cleanInternal = cleanInternal;
+    service.cleanStyle = cleanStyle;
+    service.cleanAlign = cleanAlign;
+    service.cleanSpace = cleanSpace;
+    service.cleanBorder = cleanBorder;
+    service.cleanBackground = cleanBackground;
+    service.cleanSize = cleanSize;
+    service.cleanLayout = cleanLayout;
+    service.cleanEvetns = cleanEvetns;
 
-	service.getTemplateFor = getTemplateFor;
-	service.getTemplateOf = getTemplateOf;
+    service.getTemplateFor = getTemplateFor;
+    service.getTemplateOf = getTemplateOf;
 });
 
 /* 

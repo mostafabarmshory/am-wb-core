@@ -539,8 +539,6 @@ of a widget:
  */
 .wb-group-select {
 	border: 1px solid black !important;
-	-webkit-box-shadow: 0px 0px 4px 4px #aaaaaa;
-	-moz-box-shadow: 0px 0px 4px 4px #aaaaaa;
 	box-shadow: 0px 0px 4px 4px #aaaaaa;
 }
 
@@ -570,8 +568,6 @@ of a widget:
 
 .wb-widget-select {
 	border: 1px solid black !important;
-	-webkit-box-shadow: 0px 0px 4px 4px #aaaaaa;
-	-moz-box-shadow: 0px 0px 4px 4px #aaaaaa;
 	box-shadow: 0px 0px 4px 4px #aaaaaa;
 }
 
