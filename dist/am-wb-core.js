@@ -2181,6 +2181,141 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
+        /**
+         * @ngdoc Directives
+         * @name wbUiSettingLength
+         * @author maso<mostafa.barmshory@dpq.co.ir>
+         * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+         * @description Set length (css based)
+         * 
+         * @see https://www.w3schools.com/cssref/css_units.asp
+         */
+        .directive('wbUiSettingBorder', function () {
+            return {
+                templateUrl: 'views/directives/wb-ui-setting-border.html',
+                restrict: 'E',
+                replace: true,
+                scope: {
+                    title: '@?',
+                    value: '=?',
+                    icon: '@?',
+                    description: '@?'
+                },
+                /*
+                 * @gnInject
+                 */
+                controller: function ($scope /*$resource*/) {
+                    /*
+                     * splice the different radious number from value.
+                     * the format of value is: 'ddpx ddpx ddpx ddpx' which d is digit, dd < 100 and px is pixel.
+                     * for example value = '02px 10px 08px 20px'. 
+                     */
+                    if ($scope.value) {
+                        var topLeft = $scope.value.slice(0, 2);
+                        var topRight = $scope.value.slice(5, 7);
+                        var bottomLeft = $scope.value.slice(10, 12);
+                        var bottomRight = $scope.value.slice(15, 17);
+                    }
+
+                    //check if all values are equal
+                    if (topLeft === topRight && bottomLeft === bottomRight && topLeft === bottomLeft) {
+                        $scope.allEqual = true;
+                        $scope.allCorner = topLeft;//or any one.
+                    } else {
+                        $scope.allEqual = false;
+                        $scope.topLeft = topLeft;
+                        $scope.topRight = topRight;
+                        $scope.bottomLeft = bottomLeft;
+                        $scope.bottomRight = bottomRight;
+                    }
+
+                    $scope.$watch('allCorner', function (val) {
+                        var str = '';
+                        var newVal = '';
+                        if (val < 10) {
+                            val = '0' + val;
+                        }
+                        str = val + 'px';
+                        newVal = str + ' ' + str + ' ' + str + ' ' + str;
+                        $scope.value = newVal;
+                    });
+
+                    /*
+                     * watch all corner radius
+                     */
+                    $scope.$watch('topLeft', function (val) {
+                        if (val < 10) {
+                            val = '0' + val;
+                        }
+                        topLeft = val;
+                        setRadiusValue();
+                    });
+
+                    $scope.$watch('topRight', function (val) {
+                        if (val < 10) {
+                            val = '0' + val;
+                        }
+                        topRight = val;
+                        setRadiusValue();
+                    });
+
+                    $scope.$watch('bottomLeft', function (val) {
+                        if (val < 10) {
+                            val = '0' + val;
+                        }
+                        bottomLeft = val;
+                        setRadiusValue();
+                    });
+
+                    $scope.$watch('bottomRight', function (val) {
+                        if (val < 10) {
+                            val = '0' + val;
+                        }
+                        bottomRight = val;
+                        setRadiusValue();
+                    });
+
+                    /*
+                     * set $scope.value when the value of each corner radius is changed
+                     */
+                    var setRadiusValue = function () {
+                        $scope.value =
+                                topLeft + 'px' + ' '
+                                + topRight + 'px' + ' '
+                                + bottomLeft + 'px' + ' '
+                                + bottomRight + 'px';
+                    };
+                },
+                controllerAs: 'ctrl'
+            };
+        });
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
 /**
  * @ngdoc Directives
  * @name wbUiSettingChoose
@@ -2595,6 +2730,7 @@ angular.module('am-wb-core')
 		 * @gnInject
 		 */
 		controller : function(/*$scope, $resource*/) {
+                   
 		},
 		controllerAs: 'ctrl'
 	};
@@ -3758,8 +3894,7 @@ angular.module('am-wb-core')
 		// functional properties
 		template : '<wb-group ng-model="wbModel"></wb-group>',
 		help : 'http://dpq.co.ir/more-information-link',
-		helpId: 'wb-widget-group',
-                setting: ['description']
+		helpId: 'wb-widget-group'
 	});
 	// HTML text
 	$widget.newWidget({
@@ -5061,12 +5196,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-setting-panel-expansion.html',
-    "<div id=WB-SETTING-PANEL> <md-expansion-panel ng-repeat=\"setting in settings | orderBy:priority track by setting.type\" ng-show=setting.visible> <md-expansion-panel-collapsed> <div class=md-title>{{setting.label}}</div> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header ng-click=$panel.collapse()> <div class=md-title>{{setting.label}}</div> <div class=md-summary>{{setting.description}}</div> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </div>"
+    "<div id=WB-SETTING-PANEL> <md-expansion-panel ng-repeat=\"setting in settings| orderBy:priority track by setting.type\" ng-show=setting.visible> <md-expansion-panel-collapsed> <div class=md-title>{{setting.label}}</div> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header ng-click=$panel.collapse()> <div class=md-title>{{setting.label}}</div> <div class=md-summary>{{setting.description}}</div> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-setting-panel-tabs.html',
-    "<div id=am-wb-widget-setting> <md-tabs md-dynamic-height md-border-bottom> <md-tab ng-repeat=\"setting in settings | orderBy:priority track by setting.type\" ng-disabled=!setting.visible id={{setting.key}}> <md-tab-label> <span ng-if=!setting.icon translate=\"\">{{setting.label}}</span> <wb-icon ng-if=setting.icon>{{setting.icon}}</wb-icon> </md-tab-label> <md-tab-body layout-margin> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-tab-body> </md-tab> </md-tabs> </div>"
+    "<div id=am-wb-widget-setting> <md-tabs md-dynamic-height md-border-bottom> <md-tab ng-repeat=\"setting in settings| orderBy:priority track by setting.type\" ng-disabled=!setting.visible id={{setting.key}}> <md-tab-label> <span ng-if=!setting.icon translate=\"\">{{setting.label}}</span> <wb-icon ng-if=setting.icon>{{setting.icon}}</wb-icon> </md-tab-label> <md-tab-body layout-margin> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-tab-body> </md-tab> </md-tabs> </div>"
   );
 
 
@@ -5107,6 +5242,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-ui-setting-background.html',
     "<md-input-container> <label translate=\"\">Background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate=\"\">{{value.name}}</md-option> </md-select> </md-input-container>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-border.html',
+    "<div layout=column>  <md-checkbox ng-model=allEqual ng-checked=true> Equal corners </md-checkbox>   <div ng-show=allEqual layout=row flex> <md-slider-container flex> <md-slider min=0 max=99 ng-model=allCorner> </md-slider> </md-slider-container> <md-input-container flex=20> <input type=number style=text-align:center ng-model=allCorner> </md-input-container> <p layout-align=\"end center\">px</p> </div> <div layout=column ng-show=!allEqual> <md-divider></md-divider> <div layout=row layout-align=\"space-between center\"> <p flex=25>Top left</p> <md-slider-container flex> <md-slider min=0 max=99 ng-model=topLeft> </md-slider> </md-slider-container> <md-input-container flex=15> <input type=number style=text-align:center ng-model=topLeft> </md-input-container> <p layout-align=\"end center\">px</p> </div> <div layout=row layout-align=\"space-between center\"> <p flex=25>Top right</p> <md-slider-container flex> <md-slider min=0 max=99 ng-model=topRight> </md-slider> </md-slider-container> <md-input-container flex=15> <input type=number style=text-align:center ng-model=topRight> </md-input-container> <p layout-align=\"end center\">px</p> </div> <div layout=row layout-align=\"space-between center\"> <p flex=25>Bottom left</p> <md-slider-container flex> <md-slider min=0 max=99 ng-model=bottomLeft> </md-slider> </md-slider-container> <md-input-container flex=15> <input type=number style=text-align:center ng-model=bottomLeft> </md-input-container> <p layout-align=\"end center\">px</p> </div> <div layout=row layout-align=\"space-between center\"> <p flex=25>Bottom right</p> <md-slider-container flex> <md-slider min=0 max=99 ng-model=bottomRight> </md-slider> </md-slider-container> <md-input-container flex=15> <input type=number style=text-align:center ng-model=bottomRight> </md-input-container> <p layout-align=\"end center\">px</p> </div> </div> <div class=hint ng-if=description translate=\"\">{{description}} </div> </div>"
   );
 
 
@@ -5218,7 +5358,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-border.html',
-    " <wb-ui-setting-length title=\"{{'Style' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.style> </wb-ui-setting-length> <wb-ui-setting-length title=\"{{'Width' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.width> </wb-ui-setting-length> <wb-ui-setting-length title=\"{{'Color' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.color> </wb-ui-setting-length> <wb-ui-setting-length title=\"{{'Radius' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.radius> </wb-ui-setting-length>"
+    " <wb-ui-setting-length title=\"{{'Style' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.style> </wb-ui-setting-length> <wb-ui-setting-length title=\"{{'Width' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.width> </wb-ui-setting-length> <wb-ui-setting-length title=\"{{'Color' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.color> </wb-ui-setting-length> <wb-ui-setting-border title=\"{{'Radius' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.radius> </wb-ui-setting-border>"
   );
 
 
