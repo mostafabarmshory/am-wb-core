@@ -90,8 +90,7 @@ module.exports = function(grunt) {
                     ],
                     tasks : [
                         'injector',
-                        'newer:jshint:all',
-                        'newer:jscs:all'
+                        'newer:jshint:all'
                         ],
                         options : {
                             livereload : '<%= connect.options.livereload %>'
@@ -102,7 +101,6 @@ module.exports = function(grunt) {
                 tasks : [
                     'injector',
                     'newer:jshint:test', // 
-                    'newer:jscs:test', //
                     'karma' ]
             },
             styles : {
@@ -142,27 +140,29 @@ module.exports = function(grunt) {
         connect : {
             options : {
                 port : 9001,
+                // Change this to '0.0.0.0' to access the server from
+                // outside.
                 hostname : 'localhost',
                 livereload : 35729
             },
-//            proxies : [ {
-//                context : '/', // the context of the data service
-//                // wherever the data service is running
-//                host : '<%= yeoman.pkg.backend.host %>',
-//                // the port that the data service is running on
-//                port : '<%= yeoman.pkg.backend.port %>',
-//                changeOrigin : true,
-//                headers : {
-//                    host : '<%= yeoman.pkg.backend.host %>'
-//                }
-//            } ],
+            proxies : [ {
+                context : '/', // the context of the data service
+                // wherever the data service is running
+                host : '<%= yeoman.pkg.backend.host %>',
+                // the port that the data service is running on
+                port : '<%= yeoman.pkg.backend.port %>',
+                changeOrigin : true,
+                headers : {
+                    host : '<%= yeoman.pkg.backend.host %>'
+                }
+            } ],
             livereload : {
                 options : {
                     open : true,
                     middleware : function(connect, options) {
                         var middlewares = [];
                         //Matches everything that does not contain a '.' (period)
-//                        middlewares.push(modRewrite([ '!/api/.*|^.*\\..*$ /index.html [L]' ]));
+                        middlewares.push(modRewrite([ '!/api/.*|^.*\\..*$ /index.html [L]' ]));
                         middlewares.push(connect.static('.tmp'));
                         middlewares.push(
                                 connect()
@@ -179,8 +179,9 @@ module.exports = function(grunt) {
                             options.base = [ options.base ];
                         }
 
-//                        // Setup the proxy
-//                        middlewares.push(require('grunt-connect-proxy/lib/utils').proxyRequest);
+                        // Setup the proxy
+                        middlewares
+                        .push(require('grunt-connect-proxy/lib/utils').proxyRequest);
 
                         // Serve static files
                         options.base.forEach(function(base) {
@@ -265,38 +266,10 @@ module.exports = function(grunt) {
          * https://eslint.org/
          */
         eslint : {
+            options: {
+                configFile: '.eslintrc.json'
+            },
             target : [ '<%= yeoman.app %>/{,*/}*.js' ]
-        },
-
-        /*
-         * استایل کدها رو بررسی می‌کنه تا مطمئن بشیم که کدها خوش فرم نوشته شده
-         * اند. این یک نمونه تست هست که توش به نحوه نگارش کدها توجه می‌کنه. برای
-         * این کار از یک بسته به نام jscs استفاده شده است. برای کسب اطلاع بیشتر
-         * در مورد این بسته پیونده زیر رو ببینید:
-         * 
-         * http://jscs.info/
-         * 
-         * این برنامه رو با استفاده از افزونه grunt-jscs اجرا می‌کنیم. این
-         * افزونه امکان چک کردن تمام کدهای نوشته شده رو می‌ده. اطلاعات بیشتر در
-         * مورد این افزونه در مسییر زیر وجود داره:
-         * 
-         * https://github.com/jscs-dev/grunt-jscs
-         * 
-         * برای این بسته هم یه سری تنظیم‌ها در نظر گرفته شده که تو فایل .jscsrc
-         * وجود داره در صورت تمایل می‌تونید این تنظیم‌ها رو بر اساس نیازهای
-         * خودتون به روز کنید.
-         */
-        jscs : {
-            options : {
-                config : '.jscsrc',
-                verbose : true
-            },
-            all : {
-                src : [ 'Gruntfile.js', '<%= yeoman.app %>/{,*/}*.js' ]
-            },
-            test : {
-                src : [ 'test/spec/{,*/}*.js' ]
-            }
         },
 
         /*
@@ -359,25 +332,27 @@ module.exports = function(grunt) {
          */
         wiredep : {
             app : {
-                devDependencies : true,
                 src : [ 'demo/index.html' ],
                 ignorePath : /\.\.\//
             },
             test : {
                 devDependencies : true,
-                src : '<%= karma.unit.configFile %>',
-                ignorePath : /\.\.\//,
-                fileTypes : {
-                    js : {
-                        block : /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
-                        detect : {
-                            js : /'(.*\.js)'/gi
-                        },
-                        replace : {
-                            js : '\'{{filePath}}\','
+                src : [
+                    '<%= karma.unit.configFile %>',
+                    '<%= karma.build.configFile %>'
+                    ],
+                    ignorePath : /\.\.\//,
+                    fileTypes : {
+                        js : {
+                            block : /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
+                            detect : {
+                                js : /'(.*\.js)'/gi
+                            },
+                            replace : {
+                                js : '\'{{filePath}}\','
+                            }
                         }
                     }
-                }
             }
         },
 
@@ -576,7 +551,7 @@ module.exports = function(grunt) {
                 processors : [ 
                     require('pixrem')(),
                     require('autoprefixer')({browsers: 'last 2 versions'})
-                ]
+                    ]
             },
             server : {
                 options : {
@@ -658,7 +633,7 @@ module.exports = function(grunt) {
                         '<%= yeoman.app %>/styles/**/*.css',
                         '<%= yeoman.demo %>/scripts/**/*.js',
                         '<%= yeoman.demo %>/styles/**/*.css'
-                    ]
+                        ]
                 }
             }
         }
@@ -672,7 +647,7 @@ module.exports = function(grunt) {
                 // added just before connect
                 'configureProxies:server',
                 'connect:dist:keepalive'
-            ]);
+                ]);
         }
 
         grunt.task.run([
@@ -684,11 +659,11 @@ module.exports = function(grunt) {
             'configureProxies:server', // added just before connect
             'connect:livereload',
             'watch'
-        ]);
+            ]);
     });
 
     grunt.registerTask('setversion', function(arg1) {
-        console.log('Attempting to update version to ' + arg1);
+        console.log(`Attempting to update version to ${arg1}`);
         var parsedJson= grunt.file.readJSON('bower.json');//read in the current
         parsedJson.version = arg1; //set the top level version field to arg1
         grunt.file.write('bower.json', JSON.stringify(parsedJson, null, 2));
@@ -725,19 +700,18 @@ module.exports = function(grunt) {
         'copy:dist', //
         'uglify', //
         'cssmin' //
-    ]);
+        ]);
 
     grunt.registerTask('default', [ //
         'newer:jshint', //
-        'newer:jscs', //
         'newer:eslint', //
         'test', //
         'build' //
-    ]);
+        ]);
 
     grunt.registerTask('release', [ //
         'default', 
         'karma:build',
         'jsdoc'
-    ]);
+        ]);
 };
