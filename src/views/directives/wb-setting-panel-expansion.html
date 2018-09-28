@@ -1,25 +1,25 @@
 <div 
-	id="WB-SETTING-PANEL">
-	<md-expansion-panel
-		ng-repeat="setting in settings | orderBy:priority track by setting.type"
-		ng-show="setting.visible">
-	    <md-expansion-panel-collapsed>
-	        <div class="md-title">{{setting.label}}</div>
-	    </md-expansion-panel-collapsed>
-	    <md-expansion-panel-expanded>
-			<md-expansion-panel-header
-				ng-click="$panel.collapse()">
-				<div class="md-title">{{setting.label}}</div>
-				<div class="md-summary">{{setting.description}}</div>
-			</md-expansion-panel-header>
-			<md-expansion-panel-content 
-				layout="column"
-				style="padding: 2px;">
-				<wb-setting-page
-					ng-model="wbModel"
-					wb-type="{{setting.type}}">
-				</wb-setting-page>
-			</md-expansion-panel-content>
-		</md-expansion-panel-expanded>
-	</md-expansion-panel>
+     id="WB-SETTING-PANEL">
+    <md-expansion-panel
+        ng-repeat="setting in settings| orderBy:priority track by setting.type"
+        ng-show="setting.visible">
+        <md-expansion-panel-collapsed>
+            <div class="md-title">{{setting.label}}</div>
+        </md-expansion-panel-collapsed>
+        <md-expansion-panel-expanded>
+            <md-expansion-panel-header
+                ng-click="$panel.collapse()">
+                <div class="md-title">{{setting.label}}</div>
+                <div class="md-summary">{{setting.description}}</div>
+            </md-expansion-panel-header>
+            <md-expansion-panel-content 
+                layout="column"
+                style="padding: 2px;">
+                <wb-setting-page
+                    ng-model="wbModel"
+                    wb-type="{{setting.type}}">
+                </wb-setting-page>
+            </md-expansion-panel-content>
+        </md-expansion-panel-expanded>
+    </md-expansion-panel>
 </div>
