@@ -2,15 +2,9 @@
 
     <!--<div layout="row" flex layout-align="center center">-->
 
-    <md-checkbox ng-model="allEqual" ng-checked="true">
+    <md-checkbox ng-model="allEqual" ng-checked="allEqual">
         Equal corners 
     </md-checkbox>
-
-    <!--        <p style="border: 1px solid red;border-top-left-radius: {{topLeft}};
-                 border-top-right-radius: {{topRight}};
-                 border-bottom-left-radius: {{bottomLeft}};
-                 border-bottom-right-radius: {{bottomRight}}" flex="50" translate>All Corners</p>-->
-    <!--        <span flex></span> -->
     
     <div ng-show="allEqual" layout="row" flex>
 
@@ -70,24 +64,6 @@
         
         <div layout="row" layout-align="space-between center">
             
-            <p flex="25">Bottom left</p>
-            
-            <md-slider-container flex>
-                <md-slider min="0" max="99" 
-                           ng-model="bottomLeft">
-                </md-slider>
-            </md-slider-container>
-            
-            <md-input-container flex="15">
-                <input type="number" style="text-align:center" ng-model="bottomLeft">
-            </md-input-container>
-
-            <p layout-align="end center">px</p>
-            
-        </div>
-        
-        <div layout="row" layout-align="space-between center">
-            
             <p flex="25">Bottom right</p>
             
             <md-slider-container flex>
@@ -98,6 +74,24 @@
             
             <md-input-container flex="15">
                 <input type="number" style="text-align:center" ng-model="bottomRight">
+            </md-input-container>
+
+            <p layout-align="end center">px</p>
+            
+        </div>
+        
+        <div layout="row" layout-align="space-between center">
+            
+            <p flex="25">Bottom left</p>
+            
+            <md-slider-container flex>
+                <md-slider min="0" max="99" 
+                           ng-model="bottomLeft">
+                </md-slider>
+            </md-slider-container>
+            
+            <md-input-container flex="15">
+                <input type="number" style="text-align:center" ng-model="bottomLeft">
             </md-input-container>
 
             <p layout-align="end center">px</p>

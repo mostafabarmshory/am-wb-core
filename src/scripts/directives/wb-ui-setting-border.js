@@ -57,8 +57,8 @@ angular.module('am-wb-core')
                     if ($scope.value) {
                         var topLeft = $scope.value.slice(0, 2);
                         var topRight = $scope.value.slice(5, 7);
-                        var bottomLeft = $scope.value.slice(10, 12);
-                        var bottomRight = $scope.value.slice(15, 17);
+                        var bottomRight = $scope.value.slice(10, 12);
+                        var bottomLeft = $scope.value.slice(15, 17);
                     }
 
                     //check if all values are equal
@@ -126,8 +126,8 @@ angular.module('am-wb-core')
                         $scope.value =
                                 topLeft + 'px' + ' '
                                 + topRight + 'px' + ' '
-                                + bottomLeft + 'px' + ' '
-                                + bottomRight + 'px';
+                                + bottomRight + 'px' + ' '
+                                + bottomLeft + 'px';
                     };
                 },
                 controllerAs: 'ctrl'
