@@ -27,16 +27,17 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wbUiSettingLength
+ * @name wbUiSettingPercentageLength
  * @author maso<mostafa.barmshory@dpq.co.ir>
  * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @author Masood<masoodzarei64@gmail.com>
  * @description Set length (css based)
  * 
  * @see https://www.w3schools.com/cssref/css_units.asp
  */
-.directive('wbUiSettingLength', function() {
+.directive('wbUiSettingPercentageLength', function() {
 	return {
-		templateUrl : 'views/directives/wb-ui-setting-length.html',
+		templateUrl : 'views/directives/wb-ui-setting-percentage-length.html',
 		restrict : 'E',
 		replace: true,
 		scope : {
@@ -48,9 +49,12 @@ angular.module('am-wb-core')
 		/*
 		 * @ngInject
 		 */
-		controller : function(/*$scope, $resource*/) {
+		controller : function($scope) {
+                   $scope.number = $scope.value * 100;
                    
-		},
-		controllerAs: 'ctrl'
+                   $scope.$watch('number', function (val) {
+                        $scope.value = val + '%';
+                    });
+		}
 	};
 });

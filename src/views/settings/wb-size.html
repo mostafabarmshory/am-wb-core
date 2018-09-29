@@ -4,40 +4,117 @@ Set size for widgets size
 
 @author mgh.
 @author maso<mostafa.barmshory@dpq.co.ir>
+
 -->
-<wb-ui-setting-length
-	title="Width" 
+<!--<md-input-container>
+    <label translate>Width (px)</label>
+    <input type="number" ng-model="wbModel.style.size.width">
+</md-input-container>
+<md-input-container>
+    <label translate>Height (px)</label>
+    <input type="number" ng-model="wbModel.style.size.height">
+</md-input-container>
+
+ SECTION: Min 
+<md-subheader 
+	class="md-no-sticky">
+	<span translate="">Min</span>
+</md-subheader>
+<md-input-container>
+    <label translate>Min width (px)</label>
+    <input type="number" ng-model="wbModel.style.size['min-width']">
+</md-input-container>
+<md-input-container>
+    <label translate>Min height (px)</label>
+    <input type="number" ng-model="wbModel.style.size['min-height']">
+</md-input-container>
+
+ SECTION: Max 
+<md-subheader 
+	class="md-no-sticky">
+	<span translate="">Max</span>
+</md-subheader>
+<md-input-container>
+    <label translate>Max width (px)</label>
+    <input type="number" ng-model="wbModel.style.size['max-width']">
+</md-input-container>
+<md-input-container>
+    <label translate>Max height (px)</label>
+    <input type="number" ng-model="wbModel.style.size['max-height']">
+</md-input-container>-->
+
+
+
+
+<!--<wb-ui-setting-length
+	title="Width(%)" 
 	value="wbModel.style.size.width">
 </wb-ui-setting-length>
 <wb-ui-setting-length
-	title="Height" 
+	title="Height(%)" 
 	value="wbModel.style.size.height">
 </wb-ui-setting-length>
 
-<!-- SECTION: Min -->
+ SECTION: Min 
 <md-subheader 
 	class="md-no-sticky">
 	<span translate="">Min</span>
 </md-subheader>
 <wb-ui-setting-length
-	title="Min width" 
+	title="Min width(%)" 
 	value="wbModel.style.size['min-width']">
 </wb-ui-setting-length>
 <wb-ui-setting-length
-	title="Min height" 
+	title="Min height(%)" 
 	value="wbModel.style.size['min-height']">
 </wb-ui-setting-length>
 
-<!-- SECTION: Max -->
+ SECTION: Max 
 <md-subheader 
 	class="md-no-sticky">
 	<span translate="">Max</span>
 </md-subheader>
 <wb-ui-setting-length
-	title="Max width" 
+	title="Max width(%)" 
 	value="wbModel.style.size['max-width']">
 </wb-ui-setting-length>
 <wb-ui-setting-length
-	title="Max height" 
+	title="Max height(%)" 
 	value="wbModel.style.size['max-height']">
-</wb-ui-setting-length>
+</wb-ui-setting-length>-->
+
+<wb-ui-setting-percentage-length
+	title="Width(%)" 
+	value="wbModel.style.size.width">
+</wb-ui-setting-percentage-length>
+<wb-ui-setting-percentage-length
+	title="Height(%)" 
+	value="wbModel.style.size.height">
+</wb-ui-setting-percentage-length>
+
+<md-subheader 
+	class="md-no-sticky">
+	<span translate="">SECTION: Min</span>
+</md-subheader>
+<wb-ui-setting-percentage-length
+	title="Min width(%)" 
+	value="wbModel.style.size['min-width']">
+</wb-ui-setting-percentage-length>
+<wb-ui-setting-percentage-length
+	title="Min height(%)" 
+	value="wbModel.style.size['min-height']">
+</wb-ui-setting-percentage-length>
+
+  
+<md-subheader 
+	class="md-no-sticky">
+	<span translate="">SECTION: Max</span>
+</md-subheader>
+<wb-ui-setting-percentage-length
+	title="Max width(%)" 
+	value="wbModel.style.size['max-width']">
+</wb-ui-setting-percentage-length>
+<wb-ui-setting-percentage-length
+	title="Max height(%)" 
+	value="wbModel.style.size['max-height']">
+</wb-ui-setting-percentage-length>

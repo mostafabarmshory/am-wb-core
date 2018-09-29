@@ -2323,9 +2323,10 @@ angular.module('am-wb-core')
 
         /**
          * @ngdoc Directives
-         * @name wbUiSettingLength
+         * @name wbUiSettingBorder
          * @author maso<mostafa.barmshory@dpq.co.ir>
          * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+         * @author Masood<masoodzarei64@gmail.com>
          * @description Set length (css based)
          * 
          * @see https://www.w3schools.com/cssref/css_units.asp
@@ -2867,7 +2868,7 @@ angular.module('am-wb-core')
 			description : '@?'
 		},
 		/*
-		 * @gnInject
+		 * @ngInject
 		 */
 		controller : function(/*$scope, $resource*/) {
                    
@@ -3027,6 +3028,67 @@ angular.module('am-wb-core')
 			title: '@title',
 			value: '=value',
 			icon: '@icon'
+		}
+	};
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingPercentageLength
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @author Masood<masoodzarei64@gmail.com>
+ * @description Set length (css based)
+ * 
+ * @see https://www.w3schools.com/cssref/css_units.asp
+ */
+.directive('wbUiSettingPercentageLength', function() {
+	return {
+		templateUrl : 'views/directives/wb-ui-setting-percentage-length.html',
+		restrict : 'E',
+		replace: true,
+		scope : {
+			title : '@?',
+			value : '=?',
+			icon : '@?',
+			description : '@?'
+		},
+		/*
+		 * @ngInject
+		 */
+		controller : function($scope) {
+                   $scope.number = $scope.value * 100;
+                   
+                   $scope.$watch('number', function (val) {
+                        $scope.value = val + '%';
+                    });
 		}
 	};
 });
@@ -5455,6 +5517,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/directives/wb-ui-setting-percentage-length.html',
+    "<md-input-container> <label ng-if=title translate>{{title}}</label> <input type=number min=0 max=100 ng-model=\"number\"> <div class=hint ng-if=description translate=\"\">{{description}}</div> </md-input-container>"
+  );
+
+
   $templateCache.put('views/directives/wb-ui-setting-text.html',
     "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input style=\"width: 200px\" ng-model=value flex> </md-input-container> </md-list-item>"
   );
@@ -5513,7 +5580,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-border.html',
-    " <md-input-container class=md-block> <label>Style</label> <md-select ng-model=wbModel.style.border.style> <md-option value=none>none</md-option> <md-option value=hidden>hidden</md-option> <md-option value=dotted>dotted</md-option> <md-option value=dashed>dashed</md-option> <md-option value=solid>solid</md-option> <md-option value=double>double</md-option> <md-option value=groove>groove</md-option> <md-option value=ridge>ridge</md-option> <md-option value=inset>inset</md-option> <md-option value=outset>outset</md-option> <md-option value=initial>initial</md-option> <md-option value=inherit>inherit</md-option> </md-select> </md-input-container> <md-input-container> <label>Width (px)</label> <input type=number ng-model=wbModel.style.border.width> </md-input-container> <wb-ui-setting-color title=\"{{'Color'| translate}}\" icon=format_color_fill ng-model=wbModel.style.border.color> </wb-ui-setting-color> <wb-ui-setting-border title=\"{{'Radius'| translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.radius> </wb-ui-setting-border>    "
+    " <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=wbModel.style.border.style> <md-option value=none>none</md-option> <md-option value=hidden>hidden</md-option> <md-option value=dotted>dotted</md-option> <md-option value=dashed>dashed</md-option> <md-option value=solid>solid</md-option> <md-option value=double>double</md-option> <md-option value=groove>groove</md-option> <md-option value=ridge>ridge</md-option> <md-option value=inset>inset</md-option> <md-option value=outset>outset</md-option> <md-option value=initial>initial</md-option> <md-option value=inherit>inherit</md-option> </md-select> </md-input-container> <md-input-container> <label translate>Width (px)</label> <input type=number ng-model=wbModel.style.border.width> </md-input-container> <wb-ui-setting-color title=\"{{'Color'| translate}}\" icon=format_color_fill ng-model=wbModel.style.border.color> </wb-ui-setting-color> <wb-ui-setting-border title=\"{{'Radius'| translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.radius> </wb-ui-setting-border>    "
   );
 
 
@@ -5538,7 +5605,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-size.html',
-    " <wb-ui-setting-length title=Width value=wbModel.style.size.width> </wb-ui-setting-length> <wb-ui-setting-length title=Height value=wbModel.style.size.height> </wb-ui-setting-length>  <md-subheader class=md-no-sticky> <span translate=\"\">Min</span> </md-subheader> <wb-ui-setting-length title=\"Min width\" value=\"wbModel.style.size['min-width']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" value=\"wbModel.style.size['min-height']\"> </wb-ui-setting-length>  <md-subheader class=md-no-sticky> <span translate=\"\">Max</span> </md-subheader> <wb-ui-setting-length title=\"Max width\" value=\"wbModel.style.size['max-width']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" value=\"wbModel.style.size['max-height']\"> </wb-ui-setting-length>"
+    " <wb-ui-setting-percentage-length title=Width(%) value=wbModel.style.size.width> </wb-ui-setting-percentage-length> <wb-ui-setting-percentage-length title=Height(%) value=wbModel.style.size.height> </wb-ui-setting-percentage-length> <md-subheader class=md-no-sticky> <span translate=\"\">SECTION: Min</span> </md-subheader> <wb-ui-setting-percentage-length title=\"Min width(%)\" value=\"wbModel.style.size['min-width']\"> </wb-ui-setting-percentage-length> <wb-ui-setting-percentage-length title=\"Min height(%)\" value=\"wbModel.style.size['min-height']\"> </wb-ui-setting-percentage-length> <md-subheader class=md-no-sticky> <span translate=\"\">SECTION: Max</span> </md-subheader> <wb-ui-setting-percentage-length title=\"Max width(%)\" value=\"wbModel.style.size['max-width']\"> </wb-ui-setting-percentage-length> <wb-ui-setting-percentage-length title=\"Max height(%)\" value=\"wbModel.style.size['max-height']\"> </wb-ui-setting-percentage-length>"
   );
 
 
