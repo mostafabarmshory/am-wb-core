@@ -1,16 +1,18 @@
 <div
-	layout="row">
+    layout="row">
     <wb-icon
-    	ng-if="icon"
-    	layout-padding>{{icon}}</wb-icon>
-	<div
-	    md-color-picker
-	    ng-model="valueColor"
-	    label="{{title}}"
-	    default="#f00"
-	    md-color-picker random="true"
-	    md-color-clear-button="true"
-	    md-color-generic-palette="false"
-	    md-color-history="false"
-		flex></div>
+        ng-if="icon"
+        layout-padding>{{icon}}
+    </wb-icon>
+    <div
+        md-color-picker
+        ng-model="valueColor"
+        label="{{title}}"
+        default="#f00"
+        random="true"
+        md-color-clear-button="true"
+        md-color-generic-palette="false"
+        md-color-history="false"
+        flex>
+    </div>
 </div>
