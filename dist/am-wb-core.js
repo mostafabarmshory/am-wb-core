@@ -151,89 +151,6 @@ angular.module('am-wb-core')
 angular.module('am-wb-core')
 /**
  * @ngdoc Directives
- * @name wb-align
- * @description Apply layout align into an element
- * 
- */
-.directive('wbAlign', function() {
-	var classPrefix = 'wb-flex-item-';
-
-	function removeLayout(element, config) {
-		element.removeClass(classPrefix + config.align);
-	}
-
-	/**
-	 * Adds layout config into the element
-	 * 
-	 * @param element
-	 * @param config
-	 * @returns
-	 */
-	function addLayout(element, config) {
-		element.addClass(classPrefix + config.align);
-	}
-
-	/**
-	 * Link view with attributes
-	 * 
-	 * 
-	 * @param scope
-	 * @param element
-	 * @param attrs
-	 * @returns
-	 */
-	function postLink($scope, $element, $attrs) {
-		// Watch for layout
-		$scope.$watch($attrs.wbLayout+'.align', function(newValue, oldValue) {
-			if(newValue===oldValue){
-				return;
-			}
-			if (oldValue) {
-				removeLayout($element, oldValue);
-			}
-			if (newValue) {
-				addLayout($element, newValue);
-			}
-		}, true);
-	}
-
-	/*
-	 * Directive
-	 */
-	return {
-		restrict : 'A',
-		link : postLink,
-		require:[]
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
  * @name wb-background
  * @description Apply background into the element
  */
@@ -456,7 +373,7 @@ angular.module('am-wb-core')
      * Adds layout config into the element
      * 
      * @param element
-     * @param config
+     * @param layout
      * @returns
      */
     function applyLayout(element, layout) {
@@ -513,14 +430,121 @@ angular.module('am-wb-core')
             }
             
 
-	/*
-	 * Directive
-	 */
-	return {
-		restrict : 'A',
-		link : postLink,
-		require:[]
-	};
+            // justify
+            var justify;
+            switch(layout.justify){
+            case 'start':
+                justify = 'flex-start';
+                break;
+            case 'end':
+                justify = 'flex-end';
+                break;
+            case 'center':
+                justify = 'center';
+                break;
+            case 'space-between':
+                justify = 'space-between';
+                break;
+            case 'space-around':
+                justify = 'space-around';
+                break;
+            case 'space-evenly':
+                justify = 'space-evenly';
+                break;
+            default:
+                justify = 'flex-start';
+            }
+            flexLayout['justify-content']= justify;
+
+            // align
+            var align;
+            switch(layout.align){
+            case 'start':
+                align = 'flex-start';
+                break;
+            case 'end':
+                align = 'flex-end';
+                break;
+            case 'center':
+                align = 'center';
+                break;
+            case 'baseline':
+                align = 'baseline';
+                break;
+            case 'stretch':
+                align = 'stretch';
+                break;
+            default:
+                align = 'stretch';
+            }
+            flexLayout['align-items']= align;
+        }
+
+        /*
+         * Widget
+         */
+        {
+            flexLayout.order = layout.order >= 0? layout.order : 0;
+            flexLayout['flex-grow'] = layout.grow >= 0? layout.grow : 0;
+            flexLayout['flex-shrink'] = layout.shrink >= 0? layout.shrink : 1;
+            // TODO: maso, 2018: compute based on size
+            flexLayout['flex-basis'] = 'auto';
+            
+            // align-self
+            // auto | flex-start | flex-end | center | baseline | stretch;
+            var alignSelf;
+            switch(layout.align_self){
+            case 'start':
+                alignSelf = 'flex-start';
+                break;
+            case 'end':
+                alignSelf = 'flex-end';
+                break;
+            case 'center':
+                alignSelf = 'center';
+                break;
+            case 'baseline':
+                alignSelf = 'baseline';
+                break;
+            case 'stretch':
+                alignSelf = 'stretch';
+                break;
+            default:
+                alignSelf = 'auto';
+            }
+            flexLayout['align-self']= alignSelf;
+        }
+        
+        // apply to element
+        element.css(flexLayout);
+    }
+
+    /**
+     * Link view with attributes
+     * 
+     * 
+     * @param scope
+     * @param element
+     * @param attrs
+     * @returns
+     */
+    function postLink($scope, $element, $attrs) {
+        // Watch for layout
+        $scope.$watch($attrs.wbLayout+'.layout', function(layout) {
+            if(layout){
+                applyLayout($element, layout);
+            }
+        }, true);
+    }
+
+    /*
+     * Directive
+     */
+    return {
+        restrict : 'A',
+        link : postLink,
+        require:[]
+    };
 });
 /* 
  * The MIT License (MIT)
@@ -809,6 +833,117 @@ angular.module('am-wb-core')
 		priority: 1,
 		require:['^wbGroup']
 	};
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc Directives
+ * @name wb-layout
+ * @description Apply layout into an element
+ * 
+ * Group and page are the main goles of this directive. By adding the wbLayout,
+ * widget are able to manages it layout automatically.
+ * 
+ * Note that, in smal screen devices, the colume layout apply as default.
+ */
+.directive('wbWidgetLayout', function() {
+
+    /**
+     * Adds layout config into the element
+     * 
+     * @param element
+     * @param config
+     * @returns
+     */
+    function applyLayout(element, layout) {
+        var flexLayout = {};
+        /*
+         * Widget
+         */
+        flexLayout.order = layout.order >= 0? layout.order : 0;
+        flexLayout['flex-grow'] = layout.grow >= 0? layout.grow : 0;
+        flexLayout['flex-shrink'] = layout.shrink >= 0? layout.shrink : 1;
+        // TODO: maso, 2018: compute based on size
+        flexLayout['flex-basis'] = 'auto';
+
+        // align-self
+        // auto | flex-start | flex-end | center | baseline | stretch;
+        var alignSelf;
+        switch(layout.align_self){
+        case 'start':
+            alignSelf = 'flex-start';
+            break;
+        case 'end':
+            alignSelf = 'flex-end';
+            break;
+        case 'center':
+            alignSelf = 'center';
+            break;
+        case 'baseline':
+            alignSelf = 'baseline';
+            break;
+        case 'stretch':
+            alignSelf = 'stretch';
+            break;
+        default:
+            alignSelf = 'auto';
+        }
+        flexLayout['align-self']= alignSelf;
+
+        // apply to element
+        element.css(flexLayout);
+    }
+
+    /**
+     * Link view with attributes
+     * 
+     * 
+     * @param scope
+     * @param element
+     * @param attrs
+     * @returns
+     */
+    function postLink($scope, $element, $attrs) {
+        // Watch for layout
+        $scope.$watch($attrs.wbWidgetLayout+'.layout', function(layout) {
+            if(layout){
+                applyLayout($element, layout);
+            }
+        }, true);
+    }
+
+    /*
+     * Directive
+     */
+    return {
+        restrict : 'A',
+        link : postLink,
+        require:[]
+    };
 });
 /* 
  * The MIT License (MIT)
@@ -5331,7 +5466,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widget.html',
-    "<div class=wb-widget name={{wbModel.name}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-type=wbModel.type dnd-effect-allowed=copyMove dnd-callback=1 dnd-moved=ctrl.delete() wb-widget-size=wbModel.style wb-align=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event md-theme-watch=true ng-class=\"{\n" +
+    "<div class=wb-widget name={{wbModel.name}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-type=wbModel.type dnd-effect-allowed=copyMove dnd-callback=1 dnd-moved=ctrl.delete() wb-widget-size=wbModel.style wb-widget-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event md-theme-watch=true ng-class=\"{\n" +
     "\t\t'wb-widget-edit': ctrl.isEditable(),\n" +
     "\t\t'wb-widget-select': ctrl.isSelected()\n" +
     "\t}\" transclude></div>"
@@ -5383,22 +5518,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-description.html',
-    " <md-input-container> <label translate>Lable</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate>Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate>Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=\"{{Cover | translate}}\" ng-model=wbModel.cover> </wb-ui-setting-image>"
+    " <md-input-container> <label translate=\"\">Label</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate=\"\">Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate=\"\">Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=\"{{Cover | translate}}\" ng-model=wbModel.cover> </wb-ui-setting-image>"
   );
 
 
-  $templateCache.put('views/settings/wb-general.html',
-    ""
-  );
-
-
-  $templateCache.put('views/settings/wb-layout-page.html',
-    " <wb-ui-setting-choose title=Direction icon=wb-direction items=direction ng-model=wbModel.style.layout.direction> </wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction=='row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.layout.direction=='row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}\" items=align[wbModel.style.layout.direction] ng-model=wbModel.style.layout.align> </wb-ui-setting-choose>  <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction!='row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.layout.direction!='row')?'wb-vertical-arrows':'wb-horizontal-arrows'}}\" items=justify[wbModel.style.layout.direction] ng-model=wbModel.style.layout.justify> </wb-ui-setting-choose>"
-  );
-
-
-  $templateCache.put('views/settings/wb-layout-self.html',
-    " <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction!='row')?'Vert.':'Horz.'}}\" icon=\"{{(wbModel.style.layout.direction!='row')?'swap_vert':'swap_horiz'}}\" items=selfAlign ng-model=wbModel.style.align.align> </wb-ui-setting-choose>"
+  $templateCache.put('views/settings/wb-layout.html',
+    " <wb-ui-setting-choose ng-if=\"wbModel.type==='Group'\" title=Direction icon=wb-direction items=direction ng-model=wbModel.style.layout.direction> </wb-ui-setting-choose>  <md-switch ng-if=\"wbModel.type==='Group'\" ng-model=wbModel.style.layout.wrap aria-label=\"Layout wrap\"> <span ng-if=\"wbModel.style.layout.direction==='row'\" translate=\"\">Multi row</span> <span ng-if=\"wbModel.style.layout.direction!=='row'\" translate=\"\">Multi column</span> </md-switch>  <wb-ui-setting-choose ng-if=\"wbModel.type==='Group'\" title=\"{{(wbModel.style.layout.direction=='row')?'Vert.':'Horz.'}}\" items=align[wbModel.style.layout.direction] ng-model=wbModel.style.layout.align> </wb-ui-setting-choose>  <wb-ui-setting-choose ng-if=\"wbModel.type==='Group'\" title=\"{{(wbModel.style.layout.direction!='row')?'Vert.':'Horz.'}}\" items=justify[wbModel.style.layout.direction] ng-model=wbModel.style.layout.justify> </wb-ui-setting-choose>   <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction!='row')?'Self Vert.':'Self Horz.'}}\" items=\"selfAlign['row']\" ng-model=wbModel.style.layout.align_self> </wb-ui-setting-choose>"
   );
 
 
@@ -5457,7 +5582,6 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
     "\t\t\t'contextmenu',\n" +
     "\t\t\t'directionality',\n" +
     "\t\t\t'emoticons',\n" +
-    "\t\t\t'fullscreen',\n" +
     "\t\t\t'hr',\n" +
     "\t\t\t'image',\n" +
     "\t\t\t'imagetools',\n" +
@@ -5484,11 +5608,19 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
     "\t\t\t\n" +
     "\t\t],\n" +
     "\t\ttoolbar: [\n" +
-    "      \t\t'fullscreen | undo redo | bold italic underline | fontselect fontsizeselect | visualblocks',\n" +
+    "      \t\t'fullscreen | undo redo | bold italic underline | styleselect fontselect fontsizeselect | visualblocks',\n" +
     "      \t\t'forecolor backcolor | ltr rtl |alignleft aligncenter alignright alignfull | numlist bullist outdent indent'\n" +
     "    \t],\n" +
     "\t    powerpaste_word_import: 'clean',\n" +
-    "\t    powerpaste_html_import: 'clean'\n" +
+    "\t    powerpaste_html_import: 'clean',\n" +
+    "\t\ttextpattern_patterns: [\n" +
+    "\t\t    {start: '*', end: '*', format: 'italic'},\n" +
+    "\t\t    {start: '**', end: '**', format: 'bold'},\n" +
+    "\t\t    {start: '#', format: 'h1'},\n" +
+    "\t\t    {start: '##', format: 'h2'},\n" +
+    "\t\t    {start: '###', format: 'h3'}\n" +
+    "\t\t],\n" +
+    "\t\tformat: 'raw'\n" +
     "\t}\" ng-model=wbModel.text class=\"wb-widget-fill tinymce wb-widget-text\"> </div>"
   );
 

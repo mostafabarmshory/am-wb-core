@@ -40,7 +40,7 @@ angular.module('am-wb-core')
      * Adds layout config into the element
      * 
      * @param element
-     * @param config
+     * @param layout
      * @returns
      */
     function applyLayout(element, layout) {
