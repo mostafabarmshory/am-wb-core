@@ -2981,6 +2981,71 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
+        /**
+         * @ngdoc Directives
+         * @name wbUiSettingMarginPadding
+         * @author maso<mostafa.barmshory@dpq.co.ir>
+         * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+         * @author Masood<masoodzarei64@gmail.com>
+         * @description Set length (css based)
+         * 
+         * @see https://www.w3schools.com/cssref/css_units.asp
+         */
+        .directive('wbUiSettingMarginPadding', function () {
+            return {
+                templateUrl: 'views/directives/wb-ui-setting-margin-padding.html',
+                restrict: 'E',
+                replace: true,
+                scope: {
+                    title: '@?',
+                    value: '=?',
+                    icon: '@?',
+                    description: '@?'
+                },
+                /*
+                 * @ngInject
+                 */
+                controller: function ($scope) {
+                    if ($scope.value) {
+                        var len = $scope.value.length;
+                        //extract number from value (value without 'px')
+                        $scope.number = $scope.value.slice(0, len - 2);
+                    }
+
+                    $scope.$watch('number', function (val) {
+                        $scope.value = val + 'px';
+                    });
+                }
+            };
+        });
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
 /**
  * @ngdoc Directives
  * @name wbUiSettingNumber
@@ -5506,7 +5571,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-image.html',
-    "<div layout-align=\"center center\" layout=row class=wb-ui-setting-image> <img ng-click=selectImage() ng-src={{value}} md-colors=\"{'borderColor': 'accent'}\" class=wb-ui-setting-image-preview style=\"border-size: 1px; border-style: solid\"> <md-input-container class=md-icon-float flex> <label ng-if=title translate=\"\">{{title}}</label> <input ng-model=value> <wb-icon ng-click=selectImage()>more_horiz</wb-icon> </md-input-container> </div>"
+    "<div class=\"wb-ui-setting-image wb-ui-setting-image-container\" layout=row> <div class=wb-ui-setting-image-preview ng-click=ctrl.showImagePicker($event) ng-if=wbUiSettingPreview> <img ng-show=value class=wb-ui-setting-image-result ng-src=\"{{value}}\"> </div> <md-input-container class=md-icon-float flex> <label ng-if=title> <span translate=\"\">{{title}}</span> </label> <input type=input ng-model=value class=wb-ui-setting-image-input ng-mousedown=\"(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)\"> </md-input-container> <md-button class=\"md-icon-button wb-ui-setting-image-clear\" ng-if=\"wbUiSettingClearButton && value\" ng-click=ctrl.clearValue($event); aria-label=\"Clear image\"> <md-icon md-svg-icon=clear.svg></md-icon> </md-button> </div>"
   );
 
 
@@ -5517,6 +5582,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-ui-setting-link.html',
     "<md-input-container class=md-icon-float> <input ng-model=url placeholder={{title}}> <wb-icon ng-click=selectlink() style=\"display:inline-block; cursor: pointer\">more_horiz</wb-icon> </md-input-container>"
+  );
+
+
+  $templateCache.put('views/directives/wb-ui-setting-margin-padding.html',
+    "<md-input-container> <label ng-if=title translate>{{title}}</label> <input type=number min=0 max=100 ng-model=\"number\"> <div class=hint ng-if=description translate>{{description}} </div> </md-input-container>"
   );
 
 
@@ -5588,7 +5658,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-background.html',
-    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" icon=format_color_fill ng-model=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
+    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" ng-model=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
   );
 
 
@@ -5608,7 +5678,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-margin-padding.html',
-    " <wb-ui-setting-length title=\"{{'Margin' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.margin> </wb-ui-setting-length> <wb-ui-setting-length title=\"{{'Padding' | translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.padding> </wb-ui-setting-length>"
+    " <wb-ui-setting-margin-padding title=\"{{'Margin(px)' | translate}}\" icon=wb-blank value=wbModel.style.margin> </wb-ui-setting-margin-padding> <wb-ui-setting-margin-padding title=\"{{'Padding(px)' | translate}}\" icon=wb-blank value=wbModel.style.padding> </wb-ui-setting-margin-padding> {{wbModel.style.margin}} {{wbModel.style.padding}}"
   );
 
 
@@ -5618,7 +5688,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-size.html',
-    " <wb-ui-setting-percentage-length title=Width(%) value=wbModel.style.size.width> </wb-ui-setting-percentage-length> <wb-ui-setting-percentage-length title=Height(%) value=wbModel.style.size.height> </wb-ui-setting-percentage-length> <md-subheader class=md-no-sticky> <span translate=\"\">SECTION: Min</span> </md-subheader> <wb-ui-setting-percentage-length title=\"Min width(%)\" value=\"wbModel.style.size['min-width']\"> </wb-ui-setting-percentage-length> <wb-ui-setting-percentage-length title=\"Min height(%)\" value=\"wbModel.style.size['min-height']\"> </wb-ui-setting-percentage-length> <md-subheader class=md-no-sticky> <span translate=\"\">SECTION: Max</span> </md-subheader> <wb-ui-setting-percentage-length title=\"Max width(%)\" value=\"wbModel.style.size['max-width']\"> </wb-ui-setting-percentage-length> <wb-ui-setting-percentage-length title=\"Max height(%)\" value=\"wbModel.style.size['max-height']\"> </wb-ui-setting-percentage-length>"
+    " <wb-ui-setting-percentage-length title=Width(%) value=wbModel.style.size.width> </wb-ui-setting-percentage-length> <wb-ui-setting-percentage-length title=Height(%) value=wbModel.style.size.height> </wb-ui-setting-percentage-length> <md-subheader class=md-no-sticky> <span translate=\"\">SECTION: Min</span> </md-subheader> <wb-ui-setting-percentage-length title=\"Min width(%)\" value=\"wbModel.style.size['min-width']\"> </wb-ui-setting-percentage-length> <wb-ui-setting-percentage-length title=\"Min height(%)\" value=\"wbModel.style.size['min-height']\"> </wb-ui-setting-percentage-length> <md-subheader class=md-no-sticky> <span translate=\"\">SECTION: Max</span> </md-subheader> <wb-ui-setting-percentage-length title=\"Max width(%)\" value=\"wbModel.style.size['max-width']\"> </wb-ui-setting-percentage-length> <wb-ui-setting-percentage-length title=\"Max height(%)\" value=\"wbModel.style.size['max-height']\"> </wb-ui-setting-percentage-length>    "
   );
 
 
