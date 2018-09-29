@@ -23,6 +23,10 @@
  */
 'use strict';
 
+//General options
+// - wbUiSettingClearButton 
+// - wbUiSettingPreview
+
 angular.module('am-wb-core')
 
 /**
@@ -56,7 +60,16 @@ angular.module('am-wb-core')
 		 * @ngInject
 		 */
 		controller: function($scope, $resource){
-			function selectImage(){
+			// TODO: maso, 2018:load from user config
+			$scope.wbUiSettingClearButton = true;
+			$scope.wbUiSettingPreview = true;
+
+			function clearValue(/*$event*/){
+				// General option
+				$scope.value = null;
+			}
+			
+			function showImagePicker(){
 				return $resource.get('image', {
 					style: {
 						icon: 'image',
@@ -70,7 +83,10 @@ angular.module('am-wb-core')
 				});
 			}
 
-			$scope.selectImage = selectImage;
-		}
+			this.showImagePicker = showImagePicker;
+			this.clearValue = clearValue;
+			
+		},
+		controllerAs: 'ctrl'
 	};
 });
