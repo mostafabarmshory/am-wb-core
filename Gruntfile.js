@@ -145,24 +145,24 @@ module.exports = function(grunt) {
                 hostname : 'localhost',
                 livereload : 35729
             },
-            proxies : [ {
-                context : '/', // the context of the data service
-                // wherever the data service is running
-                host : '<%= yeoman.pkg.backend.host %>',
-                // the port that the data service is running on
-                port : '<%= yeoman.pkg.backend.port %>',
-                changeOrigin : true,
-                headers : {
-                    host : '<%= yeoman.pkg.backend.host %>'
-                }
-            } ],
+//            proxies : [ {
+//                context : '/', // the context of the data service
+//                // wherever the data service is running
+//                host : '<%= yeoman.pkg.backend.host %>',
+//                // the port that the data service is running on
+//                port : '<%= yeoman.pkg.backend.port %>',
+//                changeOrigin : true,
+//                headers : {
+//                    host : '<%= yeoman.pkg.backend.host %>'
+//                }
+//            } ],
             livereload : {
                 options : {
                     open : true,
                     middleware : function(connect, options) {
                         var middlewares = [];
                         //Matches everything that does not contain a '.' (period)
-                        middlewares.push(modRewrite([ '!/api/.*|^.*\\..*$ /index.html [L]' ]));
+//                        middlewares.push(modRewrite([ '!/api/.*|^.*\\..*$ /index.html [L]' ]));
                         middlewares.push(connect.static('.tmp'));
                         middlewares.push(
                                 connect()
@@ -179,9 +179,9 @@ module.exports = function(grunt) {
                             options.base = [ options.base ];
                         }
 
-                        // Setup the proxy
-                        middlewares
-                        .push(require('grunt-connect-proxy/lib/utils').proxyRequest);
+//                        // Setup the proxy
+//                        middlewares
+//                        .push(require('grunt-connect-proxy/lib/utils').proxyRequest);
 
                         // Serve static files
                         options.base.forEach(function(base) {
@@ -332,6 +332,7 @@ module.exports = function(grunt) {
          */
         wiredep : {
             app : {
+                devDependencies : true,
                 src : [ 'demo/index.html' ],
                 ignorePath : /\.\.\//
             },
