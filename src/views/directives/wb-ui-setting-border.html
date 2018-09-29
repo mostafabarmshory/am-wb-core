@@ -1,0 +1,108 @@
+<div layout="column">
+
+    <p translate>Radius</p>    
+    
+    <md-checkbox ng-model="allEqual" ng-checked="allEqual">
+        All equal 
+    </md-checkbox>
+    
+    <div ng-show="allEqual" layout="row" flex>
+
+        <md-slider-container flex>
+            <md-slider min="0" max="99" 
+                       ng-model="allCorner">
+            </md-slider>
+        </md-slider-container>
+
+        <md-input-container flex="20">
+            <input type="number" style="text-align:center" ng-model="allCorner">
+        </md-input-container>
+
+        <p layout-align="end center">px</p>
+        
+    </div>
+
+    <div layout="column" ng-show="!allEqual">
+
+        <md-divider></md-divider>
+
+        <div layout="row" layout-align="space-between center">
+            
+            <p flex="25">Top left</p>
+            
+            <md-slider-container flex>
+                <md-slider min="0" max="99" 
+                           ng-model="topLeft">
+                </md-slider>
+            </md-slider-container>
+            
+            <md-input-container flex="15">
+                <input type="number" style="text-align:center" ng-model="topLeft">
+            </md-input-container>
+
+            <p layout-align="end center">px</p>
+            
+        </div>
+        
+        <div layout="row" layout-align="space-between center">
+            
+            <p flex="25">Top right</p>
+            
+            <md-slider-container flex>
+                <md-slider min="0" max="99" 
+                           ng-model="topRight">
+                </md-slider>
+            </md-slider-container>
+            
+            <md-input-container flex="15">
+                <input type="number" style="text-align:center" ng-model="topRight">
+            </md-input-container>
+
+            <p layout-align="end center">px</p>
+            
+        </div>
+        
+        <div layout="row" layout-align="space-between center">
+            
+            <p flex="25">Bottom right</p>
+            
+            <md-slider-container flex>
+                <md-slider min="0" max="99" 
+                           ng-model="bottomRight">
+                </md-slider>
+            </md-slider-container>
+            
+            <md-input-container flex="15">
+                <input type="number" style="text-align:center" ng-model="bottomRight">
+            </md-input-container>
+
+            <p layout-align="end center">px</p>
+            
+        </div>
+        
+        <div layout="row" layout-align="space-between center">
+            
+            <p flex="25">Bottom left</p>
+            
+            <md-slider-container flex>
+                <md-slider min="0" max="99" 
+                           ng-model="bottomLeft">
+                </md-slider>
+            </md-slider-container>
+            
+            <md-input-container flex="15">
+                <input type="number" style="text-align:center" ng-model="bottomLeft">
+            </md-input-container>
+
+            <p layout-align="end center">px</p>
+            
+        </div>
+
+    </div>
+    
+    <div 
+        class="hint" 
+        ng-if="description"
+        translate="">{{description}}
+    </div>
+</div>
