@@ -326,12 +326,8 @@ md-input-container > ng-md-icon + input {
     width: 10px !important;
     height: 32px;
 }
-<<<<<<< HEAD
 
 
-=======
-
->>>>>>> branch 'develop' of https://gitlab.com/am-wb/am-wb-core.git
 .wb-ui-setting-image {
 /*  */
 }
@@ -398,11 +394,7 @@ md-input-container > ng-md-icon + input {
 
 .wb-ui-setting-image-preview[dir='rtl'] {
 	margin-left: 8px;
-<<<<<<< HEAD
 } */
-=======
-}
->>>>>>> branch 'develop' of https://gitlab.com/am-wb/am-wb-core.git
 /**************************************************************************************
                                      Widget layout
 

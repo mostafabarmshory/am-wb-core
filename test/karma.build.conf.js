@@ -48,7 +48,7 @@ module.exports = function(config) {
 			'bower_components/handsontable/dist/handsontable.js',
 			'bower_components/ngHandsontable/dist/ngHandsontable.js',
 			'bower_components/tinycolor/tinycolor.js',
-			'bower_components/md-color-picker/dist/mdColorPicker.min.js',
+			'bower_components/md-color-picker/dist/md-color-picker.js',
 			'bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js',
 			'bower_components/jspanel4x/dist/jspanel.js',
 			'bower_components/lodash/lodash.js',
