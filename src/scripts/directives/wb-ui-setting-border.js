@@ -27,9 +27,10 @@ angular.module('am-wb-core')
 
         /**
          * @ngdoc Directives
-         * @name wbUiSettingLength
+         * @name wbUiSettingBorder
          * @author maso<mostafa.barmshory@dpq.co.ir>
          * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+         * @author Masood<masoodzarei64@gmail.com>
          * @description Set length (css based)
          * 
          * @see https://www.w3schools.com/cssref/css_units.asp

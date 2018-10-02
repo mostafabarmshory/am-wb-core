@@ -5,15 +5,15 @@ Created by mgh on 8/10/2016.
 @author maso(mostafa.barmshory@dpq.ir)
 -->
 <!-- TODO: maso, 2018: add a UI editor for these attributes -->
-<wb-ui-setting-length
-	title="{{'Margin' | translate}}"
-	slider=""
-	icon="wb-blank"
-	value="wbModel.style.margin"
-> </wb-ui-setting-length>
-<wb-ui-setting-length
-	title="{{'Padding' | translate}}"
-	slider=""
-	icon="wb-blank"
-	value="wbModel.style.padding"
-> </wb-ui-setting-length>
+<wb-ui-setting-margin-padding
+    title="{{'Margin(px)' | translate}}"
+    icon="wb-blank"
+    value="wbModel.style.margin">
+</wb-ui-setting-margin-padding>
+<wb-ui-setting-margin-padding
+    title="{{'Padding(px)' | translate}}"
+    icon="wb-blank"
+    value="wbModel.style.padding">
+</wb-ui-setting-margin-padding>
+{{wbModel.style.margin}}
+{{wbModel.style.padding}}

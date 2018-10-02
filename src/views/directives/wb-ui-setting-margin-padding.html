@@ -1,0 +1,15 @@
+<md-input-container>
+	<label
+		ng-if="title"
+		translate>{{title}}</label>
+	<input  
+		type="number"
+                min="0"
+                max="100"
+		ng-model="number" />
+	<div 
+		class="hint" 
+		ng-if="description"
+		translate>{{description}}
+        </div>
+</md-input-container>
