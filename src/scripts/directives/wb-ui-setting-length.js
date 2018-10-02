@@ -46,9 +46,10 @@ angular.module('am-wb-core')
 			description : '@?'
 		},
 		/*
-		 * @gnInject
+		 * @ngInject
 		 */
 		controller : function(/*$scope, $resource*/) {
+                   
 		},
 		controllerAs: 'ctrl'
 	};

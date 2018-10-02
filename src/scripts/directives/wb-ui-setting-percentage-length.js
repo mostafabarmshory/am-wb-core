@@ -24,60 +24,37 @@
 'use strict';
 
 angular.module('am-wb-core')
+
 /**
  * @ngdoc Directives
- * @name wb-align
- * @description Apply layout align into an element
+ * @name wbUiSettingPercentageLength
+ * @author maso<mostafa.barmshory@dpq.co.ir>
+ * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+ * @author Masood<masoodzarei64@gmail.com>
+ * @description Set length (css based)
  * 
+ * @see https://www.w3schools.com/cssref/css_units.asp
  */
-.directive('wbAlign', function() {
-	var classPrefix = 'wb-flex-item-';
-
-	function removeLayout(element, config) {
-		element.removeClass(classPrefix + config.align);
-	}
-
-	/**
-	 * Adds layout config into the element
-	 * 
-	 * @param element
-	 * @param config
-	 * @returns
-	 */
-	function addLayout(element, config) {
-		element.addClass(classPrefix + config.align);
-	}
-
-	/**
-	 * Link view with attributes
-	 * 
-	 * 
-	 * @param scope
-	 * @param element
-	 * @param attrs
-	 * @returns
-	 */
-	function postLink($scope, $element, $attrs) {
-		// Watch for layout
-		$scope.$watch($attrs.wbLayout+'.align', function(newValue, oldValue) {
-			if(newValue===oldValue){
-				return;
-			}
-			if (oldValue) {
-				removeLayout($element, oldValue);
-			}
-			if (newValue) {
-				addLayout($element, newValue);
-			}
-		}, true);
-	}
-
-	/*
-	 * Directive
-	 */
+.directive('wbUiSettingPercentageLength', function() {
 	return {
-		restrict : 'A',
-		link : postLink,
-		require:[]
+		templateUrl : 'views/directives/wb-ui-setting-percentage-length.html',
+		restrict : 'E',
+		replace: true,
+		scope : {
+			title : '@?',
+			value : '=?',
+			icon : '@?',
+			description : '@?'
+		},
+		/*
+		 * @ngInject
+		 */
+		controller : function($scope) {
+                   $scope.number = $scope.value * 100;
+                   
+                   $scope.$watch('number', function (val) {
+                        $scope.value = val + '%';
+                    });
+		}
 	};
 });

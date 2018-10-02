@@ -14,27 +14,72 @@ Created by mgh.
 @version 2.x All settings are rewrite based on new data model of the border
 -->
 <!-- TODO: maso, 2018: add a UI editor for these attributes -->
+
+<md-input-container class="md-block">
+    <label translate>Style</label>
+    <md-select ng-model="wbModel.style.border.style">
+        <md-option value="none">none</md-option>
+        <md-option value="hidden">hidden</md-option>
+        <md-option value="dotted">dotted</md-option>
+        <md-option value="dashed">dashed</md-option>
+        <md-option value="solid">solid</md-option>
+        <md-option value="double">double</md-option>
+        <md-option value="groove">groove</md-option>
+        <md-option value="ridge">ridge</md-option>
+        <md-option value="inset">inset</md-option>
+        <md-option value="outset">outset</md-option>
+        <md-option value="initial">initial</md-option>
+        <md-option value="inherit">inherit</md-option>
+    </md-select>
+</md-input-container>
+
+<md-input-container>
+    <label translate>Width (px)</label>
+    <input type="number" ng-model="wbModel.style.border.width">
+</md-input-container>
+
+<wb-ui-setting-color 
+    title="{{'Color'| translate}}" 
+    wb-ui-setting-clear-button="true"
+    wb-ui-setting-preview="true"
+    wb-ui-setting-icon="format_color_fill"
+    ng-model="wbModel.style.border.color">
+</wb-ui-setting-color>
+
+
+<wb-ui-setting-border
+    title="{{'Radius'| translate}}"
+    slider=""
+    icon="wb-blank"
+    value="wbModel.style.border.radius"> 
+</wb-ui-setting-border>
+
+
+
+<!--old version-->
+<!--<wb-ui-setting-length
+    title="{{'Style'| translate}}"
+    slider=""
+    icon="wb-blank"
+    value="wbModel.style.border.style"
+    > </wb-ui-setting-length>-->
+<!--<wb-ui-setting-length
+    title="{{'Width'| translate}}"
+    slider=""
+    icon="wb-blank"
+    value="wbModel.style.border.width"
+    > </wb-ui-setting-length>
+
 <wb-ui-setting-length
-	title="{{'Style' | translate}}"
-	slider=""
-	icon="wb-blank"
-	value="wbModel.style.border.style"
-> </wb-ui-setting-length>
-<wb-ui-setting-length
-	title="{{'Width' | translate}}"
-	slider=""
-	icon="wb-blank"
-	value="wbModel.style.border.width"
-> </wb-ui-setting-length>
-<wb-ui-setting-length
-	title="{{'Color' | translate}}"
-	slider=""
-	icon="wb-blank"
-	value="wbModel.style.border.color"
-> </wb-ui-setting-length>
-<wb-ui-setting-length
-	title="{{'Radius' | translate}}"
-	slider=""
-	icon="wb-blank"
-	value="wbModel.style.border.radius"
-> </wb-ui-setting-length>
+    title="{{'Color' | translate}}"
+    slider=""
+    icon="wb-blank"
+    value="wbModel.style.border.color"
+    > </wb-ui-setting-length>-->
+
+<!--<wb-ui-setting-length
+    title="{{'Radius'| translate}}"
+    slider=""
+    icon="wb-blank"
+    value="wbModel.style.border.radius"
+    > </wb-ui-setting-length>-->

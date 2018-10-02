@@ -11,145 +11,6 @@
 }
 
 
-/**
- * Flex css utility (cross browser)
- *
- * Created by mgh on 8/4/16.
- * Updated by maso on 2017-05-30 (adding layout in small devices)
- */
-.wb-flex, .wb-flex-row, .wb-flex-column {
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-}
-
-.wb-flex-row {
-    -webkit-flex-direction: row;
-    -ms-flex-direction: row;
-    flex-direction: row;
-}
-
-.wb-flex-column {
-    -webkit-flex-direction: column;
-    -ms-flex-direction: column;
-    flex-direction: column;
-}
-
-.wb-flex-wrap {
-    -webkit-flex-wrap: wrap;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
-}
-
-.wb-flex-nowrap {
-    -webkit-flex-wrap: nowrap;
-    -ms-flex-wrap: nowrap;
-    flex-wrap: nowrap;
-}
-
-/*
- * Layout in small devices
- */
-
-@media ( max-width : 959px) {
-    .wb-flex-row {
-        -webkit-flex-direction: column;
-        -ms-flex-direction: column;
-        flex-direction: column;
-        -webkit-align-items: stretch;
-        -ms-flex-align: stretch;
-        align-items: stretch;
-    }
-    .wb-flex-column{}
-    .wb-flex-wrap {}
-    .wb-flex-nowrap {}
-}
-
-/* justify-content */
-.wb-flex-justify-content-start {
-    -webkit-justify-content: flex-start;
-    -ms-flex-pack: start;
-    justify-content: flex-start;
-}
-
-.wb-flex-justify-content-end {
-    -webkit-justify-content: flex-end;
-    -ms-flex-pack: end;
-    justify-content: flex-end;
-}
-
-.wb-flex-justify-content-center {
-    -webkit-justify-content: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-}
-
-.wb-flex-justify-content-space-between {
-    -webkit-justify-content: space-between;
-    -ms-flex-pack: justify;
-    justify-content: space-between;
-}
-
-.wb-flex-justify-content-space-around {
-    -webkit-justify-content: space-around;
-    -ms-flex-pack: distribute;
-    justify-content: space-around;
-}
-
-/* align-items */
-.wb-flex-align-items-start {
-    -webkit-align-items: flex-start;
-    -ms-flex-align: start;
-    align-items: flex-start;
-}
-
-.wb-flex-align-items-end {
-    -webkit-align-items: flex-end;
-    -ms-flex-align: end;
-    align-items: flex-end;
-}
-
-.wb-flex-align-items-center {
-    -webkit-align-items: center;
-    -ms-flex-align: center;
-    align-items: center;
-}
-
-.wb-flex-align-items-stretch {
-    -webkit-align-items: stretch;
-    -ms-flex-align: stretch;
-    align-items: stretch;
-}
-
-.wb-flex-item-auto {
-    -webkit-align-self: auto;
-    -ms-flex-item-align: auto;
-    align-self: auto;
-}
-
-.wb-flex-item-start {
-    -webkit-align-self: flex-start;
-    -ms-flex-item-align: start;
-    align-self: flex-start;
-}
-
-.wb-flex-item-end {
-    -webkit-align-self: flex-end;
-    -ms-flex-item-align: end;
-    align-self: flex-end;
-}
-
-.wb-flex-item-stretch {
-    -webkit-align-self: stretch;
-    -ms-flex-item-align: stretch;
-    align-self: stretch;
-}
-
-.wb-flex-item-center {
-    -webkit-align-self: center;
-    -ms-flex-item-align: center;
-    align-self: center;
-}
 /*
 Rules for sizing the icon.
 */
@@ -466,26 +327,74 @@ md-input-container > ng-md-icon + input {
     height: 32px;
 }
 
+
 .wb-ui-setting-image {
 /*  */
 }
 
-.wb-ui-setting-image-preview {
-	cursor: pointer;
+.wb-ui-setting-image-container {
+	position: relative;
+}
+
+.wb-ui-setting-image-container .wb-ui-setting-image-input::-ms-clear {
+	display: none;
+}
+
+
+.wb-ui-setting-image-container .wb-ui-setting-image-preview {
+/* 	cursor: pointer;
 	border-radius: 50%;
 	border-width: 2px;
-	/* size */
 	width: 32px;
 	height: 32px;
-	
-	/* margin */
 	margin-right: 8px;
+	 */
+  content: '';
+  width: 24px;
+  height: 24px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.14), 0 2px 2px 0 rgba(0, 0, 0, 0.098), 0 1px 5px 0 rgba(0, 0, 0, 0.084);
+  position: relative;
+  top: 22px;
+  overflow: hidden;
+  background-color: #fff;
+  background-image: -webkit-linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd), -webkit-linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd);
+  background-image: linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd), linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+}
+
+.wb-ui-setting-image-container .wb-ui-setting-image-preview .wb-ui-setting-image-result {
+  position: absolute;
+  height: 100%;
+  opacity: 1;
+  background: #ff0000;
+}
+
+
+
+.wb-ui-setting-image-container .wb-ui-setting-image-clear {
+  position: absolute;
+  bottom: 42px;
+  right: -16px;
+  left: auto;
+}
+
+[dir=rtl] .wb-ui-setting-image-container .wb-ui-setting-image-clear {
+  right: auto;
+  left: -16px;
+}
+
+/* 
+.wb-ui-setting-image-preview>img {
+	border-size: 1px; 
+	border-style: solid;
 }
 
 .wb-ui-setting-image-preview[dir='rtl'] {
-	/* margin */
 	margin-left: 8px;
-}
+} */
 /**************************************************************************************
                                      Widget layout
 
@@ -539,8 +448,6 @@ of a widget:
  */
 .wb-group-select {
 	border: 1px solid black !important;
-	-webkit-box-shadow: 0px 0px 4px 4px #aaaaaa;
-	-moz-box-shadow: 0px 0px 4px 4px #aaaaaa;
 	box-shadow: 0px 0px 4px 4px #aaaaaa;
 }
 
@@ -570,8 +477,6 @@ of a widget:
 
 .wb-widget-select {
 	border: 1px solid black !important;
-	-webkit-box-shadow: 0px 0px 4px 4px #aaaaaa;
-	-moz-box-shadow: 0px 0px 4px 4px #aaaaaa;
 	box-shadow: 0px 0px 4px 4px #aaaaaa;
 }
 

@@ -23,7 +23,77 @@
  */
 'use strict';
 
+/*
+ * Setting post link
+ */
+function settingPostLink($scope, $element, $attrs, $ctrl){
+    var ngModelCtrl = $ctrl[0];
+    ngModelCtrl.$render = function(){
+        $scope.value = ngModelCtrl.$viewValue;
+    };
+    $scope.$watch('value', function(value){
+        ngModelCtrl.$setViewValue(value);
+    });
+}
+
+/**
+ * @ngdoc Controllers
+ * 
+ * @ngInject
+ */
+function wbUiSettingGeneralCtrl($scope) {
+    var ctrl = this;
+
+    // TODO: maso, 2018:load from user config
+    $scope.wbUiSettingClearButton = true;
+    $scope.wbUiSettingPreview = true;
+
+    function clearValue(/*$event*/){
+        // General option
+        $scope.value = null;
+    }
+
+    ctrl.clearValue = clearValue;
+}
+
+
+/**
+ * @ngdoc Controllers
+ * 
+ * @ngInject
+ */
+function wbUiSettingImageCtrl($scope, $resource, $controller){
+    var ctrl = this;
+
+    angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
+        $scope : $scope
+    }));
+
+    function showImagePicker(){
+        return $resource.get('image', {
+            style: {
+                icon: 'image',
+                title: 'Select image',
+                description: 'Select image from resources.'
+            },
+            data: $scope.value
+        })//
+        .then(function(value){
+            $scope.value = value;
+        });
+    }
+
+    ctrl.showImagePicker = showImagePicker;
+}
+
+
+//General options
+//- wbUiSettingClearButton 
+//- wbUiSettingPreview
+
 angular.module('am-wb-core')
+.controller('wbUiSettingGeneralCtrl', wbUiSettingGeneralCtrl)
+.controller('wbUiSettingImageCtrl', wbUiSettingImageCtrl)
 
 /**
  * @ngdoc Directives
@@ -35,42 +105,16 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingImage', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-image.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			icon: '@icon'
-		},
-		require:['ngModel'],
-		link: function($scope, $element, $attrs, $ctrl){
-			var ngModelCtrl = $ctrl[0];
-			ngModelCtrl.$render = function(){
-				$scope.value = ngModelCtrl.$viewValue;
-			};
-			$scope.$watch('value', function(value){
-				ngModelCtrl.$setViewValue(value);
-			});
-		},
-		/*
-		 * @ngInject
-		 */
-		controller: function($scope, $resource){
-			function selectImage(){
-				return $resource.get('image', {
-					style: {
-						icon: 'image',
-						title: 'Select image',
-						description: 'Select image from resources.'
-					},
-					data: $scope.value
-				})//
-				.then(function(value){
-					$scope.value = value;
-				});
-			}
-
-			$scope.selectImage = selectImage;
-		}
-	};
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-image.html',
+        restrict: 'E',
+        scope: {
+            title: '@title',
+            icon: '@icon'
+        },
+        require:['ngModel'],
+        link: settingPostLink,
+        controller: 'wbUiSettingImageCtrl',
+        controllerAs: 'ctrl'
+    };
 });

@@ -35,69 +35,181 @@ angular.module('am-wb-core')
  * Note that, in smal screen devices, the colume layout apply as default.
  */
 .directive('wbLayout', function() {
-	var classDirectionPrefix = 'wb-flex-';
-	var classJustifyPrefix = 'wb-flex-justify-content-';
-	var classAlignPrefix = 'wb-flex-align-items-';
-	/*
-	 * FIXME: maso, 2017: replace class with term
-	 * 
-	 * It is hard to port final design, while it is fulle tied into the
-	 * CSS classes. We must replace layout CSS classes with general terms
-	 * as soon as posible.
-	 */
-	/**
-	 * Remove layout configuration from element
-	 * 
-	 * @param element
-	 * @param config
-	 * @returns
-	 */
-	function removeLayout(element, config) {
-		element.removeClass(classDirectionPrefix + config.direction);
-		element.removeClass(classJustifyPrefix + config.justify);
-		element.removeClass(classAlignPrefix + config.align);
-	}
 
-	/**
-	 * Adds layout config into the element
-	 * 
-	 * @param element
-	 * @param config
-	 * @returns
-	 */
-	function addLayout(element, config) {
-		element.addClass(classDirectionPrefix + config.direction);
-		element.addClass(classJustifyPrefix + config.justify);
-		element.addClass(classAlignPrefix + config.align);
-	}
+    /**
+     * Adds layout config into the element
+     * 
+     * @param element
+     * @param layout
+     * @returns
+     */
+    function applyLayout(element, layout) {
+        var flexLayout = {};
 
-	/**
-	 * Link view with attributes
-	 * 
-	 * 
-	 * @param scope
-	 * @param element
-	 * @param attrs
-	 * @returns
-	 */
-	function postLink($scope, $element, $attrs) {
-		// Watch for layout
-		$scope.$watch($attrs.wbLayout+'.layout', function(newValue, oldValue) {
-			if (oldValue) {
-				removeLayout($element, oldValue);
-			}
-			if (newValue) {
-				addLayout($element, newValue);
-			}
-		}, true);
-	}
+        /*
+         * Group
+         * 
+         * check if is group apply flex flow
+         */
+        {
+            flexLayout.display = 'flex';
+            // row
+            if(layout.direction === 'row'){
+                flexLayout['flex-direction'] =  layout.direction_reverse? 'row-reverse' : 'row'; 
+                flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
+                flexLayout['overflow-y'] = 'visible';
+            } else {
+                flexLayout['flex-direction'] =  layout.direction_reverse? 'column-reverse' : 'column'; 
+                flexLayout['overflow-x'] = 'visible';
+                flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+            }
+            
+            // wrap
+            if(layout.wrap){
+                flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
+                // wrap align
+                var alignContent;
+                switch(layout.wrap_align){
+                case 'start':
+                    alignContent = 'flex-start';
+                    break;
+                case 'end':
+                    alignContent = 'flex-end';
+                    break;
+                case 'center':
+                    alignContent = 'center';
+                    break;
+                case 'space-between':
+                    alignContent = 'space-between';
+                    break;
+                case 'space-around':
+                    alignContent = 'space-around';
+                    break;
+                case 'stretch':
+                    alignContent = 'stretch';
+                    break;
+                default:
+                    alignContent = 'stretch';
+                }
+                flexLayout['align-content']= alignContent;
+            } else {
+                flexLayout['flex-wrap'] = 'nowrap';
+            }
+            
 
-	/*
-	 * Directive
-	 */
-	return {
-		restrict : 'A',
-		link : postLink,
-		require:[]
-	};
+            // justify
+            var justify;
+            switch(layout.justify){
+            case 'start':
+                justify = 'flex-start';
+                break;
+            case 'end':
+                justify = 'flex-end';
+                break;
+            case 'center':
+                justify = 'center';
+                break;
+            case 'space-between':
+                justify = 'space-between';
+                break;
+            case 'space-around':
+                justify = 'space-around';
+                break;
+            case 'space-evenly':
+                justify = 'space-evenly';
+                break;
+            default:
+                justify = 'flex-start';
+            }
+            flexLayout['justify-content']= justify;
+
+            // align
+            var align;
+            switch(layout.align){
+            case 'start':
+                align = 'flex-start';
+                break;
+            case 'end':
+                align = 'flex-end';
+                break;
+            case 'center':
+                align = 'center';
+                break;
+            case 'baseline':
+                align = 'baseline';
+                break;
+            case 'stretch':
+                align = 'stretch';
+                break;
+            default:
+                align = 'stretch';
+            }
+            flexLayout['align-items']= align;
+        }
+
+        /*
+         * Widget
+         */
+        {
+            flexLayout.order = layout.order >= 0? layout.order : 0;
+            flexLayout['flex-grow'] = layout.grow >= 0? layout.grow : 0;
+            flexLayout['flex-shrink'] = layout.shrink >= 0? layout.shrink : 1;
+            // TODO: maso, 2018: compute based on size
+            flexLayout['flex-basis'] = 'auto';
+            
+            // align-self
+            // auto | flex-start | flex-end | center | baseline | stretch;
+            var alignSelf;
+            switch(layout.align_self){
+            case 'start':
+                alignSelf = 'flex-start';
+                break;
+            case 'end':
+                alignSelf = 'flex-end';
+                break;
+            case 'center':
+                alignSelf = 'center';
+                break;
+            case 'baseline':
+                alignSelf = 'baseline';
+                break;
+            case 'stretch':
+                alignSelf = 'stretch';
+                break;
+            default:
+                alignSelf = 'auto';
+            }
+            flexLayout['align-self']= alignSelf;
+        }
+        
+        // apply to element
+        element.css(flexLayout);
+    }
+
+    /**
+     * Link view with attributes
+     * 
+     * 
+     * @param scope
+     * @param element
+     * @param attrs
+     * @returns
+     */
+    function postLink($scope, $element, $attrs) {
+        // Watch for layout
+        $scope.$watch($attrs.wbLayout+'.layout', function(layout) {
+            if(layout){
+                applyLayout($element, layout);
+            }
+        }, true);
+    }
+
+    /*
+     * Directive
+     */
+    return {
+        restrict : 'A',
+        link : postLink,
+        require:[]
+    };
 });

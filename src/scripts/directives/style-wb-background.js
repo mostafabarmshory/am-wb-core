@@ -42,10 +42,7 @@ angular.module('am-wb-core')
 		if(style.background){
 			cssValue.background = style.background;
 		}
-		if(style.image){
-			cssValue['background-image'] = 'url(\''+style.image+'\')';
-		}
-
+		cssValue['background-image'] = (style.image) ? 'url(\''+style.image+'\')' : 'none';
 		cssValue['background-color'] = style.color || 'initial';
 		cssValue['background-size'] = style.size || 'auto';
 		cssValue['background-repeat'] = style.repeat || 'repeat';

@@ -1,23 +1,34 @@
 <div 
-	layout-align="center center"
-	layout="row"
-	class="wb-ui-setting-image">
-	<img 
-		ng-click="selectImage()"
-		ng-src="{{value}}" 
-		md-colors="{'borderColor': 'accent'}"
-		class="wb-ui-setting-image-preview"
-		style="border-size: 1px; border-style: solid;"/>
+	class="wb-ui-setting-image wb-ui-setting-image-container"
+	layout="row">
+	<div
+		class="wb-ui-setting-image-preview" 
+		ng-click="ctrl.showImagePicker($event)"
+		ng-if="wbUiSettingPreview">
+		<img 
+			ng-show="value"
+			class="wb-ui-setting-image-result" 
+			ng-src="{{value}}"/>
+	</div>
 	<md-input-container
 		class="md-icon-float"
 		flex>
 		<label 
-			ng-if="title"
-			translate="">{{title}}</label>
+			ng-if="title">
+			<span translate="">{{title}}</span>
+		</label>
 		<input
-			type="text"
-			ng-model="value" >
-		<wb-icon
-			ng-click="selectImage()">more_horiz</wb-icon>
+			type="input"
+			ng-model="value" 
+			class='wb-ui-setting-image-input' 
+			ng-mousedown="(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)" />
 	</md-input-container>
+	
+	<md-button 
+		class="md-icon-button wb-ui-setting-image-clear" 
+		ng-if="wbUiSettingClearButton && value" 
+		ng-click="ctrl.clearValue($event);" 
+		aria-label="Clear image">
+		<md-icon md-svg-icon="clear.svg"></md-icon>
+	</md-button>
 </div>
