@@ -1,6 +1,6 @@
 # Padding 
 
-In the current model of contents, We save the setting of margin in: **style.padding**.  
+In the current model of contents, We save the setting of padding in: **style.padding**.  
 
 Here, There is an example which shows how the padding is stored in style:
 
@@ -17,13 +17,13 @@ The 4 padding properties are used to create space around an element's content, i
 
 There are properties for setting the padding for each side of an element (top, right, bottom, and left). These properties are:
 
-- margin-top
+- padding-top
 
-- margin-right
+- padding-right
 
-- margin-bottom
+- padding-bottom
 
-- margin-left
+- padding-left
 
 All the padding properties can have the following values:
 
