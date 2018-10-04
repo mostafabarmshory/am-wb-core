@@ -2921,11 +2921,77 @@ angular.module('am-wb-core')
  */
 'use strict';
 
+/*
+ * Setting post link
+ */
+function settingPostLink($scope, $element, $attrs, $ctrl){
+    var ngModelCtrl = $ctrl[0];
+    ngModelCtrl.$render = function(){
+        $scope.value = ngModelCtrl.$viewValue;
+    };
+    $scope.$watch('value', function(value){
+        ngModelCtrl.$setViewValue(value);
+    });
+}
+
+/**
+ * @ngdoc Controllers
+ * 
+ * @ngInject
+ */
+function wbUiSettingGeneralCtrl($scope) {
+    var ctrl = this;
+
+    // TODO: maso, 2018:load from user config
+    $scope.wbUiSettingClearButton = true;
+    $scope.wbUiSettingPreview = true;
+
+    function clearValue(/*$event*/){
+        // General option
+        $scope.value = null;
+    }
+
+    ctrl.clearValue = clearValue;
+}
+
+
+/**
+ * @ngdoc Controllers
+ * 
+ * @ngInject
+ */
+function wbUiSettingImageCtrl($scope, $resource, $controller){
+    var ctrl = this;
+
+    angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
+        $scope : $scope
+    }));
+
+    function showImagePicker(){
+        return $resource.get('image', {
+            style: {
+                icon: 'image',
+                title: 'Select image',
+                description: 'Select image from resources.'
+            },
+            data: $scope.value
+        })//
+        .then(function(value){
+            $scope.value = value;
+        });
+    }
+
+    ctrl.showImagePicker = showImagePicker;
+}
+
+
 //General options
-// - wbUiSettingClearButton 
-// - wbUiSettingPreview
+//- wbUiSettingClearButton 
+//- wbUiSettingPreview
 
 angular.module('am-wb-core')
+.controller('wbUiSettingGeneralCtrl', wbUiSettingGeneralCtrl)
+.controller('wbUiSettingImageCtrl', wbUiSettingImageCtrl)
 
 /**
  * @ngdoc Directives
@@ -2937,56 +3003,18 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingImage', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-image.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			icon: '@icon'
-		},
-		require:['ngModel'],
-		link: function($scope, $element, $attrs, $ctrl){
-			var ngModelCtrl = $ctrl[0];
-			ngModelCtrl.$render = function(){
-				$scope.value = ngModelCtrl.$viewValue;
-			};
-			$scope.$watch('value', function(value){
-				ngModelCtrl.$setViewValue(value);
-			});
-		},
-		/*
-		 * @ngInject
-		 */
-		controller: function($scope, $resource){
-			// TODO: maso, 2018:load from user config
-			$scope.wbUiSettingClearButton = true;
-			$scope.wbUiSettingPreview = true;
-
-			function clearValue(/*$event*/){
-				// General option
-				$scope.value = null;
-			}
-			
-			function showImagePicker(){
-				return $resource.get('image', {
-					style: {
-						icon: 'image',
-						title: 'Select image',
-						description: 'Select image from resources.'
-					},
-					data: $scope.value
-				})//
-				.then(function(value){
-					$scope.value = value;
-				});
-			}
-
-			this.showImagePicker = showImagePicker;
-			this.clearValue = clearValue;
-			
-		},
-		controllerAs: 'ctrl'
-	};
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-image.html',
+        restrict: 'E',
+        scope: {
+            title: '@title',
+            icon: '@icon'
+        },
+        require:['ngModel'],
+        link: settingPostLink,
+        controller: 'wbUiSettingImageCtrl',
+        controllerAs: 'ctrl'
+    };
 });
 
 /* 
@@ -5819,17 +5847,17 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-background.html',
-    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" ng-model=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
+    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
   );
 
 
   $templateCache.put('views/settings/wb-border.html',
-    " <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=wbModel.style.border.style> <md-option value=none>none</md-option> <md-option value=hidden>hidden</md-option> <md-option value=dotted>dotted</md-option> <md-option value=dashed>dashed</md-option> <md-option value=solid>solid</md-option> <md-option value=double>double</md-option> <md-option value=groove>groove</md-option> <md-option value=ridge>ridge</md-option> <md-option value=inset>inset</md-option> <md-option value=outset>outset</md-option> <md-option value=initial>initial</md-option> <md-option value=inherit>inherit</md-option> </md-select> </md-input-container> <md-input-container> <label translate>Width (px)</label> <input type=number ng-model=wbModel.style.border.width> </md-input-container> <wb-ui-setting-color title=\"{{'Color'| translate}}\" icon=format_color_fill ng-model=wbModel.style.border.color> </wb-ui-setting-color> <wb-ui-setting-border title=\"{{'Radius'| translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.radius> </wb-ui-setting-border>    "
+    " <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=wbModel.style.border.style> <md-option value=none>none</md-option> <md-option value=hidden>hidden</md-option> <md-option value=dotted>dotted</md-option> <md-option value=dashed>dashed</md-option> <md-option value=solid>solid</md-option> <md-option value=double>double</md-option> <md-option value=groove>groove</md-option> <md-option value=ridge>ridge</md-option> <md-option value=inset>inset</md-option> <md-option value=outset>outset</md-option> <md-option value=initial>initial</md-option> <md-option value=inherit>inherit</md-option> </md-select> </md-input-container> <md-input-container> <label translate>Width (px)</label> <input type=number ng-model=wbModel.style.border.width> </md-input-container> <wb-ui-setting-color title=\"{{'Color'| translate}}\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=wbModel.style.border.color> </wb-ui-setting-color> <wb-ui-setting-border title=\"{{'Radius'| translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.radius> </wb-ui-setting-border>    "
   );
 
 
   $templateCache.put('views/settings/wb-description.html',
-    " <md-input-container> <label translate=\"\">Label</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate=\"\">Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate=\"\">Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=\"{{Cover | translate}}\" ng-model=wbModel.cover> </wb-ui-setting-image>"
+    " <md-input-container> <label translate=\"\">Label</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate=\"\">Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate=\"\">Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=Cover wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.cover> </wb-ui-setting-image>"
   );
 
 
