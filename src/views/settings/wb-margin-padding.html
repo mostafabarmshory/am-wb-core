@@ -5,7 +5,7 @@ Created by mgh on 8/10/2016.
 @author maso(mostafa.barmshory@dpq.ir)
 -->
 <!-- TODO: maso, 2018: add a UI editor for these attributes -->
-<wb-ui-setting-margin-padding
+<!--<wb-ui-setting-margin-padding
     title="{{'Margin(px)' | translate}}"
     icon="wb-blank"
     value="wbModel.style.margin">
@@ -16,4 +16,80 @@ Created by mgh on 8/10/2016.
     value="wbModel.style.padding">
 </wb-ui-setting-margin-padding>
 {{wbModel.style.margin}}
-{{wbModel.style.padding}}
+{{wbModel.style.padding}}-->
+
+<!--margin-->
+<wb-ui-main-setting
+    title = "{{'Margin' | translate}}"
+    ng-model="all"
+    input_types = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-main-setting>
+{{all}}
+
+<!--top left-->
+<wb-ui-main-setting
+    title = "{{'Margin' | translate}}"
+    value="all"
+    input_types = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-main-setting>
+
+<!--top right-->
+<wb-ui-main-setting
+    title = "{{'Margin' | translate}}"
+    value="all"
+    input_types = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-main-setting>
+
+<!--bottom right-->
+<wb-ui-main-setting
+    title = "{{'Margin' | translate}}"
+    value="all"
+    input_types = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-main-setting>
+
+<!--bottom left-->
+<wb-ui-main-setting
+    title = "{{'Margin' | translate}}"
+    value="all"
+    input_types = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-main-setting>
+
+
+
+
+
+<!--padding-->
+<wb-ui-main-setting
+    title = "{{'Padding' | translate}}"
+    value="wbModel.style.padding"
+    input_types = "['length' , 'inherit']">
+</wb-ui-main-setting>
+
+<!--top left-->
+<wb-ui-main-setting
+    title = "{{'padding' | translate}}"
+    value="all"
+    input_types = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-main-setting>
+
+<!--top right-->
+<wb-ui-main-setting
+    title = "{{'padding' | translate}}"
+    value="all"
+    input_types = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-main-setting>
+
+<!--bottom right-->
+<wb-ui-main-setting
+    title = "{{'padding' | translate}}"
+    value="all"
+    input_types = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-main-setting>
+
+<!--bottom left-->
+<wb-ui-main-setting
+    title = "{{'padding' | translate}}"
+    value="all"
+    input_types = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-main-setting>
+

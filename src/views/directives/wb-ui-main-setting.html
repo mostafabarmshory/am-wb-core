@@ -1,0 +1,35 @@
+<div layout="column">
+
+    <div layout="row">
+        <span>{{title}}</span>
+        <span flex></span>
+        <md-input-container ng-show="lengthValues.indexOf(internalUnit) !== -1" >
+            <label>Value</label>
+            <input type="number" ng-model="internalValue">
+        </md-input-container>
+
+        <md-input-container layout-align="end center">
+            <label>Type</label>
+            <md-select ng-model="internalUnit">
+                <md-option 
+                    ng-repeat="type in types track by $index"
+                    value="{{type}}">
+                    {{type}}
+                </md-option>
+            </md-select>
+        </md-input-container>
+    </div>
+
+    <div flex>
+
+        <md-slider-container 
+            ng-show="lengthValues.indexOf(internalUnit) !== -1" 
+            flex>
+            <md-slider min="0" max="99" 
+                       ng-model="internalValue">
+            </md-slider>
+        </md-slider-container>
+
+    </div>
+
+</div>

@@ -62,3 +62,20 @@ angular.module('am-wb-core')
                 }
             };
         });
+        
+//                    Creating array from the input value. 'splitValue' is now an array.
+//                    //See: https://www.digitalocean.com/community/tutorials/how-to-index-split-and-manipulate-strings-in-javascript
+//                    var splitedValue = $scope.value.split(" ");
+//                    if (splitedValue.length === 1) {
+//                        if ($scope.types.includes(splitedValue[0])) {
+//                            $scope.selectedType = splitedValue[0];
+//                        } else {
+//                            // set the 5 sliders to this value.
+//                        }
+//                    } else if (splitedValue.length === 2) {
+//
+//                    } else if (splitedValue.length === 3) {
+//
+//                    } else if (splitedValue.length === 4) {
+//
+//                    }
