@@ -5,7 +5,6 @@ cache:
   - node_modules
 
 build-project:
-  image: node:8
   coverage: /Lines\s*:\s*(\d+\.\d+)%/
   script:
     # TODO: maso, 2018: install opera, firefox
