@@ -28,8 +28,6 @@ angular.module('am-wb-core')
         /**
          * @ngdoc Directives
          * @name wbUiMainSetting
-         * @description 
-         * 
          */
         .directive('wbUiMainSetting', function () {
 
@@ -75,7 +73,7 @@ angular.module('am-wb-core')
                 /*
                  * @ngInject
                  */
-                controller: function ($scope) {
+                controller: function (/*$scope*/) {
 
 
                 },
