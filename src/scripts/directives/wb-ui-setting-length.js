@@ -25,32 +25,68 @@
 
 angular.module('am-wb-core')
 
-/**
- * @ngdoc Directives
- * @name wbUiSettingLength
- * @author maso<mostafa.barmshory@dpq.co.ir>
- * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
- * @description Set length (css based)
- * 
- * @see https://www.w3schools.com/cssref/css_units.asp
- */
-.directive('wbUiSettingLength', function() {
-	return {
-		templateUrl : 'views/directives/wb-ui-setting-length.html',
-		restrict : 'E',
-		replace: true,
-		scope : {
-			title : '@?',
-			value : '=?',
-			icon : '@?',
-			description : '@?'
-		},
-		/*
-		 * @ngInject
-		 */
-		controller : function(/*$scope, $resource*/) {
-                   
-		},
-		controllerAs: 'ctrl'
-	};
-});
+        /**
+         * @ngdoc Directives
+         * @name wbUiSettingLength
+         */
+        .directive('wbUiSettingLength', function () {
+
+            function postLink($scope, $element, $attrs, ngModel) {
+                ngModel.$render = function () {
+                    pars(ngModel.$modelValue);
+                };
+                var types = $scope.extraValues;
+                
+                if (types.includes('length')) {
+
+                    var index = types.indexOf('length');
+                    types.splice(index, 1);
+                    // Add all length by default
+                    var lengthValues = ['px', '%', 'em', 'vh'];
+                    types = types.concat(lengthValues);
+                }
+
+                $scope.types = types;
+
+                function pars(value) {
+                    if(!value) {
+                        $scope.internalUnit = types[0];
+                        $scope.internalValue = 0;
+                    }
+                    //TODO: for example 15px should splite to 15 and px.
+                    $scope.$watch(function(){
+                        if($scope.extraValues.includes($scope.internalUnit)){
+                            return $scope.internalUnit;
+                        }
+                        return $scope.internalValue + $scope.internalUnit;
+                    } , function(newValue) {
+                        ngModel.$setViewValue(newValue);
+                    });
+                }
+            }
+
+            return {
+                templateUrl: 'views/directives/wb-ui-setting-length.html',
+                restrict: 'E',
+                replace: true,
+                scope: {
+                    title: '@title',
+                    extraValues: '=?'
+                },
+                /*
+                 * @ngInject
+                 */
+                controller: function ($scope) {
+                    /**
+                     * Check if the current unit is a numerical
+                     */
+                    this.isNumerical = function(){
+                        return angular.isArray($scope.extraValues) && !$scope.extraValues.includes($scope.internalUnit);
+                    };
+
+                },
+                controllerAs: 'ctrl',
+                link: postLink,
+                require: 'ngModel'
+            };
+        });

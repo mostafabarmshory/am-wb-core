@@ -315,7 +315,10 @@ angular.module('am-wb-core')
         type : 'marginPadding',
         label : 'Margin/Padding',
         icon: 'border_clear',
-        templateUrl : 'views/settings/wb-margin-padding.html'
+        templateUrl : 'views/settings/wb-margin-padding.html',
+        controller: function(){
+            
+        }
     });
     $settings.newPage({
         type : 'size',
