@@ -35,15 +35,16 @@ angular.module('am-wb-core')
                 ngModel.$render = function () {
                     pars(ngModel.$modelValue);
                 };
-                var types = $scope.$eval($attrs.inputTypes);
-                if (types.includes('length')) {
-
-                    var index = types.indexOf('length');
-                    types.splice(index, 1);
-
+                var types = $scope.extraValues;
+//                var types = $scope.$eval($attrs.inputTypes);
+//                if (types.includes('length')) {
+//
+//                    var index = types.indexOf('length');
+//                    types.splice(index, 1);
+                    // Add all length by default
                     var lengthValues = ['px', '%', 'em', 'vh'];
                     types = types.concat(lengthValues);
-                }
+//                }
 
                 $scope.types = types;
 
@@ -68,15 +69,21 @@ angular.module('am-wb-core')
                 replace: true,
                 scope: {
                     title: '@title',
-                    input_types: '=input_types'
+                    extraValues: '=?'
                 },
                 /*
                  * @ngInject
                  */
-                controller: function (/*$scope*/) {
-
+                controller: function ($scope) {
+                    /**
+                     * Check if the current unit is a numerical
+                     */
+                    this.isNumerical = function(){
+                        return angular.isArray($scope.extraValues) && !$scope.extraValues.includes($scope.internalUnit);
+                    };
 
                 },
+                controllerAs: 'ctrl',
                 link: postLink,
                 require: 'ngModel'
             };

@@ -1,16 +1,20 @@
-<div layout="column">
-
-    <div layout="row">
-        <span>{{title}}</span>
-        <span flex></span>
-        <md-input-container ng-show="lengthValues.indexOf(internalUnit) !== -1" >
-            <label>Value</label>
+<div 
+	layout="column"
+   	style="min-width: 200px;">{{ctrl.isNumerical()}}
+    <div 
+    	layout="row"
+    	layout-align="end center">
+        <span translate="" flex>{{title}}</span>
+        <md-input-container 
+        	ng-show="ctrl.isNumerical()"
+        	style="margin:0px; padding:0px; width:60px; height:30px;">
             <input type="number" ng-model="internalValue">
         </md-input-container>
-
-        <md-input-container layout-align="end center">
-            <label>Type</label>
-            <md-select ng-model="internalUnit">
+        <md-input-container
+        	style="margin:0px; padding:0px; width:80px; height:30px;">
+            <md-select 
+        		style="max-width:75px;"
+            	ng-model="internalUnit">
                 <md-option 
                     ng-repeat="type in types track by $index"
                     value="{{type}}">
@@ -19,17 +23,15 @@
             </md-select>
         </md-input-container>
     </div>
-
-    <div flex>
-
-        <md-slider-container 
-            ng-show="lengthValues.indexOf(internalUnit) !== -1" 
-            flex>
-            <md-slider min="0" max="99" 
-                       ng-model="internalValue">
-            </md-slider>
-        </md-slider-container>
-
-    </div>
-
+	<md-slider-container 
+	    ng-disabled="!ctrl.isNumerical()"
+       	style="margin:0px; padding:0px; height:30px;"
+       	aria-label="display length vlaue with slider" 
+       	id="wb-ui-setting-length-slider">
+	    <md-slider 
+	    	min="0" 
+	    	max="99" 
+	        ng-model="internalValue">
+	    </md-slider>
+	</md-slider-container>
 </div>

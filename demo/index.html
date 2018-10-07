@@ -72,6 +72,16 @@
 	            	ng-click="runAction(action)">
 	                <wb-icon>{{action.icon}}</wb-icon>
 	            </md-button>
+	            
+	            
+<wb-ui-main-setting
+    title = "{{'Margin' | translate}}"
+    ng-model="all"
+    extra-values = "['a' , 'b', 'c']">
+</wb-ui-main-setting>
+{{all}}
+
+
 	       </section>
 			<wb-group
 				wb-on-model-select="loadSettings($model, $ctrl)"
