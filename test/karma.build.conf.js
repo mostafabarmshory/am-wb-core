@@ -23,7 +23,12 @@ module.exports = function(config) {
 			// enable/disable phantomjs support, default is true
 			usePhantomJS: false,
 			// use headless mode, for browsers that support it, default is false
-			preferHeadless: true
+			preferHeadless: true,
+			postDetection: function(availableBrowsers) {
+				//Add IE Emulation
+				var result = availableBrowsers;
+				return result;
+			}
 		},
 
 		// list of files / patterns to load in the browser
@@ -74,6 +79,7 @@ module.exports = function(config) {
 		// Which plugins to enable
 		plugins: [
 			'karma-jasmine',
+			'karma-detect-browsers',
 
 			'karma-chrome-launcher',
 			'karma-edge-launcher',
@@ -81,12 +87,12 @@ module.exports = function(config) {
 			'karma-ie-launcher',
 			'karma-safari-launcher',
 			'karma-safaritechpreview-launcher',
-			'karma-opera-launcher',
-			'karma-detect-browsers'],
+			'karma-opera-launcher'
+		],
 
 		// Continuous Integration mode
 		// if true, it capture browsers, run tests and exit
-		singleRun: false,
+		singleRun: true,
 
 		colors: true,
 

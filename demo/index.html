@@ -1,178 +1,188 @@
 <!doctype html>
 <html
-        ng-controller="MyTestCtrl"
-        ng-app="am-wb-coreTest">
-<head>
-    <meta charset="utf-8">
-    <meta content='IE=edge' http-equiv='X-UA-Compatible'>
-    <meta property="viewport" content="width=device-width">
+    ng-controller="MyTestCtrl"
+    ng-app="am-wb-coreTest">
+    <head>
+        <meta charset="utf-8">
+        <meta content='IE=edge' http-equiv='X-UA-Compatible'>
+        <meta property="viewport" content="width=device-width">
 
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
-	<!--  injector:base -->
-	<base href="/" >
-	<!--  endinjector  -->
+        <!--  injector:base -->
+        <base href="/" >
+        <!--  endinjector  -->
 
-<!-- To add action to icons -->
-<!-- <script src="//cdnjs.cloudflare.com/ajax/libs/SVG-Morpheus/0.3.2/svg-morpheus.js"></script>  -->
+        <!-- To add action to icons -->
+        <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/SVG-Morpheus/0.3.2/svg-morpheus.js"></script>  -->
 
-	<!-- build:css({.tmp/serve,src}) styles/vendor.css -->
-	<!-- bower:css -->
-	<link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
-	<link rel="stylesheet" href="bower_components/angular-material-expansion-panel/dist/md-expansion-panel.css" />
-	<link rel="stylesheet" href="bower_components/angular-material-icons/angular-material-icons.css" />
-	<link rel="stylesheet" href="bower_components/pikaday/css/pikaday.css" />
-	<link rel="stylesheet" href="bower_components/handsontable/dist/handsontable.css" />
-	<link rel="stylesheet" href="bower_components/md-color-picker/dist/md-color-picker.css" />
-	<link rel="stylesheet" href="bower_components/jspanel4x/dist/jspanel.css" />
-	<link rel="stylesheet" href="bower_components/json-formatter/dist/json-formatter.css" />
-	<!-- endbower -->
-	<!-- endbuild -->
-	
-	<!-- build:css({.tmp/serve,src}) styles/app.css -->
-	<!-- injector:css -->
-	<link rel="stylesheet" href="styles/dialogs.css">
-	<link rel="stylesheet" href="styles/font-icon.css">
-	<link rel="stylesheet" href="styles/font-svg.css">
-	<link rel="stylesheet" href="styles/jsPanel.css">
-	<link rel="stylesheet" href="styles/setting-layout.css">
-	<link rel="stylesheet" href="styles/typography.css">
-	<link rel="stylesheet" href="styles/wb-dnd.css">
-	<link rel="stylesheet" href="styles/wb-icon.css">
-	<link rel="stylesheet" href="styles/wb-text.css">
-	<link rel="stylesheet" href="styles/wb-ui-choose.css">
-	<link rel="stylesheet" href="styles/wb-ui-setting-color.css">
-	<link rel="stylesheet" href="styles/wb-ui-setting-image.css">
-	<link rel="stylesheet" href="styles/wb-widget.css">
-	<link rel="stylesheet" href="styles/wb-widgets-module.css">
-	<link rel="stylesheet" href="styles/widget-group.css">
-	<link rel="stylesheet" href="styles/widget-text.css">
-	<link rel="stylesheet" href="styles/font-awesome.css">
-	<link rel="stylesheet" href="styles/main.css">
-	<!-- endinjector -->
-	<!-- endbuild -->
-</head>
-<body>
-    
-<div
-	layout="row"
-	layout-fill>
-	<div flex>
-       <md-content	    	
-       		layout="column">
-	        <section layout="row" layout-align="center center">
-	            <md-button
-	                    ng-class="{'md-primary' : editable}"
-	                    class="wb-group-button left"
-	                    ng-click="editable=!editable">
-	                <wb-icon>edit</wb-icon>
-	            </md-button>
-	            <md-button
-	            	ng-repeat="action in actions"
-	            	ng-click="runAction(action)">
-	                <wb-icon>{{action.icon}}</wb-icon>
-	            </md-button>
-	       </section>
-			<wb-group
-				wb-on-model-select="loadSettings($model, $ctrl)"
-				wb-editable="editable"
-				ng-model="model"
-				flex>
-			</wb-group>
-		</md-content>
-    </div>
-</div>
+        <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
+        <!-- bower:css -->
+        <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
+        <link rel="stylesheet" href="bower_components/angular-material-expansion-panel/dist/md-expansion-panel.css" />
+        <link rel="stylesheet" href="bower_components/angular-material-icons/angular-material-icons.css" />
+        <link rel="stylesheet" href="bower_components/pikaday/css/pikaday.css" />
+        <link rel="stylesheet" href="bower_components/handsontable/dist/handsontable.css" />
+        <link rel="stylesheet" href="bower_components/md-color-picker/dist/md-color-picker.css" />
+        <link rel="stylesheet" href="bower_components/jspanel4x/dist/jspanel.css" />
+        <link rel="stylesheet" href="bower_components/json-formatter/dist/json-formatter.css" />
+        <!-- endbower -->
+        <!-- endbuild -->
+
+        <!-- build:css({.tmp/serve,src}) styles/app.css -->
+        <!-- injector:css -->
+        <link rel="stylesheet" href="styles/dialogs.css">
+        <link rel="stylesheet" href="styles/font-icon.css">
+        <link rel="stylesheet" href="styles/font-svg.css">
+        <link rel="stylesheet" href="styles/jsPanel.css">
+        <link rel="stylesheet" href="styles/setting-layout.css">
+        <link rel="stylesheet" href="styles/typography.css">
+        <link rel="stylesheet" href="styles/wb-dnd.css">
+        <link rel="stylesheet" href="styles/wb-icon.css">
+        <link rel="stylesheet" href="styles/wb-text.css">
+        <link rel="stylesheet" href="styles/wb-ui-choose.css">
+        <link rel="stylesheet" href="styles/wb-ui-setting-color.css">
+        <link rel="stylesheet" href="styles/wb-ui-setting-image.css">
+        <link rel="stylesheet" href="styles/wb-widget.css">
+        <link rel="stylesheet" href="styles/wb-widgets-module.css">
+        <link rel="stylesheet" href="styles/widget-group.css">
+        <link rel="stylesheet" href="styles/widget-text.css">
+        <link rel="stylesheet" href="styles/font-awesome.css">
+        <link rel="stylesheet" href="styles/main.css">
+        <!-- endinjector -->
+        <!-- endbuild -->
+    </head>
+    <body>
+
+        <div
+            layout="row"
+            layout-fill>
+            <div flex>
+                <md-content	    	
+                    layout="column">
+                    <section layout="row" layout-align="center center">
+                        <md-button
+                            ng-class="{'md-primary' : editable}"
+                            class="wb-group-button left"
+                            ng-click="editable = !editable">
+                            <wb-icon>edit</wb-icon>
+                        </md-button>
+                        <md-button
+                            ng-repeat="action in actions"
+                            ng-click="runAction(action)">
+                            <wb-icon>{{action.icon}}</wb-icon>
+                        </md-button>
 
 
+                        <wb-ui-setting-length
+                            title = "{{'Margin'| translate}}"
+                            ng-model="all"
+                            extra-values = "['length' , 'auto', 'initial' ,'inherit']">
+                        </wb-ui-setting-length>
+                        {{all}}
 
-	<!-- build:js(src) scripts/vendor.js -->
-	<!-- bower:js -->
-	<script src="bower_components/jquery/dist/jquery.js"></script>
-	<script src="bower_components/angular/angular.js"></script>
-	<script src="bower_components/angular-animate/angular-animate.js"></script>
-	<script src="bower_components/angular-aria/angular-aria.js"></script>
-	<script src="bower_components/angular-messages/angular-messages.js"></script>
-	<script src="bower_components/angular-material/angular-material.js"></script>
-	<script src="bower_components/angular-translate/angular-translate.js"></script>
-	<script src="bower_components/tinymce/tinymce.js"></script>
-	<script src="bower_components/angular-ui-tinymce/src/tinymce.js"></script>
-	<script src="bower_components/angular-material-expansion-panel/dist/md-expansion-panel.js"></script>
-	<script src="bower_components/angular-material-icons/angular-material-icons.min.js"></script>
-	<script src="bower_components/weakmap-polyfill/weakmap-polyfill.js"></script>
-	<script src="bower_components/moment/moment.js"></script>
-	<script src="bower_components/numbro/numbro.js"></script>
-	<script src="bower_components/pikaday/pikaday.js"></script>
-	<script src="bower_components/zeroclipboard/dist/ZeroClipboard.js"></script>
-	<script src="bower_components/handsontable/dist/handsontable.js"></script>
-	<script src="bower_components/ngHandsontable/dist/ngHandsontable.js"></script>
-	<script src="bower_components/tinycolor/tinycolor.js"></script>
-	<script src="bower_components/md-color-picker/dist/md-color-picker.js"></script>
-	<script src="bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
-	<script src="bower_components/jspanel4x/dist/jspanel.js"></script>
-	<script src="bower_components/lodash/lodash.js"></script>
-	<script src="bower_components/angular-mocks/angular-mocks.js"></script>
-	<script src="bower_components/json-formatter/dist/json-formatter.js"></script>
-	<!-- endbower -->
-	<!-- endbuild -->
 
-	<!-- build:js({.tmp,app}) scripts/scripts.js -->
-	<!-- injector:js -->
-	<script src="scripts/app.js"></script>
-	<script src="scripts/configs/icons.js"></script>
-	<script src="scripts/directives/style-wb-background.js"></script>
-	<script src="scripts/directives/style-wb-border.js"></script>
-	<script src="scripts/directives/style-wb-events.js"></script>
-	<script src="scripts/directives/style-wb-layout.js"></script>
-	<script src="scripts/directives/style-wb-margin.js"></script>
-	<script src="scripts/directives/style-wb-padding.js"></script>
-	<script src="scripts/directives/style-wb-size.js"></script>
-	<script src="scripts/directives/style-wb-widget-layout.js"></script>
-	<script src="scripts/directives/style-wb-widget-size.js"></script>
-	<script src="scripts/directives/wb-group.js"></script>
-	<script src="scripts/directives/wb-icon.js"></script>
-	<script src="scripts/directives/wb-infinateScroll.js"></script>
-	<script src="scripts/directives/wb-setting-page.js"></script>
-	<script src="scripts/directives/wb-setting-panel-group.js"></script>
-	<script src="scripts/directives/wb-ui-choose.js"></script>
-	<script src="scripts/directives/wb-ui-setting-audio.js"></script>
-	<script src="scripts/directives/wb-ui-setting-background-attachment.js"></script>
-	<script src="scripts/directives/wb-ui-setting-background-origin.js"></script>
-	<script src="scripts/directives/wb-ui-setting-background-position.js"></script>
-	<script src="scripts/directives/wb-ui-setting-background-repeat.js"></script>
-	<script src="scripts/directives/wb-ui-setting-background-size.js"></script>
-	<script src="scripts/directives/wb-ui-setting-border.js"></script>
-	<script src="scripts/directives/wb-ui-setting-choose.js"></script>
-	<script src="scripts/directives/wb-ui-setting-color.js"></script>
-	<script src="scripts/directives/wb-ui-setting-data.js"></script>
-	<script src="scripts/directives/wb-ui-setting-dropdown-value.js"></script>
-	<script src="scripts/directives/wb-ui-setting-dropdown.js"></script>
-	<script src="scripts/directives/wb-ui-setting-image.js"></script>
-	<script src="scripts/directives/wb-ui-setting-length.js"></script>
-	<script src="scripts/directives/wb-ui-setting-link.js"></script>
-	<script src="scripts/directives/wb-ui-setting-margin-padding.js"></script>
-	<script src="scripts/directives/wb-ui-setting-number.js"></script>
-	<script src="scripts/directives/wb-ui-setting-on-off-switch.js"></script>
-	<script src="scripts/directives/wb-ui-setting-percentage-length.js"></script>
-	<script src="scripts/directives/wb-ui-setting-text.js"></script>
-	<script src="scripts/directives/wb-ui-setting-video.js"></script>
-	<script src="scripts/directives/wb-widget.js"></script>
-	<script src="scripts/directives/wb-widgets-explorer.js"></script>
-	<script src="scripts/directives/wb-widgets-list.js"></script>
-	<script src="scripts/directives/wb-widgets-module.js"></script>
-	<script src="scripts/filters/wb-unsafe.js"></script>
-	<script src="scripts/runs/resources.js"></script>
-	<script src="scripts/runs/settings.js"></script>
-	<script src="scripts/runs/tinymc-image.js"></script>
-	<script src="scripts/runs/widgets.js"></script>
-	<script src="scripts/services/float.js"></script>
-	<script src="scripts/services/resource.js"></script>
-	<script src="scripts/services/settings.js"></script>
-	<script src="scripts/services/ui.js"></script>
-	<script src="scripts/services/util.js"></script>
-	<script src="scripts/services/widget.js"></script>
-	<script src="scripts/demo.js"></script>
-	<!-- endinjector -->
-	<!-- endbuild -->
+                    </section>
+                    <wb-group
+                        wb-on-model-select="loadSettings($model, $ctrl)"
+                        wb-editable="editable"
+                        ng-model="model"
+                        flex>
+                    </wb-group>
+                </md-content>
+            </div>
+        </div>
 
-</body>
+
+
+        <!-- build:js(src) scripts/vendor.js -->
+        <!-- bower:js -->
+        <script src="bower_components/jquery/dist/jquery.js"></script>
+        <script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/angular-animate/angular-animate.js"></script>
+        <script src="bower_components/angular-aria/angular-aria.js"></script>
+        <script src="bower_components/angular-messages/angular-messages.js"></script>
+        <script src="bower_components/angular-material/angular-material.js"></script>
+        <script src="bower_components/angular-translate/angular-translate.js"></script>
+        <script src="bower_components/tinymce/tinymce.js"></script>
+        <script src="bower_components/angular-ui-tinymce/src/tinymce.js"></script>
+        <script src="bower_components/angular-material-expansion-panel/dist/md-expansion-panel.js"></script>
+        <script src="bower_components/angular-material-icons/angular-material-icons.min.js"></script>
+        <script src="bower_components/weakmap-polyfill/weakmap-polyfill.js"></script>
+        <script src="bower_components/moment/moment.js"></script>
+        <script src="bower_components/numbro/numbro.js"></script>
+        <script src="bower_components/pikaday/pikaday.js"></script>
+        <script src="bower_components/zeroclipboard/dist/ZeroClipboard.js"></script>
+        <script src="bower_components/handsontable/dist/handsontable.js"></script>
+        <script src="bower_components/ngHandsontable/dist/ngHandsontable.js"></script>
+        <script src="bower_components/tinycolor/tinycolor.js"></script>
+        <script src="bower_components/md-color-picker/dist/md-color-picker.js"></script>
+        <script src="bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
+        <script src="bower_components/jspanel4x/dist/jspanel.js"></script>
+        <script src="bower_components/lodash/lodash.js"></script>
+        <script src="bower_components/angular-mocks/angular-mocks.js"></script>
+        <script src="bower_components/json-formatter/dist/json-formatter.js"></script>
+        <!-- endbower -->
+        <!-- endbuild -->
+
+        <!-- build:js({.tmp,app}) scripts/scripts.js -->
+        <!-- injector:js -->
+        <script src="scripts/app.js"></script>
+        <script src="scripts/configs/icons.js"></script>
+        <script src="scripts/directives/style-wb-background.js"></script>
+        <script src="scripts/directives/style-wb-border.js"></script>
+        <script src="scripts/directives/style-wb-events.js"></script>
+        <script src="scripts/directives/style-wb-layout.js"></script>
+        <script src="scripts/directives/style-wb-margin.js"></script>
+        <script src="scripts/directives/style-wb-padding.js"></script>
+        <script src="scripts/directives/style-wb-size.js"></script>
+        <script src="scripts/directives/style-wb-widget-layout.js"></script>
+        <script src="scripts/directives/style-wb-widget-size.js"></script>
+        <script src="scripts/directives/wb-group.js"></script>
+        <script src="scripts/directives/wb-icon.js"></script>
+        <script src="scripts/directives/wb-infinateScroll.js"></script>
+        <script src="scripts/directives/wb-setting-page.js"></script>
+        <script src="scripts/directives/wb-setting-panel-group.js"></script>
+        <script src="scripts/directives/wb-ui-choose.js"></script>
+        <script src="scripts/directives/wb-ui-setting-audio.js"></script>
+        <script src="scripts/directives/wb-ui-setting-background-attachment.js"></script>
+        <script src="scripts/directives/wb-ui-setting-background-origin.js"></script>
+        <script src="scripts/directives/wb-ui-setting-background-position.js"></script>
+        <script src="scripts/directives/wb-ui-setting-background-repeat.js"></script>
+        <script src="scripts/directives/wb-ui-setting-background-size.js"></script>
+        <script src="scripts/directives/wb-ui-setting-border-radius.js"></script>
+        <script src="scripts/directives/wb-ui-setting-border.js"></script>
+        <script src="scripts/directives/wb-ui-setting-choose.js"></script>
+        <script src="scripts/directives/wb-ui-setting-color.js"></script>
+        <script src="scripts/directives/wb-ui-setting-data.js"></script>
+        <script src="scripts/directives/wb-ui-setting-dropdown-value.js"></script>
+        <script src="scripts/directives/wb-ui-setting-dropdown.js"></script>
+        <script src="scripts/directives/wb-ui-setting-image.js"></script>
+        <script src="scripts/directives/wb-ui-setting-length.js"></script>
+        <script src="scripts/directives/wb-ui-setting-link.js"></script>
+        <script src="scripts/directives/wb-ui-setting-number.js"></script>
+        <script src="scripts/directives/wb-ui-setting-on-off-switch.js"></script>
+        <script src="scripts/directives/wb-ui-setting-percentage-length.js"></script>
+        <script src="scripts/directives/wb-ui-setting-text.js"></script>
+        <script src="scripts/directives/wb-ui-setting-video.js"></script>
+        <script src="scripts/directives/wb-widget.js"></script>
+        <script src="scripts/directives/wb-widgets-explorer.js"></script>
+        <script src="scripts/directives/wb-widgets-list.js"></script>
+        <script src="scripts/directives/wb-widgets-module.js"></script>
+        <script src="scripts/filters/wb-unsafe.js"></script>
+        <script src="scripts/runs/resources.js"></script>
+        <script src="scripts/runs/settings.js"></script>
+        <script src="scripts/runs/tinymc-image.js"></script>
+        <script src="scripts/runs/widgets.js"></script>
+        <script src="scripts/services/float.js"></script>
+        <script src="scripts/services/resource.js"></script>
+        <script src="scripts/services/settings.js"></script>
+        <script src="scripts/services/ui.js"></script>
+        <script src="scripts/services/util.js"></script>
+        <script src="scripts/services/widget.js"></script>
+        <script src="scripts/demo.js"></script>
+        <!-- endinjector -->
+        <!-- endbuild -->
+
+    </body>
 </html>

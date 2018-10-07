@@ -1,19 +1,89 @@
-<!-- 
-Margin and padding setting
+<!-- Margin and Padding setting -->
 
-Created by mgh on 8/10/2016. 
-@author maso(mostafa.barmshory@dpq.ir)
--->
-<!-- TODO: maso, 2018: add a UI editor for these attributes -->
-<wb-ui-setting-margin-padding
-    title="{{'Margin(px)' | translate}}"
-    icon="wb-blank"
-    value="wbModel.style.margin">
-</wb-ui-setting-margin-padding>
-<wb-ui-setting-margin-padding
-    title="{{'Padding(px)' | translate}}"
-    icon="wb-blank"
-    value="wbModel.style.padding">
-</wb-ui-setting-margin-padding>
-{{wbModel.style.margin}}
-{{wbModel.style.padding}}
+<!--Margin-->
+<md-subheader 
+	class="md-no-sticky">
+	<span translate>Margin</span>
+</md-subheader>
+
+<!--All equal-->
+<wb-ui-setting-length
+    title="All"
+    ng-model="marginAll"
+    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-setting-length>
+
+{{outputMargin}}
+
+<md-divider></md-divider>
+
+<!--top left-->
+<wb-ui-setting-length
+    title="Top"
+    ng-model="margin.top"
+    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-setting-length>
+
+<!--top right-->
+<wb-ui-setting-length
+    title="Right"
+    ng-model="margin.right"
+    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-setting-length>
+
+<!--bottom right-->
+<wb-ui-setting-length
+    title="Bottom"
+    ng-model="margin.bottom"
+    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-setting-length>
+
+<!--bottom left-->
+<wb-ui-setting-length
+    title="Left"
+    ng-model="margin.left"
+    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
+</wb-ui-setting-length>
+
+
+<!--Padding section-->
+<md-subheader 
+	class="md-no-sticky">
+	<span translate>Padding</span>
+</md-subheader>
+
+<!--All equal-->
+<wb-ui-setting-length
+    title="Padding"
+    ng-model="paddingAll"
+    extra-values = "['inherit']">
+</wb-ui-setting-length>
+
+<!--top left-->
+<wb-ui-setting-length
+    title="Top"
+    ng-model="padding.top"
+    extra-values = "['inherit']">
+</wb-ui-setting-length>
+
+<!--top right-->
+<wb-ui-setting-length
+    title="Right"
+    ng-model="padding.right"
+    extra-values = "['inherit']">
+</wb-ui-setting-length>
+
+<!--bottom right-->
+<wb-ui-setting-length
+    title="Bottom"
+    ng-model="padding.bottom"
+    extra-values = "['inherit']">
+</wb-ui-setting-length>
+
+<!--bottom left-->
+<wb-ui-setting-length
+    title="Left"
+    ng-model="padding.left"
+    extra-values = "['inherit']">
+</wb-ui-setting-length>
+

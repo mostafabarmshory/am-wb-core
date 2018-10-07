@@ -2291,6 +2291,162 @@ angular.module('am-wb-core')
 	};
 });
 
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+//
+//        /**
+//         * @ngdoc Directives
+//         * @name wbUiSettingBorderRadius
+//         * @author maso<mostafa.barmshory@dpq.co.ir>
+//         * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
+//         * @author Masood<masoodzarei64@gmail.com>
+//         * @description Set border radius (css based)
+//         * 
+//         * @see https://www.w3schools.com/cssref/css_units.asp
+//         */
+//        .directive('wbUiSettingBorderRadius', function () {
+//            return {
+//                templateUrl: 'views/directives/wb-ui-setting-border-radius.html',
+//                restrict: 'E',
+//                replace: true,
+//                scope: {
+//                    title: '@?',
+//                    value: '=?',
+//                    icon: '@?',
+//                    description: '@?'
+//                },
+//                /*
+//                 * @ngInject
+//                 */
+//                controller: function ($scope /*$resource*/) {
+//                    /*
+//                     * splice the different radious number from value.
+//                     * the format of value is: 'ddpx ddpx ddpx ddpx' which d is digit, dd < 100 and px is pixel.
+//                     * for example value = '02px 10px 08px 20px'. 
+//                     */
+////                    if ($scope.value) {
+////                        var topLeft = $scope.value.slice(0, 2);
+////                        var topRight = $scope.value.slice(5, 7);
+////                        var bottomRight = $scope.value.slice(10, 12);
+////                        var bottomLeft = $scope.value.slice(15, 17);
+////                    }
+////
+////                    //check if all values are equal
+////                    if (topLeft === topRight && bottomLeft === bottomRight && topLeft === bottomLeft) {
+////                        $scope.allEqual = true;
+////                        $scope.allCorner = topLeft;//or any one.
+////                    } else {
+////                        $scope.allEqual = false;
+////                        $scope.topLeft = topLeft;
+////                        $scope.topRight = topRight;
+////                        $scope.bottomLeft = bottomLeft;
+////                        $scope.bottomRight = bottomRight;
+////                    }
+////
+//                    $scope.$watch('allCorner', function (val) {
+//                        $scope.value.all = val;
+////                        var str = '';
+////                        var newVal = '';
+////                        if(val === 'undefined'){
+////                            return;
+////                        }
+////                        if (val < 10) {
+////                            val = '0' + val;
+////                        }
+////                        str = val + 'px';
+////                        newVal = str + ' ' + str + ' ' + str + ' ' + str;
+////                        $scope.value = newVal;
+//                    });
+////
+////                    /*
+////                     * watch all corner radius
+////                     */
+//                    $scope.$watch('topLeft', function (val) {
+//                        $scope.value.topLeft = val;
+////                        if(val === 'undefined'){
+////                            return;
+////                        }
+////                        if (val < 10) {
+////                            val = '0' + val;
+////                        }
+////                        topLeft = val;
+////                        setRadiusValue();
+//                    });
+//
+//                    $scope.$watch('topRight', function (val) {
+//                        $scope.value.topLeft = val;
+////                        if(val === 'undefined'){
+////                            return;
+////                        }
+////                        if (val < 10) {
+////                            val = '0' + val;
+////                        }
+////                        topRight = val;
+////                        setRadiusValue();
+//                    });
+//
+//                    $scope.$watch('bottomLeft', function (val) {
+//                        $scope.value.topLeft = val;
+////                        if(val === 'undefined'){
+////                            return;
+////                        }
+////                        if (val < 10) {
+////                            val = '0' + val;
+////                        }
+////                        bottomLeft = val;
+////                        setRadiusValue();
+//                    });
+//
+//                    $scope.$watch('bottomRight', function (val) {
+//                        $scope.value.topLeft = val;
+////                        if(val === 'undefined'){
+////                            return;
+////                        }
+////                        if (val < 10) {
+////                            val = '0' + val;
+////                        }
+////                        bottomRight = val;
+////                        setRadiusValue();
+//                    });
+////
+////                    /*
+////                     * set $scope.value when the value of each corner radius is changed
+////                     */
+////                    var setRadiusValue = function () {
+////                        $scope.value =
+////                                topLeft + 'px' + ' '
+////                                + topRight + 'px' + ' '
+////                                + bottomRight + 'px' + ' '
+////                                + bottomLeft + 'px';
+////                    };
+//                },
+//                controllerAs: 'ctrl'
+//            };
+//        });
 /* 
  * The MIT License (MIT)
  * 
@@ -2765,11 +2921,77 @@ angular.module('am-wb-core')
  */
 'use strict';
 
+/*
+ * Setting post link
+ */
+function settingPostLink($scope, $element, $attrs, $ctrl){
+    var ngModelCtrl = $ctrl[0];
+    ngModelCtrl.$render = function(){
+        $scope.value = ngModelCtrl.$viewValue;
+    };
+    $scope.$watch('value', function(value){
+        ngModelCtrl.$setViewValue(value);
+    });
+}
+
+/**
+ * @ngdoc Controllers
+ * 
+ * @ngInject
+ */
+function wbUiSettingGeneralCtrl($scope) {
+    var ctrl = this;
+
+    // TODO: maso, 2018:load from user config
+    $scope.wbUiSettingClearButton = true;
+    $scope.wbUiSettingPreview = true;
+
+    function clearValue(/*$event*/){
+        // General option
+        $scope.value = null;
+    }
+
+    ctrl.clearValue = clearValue;
+}
+
+
+/**
+ * @ngdoc Controllers
+ * 
+ * @ngInject
+ */
+function wbUiSettingImageCtrl($scope, $resource, $controller){
+    var ctrl = this;
+
+    angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
+        $scope : $scope
+    }));
+
+    function showImagePicker(){
+        return $resource.get('image', {
+            style: {
+                icon: 'image',
+                title: 'Select image',
+                description: 'Select image from resources.'
+            },
+            data: $scope.value
+        })//
+        .then(function(value){
+            $scope.value = value;
+        });
+    }
+
+    ctrl.showImagePicker = showImagePicker;
+}
+
+
 //General options
-// - wbUiSettingClearButton 
-// - wbUiSettingPreview
+//- wbUiSettingClearButton 
+//- wbUiSettingPreview
 
 angular.module('am-wb-core')
+.controller('wbUiSettingGeneralCtrl', wbUiSettingGeneralCtrl)
+.controller('wbUiSettingImageCtrl', wbUiSettingImageCtrl)
 
 /**
  * @ngdoc Directives
@@ -2781,56 +3003,18 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingImage', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-image.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			icon: '@icon'
-		},
-		require:['ngModel'],
-		link: function($scope, $element, $attrs, $ctrl){
-			var ngModelCtrl = $ctrl[0];
-			ngModelCtrl.$render = function(){
-				$scope.value = ngModelCtrl.$viewValue;
-			};
-			$scope.$watch('value', function(value){
-				ngModelCtrl.$setViewValue(value);
-			});
-		},
-		/*
-		 * @ngInject
-		 */
-		controller: function($scope, $resource){
-			// TODO: maso, 2018:load from user config
-			$scope.wbUiSettingClearButton = true;
-			$scope.wbUiSettingPreview = true;
-
-			function clearValue(/*$event*/){
-				// General option
-				$scope.value = null;
-			}
-			
-			function showImagePicker(){
-				return $resource.get('image', {
-					style: {
-						icon: 'image',
-						title: 'Select image',
-						description: 'Select image from resources.'
-					},
-					data: $scope.value
-				})//
-				.then(function(value){
-					$scope.value = value;
-				});
-			}
-
-			this.showImagePicker = showImagePicker;
-			this.clearValue = clearValue;
-			
-		},
-		controllerAs: 'ctrl'
-	};
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-image.html',
+        restrict: 'E',
+        scope: {
+            title: '@title',
+            icon: '@icon'
+        },
+        require:['ngModel'],
+        link: settingPostLink,
+        controller: 'wbUiSettingImageCtrl',
+        controllerAs: 'ctrl'
+    };
 });
 
 /* 
@@ -5540,8 +5724,13 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/directives/wb-ui-setting-border-radius.html',
+    ""
+  );
+
+
   $templateCache.put('views/directives/wb-ui-setting-border.html',
-    "<div layout=column> <p translate>Radius</p> <md-checkbox ng-model=allEqual ng-checked=allEqual> All equal </md-checkbox> <div ng-show=allEqual layout=row flex> <md-slider-container flex> <md-slider min=0 max=99 ng-model=allCorner> </md-slider> </md-slider-container> <md-input-container flex=20> <input type=number style=text-align:center ng-model=allCorner> </md-input-container> <p layout-align=\"end center\">px</p> </div> <div layout=column ng-show=!allEqual> <md-divider></md-divider> <div layout=row layout-align=\"space-between center\"> <p flex=25>Top left</p> <md-slider-container flex> <md-slider min=0 max=99 ng-model=topLeft> </md-slider> </md-slider-container> <md-input-container flex=15> <input type=number style=text-align:center ng-model=topLeft> </md-input-container> <p layout-align=\"end center\">px</p> </div> <div layout=row layout-align=\"space-between center\"> <p flex=25>Top right</p> <md-slider-container flex> <md-slider min=0 max=99 ng-model=topRight> </md-slider> </md-slider-container> <md-input-container flex=15> <input type=number style=text-align:center ng-model=topRight> </md-input-container> <p layout-align=\"end center\">px</p> </div> <div layout=row layout-align=\"space-between center\"> <p flex=25>Bottom right</p> <md-slider-container flex> <md-slider min=0 max=99 ng-model=bottomRight> </md-slider> </md-slider-container> <md-input-container flex=15> <input type=number style=text-align:center ng-model=bottomRight> </md-input-container> <p layout-align=\"end center\">px</p> </div> <div layout=row layout-align=\"space-between center\"> <p flex=25>Bottom left</p> <md-slider-container flex> <md-slider min=0 max=99 ng-model=bottomLeft> </md-slider> </md-slider-container> <md-input-container flex=15> <input type=number style=text-align:center ng-model=bottomLeft> </md-input-container> <p layout-align=\"end center\">px</p> </div> </div> <div class=hint ng-if=description translate=\"\">{{description}} </div> </div>"
+    "<div layout=column> <p translate>Radius</p> <md-checkbox ng-model=allEqual ng-checked=allEqual> All equal </md-checkbox> <div ng-show=allEqual layout=row flex> <md-slider-container flex> <md-slider min=0 max=99 ng-model=allCorner> </md-slider> </md-slider-container> <md-input-container flex=20> <input type=number style=text-align:center ng-model=allCorner> </md-input-container> <p layout-align=\"end center\">px</p> </div> <div layout=column ng-show=!allEqual> <md-divider></md-divider> <md-list-item> <wb-icon>corner_top_left</wb-icon> <md-slider min=0 max=99 ng-model=topLeft flex> </md-slider> <md-input-container flex=15> <input type=number style=text-align:center ng-model=topLeft> </md-input-container> </md-list-item> <md-list-item> <wb-icon>corner_top_right</wb-icon> <md-slider min=0 max=99 ng-model=topRight flex> </md-slider> <md-input-container flex=15> <input type=number style=text-align:center ng-model=topRight> </md-input-container> </md-list-item> <md-list-item> <wb-icon>corner_bottom_right</wb-icon> <md-slider min=0 max=99 ng-model=bottomRight flex> </md-slider> <md-input-container flex=15> <input type=number style=text-align:center ng-model=bottomRight> </md-input-container> </md-list-item> <md-list-item> <wb-icon>corner_bottom_left</wb-icon> <md-slider min=0 max=99 ng-model=bottomLeft flex> </md-slider> <md-input-container flex=15> <input type=number style=text-align:center ng-model=bottomLeft> </md-input-container> </md-list-item>   <div class=hint ng-if=description translate=\"\">{{description}} </div> </div> </div>"
   );
 
 
@@ -5658,17 +5847,17 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-background.html',
-    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" ng-model=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
+    " <md-input-container class=\"md-icon-float md-block\"> <label>Background</label> <input ng-model=wbModel.style.background.background> </md-input-container> <wb-ui-setting-image title=\"Background image\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
   );
 
 
   $templateCache.put('views/settings/wb-border.html',
-    " <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=wbModel.style.border.style> <md-option value=none>none</md-option> <md-option value=hidden>hidden</md-option> <md-option value=dotted>dotted</md-option> <md-option value=dashed>dashed</md-option> <md-option value=solid>solid</md-option> <md-option value=double>double</md-option> <md-option value=groove>groove</md-option> <md-option value=ridge>ridge</md-option> <md-option value=inset>inset</md-option> <md-option value=outset>outset</md-option> <md-option value=initial>initial</md-option> <md-option value=inherit>inherit</md-option> </md-select> </md-input-container> <md-input-container> <label translate>Width (px)</label> <input type=number ng-model=wbModel.style.border.width> </md-input-container> <wb-ui-setting-color title=\"{{'Color'| translate}}\" icon=format_color_fill ng-model=wbModel.style.border.color> </wb-ui-setting-color> <wb-ui-setting-border title=\"{{'Radius'| translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.radius> </wb-ui-setting-border>    "
+    " <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=wbModel.style.border.style> <md-option value=none>none</md-option> <md-option value=hidden>hidden</md-option> <md-option value=dotted>dotted</md-option> <md-option value=dashed>dashed</md-option> <md-option value=solid>solid</md-option> <md-option value=double>double</md-option> <md-option value=groove>groove</md-option> <md-option value=ridge>ridge</md-option> <md-option value=inset>inset</md-option> <md-option value=outset>outset</md-option> <md-option value=initial>initial</md-option> <md-option value=inherit>inherit</md-option> </md-select> </md-input-container> <md-input-container> <label translate>Width (px)</label> <input type=number ng-model=wbModel.style.border.width> </md-input-container> <wb-ui-setting-color title=\"{{'Color'| translate}}\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=wbModel.style.border.color> </wb-ui-setting-color> <wb-ui-setting-border title=\"{{'Radius'| translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.radius> </wb-ui-setting-border>    "
   );
 
 
   $templateCache.put('views/settings/wb-description.html',
-    " <md-input-container> <label translate=\"\">Label</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate=\"\">Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate=\"\">Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=\"{{Cover | translate}}\" ng-model=wbModel.cover> </wb-ui-setting-image>"
+    " <md-input-container> <label translate=\"\">Label</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate=\"\">Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate=\"\">Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=Cover wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.cover> </wb-ui-setting-image>"
   );
 
 

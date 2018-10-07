@@ -40,10 +40,11 @@ Created by mgh.
 
 <wb-ui-setting-color 
     title="{{'Color'| translate}}" 
-    icon="format_color_fill" 
+    wb-ui-setting-clear-button="true"
+    wb-ui-setting-preview="true"
+    wb-ui-setting-icon="format_color_fill"
     ng-model="wbModel.style.border.color">
 </wb-ui-setting-color>
-
 
 <wb-ui-setting-border
     title="{{'Radius'| translate}}"
@@ -51,33 +52,3 @@ Created by mgh.
     icon="wb-blank"
     value="wbModel.style.border.radius"> 
 </wb-ui-setting-border>
-
-
-
-<!--old version-->
-<!--<wb-ui-setting-length
-    title="{{'Style'| translate}}"
-    slider=""
-    icon="wb-blank"
-    value="wbModel.style.border.style"
-    > </wb-ui-setting-length>-->
-<!--<wb-ui-setting-length
-    title="{{'Width'| translate}}"
-    slider=""
-    icon="wb-blank"
-    value="wbModel.style.border.width"
-    > </wb-ui-setting-length>
-
-<wb-ui-setting-length
-    title="{{'Color' | translate}}"
-    slider=""
-    icon="wb-blank"
-    value="wbModel.style.border.color"
-    > </wb-ui-setting-length>-->
-
-<!--<wb-ui-setting-length
-    title="{{'Radius'| translate}}"
-    slider=""
-    icon="wb-blank"
-    value="wbModel.style.border.radius"
-    > </wb-ui-setting-length>-->
