@@ -9,9 +9,11 @@
 <!--All equal-->
 <wb-ui-setting-length
     title="All"
-    ng-model="margin.all"
+    ng-model="marginAll"
     extra-values = "['length' , 'auto' , 'initial', 'inherit']">
 </wb-ui-setting-length>
+
+{{outputMargin}}
 
 <md-divider></md-divider>
 
@@ -44,45 +46,44 @@
 </wb-ui-setting-length>
 
 
-<!--
-Padding section
+<!--Padding section-->
 <md-subheader 
 	class="md-no-sticky">
 	<span translate>Padding</span>
 </md-subheader>
 
-All equal
+<!--All equal-->
 <wb-ui-setting-length
     title="Padding"
-    ng-model="all"
-    extra-values = "['length' , 'inherit']">
+    ng-model="paddingAll"
+    extra-values = "['inherit']">
 </wb-ui-setting-length>
 
-top left
+<!--top left-->
 <wb-ui-setting-length
-    title="Top left"
-    ng-model="topLeft"
-    extra-values = "['length' , 'inherit']">
+    title="Top"
+    ng-model="padding.top"
+    extra-values = "['inherit']">
 </wb-ui-setting-length>
 
-top right
+<!--top right-->
 <wb-ui-setting-length
-    title="Top right"
-    ng-model="all"
-    extra-values = "['length' , 'inherit']">
+    title="Right"
+    ng-model="padding.right"
+    extra-values = "['inherit']">
 </wb-ui-setting-length>
 
-bottom right
+<!--bottom right-->
 <wb-ui-setting-length
-    title="Bottom right"
-    ng-model="all"
-    extra-values = "['length' , 'inherit']">
+    title="Bottom"
+    ng-model="padding.bottom"
+    extra-values = "['inherit']">
 </wb-ui-setting-length>
 
-bottom left
+<!--bottom left-->
 <wb-ui-setting-length
-    title="Bottom left"
-    ng-model="all"
-    extra-values = "['length' , 'inherit']">
-</wb-ui-setting-length>-->
+    title="Left"
+    ng-model="padding.left"
+    extra-values = "['inherit']">
+</wb-ui-setting-length>
 

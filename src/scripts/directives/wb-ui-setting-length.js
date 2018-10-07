@@ -37,31 +37,53 @@ angular.module('am-wb-core')
                 };
                 var types = $scope.extraValues;
                 
+                // Add all length by default
+                var lengthValues = ['px', '%', 'em', 'vh'];
+                types = types.concat(lengthValues);
+                
                 if (types.includes('length')) {
-
                     var index = types.indexOf('length');
                     types.splice(index, 1);
-                    // Add all length by default
-                    var lengthValues = ['px', '%', 'em', 'vh'];
-                    types = types.concat(lengthValues);
                 }
 
                 $scope.types = types;
 
                 function pars(value) {
-                    if(!value) {
+                    if (!value) {
                         $scope.internalUnit = types[0];
                         $scope.internalValue = 0;
+                    } else {
+                        split(value);
                     }
-                    //TODO: for example 15px should splite to 15 and px.
-                    $scope.$watch(function(){
-                        if($scope.extraValues.includes($scope.internalUnit)){
+
+                    $scope.$watch(function () {
+                        if ($scope.extraValues.includes($scope.internalUnit)) {
                             return $scope.internalUnit;
                         }
                         return $scope.internalValue + $scope.internalUnit;
-                    } , function(newValue) {
+                    }, function (newValue) {
                         ngModel.$setViewValue(newValue);
                     });
+                }
+
+                /*
+                 * @param {type} val
+                 * @returns {undefined}
+                 * decsription  Splite value to 'unit' and 'value'
+                 */
+                function split(val) {
+                    if ($scope.extraValues.includes(val)) {
+                        $scope.internalUnit = val;
+                    } else {
+                        /*
+                         * A regex which groups the val into the value and unit(such as 10px -> 10 , px).
+                         * This regex also support signed float format such as (+10.75%, -100.76em)
+                         */
+                        var regex = /^([+-]?\d+\.?\d*)([a-zA-Z%]*)$/;
+                        var matches = regex.exec(val);
+                        $scope.internalValue = Number(matches[1]);
+                        $scope.internalUnit = matches[2];
+                    }
                 }
             }
 
@@ -80,7 +102,7 @@ angular.module('am-wb-core')
                     /**
                      * Check if the current unit is a numerical
                      */
-                    this.isNumerical = function(){
+                    this.isNumerical = function () {
                         return angular.isArray($scope.extraValues) && !$scope.extraValues.includes($scope.internalUnit);
                     };
 
