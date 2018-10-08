@@ -310,7 +310,7 @@ angular.module('am-wb-core')
                     };
                 }
             });
-
+            //TODO: Masood, 2018: Move this controller to a separated controller.
             $settings.newPage({
                 type: 'marginPadding',
                 label: 'Margin/Padding',

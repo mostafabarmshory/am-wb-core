@@ -4,6 +4,7 @@
     <div 
         layout="row"
         layout-align="end center">
+        <wb-icon ng-if="icon">{{icon}}</wb-icon>
         <span flex translate>{{title}}</span>
         <md-input-container 
             ng-show="ctrl.isNumerical()"

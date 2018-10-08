@@ -93,6 +93,8 @@ angular.module('am-wb-core')
                 replace: true,
                 scope: {
                     title: '@title',
+                    icon: '@?',
+                    description: '@?', 
                     extraValues: '=?'
                 },
                 /*
