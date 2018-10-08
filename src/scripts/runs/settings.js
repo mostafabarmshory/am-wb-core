@@ -542,7 +542,12 @@ angular.module('am-wb-core')
                         //All items are equal
                         var dimAll;
                         var dimsArray = str.split(' ');
-                        if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+                        // 0px is selected
+                        if(dimsArray.length === 1) {
+                            dimAll = str;
+                            return dimAll;
+                        }//All 4 items is equal
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
                             dimAll = dimsArray[0];
                         } //Items are 4 and different
                         else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
