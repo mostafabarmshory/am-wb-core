@@ -7,37 +7,81 @@ a panel for setting a border for a widget. for each left/right/top/bottom proper
 - border-color
 - border-radius
 
-
-Created by mgh.
-@author maso(mostafa.barmshory@dpq.co.ir)
+Created by masood.
+@author masood(masoodzarei64@gmail.com)
 
 @version 2.x All settings are rewrite based on new data model of the border
 -->
-<!-- TODO: maso, 2018: add a UI editor for these attributes -->
+
+<!--STYLE SECTION-->
+<md-subheader 
+    class="md-hue-3">
+    <span translate>Style</span>
+</md-subheader>
 
 <md-input-container class="md-block">
     <label translate>Style</label>
     <md-select ng-model="wbModel.style.border.style">
-        <md-option value="none">none</md-option>
-        <md-option value="hidden">hidden</md-option>
-        <md-option value="dotted">dotted</md-option>
-        <md-option value="dashed">dashed</md-option>
-        <md-option value="solid">solid</md-option>
-        <md-option value="double">double</md-option>
-        <md-option value="groove">groove</md-option>
-        <md-option value="ridge">ridge</md-option>
-        <md-option value="inset">inset</md-option>
-        <md-option value="outset">outset</md-option>
-        <md-option value="initial">initial</md-option>
-        <md-option value="inherit">inherit</md-option>
+        <md-option ng-repeat="style in ::styles" value="{{::style.value}}"> 
+            {{::style.title}}
+        </md-option>
     </md-select>
 </md-input-container>
 
-<md-input-container>
-    <label translate>Width (px)</label>
-    <input type="number" ng-model="wbModel.style.border.width">
-</md-input-container>
+<!--WIDTH SECTION-->
+<md-subheader 
+    class="md-hue-3">
+    <span translate>Width</span>
+</md-subheader>
 
+<wb-ui-setting-length
+    title="All"
+    icon="border_all"
+    description="Set all sides width"
+    ng-model="widthAll"
+    extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
+</wb-ui-setting-length>
+
+<md-divider></md-divider>
+<md-divider></md-divider>
+<md-divider></md-divider>
+<md-divider></md-divider>
+<md-divider></md-divider>
+<md-divider></md-divider>
+<md-divider></md-divider>
+
+<wb-ui-setting-length
+    title="Top"
+    icon="border_top"
+    ng-model="width.top"
+    extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
+</wb-ui-setting-length>
+<wb-ui-setting-length
+    title="Right"
+    icon="border_right"
+    ng-model="width.right"
+    extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
+</wb-ui-setting-length>
+<wb-ui-setting-length
+    title="Bottom"
+    icon="border_bottom"
+    ng-model="width.bottom"
+    extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
+</wb-ui-setting-length>
+<wb-ui-setting-length
+    title="Left"
+    icon="border_left"
+    ng-model="width.left"
+    extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
+</wb-ui-setting-length>
+
+
+
+<!--COLOR SECTION-->
+<md-subheader 
+    class="md-hue-3">
+    <span translate>Color</span>
+</md-subheader>
 <wb-ui-setting-color 
     title="{{'Color'| translate}}" 
     wb-ui-setting-clear-button="true"
@@ -46,9 +90,53 @@ Created by mgh.
     ng-model="wbModel.style.border.color">
 </wb-ui-setting-color>
 
-<wb-ui-setting-border
-    title="{{'Radius'| translate}}"
-    slider=""
-    icon="wb-blank"
-    value="wbModel.style.border.radius"> 
-</wb-ui-setting-border>
+
+<!--RADIUS SECTION-->
+<md-subheader 
+    class="md-hue-3">
+    <span translate>Radius</span>
+</md-subheader>
+
+<wb-ui-setting-length
+    title="All"
+    icon="full_rounded"
+    description="Set all sides radius"
+    ng-model="radiusAll"
+    extra-values="['length', 'initial', 'inherit']">
+</wb-ui-setting-length>
+
+<md-divider></md-divider>
+<md-divider></md-divider>
+<md-divider></md-divider>
+<md-divider></md-divider>
+<md-divider></md-divider>
+<md-divider></md-divider>
+<md-divider></md-divider>
+
+<wb-ui-setting-length
+    title="Top left"
+    icon="corner_top_left"
+    ng-model="radius.topLeft"
+    extra-values="['length', 'initial', 'inherit']">
+</wb-ui-setting-length>
+<wb-ui-setting-length
+    title="Top right"
+    icon="corner_top_right"
+    ng-model="radius.topRight"
+    extra-values="['length', 'initial', 'inherit']">
+</wb-ui-setting-length>
+<wb-ui-setting-length
+    title="Bottom right"
+    icon="corner_bottom_right"
+    ng-model="radius.bottomRight"
+    extra-values="['length', 'initial', 'inherit']">
+</wb-ui-setting-length>
+<wb-ui-setting-length
+    title="Bottom left"
+    icon="corner_bottom_left"
+    ng-model="radius.bottomLeft"
+    extra-values="['length', 'initial', 'inherit']">
+</wb-ui-setting-length>
+
+
+

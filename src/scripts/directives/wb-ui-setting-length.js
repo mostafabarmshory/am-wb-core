@@ -38,7 +38,7 @@ angular.module('am-wb-core')
                 var types = $scope.extraValues;
                 
                 // Add all length by default
-                var lengthValues = ['px', '%', 'em', 'vh'];
+                var lengthValues = ['px', 'cm', 'in', '%', 'vh'];
                 types = types.concat(lengthValues);
                 
                 if (types.includes('length')) {
@@ -95,7 +95,7 @@ angular.module('am-wb-core')
                     title: '@title',
                     icon: '@?',
                     description: '@?', 
-                    extraValues: '=?'
+                    extraValues: '<?'
                 },
                 /*
                  * @ngInject
