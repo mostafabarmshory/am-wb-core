@@ -2291,298 +2291,6 @@ angular.module('am-wb-core')
 	};
 });
 
-///* 
-// * The MIT License (MIT)
-// * 
-// * Copyright (c) 2016 weburger
-// * 
-// * Permission is hereby granted, free of charge, to any person obtaining a copy
-// * of this software and associated documentation files (the "Software"), to deal
-// * in the Software without restriction, including without limitation the rights
-// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// * copies of the Software, and to permit persons to whom the Software is
-// * furnished to do so, subject to the following conditions:
-// * 
-// * The above copyright notice and this permission notice shall be included in all
-// * copies or substantial portions of the Software.
-// * 
-// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// * SOFTWARE.
-// */
-//'use strict';
-//
-//angular.module('am-wb-core')
-//
-//        /**
-//         * @ngdoc Directives
-//         * @name wbUiSettingBorderRadius
-//         * @author maso<mostafa.barmshory@dpq.co.ir>
-//         * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
-//         * @author Masood<masoodzarei64@gmail.com>
-//         * @description Set border radius (css based)
-//         * 
-//         * @see https://www.w3schools.com/cssref/css_units.asp
-//         */
-//        .directive('wbUiSettingBorderRadius', function () {
-//            return {
-//                templateUrl: 'views/directives/wb-ui-setting-border-radius.html',
-//                restrict: 'E',
-//                replace: true,
-//                scope: {
-//                    title: '@?',
-//                    value: '=?',
-//                    icon: '@?',
-//                    description: '@?'
-//                },
-//                /*
-//                 * @ngInject
-//                 */
-//                controller: function ($scope /*$resource*/) {
-//                    /*
-//                     * splice the different radious number from value.
-//                     * the format of value is: 'ddpx ddpx ddpx ddpx' which d is digit, dd < 100 and px is pixel.
-//                     * for example value = '02px 10px 08px 20px'. 
-//                     */
-////                    if ($scope.value) {
-////                        var topLeft = $scope.value.slice(0, 2);
-////                        var topRight = $scope.value.slice(5, 7);
-////                        var bottomRight = $scope.value.slice(10, 12);
-////                        var bottomLeft = $scope.value.slice(15, 17);
-////                    }
-////
-////                    //check if all values are equal
-////                    if (topLeft === topRight && bottomLeft === bottomRight && topLeft === bottomLeft) {
-////                        $scope.allEqual = true;
-////                        $scope.allCorner = topLeft;//or any one.
-////                    } else {
-////                        $scope.allEqual = false;
-////                        $scope.topLeft = topLeft;
-////                        $scope.topRight = topRight;
-////                        $scope.bottomLeft = bottomLeft;
-////                        $scope.bottomRight = bottomRight;
-////                    }
-////
-//                    $scope.$watch('allCorner', function (val) {
-//                        $scope.value.all = val;
-////                        var str = '';
-////                        var newVal = '';
-////                        if(val === 'undefined'){
-////                            return;
-////                        }
-////                        if (val < 10) {
-////                            val = '0' + val;
-////                        }
-////                        str = val + 'px';
-////                        newVal = str + ' ' + str + ' ' + str + ' ' + str;
-////                        $scope.value = newVal;
-//                    });
-////
-////                    /*
-////                     * watch all corner radius
-////                     */
-//                    $scope.$watch('topLeft', function (val) {
-//                        $scope.value.topLeft = val;
-////                        if(val === 'undefined'){
-////                            return;
-////                        }
-////                        if (val < 10) {
-////                            val = '0' + val;
-////                        }
-////                        topLeft = val;
-////                        setRadiusValue();
-//                    });
-//
-//                    $scope.$watch('topRight', function (val) {
-//                        $scope.value.topLeft = val;
-////                        if(val === 'undefined'){
-////                            return;
-////                        }
-////                        if (val < 10) {
-////                            val = '0' + val;
-////                        }
-////                        topRight = val;
-////                        setRadiusValue();
-//                    });
-//
-//                    $scope.$watch('bottomLeft', function (val) {
-//                        $scope.value.topLeft = val;
-////                        if(val === 'undefined'){
-////                            return;
-////                        }
-////                        if (val < 10) {
-////                            val = '0' + val;
-////                        }
-////                        bottomLeft = val;
-////                        setRadiusValue();
-//                    });
-//
-//                    $scope.$watch('bottomRight', function (val) {
-//                        $scope.value.topLeft = val;
-////                        if(val === 'undefined'){
-////                            return;
-////                        }
-////                        if (val < 10) {
-////                            val = '0' + val;
-////                        }
-////                        bottomRight = val;
-////                        setRadiusValue();
-//                    });
-////
-////                    /*
-////                     * set $scope.value when the value of each corner radius is changed
-////                     */
-////                    var setRadiusValue = function () {
-////                        $scope.value =
-////                                topLeft + 'px' + ' '
-////                                + topRight + 'px' + ' '
-////                                + bottomRight + 'px' + ' '
-////                                + bottomLeft + 'px';
-////                    };
-//                },
-//                controllerAs: 'ctrl'
-//            };
-//        });
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-        /**
-         * @ngdoc Directives
-         * @name wbUiSettingBorder
-         * @author maso<mostafa.barmshory@dpq.co.ir>
-         * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
-         * @author Masood<masoodzarei64@gmail.com>
-         * @description Set length (css based)
-         * 
-         * @see https://www.w3schools.com/cssref/css_units.asp
-         */
-        .directive('wbUiSettingBorder', function () {
-            return {
-                templateUrl: 'views/directives/wb-ui-setting-border.html',
-                restrict: 'E',
-                replace: true,
-                scope: {
-                    title: '@?',
-                    value: '=?',
-                    icon: '@?',
-                    description: '@?'
-                },
-                /*
-                 * @gnInject
-                 */
-                controller: function ($scope /*$resource*/) {
-                    /*
-                     * splice the different radious number from value.
-                     * the format of value is: 'ddpx ddpx ddpx ddpx' which d is digit, dd < 100 and px is pixel.
-                     * for example value = '02px 10px 08px 20px'. 
-                     */
-                    if ($scope.value) {
-                        var topLeft = $scope.value.slice(0, 2);
-                        var topRight = $scope.value.slice(5, 7);
-                        var bottomRight = $scope.value.slice(10, 12);
-                        var bottomLeft = $scope.value.slice(15, 17);
-                    }
-
-                    //check if all values are equal
-                    if (topLeft === topRight && bottomLeft === bottomRight && topLeft === bottomLeft) {
-                        $scope.allEqual = true;
-                        $scope.allCorner = topLeft;//or any one.
-                    } else {
-                        $scope.allEqual = false;
-                        $scope.topLeft = topLeft;
-                        $scope.topRight = topRight;
-                        $scope.bottomLeft = bottomLeft;
-                        $scope.bottomRight = bottomRight;
-                    }
-
-                    $scope.$watch('allCorner', function (val) {
-                        var str = '';
-                        var newVal = '';
-                        if (val < 10) {
-                            val = '0' + val;
-                        }
-                        str = val + 'px';
-                        newVal = str + ' ' + str + ' ' + str + ' ' + str;
-                        $scope.value = newVal;
-                    });
-
-                    /*
-                     * watch all corner radius
-                     */
-                    $scope.$watch('topLeft', function (val) {
-                        if (val < 10) {
-                            val = '0' + val;
-                        }
-                        topLeft = val;
-                        setRadiusValue();
-                    });
-
-                    $scope.$watch('topRight', function (val) {
-                        if (val < 10) {
-                            val = '0' + val;
-                        }
-                        topRight = val;
-                        setRadiusValue();
-                    });
-
-                    $scope.$watch('bottomLeft', function (val) {
-                        if (val < 10) {
-                            val = '0' + val;
-                        }
-                        bottomLeft = val;
-                        setRadiusValue();
-                    });
-
-                    $scope.$watch('bottomRight', function (val) {
-                        if (val < 10) {
-                            val = '0' + val;
-                        }
-                        bottomRight = val;
-                        setRadiusValue();
-                    });
-
-                    /*
-                     * set $scope.value when the value of each corner radius is changed
-                     */
-                    var setRadiusValue = function () {
-                        $scope.value =
-                                topLeft + 'px' + ' '
-                                + topRight + 'px' + ' '
-                                + bottomRight + 'px' + ' '
-                                + bottomLeft + 'px';
-                    };
-                },
-                controllerAs: 'ctrl'
-            };
-        });
 /* 
  * The MIT License (MIT)
  * 
@@ -3057,7 +2765,7 @@ angular.module('am-wb-core')
                 var types = $scope.extraValues;
                 
                 // Add all length by default
-                var lengthValues = ['px', '%', 'em', 'vh'];
+                var lengthValues = ['px', 'cm', 'in', '%', 'vh'];
                 types = types.concat(lengthValues);
                 
                 if (types.includes('length')) {
@@ -3112,7 +2820,9 @@ angular.module('am-wb-core')
                 replace: true,
                 scope: {
                     title: '@title',
-                    extraValues: '=?'
+                    icon: '@?',
+                    description: '@?', 
+                    extraValues: '<?'
                 },
                 /*
                  * @ngInject
@@ -3283,67 +2993,6 @@ angular.module('am-wb-core')
 			title: '@title',
 			value: '=value',
 			icon: '@icon'
-		}
-	};
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingPercentageLength
- * @author maso<mostafa.barmshory@dpq.co.ir>
- * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
- * @author Masood<masoodzarei64@gmail.com>
- * @description Set length (css based)
- * 
- * @see https://www.w3schools.com/cssref/css_units.asp
- */
-.directive('wbUiSettingPercentageLength', function() {
-	return {
-		templateUrl : 'views/directives/wb-ui-setting-percentage-length.html',
-		restrict : 'E',
-		replace: true,
-		scope : {
-			title : '@?',
-			value : '=?',
-			icon : '@?',
-			description : '@?'
-		},
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-                   $scope.number = $scope.value * 100;
-                   
-                   $scope.$watch('number', function (val) {
-                        $scope.value = val + '%';
-                    });
 		}
 	};
 });
@@ -4056,7 +3705,7 @@ angular.module('am-wb-core')
                 controller: function ($scope) {
                     var scope = $scope;
                     scope.styles = [{
-                            title: 'No Border',
+                            title: 'None',
                             value: 'none'
                         }, {
                             title: 'Solid',
@@ -4083,6 +3732,217 @@ angular.module('am-wb-core')
                             title: 'Outset',
                             value: 'outset'
                         }];
+
+
+                    /*
+                     * Settings about border width
+                     */
+                    $scope.$watch('widthAll', function (val) {
+                        setAllWidth($scope.width, val || 'medium');//medium is default value of width
+                    });
+
+                    function setAllWidth(dim, val) {
+
+                        dim.top = val;
+                        dim.right = val;
+                        dim.bottom = val;
+                        dim.left = val;
+
+                    }
+
+                    $scope.$watch('width', function (newWidth) {
+                        $scope.wbModel.style.border.width = createDimWidthStr(newWidth);
+                    }, true);
+
+                    function createDimWidthStr(dim) {
+                        var output =
+                                dim.top + ' ' +
+                                dim.right + ' ' +
+                                dim.bottom + ' ' +
+                                dim.left;
+                        return output;
+                    }
+
+                    /*
+                     * watch 'wbModel' and apply the changes in setting panel
+                     */
+                    $scope.$watch('wbModel', function (model) {
+
+                        //width is a string such as '10px 25% 2vh 4px'
+                        var width = fillWidthFromString($scope.width, model.style.border.width || 'medium');
+
+                        if (width) {
+                            $scope.widthAll = width;
+                        }
+
+                    });
+
+                    /*
+                     * splite 'width' to its components
+                     * check different state Based on CSS rules. see for example:
+                     * https://www.w3schools.com/CSSref/pr_border-width.asp
+                     */
+                    function fillWidthFromString(dim, str) {
+
+                        var dimAll;
+                        var dimsArray = str.split(' ');
+
+                        // 'medium' is selected
+                        if (dimsArray.length === 1) {
+                            dimAll = str;
+                            return dimAll;
+                        }
+
+                        //Items are 4 and equal
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+                            dimAll = dimsArray[0];
+                        }
+
+                        //Items are 4 and different
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
+                            dim.top = dimsArray[0];
+                            dim.right = dimsArray[1];
+                            dim.bottom = dimsArray[2];
+                            dim.left = dimsArray[3];
+                        }
+
+                        //Items are 3
+                        else if (dimsArray.length === 3) {
+                            dim.top = dimsArray[0];
+                            dim.right = dimsArray[1];
+                            dim.left = dimsArray[1];
+                            dim.bottom = dimsArray[2];
+                        }
+
+                        //Items are 2
+                        else if (dimsArray.length === 2) {
+                            dim.top = dimsArray[0];
+                            dim.bottom = dimsArray[0];
+                            dim.right = dimsArray[1];
+                            dim.left = dimsArray[1];
+                        }
+
+                        //Items are 1
+                        else if (dimsArray.length === 1) {
+                            dim.top = dimsArray[0];
+                            dim.right = dimsArray[0];
+                            dim.bottom = dimsArray[0];
+                            dim.left = dimsArray[0];
+                        }
+
+                        //All items are undefined. In this case default value is 'medium'.
+                        else if (!dimsArray.length) {
+                            dimAll = 'medium';
+                        }
+
+                        return dimAll;
+                    }
+
+                    /*
+                     * Settings about border radius
+                     */
+                    $scope.$watch('radiusAll', function (val) {
+                        setAllRadius($scope.radius, val || '0px');//0px is default value of radius
+                    });
+
+                    function setAllRadius(dim, val) {
+
+                        dim.topLeft = val;
+                        dim.topRight = val;
+                        dim.bottomRight = val;
+                        dim.bottomLeft = val;
+
+                    }
+
+                    $scope.$watch('radius', function (newRadius) {
+                        $scope.wbModel.style.border.radius = createDimeRadiusStr(newRadius);
+                    }, true);
+
+                    function createDimeRadiusStr(dim) {
+
+                        var output =
+                                dim.topLeft + ' ' +
+                                dim.topRight + ' ' +
+                                dim.bottomRight + ' ' +
+                                dim.bottomLeft;
+                        return output;
+
+                    }
+
+                    /*
+                     * watch 'wbModel' and apply the changes in setting panel
+                     */
+                    $scope.$watch('wbModel', function (model) {
+
+                        //radius is a string such as '10px 25% 2vh 4px'
+                        var radius = fillRadiusFromString($scope.radius, model.style.border.radius || '0px');
+
+                        if (radius) {
+                            $scope.radiusAll = radius;
+                        }
+
+                    });
+
+                    /*
+                     * splite 'radius' to its components
+                     * check different state Based on CSS rules. see for example:
+                     * https://www.w3schools.com/CSSref/css3_pr_border-radius.asp
+                     */
+                    function fillRadiusFromString(dim, str) {
+
+                        var dimAll;
+                        var dimsArray = str.split(' ');
+
+                        // 0px is selected
+                        if (dimsArray.length === 1) {
+                            dimAll = str;
+                            return dimAll;
+                        }
+
+                        //Items are 4 and equal
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+                            dimAll = dimsArray[0];
+                        }
+
+                        //Items are 4 and different
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
+                            dim.topLeft = dimsArray[0];
+                            dim.topRight = dimsArray[1];
+                            dim.bottomRight = dimsArray[2];
+                            dim.bottomLeft = dimsArray[3];
+                        }
+
+                        //Items are 3
+                        else if (dimsArray.length === 3) {
+                            dim.topLeft = dimsArray[0];
+                            dim.topRight = dimsArray[1];
+                            dim.bottomLeft = dimsArray[1];
+                            dim.bottomRight = dimsArray[2];
+                        }
+
+                        //Items are 2
+                        else if (dimsArray.length === 2) {
+                            dim.topLeft = dimsArray[0];
+                            dim.bottomRight = dimsArray[0];
+                            dim.topRight = dimsArray[1];
+                            dim.bottomLeft = dimsArray[1];
+                        }
+
+                        //Items are 1
+                        else if (dimsArray.length === 1) {
+                            dim.topLeft = dimsArray[0];
+                            dim.topRight = dimsArray[0];
+                            dim.bottomRight = dimsArray[0];
+                            dim.bottomLeft = dimsArray[0];
+                        }
+
+                        //All items are undefined. In this case default value is 'medium'.
+                        else if (!dimsArray.length) {
+                            dimAll = '0px';
+                        }
+
+                        return dimAll;
+                    }
                 },
                 templateUrl: 'views/settings/wb-border.html'
             });
@@ -4257,102 +4117,136 @@ angular.module('am-wb-core')
                     };
                 }
             });
-
+            //TODO: Masood, 2018: Move this controller to a separated controller.
             $settings.newPage({
                 type: 'marginPadding',
                 label: 'Margin/Padding',
                 icon: 'border_clear',
                 templateUrl: 'views/settings/wb-margin-padding.html',
+                /*
+                 * @ngInject
+                 */
                 controller: function ($scope) {
 
                     /*
-                     * All settings about margin
+                     * All settings about margin and padding
                      */
                     $scope.$watch('marginAll', function (val) {
-                        setAllMargin($scope.margin, val || '0px');
+                        setAllMargin($scope.margin, val || '0px');//default value of margin
                     });
+
                     $scope.$watch('paddingAll', function (val) {
-                        setAllMargin($scope.padding, val || '0px');
+                        setAllMargin($scope.padding, val || '0px');//default value of padding
                     });
 
                     function setAllMargin(dim, val) {
+
                         dim.top = val;
                         dim.right = val;
                         dim.bottom = val;
                         dim.left = val;
+
                     }
 
-                    $scope.$watch('margin', function (val) {
-                        $scope.wbModel.style.margin = createDimeStr(val);
+                    $scope.$watch('margin', function (newMargin) {//margin is object
+                        $scope.wbModel.style.margin = createDimeStr(newMargin);
                     }, true);
-                    $scope.$watch('padding', function (val) {
-                        $scope.wbModel.style.padding = createDimeStr(val);
+
+                    $scope.$watch('padding', function (newPadding) {//padding is object
+                        $scope.wbModel.style.padding = createDimeStr(newPadding);
                     }, true);
 
                     function createDimeStr(dim) {
+
                         var output =
                                 dim.top + ' ' +
                                 dim.right + ' ' +
                                 dim.bottom + ' ' +
                                 dim.left;
                         return output;
+
                     }
 
                     /*
                      * watch 'wbModel' and apply the changes in setting panel
                      */
                     $scope.$watch('wbModel', function (model) {
+
                         //margin is a string such as '10px 25% 2vh 4px'
                         var margin = fillFromString($scope.margin, model.style.margin || '0px');
+
                         if (margin) {
                             $scope.marginAll = margin;
                         }
-                        var paddingAll = fillFromString($scope.padding, model.style.padding || '0px');
-                        if (paddingAll) {
-                            $scope.paddingAll = paddingAll;
+
+                        var padding = fillFromString($scope.padding, model.style.padding || '0px');
+
+                        if (padding) {
+                            $scope.paddingAll = padding;
                         }
                     });
 
                     /*
-                     * splite margin to its components
+                     * splite margin/padding to its components
                      * check different state Based on CSS rules. see for example:
                      * https://www.w3schools.com/cssref/pr_margin.asp
+                     * https://www.w3schools.com/cssref/pr_padding.asp
                      */
+
                     function fillFromString(dim, str) {
-                        //All items are equal
-                        var marginAll;
-                        var marginsArray = str.split(' ');
-                        if (marginsArray.length === 4 && _.uniq(marginsArray).length === 1) {
-                            marginAll = marginsArray[0];
-                        } //Items are 4 and different
-                        else if (marginsArray.length === 4 && _.uniq(marginsArray).length > 1) {
-                            dim.top = marginsArray[0];
-                            dim.right = marginsArray[1];
-                            dim.bottom = marginsArray[2];
-                            dim.left = marginsArray[3];
-                        }//Items are 3
-                        else if (marginsArray.length === 3) {
-                            dim.top = marginsArray[0];
-                            dim.right = marginsArray[1];
-                            dim.left = marginsArray[1];
-                            dim.bottom = marginsArray[2];
-                        }//Items are 2
-                        else if (marginsArray.length === 2) {
-                            dim.top = marginsArray[0];
-                            dim.bottom = marginsArray[0];
-                            dim.right = marginsArray[1];
-                            dim.left = marginsArray[1];
-                        }//Items are 1
-                        else if (marginsArray.length === 1) {
-                            dim.top = marginsArray[0];
-                            dim.right = marginsArray[0];
-                            dim.bottom = marginsArray[0];
-                            dim.left = marginsArray[0];
-                        }//All items are undefined. In this case default value is 0.
-                        else if (!marginsArray.length) {
-                            marginAll = 0;
+
+                        var dimAll;
+                        var dimsArray = str.split(' ');
+
+                        // 0px is selected
+                        if (dimsArray.length === 1) {
+                            dimAll = str;
+                            return dimAll;
                         }
-                        return marginAll;
+
+                        //All 4 items is equal
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+                            dimAll = dimsArray[0];
+                        }
+
+                        //Items are 4 and different
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
+                            dim.top = dimsArray[0];
+                            dim.right = dimsArray[1];
+                            dim.bottom = dimsArray[2];
+                            dim.left = dimsArray[3];
+                        }
+
+                        //Items are 3
+                        else if (dimsArray.length === 3) {
+                            dim.top = dimsArray[0];
+                            dim.right = dimsArray[1];
+                            dim.left = dimsArray[1];
+                            dim.bottom = dimsArray[2];
+                        }
+
+                        //Items are 2
+                        else if (dimsArray.length === 2) {
+                            dim.top = dimsArray[0];
+                            dim.bottom = dimsArray[0];
+                            dim.right = dimsArray[1];
+                            dim.left = dimsArray[1];
+                        }
+
+                        //Items are 1
+                        else if (dimsArray.length === 1) {
+                            dim.top = dimsArray[0];
+                            dim.right = dimsArray[0];
+                            dim.bottom = dimsArray[0];
+                            dim.left = dimsArray[0];
+                        }
+
+                        //All items are undefined. In this case default value is 0px.
+                        else if (!dimsArray.length) {
+                            dimAll = '0px';
+                        }
+
+                        return dimAll;
                     }
                 }
             });
@@ -5809,16 +5703,6 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/directives/wb-ui-setting-border-radius.html',
-    ""
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-border.html',
-    "<div layout=column> <p translate>Radius</p> <md-checkbox ng-model=allEqual ng-checked=allEqual> All equal </md-checkbox> <div ng-show=allEqual layout=row flex> <md-slider-container flex> <md-slider min=0 max=99 ng-model=allCorner> </md-slider> </md-slider-container> <md-input-container flex=20> <input type=number style=text-align:center ng-model=allCorner> </md-input-container> <p layout-align=\"end center\">px</p> </div> <div layout=column ng-show=!allEqual> <md-divider></md-divider> <md-list-item> <wb-icon>corner_top_left</wb-icon> <md-slider min=0 max=99 ng-model=topLeft flex> </md-slider> <md-input-container flex=15> <input type=number style=text-align:center ng-model=topLeft> </md-input-container> </md-list-item> <md-list-item> <wb-icon>corner_top_right</wb-icon> <md-slider min=0 max=99 ng-model=topRight flex> </md-slider> <md-input-container flex=15> <input type=number style=text-align:center ng-model=topRight> </md-input-container> </md-list-item> <md-list-item> <wb-icon>corner_bottom_right</wb-icon> <md-slider min=0 max=99 ng-model=bottomRight flex> </md-slider> <md-input-container flex=15> <input type=number style=text-align:center ng-model=bottomRight> </md-input-container> </md-list-item> <md-list-item> <wb-icon>corner_bottom_left</wb-icon> <md-slider min=0 max=99 ng-model=bottomLeft flex> </md-slider> <md-input-container flex=15> <input type=number style=text-align:center ng-model=bottomLeft> </md-input-container> </md-list-item>   <div class=hint ng-if=description translate=\"\">{{description}} </div> </div> </div>"
-  );
-
-
   $templateCache.put('views/directives/wb-ui-setting-choose.html',
     "<md-list-item> <wb-icon ng-hide=\"icon === undefined || icon === null || icon === ''\" wb-icon-name={{icon}}> </wb-icon> <p ng-hide=\"title === undefined || title === null || title === ''\">{{title}}</p> <md-tabs flex=100 class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in xitems\"> <md-tab-label> <md-tooltip ng-show=item.title>{{item.title | translate}}</md-tooltip> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs> </md-list-item> "
   );
@@ -5850,7 +5734,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-length.html',
-    "<div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <span flex translate>{{title}}</span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input type=number ng-model=internalValue> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select style=max-width:75px ng-model=internalUnit> <md-option ng-repeat=\"type in types track by $index\" value={{type}}> {{type}} </md-option> </md-select> </md-input-container> </div> <md-slider-container ng-disabled=!ctrl.isNumerical() style=\"margin:0px; padding:0px; height:30px\" aria-label=\"display length vlaue with slider\" id=wb-ui-setting-length-slider> <md-slider min=0 max=99 ng-model=internalValue> </md-slider> </md-slider-container> </div>"
+    "<div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <wb-icon ng-if=icon> {{icon}} </wb-icon> <span flex ng-if=title translate>{{::title}} <md-tooltip ng-if=description>{{::description}}</md-tooltip> </span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input type=number ng-model=internalValue> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select style=max-width:75px ng-model=internalUnit> <md-option ng-repeat=\"type in ::types track by $index\" value={{::type}}> {{::type}} </md-option> </md-select> </md-input-container> </div> <md-slider-container ng-disabled=!ctrl.isNumerical() style=\"margin:0px; padding:0px; height:30px\" aria-label=\"display length vlaue with slider\" id=wb-ui-setting-length-slider> <md-slider min=0 max=99 ng-model=internalValue> </md-slider> </md-slider-container> </div>"
   );
 
 
@@ -5932,7 +5816,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-border.html',
-    " <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=wbModel.style.border.style> <md-option value=none>none</md-option> <md-option value=hidden>hidden</md-option> <md-option value=dotted>dotted</md-option> <md-option value=dashed>dashed</md-option> <md-option value=solid>solid</md-option> <md-option value=double>double</md-option> <md-option value=groove>groove</md-option> <md-option value=ridge>ridge</md-option> <md-option value=inset>inset</md-option> <md-option value=outset>outset</md-option> <md-option value=initial>initial</md-option> <md-option value=inherit>inherit</md-option> </md-select> </md-input-container> <md-input-container> <label translate>Width (px)</label> <input type=number ng-model=wbModel.style.border.width> </md-input-container> <wb-ui-setting-color title=\"{{'Color'| translate}}\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=wbModel.style.border.color> </wb-ui-setting-color> <wb-ui-setting-border title=\"{{'Radius'| translate}}\" slider=\"\" icon=wb-blank value=wbModel.style.border.radius> </wb-ui-setting-border>"
+    " <md-subheader class=md-hue-3> <span translate>Style</span> </md-subheader> <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=wbModel.style.border.style> <md-option ng-repeat=\"style in ::styles\" value={{::style.value}}> {{::style.title}} </md-option> </md-select> </md-input-container>  <md-subheader class=md-hue-3> <span translate>Width</span> </md-subheader> <wb-ui-setting-length title=All icon=border_all description=\"Set all sides width\" ng-model=widthAll extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <wb-ui-setting-length title=Top icon=border_top ng-model=width.top extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Right icon=border_right ng-model=width.right extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=width.bottom extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Left icon=border_left ng-model=width.left extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Color</span> </md-subheader> <wb-ui-setting-color title=\"{{'Color'| translate}}\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=wbModel.style.border.color> </wb-ui-setting-color>  <md-subheader class=md-hue-3> <span translate>Radius</span> </md-subheader> <wb-ui-setting-length title=All icon=full_rounded description=\"Set all sides radius\" ng-model=radiusAll extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <wb-ui-setting-length title=\"Top left\" icon=corner_top_left ng-model=radius.topLeft extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Top right\" icon=corner_top_right ng-model=radius.topRight extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom right\" icon=corner_bottom_right ng-model=radius.bottomRight extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom left\" icon=corner_bottom_left ng-model=radius.bottomLeft extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
   );
 
 
@@ -5947,7 +5831,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-margin-padding.html',
-    " <md-subheader class=md-no-sticky> <span translate>Margin</span> </md-subheader>  <wb-ui-setting-length title=All ng-model=marginAll extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length> {{outputMargin}} <md-divider></md-divider>  <wb-ui-setting-length title=Top ng-model=margin.top extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right ng-model=margin.right extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom ng-model=margin.bottom extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left ng-model=margin.left extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-no-sticky> <span translate>Padding</span> </md-subheader>  <wb-ui-setting-length title=Padding ng-model=paddingAll extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Top ng-model=padding.top extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right ng-model=padding.right extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom ng-model=padding.bottom extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left ng-model=padding.left extra-values=\"['inherit']\"> </wb-ui-setting-length>"
+    " <md-subheader class=md-hue-3> <span translate>Margin</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all margins\" ng-model=marginAll extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider>  <wb-ui-setting-length title=Top icon=border_top ng-model=margin.top extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=margin.right extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=margin.bottom extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=margin.left extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Padding</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all paddings\" ng-model=paddingAll extra-values=\"['inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider>  <wb-ui-setting-length title=Top icon=border_top ng-model=padding.top extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=padding.right extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=padding.bottom extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=padding.left extra-values=\"['inherit']\"> </wb-ui-setting-length>"
   );
 
 
@@ -5957,7 +5841,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-size.html',
-    " <wb-ui-setting-percentage-length title=Width(%) value=wbModel.style.size.width> </wb-ui-setting-percentage-length> <wb-ui-setting-percentage-length title=Height(%) value=wbModel.style.size.height> </wb-ui-setting-percentage-length> <md-subheader class=md-no-sticky> <span translate=\"\">SECTION: Min</span> </md-subheader> <wb-ui-setting-percentage-length title=\"Min width(%)\" value=\"wbModel.style.size['min-width']\"> </wb-ui-setting-percentage-length> <wb-ui-setting-percentage-length title=\"Min height(%)\" value=\"wbModel.style.size['min-height']\"> </wb-ui-setting-percentage-length> <md-subheader class=md-no-sticky> <span translate=\"\">SECTION: Max</span> </md-subheader> <wb-ui-setting-percentage-length title=\"Max width(%)\" value=\"wbModel.style.size['max-width']\"> </wb-ui-setting-percentage-length> <wb-ui-setting-percentage-length title=\"Max height(%)\" value=\"wbModel.style.size['max-height']\"> </wb-ui-setting-percentage-length>    "
+    " <md-subheader class=md-hue-3> <span translate>Size</span> </md-subheader> <wb-ui-setting-length title=Width description=\"Set the width\" ng-model=wbModel.style.size.width extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Height description=\"Set the height\" ng-model=wbModel.style.size.height extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-subheader class=md-hue-3> <span translate>Min Size</span> </md-subheader> <wb-ui-setting-length title=\"Min width\" description=\"Set the minimum width\" ng-model=wbModel.style.size.minWidth extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" description=\"Set the minimum height\" ng-model=wbModel.style.size.minHeight extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-subheader class=md-hue-3> <span translate>Max size</span> </md-subheader> <wb-ui-setting-length title=\"Max width\" description=\"Set the maximum width\" ng-model=wbModel.style.size.maxWidth extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" description=\"Set the maximum height\" ng-model=wbModel.style.size.maxHeight extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
   );
 
 

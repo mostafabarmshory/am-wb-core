@@ -4,7 +4,12 @@
     <div 
         layout="row"
         layout-align="end center">
-        <span flex translate>{{title}}</span>
+        <wb-icon ng-if="icon">
+            {{icon}}
+        </wb-icon>
+        <span flex ng-if="title" translate>{{::title}}
+            <md-tooltip ng-if="description">{{::description}}</md-tooltip>
+        </span>
         <md-input-container 
             ng-show="ctrl.isNumerical()"
             style="margin:0px; padding:0px; width:60px; height:30px;">
@@ -16,9 +21,9 @@
                 style="max-width:75px;"
                 ng-model="internalUnit">
                 <md-option 
-                    ng-repeat="type in types track by $index"
-                    value="{{type}}">
-                    {{type}}
+                    ng-repeat="type in ::types track by $index"
+                    value="{{::type}}">
+                    {{::type}}
                 </md-option>
             </md-select>
         </md-input-container>

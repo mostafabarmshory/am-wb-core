@@ -109,7 +109,7 @@ angular.module('am-wb-core')
                 controller: function ($scope) {
                     var scope = $scope;
                     scope.styles = [{
-                            title: 'No Border',
+                            title: 'None',
                             value: 'none'
                         }, {
                             title: 'Solid',
@@ -136,6 +136,217 @@ angular.module('am-wb-core')
                             title: 'Outset',
                             value: 'outset'
                         }];
+
+
+                    /*
+                     * Settings about border width
+                     */
+                    $scope.$watch('widthAll', function (val) {
+                        setAllWidth($scope.width, val || 'medium');//medium is default value of width
+                    });
+
+                    function setAllWidth(dim, val) {
+
+                        dim.top = val;
+                        dim.right = val;
+                        dim.bottom = val;
+                        dim.left = val;
+
+                    }
+
+                    $scope.$watch('width', function (newWidth) {
+                        $scope.wbModel.style.border.width = createDimWidthStr(newWidth);
+                    }, true);
+
+                    function createDimWidthStr(dim) {
+                        var output =
+                                dim.top + ' ' +
+                                dim.right + ' ' +
+                                dim.bottom + ' ' +
+                                dim.left;
+                        return output;
+                    }
+
+                    /*
+                     * watch 'wbModel' and apply the changes in setting panel
+                     */
+                    $scope.$watch('wbModel', function (model) {
+
+                        //width is a string such as '10px 25% 2vh 4px'
+                        var width = fillWidthFromString($scope.width, model.style.border.width || 'medium');
+
+                        if (width) {
+                            $scope.widthAll = width;
+                        }
+
+                    });
+
+                    /*
+                     * splite 'width' to its components
+                     * check different state Based on CSS rules. see for example:
+                     * https://www.w3schools.com/CSSref/pr_border-width.asp
+                     */
+                    function fillWidthFromString(dim, str) {
+
+                        var dimAll;
+                        var dimsArray = str.split(' ');
+
+                        // 'medium' is selected
+                        if (dimsArray.length === 1) {
+                            dimAll = str;
+                            return dimAll;
+                        }
+
+                        //Items are 4 and equal
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+                            dimAll = dimsArray[0];
+                        }
+
+                        //Items are 4 and different
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
+                            dim.top = dimsArray[0];
+                            dim.right = dimsArray[1];
+                            dim.bottom = dimsArray[2];
+                            dim.left = dimsArray[3];
+                        }
+
+                        //Items are 3
+                        else if (dimsArray.length === 3) {
+                            dim.top = dimsArray[0];
+                            dim.right = dimsArray[1];
+                            dim.left = dimsArray[1];
+                            dim.bottom = dimsArray[2];
+                        }
+
+                        //Items are 2
+                        else if (dimsArray.length === 2) {
+                            dim.top = dimsArray[0];
+                            dim.bottom = dimsArray[0];
+                            dim.right = dimsArray[1];
+                            dim.left = dimsArray[1];
+                        }
+
+                        //Items are 1
+                        else if (dimsArray.length === 1) {
+                            dim.top = dimsArray[0];
+                            dim.right = dimsArray[0];
+                            dim.bottom = dimsArray[0];
+                            dim.left = dimsArray[0];
+                        }
+
+                        //All items are undefined. In this case default value is 'medium'.
+                        else if (!dimsArray.length) {
+                            dimAll = 'medium';
+                        }
+
+                        return dimAll;
+                    }
+
+                    /*
+                     * Settings about border radius
+                     */
+                    $scope.$watch('radiusAll', function (val) {
+                        setAllRadius($scope.radius, val || '0px');//0px is default value of radius
+                    });
+
+                    function setAllRadius(dim, val) {
+
+                        dim.topLeft = val;
+                        dim.topRight = val;
+                        dim.bottomRight = val;
+                        dim.bottomLeft = val;
+
+                    }
+
+                    $scope.$watch('radius', function (newRadius) {
+                        $scope.wbModel.style.border.radius = createDimeRadiusStr(newRadius);
+                    }, true);
+
+                    function createDimeRadiusStr(dim) {
+
+                        var output =
+                                dim.topLeft + ' ' +
+                                dim.topRight + ' ' +
+                                dim.bottomRight + ' ' +
+                                dim.bottomLeft;
+                        return output;
+
+                    }
+
+                    /*
+                     * watch 'wbModel' and apply the changes in setting panel
+                     */
+                    $scope.$watch('wbModel', function (model) {
+
+                        //radius is a string such as '10px 25% 2vh 4px'
+                        var radius = fillRadiusFromString($scope.radius, model.style.border.radius || '0px');
+
+                        if (radius) {
+                            $scope.radiusAll = radius;
+                        }
+
+                    });
+
+                    /*
+                     * splite 'radius' to its components
+                     * check different state Based on CSS rules. see for example:
+                     * https://www.w3schools.com/CSSref/css3_pr_border-radius.asp
+                     */
+                    function fillRadiusFromString(dim, str) {
+
+                        var dimAll;
+                        var dimsArray = str.split(' ');
+
+                        // 0px is selected
+                        if (dimsArray.length === 1) {
+                            dimAll = str;
+                            return dimAll;
+                        }
+
+                        //Items are 4 and equal
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+                            dimAll = dimsArray[0];
+                        }
+
+                        //Items are 4 and different
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
+                            dim.topLeft = dimsArray[0];
+                            dim.topRight = dimsArray[1];
+                            dim.bottomRight = dimsArray[2];
+                            dim.bottomLeft = dimsArray[3];
+                        }
+
+                        //Items are 3
+                        else if (dimsArray.length === 3) {
+                            dim.topLeft = dimsArray[0];
+                            dim.topRight = dimsArray[1];
+                            dim.bottomLeft = dimsArray[1];
+                            dim.bottomRight = dimsArray[2];
+                        }
+
+                        //Items are 2
+                        else if (dimsArray.length === 2) {
+                            dim.topLeft = dimsArray[0];
+                            dim.bottomRight = dimsArray[0];
+                            dim.topRight = dimsArray[1];
+                            dim.bottomLeft = dimsArray[1];
+                        }
+
+                        //Items are 1
+                        else if (dimsArray.length === 1) {
+                            dim.topLeft = dimsArray[0];
+                            dim.topRight = dimsArray[0];
+                            dim.bottomRight = dimsArray[0];
+                            dim.bottomLeft = dimsArray[0];
+                        }
+
+                        //All items are undefined. In this case default value is 'medium'.
+                        else if (!dimsArray.length) {
+                            dimAll = '0px';
+                        }
+
+                        return dimAll;
+                    }
                 },
                 templateUrl: 'views/settings/wb-border.html'
             });
@@ -310,102 +521,136 @@ angular.module('am-wb-core')
                     };
                 }
             });
-
+            //TODO: Masood, 2018: Move this controller to a separated controller.
             $settings.newPage({
                 type: 'marginPadding',
                 label: 'Margin/Padding',
                 icon: 'border_clear',
                 templateUrl: 'views/settings/wb-margin-padding.html',
+                /*
+                 * @ngInject
+                 */
                 controller: function ($scope) {
 
                     /*
-                     * All settings about margin
+                     * All settings about margin and padding
                      */
                     $scope.$watch('marginAll', function (val) {
-                        setAllMargin($scope.margin, val || '0px');
+                        setAllMargin($scope.margin, val || '0px');//default value of margin
                     });
+
                     $scope.$watch('paddingAll', function (val) {
-                        setAllMargin($scope.padding, val || '0px');
+                        setAllMargin($scope.padding, val || '0px');//default value of padding
                     });
 
                     function setAllMargin(dim, val) {
+
                         dim.top = val;
                         dim.right = val;
                         dim.bottom = val;
                         dim.left = val;
+
                     }
 
-                    $scope.$watch('margin', function (val) {
-                        $scope.wbModel.style.margin = createDimeStr(val);
+                    $scope.$watch('margin', function (newMargin) {//margin is object
+                        $scope.wbModel.style.margin = createDimeStr(newMargin);
                     }, true);
-                    $scope.$watch('padding', function (val) {
-                        $scope.wbModel.style.padding = createDimeStr(val);
+
+                    $scope.$watch('padding', function (newPadding) {//padding is object
+                        $scope.wbModel.style.padding = createDimeStr(newPadding);
                     }, true);
 
                     function createDimeStr(dim) {
+
                         var output =
                                 dim.top + ' ' +
                                 dim.right + ' ' +
                                 dim.bottom + ' ' +
                                 dim.left;
                         return output;
+
                     }
 
                     /*
                      * watch 'wbModel' and apply the changes in setting panel
                      */
                     $scope.$watch('wbModel', function (model) {
+
                         //margin is a string such as '10px 25% 2vh 4px'
                         var margin = fillFromString($scope.margin, model.style.margin || '0px');
+
                         if (margin) {
                             $scope.marginAll = margin;
                         }
-                        var paddingAll = fillFromString($scope.padding, model.style.padding || '0px');
-                        if (paddingAll) {
-                            $scope.paddingAll = paddingAll;
+
+                        var padding = fillFromString($scope.padding, model.style.padding || '0px');
+
+                        if (padding) {
+                            $scope.paddingAll = padding;
                         }
                     });
 
                     /*
-                     * splite margin to its components
+                     * splite margin/padding to its components
                      * check different state Based on CSS rules. see for example:
                      * https://www.w3schools.com/cssref/pr_margin.asp
+                     * https://www.w3schools.com/cssref/pr_padding.asp
                      */
+
                     function fillFromString(dim, str) {
-                        //All items are equal
-                        var marginAll;
-                        var marginsArray = str.split(' ');
-                        if (marginsArray.length === 4 && _.uniq(marginsArray).length === 1) {
-                            marginAll = marginsArray[0];
-                        } //Items are 4 and different
-                        else if (marginsArray.length === 4 && _.uniq(marginsArray).length > 1) {
-                            dim.top = marginsArray[0];
-                            dim.right = marginsArray[1];
-                            dim.bottom = marginsArray[2];
-                            dim.left = marginsArray[3];
-                        }//Items are 3
-                        else if (marginsArray.length === 3) {
-                            dim.top = marginsArray[0];
-                            dim.right = marginsArray[1];
-                            dim.left = marginsArray[1];
-                            dim.bottom = marginsArray[2];
-                        }//Items are 2
-                        else if (marginsArray.length === 2) {
-                            dim.top = marginsArray[0];
-                            dim.bottom = marginsArray[0];
-                            dim.right = marginsArray[1];
-                            dim.left = marginsArray[1];
-                        }//Items are 1
-                        else if (marginsArray.length === 1) {
-                            dim.top = marginsArray[0];
-                            dim.right = marginsArray[0];
-                            dim.bottom = marginsArray[0];
-                            dim.left = marginsArray[0];
-                        }//All items are undefined. In this case default value is 0.
-                        else if (!marginsArray.length) {
-                            marginAll = 0;
+
+                        var dimAll;
+                        var dimsArray = str.split(' ');
+
+                        // 0px is selected
+                        if (dimsArray.length === 1) {
+                            dimAll = str;
+                            return dimAll;
                         }
-                        return marginAll;
+
+                        //All 4 items is equal
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+                            dimAll = dimsArray[0];
+                        }
+
+                        //Items are 4 and different
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
+                            dim.top = dimsArray[0];
+                            dim.right = dimsArray[1];
+                            dim.bottom = dimsArray[2];
+                            dim.left = dimsArray[3];
+                        }
+
+                        //Items are 3
+                        else if (dimsArray.length === 3) {
+                            dim.top = dimsArray[0];
+                            dim.right = dimsArray[1];
+                            dim.left = dimsArray[1];
+                            dim.bottom = dimsArray[2];
+                        }
+
+                        //Items are 2
+                        else if (dimsArray.length === 2) {
+                            dim.top = dimsArray[0];
+                            dim.bottom = dimsArray[0];
+                            dim.right = dimsArray[1];
+                            dim.left = dimsArray[1];
+                        }
+
+                        //Items are 1
+                        else if (dimsArray.length === 1) {
+                            dim.top = dimsArray[0];
+                            dim.right = dimsArray[0];
+                            dim.bottom = dimsArray[0];
+                            dim.left = dimsArray[0];
+                        }
+
+                        //All items are undefined. In this case default value is 0px.
+                        else if (!dimsArray.length) {
+                            dimAll = '0px';
+                        }
+
+                        return dimAll;
                     }
                 }
             });
