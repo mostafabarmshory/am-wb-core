@@ -4263,6 +4263,9 @@ angular.module('am-wb-core')
                 label: 'Margin/Padding',
                 icon: 'border_clear',
                 templateUrl: 'views/settings/wb-margin-padding.html',
+                /*
+                 * @ngInject
+                 */
                 controller: function ($scope) {
 
                     /*
