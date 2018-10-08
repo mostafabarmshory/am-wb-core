@@ -146,10 +146,12 @@ angular.module('am-wb-core')
                     });
 
                     function setAllWidth(dim, val) {
+                        
                         dim.top = val;
                         dim.right = val;
                         dim.bottom = val;
                         dim.left = val;
+                        
                     }
 
                     $scope.$watch('width', function (newWidth) {
@@ -169,11 +171,14 @@ angular.module('am-wb-core')
                      * watch 'wbModel' and apply the changes in setting panel
                      */
                     $scope.$watch('wbModel', function (model) {
+                        
                         //width is a string such as '10px 25% 2vh 4px'
                         var width = fillWidthFromString($scope.width, model.style.border.width || 'medium');
+                        
                         if (width) {
                             $scope.widthAll = width;
                         }
+                        
                     });
 
                     /*
@@ -182,40 +187,58 @@ angular.module('am-wb-core')
                      * https://www.w3schools.com/CSSref/pr_border-width.asp
                      */
                     function fillWidthFromString(dim, str) {
-                        //All items are equal
+                        
                         var dimAll;
                         var dimsArray = str.split(' ');
+                        
+                        // 'medium' is selected
+                        if (dimsArray.length === 1) {
+                            dimAll = str;
+                            return dimAll;
+                        }
+                        
                         //Items are 4 and equal
-                        if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
                             dimAll = dimsArray[0];
-                        } //Items are 4 and different
+                        } 
+                        
+                        //Items are 4 and different
                         else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
                             dim.top = dimsArray[0];
                             dim.right = dimsArray[1];
                             dim.bottom = dimsArray[2];
                             dim.left = dimsArray[3];
-                        }//Items are 3
+                        }
+                        
+                        //Items are 3
                         else if (dimsArray.length === 3) {
                             dim.top = dimsArray[0];
                             dim.right = dimsArray[1];
                             dim.left = dimsArray[1];
                             dim.bottom = dimsArray[2];
-                        }//Items are 2
+                        }
+                        
+                        //Items are 2
                         else if (dimsArray.length === 2) {
                             dim.top = dimsArray[0];
                             dim.bottom = dimsArray[0];
                             dim.right = dimsArray[1];
                             dim.left = dimsArray[1];
-                        }//Items are 1
+                        }
+                        
+                        //Items are 1
                         else if (dimsArray.length === 1) {
                             dim.top = dimsArray[0];
                             dim.right = dimsArray[0];
                             dim.bottom = dimsArray[0];
                             dim.left = dimsArray[0];
-                        }//All items are undefined. In this case default value is 'medium'.
+                        }
+                        
+                        //All items are undefined. In this case default value is 'medium'.
                         else if (!dimsArray.length) {
                             dimAll = 'medium';
                         }
+                        
                         return dimAll;
                     }
 
@@ -227,10 +250,12 @@ angular.module('am-wb-core')
                     });
 
                     function setAllRadius(dim, val) {
+                        
                         dim.topLeft = val;
                         dim.topRight = val;
                         dim.bottomRight = val;
                         dim.bottomLeft = val;
+                        
                     }
 
                     $scope.$watch('radius', function (newRadius) {
@@ -238,23 +263,28 @@ angular.module('am-wb-core')
                     }, true);
 
                     function createDimeRadiusStr(dim) {
+                        
                         var output =
                                 dim.topLeft + ' ' +
                                 dim.topRight + ' ' +
                                 dim.bottomRight + ' ' +
                                 dim.bottomLeft;
                         return output;
+                        
                     }
 
                     /*
                      * watch 'wbModel' and apply the changes in setting panel
                      */
                     $scope.$watch('wbModel', function (model) {
+                        
                         //radius is a string such as '10px 25% 2vh 4px'
                         var radius = fillRadiusFromString($scope.radius, model.style.border.radius || '0px');
+                        
                         if (radius) {
                             $scope.radiusAll = radius;
                         }
+                        
                     });
 
                     /*
@@ -263,40 +293,58 @@ angular.module('am-wb-core')
                      * https://www.w3schools.com/CSSref/css3_pr_border-radius.asp
                      */
                     function fillRadiusFromString(dim, str) {
-                        //All items are equal
+                        
                         var dimAll;
                         var dimsArray = str.split(' ');
+                        
+                        // 0px is selected
+                        if (dimsArray.length === 1) {
+                            dimAll = str;
+                            return dimAll;
+                        }
+                        
                         //Items are 4 and equal
-                        if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+                        else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
                             dimAll = dimsArray[0];
-                        } //Items are 4 and different
+                        } 
+                        
+                        //Items are 4 and different
                         else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
                             dim.topLeft = dimsArray[0];
                             dim.topRight = dimsArray[1];
                             dim.bottomRight = dimsArray[2];
                             dim.bottomLeft = dimsArray[3];
-                        }//Items are 3
+                        }
+                        
+                        //Items are 3
                         else if (dimsArray.length === 3) {
                             dim.topLeft = dimsArray[0];
                             dim.topRight = dimsArray[1];
                             dim.bottomLeft = dimsArray[1];
                             dim.bottomRight = dimsArray[2];
-                        }//Items are 2
+                        }
+                        
+                        //Items are 2
                         else if (dimsArray.length === 2) {
                             dim.topLeft = dimsArray[0];
                             dim.bottomRight = dimsArray[0];
                             dim.topRight = dimsArray[1];
                             dim.bottomLeft = dimsArray[1];
-                        }//Items are 1
+                        }
+                        
+                        //Items are 1
                         else if (dimsArray.length === 1) {
                             dim.topLeft = dimsArray[0];
                             dim.topRight = dimsArray[0];
                             dim.bottomRight = dimsArray[0];
                             dim.bottomLeft = dimsArray[0];
-                        }//All items are undefined. In this case default value is 'medium'.
+                        }
+                        
+                        //All items are undefined. In this case default value is 'medium'.
                         else if (!dimsArray.length) {
                             dimAll = '0px';
                         }
+                        
                         return dimAll;
                     }
                 },
@@ -490,43 +538,53 @@ angular.module('am-wb-core')
                     $scope.$watch('marginAll', function (val) {
                         setAllMargin($scope.margin, val || '0px');//default value of margin
                     });
+                    
                     $scope.$watch('paddingAll', function (val) {
                         setAllMargin($scope.padding, val || '0px');//default value of padding
                     });
 
                     function setAllMargin(dim, val) {
+                        
                         dim.top = val;
                         dim.right = val;
                         dim.bottom = val;
                         dim.left = val;
+                        
                     }
 
                     $scope.$watch('margin', function (newMargin) {//margin is object
                         $scope.wbModel.style.margin = createDimeStr(newMargin);
                     }, true);
+                    
                     $scope.$watch('padding', function (newPadding) {//padding is object
                         $scope.wbModel.style.padding = createDimeStr(newPadding);
                     }, true);
 
                     function createDimeStr(dim) {
+                        
                         var output =
                                 dim.top + ' ' +
                                 dim.right + ' ' +
                                 dim.bottom + ' ' +
                                 dim.left;
                         return output;
+                        
                     }
 
                     /*
                      * watch 'wbModel' and apply the changes in setting panel
                      */
                     $scope.$watch('wbModel', function (model) {
+                        
                         //margin is a string such as '10px 25% 2vh 4px'
                         var margin = fillFromString($scope.margin, model.style.margin || '0px');
+                        
                         if (margin) {
                             $scope.marginAll = margin;
                         }
+                        
                         var padding = fillFromString($scope.padding, model.style.padding || '0px');
+                        
                         if (padding) {
                             $scope.paddingAll = padding;
                         }
@@ -538,45 +596,60 @@ angular.module('am-wb-core')
                      * https://www.w3schools.com/cssref/pr_margin.asp
                      * https://www.w3schools.com/cssref/pr_padding.asp
                      */
+                    
                     function fillFromString(dim, str) {
-                        //All items are equal
+                        
                         var dimAll;
                         var dimsArray = str.split(' ');
+                        
                         // 0px is selected
                         if(dimsArray.length === 1) {
                             dimAll = str;
                             return dimAll;
-                        }//All 4 items is equal
+                        }
+                        
+                        //All 4 items is equal
                         else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
                             dimAll = dimsArray[0];
-                        } //Items are 4 and different
+                        } 
+                        
+                        //Items are 4 and different
                         else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
                             dim.top = dimsArray[0];
                             dim.right = dimsArray[1];
                             dim.bottom = dimsArray[2];
                             dim.left = dimsArray[3];
-                        }//Items are 3
+                        }
+                        
+                        //Items are 3
                         else if (dimsArray.length === 3) {
                             dim.top = dimsArray[0];
                             dim.right = dimsArray[1];
                             dim.left = dimsArray[1];
                             dim.bottom = dimsArray[2];
-                        }//Items are 2
+                        }
+                        
+                        //Items are 2
                         else if (dimsArray.length === 2) {
                             dim.top = dimsArray[0];
                             dim.bottom = dimsArray[0];
                             dim.right = dimsArray[1];
                             dim.left = dimsArray[1];
-                        }//Items are 1
+                        }
+                        
+                        //Items are 1
                         else if (dimsArray.length === 1) {
                             dim.top = dimsArray[0];
                             dim.right = dimsArray[0];
                             dim.bottom = dimsArray[0];
                             dim.left = dimsArray[0];
-                        }//All items are undefined. In this case default value is 0.
+                        }
+                        
+                        //All items are undefined. In this case default value is 0px.
                         else if (!dimsArray.length) {
                             dimAll = '0px';
                         }
+                        
                         return dimAll;
                     }
                 }
