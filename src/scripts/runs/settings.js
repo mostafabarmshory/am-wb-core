@@ -526,9 +526,9 @@ angular.module('am-wb-core')
                         if (margin) {
                             $scope.marginAll = margin;
                         }
-                        var paddingAll = fillFromString($scope.padding, model.style.padding || '0px');
-                        if (paddingAll) {
-                            $scope.paddingAll = paddingAll;
+                        var padding = fillFromString($scope.padding, model.style.padding || '0px');
+                        if (padding) {
+                            $scope.paddingAll = padding;
                         }
                     });
 
