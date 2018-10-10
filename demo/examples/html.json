@@ -5,7 +5,19 @@
 		{
 			"type": "HtmlText",
 			"name": "Widget",
-			"text": "<h2>HTML Text 1</h2>"
+			"text": "<h2>HTML Text 1</h2>",
+                        "style": {
+                            "shadows": [
+                                {
+                                    "hShift": "0px",
+                                    "vShift": "0px",
+                                    "blur": "2px",
+                                    "spread": "1px",
+                                    "color": "rgb(0,0,0,0.5)"
+                                }
+                            ],
+                            "margin": "10px"
+                        }
 		},
 		{
 			"type": "Group",

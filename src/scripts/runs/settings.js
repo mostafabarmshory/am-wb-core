@@ -654,10 +654,19 @@ angular.module('am-wb-core')
                     }
                 }
             });
+            
             $settings.newPage({
                 type: 'size',
                 label: 'Size',
                 icon: 'photo_size_select_large',
                 templateUrl: 'views/settings/wb-size.html'
+            });
+            
+            $settings.newPage({
+                type: 'shadow',
+                label: 'Shadow',
+                icon: '',
+                description: 'Show different shadows (zero or more) around the widget',
+                templateUrl: 'views/settings/wb-shadow.html'
             });
         });
