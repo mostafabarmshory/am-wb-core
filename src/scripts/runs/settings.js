@@ -654,19 +654,44 @@ angular.module('am-wb-core')
                     }
                 }
             });
-            
+
             $settings.newPage({
                 type: 'size',
                 label: 'Size',
                 icon: 'photo_size_select_large',
                 templateUrl: 'views/settings/wb-size.html'
             });
-            
+
             $settings.newPage({
                 type: 'shadow',
                 label: 'Shadow',
-                icon: '',
+                icon: 'brightness_low',
                 description: 'Show different shadows (zero or more) around the widget',
-                templateUrl: 'views/settings/wb-shadow.html'
+                templateUrl: 'views/settings/wb-shadow.html',
+                /*
+                 * @ngInject
+                 */
+                controller: function ($scope) {
+                    
+                    if (!$scope.wbModel.style.shadows) {
+                        $scope.wbModel.style.shadows = [];
+                    }
+
+                    this.remove = function (index) {
+                        $scope.wbModel.style.shadows.splice(index, 1);
+                    };
+                    
+                    this.addShadow = function () {
+                        $scope.wbModel.style.shadows.push({
+                            hShift: '0px',
+                            vShift: '0px',
+                            blur: '0px',
+                            spread: '0px',
+                            color: 'rgb(0,0,0,0.5)'
+                        });
+                    };
+
+                },
+                controllerAs: 'ctrl'
             });
         });

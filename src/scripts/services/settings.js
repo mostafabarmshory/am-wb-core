@@ -37,9 +37,9 @@ angular.module('am-wb-core')
 	 * Default settings
 	 */
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
-		'background', 'layout', 'marginPadding', 'size' ];
+		'background', 'layout', 'marginPadding', 'size', 'shadow' ];
 	var WB_SETTINGS_WIDGET_DEFAULT = [ 'border',
-		'background', 'marginPadding', 'layout', 'size' ];
+		'background', 'marginPadding', 'layout', 'size', 'shadow' ];
 
 	/**
 	 * Setting page storage

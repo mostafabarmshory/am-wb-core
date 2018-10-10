@@ -27,7 +27,7 @@ angular.module('am-wb-core')
         /**
          * @ngdoc Directives
          * @name wb-shadows
-         * @description Apply margin into the element
+         * @description Apply shadow into the element
          */
         .directive('wbShadows', function () {
             return {
@@ -37,18 +37,14 @@ angular.module('am-wb-core')
                         var shadowStr = '';
 
                         if (!style || !angular.isArray(style.shadows) || style.shadows.length === 0) {
-
                             shadowStr = 'none';
-
                         } else {
-
                             angular.forEach(style.shadows, function (shadow, index) {
                                 shadowStr += createShadowStr(shadow);
                                 if(index + 1 < style.shadows.length){
                                     shadowStr += ', ';
                                 }
                             });
-                            
                         }
 
                         function createShadowStr(shadow) {
