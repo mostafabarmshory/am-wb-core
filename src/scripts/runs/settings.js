@@ -720,15 +720,15 @@ angular.module('am-wb-core')
                  */
                 controller: function ($scope) {
 
-                    if (!$scope.wbModel.style.shadows) {
-                        $scope.wbModel.style.shadows = [];
-                    }
 
                     this.remove = function (index) {
                         $scope.wbModel.style.shadows.splice(index, 1);
                     };
 
                     this.addShadow = function () {
+                        if (!$scope.wbModel.style.shadows) {
+                            $scope.wbModel.style.shadows = [];
+                        }
                         $scope.wbModel.style.shadows.push({
                             hShift: '0px',
                             vShift: '0px',
