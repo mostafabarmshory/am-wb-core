@@ -24,16 +24,17 @@
 'use strict';
 
 angular.module('am-wb-core', [
-	'ngMessages',//
-	'ngAnimate',//
-	'ngAria',//
-	'ngMaterial',//
-	'pascalprecht.translate',//
-	'mdColorPicker',//
-	//'ngMaterialWysiwyg',
-	'ui.tinymce', //
-	'dndLists',//
-	'material.components.expansionPanels',//
-	'ngMdIcons', // Material icons
+	'ngMessages',
+	'ngAnimate',
+	'ngAria',
+	'ngMaterial',
+	'ngSanitize',
+	
+	'pascalprecht.translate',
+	'mdColorPicker',
+	'ui.tinymce',
+	'dndLists',
+	'material.components.expansionPanels',
+	'ngMdIcons',
 	'ngHandsontable'
 ]);
