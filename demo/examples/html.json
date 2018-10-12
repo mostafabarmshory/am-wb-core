@@ -16,7 +16,10 @@
                                     "color": "rgb(0,0,0,0.5)"
                                 }
                             ],
-                            "margin": "10px"
+                            "margin": "10px",
+                            "color": "red",
+                            "cursor": "grab",
+                            "opacity": "0.1"
                         }
 		},
 		{
