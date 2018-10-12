@@ -35,15 +35,22 @@ angular.module('am-wb-core')
                 ngModel.$render = function () {
                     pars(ngModel.$modelValue);
                 };
-                var types = $scope.extraValues;
-                
+
                 // Add all length by default
-                var lengthValues = ['px', 'cm', 'in', '%', 'vh'];
-                types = types.concat(lengthValues);
-                
-                if (types.includes('length')) {
-                    var index = types.indexOf('length');
-                    types.splice(index, 1);
+                $scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
+                $scope.extraValues = $scope.extraValues || [];
+                var types = $scope.extraValues;
+                if (types) { 
+                    
+                    types = types.concat($scope.lengthValues);
+
+                    if (types.includes('length')) {
+                        var index = types.indexOf('length');
+                        types.splice(index, 1);
+                    }
+                    
+                } else {
+                    types = $scope.lengthValues;
                 }
 
                 $scope.types = types;
@@ -94,7 +101,7 @@ angular.module('am-wb-core')
                 scope: {
                     title: '@title',
                     icon: '@?',
-                    description: '@?', 
+                    description: '@?',
                     extraValues: '<?'
                 },
                 /*
@@ -102,10 +109,10 @@ angular.module('am-wb-core')
                  */
                 controller: function ($scope) {
                     /**
-                     * Check if the current unit is a numerical
+                     * Check if the current unit is numerical
                      */
                     this.isNumerical = function () {
-                        return angular.isArray($scope.extraValues) && !$scope.extraValues.includes($scope.internalUnit);
+                          return $scope.lengthValues.includes($scope.internalUnit);
                     };
 
                 },

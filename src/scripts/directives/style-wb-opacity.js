@@ -23,18 +23,30 @@
  */
 'use strict';
 
-angular.module('am-wb-core', [
-	'ngMessages',
-	'ngAnimate',
-	'ngAria',
-	'ngMaterial',
-	'ngSanitize',
-	
-	'pascalprecht.translate',
-	'mdColorPicker',
-	'ui.tinymce',
-	'dndLists',
-	'material.components.expansionPanels',
-	'ngMdIcons',
-	'ngHandsontable'
-]);
+angular.module('am-wb-core')
+        /**
+         * @ngdoc Directives
+         * @name wb-opacity
+         * @description Apply opacity into the element
+         */
+        .directive('wbOpacity', function () {
+            return {
+                restrict: 'A',
+                link: function (scope, element, attributes) {
+                    return scope.$watch(attributes.wbOpacity, function (style) {
+                        var opacity = '';
+
+                        if (!style) {
+                            return;
+                        } else if (!style.opacity) {
+                            opacity = '1';
+                        } else {
+                            opacity = style.opacity;
+                        }
+
+                        element.css('opacity', opacity);
+
+                    }, true);
+                }
+            };
+        });

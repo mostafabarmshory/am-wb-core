@@ -1,20 +1,25 @@
 <div 
     layout="column"
     style="min-width: 200px;">
+    
     <div 
         layout="row"
         layout-align="end center">
+        
         <wb-icon ng-if="icon">
             {{icon}}
         </wb-icon>
+        
         <span flex ng-if="title" translate>{{::title}}
             <md-tooltip ng-if="description">{{::description}}</md-tooltip>
         </span>
+        
         <md-input-container 
             ng-show="ctrl.isNumerical()"
             style="margin:0px; padding:0px; width:60px; height:30px;">
             <input type="number" ng-model="internalValue">
         </md-input-container>
+        
         <md-input-container
             style="margin:0px; padding:0px; width:80px; height:30px;">
             <md-select 
@@ -27,7 +32,9 @@
                 </md-option>
             </md-select>
         </md-input-container>
+        
     </div>
+    
     <md-slider-container 
         ng-disabled="!ctrl.isNumerical()"
        	style="margin:0px; padding:0px; height:30px;"
@@ -39,4 +46,5 @@
             ng-model="internalValue">
         </md-slider>
     </md-slider-container>
+    
 </div>

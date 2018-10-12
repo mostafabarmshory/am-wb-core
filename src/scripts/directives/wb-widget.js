@@ -41,7 +41,9 @@ angular.module('am-wb-core')
 		// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
 		// FIXME: maso, 2017: use regular dom insted of ng-transclude
 		$transclude($scope, function(clone/*, $scope*/) {
-			$element.append(clone);
+			if(clone){
+				$element.append(clone);
+			}
 		});
 
 		// set wbGroup

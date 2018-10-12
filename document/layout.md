@@ -38,6 +38,10 @@ This defines a flex container; inline or block depending on the given value. It 
 	.container {
 	  display: flex; /* or inline-flex */
 	}
+	
+	{
+		type: 'Group'
+	}
 
 Note that CSS columns have no effect on a flex container.
 
@@ -49,8 +53,20 @@ Note that CSS columns have no effect on a flex container.
 
 This establishes the main-axis, thus defining the direction flex items are placed in the flex container. Flexbox is (aside from optional wrapping) a single-direction layout concept. Think of flex items as primarily laying out either in horizontal rows or vertical columns.
 
+- row 
+- column
+
 	.container {
 	  flex-direction: row | row-reverse | column | column-reverse;
+	}
+	
+	{
+		type: 'Group'
+		style: {
+			layout: {
+				direction: 'row'
+			}
+		}
 	}
 	
 row (default): left to right in ltr; right to left in rtl
@@ -68,6 +84,18 @@ By default, flex items will all try to fit onto one line. You can change that an
 	.container{
 	  flex-wrap: nowrap | wrap | wrap-reverse;
 	}
+	
+	
+	{
+		type: 'Group'
+		style: {
+			layout: {
+				direction: 'row',
+				wrap: true
+			}
+		}
+	}
+	
 
 nowrap (default): all flex items will be on one line
 wrap: flex items will wrap onto multiple lines, from top to bottom.
@@ -83,6 +111,17 @@ This defines the alignment along the main axis. It helps distribute extra free s
 
 	.container {
 	  justify-content: flex-start | flex-end | center | space-between | space-around | space-evenly;
+	}
+	
+	{
+		type: 'Group'
+		style: {
+			layout: {
+				direction: 'row',
+				wrap: true,
+				justify: 'center'
+			}
+		}
 	}
 
 flex-start (default): items are packed toward the start line
@@ -102,6 +141,18 @@ This defines the default behaviour for how flex items are laid out along the cro
 	.container {
 	  align-items: flex-start | flex-end | center | baseline | stretch;
 	}
+	
+	{
+		type: 'Group'
+		style: {
+			layout: {
+				direction: 'row',
+				wrap: true,
+				justify: 'center',
+				align: 'center'
+			}
+		}
+	}
 flex-start: cross-start margin edge of the items is placed on the cross-start line
 flex-end: cross-end margin edge of the items is placed on the cross-end line
 center: items are centered in the cross-axis
@@ -117,9 +168,23 @@ This aligns a flex container's lines within when there is extra space in the cro
 
 Note: this property has no effect when there is only one line of flex items.
 
-.container {
-  align-content: flex-start | flex-end | center | space-between | space-around | stretch;
-}
+	.container {
+	  align-content: flex-start | flex-end | center | space-between | space-around | stretch;
+	}
+	
+	
+	{
+		type: 'Group'
+		style: {
+			layout: {
+				direction: 'row',
+				wrap: true,
+				justify: 'center',
+				align: 'center'
+			}
+		}
+	}
+
 flex-start: lines packed to the start of the container
 flex-end: lines packed to the end of the container
 center: lines packed to the center of the container

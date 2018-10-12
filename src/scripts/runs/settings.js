@@ -32,6 +32,53 @@ angular.module('am-wb-core')
 
 
             $settings.newPage({
+                type: 'general',
+                label: 'General',
+                icon: 'opacity',
+                templateUrl: 'views/settings/wb-color-cursor-opacity.html',
+                
+                 /*
+                 * @ngInject
+                 */
+                controller: function ($scope) {
+                    $scope.cursors = [{
+                            title: 'Alias',
+                            value: 'alias'
+                        }, {
+                            title: 'All scroll',
+                            value: 'all-scroll'
+                        }, {
+                            title: 'Auto',
+                            value: 'auto'
+                        }, {
+                            title: 'Cell',
+                            value: 'cell'
+                        }, {
+                            title: 'Context menu',
+                            value: 'context-menu'
+                        }, {
+                            title: 'Col resize',
+                            value: 'col-resize'
+                        }, {
+                            title: 'Copy',
+                            value: 'copy'
+                        }, {
+                            title: 'Default',
+                            value: 'default'
+                        }, {
+                            title: 'Grab',
+                            value: 'grab'
+                        }, {
+                            title: 'Pointer',
+                            value: 'pointer'
+                        }, {
+                            title: 'Move',
+                            value: 'move'
+                        }];
+                }
+            });
+            
+            $settings.newPage({
                 type: 'background',
                 label: 'Background',
                 icon: 'image',
@@ -654,10 +701,44 @@ angular.module('am-wb-core')
                     }
                 }
             });
+
             $settings.newPage({
                 type: 'size',
                 label: 'Size',
                 icon: 'photo_size_select_large',
                 templateUrl: 'views/settings/wb-size.html'
+            });
+
+            $settings.newPage({
+                type: 'shadow',
+                label: 'Shadow',
+                icon: 'brightness_low',
+                description: 'Show different shadows (zero or more) around the widget',
+                templateUrl: 'views/settings/wb-shadow.html',
+                /*
+                 * @ngInject
+                 */
+                controller: function ($scope) {
+
+
+                    this.remove = function (index) {
+                        $scope.wbModel.style.shadows.splice(index, 1);
+                    };
+
+                    this.addShadow = function () {
+                        if (!$scope.wbModel.style.shadows) {
+                            $scope.wbModel.style.shadows = [];
+                        }
+                        $scope.wbModel.style.shadows.push({
+                            hShift: '0px',
+                            vShift: '0px',
+                            blur: '0px',
+                            spread: '0px',
+                            color: 'rgb(0,0,0,0.5)'
+                        });
+                    };
+
+                },
+                controllerAs: 'ctrl'
             });
         });

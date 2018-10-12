@@ -23,18 +23,30 @@
  */
 'use strict';
 
-angular.module('am-wb-core', [
-	'ngMessages',
-	'ngAnimate',
-	'ngAria',
-	'ngMaterial',
-	'ngSanitize',
-	
-	'pascalprecht.translate',
-	'mdColorPicker',
-	'ui.tinymce',
-	'dndLists',
-	'material.components.expansionPanels',
-	'ngMdIcons',
-	'ngHandsontable'
-]);
+angular.module('am-wb-core')
+        /**
+         * @ngdoc Directives
+         * @name wb-cursor
+         * @description Apply cursor into the element
+         */
+        .directive('wbCursor', function () {
+            return {
+                restrict: 'A',
+                link: function (scope, element, attributes) {
+                    return scope.$watch(attributes.wbCursor, function (style) {
+                        var cursor = '';
+
+                        if (!style) {
+                            return;
+                        } else if (!style.cursor) {
+                            cursor = 'auto';
+                        } else {
+                            cursor = style.cursor;
+                        }
+
+                        element.css('cursor', cursor);
+
+                    }, true);
+                }
+            };
+        });

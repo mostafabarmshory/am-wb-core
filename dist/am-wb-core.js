@@ -24,17 +24,18 @@
 'use strict';
 
 angular.module('am-wb-core', [
-	'ngMessages',//
-	'ngAnimate',//
-	'ngAria',//
-	'ngMaterial',//
-	'pascalprecht.translate',//
-	'mdColorPicker',//
-	//'ngMaterialWysiwyg',
-	'ui.tinymce', //
-	'dndLists',//
-	'material.components.expansionPanels',//
-	'ngMdIcons', // Material icons
+	'ngMessages',
+	'ngAnimate',
+	'ngAria',
+	'ngMaterial',
+	'ngSanitize',
+	
+	'pascalprecht.translate',
+	'mdColorPicker',
+	'ui.tinymce',
+	'dndLists',
+	'material.components.expansionPanels',
+	'ngMdIcons',
 	'ngHandsontable'
 ]);
 
@@ -268,6 +269,110 @@ angular.module('am-wb-core')
 		}
 	};
 });
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+        /**
+         * @ngdoc Directives
+         * @name wb-color
+         * @description Apply color into the element
+         */
+        .directive('wbColor', function () {
+            return {
+                restrict: 'A',
+                link: function (scope, element, attributes) {
+                    return scope.$watch(attributes.wbColor, function (style) {
+                        var color = '';
+
+                        if (!style) {
+                            return;
+                        } else if (!style.color) {
+                            color = 'initial';
+                        } else {
+                            color = style.color;
+                        }
+
+                        element.css('color', color);
+
+                    }, true);
+                }
+            };
+        });
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+        /**
+         * @ngdoc Directives
+         * @name wb-cursor
+         * @description Apply cursor into the element
+         */
+        .directive('wbCursor', function () {
+            return {
+                restrict: 'A',
+                link: function (scope, element, attributes) {
+                    return scope.$watch(attributes.wbCursor, function (style) {
+                        var cursor = '';
+
+                        if (!style) {
+                            return;
+                        } else if (!style.cursor) {
+                            cursor = 'auto';
+                        } else {
+                            cursor = style.cursor;
+                        }
+
+                        element.css('cursor', cursor);
+
+                    }, true);
+                }
+            };
+        });
 /* 
  * The MIT License (MIT)
  * 
@@ -615,6 +720,58 @@ angular.module('am-wb-core')
 'use strict';
 
 angular.module('am-wb-core')
+        /**
+         * @ngdoc Directives
+         * @name wb-opacity
+         * @description Apply opacity into the element
+         */
+        .directive('wbOpacity', function () {
+            return {
+                restrict: 'A',
+                link: function (scope, element, attributes) {
+                    return scope.$watch(attributes.wbOpacity, function (style) {
+                        var opacity = '';
+
+                        if (!style) {
+                            return;
+                        } else if (!style.opacity) {
+                            opacity = '1';
+                        } else {
+                            opacity = style.opacity;
+                        }
+
+                        element.css('opacity', opacity);
+
+                    }, true);
+                }
+            };
+        });
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
 /**
  * @ngdoc Directives
  * @name wb-padding
@@ -635,6 +792,78 @@ angular.module('am-wb-core')
 		}
 	};
 });
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+        /**
+         * @ngdoc Directives
+         * @name wb-shadows
+         * @description Apply shadow into the element
+         */
+        .directive('wbShadows', function () {
+            return {
+                restrict: 'A',
+                link: function (scope, element, attributes) {
+                    return scope.$watch(attributes.wbShadows, function (style) {
+                        var shadowStr = '';
+
+                        if (!style || !angular.isArray(style.shadows) || style.shadows.length === 0) {
+                            shadowStr = 'none';
+                        } else {
+                            angular.forEach(style.shadows, function (shadow, index) {
+                                shadowStr += createShadowStr(shadow);
+                                if(index + 1 < style.shadows.length){
+                                    shadowStr += ', ';
+                                }
+                            });
+                        }
+
+                        function createShadowStr(shadow) {
+
+                            var hShift = shadow.hShift || '0px';
+                            var vShift = shadow.vShift || '0px';
+                            var blur = shadow.blur || '0px';
+                            var spread = shadow.spread || '0px';
+                            var color = shadow.color || 'black';
+                            
+                            var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
+                            
+                            if(shadow.inset) {
+                                boxShadow = boxShadow.concat(' ' + 'inset');
+                            }
+                            
+                            return boxShadow;
+                        }
+
+                        element.css('box-shadow', shadowStr);
+
+                    }, true);
+                }
+            };
+        });
 /* 
  * The MIT License (MIT)
  * 
@@ -2762,15 +2991,22 @@ angular.module('am-wb-core')
                 ngModel.$render = function () {
                     pars(ngModel.$modelValue);
                 };
-                var types = $scope.extraValues;
-                
+
                 // Add all length by default
-                var lengthValues = ['px', 'cm', 'in', '%', 'vh'];
-                types = types.concat(lengthValues);
-                
-                if (types.includes('length')) {
-                    var index = types.indexOf('length');
-                    types.splice(index, 1);
+                $scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
+                $scope.extraValues = $scope.extraValues || [];
+                var types = $scope.extraValues;
+                if (types) { 
+                    
+                    types = types.concat($scope.lengthValues);
+
+                    if (types.includes('length')) {
+                        var index = types.indexOf('length');
+                        types.splice(index, 1);
+                    }
+                    
+                } else {
+                    types = $scope.lengthValues;
                 }
 
                 $scope.types = types;
@@ -2821,7 +3057,7 @@ angular.module('am-wb-core')
                 scope: {
                     title: '@title',
                     icon: '@?',
-                    description: '@?', 
+                    description: '@?',
                     extraValues: '<?'
                 },
                 /*
@@ -2829,10 +3065,10 @@ angular.module('am-wb-core')
                  */
                 controller: function ($scope) {
                     /**
-                     * Check if the current unit is a numerical
+                     * Check if the current unit is numerical
                      */
                     this.isNumerical = function () {
-                        return angular.isArray($scope.extraValues) && !$scope.extraValues.includes($scope.internalUnit);
+                          return $scope.lengthValues.includes($scope.internalUnit);
                     };
 
                 },
@@ -3148,7 +3384,9 @@ angular.module('am-wb-core')
 		// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
 		// FIXME: maso, 2017: use regular dom insted of ng-transclude
 		$transclude($scope, function(clone/*, $scope*/) {
-			$element.append(clone);
+			if(clone){
+				$element.append(clone);
+			}
 		});
 
 		// set wbGroup
@@ -3627,6 +3865,53 @@ angular.module('am-wb-core')
         .run(function ($settings) {
 
 
+            $settings.newPage({
+                type: 'general',
+                label: 'General',
+                icon: 'opacity',
+                templateUrl: 'views/settings/wb-color-cursor-opacity.html',
+                
+                 /*
+                 * @ngInject
+                 */
+                controller: function ($scope) {
+                    $scope.cursors = [{
+                            title: 'Alias',
+                            value: 'alias'
+                        }, {
+                            title: 'All scroll',
+                            value: 'all-scroll'
+                        }, {
+                            title: 'Auto',
+                            value: 'auto'
+                        }, {
+                            title: 'Cell',
+                            value: 'cell'
+                        }, {
+                            title: 'Context menu',
+                            value: 'context-menu'
+                        }, {
+                            title: 'Col resize',
+                            value: 'col-resize'
+                        }, {
+                            title: 'Copy',
+                            value: 'copy'
+                        }, {
+                            title: 'Default',
+                            value: 'default'
+                        }, {
+                            title: 'Grab',
+                            value: 'grab'
+                        }, {
+                            title: 'Pointer',
+                            value: 'pointer'
+                        }, {
+                            title: 'Move',
+                            value: 'move'
+                        }];
+                }
+            });
+            
             $settings.newPage({
                 type: 'background',
                 label: 'Background',
@@ -4250,11 +4535,45 @@ angular.module('am-wb-core')
                     }
                 }
             });
+
             $settings.newPage({
                 type: 'size',
                 label: 'Size',
                 icon: 'photo_size_select_large',
                 templateUrl: 'views/settings/wb-size.html'
+            });
+
+            $settings.newPage({
+                type: 'shadow',
+                label: 'Shadow',
+                icon: 'brightness_low',
+                description: 'Show different shadows (zero or more) around the widget',
+                templateUrl: 'views/settings/wb-shadow.html',
+                /*
+                 * @ngInject
+                 */
+                controller: function ($scope) {
+
+
+                    this.remove = function (index) {
+                        $scope.wbModel.style.shadows.splice(index, 1);
+                    };
+
+                    this.addShadow = function () {
+                        if (!$scope.wbModel.style.shadows) {
+                            $scope.wbModel.style.shadows = [];
+                        }
+                        $scope.wbModel.style.shadows.push({
+                            hShift: '0px',
+                            vShift: '0px',
+                            blur: '0px',
+                            spread: '0px',
+                            color: 'rgb(0,0,0,0.5)'
+                        });
+                    };
+
+                },
+                controllerAs: 'ctrl'
             });
         });
 
@@ -4899,10 +5218,10 @@ angular.module('am-wb-core')
 	/*
 	 * Default settings
 	 */
-	var WB_SETTINGS_GROUP_DEFAULT = [ 'description', 'border',
-		'background', 'layout', 'marginPadding', 'size' ];
-	var WB_SETTINGS_WIDGET_DEFAULT = [ 'border',
-		'background', 'marginPadding', 'layout', 'size' ];
+	var WB_SETTINGS_GROUP_DEFAULT = [ 'general', 'description', 'border',
+		'background', 'layout', 'marginPadding', 'size', 'shadow' ];
+	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'border',
+		'background', 'marginPadding', 'layout', 'size', 'shadow' ];
 
 	/**
 	 * Setting page storage
@@ -5645,7 +5964,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-group.html',
-    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"dropCallback(index, item, external, type)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" wb-size=wbModel.style wb-layout=wbModel.style wb-align=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event ng-class=\"{\n" +
+    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"dropCallback(index, item, external, type)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" wb-size=wbModel.style wb-layout=wbModel.style wb-align=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-shadows=wbModel.style wb-color=wbModel.style wb-cursor=wbModel.style wb-opacity=wbModel.style wb-events=wbModel.event ng-class=\"{\n" +
     "\t\t'wb-group-root': ctrl.isRoot(),\n" +
     "\t\t'wb-group-edit': ctrl.isEditable(),\n" +
     "\t\t'wb-group-select': ctrl.isSelected()\n" +
@@ -5753,11 +6072,6 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/directives/wb-ui-setting-percentage-length.html',
-    "<md-input-container> <label ng-if=title translate>{{title}}</label> <input type=number min=0 max=100 ng-model=\"number\"> <div class=hint ng-if=description translate=\"\">{{description}}</div> </md-input-container>"
-  );
-
-
   $templateCache.put('views/directives/wb-ui-setting-text.html',
     "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input style=\"width: 200px\" ng-model=value flex> </md-input-container> </md-list-item>"
   );
@@ -5769,7 +6083,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widget.html',
-    "<div class=wb-widget name={{wbModel.name}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-type=wbModel.type dnd-effect-allowed=copyMove dnd-callback=1 dnd-moved=ctrl.delete() wb-widget-size=wbModel.style wb-widget-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-events=wbModel.event md-theme-watch=true ng-class=\"{\n" +
+    "<div class=wb-widget name={{wbModel.name}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-type=wbModel.type dnd-effect-allowed=copyMove dnd-callback=1 dnd-moved=ctrl.delete() wb-widget-size=wbModel.style wb-widget-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-shadows=wbModel.style wb-color=wbModel.style wb-cursor=wbModel.style wb-opacity=wbModel.style wb-events=wbModel.event md-theme-watch=true ng-class=\"{\n" +
     "\t\t'wb-widget-edit': ctrl.isEditable(),\n" +
     "\t\t'wb-widget-select': ctrl.isSelected()\n" +
     "\t}\" transclude></div>"
@@ -5816,7 +6130,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-border.html',
-    " <md-subheader class=md-hue-3> <span translate>Style</span> </md-subheader> <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=wbModel.style.border.style> <md-option ng-repeat=\"style in ::styles\" value={{::style.value}}> {{::style.title}} </md-option> </md-select> </md-input-container>  <md-subheader class=md-hue-3> <span translate>Width</span> </md-subheader> <wb-ui-setting-length title=All icon=border_all description=\"Set all sides width\" ng-model=widthAll extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <wb-ui-setting-length title=Top icon=border_top ng-model=width.top extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Right icon=border_right ng-model=width.right extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=width.bottom extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Left icon=border_left ng-model=width.left extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Color</span> </md-subheader> <wb-ui-setting-color title=\"{{'Color'| translate}}\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=wbModel.style.border.color> </wb-ui-setting-color>  <md-subheader class=md-hue-3> <span translate>Radius</span> </md-subheader> <wb-ui-setting-length title=All icon=full_rounded description=\"Set all sides radius\" ng-model=radiusAll extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <wb-ui-setting-length title=\"Top left\" icon=corner_top_left ng-model=radius.topLeft extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Top right\" icon=corner_top_right ng-model=radius.topRight extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom right\" icon=corner_bottom_right ng-model=radius.bottomRight extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom left\" icon=corner_bottom_left ng-model=radius.bottomLeft extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
+    " <md-subheader class=md-hue-3> <span translate>Style</span> </md-subheader> <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=wbModel.style.border.style> <md-option ng-repeat=\"style in ::styles\" value={{::style.value}}> {{::style.title}} </md-option> </md-select> </md-input-container>  <md-subheader class=md-hue-3> <span translate>Width</span> </md-subheader> <wb-ui-setting-length title=All icon=border_all description=\"Set all sides width\" ng-model=widthAll extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=Top icon=border_top ng-model=width.top extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Right icon=border_right ng-model=width.right extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=width.bottom extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Left icon=border_left ng-model=width.left extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Color</span> </md-subheader> <wb-ui-setting-color title=\"{{'Color'| translate}}\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=wbModel.style.border.color> </wb-ui-setting-color>  <md-subheader class=md-hue-3> <span translate>Radius</span> </md-subheader> <wb-ui-setting-length title=All icon=full_rounded description=\"Set all sides radius\" ng-model=radiusAll extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=\"Top left\" icon=corner_top_left ng-model=radius.topLeft extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Top right\" icon=corner_top_right ng-model=radius.topRight extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom right\" icon=corner_bottom_right ng-model=radius.bottomRight extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom left\" icon=corner_bottom_left ng-model=radius.bottomLeft extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
+  );
+
+
+  $templateCache.put('views/settings/wb-color-cursor-opacity.html',
+    " <div layout=column style=\"min-width: 200px\">  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.style.color> </wb-ui-setting-color>  <div layout=row> <wb-icon>mouse</wb-icon> <p translate=\"\">Cursor</p> <span flex></span> <md-input-container layout-align=\"end center\"> <md-select style=max-width:75px ng-model=wbModel.style.cursor> <md-option ng-repeat=\"cursor in ::cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </div>  <div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <wb-icon>opacity</wb-icon> <span flex translate=\"\">Opacity</span> <md-input-container style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input ng-model=wbModel.style.opacity> </md-input-container> </div>  </div> </div>"
   );
 
 
@@ -5837,6 +6156,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/settings/wb-notfound.html',
     " <wb-icon>bug</wb-icon> <h2>Settings page not found</h2>"
+  );
+
+
+  $templateCache.put('views/settings/wb-shadow.html',
+    " <div layout=row flex> <md-button ng-click=ctrl.addShadow()> <span translate=\"\">New shadow</span> </md-button> </div>  <div ng-repeat=\"shadow in wbModel.style.shadows track by $index\" layout=column> <md-toolbar style=\"padding-left: 16px; padding-right: 16px\" class=md-hue-3> <div layout=row layout-align=\"end center\"> <p flex>Shadow {{$index + 1}}</p> <md-button flex=10 class=md-icon-button ng-click=ctrl.remove($index)> <wb-icon>delete</wb-icon> </md-button> </div> </md-toolbar> <div layout=column> <wb-ui-setting-length title=\"Horizontal Shift\" ng-model=shadow.hShift> </wb-ui-setting-length> <wb-ui-setting-length title=\"Vertical Shift\" ng-model=shadow.vShift> </wb-ui-setting-length> <wb-ui-setting-length title=Blur ng-model=shadow.blur> </wb-ui-setting-length> <wb-ui-setting-length title=Spread ng-model=shadow.spread> </wb-ui-setting-length> <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=shadow.color> </wb-ui-setting-color> <md-checkbox ng-model=shadow.inset aria-label=Inset> <span translate=\"\">Inset</span> </md-checkbox> </div> </div>"
   );
 
 

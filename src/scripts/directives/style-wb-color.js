@@ -23,18 +23,30 @@
  */
 'use strict';
 
-angular.module('am-wb-core', [
-	'ngMessages',
-	'ngAnimate',
-	'ngAria',
-	'ngMaterial',
-	'ngSanitize',
-	
-	'pascalprecht.translate',
-	'mdColorPicker',
-	'ui.tinymce',
-	'dndLists',
-	'material.components.expansionPanels',
-	'ngMdIcons',
-	'ngHandsontable'
-]);
+angular.module('am-wb-core')
+        /**
+         * @ngdoc Directives
+         * @name wb-color
+         * @description Apply color into the element
+         */
+        .directive('wbColor', function () {
+            return {
+                restrict: 'A',
+                link: function (scope, element, attributes) {
+                    return scope.$watch(attributes.wbColor, function (style) {
+                        var color = '';
+
+                        if (!style) {
+                            return;
+                        } else if (!style.color) {
+                            color = 'initial';
+                        } else {
+                            color = style.color;
+                        }
+
+                        element.css('color', color);
+
+                    }, true);
+                }
+            };
+        });
