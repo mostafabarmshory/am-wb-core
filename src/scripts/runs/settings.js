@@ -734,7 +734,7 @@ angular.module('am-wb-core')
                             vShift: '0px',
                             blur: '0px',
                             spread: '0px',
-                            color: 'rgb(0,0,0,0.5)'
+                            color: 'rgb(0,0,0)'
                         });
                     };
 
