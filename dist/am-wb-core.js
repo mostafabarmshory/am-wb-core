@@ -469,7 +469,7 @@ angular.module('am-wb-core')
  * 
  * Note that, in smal screen devices, the colume layout apply as default.
  */
-.directive('wbLayout', function() {
+.directive('wbLayout', function($mdMedia) {
 
     /**
      * Adds layout config into the element
@@ -489,7 +489,7 @@ angular.module('am-wb-core')
         {
             flexLayout.display = 'flex';
             // row
-            if(layout.direction === 'row'){
+            if(layout.direction === 'row' && $mdMedia('gt-sm')){
                 flexLayout['flex-direction'] =  layout.direction_reverse? 'row-reverse' : 'row'; 
                 flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
                 flexLayout['overflow-y'] = 'visible';
@@ -6145,12 +6145,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-shadow.html',
-    " <div layout=row flex> <md-button ng-click=ctrl.addShadow()> <span translate=\"\">New shadow</span> </md-button> </div>  <div ng-repeat=\"shadow in wbModel.style.shadows track by $index\" layout=column> <md-toolbar style=\"padding-left: 16px; padding-right: 16px\" class=md-hue-3> <div layout=row layout-align=\"end center\"> <p flex>Shadow {{$index + 1}}</p> <md-button flex=10 class=md-icon-button ng-click=ctrl.remove($index)> <wb-icon>delete</wb-icon> </md-button> </div> </md-toolbar> <div layout=column> <wb-ui-setting-length title=\"Horizontal Shift\" ng-model=shadow.hShift> </wb-ui-setting-length> <wb-ui-setting-length title=\"Vertical Shift\" ng-model=shadow.vShift> </wb-ui-setting-length> <wb-ui-setting-length title=Blur ng-model=shadow.blur> </wb-ui-setting-length> <wb-ui-setting-length title=Spread ng-model=shadow.spread> </wb-ui-setting-length> <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=shadow.color> </wb-ui-setting-color> <md-checkbox ng-model=shadow.inset aria-label=Inset> <span translate=\"\">Inset</span> </md-checkbox> </div> </div>"
+    " <div layout=row flex> <md-button ng-click=ctrl.addShadow()> <span translate=\"\">New shadow</span> </md-button> </div>  <div ng-repeat=\"shadow in wbModel.style.shadows track by $index\" layout=column> <md-toolbar style=\"padding-top:0px; padding-bottom:0px; padding-left: 16px; padding-right: 16px; min-height: 16px\" class=md-hue-3> <div layout=row layout-align=\"end center\"> <p style=\"font-size: 14px\" flex>Shadow {{$index + 1}}</p> <md-button flex=10 class=md-icon-button ng-click=ctrl.remove($index)> <wb-icon>delete</wb-icon> </md-button> </div> </md-toolbar> <div layout=column> <wb-ui-setting-length title=\"Horizontal Shift\" ng-model=shadow.hShift> </wb-ui-setting-length> <wb-ui-setting-length title=\"Vertical Shift\" ng-model=shadow.vShift> </wb-ui-setting-length> <wb-ui-setting-length title=Blur ng-model=shadow.blur> </wb-ui-setting-length> <wb-ui-setting-length title=Spread ng-model=shadow.spread> </wb-ui-setting-length> <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=shadow.color> </wb-ui-setting-color> <md-checkbox ng-model=shadow.inset aria-label=Inset> <span translate=\"\">Inset</span> </md-checkbox> </div> </div>"
   );
 
 
   $templateCache.put('views/settings/wb-size.html',
-    " <md-subheader class=md-hue-3> <span translate>Size</span> </md-subheader> <wb-ui-setting-length title=Width description=\"Set the width\" ng-model=wbModel.style.size.width extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Height description=\"Set the height\" ng-model=wbModel.style.size.height extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-subheader class=md-hue-3> <span translate>Min Size</span> </md-subheader> <wb-ui-setting-length title=\"Min width\" description=\"Set the minimum width\" ng-model=wbModel.style.size.minWidth extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" description=\"Set the minimum height\" ng-model=wbModel.style.size.minHeight extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-subheader class=md-hue-3> <span translate>Max size</span> </md-subheader> <wb-ui-setting-length title=\"Max width\" description=\"Set the maximum width\" ng-model=wbModel.style.size.maxWidth extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" description=\"Set the maximum height\" ng-model=wbModel.style.size.maxHeight extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
+    " <md-subheader> <span translate>Size</span> </md-subheader> <wb-ui-setting-length title=Width description=\"Set the width\" ng-model=wbModel.style.size.width extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Height description=\"Set the height\" ng-model=wbModel.style.size.height extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-subheader> <span translate>Min Size</span> </md-subheader> <wb-ui-setting-length title=\"Min width\" description=\"Set the minimum width\" ng-model=wbModel.style.size.minWidth extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" description=\"Set the minimum height\" ng-model=wbModel.style.size.minHeight extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-subheader> <span translate>Max size</span> </md-subheader> <wb-ui-setting-length title=\"Max width\" description=\"Set the maximum width\" ng-model=wbModel.style.size.maxWidth extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" description=\"Set the maximum height\" ng-model=wbModel.style.size.maxHeight extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
   );
 
 
@@ -6203,30 +6203,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
     "                'wordcount'\n" +
     "            ],\n" +
     "            toolbar: [\n" +
-    "                'fullscreen | undo redo | bold italic underline | styleselect fontselect fontsizeselect | visualblocks',\n" +
+    "                'fullscreen | undo redo | bold italic underline | fontselect fontsizeselect | visualblocks',\n" +
     "                'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'\n" +
     "            ],\n" +
     "\t    powerpaste_word_import: 'clean',\n" +
     "\t    powerpaste_html_import: 'clean',\n" +
-    "            textpattern_patterns: [\n" +
-    "                {start: '*', end: '*', format: 'italic'},\n" +
-    "                {start: '**', end: '**', format: 'bold'},\n" +
-    "                {start: '#', format: 'h1'},\n" +
-    "                {start: '##', format: 'h2'},\n" +
-    "                {start: '###', format: 'h3'}\n" +
-    "            ],\n" +
-    "            format: 'raw',\n" +
-    "            \n" +
-    "            style_formats_merge: true,\n" +
-    "            style_formats: [\n" +
-    "                {title: 'Bold text', inline: 'b'},\n" +
-    "                {title: 'Red text', inline: 'span', styles: {color: '#ff0000'}},\n" +
-    "                {title: 'Red header', block: 'h1', styles: {color: '#ff0000'}},\n" +
-    "                {title: 'Example 1', inline: 'span', classes: 'example1'},\n" +
-    "                {title: 'Example 2', inline: 'span', classes: 'example2'},\n" +
-    "                {title: 'Table styles'},\n" +
-    "                {title: 'Table row 1', selector: 'tr', classes: 'tablerow1'}\n" +
-    "            ]\n" +
+    "            format: 'raw'\n" +
     "\t}\" ng-model=wbModel.text class=\"wb-widget-fill tinymce wb-widget-text\"> </div>"
   );
 
