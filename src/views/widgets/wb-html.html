@@ -54,30 +54,12 @@
                 'wordcount'
             ],
             toolbar: [
-                'fullscreen | undo redo | bold italic underline | styleselect fontselect fontsizeselect | visualblocks',
-                'forecolor backcolor | ltr rtl | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'
+                'fullscreen | undo redo | bold italic underline | fontselect fontsizeselect | visualblocks',
+                'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'
             ],
 	    powerpaste_word_import: 'clean',
 	    powerpaste_html_import: 'clean',
-            textpattern_patterns: [
-                {start: '*', end: '*', format: 'italic'},
-                {start: '**', end: '**', format: 'bold'},
-                {start: '#', format: 'h1'},
-                {start: '##', format: 'h2'},
-                {start: '###', format: 'h3'}
-            ],
-            format: 'raw',
-            
-            style_formats_merge: true,
-            style_formats: [
-                {title: 'Bold text', inline: 'b'},
-                {title: 'Red text', inline: 'span', styles: {color: '#ff0000'}},
-                {title: 'Red header', block: 'h1', styles: {color: '#ff0000'}},
-                {title: 'Example 1', inline: 'span', classes: 'example1'},
-                {title: 'Example 2', inline: 'span', classes: 'example2'},
-                {title: 'Table styles'},
-                {title: 'Table row 1', selector: 'tr', classes: 'tablerow1'}
-            ]
+            format: 'raw'
 	}"
 	ng-model="wbModel.text"
 	class="wb-widget-fill tinymce wb-widget-text">
