@@ -37,8 +37,6 @@ module.exports = function(config) {
 			'bower_components/angular-sanitize/angular-sanitize.js',
 			'bower_components/angular-material/angular-material.js',
 			'bower_components/angular-translate/angular-translate.js',
-			'bower_components/tinymce/tinymce.js',
-			'bower_components/angular-ui-tinymce/src/tinymce.js',
 			'bower_components/angular-material-icons/angular-material-icons.min.js',
 			'bower_components/weakmap-polyfill/weakmap-polyfill.js',
 			'bower_components/moment/moment.js',
@@ -53,6 +51,7 @@ module.exports = function(config) {
 			'bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js',
 			'bower_components/jspanel4x/dist/jspanel.js',
 			'bower_components/lodash/lodash.js',
+			'bower_components/tinymce/tinymce.js',
 			'bower_components/angular-mocks/angular-mocks.js',
 			'bower_components/json-formatter/dist/json-formatter.js',
 			// endbower

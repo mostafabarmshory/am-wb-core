@@ -11,7 +11,8 @@
 		"toast": true,
 		"prompt": true,
 		"jsPanel": true,
-		"_": true
+		"_": true,
+		"tinymce": true
 	},
 	"extends": "eslint:recommended",
 	"parserOptions": {
