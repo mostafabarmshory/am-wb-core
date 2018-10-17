@@ -6419,7 +6419,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/widgets/wb-html.html',
-    " <div ng-if=!ctrl.isEditable() ng-bind-html=\"wbModel.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
+    " <div ng-if=!ctrl.isEditable() ng-bind-html=\"::wbModel.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
     "        selector : 'div.tinymce', \n" +
     "        menubar: true,\n" +
     "\t    inline: true,\n" +
