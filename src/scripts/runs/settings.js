@@ -87,9 +87,9 @@ angular.module('am-wb-core')
 	    });
 
 	    $settings.newPage({
-		type: 'description',
-		label: 'Description',
-		templateUrl: 'views/settings/wb-description.html'
+		type: 'SEO',
+		label: 'SEO',
+		templateUrl: 'views/settings/wb-seo.html'
 	    });
 
 	    $settings.newPage({

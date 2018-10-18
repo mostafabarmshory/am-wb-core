@@ -266,6 +266,7 @@ angular.module('am-wb-core').service('$wbUtil', function($q, $templateRequest, $
      */
     function clean(model, force)
     {
+	model.type = 'Group';
         if (model.version === 'wb1' && !force) {
             return model;
         }

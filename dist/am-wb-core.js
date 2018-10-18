@@ -29,7 +29,7 @@ angular.module('am-wb-core', [
 	'ngAria',
 	'ngMaterial',
 	'ngSanitize',
-	
+
 	'pascalprecht.translate',
 	'mdColorPicker',
 	'ui.tinymce',
@@ -3921,9 +3921,9 @@ angular.module('am-wb-core')
 	    });
 
 	    $settings.newPage({
-		type: 'description',
-		label: 'Description',
-		templateUrl: 'views/settings/wb-description.html'
+		type: 'SEO',
+		label: 'SEO',
+		templateUrl: 'views/settings/wb-seo.html'
 	    });
 
 	    $settings.newPage({
@@ -5202,8 +5202,8 @@ angular.module('am-wb-core')
 	/*
 	 * Default settings
 	 */
-	var WB_SETTINGS_GROUP_DEFAULT = [ 'general', 'description', 'border',
-		'background', 'layout', 'marginPadding', 'size', 'shadow' ];
+	var WB_SETTINGS_GROUP_DEFAULT = [ 'general'/*, 'description'*/, 'border',
+		'background', 'layout', 'marginPadding', 'size', 'shadow', 'SEO' ];
 	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'border',
 		'background', 'marginPadding', 'layout', 'size', 'shadow' ];
 
@@ -5647,6 +5647,7 @@ angular.module('am-wb-core').service('$wbUtil', function($q, $templateRequest, $
      */
     function clean(model, force)
     {
+	model.type = 'Group';
         if (model.version === 'wb1' && !force) {
             return model;
         }
@@ -6382,11 +6383,6 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/settings/wb-description.html',
-    " <md-input-container> <label translate=\"\">Label</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate=\"\">Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate=\"\">Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=Cover wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.cover> </wb-ui-setting-image>"
-  );
-
-
   $templateCache.put('views/settings/wb-layout.html',
     " <wb-ui-setting-choose ng-if=\"wbModel.type==='Group'\" title=Direction icon=wb-direction items=direction ng-model=wbModel.style.layout.direction> </wb-ui-setting-choose>  <md-switch ng-if=\"wbModel.type==='Group'\" ng-model=wbModel.style.layout.wrap aria-label=\"Layout wrap\"> <span ng-if=\"wbModel.style.layout.direction==='row'\" translate=\"\">Multi row</span> <span ng-if=\"wbModel.style.layout.direction!=='row'\" translate=\"\">Multi column</span> </md-switch>  <wb-ui-setting-choose ng-if=\"wbModel.type==='Group'\" title=\"{{(wbModel.style.layout.direction=='row')?'Vert.':'Horz.'}}\" items=align[wbModel.style.layout.direction] ng-model=wbModel.style.layout.align> </wb-ui-setting-choose>  <wb-ui-setting-choose ng-if=\"wbModel.type==='Group'\" title=\"{{(wbModel.style.layout.direction!='row')?'Vert.':'Horz.'}}\" items=justify[wbModel.style.layout.direction] ng-model=wbModel.style.layout.justify> </wb-ui-setting-choose>   <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction!='row')?'Self Vert.':'Self Horz.'}}\" items=\"selfAlign['row']\" ng-model=wbModel.style.layout.align_self> </wb-ui-setting-choose>"
   );
@@ -6399,6 +6395,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/settings/wb-notfound.html',
     " <wb-icon>bug</wb-icon> <h2>Settings page not found</h2>"
+  );
+
+
+  $templateCache.put('views/settings/wb-seo.html',
+    " <md-input-container> <label translate=\"\">Label</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate=\"\">Category</label> <input ng-model=wbModel.category> </md-input-container> <md-input-container> <label translate=\"\">Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate=\"\">Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=Cover wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.cover> </wb-ui-setting-image>"
   );
 
 
@@ -6418,55 +6419,55 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/widgets/wb-html.html',
-    " <div ng-if=!ctrl.isEditable() ng-bind-html=\"wbModel.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
-    "            selector : 'div.tinymce', \n" +
-    "            menubar: true,\n" +
+    " <div ng-if=!ctrl.isEditable() ng-bind-html=\"::wbModel.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
+    "        selector : 'div.tinymce', \n" +
+    "        menubar: true,\n" +
     "\t    inline: true,\n" +
     "\t    theme: 'modern',\n" +
-    "            plugins : [\n" +
-    "                'advlist',\n" +
-    "                'autolink',\n" +
-    "                'autoresize',\n" +
-    "                'autosave',\n" +
-    "                'bbcode',\n" +
-    "                'charmap',\n" +
-    "                'code',\n" +
-    "                'codesample',\n" +
-    "                'colorpicker',\n" +
-    "                'contextmenu',\n" +
-    "                'directionality',\n" +
-    "                'emoticons',\n" +
-    "                'hr',\n" +
-    "                'image',\n" +
-    "                'imagetools',\n" +
-    "                'importcss',\n" +
-    "                'insertdatetime',\n" +
-    "                'legacyoutput',\n" +
-    "                'link',\n" +
-    "                'lists',\n" +
-    "                'media',\n" +
-    "                'nonbreaking',\n" +
-    "                'noneditable',\n" +
-    "                'paste',\n" +
-    "                'save',\n" +
-    "                'searchreplace',\n" +
-    "                'spellchecker',\n" +
-    "                'tabfocus',\n" +
-    "                'table',\n" +
-    "                'template',\n" +
-    "                'textcolor',\n" +
-    "                'textpattern',\n" +
-    "                'toc',\n" +
-    "                'visualblocks',\n" +
-    "                'wordcount'\n" +
-    "            ],\n" +
-    "            toolbar: [\n" +
-    "                'fullscreen | undo redo | bold italic underline | fontselect fontsizeselect | visualblocks',\n" +
-    "                'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'\n" +
-    "            ],\n" +
+    "        plugins : [\n" +
+    "            'advlist',\n" +
+    "            'autolink',\n" +
+    "            'autoresize',\n" +
+    "            'autosave',\n" +
+    "            'bbcode',\n" +
+    "            'charmap',\n" +
+    "            'code',\n" +
+    "            'codesample',\n" +
+    "            'colorpicker',\n" +
+    "            'contextmenu',\n" +
+    "            'directionality',\n" +
+    "            'emoticons',\n" +
+    "            'hr',\n" +
+    "            'image',\n" +
+    "            'imagetools',\n" +
+    "            'importcss',\n" +
+    "            'insertdatetime',\n" +
+    "            'legacyoutput',\n" +
+    "            'link',\n" +
+    "            'lists',\n" +
+    "            'media',\n" +
+    "            'nonbreaking',\n" +
+    "            'noneditable',\n" +
+    "            'paste',\n" +
+    "            'save',\n" +
+    "            'searchreplace',\n" +
+    "            'spellchecker',\n" +
+    "            'tabfocus',\n" +
+    "            'table',\n" +
+    "            'template',\n" +
+    "            'textcolor',\n" +
+    "            'textpattern',\n" +
+    "            'toc',\n" +
+    "            'visualblocks',\n" +
+    "            'wordcount'\n" +
+    "        ],\n" +
+    "        toolbar: [\n" +
+    "            'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',\n" +
+    "            'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'\n" +
+    "        ],\n" +
     "\t    powerpaste_word_import: 'clean',\n" +
     "\t    powerpaste_html_import: 'clean',\n" +
-    "            format: 'raw'\n" +
+    "        format: 'raw',\n" +
     "\t}\" ng-model=wbModel.text class=\"wb-widget-fill tinymce wb-widget-text\"> </div>"
   );
 
