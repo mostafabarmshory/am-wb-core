@@ -16,6 +16,7 @@ of a widget:
  */
 .wb-group-root {
 	overflow: auto !important;
+        min-height: 32px;
 }
 
 .wb-group-root.wb-group-edit {
