@@ -60,7 +60,6 @@ angular.module('am-wb-core')
 		help : 'http://dpq.co.ir',
 		helpId: 'wb-widget-html',
 		// functional properties
-		templateUrl : 'views/widgets/wb-html.html',
-		setting:['text']
+		templateUrl : 'views/widgets/wb-html.html'
 	});
 });

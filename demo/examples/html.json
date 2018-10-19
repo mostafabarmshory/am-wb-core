@@ -1,6 +1,11 @@
 {
 	"type": "Group",
 	"name": "Root",
+	"style":{
+		"layout":{
+			"direction": "row"
+		}
+	},
 	"contents": [
 		{
 			"type": "HtmlText",

@@ -6,68 +6,60 @@
  -->
 <div
 	ng-if="!ctrl.isEditable()"
-    ng-bind-html="wbModel.text | wbunsafe"
+	ng-bind-html="::wbModel.text | wbunsafe"
 	class="wb-widget-fill wb-widget-text">
 </div>
 <div
 	ng-if="ctrl.isEditable()"
 	ui-tinymce="{
-		selector : 'div.tinymce',
-		menubar: true,
+        selector : 'div.tinymce', 
+        menubar: true,
 	    inline: true,
 	    theme: 'modern',
-		plugins : [
-			'advlist',
-			'autolink',
-			'autoresize',
-			'autosave',
-			'bbcode',
-			'charmap',
-			'code',
-			'codesample',
-			'colorpicker',
-			'contextmenu',
-			'directionality',
-			'emoticons',
-			'hr',
-			'image',
-			'imagetools',
-			'importcss',
-			'insertdatetime',
-			'legacyoutput',
-			'link',
-			'lists',
-			'media',
-			'nonbreaking',
-			'noneditable',
-			'paste',
-			'save',
-			'searchreplace',
-			'spellchecker',
-			'tabfocus',
-			'table',
-			'template',
-			'textcolor',
-			'textpattern',
-			'toc',
-			'visualblocks',
-			'wordcount'
-			
-		],
-		toolbar: [
-      		'fullscreen | undo redo | bold italic underline | styleselect fontselect fontsizeselect | visualblocks',
-      		'forecolor backcolor | ltr rtl |alignleft aligncenter alignright alignfull | numlist bullist outdent indent'
-    	],
+        plugins : [
+            'advlist',
+            'autolink',
+            'autoresize',
+            'autosave',
+            'bbcode',
+            'charmap',
+            'code',
+            'codesample',
+            'colorpicker',
+            'contextmenu',
+            'directionality',
+            'emoticons',
+            'hr',
+            'image',
+            'imagetools',
+            'importcss',
+            'insertdatetime',
+            'legacyoutput',
+            'link',
+            'lists',
+            'media',
+            'nonbreaking',
+            'noneditable',
+            'paste',
+            'save',
+            'searchreplace',
+            'spellchecker',
+            'tabfocus',
+            'table',
+            'template',
+            'textcolor',
+            'textpattern',
+            'toc',
+            'visualblocks',
+            'wordcount'
+        ],
+        toolbar: [
+            'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',
+            'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'
+        ],
 	    powerpaste_word_import: 'clean',
 	    powerpaste_html_import: 'clean',
-		textpattern_patterns: [
-		    {start: '*', end: '*', format: 'italic'},
-		    {start: '**', end: '**', format: 'bold'},
-		    {start: '#', format: 'h1'},
-		    {start: '##', format: 'h2'},
-		    {start: '###', format: 'h3'}
-		],
-		format: 'raw'
+        format: 'raw',
 	}"
 	ng-model="wbModel.text"
 	class="wb-widget-fill tinymce wb-widget-text">

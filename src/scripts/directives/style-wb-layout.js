@@ -34,7 +34,7 @@ angular.module('am-wb-core')
  * 
  * Note that, in smal screen devices, the colume layout apply as default.
  */
-.directive('wbLayout', function() {
+.directive('wbLayout', function($mdMedia) {
 
     /**
      * Adds layout config into the element
@@ -54,7 +54,7 @@ angular.module('am-wb-core')
         {
             flexLayout.display = 'flex';
             // row
-            if(layout.direction === 'row'){
+            if(layout.direction === 'row' && $mdMedia('gt-sm')){
                 flexLayout['flex-direction'] =  layout.direction_reverse? 'row-reverse' : 'row'; 
                 flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
                 flexLayout['overflow-y'] = 'visible';
