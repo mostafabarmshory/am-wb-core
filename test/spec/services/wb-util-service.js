@@ -135,4 +135,17 @@ describe('Service $wbUtil', function () {
 			expect(clone.style.border.radius).toBe(expData.style.border.radius);
 		}
 	});
+	it('should not change model type if the model has type; Otherwise the type is set to "Group"', function () {
+	    var model1 = {
+		type : 'Text'
+	    };
+	    var model2 = {
+	    };
+	    
+	    var newModel1 = $wbUtil.clean(model1);
+	    expect(newModel1.type).toBe('Text');
+	    
+	    var newModel2 = $wbUtil.clean(model2);
+	    expect(newModel2.type).toBe('Group');
+	});
 });
