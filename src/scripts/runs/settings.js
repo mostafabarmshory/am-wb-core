@@ -546,11 +546,12 @@ angular.module('am-wb-core')
 		    
 		    var ctrl = this;
 		    $scope.$watch('wbModel', function (model) {
-			ctrl.direction = model.style.layout.direction;
-			ctrl.align = model.style.layout.align;
-			ctrl.wrap = model.style.layout.wrap;
-			ctrl.alignSelf = model.style.layout.align_self;
-			ctrl.justify = model.style.layout.justify;
+			var layout = model.style.layout || {};
+			ctrl.direction = layout.direction;
+			ctrl.align = layout.align;
+			ctrl.wrap = layout.wrap;
+			ctrl.alignSelf = layout.align_self;
+			ctrl.justify = layout.justify;
 		    });
 
 		    /*
@@ -738,7 +739,71 @@ angular.module('am-wb-core')
 		type: 'size',
 		label: 'Size',
 		icon: 'photo_size_select_large',
-		templateUrl: 'views/settings/wb-size.html'
+		templateUrl: 'views/settings/wb-size.html',
+		controllerAs: 'ctrl',
+		
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+		   
+		   // Sample of size object in wbModel
+		    /*
+			wbModel: {
+			   style: {
+			       size: {
+				   height: "372px"
+				   maxHeight: "auto"
+				   maxWidth: "auto"
+				   minHeight: "auto"
+				   minWidth: "auto"
+				   width: "311px"
+			       };
+			   }
+			}
+		    */
+		   
+		   /*
+		     * watch 'wbModel' and apply the changes in setting panel
+		     */
+		    
+		    var ctrl = this;
+		    $scope.$watch('wbModel', function (model) {
+			ctrl.width = model.style.size.width;
+			ctrl.height = model.style.size.height;
+			ctrl.minWidth = model.style.size.minWidth;
+			ctrl.minHeight = model.style.size.minHeight;
+			ctrl.maxWidth = model.style.size.maxWidth;
+			ctrl.maxHeight = model.style.size.maxHeight;
+		    }, true);
+
+		    /*
+		     * This part updates the wbModel whenever the size properties are changed in view
+		     */
+		    this.widthChanged = function () {
+			$scope.wbModel.style.size.width = this.width;
+		    };
+
+		    this.heightChanged = function () {
+			$scope.wbModel.style.size.height = this.height;
+		    };
+
+		    this.minWidthChanged = function () {
+			$scope.wbModel.style.size.minWidth = this.minWidth;
+		    };
+
+		    this.minHeightChanged = function () {
+			$scope.wbModel.style.size.minHeight = this.minHeight;
+		    };
+
+		    this.maxWidthChanged = function () {
+			$scope.wbModel.style.size.maxWidth = this.maxWidth;
+		    };
+		    
+		    this.maxHeightChanged = function () {
+			$scope.wbModel.style.size.maxHeight = this.maxHeight;
+		    };
+		}
 	    });
 
 	    $settings.newPage({
