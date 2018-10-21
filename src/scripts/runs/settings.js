@@ -93,13 +93,6 @@ angular.module('am-wb-core')
 	    });
 
 	    $settings.newPage({
-		type: 'layout',
-		label: 'Layout',
-		description: 'Manages layout of the current item.',
-		icon: 'dashboard',
-		templateUrl: 'views/settings/wb-layout.html'
-	    });
-	    $settings.newPage({
 		type: 'border',
 		label: 'Border',
 		icon: 'border_all',
@@ -392,6 +385,7 @@ angular.module('am-wb-core')
 		type: 'layout',
 		label: 'Layout',
 		icon: 'dashboard',
+		description: 'Manages layout of the current item.',
 		templateUrl: 'views/settings/wb-layout.html',
 		controllerAs: 'ctrl',
 		/*
@@ -400,7 +394,7 @@ angular.module('am-wb-core')
 		 * @ngInject
 		 */
 		controller: function ($scope) {
-		    $scope.direction = [{
+		    this.direction_ = [{
 			    title: 'column',
 			    icon: 'wb-horizontal-boxes',
 			    value: 'column'
@@ -410,7 +404,7 @@ angular.module('am-wb-core')
 			    value: 'row'
 			}];
 
-		    $scope.justify = {
+		    this.justify_ = {
 			'row': [{
 				title: 'Start',
 				icon: 'sort_start_horiz',
@@ -455,7 +449,7 @@ angular.module('am-wb-core')
 			    }]
 		    };
 
-		    $scope.align = {
+		    this.align_ = {
 			'column': [{
 				title: 'Stretch',
 				icon: 'format_align_justify',
@@ -492,7 +486,7 @@ angular.module('am-wb-core')
 			    }]
 		    };
 
-		    $scope.selfAlign = {
+		    this.selfAlign_ = {
 			'column': [{
 				title: 'Stretch',
 				icon: 'format_align_justify',
@@ -527,6 +521,59 @@ angular.module('am-wb-core')
 				icon: 'align_center_vertical',
 				value: 'center'
 			    }]
+		    };
+
+		    /*
+		     * Sample of layout object in wbModel
+		     * 
+		     wbModel: {
+			style: {    
+			    layout: {
+				align: "stretch",
+				wrap: "true",
+				align_self: "stretch",
+				direction: "column",
+				justify: "start",
+			    };
+			}	
+		     }
+		     */
+
+
+		    /*
+		     * watch 'wbModel' and apply the changes in setting panel
+		     */
+		    
+		    var ctrl = this;
+		    $scope.$watch('wbModel', function (model) {
+			ctrl.direction = model.style.layout.direction;
+			ctrl.align = model.style.layout.align;
+			ctrl.wrap = model.style.layout.wrap;
+			ctrl.alignSelf = model.style.layout.align_self;
+			ctrl.justify = model.style.layout.justify;
+		    });
+
+		    /*
+		     * This part updates the wbModel whenever the layout properties are changed in view
+		     */
+		    this.directionChanged = function () {
+			$scope.wbModel.style.layout.direction = this.direction;
+		    };
+
+		    this.wrapChanged = function () {
+			$scope.wbModel.style.layout.wrap = this.wrap;
+		    };
+
+		    this.alignChanged = function () {
+			$scope.wbModel.style.layout.align = this.align;
+		    };
+
+		    this.justifyChanged = function () {
+			$scope.wbModel.style.layout.justify = this.justify;
+		    };
+
+		    this.alignSelfChanged = function () {
+			$scope.wbModel.style.layout.align_self = this.alignSelf;
 		    };
 		}
 	    });
@@ -557,7 +604,7 @@ angular.module('am-wb-core')
 			setAllMargin($scope.padding, val || '0px');//default value of padding
 			$scope.wbModel.style.padding = createDimeStr($scope.padding);
 		    }
-		    
+
 		    function setAllMargin(dim, val) {
 
 			if (dim) {
@@ -566,7 +613,7 @@ angular.module('am-wb-core')
 			    dim.bottom = val;
 			    dim.left = val;
 			}
-			
+
 
 		    }
 
