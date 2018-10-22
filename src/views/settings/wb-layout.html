@@ -55,28 +55,50 @@ the following items can be set for customizing container layout:
 
 <!--Align Items--> 
 <wb-ui-setting-choose 
-    ng-if="wbModel.type === 'Group'"
-    title="{{(ctrl.direction=='row')?'Vert.':'Horz.'}}"
-    items="ctrl.align_[ctrl.direction]" 
+    ng-if="wbModel.type === 'Group' && ctrl.direction==='row'"
+    title="Vert."
+    items="ctrl.align_['row']" 
+    ng-model="ctrl.align"
+    ng-change="ctrl.alignChanged()">
+</wb-ui-setting-choose>
+<wb-ui-setting-choose 
+    ng-if="wbModel.type === 'Group' && ctrl.direction==='column'"
+    title="Horz."
+    items="ctrl.align_['column']" 
     ng-model="ctrl.align"
     ng-change="ctrl.alignChanged()">
 </wb-ui-setting-choose>
 
 <!--Justify Content--> 
 <wb-ui-setting-choose 
-    ng-if="wbModel.type === 'Group'"
-    title="{{(ctrl.direction!='row')?'Vert.':'Horz.'}}"
-    items="ctrl.justify_[ctrl.direction]" 
+    ng-if="wbModel.type === 'Group' && ctrl.direction==='row'"
+    title="Vert.'"
+    items="ctrl.justify_['row']" 
+    ng-model="ctrl.justify"
+    ng-change="ctrl.justifyChanged()">
+</wb-ui-setting-choose>
+<wb-ui-setting-choose 
+    ng-if="wbModel.type === 'Group' && ctrl.direction==='column'"
+    title="Horz."
+    items="ctrl.justify_['column']" 
     ng-model="ctrl.justify"
     ng-change="ctrl.justifyChanged()">
 </wb-ui-setting-choose>
 
 
-<!--Align Items--> 
+<!--selfAlign--> 
 <!--TODO: maso, 2018: get parent align--> 
 <wb-ui-setting-choose
-    title="{{(ctrl.direction!='row')?'Self Vert.':'Self Horz.'}}"
+    ng-if="ctrl.direction==='row'"
+    title="Self Vert."
     items="ctrl.selfAlign_['row']" 
+    ng-model="ctrl.alignSelf"
+    ng-change="ctrl.alignSelfChanged()"> 
+</wb-ui-setting-choose>
+<wb-ui-setting-choose
+    ng-if="ctrl.direction==='column'"
+    title="Self Horz."
+    items="ctrl.selfAlign_['column']" 
     ng-model="ctrl.alignSelf"
     ng-change="ctrl.alignSelfChanged()"> 
 </wb-ui-setting-choose>

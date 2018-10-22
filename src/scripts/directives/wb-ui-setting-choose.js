@@ -55,16 +55,20 @@ angular.module('am-wb-core')
 		 */
 		function render() {
 			scope.selectedIndex = toIndex(ngModelCtrl.$modelValue);
-			ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+			//ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
 		}
 
 		ngModelCtrl.$render = render;
 
-		scope.$watch('selectedIndex', function () {
-			if(angular.isDefined(scope.selectedIndex)){
-				ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
-			}
-		});
+//		scope.$watch('selectedIndex', function () {
+//			if(angular.isDefined(scope.selectedIndex)){
+//				ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+//			}
+//		});
+
+		scope.selectionChanged = function(){
+		    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+		};
 	}
 
 	/*

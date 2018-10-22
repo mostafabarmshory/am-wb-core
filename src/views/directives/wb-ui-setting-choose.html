@@ -3,16 +3,21 @@
     	ng-hide="icon === undefined || icon === null || icon === ''" 
     	wb-icon-name="{{icon}}">
     </wb-icon>
-    <p ng-hide="title === undefined || title === null || title === ''">{{title}}</p>
+    <p ng-hide="title === undefined || title === null || title === ''">{{::title}}</p>
 
 	<md-tabs
 		flex="100"
 		class="wb-tab-as-choose-button"
 		md-selected="selectedIndex">
-		<md-tab ng-repeat="item in xitems">
+		<md-tab 
+                    ng-repeat="item in ::xitems"
+                    md-on-select="selectionChanged()">
 			<md-tab-label>
-				<md-tooltip ng-show="item.title">{{item.title | translate}}</md-tooltip>
-				<wb-icon >{{item.icon}}</wb-icon>
+				<md-tooltip 
+                                    ng-if="::item.title">
+                                    <span translate="">{{::item.title}}</span>  
+                                </md-tooltip>
+				<wb-icon >{{::item.icon}}</wb-icon>
 			</md-tab-label>
 		</md-tab>
 	</md-tabs>
