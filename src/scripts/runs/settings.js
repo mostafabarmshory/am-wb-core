@@ -96,6 +96,8 @@ angular.module('am-wb-core')
 		type: 'border',
 		label: 'Border',
 		icon: 'border_all',
+		templateUrl: 'views/settings/wb-border.html',
+		controllerAs: 'ctrl',
 		/*
 		 * @ngInject
 		 */
@@ -128,33 +130,87 @@ angular.module('am-wb-core')
 			}, {
 			    title: 'Outset',
 			    value: 'outset'
-			}];
+		    }];
 
-
+		    /*
+		     * watch 'wbModel' and apply the changes into setting panel
+		     */
+		    var ctrl = this;
+		    $scope.$watch('wbModel', function (model) {
+			/*
+			 * Set style
+			 */
+			ctrl.style = $scope.wbModel.style.border.style;
+			
+			/*
+			* Set color
+			*/
+			ctrl.color = $scope.wbModel.style.border.color;
+			
+			/*
+			 * Set width
+			 * width is a string such as '10px 25% 2vh 4px'
+			 */
+			ctrl.width = {};
+			var width = fillWidthFromString(ctrl.width, model.style.border.width || 'medium');
+			if (width) {
+			    ctrl.widthAll = width;
+			    ctrl.width.top = width;
+			    ctrl.width.right = width;
+			    ctrl.width.bottom = width;
+			    ctrl.width.left = width;
+			}
+			
+			/*
+			 * Set radius
+			 * radius is a string such as '10px 25% 2vh 4px'
+			 */
+			var radius = fillRadiusFromString(ctrl, model.style.border.radius || '0px');
+			if (radius) {
+			    ctrl.radiusAll = radius;
+			    ctrl.topLeft = radius;
+			    ctrl.topRight = radius;
+			    ctrl.bottomLeft = radius;
+			    ctrl.bottomRight = radius;
+			}
+		    });
+		    
+		    /*
+		    * border style
+		    */
+		    this.styleChanged = function (newStyle) {
+			$scope.wbModel.style.border.style = newStyle;
+		    };
+		    
+		    /*
+		    * border color
+		    */
+		    this.colorChanged = function (newColor) {
+			$scope.wbModel.style.border.color = newColor;
+		    };
+		    
 		    /*
 		     * Settings about border width
 		     */
-		    $scope.$watch('widthAll', function (val) {
-			setAllWidth($scope.width, val || 'medium');//medium is default value of width
-		    });
+		    this.widthAllChanged = function(val) {
+			setAllWidth(this.width, val || 'medium');//medium is default value of width
+			$scope.wbModel.style.border.width = createDimWidthStr(this.width);
+		    };
+		    
+		    this.widthChanged = function () {
+			$scope.wbModel.style.border.width = createDimWidthStr(this.width);
+		    };
 
 		    function setAllWidth(dim, val) {
-
 			if (dim) {
 			    dim.top = val;
 			    dim.right = val;
 			    dim.bottom = val;
 			    dim.left = val;
 			}
-
 		    }
-
-		    $scope.$watch('width', function (newWidth) {
-			$scope.wbModel.style.border.width = createDimWidthStr(newWidth);
-		    }, true);
-
+		    
 		    function createDimWidthStr(dim) {
-
 			if (dim) {
 			    var output =
 				    dim.top + ' ' +
@@ -166,26 +222,11 @@ angular.module('am-wb-core')
 		    }
 
 		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-		    $scope.$watch('wbModel', function (model) {
-
-			//width is a string such as '10px 25% 2vh 4px'
-			var width = fillWidthFromString($scope.width, model.style.border.width || 'medium');
-
-			if (width) {
-			    $scope.widthAll = width;
-			}
-
-		    });
-
-		    /*
 		     * splite 'width' to its components
 		     * check different state Based on CSS rules. see for example:
 		     * https://www.w3schools.com/CSSref/pr_border-width.asp
 		     */
 		    function fillWidthFromString(dim, str) {
-
 			var dimAll;
 			var dimsArray = str.split(' ');
 
@@ -198,6 +239,10 @@ angular.module('am-wb-core')
 			//Items are 4 and equal
 			else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
 			    dimAll = dimsArray[0];
+			    dim.top = dimAll;
+			    dim.right = dimAll;
+			    dim.bottom = dimAll;
+			    dim.left = dimAll;
 			}
 
 			//Items are 4 and different
@@ -236,34 +281,31 @@ angular.module('am-wb-core')
 			else if (!dimsArray.length) {
 			    dimAll = 'medium';
 			}
-
 			return dimAll;
 		    }
 
 		    /*
 		     * Settings about border radius
 		     */
-		    $scope.$watch('radiusAll', function (val) {
-			setAllRadius($scope.radius, val || '0px');//0px is default value of radius
-		    });
-
+		    this.radiusAllChanged = function (val) {
+			setAllRadius(this, val || '0px');//0px is default value of radius
+			$scope.wbModel.style.border.radius = createDimeRadiusStr(this);
+		    };
+		    
+		    this.radiusChanged = function () {
+			$scope.wbModel.style.border.radius = createDimeRadiusStr(this);
+		    };
+		    
 		    function setAllRadius(dim, val) {
-
 			if (dim) {
 			    dim.topLeft = val;
 			    dim.topRight = val;
 			    dim.bottomRight = val;
 			    dim.bottomLeft = val;
 			}
-
 		    }
 
-		    $scope.$watch('radius', function (newRadius) {
-			$scope.wbModel.style.border.radius = createDimeRadiusStr(newRadius);
-		    }, true);
-
 		    function createDimeRadiusStr(dim) {
-
 			if (dim) {
 			    var output =
 				    dim.topLeft + ' ' +
@@ -272,22 +314,7 @@ angular.module('am-wb-core')
 				    dim.bottomLeft;
 			    return output;
 			}
-
 		    }
-
-		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-		    $scope.$watch('wbModel', function (model) {
-
-			//radius is a string such as '10px 25% 2vh 4px'
-			var radius = fillRadiusFromString($scope.radius, model.style.border.radius || '0px');
-
-			if (radius) {
-			    $scope.radiusAll = radius;
-			}
-
-		    });
 
 		    /*
 		     * splite 'radius' to its components
@@ -308,6 +335,10 @@ angular.module('am-wb-core')
 			//Items are 4 and equal
 			else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
 			    dimAll = dimsArray[0];
+			    dim.topLeft = dimAll;
+			    dim.topRight = dimAll;
+			    dim.bottomRight = dimAll;
+			    dim.bottomLeft = dimAll;
 			}
 
 			//Items are 4 and different
@@ -346,11 +377,10 @@ angular.module('am-wb-core')
 			else if (!dimsArray.length) {
 			    dimAll = '0px';
 			}
-
 			return dimAll;
 		    }
-		},
-		templateUrl: 'views/settings/wb-border.html'
+		   
+		}
 	    });
 
 	    /**
