@@ -140,19 +140,20 @@ angular.module('am-wb-core')
 			/*
 			 * Set style
 			 */
-			ctrl.style = $scope.wbModel.style.border.style;
+			var border = model.style.border || {};
+			ctrl.style = border.style;
 			
 			/*
 			* Set color
 			*/
-			ctrl.color = $scope.wbModel.style.border.color;
+			ctrl.color = border.color;
 			
 			/*
 			 * Set width
 			 * width is a string such as '10px 25% 2vh 4px'
 			 */
 			ctrl.width = {};
-			var width = fillWidthFromString(ctrl.width, model.style.border.width || 'medium');
+			var width = fillWidthFromString(ctrl.width, border.width || 'medium');
 			if (width) {
 			    ctrl.widthAll = width;
 			    ctrl.width.top = width;
@@ -165,13 +166,14 @@ angular.module('am-wb-core')
 			 * Set radius
 			 * radius is a string such as '10px 25% 2vh 4px'
 			 */
-			var radius = fillRadiusFromString(ctrl, model.style.border.radius || '0px');
+			ctrl.radius = {};
+			var radius = fillRadiusFromString(ctrl.radius, border.radius || '0px');
 			if (radius) {
 			    ctrl.radiusAll = radius;
-			    ctrl.topLeft = radius;
-			    ctrl.topRight = radius;
-			    ctrl.bottomLeft = radius;
-			    ctrl.bottomRight = radius;
+			    ctrl.radius.topLeft = radius;
+			    ctrl.radius.topRight = radius;
+			    ctrl.radius.bottomLeft = radius;
+			    ctrl.radius.bottomRight = radius;
 			}
 		    });
 		    
@@ -288,12 +290,12 @@ angular.module('am-wb-core')
 		     * Settings about border radius
 		     */
 		    this.radiusAllChanged = function (val) {
-			setAllRadius(this, val || '0px');//0px is default value of radius
-			$scope.wbModel.style.border.radius = createDimeRadiusStr(this);
+			setAllRadius(this.radius, val || '0px');//0px is default value of radius
+			$scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
 		    };
 		    
 		    this.radiusChanged = function () {
-			$scope.wbModel.style.border.radius = createDimeRadiusStr(this);
+			$scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
 		    };
 		    
 		    function setAllRadius(dim, val) {
