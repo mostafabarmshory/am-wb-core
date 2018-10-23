@@ -130,7 +130,7 @@ angular.module('am-wb-core')
 			}, {
 			    title: 'Outset',
 			    value: 'outset'
-		    }];
+			}];
 
 		    /*
 		     * watch 'wbModel' and apply the changes into setting panel
@@ -142,12 +142,12 @@ angular.module('am-wb-core')
 			 */
 			var border = model.style.border || {};
 			ctrl.style = border.style;
-			
+
 			/*
-			* Set color
-			*/
+			 * Set color
+			 */
 			ctrl.color = border.color;
-			
+
 			/*
 			 * Set width
 			 * width is a string such as '10px 25% 2vh 4px'
@@ -161,7 +161,7 @@ angular.module('am-wb-core')
 			    ctrl.width.bottom = width;
 			    ctrl.width.left = width;
 			}
-			
+
 			/*
 			 * Set radius
 			 * radius is a string such as '10px 25% 2vh 4px'
@@ -176,29 +176,29 @@ angular.module('am-wb-core')
 			    ctrl.radius.bottomRight = radius;
 			}
 		    });
-		    
+
 		    /*
-		    * border style
-		    */
+		     * border style
+		     */
 		    this.styleChanged = function (newStyle) {
 			$scope.wbModel.style.border.style = newStyle;
 		    };
-		    
+
 		    /*
-		    * border color
-		    */
+		     * border color
+		     */
 		    this.colorChanged = function (newColor) {
 			$scope.wbModel.style.border.color = newColor;
 		    };
-		    
+
 		    /*
 		     * Settings about border width
 		     */
-		    this.widthAllChanged = function(val) {
+		    this.widthAllChanged = function (val) {
 			setAllWidth(this.width, val || 'medium');//medium is default value of width
 			$scope.wbModel.style.border.width = createDimWidthStr(this.width);
 		    };
-		    
+
 		    this.widthChanged = function () {
 			$scope.wbModel.style.border.width = createDimWidthStr(this.width);
 		    };
@@ -211,7 +211,7 @@ angular.module('am-wb-core')
 			    dim.left = val;
 			}
 		    }
-		    
+
 		    function createDimWidthStr(dim) {
 			if (dim) {
 			    var output =
@@ -293,11 +293,11 @@ angular.module('am-wb-core')
 			setAllRadius(this.radius, val || '0px');//0px is default value of radius
 			$scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
 		    };
-		    
+
 		    this.radiusChanged = function () {
 			$scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
 		    };
-		    
+
 		    function setAllRadius(dim, val) {
 			if (dim) {
 			    dim.topLeft = val;
@@ -381,7 +381,7 @@ angular.module('am-wb-core')
 			}
 			return dimAll;
 		    }
-		   
+
 		}
 	    });
 
@@ -559,15 +559,15 @@ angular.module('am-wb-core')
 		     * Sample of layout object in wbModel
 		     * 
 		     wbModel: {
-			style: {    
-			    layout: {
-				align: "stretch",
-				wrap: "true",
-				align_self: "stretch",
-				direction: "column",
-				justify: "start",
-			    };
-			}	
+		     style: {    
+		     layout: {
+		     align: "stretch",
+		     wrap: "true",
+		     align_self: "stretch",
+		     direction: "column",
+		     justify: "start",
+		     };
+		     }	
 		     }
 		     */
 
@@ -575,7 +575,7 @@ angular.module('am-wb-core')
 		    /*
 		     * watch 'wbModel' and apply the changes in setting panel
 		     */
-		    
+
 		    var ctrl = this;
 		    $scope.$watch('wbModel', function (model) {
 			var layout = model.style.layout || {};
@@ -773,32 +773,32 @@ angular.module('am-wb-core')
 		icon: 'photo_size_select_large',
 		templateUrl: 'views/settings/wb-size.html',
 		controllerAs: 'ctrl',
-		
+
 		/*
 		 * @ngInject
 		 */
 		controller: function ($scope) {
-		   
-		   // Sample of size object in wbModel
+
+		    // Sample of size object in wbModel
 		    /*
-			wbModel: {
-			   style: {
-			       size: {
+		     wbModel: {
+			style: {
+			    size: {
 				   height: "372px"
 				   maxHeight: "auto"
 				   maxWidth: "auto"
 				   minHeight: "auto"
 				   minWidth: "auto"
 				   width: "311px"
-			       };
-			   }
+			    };
 			}
-		    */
-		   
-		   /*
+		     }
+		     */
+
+		    /*
 		     * watch 'wbModel' and apply the changes in setting panel
 		     */
-		    
+
 		    var ctrl = this;
 		    $scope.$watch('wbModel', function (model) {
 			ctrl.width = model.style.size.width;
@@ -817,7 +817,19 @@ angular.module('am-wb-core')
 		    };
 
 		    this.heightChanged = function () {
-			$scope.wbModel.style.size.height = this.height;
+			if (this.height === '0px') {
+			    $scope.wbModel.style.size.height = '50px';
+			} else if (this.height === '0vh') {
+			   $scope.wbModel.style.size.height = '50vh'; 
+			} else if (this.height === '0in') {
+			   $scope.wbModel.style.size.height = '50in'; 
+			} else if (this.height === '0cm') {
+			   $scope.wbModel.style.size.height = '20cm'; 
+			} else if (this.height === '0%') {
+			   $scope.wbModel.style.size.height = '50%'; 
+			} else {
+			    $scope.wbModel.style.size.height = this.height;
+			}
 		    };
 
 		    this.minWidthChanged = function () {
@@ -831,7 +843,7 @@ angular.module('am-wb-core')
 		    this.maxWidthChanged = function () {
 			$scope.wbModel.style.size.maxWidth = this.maxWidth;
 		    };
-		    
+
 		    this.maxHeightChanged = function () {
 			$scope.wbModel.style.size.maxHeight = this.maxHeight;
 		    };

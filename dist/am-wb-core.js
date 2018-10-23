@@ -890,14 +890,14 @@ angular.module('am-wb-core')
 'use strict';
 
 angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-size
- * @description Apply margin into the element
- */
-.directive('wbSize', function($q, $wbUtil, $rootElement, $document, $compile) {
+	/**
+	 * @ngdoc Directives
+	 * @name wb-size
+	 * @description Apply margin into the element
+	 */
+	.directive('wbSize', function ($q, $wbUtil, $rootElement, $document, $compile) {
 
-	function postLink($scope, $element, $attrs, $ctrls){
+	    function postLink($scope, $element, $attrs, $ctrls) {
 		var button;
 		var optionButton;
 		var dimension = {};
@@ -908,158 +908,160 @@ angular.module('am-wb-core')
 
 		// main ctrl
 		var ctrl = $ctrls[0];
-		
-		
-		function isRoot(){
-			return ctrl.isRoot();
+
+
+		function isRoot() {
+		    return ctrl.isRoot();
 		}
 
-		function distroy(){
-			watchSize();
-			watchSelection();
+		function distroy() {
+		    watchSize();
+		    watchSelection();
 
-			if(button){
-				button.remove();
-			}
-			if(optionButton){
-				optionButton.remove();
-			}
+		    if (button) {
+			button.remove();
+		    }
+		    if (optionButton) {
+			optionButton.remove();
+		    }
 		}
 
-		function getBound(){
-			var off = $element.offset();
-			return {
-				left: off.left,
-				top: off.top,
-				width: $element.innerWidth(),
-				height: $element.innerHeight()
-			};
+		function getBound() {
+		    var off = $element.offset();
+		    return {
+			left: off.left,
+			top: off.top,
+			width: $element.innerWidth(),
+			height: $element.innerHeight()
+		    };
 		}
 
-		function bindToElement(bound){
-			button.css('left', bound.left + bound.width - 15 + 'px');
-			button.css('top', bound.top + bound.height - 16 + 'px');
+		function bindToElement(bound) {
+		    button.css('left', bound.left + bound.width - 15 + 'px');
+		    button.css('top', bound.top + bound.height - 16 + 'px');
 
-			optionButton.css('left', bound.left + 'px');
-			optionButton.css('top', bound.top + 'px');
+		    optionButton.css('left', bound.left + 'px');
+		    optionButton.css('top', bound.top + 'px');
 		}
 
 		function mousemove($event) {
-			var deltaWidth = dimension.width - (position.x - $event.clientX);
-			var deltaHeight = dimension.height - (position.y - $event.clientY);
-			var newDimensions = {
-					width:  deltaWidth + 'px',
-					height: deltaHeight + 'px'
-			};
-
-			$element.css(newDimensions);
-			if($scope.wbModel){
-				$scope.wbModel.style.size.width = newDimensions.width;
-				$scope.wbModel.style.size.height = newDimensions.height;
-			}
-			bindToElement(getBound());
-			$scope.$apply();
-			return false;
+		    var deltaWidth = dimension.width - (position.x - $event.clientX);
+		    var deltaHeight = dimension.height - (position.y - $event.clientY);
+		    var newDimensions = {
+			width: deltaWidth + 'px',
+			height: deltaHeight + 'px'
+		    };
+		    if ($scope.wbModel.style.size.height === 'auto') {
+			newDimensions.height = 'auto';
+		    }
+		    $element.css(newDimensions);
+		    if ($scope.wbModel) {
+			$scope.wbModel.style.size.width = newDimensions.width;
+			$scope.wbModel.style.size.height = newDimensions.height;
+		    }
+		    bindToElement(getBound());
+		    $scope.$apply();
+		    return false;
 		}
 
 		function mouseup() {
-			$document.unbind('mousemove', mousemove);
-			$document.unbind('mouseup', mouseup);
-			lock = false;
+		    $document.unbind('mousemove', mousemove);
+		    $document.unbind('mouseup', mouseup);
+		    lock = false;
 		}
 
 		function mousedown($event) {
-			$event.stopImmediatePropagation();
-			position.x = $event.clientX;
-			position.y = $event.clientY;
-			lock = true;
-			dimension.width = $element.prop('offsetWidth');
-			dimension.height = $element.prop('offsetHeight');
-			$document.bind('mousemove', mousemove);
-			$document.bind('mouseup', mouseup);
-			return false;
+		    $event.stopImmediatePropagation();
+		    position.x = $event.clientX;
+		    position.y = $event.clientY;
+		    lock = true;
+		    dimension.width = $element.prop('offsetWidth');
+		    dimension.height = $element.prop('offsetHeight');
+		    $document.bind('mousemove', mousemove);
+		    $document.bind('mouseup', mouseup);
+		    return false;
 		}
 
-		function checkButton(){
-			if(button) {
-				return $q.resolve();
-			}
-			button = angular.element('<span></span>');
-			$rootElement.append(button);
-			button.css({
-				width: '15px',
-				height: '15px',
-				position: 'absolute',
-				visibility: 'hidden',
-				cursor: 'nwse-resize'
-			});
-			button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-			button.on('mousedown', mousedown);
+		function checkButton() {
+		    if (button) {
+			return $q.resolve();
+		    }
+		    button = angular.element('<span></span>');
+		    $rootElement.append(button);
+		    button.css({
+			width: '15px',
+			height: '15px',
+			position: 'absolute',
+			visibility: 'hidden',
+			cursor: 'nwse-resize'
+		    });
+		    button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
+		    button.on('mousedown', mousedown);
 
-			var oj = $wbUtil.getTemplateFor({
-				templateUrl: 'views/partials/wb-widget-options.html'
-			}).then(function(template){
-				optionButton = angular.element(template);
-				$rootElement.append(optionButton);
-				optionButton.css({
-					position: 'absolute',
-					visibility: 'hidden'
-				});
-				$compile(optionButton)($scope);
-				bindToElement(getBound());
+		    var oj = $wbUtil.getTemplateFor({
+			templateUrl: 'views/partials/wb-widget-options.html'
+		    }).then(function (template) {
+			optionButton = angular.element(template);
+			$rootElement.append(optionButton);
+			optionButton.css({
+			    position: 'absolute',
+			    visibility: 'hidden'
 			});
+			$compile(optionButton)($scope);
+			bindToElement(getBound());
+		    });
 
-			return $q.all([oj]).then(function(){
-				$scope.$watch(getBound, function (bound) {
-					if(!bound) {
-						return;
-					}
-					bindToElement(getBound());
-				}, true);
+		    return $q.all([oj]).then(function () {
+			$scope.$watch(getBound, function (bound) {
+			    if (!bound) {
+				return;
+			    }
+			    bindToElement(getBound());
+			}, true);
 
-			});
+		    });
 		}
 
 
 		// Watch size
-		watchSize = $scope.$watch($attrs.wbSize+'.size', function(size) {
-			if(isRoot() || !size || lock){
-				return;
-			}
-			$element.css(size);
-			if(optionButton){
-				bindToElement(getBound());
-			}
+		watchSize = $scope.$watch($attrs.wbSize + '.size', function (size) {
+		    if (isRoot() || !size || lock) {
+			return;
+		    }
+		    $element.css(size);
+		    if (optionButton) {
+			bindToElement(getBound());
+		    }
 		}, true);
 
 		ctrl.on('delete', distroy);
-		watchSelection = $scope.$watch(function(){
-			return ctrl.isSelected();
-		}, function(value){
-			if(value){
-				checkButton()
-				.then(function(){
-					if(!isRoot()){
-						button.css('visibility', 'visible');
-					}
-					optionButton.css('visibility', 'visible');
+		watchSelection = $scope.$watch(function () {
+		    return ctrl.isSelected();
+		}, function (value) {
+		    if (value) {
+			checkButton()
+				.then(function () {
+				    if (!isRoot()) {
+					button.css('visibility', 'visible');
+				    }
+				    optionButton.css('visibility', 'visible');
 				});
-			} else {
-				if(optionButton) {
-					button.css('visibility', 'hidden');
-					optionButton.css('visibility', 'hidden');
-				}
+		    } else {
+			if (optionButton) {
+			    button.css('visibility', 'hidden');
+			    optionButton.css('visibility', 'hidden');
 			}
+		    }
 		});
-	}
+	    }
 
-	return {
-		restrict : 'A',
-		link : postLink,
+	    return {
+		restrict: 'A',
+		link: postLink,
 		priority: 1,
-		require:['^wbGroup']
-	};
-});
+		require: ['^wbGroup']
+	    };
+	});
 /* 
  * The MIT License (MIT)
  * 
@@ -1197,14 +1199,14 @@ angular.module('am-wb-core')
 'use strict';
 
 angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-widget-size
- * @description Apply margin into the element
- */
-.directive('wbWidgetSize', function($q, $wbUtil, $rootElement, $document, $compile) {
+	/**
+	 * @ngdoc Directives
+	 * @name wb-widget-size
+	 * @description Apply margin into the element
+	 */
+	.directive('wbWidgetSize', function ($q, $wbUtil, $rootElement, $document, $compile) {
 
-	function postLink($scope, $element, $attrs, $ctrls){
+	    function postLink($scope, $element, $attrs, $ctrls) {
 		var button;
 		var optionButton;
 		var dimension = {};
@@ -1216,149 +1218,151 @@ angular.module('am-wb-core')
 		// main ctrl
 		var ctrl = $ctrls[0];
 
-		function distroy(){
-			watchSize();
-			watchSelection();
+		function distroy() {
+		    watchSize();
+		    watchSelection();
 
-			if(button){
-				button.remove();
-			}
-			if(optionButton){
-				optionButton.remove();
-			}
-		}
-		
-		function getBound(){
-			var off = $element.offset();
-			return {
-				left: off.left,
-				top: off.top,
-				width: $element.innerWidth(),
-				height: $element.innerHeight()
-			};
+		    if (button) {
+			button.remove();
+		    }
+		    if (optionButton) {
+			optionButton.remove();
+		    }
 		}
 
-		function bindToElement(bound){
-			button.css('left', bound.left + bound.width - 15 + 'px');
-			button.css('top', bound.top + bound.height - 16 + 'px');
+		function getBound() {
+		    var off = $element.offset();
+		    return {
+			left: off.left,
+			top: off.top,
+			width: $element.innerWidth(),
+			height: $element.innerHeight()
+		    };
+		}
 
-			optionButton.css('left', bound.left + 'px');
-			optionButton.css('top', bound.top + 'px');
+		function bindToElement(bound) {
+		    button.css('left', bound.left + bound.width - 15 + 'px');
+		    button.css('top', bound.top + bound.height - 16 + 'px');
+
+		    optionButton.css('left', bound.left + 'px');
+		    optionButton.css('top', bound.top + 'px');
 		}
 
 		function mousemove($event) {
-			var deltaWidth = dimension.width - (position.x - $event.clientX);
-			var deltaHeight = dimension.height - (position.y - $event.clientY);
-			var newDimensions = {
-					width:  deltaWidth + 'px',
-					height: deltaHeight + 'px'
-			};
-
-			$element.css(newDimensions);
-			if($scope.wbModel){
-				$scope.wbModel.style.size.width = newDimensions.width;
-				$scope.wbModel.style.size.height = newDimensions.height;
-			}
-			bindToElement(getBound());
-			$scope.$apply();
-			return false;
+		    var deltaWidth = dimension.width - (position.x - $event.clientX);
+		    var deltaHeight = dimension.height - (position.y - $event.clientY);
+		    var newDimensions = {
+			width: deltaWidth + 'px',
+			height: deltaHeight + 'px'
+		    };
+		    if ($scope.wbModel.style.size.height === 'auto') {
+			newDimensions.height = 'auto';
+		    }
+		    $element.css(newDimensions);
+		    if ($scope.wbModel) {
+			$scope.wbModel.style.size.width = newDimensions.width;
+			$scope.wbModel.style.size.height = newDimensions.height;
+		    }
+		    bindToElement(getBound());
+		    $scope.$apply();
+		    return false;
 		}
 
 		function mouseup() {
-			$document.unbind('mousemove', mousemove);
-			$document.unbind('mouseup', mouseup);
-			lock = false;
+		    $document.unbind('mousemove', mousemove);
+		    $document.unbind('mouseup', mouseup);
+		    lock = false;
 		}
 
 		function mousedown($event) {
-			$event.stopImmediatePropagation();
-			position.x = $event.clientX;
-			position.y = $event.clientY;
-			lock = true;
-			dimension.width = $element.prop('offsetWidth');
-			dimension.height = $element.prop('offsetHeight');
-			$document.bind('mousemove', mousemove);
-			$document.bind('mouseup', mouseup);
-			return false;
+		    $event.stopImmediatePropagation();
+		    position.x = $event.clientX;
+		    position.y = $event.clientY;
+		    lock = true;
+		    dimension.width = $element.prop('offsetWidth');
+		    dimension.height = $element.prop('offsetHeight');
+		    $document.bind('mousemove', mousemove);
+		    $document.bind('mouseup', mouseup);
+		    return false;
 		}
 
-		function checkButton(){
-			if(button) {
-				return $q.resolve();
-			}
-			button = angular.element('<span></span>');
-			$rootElement.append(button);
-			button.css({
-				width: '15px',
-				height: '15px',
-				position: 'absolute',
-				visibility: 'hidden',
-				cursor: 'nwse-resize'
-			});
-			button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-			button.on('mousedown', mousedown);
+		function checkButton() {
+		    if (button) {
+			return $q.resolve();
+		    }
+		    button = angular.element('<span></span>');
+		    $rootElement.append(button);
+		    button.css({
+			width: '15px',
+			height: '15px',
+			position: 'absolute',
+			visibility: 'hidden',
+			cursor: 'nwse-resize'
+		    });
+		    button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
+		    button.on('mousedown', mousedown);
 
-			var oj = $wbUtil.getTemplateFor({
-				templateUrl: 'views/partials/wb-widget-options.html'
-			}).then(function(template){
-				optionButton = angular.element(template);
-				$rootElement.append(optionButton);
-				optionButton.css({
-					position: 'absolute',
-					visibility: 'hidden'
-				});
-				$compile(optionButton)($scope);
-				bindToElement(getBound());
+		    var oj = $wbUtil.getTemplateFor({
+			templateUrl: 'views/partials/wb-widget-options.html'
+		    }).then(function (template) {
+			optionButton = angular.element(template);
+			$rootElement.append(optionButton);
+			optionButton.css({
+			    position: 'absolute',
+			    visibility: 'hidden'
 			});
+			$compile(optionButton)($scope);
+			bindToElement(getBound());
+		    });
 
-			return $q.all([oj]).then(function(){
-				$scope.$watch(getBound, function (bound) {
-					if(!bound) {
-						return;
-					}
-					bindToElement(getBound());
-				}, true);
+		    return $q.all([oj]).then(function () {
+			$scope.$watch(getBound, function (bound) {
+			    if (!bound) {
+				return;
+			    }
+			    bindToElement(getBound());
+			}, true);
 
-			});
+		    });
 		}
 
-		
+
 		ctrl.on('delete', distroy);
 		// Watch size
-		watchSize = $scope.$watch($attrs.wbWidgetSize+'.size', function(size) {
-			if(!size || lock){
-				return;
-			}
-			$element.css(size);
-			if(optionButton){
-				bindToElement(getBound());
-			}
+		watchSize = $scope.$watch($attrs.wbWidgetSize + '.size', function (size) {
+		    if (!size || lock) {
+			return;
+		    }
+		    $element.css(size);
+		    if (optionButton) {
+			bindToElement(getBound());
+		    }
 		}, true);
 
-		watchSelection = $scope.$watch(function(){
-			return ctrl.isSelected();
-		}, function(value){
-			if(value){
-				checkButton()
-				.then(function(){
-					button.css('visibility', 'visible');
-					optionButton.css('visibility', 'visible');
+		watchSelection = $scope.$watch(function () {
+		    return ctrl.isSelected();
+		}, function (value) {
+		    if (value) {
+			checkButton()
+				.then(function () {
+				    button.css('visibility', 'visible');
+				    optionButton.css('visibility', 'visible');
 				});
-			} else {
-				if(optionButton) {
-					button.css('visibility', 'hidden');
-					optionButton.css('visibility', 'hidden');
-				}
+		    } else {
+			if (optionButton) {
+			    button.css('visibility', 'hidden');
+			    optionButton.css('visibility', 'hidden');
 			}
+		    }
 		});
-	}
+	    }
 
-	return {
-		restrict : 'A',
-		link : postLink,
-		require:['^wbWidget']
-	};
-});
+	    return {
+		restrict: 'A',
+		link: postLink,
+		require: ['^wbWidget']
+	    };
+	});
 /* 
  * The MIT License (MIT)
  * 
@@ -3968,7 +3972,7 @@ angular.module('am-wb-core')
 			}, {
 			    title: 'Outset',
 			    value: 'outset'
-		    }];
+			}];
 
 		    /*
 		     * watch 'wbModel' and apply the changes into setting panel
@@ -3980,12 +3984,12 @@ angular.module('am-wb-core')
 			 */
 			var border = model.style.border || {};
 			ctrl.style = border.style;
-			
+
 			/*
-			* Set color
-			*/
+			 * Set color
+			 */
 			ctrl.color = border.color;
-			
+
 			/*
 			 * Set width
 			 * width is a string such as '10px 25% 2vh 4px'
@@ -3999,7 +4003,7 @@ angular.module('am-wb-core')
 			    ctrl.width.bottom = width;
 			    ctrl.width.left = width;
 			}
-			
+
 			/*
 			 * Set radius
 			 * radius is a string such as '10px 25% 2vh 4px'
@@ -4014,29 +4018,29 @@ angular.module('am-wb-core')
 			    ctrl.radius.bottomRight = radius;
 			}
 		    });
-		    
+
 		    /*
-		    * border style
-		    */
+		     * border style
+		     */
 		    this.styleChanged = function (newStyle) {
 			$scope.wbModel.style.border.style = newStyle;
 		    };
-		    
+
 		    /*
-		    * border color
-		    */
+		     * border color
+		     */
 		    this.colorChanged = function (newColor) {
 			$scope.wbModel.style.border.color = newColor;
 		    };
-		    
+
 		    /*
 		     * Settings about border width
 		     */
-		    this.widthAllChanged = function(val) {
+		    this.widthAllChanged = function (val) {
 			setAllWidth(this.width, val || 'medium');//medium is default value of width
 			$scope.wbModel.style.border.width = createDimWidthStr(this.width);
 		    };
-		    
+
 		    this.widthChanged = function () {
 			$scope.wbModel.style.border.width = createDimWidthStr(this.width);
 		    };
@@ -4049,7 +4053,7 @@ angular.module('am-wb-core')
 			    dim.left = val;
 			}
 		    }
-		    
+
 		    function createDimWidthStr(dim) {
 			if (dim) {
 			    var output =
@@ -4131,11 +4135,11 @@ angular.module('am-wb-core')
 			setAllRadius(this.radius, val || '0px');//0px is default value of radius
 			$scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
 		    };
-		    
+
 		    this.radiusChanged = function () {
 			$scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
 		    };
-		    
+
 		    function setAllRadius(dim, val) {
 			if (dim) {
 			    dim.topLeft = val;
@@ -4219,7 +4223,7 @@ angular.module('am-wb-core')
 			}
 			return dimAll;
 		    }
-		   
+
 		}
 	    });
 
@@ -4397,15 +4401,15 @@ angular.module('am-wb-core')
 		     * Sample of layout object in wbModel
 		     * 
 		     wbModel: {
-			style: {    
-			    layout: {
-				align: "stretch",
-				wrap: "true",
-				align_self: "stretch",
-				direction: "column",
-				justify: "start",
-			    };
-			}	
+		     style: {    
+		     layout: {
+		     align: "stretch",
+		     wrap: "true",
+		     align_self: "stretch",
+		     direction: "column",
+		     justify: "start",
+		     };
+		     }	
 		     }
 		     */
 
@@ -4413,7 +4417,7 @@ angular.module('am-wb-core')
 		    /*
 		     * watch 'wbModel' and apply the changes in setting panel
 		     */
-		    
+
 		    var ctrl = this;
 		    $scope.$watch('wbModel', function (model) {
 			var layout = model.style.layout || {};
@@ -4611,32 +4615,32 @@ angular.module('am-wb-core')
 		icon: 'photo_size_select_large',
 		templateUrl: 'views/settings/wb-size.html',
 		controllerAs: 'ctrl',
-		
+
 		/*
 		 * @ngInject
 		 */
 		controller: function ($scope) {
-		   
-		   // Sample of size object in wbModel
+
+		    // Sample of size object in wbModel
 		    /*
-			wbModel: {
-			   style: {
-			       size: {
+		     wbModel: {
+			style: {
+			    size: {
 				   height: "372px"
 				   maxHeight: "auto"
 				   maxWidth: "auto"
 				   minHeight: "auto"
 				   minWidth: "auto"
 				   width: "311px"
-			       };
-			   }
+			    };
 			}
-		    */
-		   
-		   /*
+		     }
+		     */
+
+		    /*
 		     * watch 'wbModel' and apply the changes in setting panel
 		     */
-		    
+
 		    var ctrl = this;
 		    $scope.$watch('wbModel', function (model) {
 			ctrl.width = model.style.size.width;
@@ -4655,7 +4659,19 @@ angular.module('am-wb-core')
 		    };
 
 		    this.heightChanged = function () {
-			$scope.wbModel.style.size.height = this.height;
+			if (this.height === '0px') {
+			    $scope.wbModel.style.size.height = '50px';
+			} else if (this.height === '0vh') {
+			   $scope.wbModel.style.size.height = '50vh'; 
+			} else if (this.height === '0in') {
+			   $scope.wbModel.style.size.height = '50in'; 
+			} else if (this.height === '0cm') {
+			   $scope.wbModel.style.size.height = '20cm'; 
+			} else if (this.height === '0%') {
+			   $scope.wbModel.style.size.height = '50%'; 
+			} else {
+			    $scope.wbModel.style.size.height = this.height;
+			}
 		    };
 
 		    this.minWidthChanged = function () {
@@ -4669,7 +4685,7 @@ angular.module('am-wb-core')
 		    this.maxWidthChanged = function () {
 			$scope.wbModel.style.size.maxWidth = this.maxWidth;
 		    };
-		    
+
 		    this.maxHeightChanged = function () {
 			$scope.wbModel.style.size.maxHeight = this.maxHeight;
 		    };
