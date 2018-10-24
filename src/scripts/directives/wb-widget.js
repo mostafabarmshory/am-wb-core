@@ -112,7 +112,7 @@ angular.module('am-wb-core')
 				title: 'Delete',
 				icon: 'delete',
 				action: ctrl.delete,
-				description: 'Delete widget'
+				description: 'Delete widget (Delete)'
 			},{
 				title: 'Clone',
 				icon: 'content_copy',
@@ -121,7 +121,7 @@ angular.module('am-wb-core')
 					var index = $scope.group.indexOfChild($scope.wbModel);
 					$scope.group.addChild(index, model);
 				},
-				description: 'Duplicate widget'
+				description: 'Duplicate widget (ctrl+D)'
 			}];
 		};
 
