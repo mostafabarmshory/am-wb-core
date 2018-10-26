@@ -62,5 +62,6 @@
         format: 'raw',
 	}"
 	ng-model="wbModel.text"
-	class="wb-widget-fill tinymce wb-widget-text">
+	class="wb-widget-fill tinymce wb-widget-text"
+        ng-click="$event.stopPropagation();">
 </div>

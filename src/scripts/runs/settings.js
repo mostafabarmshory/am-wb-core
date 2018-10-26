@@ -93,16 +93,11 @@ angular.module('am-wb-core')
 	    });
 
 	    $settings.newPage({
-		type: 'layout',
-		label: 'Layout',
-		description: 'Manages layout of the current item.',
-		icon: 'dashboard',
-		templateUrl: 'views/settings/wb-layout.html'
-	    });
-	    $settings.newPage({
 		type: 'border',
 		label: 'Border',
 		icon: 'border_all',
+		templateUrl: 'views/settings/wb-border.html',
+		controllerAs: 'ctrl',
 		/*
 		 * @ngInject
 		 */
@@ -137,31 +132,87 @@ angular.module('am-wb-core')
 			    value: 'outset'
 			}];
 
+		    /*
+		     * watch 'wbModel' and apply the changes into setting panel
+		     */
+		    var ctrl = this;
+		    $scope.$watch('wbModel', function (model) {
+			/*
+			 * Set style
+			 */
+			var border = model.style.border || {};
+			ctrl.style = border.style;
+
+			/*
+			 * Set color
+			 */
+			ctrl.color = border.color;
+
+			/*
+			 * Set width
+			 * width is a string such as '10px 25% 2vh 4px'
+			 */
+			ctrl.width = {};
+			var width = fillWidthFromString(ctrl.width, border.width || 'medium');
+			if (width) {
+			    ctrl.widthAll = width;
+			    ctrl.width.top = width;
+			    ctrl.width.right = width;
+			    ctrl.width.bottom = width;
+			    ctrl.width.left = width;
+			}
+
+			/*
+			 * Set radius
+			 * radius is a string such as '10px 25% 2vh 4px'
+			 */
+			ctrl.radius = {};
+			var radius = fillRadiusFromString(ctrl.radius, border.radius || '0px');
+			if (radius) {
+			    ctrl.radiusAll = radius;
+			    ctrl.radius.topLeft = radius;
+			    ctrl.radius.topRight = radius;
+			    ctrl.radius.bottomLeft = radius;
+			    ctrl.radius.bottomRight = radius;
+			}
+		    });
+
+		    /*
+		     * border style
+		     */
+		    this.styleChanged = function (newStyle) {
+			$scope.wbModel.style.border.style = newStyle;
+		    };
+
+		    /*
+		     * border color
+		     */
+		    this.colorChanged = function (newColor) {
+			$scope.wbModel.style.border.color = newColor;
+		    };
 
 		    /*
 		     * Settings about border width
 		     */
-		    $scope.$watch('widthAll', function (val) {
-			setAllWidth($scope.width, val || 'medium');//medium is default value of width
-		    });
+		    this.widthAllChanged = function (val) {
+			setAllWidth(this.width, val || 'medium');//medium is default value of width
+			$scope.wbModel.style.border.width = createDimWidthStr(this.width);
+		    };
+
+		    this.widthChanged = function () {
+			$scope.wbModel.style.border.width = createDimWidthStr(this.width);
+		    };
 
 		    function setAllWidth(dim, val) {
-
 			if (dim) {
 			    dim.top = val;
 			    dim.right = val;
 			    dim.bottom = val;
 			    dim.left = val;
 			}
-
 		    }
 
-		    $scope.$watch('width', function (newWidth) {
-			$scope.wbModel.style.border.width = createDimWidthStr(newWidth);
-		    }, true);
-
 		    function createDimWidthStr(dim) {
-
 			if (dim) {
 			    var output =
 				    dim.top + ' ' +
@@ -173,26 +224,11 @@ angular.module('am-wb-core')
 		    }
 
 		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-		    $scope.$watch('wbModel', function (model) {
-
-			//width is a string such as '10px 25% 2vh 4px'
-			var width = fillWidthFromString($scope.width, model.style.border.width || 'medium');
-
-			if (width) {
-			    $scope.widthAll = width;
-			}
-
-		    });
-
-		    /*
 		     * splite 'width' to its components
 		     * check different state Based on CSS rules. see for example:
 		     * https://www.w3schools.com/CSSref/pr_border-width.asp
 		     */
 		    function fillWidthFromString(dim, str) {
-
 			var dimAll;
 			var dimsArray = str.split(' ');
 
@@ -205,6 +241,10 @@ angular.module('am-wb-core')
 			//Items are 4 and equal
 			else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
 			    dimAll = dimsArray[0];
+			    dim.top = dimAll;
+			    dim.right = dimAll;
+			    dim.bottom = dimAll;
+			    dim.left = dimAll;
 			}
 
 			//Items are 4 and different
@@ -243,34 +283,31 @@ angular.module('am-wb-core')
 			else if (!dimsArray.length) {
 			    dimAll = 'medium';
 			}
-
 			return dimAll;
 		    }
 
 		    /*
 		     * Settings about border radius
 		     */
-		    $scope.$watch('radiusAll', function (val) {
-			setAllRadius($scope.radius, val || '0px');//0px is default value of radius
-		    });
+		    this.radiusAllChanged = function (val) {
+			setAllRadius(this.radius, val || '0px');//0px is default value of radius
+			$scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
+		    };
+
+		    this.radiusChanged = function () {
+			$scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
+		    };
 
 		    function setAllRadius(dim, val) {
-
 			if (dim) {
 			    dim.topLeft = val;
 			    dim.topRight = val;
 			    dim.bottomRight = val;
 			    dim.bottomLeft = val;
 			}
-
 		    }
 
-		    $scope.$watch('radius', function (newRadius) {
-			$scope.wbModel.style.border.radius = createDimeRadiusStr(newRadius);
-		    }, true);
-
 		    function createDimeRadiusStr(dim) {
-
 			if (dim) {
 			    var output =
 				    dim.topLeft + ' ' +
@@ -279,22 +316,7 @@ angular.module('am-wb-core')
 				    dim.bottomLeft;
 			    return output;
 			}
-
 		    }
-
-		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-		    $scope.$watch('wbModel', function (model) {
-
-			//radius is a string such as '10px 25% 2vh 4px'
-			var radius = fillRadiusFromString($scope.radius, model.style.border.radius || '0px');
-
-			if (radius) {
-			    $scope.radiusAll = radius;
-			}
-
-		    });
 
 		    /*
 		     * splite 'radius' to its components
@@ -315,6 +337,10 @@ angular.module('am-wb-core')
 			//Items are 4 and equal
 			else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
 			    dimAll = dimsArray[0];
+			    dim.topLeft = dimAll;
+			    dim.topRight = dimAll;
+			    dim.bottomRight = dimAll;
+			    dim.bottomLeft = dimAll;
 			}
 
 			//Items are 4 and different
@@ -353,11 +379,10 @@ angular.module('am-wb-core')
 			else if (!dimsArray.length) {
 			    dimAll = '0px';
 			}
-
 			return dimAll;
 		    }
-		},
-		templateUrl: 'views/settings/wb-border.html'
+
+		}
 	    });
 
 	    /**
@@ -392,6 +417,7 @@ angular.module('am-wb-core')
 		type: 'layout',
 		label: 'Layout',
 		icon: 'dashboard',
+		description: 'Manages layout of the current item.',
 		templateUrl: 'views/settings/wb-layout.html',
 		controllerAs: 'ctrl',
 		/*
@@ -400,7 +426,7 @@ angular.module('am-wb-core')
 		 * @ngInject
 		 */
 		controller: function ($scope) {
-		    $scope.direction = [{
+		    this.direction_ = [{
 			    title: 'column',
 			    icon: 'wb-horizontal-boxes',
 			    value: 'column'
@@ -410,7 +436,7 @@ angular.module('am-wb-core')
 			    value: 'row'
 			}];
 
-		    $scope.justify = {
+		    this.justify_ = {
 			'row': [{
 				title: 'Start',
 				icon: 'sort_start_horiz',
@@ -455,7 +481,7 @@ angular.module('am-wb-core')
 			    }]
 		    };
 
-		    $scope.align = {
+		    this.align_ = {
 			'column': [{
 				title: 'Stretch',
 				icon: 'format_align_justify',
@@ -492,7 +518,7 @@ angular.module('am-wb-core')
 			    }]
 		    };
 
-		    $scope.selfAlign = {
+		    this.selfAlign_ = {
 			'column': [{
 				title: 'Stretch',
 				icon: 'format_align_justify',
@@ -527,6 +553,60 @@ angular.module('am-wb-core')
 				icon: 'align_center_vertical',
 				value: 'center'
 			    }]
+		    };
+
+		    /*
+		     * Sample of layout object in wbModel
+		     * 
+		     wbModel: {
+		     style: {    
+		     layout: {
+		     align: "stretch",
+		     wrap: "true",
+		     align_self: "stretch",
+		     direction: "column",
+		     justify: "start",
+		     };
+		     }	
+		     }
+		     */
+
+
+		    /*
+		     * watch 'wbModel' and apply the changes in setting panel
+		     */
+
+		    var ctrl = this;
+		    $scope.$watch('wbModel', function (model) {
+			var layout = model.style.layout || {};
+			ctrl.direction = layout.direction;
+			ctrl.align = layout.align;
+			ctrl.wrap = layout.wrap;
+			ctrl.alignSelf = layout.align_self;
+			ctrl.justify = layout.justify;
+		    });
+
+		    /*
+		     * This part updates the wbModel whenever the layout properties are changed in view
+		     */
+		    this.directionChanged = function () {
+			$scope.wbModel.style.layout.direction = this.direction;
+		    };
+
+		    this.wrapChanged = function () {
+			$scope.wbModel.style.layout.wrap = this.wrap;
+		    };
+
+		    this.alignChanged = function () {
+			$scope.wbModel.style.layout.align = this.align;
+		    };
+
+		    this.justifyChanged = function () {
+			$scope.wbModel.style.layout.justify = this.justify;
+		    };
+
+		    this.alignSelfChanged = function () {
+			$scope.wbModel.style.layout.align_self = this.alignSelf;
 		    };
 		}
 	    });
@@ -557,7 +637,7 @@ angular.module('am-wb-core')
 			setAllMargin($scope.padding, val || '0px');//default value of padding
 			$scope.wbModel.style.padding = createDimeStr($scope.padding);
 		    }
-		    
+
 		    function setAllMargin(dim, val) {
 
 			if (dim) {
@@ -566,7 +646,7 @@ angular.module('am-wb-core')
 			    dim.bottom = val;
 			    dim.left = val;
 			}
-			
+
 
 		    }
 
@@ -691,7 +771,83 @@ angular.module('am-wb-core')
 		type: 'size',
 		label: 'Size',
 		icon: 'photo_size_select_large',
-		templateUrl: 'views/settings/wb-size.html'
+		templateUrl: 'views/settings/wb-size.html',
+		controllerAs: 'ctrl',
+
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+
+		    // Sample of size object in wbModel
+		    /*
+		     wbModel: {
+			style: {
+			    size: {
+				   height: "372px"
+				   maxHeight: "auto"
+				   maxWidth: "auto"
+				   minHeight: "auto"
+				   minWidth: "auto"
+				   width: "311px"
+			    };
+			}
+		     }
+		     */
+
+		    /*
+		     * watch 'wbModel' and apply the changes in setting panel
+		     */
+
+		    var ctrl = this;
+		    $scope.$watch('wbModel', function (model) {
+			ctrl.width = model.style.size.width;
+			ctrl.height = model.style.size.height;
+			ctrl.minWidth = model.style.size.minWidth;
+			ctrl.minHeight = model.style.size.minHeight;
+			ctrl.maxWidth = model.style.size.maxWidth;
+			ctrl.maxHeight = model.style.size.maxHeight;
+		    }, true);
+
+		    /*
+		     * This part updates the wbModel whenever the size properties are changed in view
+		     */
+		    this.widthChanged = function () {
+			$scope.wbModel.style.size.width = this.width;
+		    };
+
+		    this.heightChanged = function () {
+			if (this.height === '0px') {
+			    $scope.wbModel.style.size.height = '50px';
+			} else if (this.height === '0vh') {
+			   $scope.wbModel.style.size.height = '50vh'; 
+			} else if (this.height === '0in') {
+			   $scope.wbModel.style.size.height = '50in'; 
+			} else if (this.height === '0cm') {
+			   $scope.wbModel.style.size.height = '20cm'; 
+			} else if (this.height === '0%') {
+			   $scope.wbModel.style.size.height = '50%'; 
+			} else {
+			    $scope.wbModel.style.size.height = this.height;
+			}
+		    };
+
+		    this.minWidthChanged = function () {
+			$scope.wbModel.style.size.minWidth = this.minWidth;
+		    };
+
+		    this.minHeightChanged = function () {
+			$scope.wbModel.style.size.minHeight = this.minHeight;
+		    };
+
+		    this.maxWidthChanged = function () {
+			$scope.wbModel.style.size.maxWidth = this.maxWidth;
+		    };
+
+		    this.maxHeightChanged = function () {
+			$scope.wbModel.style.size.maxHeight = this.maxHeight;
+		    };
+		}
 	    });
 
 	    $settings.newPage({

@@ -24,14 +24,14 @@
 'use strict';
 
 angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-widget-size
- * @description Apply margin into the element
- */
-.directive('wbWidgetSize', function($q, $wbUtil, $rootElement, $document, $compile) {
+	/**
+	 * @ngdoc Directives
+	 * @name wb-widget-size
+	 * @description Apply margin into the element
+	 */
+	.directive('wbWidgetSize', function ($q, $wbUtil, $rootElement, $document, $compile) {
 
-	function postLink($scope, $element, $attrs, $ctrls){
+	    function postLink($scope, $element, $attrs, $ctrls) {
 		var button;
 		var optionButton;
 		var dimension = {};
@@ -43,146 +43,148 @@ angular.module('am-wb-core')
 		// main ctrl
 		var ctrl = $ctrls[0];
 
-		function distroy(){
-			watchSize();
-			watchSelection();
+		function distroy() {
+		    watchSize();
+		    watchSelection();
 
-			if(button){
-				button.remove();
-			}
-			if(optionButton){
-				optionButton.remove();
-			}
-		}
-		
-		function getBound(){
-			var off = $element.offset();
-			return {
-				left: off.left,
-				top: off.top,
-				width: $element.innerWidth(),
-				height: $element.innerHeight()
-			};
+		    if (button) {
+			button.remove();
+		    }
+		    if (optionButton) {
+			optionButton.remove();
+		    }
 		}
 
-		function bindToElement(bound){
-			button.css('left', bound.left + bound.width - 15 + 'px');
-			button.css('top', bound.top + bound.height - 16 + 'px');
+		function getBound() {
+		    var off = $element.offset();
+		    return {
+			left: off.left,
+			top: off.top,
+			width: $element.innerWidth(),
+			height: $element.innerHeight()
+		    };
+		}
 
-			optionButton.css('left', bound.left + 'px');
-			optionButton.css('top', bound.top + 'px');
+		function bindToElement(bound) {
+		    button.css('left', bound.left + bound.width - 15 + 'px');
+		    button.css('top', bound.top + bound.height - 16 + 'px');
+
+		    optionButton.css('left', bound.left + 'px');
+		    optionButton.css('top', bound.top + 'px');
 		}
 
 		function mousemove($event) {
-			var deltaWidth = dimension.width - (position.x - $event.clientX);
-			var deltaHeight = dimension.height - (position.y - $event.clientY);
-			var newDimensions = {
-					width:  deltaWidth + 'px',
-					height: deltaHeight + 'px'
-			};
-
-			$element.css(newDimensions);
-			if($scope.wbModel){
-				$scope.wbModel.style.size.width = newDimensions.width;
-				$scope.wbModel.style.size.height = newDimensions.height;
-			}
-			bindToElement(getBound());
-			$scope.$apply();
-			return false;
+		    var deltaWidth = dimension.width - (position.x - $event.clientX);
+		    var deltaHeight = dimension.height - (position.y - $event.clientY);
+		    var newDimensions = {
+			width: deltaWidth + 'px',
+			height: deltaHeight + 'px'
+		    };
+		    if ($scope.wbModel.style.size.height === 'auto') {
+			newDimensions.height = 'auto';
+		    }
+		    $element.css(newDimensions);
+		    if ($scope.wbModel) {
+			$scope.wbModel.style.size.width = newDimensions.width;
+			$scope.wbModel.style.size.height = newDimensions.height;
+		    }
+		    bindToElement(getBound());
+		    $scope.$apply();
+		    return false;
 		}
 
 		function mouseup() {
-			$document.unbind('mousemove', mousemove);
-			$document.unbind('mouseup', mouseup);
-			lock = false;
+		    $document.unbind('mousemove', mousemove);
+		    $document.unbind('mouseup', mouseup);
+		    lock = false;
 		}
 
 		function mousedown($event) {
-			$event.stopImmediatePropagation();
-			position.x = $event.clientX;
-			position.y = $event.clientY;
-			lock = true;
-			dimension.width = $element.prop('offsetWidth');
-			dimension.height = $element.prop('offsetHeight');
-			$document.bind('mousemove', mousemove);
-			$document.bind('mouseup', mouseup);
-			return false;
+		    $event.stopImmediatePropagation();
+		    position.x = $event.clientX;
+		    position.y = $event.clientY;
+		    lock = true;
+		    dimension.width = $element.prop('offsetWidth');
+		    dimension.height = $element.prop('offsetHeight');
+		    $document.bind('mousemove', mousemove);
+		    $document.bind('mouseup', mouseup);
+		    return false;
 		}
 
-		function checkButton(){
-			if(button) {
-				return $q.resolve();
-			}
-			button = angular.element('<span></span>');
-			$rootElement.append(button);
-			button.css({
-				width: '15px',
-				height: '15px',
-				position: 'absolute',
-				visibility: 'hidden',
-				cursor: 'nwse-resize'
-			});
-			button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-			button.on('mousedown', mousedown);
+		function checkButton() {
+		    if (button) {
+			return $q.resolve();
+		    }
+		    button = angular.element('<span></span>');
+		    $rootElement.append(button);
+		    button.css({
+			width: '15px',
+			height: '15px',
+			position: 'absolute',
+			visibility: 'hidden',
+			cursor: 'nwse-resize'
+		    });
+		    button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
+		    button.on('mousedown', mousedown);
 
-			var oj = $wbUtil.getTemplateFor({
-				templateUrl: 'views/partials/wb-widget-options.html'
-			}).then(function(template){
-				optionButton = angular.element(template);
-				$rootElement.append(optionButton);
-				optionButton.css({
-					position: 'absolute',
-					visibility: 'hidden'
-				});
-				$compile(optionButton)($scope);
-				bindToElement(getBound());
+		    var oj = $wbUtil.getTemplateFor({
+			templateUrl: 'views/partials/wb-widget-options.html'
+		    }).then(function (template) {
+			optionButton = angular.element(template);
+			$rootElement.append(optionButton);
+			optionButton.css({
+			    position: 'absolute',
+			    visibility: 'hidden'
 			});
+			$compile(optionButton)($scope);
+			bindToElement(getBound());
+		    });
 
-			return $q.all([oj]).then(function(){
-				$scope.$watch(getBound, function (bound) {
-					if(!bound) {
-						return;
-					}
-					bindToElement(getBound());
-				}, true);
+		    return $q.all([oj]).then(function () {
+			$scope.$watch(getBound, function (bound) {
+			    if (!bound) {
+				return;
+			    }
+			    bindToElement(getBound());
+			}, true);
 
-			});
+		    });
 		}
 
-		
+
 		ctrl.on('delete', distroy);
 		// Watch size
-		watchSize = $scope.$watch($attrs.wbWidgetSize+'.size', function(size) {
-			if(!size || lock){
-				return;
-			}
-			$element.css(size);
-			if(optionButton){
-				bindToElement(getBound());
-			}
+		watchSize = $scope.$watch($attrs.wbWidgetSize + '.size', function (size) {
+		    if (!size || lock) {
+			return;
+		    }
+		    $element.css(size);
+		    if (optionButton) {
+			bindToElement(getBound());
+		    }
 		}, true);
 
-		watchSelection = $scope.$watch(function(){
-			return ctrl.isSelected();
-		}, function(value){
-			if(value){
-				checkButton()
-				.then(function(){
-					button.css('visibility', 'visible');
-					optionButton.css('visibility', 'visible');
+		watchSelection = $scope.$watch(function () {
+		    return ctrl.isSelected();
+		}, function (value) {
+		    if (value) {
+			checkButton()
+				.then(function () {
+				    button.css('visibility', 'visible');
+				    optionButton.css('visibility', 'visible');
 				});
-			} else {
-				if(optionButton) {
-					button.css('visibility', 'hidden');
-					optionButton.css('visibility', 'hidden');
-				}
+		    } else {
+			if (optionButton) {
+			    button.css('visibility', 'hidden');
+			    optionButton.css('visibility', 'hidden');
 			}
+		    }
 		});
-	}
+	    }
 
-	return {
-		restrict : 'A',
-		link : postLink,
-		require:['^wbWidget']
-	};
-});
+	    return {
+		restrict: 'A',
+		link: postLink,
+		require: ['^wbWidget']
+	    };
+	});

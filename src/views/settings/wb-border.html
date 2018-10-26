@@ -12,21 +12,31 @@ Created by masood.
 
 @version 2.x All settings are rewrite based on new data model of the border
 -->
-
-<!--STYLE SECTION-->
+<!--STYLE AND COLOR SECTION-->
 <md-subheader 
     class="md-hue-3">
-    <span translate>Style</span>
+    <span translate>Style and Color</span>
 </md-subheader>
-
+<!--STYLE SECTION-->
 <md-input-container class="md-block">
     <label translate>Style</label>
-    <md-select ng-model="wbModel.style.border.style">
+    <md-select 
+        ng-model="ctrl.style"
+        ng-change="ctrl.styleChanged(ctrl.style)">
         <md-option ng-repeat="style in ::styles" value="{{::style.value}}"> 
             {{::style.title}}
         </md-option>
     </md-select>
 </md-input-container>
+<!--COLOR SECTION-->
+<wb-ui-setting-color 
+    title="{{'Color'| translate}}" 
+    wb-ui-setting-clear-button="true"
+    wb-ui-setting-preview="true"
+    wb-ui-setting-icon="format_color_fill"
+    ng-model="ctrl.color"
+    ng-change="ctrl.colorChanged(ctrl.color)">
+</wb-ui-setting-color>
 
 <!--WIDTH SECTION-->
 <md-subheader 
@@ -38,7 +48,8 @@ Created by masood.
     title="All"
     icon="border_all"
     description="Set all sides width"
-    ng-model="widthAll"
+    ng-model="ctrl.widthAll"
+    ng-change="ctrl.widthAllChanged(ctrl.widthAll)"
     extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
 </wb-ui-setting-length>
 
@@ -47,42 +58,31 @@ Created by masood.
 <wb-ui-setting-length
     title="Top"
     icon="border_top"
-    ng-model="width.top"
+    ng-model="ctrl.width.top"
+    ng-change="ctrl.widthChanged()"
     extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
 </wb-ui-setting-length>
 <wb-ui-setting-length
     title="Right"
     icon="border_right"
-    ng-model="width.right"
+    ng-model="ctrl.width.right"
+    ng-change="ctrl.widthChanged()"
     extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
 </wb-ui-setting-length>
 <wb-ui-setting-length
     title="Bottom"
     icon="border_bottom"
-    ng-model="width.bottom"
+    ng-model="ctrl.width.bottom"
+    ng-change="ctrl.widthChanged()"
     extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
 </wb-ui-setting-length>
 <wb-ui-setting-length
     title="Left"
     icon="border_left"
-    ng-model="width.left"
+    ng-model="ctrl.width.left"
+    ng-change="ctrl.widthChanged()"
     extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
 </wb-ui-setting-length>
-
-
-
-<!--COLOR SECTION-->
-<md-subheader 
-    class="md-hue-3">
-    <span translate>Color</span>
-</md-subheader>
-<wb-ui-setting-color 
-    title="{{'Color'| translate}}" 
-    wb-ui-setting-clear-button="true"
-    wb-ui-setting-preview="true"
-    wb-ui-setting-icon="format_color_fill"
-    ng-model="wbModel.style.border.color">
-</wb-ui-setting-color>
 
 
 <!--RADIUS SECTION-->
@@ -95,7 +95,8 @@ Created by masood.
     title="All"
     icon="full_rounded"
     description="Set all sides radius"
-    ng-model="radiusAll"
+    ng-model="ctrl.radiusAll"
+    ng-change="ctrl.radiusAllChanged(ctrl.radiusAll)"
     extra-values="['length', 'initial', 'inherit']">
 </wb-ui-setting-length>
 
@@ -104,25 +105,29 @@ Created by masood.
 <wb-ui-setting-length
     title="Top left"
     icon="corner_top_left"
-    ng-model="radius.topLeft"
+    ng-model="ctrl.radius.topLeft"
+    ng-change="ctrl.radiusChanged()"
     extra-values="['length', 'initial', 'inherit']">
 </wb-ui-setting-length>
 <wb-ui-setting-length
     title="Top right"
     icon="corner_top_right"
-    ng-model="radius.topRight"
+    ng-model="ctrl.radius.topRight"
+    ng-change="ctrl.radiusChanged()"
     extra-values="['length', 'initial', 'inherit']">
 </wb-ui-setting-length>
 <wb-ui-setting-length
     title="Bottom right"
     icon="corner_bottom_right"
-    ng-model="radius.bottomRight"
+    ng-model="ctrl.radius.bottomRight"
+    ng-change="ctrl.radiusChanged()"
     extra-values="['length', 'initial', 'inherit']">
 </wb-ui-setting-length>
 <wb-ui-setting-length
     title="Bottom left"
     icon="corner_bottom_left"
-    ng-model="radius.bottomLeft"
+    ng-model="ctrl.radius.bottomLeft"
+    ng-change="ctrl.radiusChanged()"
     extra-values="['length', 'initial', 'inherit']">
 </wb-ui-setting-length>
 

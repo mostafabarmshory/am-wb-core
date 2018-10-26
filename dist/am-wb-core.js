@@ -890,14 +890,14 @@ angular.module('am-wb-core')
 'use strict';
 
 angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-size
- * @description Apply margin into the element
- */
-.directive('wbSize', function($q, $wbUtil, $rootElement, $document, $compile) {
+	/**
+	 * @ngdoc Directives
+	 * @name wb-size
+	 * @description Apply margin into the element
+	 */
+	.directive('wbSize', function ($q, $wbUtil, $rootElement, $document, $compile) {
 
-	function postLink($scope, $element, $attrs, $ctrls){
+	    function postLink($scope, $element, $attrs, $ctrls) {
 		var button;
 		var optionButton;
 		var dimension = {};
@@ -908,158 +908,160 @@ angular.module('am-wb-core')
 
 		// main ctrl
 		var ctrl = $ctrls[0];
-		
-		
-		function isRoot(){
-			return ctrl.isRoot();
+
+
+		function isRoot() {
+		    return ctrl.isRoot();
 		}
 
-		function distroy(){
-			watchSize();
-			watchSelection();
+		function distroy() {
+		    watchSize();
+		    watchSelection();
 
-			if(button){
-				button.remove();
-			}
-			if(optionButton){
-				optionButton.remove();
-			}
+		    if (button) {
+			button.remove();
+		    }
+		    if (optionButton) {
+			optionButton.remove();
+		    }
 		}
 
-		function getBound(){
-			var off = $element.offset();
-			return {
-				left: off.left,
-				top: off.top,
-				width: $element.innerWidth(),
-				height: $element.innerHeight()
-			};
+		function getBound() {
+		    var off = $element.offset();
+		    return {
+			left: off.left,
+			top: off.top,
+			width: $element.innerWidth(),
+			height: $element.innerHeight()
+		    };
 		}
 
-		function bindToElement(bound){
-			button.css('left', bound.left + bound.width - 15 + 'px');
-			button.css('top', bound.top + bound.height - 16 + 'px');
+		function bindToElement(bound) {
+		    button.css('left', bound.left + bound.width - 15 + 'px');
+		    button.css('top', bound.top + bound.height - 16 + 'px');
 
-			optionButton.css('left', bound.left + 'px');
-			optionButton.css('top', bound.top + 'px');
+		    optionButton.css('left', bound.left + 'px');
+		    optionButton.css('top', bound.top + 'px');
 		}
 
 		function mousemove($event) {
-			var deltaWidth = dimension.width - (position.x - $event.clientX);
-			var deltaHeight = dimension.height - (position.y - $event.clientY);
-			var newDimensions = {
-					width:  deltaWidth + 'px',
-					height: deltaHeight + 'px'
-			};
-
-			$element.css(newDimensions);
-			if($scope.wbModel){
-				$scope.wbModel.style.size.width = newDimensions.width;
-				$scope.wbModel.style.size.height = newDimensions.height;
-			}
-			bindToElement(getBound());
-			$scope.$apply();
-			return false;
+		    var deltaWidth = dimension.width - (position.x - $event.clientX);
+		    var deltaHeight = dimension.height - (position.y - $event.clientY);
+		    var newDimensions = {
+			width: deltaWidth + 'px',
+			height: deltaHeight + 'px'
+		    };
+		    if ($scope.wbModel.style.size.height === 'auto') {
+			newDimensions.height = 'auto';
+		    }
+		    $element.css(newDimensions);
+		    if ($scope.wbModel) {
+			$scope.wbModel.style.size.width = newDimensions.width;
+			$scope.wbModel.style.size.height = newDimensions.height;
+		    }
+		    bindToElement(getBound());
+		    $scope.$apply();
+		    return false;
 		}
 
 		function mouseup() {
-			$document.unbind('mousemove', mousemove);
-			$document.unbind('mouseup', mouseup);
-			lock = false;
+		    $document.unbind('mousemove', mousemove);
+		    $document.unbind('mouseup', mouseup);
+		    lock = false;
 		}
 
 		function mousedown($event) {
-			$event.stopImmediatePropagation();
-			position.x = $event.clientX;
-			position.y = $event.clientY;
-			lock = true;
-			dimension.width = $element.prop('offsetWidth');
-			dimension.height = $element.prop('offsetHeight');
-			$document.bind('mousemove', mousemove);
-			$document.bind('mouseup', mouseup);
-			return false;
+		    $event.stopImmediatePropagation();
+		    position.x = $event.clientX;
+		    position.y = $event.clientY;
+		    lock = true;
+		    dimension.width = $element.prop('offsetWidth');
+		    dimension.height = $element.prop('offsetHeight');
+		    $document.bind('mousemove', mousemove);
+		    $document.bind('mouseup', mouseup);
+		    return false;
 		}
 
-		function checkButton(){
-			if(button) {
-				return $q.resolve();
-			}
-			button = angular.element('<span></span>');
-			$rootElement.append(button);
-			button.css({
-				width: '15px',
-				height: '15px',
-				position: 'absolute',
-				visibility: 'hidden',
-				cursor: 'nwse-resize'
-			});
-			button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-			button.on('mousedown', mousedown);
+		function checkButton() {
+		    if (button) {
+			return $q.resolve();
+		    }
+		    button = angular.element('<span></span>');
+		    $rootElement.append(button);
+		    button.css({
+			width: '15px',
+			height: '15px',
+			position: 'absolute',
+			visibility: 'hidden',
+			cursor: 'nwse-resize'
+		    });
+		    button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
+		    button.on('mousedown', mousedown);
 
-			var oj = $wbUtil.getTemplateFor({
-				templateUrl: 'views/partials/wb-widget-options.html'
-			}).then(function(template){
-				optionButton = angular.element(template);
-				$rootElement.append(optionButton);
-				optionButton.css({
-					position: 'absolute',
-					visibility: 'hidden'
-				});
-				$compile(optionButton)($scope);
-				bindToElement(getBound());
+		    var oj = $wbUtil.getTemplateFor({
+			templateUrl: 'views/partials/wb-widget-options.html'
+		    }).then(function (template) {
+			optionButton = angular.element(template);
+			$rootElement.append(optionButton);
+			optionButton.css({
+			    position: 'absolute',
+			    visibility: 'hidden'
 			});
+			$compile(optionButton)($scope);
+			bindToElement(getBound());
+		    });
 
-			return $q.all([oj]).then(function(){
-				$scope.$watch(getBound, function (bound) {
-					if(!bound) {
-						return;
-					}
-					bindToElement(getBound());
-				}, true);
+		    return $q.all([oj]).then(function () {
+			$scope.$watch(getBound, function (bound) {
+			    if (!bound) {
+				return;
+			    }
+			    bindToElement(getBound());
+			}, true);
 
-			});
+		    });
 		}
 
 
 		// Watch size
-		watchSize = $scope.$watch($attrs.wbSize+'.size', function(size) {
-			if(isRoot() || !size || lock){
-				return;
-			}
-			$element.css(size);
-			if(optionButton){
-				bindToElement(getBound());
-			}
+		watchSize = $scope.$watch($attrs.wbSize + '.size', function (size) {
+		    if (isRoot() || !size || lock) {
+			return;
+		    }
+		    $element.css(size);
+		    if (optionButton) {
+			bindToElement(getBound());
+		    }
 		}, true);
 
 		ctrl.on('delete', distroy);
-		watchSelection = $scope.$watch(function(){
-			return ctrl.isSelected();
-		}, function(value){
-			if(value){
-				checkButton()
-				.then(function(){
-					if(!isRoot()){
-						button.css('visibility', 'visible');
-					}
-					optionButton.css('visibility', 'visible');
+		watchSelection = $scope.$watch(function () {
+		    return ctrl.isSelected();
+		}, function (value) {
+		    if (value) {
+			checkButton()
+				.then(function () {
+				    if (!isRoot()) {
+					button.css('visibility', 'visible');
+				    }
+				    optionButton.css('visibility', 'visible');
 				});
-			} else {
-				if(optionButton) {
-					button.css('visibility', 'hidden');
-					optionButton.css('visibility', 'hidden');
-				}
+		    } else {
+			if (optionButton) {
+			    button.css('visibility', 'hidden');
+			    optionButton.css('visibility', 'hidden');
 			}
+		    }
 		});
-	}
+	    }
 
-	return {
-		restrict : 'A',
-		link : postLink,
+	    return {
+		restrict: 'A',
+		link: postLink,
 		priority: 1,
-		require:['^wbGroup']
-	};
-});
+		require: ['^wbGroup']
+	    };
+	});
 /* 
  * The MIT License (MIT)
  * 
@@ -1197,14 +1199,14 @@ angular.module('am-wb-core')
 'use strict';
 
 angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-widget-size
- * @description Apply margin into the element
- */
-.directive('wbWidgetSize', function($q, $wbUtil, $rootElement, $document, $compile) {
+	/**
+	 * @ngdoc Directives
+	 * @name wb-widget-size
+	 * @description Apply margin into the element
+	 */
+	.directive('wbWidgetSize', function ($q, $wbUtil, $rootElement, $document, $compile) {
 
-	function postLink($scope, $element, $attrs, $ctrls){
+	    function postLink($scope, $element, $attrs, $ctrls) {
 		var button;
 		var optionButton;
 		var dimension = {};
@@ -1216,149 +1218,151 @@ angular.module('am-wb-core')
 		// main ctrl
 		var ctrl = $ctrls[0];
 
-		function distroy(){
-			watchSize();
-			watchSelection();
+		function distroy() {
+		    watchSize();
+		    watchSelection();
 
-			if(button){
-				button.remove();
-			}
-			if(optionButton){
-				optionButton.remove();
-			}
-		}
-		
-		function getBound(){
-			var off = $element.offset();
-			return {
-				left: off.left,
-				top: off.top,
-				width: $element.innerWidth(),
-				height: $element.innerHeight()
-			};
+		    if (button) {
+			button.remove();
+		    }
+		    if (optionButton) {
+			optionButton.remove();
+		    }
 		}
 
-		function bindToElement(bound){
-			button.css('left', bound.left + bound.width - 15 + 'px');
-			button.css('top', bound.top + bound.height - 16 + 'px');
+		function getBound() {
+		    var off = $element.offset();
+		    return {
+			left: off.left,
+			top: off.top,
+			width: $element.innerWidth(),
+			height: $element.innerHeight()
+		    };
+		}
 
-			optionButton.css('left', bound.left + 'px');
-			optionButton.css('top', bound.top + 'px');
+		function bindToElement(bound) {
+		    button.css('left', bound.left + bound.width - 15 + 'px');
+		    button.css('top', bound.top + bound.height - 16 + 'px');
+
+		    optionButton.css('left', bound.left + 'px');
+		    optionButton.css('top', bound.top + 'px');
 		}
 
 		function mousemove($event) {
-			var deltaWidth = dimension.width - (position.x - $event.clientX);
-			var deltaHeight = dimension.height - (position.y - $event.clientY);
-			var newDimensions = {
-					width:  deltaWidth + 'px',
-					height: deltaHeight + 'px'
-			};
-
-			$element.css(newDimensions);
-			if($scope.wbModel){
-				$scope.wbModel.style.size.width = newDimensions.width;
-				$scope.wbModel.style.size.height = newDimensions.height;
-			}
-			bindToElement(getBound());
-			$scope.$apply();
-			return false;
+		    var deltaWidth = dimension.width - (position.x - $event.clientX);
+		    var deltaHeight = dimension.height - (position.y - $event.clientY);
+		    var newDimensions = {
+			width: deltaWidth + 'px',
+			height: deltaHeight + 'px'
+		    };
+		    if ($scope.wbModel.style.size.height === 'auto') {
+			newDimensions.height = 'auto';
+		    }
+		    $element.css(newDimensions);
+		    if ($scope.wbModel) {
+			$scope.wbModel.style.size.width = newDimensions.width;
+			$scope.wbModel.style.size.height = newDimensions.height;
+		    }
+		    bindToElement(getBound());
+		    $scope.$apply();
+		    return false;
 		}
 
 		function mouseup() {
-			$document.unbind('mousemove', mousemove);
-			$document.unbind('mouseup', mouseup);
-			lock = false;
+		    $document.unbind('mousemove', mousemove);
+		    $document.unbind('mouseup', mouseup);
+		    lock = false;
 		}
 
 		function mousedown($event) {
-			$event.stopImmediatePropagation();
-			position.x = $event.clientX;
-			position.y = $event.clientY;
-			lock = true;
-			dimension.width = $element.prop('offsetWidth');
-			dimension.height = $element.prop('offsetHeight');
-			$document.bind('mousemove', mousemove);
-			$document.bind('mouseup', mouseup);
-			return false;
+		    $event.stopImmediatePropagation();
+		    position.x = $event.clientX;
+		    position.y = $event.clientY;
+		    lock = true;
+		    dimension.width = $element.prop('offsetWidth');
+		    dimension.height = $element.prop('offsetHeight');
+		    $document.bind('mousemove', mousemove);
+		    $document.bind('mouseup', mouseup);
+		    return false;
 		}
 
-		function checkButton(){
-			if(button) {
-				return $q.resolve();
-			}
-			button = angular.element('<span></span>');
-			$rootElement.append(button);
-			button.css({
-				width: '15px',
-				height: '15px',
-				position: 'absolute',
-				visibility: 'hidden',
-				cursor: 'nwse-resize'
-			});
-			button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-			button.on('mousedown', mousedown);
+		function checkButton() {
+		    if (button) {
+			return $q.resolve();
+		    }
+		    button = angular.element('<span></span>');
+		    $rootElement.append(button);
+		    button.css({
+			width: '15px',
+			height: '15px',
+			position: 'absolute',
+			visibility: 'hidden',
+			cursor: 'nwse-resize'
+		    });
+		    button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
+		    button.on('mousedown', mousedown);
 
-			var oj = $wbUtil.getTemplateFor({
-				templateUrl: 'views/partials/wb-widget-options.html'
-			}).then(function(template){
-				optionButton = angular.element(template);
-				$rootElement.append(optionButton);
-				optionButton.css({
-					position: 'absolute',
-					visibility: 'hidden'
-				});
-				$compile(optionButton)($scope);
-				bindToElement(getBound());
+		    var oj = $wbUtil.getTemplateFor({
+			templateUrl: 'views/partials/wb-widget-options.html'
+		    }).then(function (template) {
+			optionButton = angular.element(template);
+			$rootElement.append(optionButton);
+			optionButton.css({
+			    position: 'absolute',
+			    visibility: 'hidden'
 			});
+			$compile(optionButton)($scope);
+			bindToElement(getBound());
+		    });
 
-			return $q.all([oj]).then(function(){
-				$scope.$watch(getBound, function (bound) {
-					if(!bound) {
-						return;
-					}
-					bindToElement(getBound());
-				}, true);
+		    return $q.all([oj]).then(function () {
+			$scope.$watch(getBound, function (bound) {
+			    if (!bound) {
+				return;
+			    }
+			    bindToElement(getBound());
+			}, true);
 
-			});
+		    });
 		}
 
-		
+
 		ctrl.on('delete', distroy);
 		// Watch size
-		watchSize = $scope.$watch($attrs.wbWidgetSize+'.size', function(size) {
-			if(!size || lock){
-				return;
-			}
-			$element.css(size);
-			if(optionButton){
-				bindToElement(getBound());
-			}
+		watchSize = $scope.$watch($attrs.wbWidgetSize + '.size', function (size) {
+		    if (!size || lock) {
+			return;
+		    }
+		    $element.css(size);
+		    if (optionButton) {
+			bindToElement(getBound());
+		    }
 		}, true);
 
-		watchSelection = $scope.$watch(function(){
-			return ctrl.isSelected();
-		}, function(value){
-			if(value){
-				checkButton()
-				.then(function(){
-					button.css('visibility', 'visible');
-					optionButton.css('visibility', 'visible');
+		watchSelection = $scope.$watch(function () {
+		    return ctrl.isSelected();
+		}, function (value) {
+		    if (value) {
+			checkButton()
+				.then(function () {
+				    button.css('visibility', 'visible');
+				    optionButton.css('visibility', 'visible');
 				});
-			} else {
-				if(optionButton) {
-					button.css('visibility', 'hidden');
-					optionButton.css('visibility', 'hidden');
-				}
+		    } else {
+			if (optionButton) {
+			    button.css('visibility', 'hidden');
+			    optionButton.css('visibility', 'hidden');
 			}
+		    }
 		});
-	}
+	    }
 
-	return {
-		restrict : 'A',
-		link : postLink,
-		require:['^wbWidget']
-	};
-});
+	    return {
+		restrict: 'A',
+		link: postLink,
+		require: ['^wbWidget']
+	    };
+	});
 /* 
  * The MIT License (MIT)
  * 
@@ -2577,16 +2581,20 @@ angular.module('am-wb-core')
 		 */
 		function render() {
 			scope.selectedIndex = toIndex(ngModelCtrl.$modelValue);
-			ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+			//ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
 		}
 
 		ngModelCtrl.$render = render;
 
-		scope.$watch('selectedIndex', function () {
-			if(angular.isDefined(scope.selectedIndex)){
-				ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
-			}
-		});
+//		scope.$watch('selectedIndex', function () {
+//			if(angular.isDefined(scope.selectedIndex)){
+//				ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+//			}
+//		});
+
+		scope.selectionChanged = function(){
+		    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
+		};
 	}
 
 	/*
@@ -3455,7 +3463,7 @@ angular.module('am-wb-core')
 				title: 'Delete',
 				icon: 'delete',
 				action: ctrl.delete,
-				description: 'Delete widget'
+				description: 'Delete widget (Delete)'
 			},{
 				title: 'Clone',
 				icon: 'content_copy',
@@ -3464,7 +3472,7 @@ angular.module('am-wb-core')
 					var index = $scope.group.indexOfChild($scope.wbModel);
 					$scope.group.addChild(index, model);
 				},
-				description: 'Duplicate widget'
+				description: 'Duplicate widget (ctrl+D)'
 			}];
 		};
 
@@ -3927,16 +3935,11 @@ angular.module('am-wb-core')
 	    });
 
 	    $settings.newPage({
-		type: 'layout',
-		label: 'Layout',
-		description: 'Manages layout of the current item.',
-		icon: 'dashboard',
-		templateUrl: 'views/settings/wb-layout.html'
-	    });
-	    $settings.newPage({
 		type: 'border',
 		label: 'Border',
 		icon: 'border_all',
+		templateUrl: 'views/settings/wb-border.html',
+		controllerAs: 'ctrl',
 		/*
 		 * @ngInject
 		 */
@@ -3971,31 +3974,87 @@ angular.module('am-wb-core')
 			    value: 'outset'
 			}];
 
+		    /*
+		     * watch 'wbModel' and apply the changes into setting panel
+		     */
+		    var ctrl = this;
+		    $scope.$watch('wbModel', function (model) {
+			/*
+			 * Set style
+			 */
+			var border = model.style.border || {};
+			ctrl.style = border.style;
+
+			/*
+			 * Set color
+			 */
+			ctrl.color = border.color;
+
+			/*
+			 * Set width
+			 * width is a string such as '10px 25% 2vh 4px'
+			 */
+			ctrl.width = {};
+			var width = fillWidthFromString(ctrl.width, border.width || 'medium');
+			if (width) {
+			    ctrl.widthAll = width;
+			    ctrl.width.top = width;
+			    ctrl.width.right = width;
+			    ctrl.width.bottom = width;
+			    ctrl.width.left = width;
+			}
+
+			/*
+			 * Set radius
+			 * radius is a string such as '10px 25% 2vh 4px'
+			 */
+			ctrl.radius = {};
+			var radius = fillRadiusFromString(ctrl.radius, border.radius || '0px');
+			if (radius) {
+			    ctrl.radiusAll = radius;
+			    ctrl.radius.topLeft = radius;
+			    ctrl.radius.topRight = radius;
+			    ctrl.radius.bottomLeft = radius;
+			    ctrl.radius.bottomRight = radius;
+			}
+		    });
+
+		    /*
+		     * border style
+		     */
+		    this.styleChanged = function (newStyle) {
+			$scope.wbModel.style.border.style = newStyle;
+		    };
+
+		    /*
+		     * border color
+		     */
+		    this.colorChanged = function (newColor) {
+			$scope.wbModel.style.border.color = newColor;
+		    };
 
 		    /*
 		     * Settings about border width
 		     */
-		    $scope.$watch('widthAll', function (val) {
-			setAllWidth($scope.width, val || 'medium');//medium is default value of width
-		    });
+		    this.widthAllChanged = function (val) {
+			setAllWidth(this.width, val || 'medium');//medium is default value of width
+			$scope.wbModel.style.border.width = createDimWidthStr(this.width);
+		    };
+
+		    this.widthChanged = function () {
+			$scope.wbModel.style.border.width = createDimWidthStr(this.width);
+		    };
 
 		    function setAllWidth(dim, val) {
-
 			if (dim) {
 			    dim.top = val;
 			    dim.right = val;
 			    dim.bottom = val;
 			    dim.left = val;
 			}
-
 		    }
 
-		    $scope.$watch('width', function (newWidth) {
-			$scope.wbModel.style.border.width = createDimWidthStr(newWidth);
-		    }, true);
-
 		    function createDimWidthStr(dim) {
-
 			if (dim) {
 			    var output =
 				    dim.top + ' ' +
@@ -4007,26 +4066,11 @@ angular.module('am-wb-core')
 		    }
 
 		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-		    $scope.$watch('wbModel', function (model) {
-
-			//width is a string such as '10px 25% 2vh 4px'
-			var width = fillWidthFromString($scope.width, model.style.border.width || 'medium');
-
-			if (width) {
-			    $scope.widthAll = width;
-			}
-
-		    });
-
-		    /*
 		     * splite 'width' to its components
 		     * check different state Based on CSS rules. see for example:
 		     * https://www.w3schools.com/CSSref/pr_border-width.asp
 		     */
 		    function fillWidthFromString(dim, str) {
-
 			var dimAll;
 			var dimsArray = str.split(' ');
 
@@ -4039,6 +4083,10 @@ angular.module('am-wb-core')
 			//Items are 4 and equal
 			else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
 			    dimAll = dimsArray[0];
+			    dim.top = dimAll;
+			    dim.right = dimAll;
+			    dim.bottom = dimAll;
+			    dim.left = dimAll;
 			}
 
 			//Items are 4 and different
@@ -4077,34 +4125,31 @@ angular.module('am-wb-core')
 			else if (!dimsArray.length) {
 			    dimAll = 'medium';
 			}
-
 			return dimAll;
 		    }
 
 		    /*
 		     * Settings about border radius
 		     */
-		    $scope.$watch('radiusAll', function (val) {
-			setAllRadius($scope.radius, val || '0px');//0px is default value of radius
-		    });
+		    this.radiusAllChanged = function (val) {
+			setAllRadius(this.radius, val || '0px');//0px is default value of radius
+			$scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
+		    };
+
+		    this.radiusChanged = function () {
+			$scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
+		    };
 
 		    function setAllRadius(dim, val) {
-
 			if (dim) {
 			    dim.topLeft = val;
 			    dim.topRight = val;
 			    dim.bottomRight = val;
 			    dim.bottomLeft = val;
 			}
-
 		    }
 
-		    $scope.$watch('radius', function (newRadius) {
-			$scope.wbModel.style.border.radius = createDimeRadiusStr(newRadius);
-		    }, true);
-
 		    function createDimeRadiusStr(dim) {
-
 			if (dim) {
 			    var output =
 				    dim.topLeft + ' ' +
@@ -4113,22 +4158,7 @@ angular.module('am-wb-core')
 				    dim.bottomLeft;
 			    return output;
 			}
-
 		    }
-
-		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-		    $scope.$watch('wbModel', function (model) {
-
-			//radius is a string such as '10px 25% 2vh 4px'
-			var radius = fillRadiusFromString($scope.radius, model.style.border.radius || '0px');
-
-			if (radius) {
-			    $scope.radiusAll = radius;
-			}
-
-		    });
 
 		    /*
 		     * splite 'radius' to its components
@@ -4149,6 +4179,10 @@ angular.module('am-wb-core')
 			//Items are 4 and equal
 			else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
 			    dimAll = dimsArray[0];
+			    dim.topLeft = dimAll;
+			    dim.topRight = dimAll;
+			    dim.bottomRight = dimAll;
+			    dim.bottomLeft = dimAll;
 			}
 
 			//Items are 4 and different
@@ -4187,11 +4221,10 @@ angular.module('am-wb-core')
 			else if (!dimsArray.length) {
 			    dimAll = '0px';
 			}
-
 			return dimAll;
 		    }
-		},
-		templateUrl: 'views/settings/wb-border.html'
+
+		}
 	    });
 
 	    /**
@@ -4226,6 +4259,7 @@ angular.module('am-wb-core')
 		type: 'layout',
 		label: 'Layout',
 		icon: 'dashboard',
+		description: 'Manages layout of the current item.',
 		templateUrl: 'views/settings/wb-layout.html',
 		controllerAs: 'ctrl',
 		/*
@@ -4234,7 +4268,7 @@ angular.module('am-wb-core')
 		 * @ngInject
 		 */
 		controller: function ($scope) {
-		    $scope.direction = [{
+		    this.direction_ = [{
 			    title: 'column',
 			    icon: 'wb-horizontal-boxes',
 			    value: 'column'
@@ -4244,7 +4278,7 @@ angular.module('am-wb-core')
 			    value: 'row'
 			}];
 
-		    $scope.justify = {
+		    this.justify_ = {
 			'row': [{
 				title: 'Start',
 				icon: 'sort_start_horiz',
@@ -4289,7 +4323,7 @@ angular.module('am-wb-core')
 			    }]
 		    };
 
-		    $scope.align = {
+		    this.align_ = {
 			'column': [{
 				title: 'Stretch',
 				icon: 'format_align_justify',
@@ -4326,7 +4360,7 @@ angular.module('am-wb-core')
 			    }]
 		    };
 
-		    $scope.selfAlign = {
+		    this.selfAlign_ = {
 			'column': [{
 				title: 'Stretch',
 				icon: 'format_align_justify',
@@ -4361,6 +4395,60 @@ angular.module('am-wb-core')
 				icon: 'align_center_vertical',
 				value: 'center'
 			    }]
+		    };
+
+		    /*
+		     * Sample of layout object in wbModel
+		     * 
+		     wbModel: {
+		     style: {    
+		     layout: {
+		     align: "stretch",
+		     wrap: "true",
+		     align_self: "stretch",
+		     direction: "column",
+		     justify: "start",
+		     };
+		     }	
+		     }
+		     */
+
+
+		    /*
+		     * watch 'wbModel' and apply the changes in setting panel
+		     */
+
+		    var ctrl = this;
+		    $scope.$watch('wbModel', function (model) {
+			var layout = model.style.layout || {};
+			ctrl.direction = layout.direction;
+			ctrl.align = layout.align;
+			ctrl.wrap = layout.wrap;
+			ctrl.alignSelf = layout.align_self;
+			ctrl.justify = layout.justify;
+		    });
+
+		    /*
+		     * This part updates the wbModel whenever the layout properties are changed in view
+		     */
+		    this.directionChanged = function () {
+			$scope.wbModel.style.layout.direction = this.direction;
+		    };
+
+		    this.wrapChanged = function () {
+			$scope.wbModel.style.layout.wrap = this.wrap;
+		    };
+
+		    this.alignChanged = function () {
+			$scope.wbModel.style.layout.align = this.align;
+		    };
+
+		    this.justifyChanged = function () {
+			$scope.wbModel.style.layout.justify = this.justify;
+		    };
+
+		    this.alignSelfChanged = function () {
+			$scope.wbModel.style.layout.align_self = this.alignSelf;
 		    };
 		}
 	    });
@@ -4391,7 +4479,7 @@ angular.module('am-wb-core')
 			setAllMargin($scope.padding, val || '0px');//default value of padding
 			$scope.wbModel.style.padding = createDimeStr($scope.padding);
 		    }
-		    
+
 		    function setAllMargin(dim, val) {
 
 			if (dim) {
@@ -4400,7 +4488,7 @@ angular.module('am-wb-core')
 			    dim.bottom = val;
 			    dim.left = val;
 			}
-			
+
 
 		    }
 
@@ -4525,7 +4613,83 @@ angular.module('am-wb-core')
 		type: 'size',
 		label: 'Size',
 		icon: 'photo_size_select_large',
-		templateUrl: 'views/settings/wb-size.html'
+		templateUrl: 'views/settings/wb-size.html',
+		controllerAs: 'ctrl',
+
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+
+		    // Sample of size object in wbModel
+		    /*
+		     wbModel: {
+			style: {
+			    size: {
+				   height: "372px"
+				   maxHeight: "auto"
+				   maxWidth: "auto"
+				   minHeight: "auto"
+				   minWidth: "auto"
+				   width: "311px"
+			    };
+			}
+		     }
+		     */
+
+		    /*
+		     * watch 'wbModel' and apply the changes in setting panel
+		     */
+
+		    var ctrl = this;
+		    $scope.$watch('wbModel', function (model) {
+			ctrl.width = model.style.size.width;
+			ctrl.height = model.style.size.height;
+			ctrl.minWidth = model.style.size.minWidth;
+			ctrl.minHeight = model.style.size.minHeight;
+			ctrl.maxWidth = model.style.size.maxWidth;
+			ctrl.maxHeight = model.style.size.maxHeight;
+		    }, true);
+
+		    /*
+		     * This part updates the wbModel whenever the size properties are changed in view
+		     */
+		    this.widthChanged = function () {
+			$scope.wbModel.style.size.width = this.width;
+		    };
+
+		    this.heightChanged = function () {
+			if (this.height === '0px') {
+			    $scope.wbModel.style.size.height = '50px';
+			} else if (this.height === '0vh') {
+			   $scope.wbModel.style.size.height = '50vh'; 
+			} else if (this.height === '0in') {
+			   $scope.wbModel.style.size.height = '50in'; 
+			} else if (this.height === '0cm') {
+			   $scope.wbModel.style.size.height = '20cm'; 
+			} else if (this.height === '0%') {
+			   $scope.wbModel.style.size.height = '50%'; 
+			} else {
+			    $scope.wbModel.style.size.height = this.height;
+			}
+		    };
+
+		    this.minWidthChanged = function () {
+			$scope.wbModel.style.size.minWidth = this.minWidth;
+		    };
+
+		    this.minHeightChanged = function () {
+			$scope.wbModel.style.size.minHeight = this.minHeight;
+		    };
+
+		    this.maxWidthChanged = function () {
+			$scope.wbModel.style.size.maxWidth = this.maxWidth;
+		    };
+
+		    this.maxHeightChanged = function () {
+			$scope.wbModel.style.size.maxHeight = this.maxHeight;
+		    };
+		}
 	    });
 
 	    $settings.newPage({
@@ -6272,7 +6436,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-choose.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon === undefined || icon === null || icon === ''\" wb-icon-name={{icon}}> </wb-icon> <p ng-hide=\"title === undefined || title === null || title === ''\">{{title}}</p> <md-tabs flex=100 class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in xitems\"> <md-tab-label> <md-tooltip ng-show=item.title>{{item.title | translate}}</md-tooltip> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs> </md-list-item> "
+    "<md-list-item> <wb-icon ng-hide=\"icon === undefined || icon === null || icon === ''\" wb-icon-name={{icon}}> </wb-icon> <p ng-hide=\"title === undefined || title === null || title === ''\">{{::title}}</p> <md-tabs flex=100 class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in ::xitems\" md-on-select=selectionChanged()> <md-tab-label> <md-tooltip ng-if=::item.title> <span translate=\"\">{{::item.title}}</span> </md-tooltip> <wb-icon>{{::item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs> </md-list-item> "
   );
 
 
@@ -6340,7 +6504,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widgets-explorer.html',
-    "<div> <script src=../../scripts/directives/wb-widgets-explorer.js></script> <div layout=column>  <md-toolbar ng-show=!(showSearch||showSort||showState)> <div class=md-toolbar-tools> <h3 flex translate>Widgets</h3> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=\"wbWidgetExplorer._view_list=!wbWidgetExplorer._view_list\" class=md-icon-button aria-label=\"View mode\"> <wb-icon>{{wbWidgetExplorer._view_list ? 'view_module' : 'view_list'}}</wb-icon> </md-button> <md-button ng-click=\"wbWidgetExplorer._tree_mode=!wbWidgetExplorer._tree_mode\" class=md-icon-button aria-label=\"Tree mode\"> <wb-icon>{{wbWidgetExplorer._tree_mode? 'list' : 'list_tree'}}</wb-icon> </md-button> </div> </md-toolbar>  <md-toolbar class=md-hue-1 ng-show=showSearch> <div class=md-toolbar-tools> <md-button class=md-icon-button ng-click=\"showSearch = !showSearch\" aria-label=Back> <wb-icon>arrow_back</wb-icon> </md-button> <md-input-container md-theme=input flex> <label>&nbsp;</label> <input ng-model=query ng-keyup=\"runQuery(query, $event)\"> </md-input-container> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> </div> </md-toolbar> <md-expansion-panel-group ng-if=wbWidgetExplorer._tree_mode> <md-expansion-panel ng-repeat=\"group in groups\"> <md-expansion-panel-collapsed> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-header> <md-expansion-panel-content style=\"padding: 0px; margin: 0px\"> <wb-widgets-list ng-if=wbWidgetExplorer._view_list widgets=group.widgets> </wb-widgets-list> <wb-widgets-module ng-if=!wbWidgetExplorer._view_list widgets=group.widgets> </wb-widgets-module> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </md-expansion-panel-group> <wb-widgets-list ng-if=\"!wbWidgetExplorer._tree_mode &amp;&amp; wbWidgetExplorer._view_list\" widgets=widgets> </wb-widgets-list> <wb-widgets-module ng-if=\"!wbWidgetExplorer._tree_mode &amp;&amp; !wbWidgetExplorer._view_list\" widgets=widgets> </wb-widgets-module> </div> </div>"
+    "<div> <div layout=column>  <md-toolbar ng-show=!(showSearch||showSort||showState)> <div class=md-toolbar-tools> <h3 flex translate>Widgets</h3> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=\"wbWidgetExplorer._view_list=!wbWidgetExplorer._view_list\" class=md-icon-button aria-label=\"View mode\"> <wb-icon>{{wbWidgetExplorer._view_list ? 'view_module' : 'view_list'}}</wb-icon> </md-button> <md-button ng-click=\"wbWidgetExplorer._tree_mode=!wbWidgetExplorer._tree_mode\" class=md-icon-button aria-label=\"Tree mode\"> <wb-icon>{{wbWidgetExplorer._tree_mode? 'list' : 'list_tree'}}</wb-icon> </md-button> </div> </md-toolbar>  <md-toolbar class=md-hue-1 ng-show=showSearch> <div class=md-toolbar-tools> <md-button class=md-icon-button ng-click=\"showSearch = !showSearch\" aria-label=Back> <wb-icon>arrow_back</wb-icon> </md-button> <md-input-container md-theme=input flex> <label>&nbsp;</label> <input ng-model=query ng-keyup=\"runQuery(query, $event)\"> </md-input-container> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> </div> </md-toolbar> <md-expansion-panel-group ng-if=wbWidgetExplorer._tree_mode> <md-expansion-panel ng-repeat=\"group in groups\"> <md-expansion-panel-collapsed> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-header> <md-expansion-panel-content style=\"padding: 0px; margin: 0px\"> <wb-widgets-list ng-if=wbWidgetExplorer._view_list widgets=group.widgets> </wb-widgets-list> <wb-widgets-module ng-if=!wbWidgetExplorer._view_list widgets=group.widgets> </wb-widgets-module> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </md-expansion-panel-group> <wb-widgets-list ng-if=\"!wbWidgetExplorer._tree_mode &amp;&amp; wbWidgetExplorer._view_list\" widgets=widgets> </wb-widgets-list> <wb-widgets-module ng-if=\"!wbWidgetExplorer._tree_mode &amp;&amp; !wbWidgetExplorer._view_list\" widgets=widgets> </wb-widgets-module> </div> </div>"
   );
 
 
@@ -6379,7 +6543,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-border.html',
-    " <md-subheader class=md-hue-3> <span translate>Style</span> </md-subheader> <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=wbModel.style.border.style> <md-option ng-repeat=\"style in ::styles\" value={{::style.value}}> {{::style.title}} </md-option> </md-select> </md-input-container>  <md-subheader class=md-hue-3> <span translate>Width</span> </md-subheader> <wb-ui-setting-length title=All icon=border_all description=\"Set all sides width\" ng-model=widthAll extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=Top icon=border_top ng-model=width.top extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Right icon=border_right ng-model=width.right extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=width.bottom extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Left icon=border_left ng-model=width.left extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Color</span> </md-subheader> <wb-ui-setting-color title=\"{{'Color'| translate}}\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=wbModel.style.border.color> </wb-ui-setting-color>  <md-subheader class=md-hue-3> <span translate>Radius</span> </md-subheader> <wb-ui-setting-length title=All icon=full_rounded description=\"Set all sides radius\" ng-model=radiusAll extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=\"Top left\" icon=corner_top_left ng-model=radius.topLeft extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Top right\" icon=corner_top_right ng-model=radius.topRight extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom right\" icon=corner_bottom_right ng-model=radius.bottomRight extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom left\" icon=corner_bottom_left ng-model=radius.bottomLeft extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
+    " <md-subheader class=md-hue-3> <span translate>Style and Color</span> </md-subheader>  <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=ctrl.style ng-change=ctrl.styleChanged(ctrl.style)> <md-option ng-repeat=\"style in ::styles\" value={{::style.value}}> {{::style.title}} </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=\"{{'Color'| translate}}\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=ctrl.color ng-change=ctrl.colorChanged(ctrl.color)> </wb-ui-setting-color>  <md-subheader class=md-hue-3> <span translate>Width</span> </md-subheader> <wb-ui-setting-length title=All icon=border_all description=\"Set all sides width\" ng-model=ctrl.widthAll ng-change=ctrl.widthAllChanged(ctrl.widthAll) extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=Top icon=border_top ng-model=ctrl.width.top ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Right icon=border_right ng-model=ctrl.width.right ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=ctrl.width.bottom ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Left icon=border_left ng-model=ctrl.width.left ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Radius</span> </md-subheader> <wb-ui-setting-length title=All icon=full_rounded description=\"Set all sides radius\" ng-model=ctrl.radiusAll ng-change=ctrl.radiusAllChanged(ctrl.radiusAll) extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=\"Top left\" icon=corner_top_left ng-model=ctrl.radius.topLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Top right\" icon=corner_top_right ng-model=ctrl.radius.topRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom right\" icon=corner_bottom_right ng-model=ctrl.radius.bottomRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom left\" icon=corner_bottom_left ng-model=ctrl.radius.bottomLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
   );
 
 
@@ -6389,12 +6553,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-layout.html',
-    " <wb-ui-setting-choose ng-if=\"wbModel.type==='Group'\" title=Direction icon=wb-direction items=direction ng-model=wbModel.style.layout.direction> </wb-ui-setting-choose>  <md-switch ng-if=\"wbModel.type==='Group'\" ng-model=wbModel.style.layout.wrap aria-label=\"Layout wrap\"> <span ng-if=\"wbModel.style.layout.direction==='row'\" translate=\"\">Multi row</span> <span ng-if=\"wbModel.style.layout.direction!=='row'\" translate=\"\">Multi column</span> </md-switch>  <wb-ui-setting-choose ng-if=\"wbModel.type==='Group'\" title=\"{{(wbModel.style.layout.direction=='row')?'Vert.':'Horz.'}}\" items=align[wbModel.style.layout.direction] ng-model=wbModel.style.layout.align> </wb-ui-setting-choose>  <wb-ui-setting-choose ng-if=\"wbModel.type==='Group'\" title=\"{{(wbModel.style.layout.direction!='row')?'Vert.':'Horz.'}}\" items=justify[wbModel.style.layout.direction] ng-model=wbModel.style.layout.justify> </wb-ui-setting-choose>   <wb-ui-setting-choose title=\"{{(wbModel.style.layout.direction!='row')?'Self Vert.':'Self Horz.'}}\" items=\"selfAlign['row']\" ng-model=wbModel.style.layout.align_self> </wb-ui-setting-choose>"
+    " <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group'\" title=Direction icon=wb-direction items=ctrl.direction_ ng-model=ctrl.direction ng-change=ctrl.directionChanged()> </wb-ui-setting-choose>  <md-switch ng-if=\"wbModel.type === 'Group'\" ng-model=ctrl.wrap ng-change=ctrl.wrapChanged() aria-label=\"Layout wrap\"> <span ng-if=\"ctrl.direction === 'row'\" translate=\"\">Multi row</span> <span ng-if=\"ctrl.direction !== 'row'\" translate=\"\">Multi column</span> </md-switch>  <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group' && ctrl.direction==='row'\" title=Vert. items=\"ctrl.align_['row']\" ng-model=ctrl.align ng-change=ctrl.alignChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group' && ctrl.direction==='column'\" title=Horz. items=\"ctrl.align_['column']\" ng-model=ctrl.align ng-change=ctrl.alignChanged()> </wb-ui-setting-choose>  <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group' && ctrl.direction==='row'\" title=\"Vert.'\" items=\"ctrl.justify_['row']\" ng-model=ctrl.justify ng-change=ctrl.justifyChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group' && ctrl.direction==='column'\" title=Horz. items=\"ctrl.justify_['column']\" ng-model=ctrl.justify ng-change=ctrl.justifyChanged()> </wb-ui-setting-choose>   <wb-ui-setting-choose title=\"Self Vert.\" items=\"ctrl.selfAlign_['row']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose>"
   );
 
 
   $templateCache.put('views/settings/wb-margin-padding.html',
-    " <md-subheader class=md-hue-3> <span translate>Margin</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all margins\" ng-model=marginAll ng-change=ctrl.updateAllMargin(marginAll) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider>  <wb-ui-setting-length title=Top icon=border_top ng-model=margin.top ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=margin.right ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=margin.bottom ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=margin.left ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Padding</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all paddings\" ng-model=paddingAll ng-change=ctrl.updateAllPadding(paddingAll) extra-values=\"['inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider>  <wb-ui-setting-length title=Top icon=border_top ng-model=padding.top ng-change=updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=padding.right ng-change=updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=padding.bottom ng-change=updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=padding.left ng-change=updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>"
+    " <md-subheader class=md-hue-3> <span translate>Margin</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all margins\" ng-model=marginAll ng-change=ctrl.updateAllMargin(marginAll) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider>  <wb-ui-setting-length title=Top icon=border_top ng-model=margin.top ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=margin.right ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=margin.bottom ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=margin.left ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Padding</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all paddings\" ng-model=paddingAll ng-change=ctrl.updateAllPadding(paddingAll) extra-values=\"['inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider>  <wb-ui-setting-length title=Top icon=border_top ng-model=padding.top ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=padding.right ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=padding.bottom ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=padding.left ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>"
   );
 
 
@@ -6414,7 +6578,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-size.html',
-    " <md-subheader class=md-hue-3> <span translate>Size</span> </md-subheader> <wb-ui-setting-length title=Width description=\"Set the width\" ng-model=wbModel.style.size.width extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Height description=\"Set the height\" ng-model=wbModel.style.size.height extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-subheader class=md-hue-3> <span translate>Min Size</span> </md-subheader> <wb-ui-setting-length title=\"Min width\" description=\"Set the minimum width\" ng-model=wbModel.style.size.minWidth extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" description=\"Set the minimum height\" ng-model=wbModel.style.size.minHeight extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-subheader class=md-hue-3> <span translate>Max size</span> </md-subheader> <wb-ui-setting-length title=\"Max width\" description=\"Set the maximum width\" ng-model=wbModel.style.size.maxWidth extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" description=\"Set the maximum height\" ng-model=wbModel.style.size.maxHeight extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
+    " <md-subheader class=md-hue-3> <span translate>Size</span> </md-subheader> <wb-ui-setting-length title=Width description=\"Set the width\" ng-model=ctrl.width ng-change=ctrl.widthChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Height description=\"Set the height\" ng-model=ctrl.height ng-change=ctrl.heightChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-subheader class=md-hue-3> <span translate>Min Size</span> </md-subheader> <wb-ui-setting-length title=\"Min width\" description=\"Set the minimum width\" ng-model=ctrl.minWidth ng-change=ctrl.minWidthChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" description=\"Set the minimum height\" ng-model=ctrl.minHeight ng-change=ctrl.minHeightChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-subheader class=md-hue-3> <span translate>Max size</span> </md-subheader> <wb-ui-setting-length title=\"Max width\" description=\"Set the maximum width\" ng-model=ctrl.maxWidth ng-change=ctrl.maxWidthChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" description=\"Set the maximum height\" ng-model=ctrl.maxHeight ng-change=ctrl.maxHeightChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
   );
 
 
@@ -6473,7 +6637,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
     "\t    powerpaste_word_import: 'clean',\n" +
     "\t    powerpaste_html_import: 'clean',\n" +
     "        format: 'raw',\n" +
-    "\t}\" ng-model=wbModel.text class=\"wb-widget-fill tinymce wb-widget-text\"> </div>"
+    "\t}\" ng-model=wbModel.text class=\"wb-widget-fill tinymce wb-widget-text\" ng-click=$event.stopPropagation();> </div>"
   );
 
 
