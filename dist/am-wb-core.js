@@ -459,195 +459,208 @@ angular.module('am-wb-core')
 'use strict';
 
 angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-layout
- * @description Apply layout into an element
- * 
- * Group and page are the main goles of this directive. By adding the wbLayout,
- * widget are able to manages it layout automatically.
- * 
- * Note that, in smal screen devices, the colume layout apply as default.
- */
-.directive('wbLayout', function($mdMedia) {
+	/**
+	 * @ngdoc Directives
+	 * @name wb-layout
+	 * @description Apply layout into an element
+	 * 
+	 * Group and page are the main goles of this directive. By adding the wbLayout,
+	 * widget are able to manages it layout automatically.
+	 * 
+	 * Note that, in smal screen devices, the colume layout apply as default.
+	 */
+	.directive('wbLayout', function ($mdMedia) {
 
-    /**
-     * Adds layout config into the element
-     * 
-     * @param element
-     * @param layout
-     * @returns
-     */
-    function applyLayout(element, layout) {
-        var flexLayout = {};
+	    /**
+	     * Adds layout config into the element
+	     * 
+	     * @param element
+	     * @param layout
+	     * @returns
+	     */
+	    function applyLayout(element, layout) {
+		var flexLayout = {};
 
-        /*
-         * Group
-         * 
-         * check if is group apply flex flow
-         */
-        {
-            flexLayout.display = 'flex';
-            // row
-            if(layout.direction === 'row' && $mdMedia('gt-sm')){
-                flexLayout['flex-direction'] =  layout.direction_reverse? 'row-reverse' : 'row'; 
-                flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
-                flexLayout['overflow-y'] = 'visible';
-            } else {
-                flexLayout['flex-direction'] =  layout.direction_reverse? 'column-reverse' : 'column'; 
-                flexLayout['overflow-x'] = 'visible';
-                flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
-            }
-            
-            // wrap
-            if(layout.wrap){
-                flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
-                // wrap align
-                var alignContent;
-                switch(layout.wrap_align){
-                case 'start':
-                    alignContent = 'flex-start';
-                    break;
-                case 'end':
-                    alignContent = 'flex-end';
-                    break;
-                case 'center':
-                    alignContent = 'center';
-                    break;
-                case 'space-between':
-                    alignContent = 'space-between';
-                    break;
-                case 'space-around':
-                    alignContent = 'space-around';
-                    break;
-                case 'stretch':
-                    alignContent = 'stretch';
-                    break;
-                default:
-                    alignContent = 'stretch';
-                }
-                flexLayout['align-content']= alignContent;
-            } else {
-                flexLayout['flex-wrap'] = 'nowrap';
-            }
-            
+		/*
+		 * Group
+		 * 
+		 * check if is group apply flex flow
+		 */
+		{
 
-            // justify
-            var justify;
-            switch(layout.justify){
-            case 'start':
-                justify = 'flex-start';
-                break;
-            case 'end':
-                justify = 'flex-end';
-                break;
-            case 'center':
-                justify = 'center';
-                break;
-            case 'space-between':
-                justify = 'space-between';
-                break;
-            case 'space-around':
-                justify = 'space-around';
-                break;
-            case 'space-evenly':
-                justify = 'space-evenly';
-                break;
-            default:
-                justify = 'flex-start';
-            }
-            flexLayout['justify-content']= justify;
+		    flexLayout.display = 'flex';
+		    // row
+		    if (layout.direction === 'row' && $mdMedia('gt-sm')) {
+			flexLayout['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
+			flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
+			flexLayout['overflow-y'] = 'visible';
+		    } else {
+			flexLayout['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
+			flexLayout['overflow-x'] = 'visible';
+			flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+		    }
 
-            // align
-            var align;
-            switch(layout.align){
-            case 'start':
-                align = 'flex-start';
-                break;
-            case 'end':
-                align = 'flex-end';
-                break;
-            case 'center':
-                align = 'center';
-                break;
-            case 'baseline':
-                align = 'baseline';
-                break;
-            case 'stretch':
-                align = 'stretch';
-                break;
-            default:
-                align = 'stretch';
-            }
-            flexLayout['align-items']= align;
-        }
 
-        /*
-         * Widget
-         */
-        {
-            flexLayout.order = layout.order >= 0? layout.order : 0;
-            flexLayout['flex-grow'] = layout.grow >= 0? layout.grow : 0;
-            flexLayout['flex-shrink'] = layout.shrink >= 0? layout.shrink : 1;
-            // TODO: maso, 2018: compute based on size
-            flexLayout['flex-basis'] = 'auto';
-            
-            // align-self
-            // auto | flex-start | flex-end | center | baseline | stretch;
-            var alignSelf;
-            switch(layout.align_self){
-            case 'start':
-                alignSelf = 'flex-start';
-                break;
-            case 'end':
-                alignSelf = 'flex-end';
-                break;
-            case 'center':
-                alignSelf = 'center';
-                break;
-            case 'baseline':
-                alignSelf = 'baseline';
-                break;
-            case 'stretch':
-                alignSelf = 'stretch';
-                break;
-            default:
-                alignSelf = 'auto';
-            }
-            flexLayout['align-self']= alignSelf;
-        }
-        
-        // apply to element
-        element.css(flexLayout);
-    }
+		    // wrap
+		    if (layout.wrap) {
+			flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
+			// wrap align
+			var alignContent;
+			switch (layout.wrap_align) {
+			    case 'start':
+				alignContent = 'flex-start';
+				break;
+			    case 'end':
+				alignContent = 'flex-end';
+				break;
+			    case 'center':
+				alignContent = 'center';
+				break;
+			    case 'space-between':
+				alignContent = 'space-between';
+				break;
+			    case 'space-around':
+				alignContent = 'space-around';
+				break;
+			    case 'stretch':
+				alignContent = 'stretch';
+				break;
+			    default:
+				alignContent = 'stretch';
+			}
+			flexLayout['align-content'] = alignContent;
+		    } else {
+			flexLayout['flex-wrap'] = 'nowrap';
+		    }
 
-    /**
-     * Link view with attributes
-     * 
-     * 
-     * @param scope
-     * @param element
-     * @param attrs
-     * @returns
-     */
-    function postLink($scope, $element, $attrs) {
-        // Watch for layout
-        $scope.$watch($attrs.wbLayout+'.layout', function(layout) {
-            if(layout){
-                applyLayout($element, layout);
-            }
-        }, true);
-    }
 
-    /*
-     * Directive
-     */
-    return {
-        restrict : 'A',
-        link : postLink,
-        require:[]
-    };
-});
+		    // justify
+		    var justify;
+		    switch (layout.justify) {
+			case 'start':
+			    justify = 'flex-start';
+			    break;
+			case 'end':
+			    justify = 'flex-end';
+			    break;
+			case 'center':
+			    justify = 'center';
+			    break;
+			case 'space-between':
+			    justify = 'space-between';
+			    break;
+			case 'space-around':
+			    justify = 'space-around';
+			    break;
+			case 'space-evenly':
+			    justify = 'space-evenly';
+			    break;
+			default:
+			    justify = 'flex-start';
+		    }
+		    flexLayout['justify-content'] = justify;
+
+		    // align
+		    var align;
+		    switch (layout.align) {
+			case 'start':
+			    align = 'flex-start';
+			    break;
+			case 'end':
+			    align = 'flex-end';
+			    break;
+			case 'center':
+			    align = 'center';
+			    break;
+			case 'baseline':
+			    align = 'baseline';
+			    break;
+			case 'stretch':
+			    align = 'stretch';
+			    break;
+			default:
+			    align = 'stretch';
+		    }
+		    flexLayout['align-items'] = align;
+		}
+
+		/*
+		 * Widget
+		 */
+		{
+		    flexLayout.order = layout.order >= 0 ? layout.order : 0;
+		    flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
+		    flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
+		    // TODO: maso, 2018: compute based on size
+		    flexLayout['flex-basis'] = 'auto';
+
+		    // align-self
+		    // auto | flex-start | flex-end | center | baseline | stretch;
+		    var alignSelf;
+		    switch (layout.align_self) {
+			case 'start':
+			    alignSelf = 'flex-start';
+			    break;
+			case 'end':
+			    alignSelf = 'flex-end';
+			    break;
+			case 'center':
+			    alignSelf = 'center';
+			    break;
+			case 'baseline':
+			    alignSelf = 'baseline';
+			    break;
+			case 'stretch':
+			    alignSelf = 'stretch';
+			    break;
+			default:
+			    alignSelf = 'auto';
+		    }
+		    flexLayout['align-self'] = alignSelf;
+		}
+
+		// apply to element
+		element.css(flexLayout);
+	    }
+
+	    /**
+	     * Link view with attributes
+	     * 
+	     * 
+	     * @param scope
+	     * @param element
+	     * @param attrs
+	     * @returns
+	     */
+	    function postLink($scope, $element, $attrs) {
+		// Watch for layout
+		var layoutData = null;
+		$scope.$watch($attrs.wbLayout + '.layout', function (layout) {
+		    if (layout) {
+			layoutData = layout;
+			applyLayout($element, layoutData);
+		    }
+		}, true);
+		
+		//Watch for media size
+		$scope.$watch (function () {
+		    return ($mdMedia('gt-sm'));
+		}, function () {
+		    if (layoutData) {
+			applyLayout($element, layoutData);
+		    }
+		});
+	    }
+
+	    /*
+	     * Directive
+	     */
+	    return {
+		restrict: 'A',
+		link: postLink,
+		require: []
+	    };
+	});
 /* 
  * The MIT License (MIT)
  * 
@@ -895,7 +908,7 @@ angular.module('am-wb-core')
 	 * @name wb-size
 	 * @description Apply margin into the element
 	 */
-	.directive('wbSize', function ($q, $wbUtil, $rootElement, $document, $compile) {
+	.directive('wbSize', function ($q, $wbUtil, $rootElement, $document, $compile, $mdMedia) {
 
 	    function postLink($scope, $element, $attrs, $ctrls) {
 		var button;
@@ -905,6 +918,8 @@ angular.module('am-wb-core')
 		var lock = false;
 		var watchSelection = null;
 		var watchSize = null;
+		var watchMedia = null;
+		var localSize = null;
 
 		// main ctrl
 		var ctrl = $ctrls[0];
@@ -1022,17 +1037,38 @@ angular.module('am-wb-core')
 		    });
 		}
 
-
-		// Watch size
-		watchSize = $scope.$watch($attrs.wbSize + '.size', function (size) {
+		function reloadSize () {
+		    var size = localSize;
 		    if (isRoot() || !size || lock) {
 			return;
 		    }
-		    $element.css(size);
+		    //check screen size and do appropriate work related to mobile mode
+		    if (!$mdMedia('gt-sm')) {
+			$element.css({
+			    width: 'auto',
+			    height: 'auto',
+			    minWidth: 'auto',
+			    maxWidth: 'auto',
+			    minHeight: 'auto',
+			    maxHeight: 'auto'
+			});
+		    } else {
+			$element.css(size);
+		    }
 		    if (optionButton) {
 			bindToElement(getBound());
 		    }
+		}
+
+		// Watch size
+		watchSize = $scope.$watch($attrs.wbSize + '.size', function (size) {
+		    localSize = size;
+		    reloadSize();
 		}, true);
+		
+		watchMedia = $scope.$watch (function () {
+		   return ($mdMedia('gt-sm')); 
+		}, reloadSize);
 
 		ctrl.on('delete', distroy);
 		watchSelection = $scope.$watch(function () {
