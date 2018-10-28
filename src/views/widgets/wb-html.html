@@ -14,8 +14,8 @@
 	ui-tinymce="{
         selector : 'div.tinymce', 
         menubar: true,
-	    inline: true,
-	    theme: 'modern',
+        inline: true,
+        theme: 'modern',
         plugins : [
             'advlist',
             'autolink',
@@ -57,11 +57,11 @@
             'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',
             'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'
         ],
-	    powerpaste_word_import: 'clean',
-	    powerpaste_html_import: 'clean',
+        powerpaste_word_import: 'clean',
+        powerpaste_html_import: 'clean',
         format: 'raw',
-	}"
+    }"
 	ng-model="wbModel.text"
 	class="wb-widget-fill tinymce wb-widget-text"
-        ng-click="$event.stopPropagation();">
+    ng-keypress="$event.stopPropagation();">
 </div>
