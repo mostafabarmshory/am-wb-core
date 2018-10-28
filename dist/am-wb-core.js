@@ -6637,7 +6637,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
     "        powerpaste_word_import: 'clean',\n" +
     "        powerpaste_html_import: 'clean',\n" +
     "        format: 'raw',\n" +
-    "    }\" ng-model=wbModel.text class=\"wb-widget-fill tinymce wb-widget-text\" ng-keypress=$event.stopPropagation();> </div>"
+    "    }\" ng-model=wbModel.text class=\"wb-widget-fill tinymce wb-widget-text\" ng-keydown=$event.stopPropagation();> </div>"
   );
 
 
