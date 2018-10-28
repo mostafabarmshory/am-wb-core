@@ -6591,8 +6591,8 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
     " <div ng-if=!ctrl.isEditable() ng-bind-html=\"::wbModel.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
     "        selector : 'div.tinymce', \n" +
     "        menubar: true,\n" +
-    "\t    inline: true,\n" +
-    "\t    theme: 'modern',\n" +
+    "        inline: true,\n" +
+    "        theme: 'modern',\n" +
     "        plugins : [\n" +
     "            'advlist',\n" +
     "            'autolink',\n" +
@@ -6634,10 +6634,10 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
     "            'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',\n" +
     "            'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'\n" +
     "        ],\n" +
-    "\t    powerpaste_word_import: 'clean',\n" +
-    "\t    powerpaste_html_import: 'clean',\n" +
+    "        powerpaste_word_import: 'clean',\n" +
+    "        powerpaste_html_import: 'clean',\n" +
     "        format: 'raw',\n" +
-    "\t}\" ng-model=wbModel.text class=\"wb-widget-fill tinymce wb-widget-text\" ng-click=$event.stopPropagation();> </div>"
+    "    }\" ng-model=wbModel.text class=\"wb-widget-fill tinymce wb-widget-text\" ng-keydown=$event.stopPropagation();> </div>"
   );
 
 
