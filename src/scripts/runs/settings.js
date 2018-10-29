@@ -619,7 +619,10 @@ angular.module('am-wb-core')
              * @memberof marginPaddingCtrl
              */
             function updateAllMargin(val) {
-                setAllMargin($scope.margin, val || '0px');//default value of margin
+                if(!val){
+                    return;
+                }
+                setAllMargin($scope.margin, val);//default value of margin
                 $scope.wbModel.style.margin = createDimeStr($scope.margin);
             }
 
@@ -629,7 +632,10 @@ angular.module('am-wb-core')
              * @memberof marginPaddingCtrl
              */
             function updateAllPadding(val) {
-                setAllMargin($scope.padding, val || '0px');//default value of padding
+                if(!val){
+                    return;
+                }
+                setAllMargin($scope.padding, val);//default value of padding
                 $scope.wbModel.style.padding = createDimeStr($scope.padding);
             }
 
@@ -665,14 +671,9 @@ angular.module('am-wb-core')
                     return output;
                 }
             }
-
-            /*
-             * watch 'wbModel' and apply the changes in setting panel
-             */
-            $scope.$watch('wbModel', function (model) {
-
+            function setModel(model) {
                 //margin is a string such as '10px 25% 2vh 4px'
-                var margin = fillFromString($scope.margin, model.style.margin || '0px');
+                var margin = fillFromString($scope.margin, model.style.margin);
                 if (margin) {
                     $scope.marginAll = margin;
                     $scope.margin.top = margin;
@@ -681,7 +682,7 @@ angular.module('am-wb-core')
                     $scope.margin.left = margin;
                 }
 
-                var padding = fillFromString($scope.padding, model.style.padding || '0px');
+                var padding = fillFromString($scope.padding, model.style.padding);
                 if (padding) {
                     $scope.paddingAll = padding;
                     $scope.padding.top = padding;
@@ -689,8 +690,12 @@ angular.module('am-wb-core')
                     $scope.padding.bottom = padding;
                     $scope.padding.left = padding;
                 }
+            }
 
-            });
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
+            $scope.$watch('wbModel', setModel);
 
             /*
              * splite margin/padding to its components
@@ -700,7 +705,7 @@ angular.module('am-wb-core')
              */
 
             function fillFromString(dim, str) {
-
+                str = str || '';
                 var dimAll;
                 var dimsArray = str.split(' ');
 
@@ -751,10 +756,9 @@ angular.module('am-wb-core')
                 else if (!dimsArray.length) {
                     dimAll = '0px';
                 }
-
                 return dimAll;
-
             }
+            
             this.updateAllMargin = updateAllMargin;
             this.updateAllPadding = updateAllPadding;
             this.updateMargin = updateMargin;

@@ -3041,14 +3041,11 @@ angular.module('am-wb-core')
                 $scope.extraValues = $scope.extraValues || [];
                 var types = $scope.extraValues;
                 if (types) { 
-                    
                     types = types.concat($scope.lengthValues);
-
                     if (types.includes('length')) {
                         var index = types.indexOf('length');
                         types.splice(index, 1);
                     }
-                    
                 } else {
                     types = $scope.lengthValues;
                 }
@@ -3062,16 +3059,11 @@ angular.module('am-wb-core')
                     } else {
                         split(value);
                     }
-
-                    $scope.$watch(function () {
-                        if ($scope.extraValues.includes($scope.internalUnit)) {
-                            return $scope.internalUnit;
-                        }
-                        return $scope.internalValue + $scope.internalUnit;
-                    }, function (newValue) {
-                        ngModel.$setViewValue(newValue);
-                    });
                 }
+                
+                $scope.updateLength = function(unit, value) {
+                    ngModel.$setViewValue(value+unit);
+                };
 
                 /*
                  * @param {type} val
@@ -4497,7 +4489,10 @@ angular.module('am-wb-core')
              * @memberof marginPaddingCtrl
              */
             function updateAllMargin(val) {
-                setAllMargin($scope.margin, val || '0px');//default value of margin
+                if(!val){
+                    return;
+                }
+                setAllMargin($scope.margin, val);//default value of margin
                 $scope.wbModel.style.margin = createDimeStr($scope.margin);
             }
 
@@ -4507,7 +4502,10 @@ angular.module('am-wb-core')
              * @memberof marginPaddingCtrl
              */
             function updateAllPadding(val) {
-                setAllMargin($scope.padding, val || '0px');//default value of padding
+                if(!val){
+                    return;
+                }
+                setAllMargin($scope.padding, val);//default value of padding
                 $scope.wbModel.style.padding = createDimeStr($scope.padding);
             }
 
@@ -4543,14 +4541,9 @@ angular.module('am-wb-core')
                     return output;
                 }
             }
-
-            /*
-             * watch 'wbModel' and apply the changes in setting panel
-             */
-            $scope.$watch('wbModel', function (model) {
-
+            function setModel(model) {
                 //margin is a string such as '10px 25% 2vh 4px'
-                var margin = fillFromString($scope.margin, model.style.margin || '0px');
+                var margin = fillFromString($scope.margin, model.style.margin);
                 if (margin) {
                     $scope.marginAll = margin;
                     $scope.margin.top = margin;
@@ -4559,7 +4552,7 @@ angular.module('am-wb-core')
                     $scope.margin.left = margin;
                 }
 
-                var padding = fillFromString($scope.padding, model.style.padding || '0px');
+                var padding = fillFromString($scope.padding, model.style.padding);
                 if (padding) {
                     $scope.paddingAll = padding;
                     $scope.padding.top = padding;
@@ -4567,8 +4560,12 @@ angular.module('am-wb-core')
                     $scope.padding.bottom = padding;
                     $scope.padding.left = padding;
                 }
+            }
 
-            });
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
+            $scope.$watch('wbModel', setModel);
 
             /*
              * splite margin/padding to its components
@@ -4578,7 +4575,7 @@ angular.module('am-wb-core')
              */
 
             function fillFromString(dim, str) {
-
+                str = str || '';
                 var dimAll;
                 var dimsArray = str.split(' ');
 
@@ -4629,10 +4626,9 @@ angular.module('am-wb-core')
                 else if (!dimsArray.length) {
                     dimAll = '0px';
                 }
-
                 return dimAll;
-
             }
+            
             this.updateAllMargin = updateAllMargin;
             this.updateAllPadding = updateAllPadding;
             this.updateMargin = updateMargin;
@@ -6497,7 +6493,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-length.html',
-    "<div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <wb-icon ng-if=icon> {{icon}} </wb-icon> <span flex ng-if=title translate>{{::title}} <md-tooltip ng-if=description>{{::description}}</md-tooltip> </span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input type=number ng-model=internalValue> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select style=max-width:75px ng-model=internalUnit> <md-option ng-repeat=\"type in ::types track by $index\" value={{::type}}> {{::type}} </md-option> </md-select> </md-input-container> </div> <md-slider-container ng-disabled=!ctrl.isNumerical() style=\"margin:0px; padding:0px; height:30px\" aria-label=\"display length vlaue with slider\" id=wb-ui-setting-length-slider> <md-slider min=0 max=99 ng-model=internalValue> </md-slider> </md-slider-container> </div>"
+    "<div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <wb-icon ng-if=icon>{{icon}}</wb-icon> <span flex ng-if=title translate=\"\">{{::title}} <md-tooltip ng-if=description>{{::description}}</md-tooltip> </span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input type=number ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select style=max-width:75px ng-model=internalUnit ng-change=\"updateLength(internalUnit, internalValue)\"> <md-option ng-repeat=\"type in ::types track by $index\" value={{::type}}> {{::type}} </md-option> </md-select> </md-input-container> </div> <md-slider-container ng-disabled=!ctrl.isNumerical() style=\"margin:0px; padding:0px; height:30px\" aria-label=\"display length vlaue with slider\" id=wb-ui-setting-length-slider> <md-slider min=0 max=99 ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-slider> </md-slider-container> </div>"
   );
 
 
@@ -6589,7 +6585,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-margin-padding.html',
-    " <md-subheader class=md-hue-3> <span translate>Margin</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all margins\" ng-model=marginAll ng-change=ctrl.updateAllMargin(marginAll) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider>  <wb-ui-setting-length title=Top icon=border_top ng-model=margin.top ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=margin.right ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=margin.bottom ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=margin.left ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Padding</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all paddings\" ng-model=paddingAll ng-change=ctrl.updateAllPadding(paddingAll) extra-values=\"['inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider>  <wb-ui-setting-length title=Top icon=border_top ng-model=padding.top ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=padding.right ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=padding.bottom ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=padding.left ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>"
+    " <md-subheader class=md-hue-3> <span translate>Margin</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all margins\" ng-model=marginAll ng-change=ctrl.updateAllMargin(marginAll) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Top icon=border_top ng-model=margin.top ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=margin.right ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=margin.bottom ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=margin.left ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Padding</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all paddings\" ng-model=paddingAll ng-change=ctrl.updateAllPadding(paddingAll) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Top icon=border_top ng-model=padding.top ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=padding.right ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=padding.bottom ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=padding.left ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>"
   );
 
 
