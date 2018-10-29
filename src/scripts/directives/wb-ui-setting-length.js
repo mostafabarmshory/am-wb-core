@@ -41,14 +41,11 @@ angular.module('am-wb-core')
                 $scope.extraValues = $scope.extraValues || [];
                 var types = $scope.extraValues;
                 if (types) { 
-                    
                     types = types.concat($scope.lengthValues);
-
                     if (types.includes('length')) {
                         var index = types.indexOf('length');
                         types.splice(index, 1);
                     }
-                    
                 } else {
                     types = $scope.lengthValues;
                 }
@@ -62,16 +59,11 @@ angular.module('am-wb-core')
                     } else {
                         split(value);
                     }
-
-                    $scope.$watch(function () {
-                        if ($scope.extraValues.includes($scope.internalUnit)) {
-                            return $scope.internalUnit;
-                        }
-                        return $scope.internalValue + $scope.internalUnit;
-                    }, function (newValue) {
-                        ngModel.$setViewValue(newValue);
-                    });
                 }
+                
+                $scope.updateLength = function(unit, value) {
+                    ngModel.$setViewValue(value+unit);
+                };
 
                 /*
                  * @param {type} val

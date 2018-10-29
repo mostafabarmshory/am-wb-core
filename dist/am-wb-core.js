@@ -459,195 +459,208 @@ angular.module('am-wb-core')
 'use strict';
 
 angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-layout
- * @description Apply layout into an element
- * 
- * Group and page are the main goles of this directive. By adding the wbLayout,
- * widget are able to manages it layout automatically.
- * 
- * Note that, in smal screen devices, the colume layout apply as default.
- */
-.directive('wbLayout', function($mdMedia) {
+	/**
+	 * @ngdoc Directives
+	 * @name wb-layout
+	 * @description Apply layout into an element
+	 * 
+	 * Group and page are the main goles of this directive. By adding the wbLayout,
+	 * widget are able to manages it layout automatically.
+	 * 
+	 * Note that, in smal screen devices, the colume layout apply as default.
+	 */
+	.directive('wbLayout', function ($mdMedia) {
 
-    /**
-     * Adds layout config into the element
-     * 
-     * @param element
-     * @param layout
-     * @returns
-     */
-    function applyLayout(element, layout) {
-        var flexLayout = {};
+	    /**
+	     * Adds layout config into the element
+	     * 
+	     * @param element
+	     * @param layout
+	     * @returns
+	     */
+	    function applyLayout(element, layout) {
+		var flexLayout = {};
 
-        /*
-         * Group
-         * 
-         * check if is group apply flex flow
-         */
-        {
-            flexLayout.display = 'flex';
-            // row
-            if(layout.direction === 'row' && $mdMedia('gt-sm')){
-                flexLayout['flex-direction'] =  layout.direction_reverse? 'row-reverse' : 'row'; 
-                flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
-                flexLayout['overflow-y'] = 'visible';
-            } else {
-                flexLayout['flex-direction'] =  layout.direction_reverse? 'column-reverse' : 'column'; 
-                flexLayout['overflow-x'] = 'visible';
-                flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
-            }
-            
-            // wrap
-            if(layout.wrap){
-                flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
-                // wrap align
-                var alignContent;
-                switch(layout.wrap_align){
-                case 'start':
-                    alignContent = 'flex-start';
-                    break;
-                case 'end':
-                    alignContent = 'flex-end';
-                    break;
-                case 'center':
-                    alignContent = 'center';
-                    break;
-                case 'space-between':
-                    alignContent = 'space-between';
-                    break;
-                case 'space-around':
-                    alignContent = 'space-around';
-                    break;
-                case 'stretch':
-                    alignContent = 'stretch';
-                    break;
-                default:
-                    alignContent = 'stretch';
-                }
-                flexLayout['align-content']= alignContent;
-            } else {
-                flexLayout['flex-wrap'] = 'nowrap';
-            }
-            
+		/*
+		 * Group
+		 * 
+		 * check if is group apply flex flow
+		 */
+		{
 
-            // justify
-            var justify;
-            switch(layout.justify){
-            case 'start':
-                justify = 'flex-start';
-                break;
-            case 'end':
-                justify = 'flex-end';
-                break;
-            case 'center':
-                justify = 'center';
-                break;
-            case 'space-between':
-                justify = 'space-between';
-                break;
-            case 'space-around':
-                justify = 'space-around';
-                break;
-            case 'space-evenly':
-                justify = 'space-evenly';
-                break;
-            default:
-                justify = 'flex-start';
-            }
-            flexLayout['justify-content']= justify;
+		    flexLayout.display = 'flex';
+		    // row
+		    if (layout.direction === 'row' && $mdMedia('gt-sm')) {
+			flexLayout['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
+			flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
+			flexLayout['overflow-y'] = 'visible';
+		    } else {
+			flexLayout['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
+			flexLayout['overflow-x'] = 'visible';
+			flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+		    }
 
-            // align
-            var align;
-            switch(layout.align){
-            case 'start':
-                align = 'flex-start';
-                break;
-            case 'end':
-                align = 'flex-end';
-                break;
-            case 'center':
-                align = 'center';
-                break;
-            case 'baseline':
-                align = 'baseline';
-                break;
-            case 'stretch':
-                align = 'stretch';
-                break;
-            default:
-                align = 'stretch';
-            }
-            flexLayout['align-items']= align;
-        }
 
-        /*
-         * Widget
-         */
-        {
-            flexLayout.order = layout.order >= 0? layout.order : 0;
-            flexLayout['flex-grow'] = layout.grow >= 0? layout.grow : 0;
-            flexLayout['flex-shrink'] = layout.shrink >= 0? layout.shrink : 1;
-            // TODO: maso, 2018: compute based on size
-            flexLayout['flex-basis'] = 'auto';
-            
-            // align-self
-            // auto | flex-start | flex-end | center | baseline | stretch;
-            var alignSelf;
-            switch(layout.align_self){
-            case 'start':
-                alignSelf = 'flex-start';
-                break;
-            case 'end':
-                alignSelf = 'flex-end';
-                break;
-            case 'center':
-                alignSelf = 'center';
-                break;
-            case 'baseline':
-                alignSelf = 'baseline';
-                break;
-            case 'stretch':
-                alignSelf = 'stretch';
-                break;
-            default:
-                alignSelf = 'auto';
-            }
-            flexLayout['align-self']= alignSelf;
-        }
-        
-        // apply to element
-        element.css(flexLayout);
-    }
+		    // wrap
+		    if (layout.wrap) {
+			flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
+			// wrap align
+			var alignContent;
+			switch (layout.wrap_align) {
+			    case 'start':
+				alignContent = 'flex-start';
+				break;
+			    case 'end':
+				alignContent = 'flex-end';
+				break;
+			    case 'center':
+				alignContent = 'center';
+				break;
+			    case 'space-between':
+				alignContent = 'space-between';
+				break;
+			    case 'space-around':
+				alignContent = 'space-around';
+				break;
+			    case 'stretch':
+				alignContent = 'stretch';
+				break;
+			    default:
+				alignContent = 'stretch';
+			}
+			flexLayout['align-content'] = alignContent;
+		    } else {
+			flexLayout['flex-wrap'] = 'nowrap';
+		    }
 
-    /**
-     * Link view with attributes
-     * 
-     * 
-     * @param scope
-     * @param element
-     * @param attrs
-     * @returns
-     */
-    function postLink($scope, $element, $attrs) {
-        // Watch for layout
-        $scope.$watch($attrs.wbLayout+'.layout', function(layout) {
-            if(layout){
-                applyLayout($element, layout);
-            }
-        }, true);
-    }
 
-    /*
-     * Directive
-     */
-    return {
-        restrict : 'A',
-        link : postLink,
-        require:[]
-    };
-});
+		    // justify
+		    var justify;
+		    switch (layout.justify) {
+			case 'start':
+			    justify = 'flex-start';
+			    break;
+			case 'end':
+			    justify = 'flex-end';
+			    break;
+			case 'center':
+			    justify = 'center';
+			    break;
+			case 'space-between':
+			    justify = 'space-between';
+			    break;
+			case 'space-around':
+			    justify = 'space-around';
+			    break;
+			case 'space-evenly':
+			    justify = 'space-evenly';
+			    break;
+			default:
+			    justify = 'flex-start';
+		    }
+		    flexLayout['justify-content'] = justify;
+
+		    // align
+		    var align;
+		    switch (layout.align) {
+			case 'start':
+			    align = 'flex-start';
+			    break;
+			case 'end':
+			    align = 'flex-end';
+			    break;
+			case 'center':
+			    align = 'center';
+			    break;
+			case 'baseline':
+			    align = 'baseline';
+			    break;
+			case 'stretch':
+			    align = 'stretch';
+			    break;
+			default:
+			    align = 'stretch';
+		    }
+		    flexLayout['align-items'] = align;
+		}
+
+		/*
+		 * Widget
+		 */
+		{
+		    flexLayout.order = layout.order >= 0 ? layout.order : 0;
+		    flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
+		    flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
+		    // TODO: maso, 2018: compute based on size
+		    flexLayout['flex-basis'] = 'auto';
+
+		    // align-self
+		    // auto | flex-start | flex-end | center | baseline | stretch;
+		    var alignSelf;
+		    switch (layout.align_self) {
+			case 'start':
+			    alignSelf = 'flex-start';
+			    break;
+			case 'end':
+			    alignSelf = 'flex-end';
+			    break;
+			case 'center':
+			    alignSelf = 'center';
+			    break;
+			case 'baseline':
+			    alignSelf = 'baseline';
+			    break;
+			case 'stretch':
+			    alignSelf = 'stretch';
+			    break;
+			default:
+			    alignSelf = 'auto';
+		    }
+		    flexLayout['align-self'] = alignSelf;
+		}
+
+		// apply to element
+		element.css(flexLayout);
+	    }
+
+	    /**
+	     * Link view with attributes
+	     * 
+	     * 
+	     * @param scope
+	     * @param element
+	     * @param attrs
+	     * @returns
+	     */
+	    function postLink($scope, $element, $attrs) {
+		// Watch for layout
+		var layoutData = null;
+		$scope.$watch($attrs.wbLayout + '.layout', function (layout) {
+		    if (layout) {
+			layoutData = layout;
+			applyLayout($element, layoutData);
+		    }
+		}, true);
+		
+		//Watch for media size
+		$scope.$watch (function () {
+		    return ($mdMedia('gt-sm'));
+		}, function () {
+		    if (layoutData) {
+			applyLayout($element, layoutData);
+		    }
+		});
+	    }
+
+	    /*
+	     * Directive
+	     */
+	    return {
+		restrict: 'A',
+		link: postLink,
+		require: []
+	    };
+	});
 /* 
  * The MIT License (MIT)
  * 
@@ -895,7 +908,7 @@ angular.module('am-wb-core')
 	 * @name wb-size
 	 * @description Apply margin into the element
 	 */
-	.directive('wbSize', function ($q, $wbUtil, $rootElement, $document, $compile) {
+	.directive('wbSize', function ($q, $wbUtil, $rootElement, $document, $compile, $mdMedia) {
 
 	    function postLink($scope, $element, $attrs, $ctrls) {
 		var button;
@@ -905,6 +918,8 @@ angular.module('am-wb-core')
 		var lock = false;
 		var watchSelection = null;
 		var watchSize = null;
+		var watchMedia = null;
+		var localSize = null;
 
 		// main ctrl
 		var ctrl = $ctrls[0];
@@ -1022,17 +1037,38 @@ angular.module('am-wb-core')
 		    });
 		}
 
-
-		// Watch size
-		watchSize = $scope.$watch($attrs.wbSize + '.size', function (size) {
+		function reloadSize () {
+		    var size = localSize;
 		    if (isRoot() || !size || lock) {
 			return;
 		    }
-		    $element.css(size);
+		    //check screen size and do appropriate work related to mobile mode
+		    if (!$mdMedia('gt-sm')) {
+			$element.css({
+			    width: 'auto',
+			    height: 'auto',
+			    minWidth: 'auto',
+			    maxWidth: 'auto',
+			    minHeight: 'auto',
+			    maxHeight: 'auto'
+			});
+		    } else {
+			$element.css(size);
+		    }
 		    if (optionButton) {
 			bindToElement(getBound());
 		    }
+		}
+
+		// Watch size
+		watchSize = $scope.$watch($attrs.wbSize + '.size', function (size) {
+		    localSize = size;
+		    reloadSize();
 		}, true);
+		
+		watchMedia = $scope.$watch (function () {
+		   return ($mdMedia('gt-sm')); 
+		}, reloadSize);
 
 		ctrl.on('delete', distroy);
 		watchSelection = $scope.$watch(function () {
@@ -3005,14 +3041,11 @@ angular.module('am-wb-core')
                 $scope.extraValues = $scope.extraValues || [];
                 var types = $scope.extraValues;
                 if (types) { 
-                    
                     types = types.concat($scope.lengthValues);
-
                     if (types.includes('length')) {
                         var index = types.indexOf('length');
                         types.splice(index, 1);
                     }
-                    
                 } else {
                     types = $scope.lengthValues;
                 }
@@ -3026,16 +3059,11 @@ angular.module('am-wb-core')
                     } else {
                         split(value);
                     }
-
-                    $scope.$watch(function () {
-                        if ($scope.extraValues.includes($scope.internalUnit)) {
-                            return $scope.internalUnit;
-                        }
-                        return $scope.internalValue + $scope.internalUnit;
-                    }, function (newValue) {
-                        ngModel.$setViewValue(newValue);
-                    });
                 }
+                
+                $scope.updateLength = function(unit, value) {
+                    ngModel.$setViewValue(value+unit);
+                };
 
                 /*
                  * @param {type} val
@@ -3867,762 +3895,761 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-	/**
-	 * Load widgets
-	 */
-	.run(function ($settings) {
-
-
-	    $settings.newPage({
-		type: 'general',
-		label: 'General',
-		icon: 'opacity',
-		templateUrl: 'views/settings/wb-color-cursor-opacity.html',
-
-		/*
-		 * @ngInject
-		 */
-		controller: function ($scope) {
-		    $scope.cursors = [{
-			    title: 'Alias',
-			    value: 'alias'
-			}, {
-			    title: 'All scroll',
-			    value: 'all-scroll'
-			}, {
-			    title: 'Auto',
-			    value: 'auto'
-			}, {
-			    title: 'Cell',
-			    value: 'cell'
-			}, {
-			    title: 'Context menu',
-			    value: 'context-menu'
-			}, {
-			    title: 'Col resize',
-			    value: 'col-resize'
-			}, {
-			    title: 'Copy',
-			    value: 'copy'
-			}, {
-			    title: 'Default',
-			    value: 'default'
-			}, {
-			    title: 'Grab',
-			    value: 'grab'
-			}, {
-			    title: 'Pointer',
-			    value: 'pointer'
-			}, {
-			    title: 'Move',
-			    value: 'move'
-			}];
-		}
-	    });
-
-	    $settings.newPage({
-		type: 'background',
-		label: 'Background',
-		icon: 'image',
-		description: '',
-		templateUrl: 'views/settings/wb-background.html'
-	    });
-
-	    $settings.newPage({
-		type: 'SEO',
-		label: 'SEO',
-		templateUrl: 'views/settings/wb-seo.html'
-	    });
-
-	    $settings.newPage({
-		type: 'border',
-		label: 'Border',
-		icon: 'border_all',
-		templateUrl: 'views/settings/wb-border.html',
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function ($scope) {
-		    var scope = $scope;
-		    scope.styles = [{
-			    title: 'None',
-			    value: 'none'
-			}, {
-			    title: 'Solid',
-			    value: 'solid'
-			}, {
-			    title: 'Dotted',
-			    value: 'dotted'
-			}, {
-			    title: 'Dashed',
-			    value: 'dashed'
-			}, {
-			    title: 'Double',
-			    value: 'double'
-			}, {
-			    title: 'Groove',
-			    value: 'groove'
-			}, {
-			    title: 'Ridge',
-			    value: 'ridge'
-			}, {
-			    title: 'Inset',
-			    value: 'inset'
-			}, {
-			    title: 'Outset',
-			    value: 'outset'
-			}];
-
-		    /*
-		     * watch 'wbModel' and apply the changes into setting panel
-		     */
-		    var ctrl = this;
-		    $scope.$watch('wbModel', function (model) {
-			/*
-			 * Set style
-			 */
-			var border = model.style.border || {};
-			ctrl.style = border.style;
-
-			/*
-			 * Set color
-			 */
-			ctrl.color = border.color;
-
-			/*
-			 * Set width
-			 * width is a string such as '10px 25% 2vh 4px'
-			 */
-			ctrl.width = {};
-			var width = fillWidthFromString(ctrl.width, border.width || 'medium');
-			if (width) {
-			    ctrl.widthAll = width;
-			    ctrl.width.top = width;
-			    ctrl.width.right = width;
-			    ctrl.width.bottom = width;
-			    ctrl.width.left = width;
-			}
-
-			/*
-			 * Set radius
-			 * radius is a string such as '10px 25% 2vh 4px'
-			 */
-			ctrl.radius = {};
-			var radius = fillRadiusFromString(ctrl.radius, border.radius || '0px');
-			if (radius) {
-			    ctrl.radiusAll = radius;
-			    ctrl.radius.topLeft = radius;
-			    ctrl.radius.topRight = radius;
-			    ctrl.radius.bottomLeft = radius;
-			    ctrl.radius.bottomRight = radius;
-			}
-		    });
-
-		    /*
-		     * border style
-		     */
-		    this.styleChanged = function (newStyle) {
-			$scope.wbModel.style.border.style = newStyle;
-		    };
-
-		    /*
-		     * border color
-		     */
-		    this.colorChanged = function (newColor) {
-			$scope.wbModel.style.border.color = newColor;
-		    };
-
-		    /*
-		     * Settings about border width
-		     */
-		    this.widthAllChanged = function (val) {
-			setAllWidth(this.width, val || 'medium');//medium is default value of width
-			$scope.wbModel.style.border.width = createDimWidthStr(this.width);
-		    };
-
-		    this.widthChanged = function () {
-			$scope.wbModel.style.border.width = createDimWidthStr(this.width);
-		    };
-
-		    function setAllWidth(dim, val) {
-			if (dim) {
-			    dim.top = val;
-			    dim.right = val;
-			    dim.bottom = val;
-			    dim.left = val;
-			}
-		    }
-
-		    function createDimWidthStr(dim) {
-			if (dim) {
-			    var output =
-				    dim.top + ' ' +
-				    dim.right + ' ' +
-				    dim.bottom + ' ' +
-				    dim.left;
-			    return output;
-			}
-		    }
-
-		    /*
-		     * splite 'width' to its components
-		     * check different state Based on CSS rules. see for example:
-		     * https://www.w3schools.com/CSSref/pr_border-width.asp
-		     */
-		    function fillWidthFromString(dim, str) {
-			var dimAll;
-			var dimsArray = str.split(' ');
-
-			// 'medium' is selected
-			if (dimsArray.length === 1) {
-			    dimAll = str;
-			    return dimAll;
-			}
-
-			//Items are 4 and equal
-			else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
-			    dimAll = dimsArray[0];
-			    dim.top = dimAll;
-			    dim.right = dimAll;
-			    dim.bottom = dimAll;
-			    dim.left = dimAll;
-			}
-
-			//Items are 4 and different
-			else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
-			    dim.top = dimsArray[0];
-			    dim.right = dimsArray[1];
-			    dim.bottom = dimsArray[2];
-			    dim.left = dimsArray[3];
-			}
-
-			//Items are 3
-			else if (dimsArray.length === 3) {
-			    dim.top = dimsArray[0];
-			    dim.right = dimsArray[1];
-			    dim.left = dimsArray[1];
-			    dim.bottom = dimsArray[2];
-			}
-
-			//Items are 2
-			else if (dimsArray.length === 2) {
-			    dim.top = dimsArray[0];
-			    dim.bottom = dimsArray[0];
-			    dim.right = dimsArray[1];
-			    dim.left = dimsArray[1];
-			}
-
-			//Items are 1
-			else if (dimsArray.length === 1) {
-			    dim.top = dimsArray[0];
-			    dim.right = dimsArray[0];
-			    dim.bottom = dimsArray[0];
-			    dim.left = dimsArray[0];
-			}
-
-			//All items are undefined. In this case default value is 'medium'.
-			else if (!dimsArray.length) {
-			    dimAll = 'medium';
-			}
-			return dimAll;
-		    }
-
-		    /*
-		     * Settings about border radius
-		     */
-		    this.radiusAllChanged = function (val) {
-			setAllRadius(this.radius, val || '0px');//0px is default value of radius
-			$scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
-		    };
-
-		    this.radiusChanged = function () {
-			$scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
-		    };
-
-		    function setAllRadius(dim, val) {
-			if (dim) {
-			    dim.topLeft = val;
-			    dim.topRight = val;
-			    dim.bottomRight = val;
-			    dim.bottomLeft = val;
-			}
-		    }
-
-		    function createDimeRadiusStr(dim) {
-			if (dim) {
-			    var output =
-				    dim.topLeft + ' ' +
-				    dim.topRight + ' ' +
-				    dim.bottomRight + ' ' +
-				    dim.bottomLeft;
-			    return output;
-			}
-		    }
-
-		    /*
-		     * splite 'radius' to its components
-		     * check different state Based on CSS rules. see for example:
-		     * https://www.w3schools.com/CSSref/css3_pr_border-radius.asp
-		     */
-		    function fillRadiusFromString(dim, str) {
-
-			var dimAll;
-			var dimsArray = str.split(' ');
-
-			// 0px is selected
-			if (dimsArray.length === 1) {
-			    dimAll = str;
-			    return dimAll;
-			}
-
-			//Items are 4 and equal
-			else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
-			    dimAll = dimsArray[0];
-			    dim.topLeft = dimAll;
-			    dim.topRight = dimAll;
-			    dim.bottomRight = dimAll;
-			    dim.bottomLeft = dimAll;
-			}
-
-			//Items are 4 and different
-			else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
-			    dim.topLeft = dimsArray[0];
-			    dim.topRight = dimsArray[1];
-			    dim.bottomRight = dimsArray[2];
-			    dim.bottomLeft = dimsArray[3];
-			}
-
-			//Items are 3
-			else if (dimsArray.length === 3) {
-			    dim.topLeft = dimsArray[0];
-			    dim.topRight = dimsArray[1];
-			    dim.bottomLeft = dimsArray[1];
-			    dim.bottomRight = dimsArray[2];
-			}
-
-			//Items are 2
-			else if (dimsArray.length === 2) {
-			    dim.topLeft = dimsArray[0];
-			    dim.bottomRight = dimsArray[0];
-			    dim.topRight = dimsArray[1];
-			    dim.bottomLeft = dimsArray[1];
-			}
-
-			//Items are 1
-			else if (dimsArray.length === 1) {
-			    dim.topLeft = dimsArray[0];
-			    dim.topRight = dimsArray[0];
-			    dim.bottomRight = dimsArray[0];
-			    dim.bottomLeft = dimsArray[0];
-			}
-
-			//All items are undefined. In this case default value is 'medium'.
-			else if (!dimsArray.length) {
-			    dimAll = '0px';
-			}
-			return dimAll;
-		    }
-
-		}
-	    });
-
-	    /**
-	     * @ngdoc Widget Settings
-	     * @name layout
-	     * @description Manages element layout
-	     * 
-	     * Layout is consists of the following attributes for a group:
-	     * 
-	     * <ul>
-	     *     <li>direction</li>
-	     *     <li>direction-inverse</li>
-	     *     <li>wrap</li>
-	     *     <li>wrap-inverse</li>
-	     *     <li>align</li>
-	     *     <li>justify</li>
-	     * </ul>
-	     * 
-	     * and following ones for a widget (or group):
-	     * 
-	     * <ul>
-	     *     <li>grow</li>
-	     *     <li>shrink</li>
-	     *     <li>order</li>
-	     * </ul>
-	     * 
-	     * See the layout documents for more details.
-	     * 
-	     * @see wb-layout
-	     */
-	    $settings.newPage({
-		type: 'layout',
-		label: 'Layout',
-		icon: 'dashboard',
-		description: 'Manages layout of the current item.',
-		templateUrl: 'views/settings/wb-layout.html',
-		controllerAs: 'ctrl',
-		/*
-		 * Manages setting page 
-		 * 
-		 * @ngInject
-		 */
-		controller: function ($scope) {
-		    this.direction_ = [{
-			    title: 'column',
-			    icon: 'wb-horizontal-boxes',
-			    value: 'column'
-			}, {
-			    title: 'row',
-			    icon: 'wb-vertical-boxes',
-			    value: 'row'
-			}];
-
-		    this.justify_ = {
-			'row': [{
-				title: 'Start',
-				icon: 'sort_start_horiz',
-				value: 'start'
-			    }, {
-				title: 'End',
-				icon: 'sort_end_horiz',
-				value: 'end'
-			    }, {
-				title: 'Center',
-				icon: 'sort_center_horiz',
-				value: 'center'
-			    }, {
-				title: 'Space Around',
-				icon: 'sort_space_around_horiz',
-				value: 'space-around'
-			    }, {
-				title: 'Space Between',
-				icon: 'sort_space_between_horiz',
-				value: 'space-between'
-			    }],
-			'column': [{
-				title: 'Start',
-				icon: 'sort_start_vert',
-				value: 'start'
-			    }, {
-				title: 'End',
-				icon: 'sort_end_vert',
-				value: 'end'
-			    }, {
-				title: 'Center',
-				icon: 'sort_center_vert',
-				value: 'center'
-			    }, {
-				title: 'Space Around',
-				icon: 'sort_space_around_vert',
-				value: 'space-around'
-			    }, {
-				title: 'Space Between',
-				icon: 'sort_space_between_vert',
-				value: 'space-between'
-			    }]
-		    };
-
-		    this.align_ = {
-			'column': [{
-				title: 'Stretch',
-				icon: 'format_align_justify',
-				value: 'stretch'
-			    }, {
-				title: 'Start',
-				icon: 'format_align_left',
-				value: 'start'
-			    }, {
-				title: 'End',
-				icon: 'format_align_right',
-				value: 'end'
-			    }, {
-				title: 'Center',
-				icon: 'format_align_center',
-				value: 'center'
-			    }],
-			'row': [{
-				title: 'Stretch',
-				icon: 'align_justify_vertical',
-				value: 'stretch'
-			    }, {
-				title: 'Start',
-				icon: 'align_start_vertical',
-				value: 'start'
-			    }, {
-				title: 'End',
-				icon: 'align_end_vertical',
-				value: 'end'
-			    }, {
-				title: 'Center',
-				icon: 'align_center_vertical',
-				value: 'center'
-			    }]
-		    };
-
-		    this.selfAlign_ = {
-			'column': [{
-				title: 'Stretch',
-				icon: 'format_align_justify',
-				value: 'stretch'
-			    }, {
-				title: 'Start',
-				icon: 'format_align_left',
-				value: 'start'
-			    }, {
-				title: 'End',
-				icon: 'format_align_right',
-				value: 'end'
-			    }, {
-				title: 'Center',
-				icon: 'format_align_center',
-				value: 'center'
-			    }],
-			'row': [{
-				title: 'Stretch',
-				icon: 'align_justify_vertical',
-				value: 'stretch'
-			    }, {
-				title: 'Start',
-				icon: 'align_start_vertical',
-				value: 'start'
-			    }, {
-				title: 'End',
-				icon: 'align_end_vertical',
-				value: 'end'
-			    }, {
-				title: 'Center',
-				icon: 'align_center_vertical',
-				value: 'center'
-			    }]
-		    };
-
-		    /*
-		     * Sample of layout object in wbModel
-		     * 
-		     wbModel: {
-		     style: {    
-		     layout: {
-		     align: "stretch",
-		     wrap: "true",
-		     align_self: "stretch",
-		     direction: "column",
-		     justify: "start",
-		     };
-		     }	
-		     }
-		     */
-
-
-		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-
-		    var ctrl = this;
-		    $scope.$watch('wbModel', function (model) {
-			var layout = model.style.layout || {};
-			ctrl.direction = layout.direction;
-			ctrl.align = layout.align;
-			ctrl.wrap = layout.wrap;
-			ctrl.alignSelf = layout.align_self;
-			ctrl.justify = layout.justify;
-		    });
-
-		    /*
-		     * This part updates the wbModel whenever the layout properties are changed in view
-		     */
-		    this.directionChanged = function () {
-			$scope.wbModel.style.layout.direction = this.direction;
-		    };
-
-		    this.wrapChanged = function () {
-			$scope.wbModel.style.layout.wrap = this.wrap;
-		    };
-
-		    this.alignChanged = function () {
-			$scope.wbModel.style.layout.align = this.align;
-		    };
-
-		    this.justifyChanged = function () {
-			$scope.wbModel.style.layout.justify = this.justify;
-		    };
-
-		    this.alignSelfChanged = function () {
-			$scope.wbModel.style.layout.align_self = this.alignSelf;
-		    };
-		}
-	    });
-	    //TODO: Masood, 2018: Move this controller to a separated controller.
-	    $settings.newPage({
-		type: 'marginPadding',
-		label: 'Margin/Padding',
-		icon: 'border_clear',
-		templateUrl: 'views/settings/wb-margin-padding.html',
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function ($scope) {
-		    $scope.margin = {};
-		    $scope.padding = {};
-
-		    /*
-		     * All settings about margin and padding
-		     */
-
-		    function updateAllMargin(val) {
-			setAllMargin($scope.margin, val || '0px');//default value of margin
-			$scope.wbModel.style.margin = createDimeStr($scope.margin);
-		    }
-
-		    function updateAllPadding(val) {
-			setAllMargin($scope.padding, val || '0px');//default value of padding
-			$scope.wbModel.style.padding = createDimeStr($scope.padding);
-		    }
-
-		    function setAllMargin(dim, val) {
-
-			if (dim) {
-			    dim.top = val;
-			    dim.right = val;
-			    dim.bottom = val;
-			    dim.left = val;
-			}
-
-
-		    }
-
-		    function updateMargin(newMargin) {
-			$scope.wbModel.style.margin = createDimeStr(newMargin);
-		    }
-
-		    function updatePadding(newPadding) {
-			$scope.wbModel.style.padding = createDimeStr(newPadding);
-		    }
-
-		    function createDimeStr(dim) {
-
-			if (dim) {
-			    var output =
-				    dim.top + ' ' +
-				    dim.right + ' ' +
-				    dim.bottom + ' ' +
-				    dim.left;
-			    return output;
-			}
-
-		    }
-
-		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-		    $scope.$watch('wbModel', function (model) {
-
-			//margin is a string such as '10px 25% 2vh 4px'
-			var margin = fillFromString($scope.margin, model.style.margin || '0px');
-			if (margin) {
-			    $scope.marginAll = margin;
-			    $scope.margin.top = margin;
-			    $scope.margin.right = margin;
-			    $scope.margin.bottom = margin;
-			    $scope.margin.left = margin;
-			}
-
-			var padding = fillFromString($scope.padding, model.style.padding || '0px');
-			if (padding) {
-			    $scope.paddingAll = padding;
-			    $scope.padding.top = padding;
-			    $scope.padding.right = padding;
-			    $scope.padding.bottom = padding;
-			    $scope.padding.left = padding;
-			}
-
-		    });
-
-		    /*
-		     * splite margin/padding to its components
-		     * check different state Based on CSS rules. see for example:
-		     * https://www.w3schools.com/cssref/pr_margin.asp
-		     * https://www.w3schools.com/cssref/pr_padding.asp
-		     */
-
-		    function fillFromString(dim, str) {
-
-			var dimAll;
-			var dimsArray = str.split(' ');
-
-			// 0px is selected
-			if (dimsArray.length === 1) {
-			    dimAll = str;
-			    return dimAll;
-			}
-
-			//All 4 items is equal
-			else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
-			    dimAll = dimsArray[0];
-			}
-
-			//Items are 4 and different
-			else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
-			    dim.top = dimsArray[0];
-			    dim.right = dimsArray[1];
-			    dim.bottom = dimsArray[2];
-			    dim.left = dimsArray[3];
-			}
-
-			//Items are 3
-			else if (dimsArray.length === 3) {
-			    dim.top = dimsArray[0];
-			    dim.right = dimsArray[1];
-			    dim.left = dimsArray[1];
-			    dim.bottom = dimsArray[2];
-			}
-
-			//Items are 2
-			else if (dimsArray.length === 2) {
-			    dim.top = dimsArray[0];
-			    dim.bottom = dimsArray[0];
-			    dim.right = dimsArray[1];
-			    dim.left = dimsArray[1];
-			}
-
-			//Items are 1
-			else if (dimsArray.length === 1) {
-			    dim.top = dimsArray[0];
-			    dim.right = dimsArray[0];
-			    dim.bottom = dimsArray[0];
-			    dim.left = dimsArray[0];
-			}
-
-			//All items are undefined. In this case default value is 0px.
-			else if (!dimsArray.length) {
-			    dimAll = '0px';
-			}
-
-			return dimAll;
-
-		    }
-		    this.updateAllMargin = updateAllMargin;
-		    this.updateAllPadding = updateAllPadding;
-		    this.updateMargin = updateMargin;
-		    this.updatePadding = updatePadding;
-		}
-	    });
-
-	    $settings.newPage({
-		type: 'size',
-		label: 'Size',
-		icon: 'photo_size_select_large',
-		templateUrl: 'views/settings/wb-size.html',
-		controllerAs: 'ctrl',
-
-		/*
-		 * @ngInject
-		 */
-		controller: function ($scope) {
-
-		    // Sample of size object in wbModel
-		    /*
+/**
+ * Load widgets
+ */
+.run(function ($settings) {
+
+
+    $settings.newPage({
+        type: 'general',
+        label: 'General',
+        icon: 'opacity',
+        templateUrl: 'views/settings/wb-color-cursor-opacity.html',
+
+        /*
+         * @ngInject
+         */
+        controller: function ($scope) {
+            $scope.cursors = [{
+                title: 'Alias',
+                value: 'alias'
+            }, {
+                title: 'All scroll',
+                value: 'all-scroll'
+            }, {
+                title: 'Auto',
+                value: 'auto'
+            }, {
+                title: 'Cell',
+                value: 'cell'
+            }, {
+                title: 'Context menu',
+                value: 'context-menu'
+            }, {
+                title: 'Col resize',
+                value: 'col-resize'
+            }, {
+                title: 'Copy',
+                value: 'copy'
+            }, {
+                title: 'Default',
+                value: 'default'
+            }, {
+                title: 'Grab',
+                value: 'grab'
+            }, {
+                title: 'Pointer',
+                value: 'pointer'
+            }, {
+                title: 'Move',
+                value: 'move'
+            }];
+        }
+    });
+
+    $settings.newPage({
+        type: 'background',
+        label: 'Background',
+        icon: 'image',
+        description: '',
+        templateUrl: 'views/settings/wb-background.html'
+    });
+
+    $settings.newPage({
+        type: 'SEO',
+        label: 'SEO',
+        templateUrl: 'views/settings/wb-seo.html'
+    });
+
+    $settings.newPage({
+        type: 'border',
+        label: 'Border',
+        icon: 'border_all',
+        templateUrl: 'views/settings/wb-border.html',
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function ($scope) {
+            var scope = $scope;
+            scope.styles = [{
+                title: 'None',
+                value: 'none'
+            }, {
+                title: 'Solid',
+                value: 'solid'
+            }, {
+                title: 'Dotted',
+                value: 'dotted'
+            }, {
+                title: 'Dashed',
+                value: 'dashed'
+            }, {
+                title: 'Double',
+                value: 'double'
+            }, {
+                title: 'Groove',
+                value: 'groove'
+            }, {
+                title: 'Ridge',
+                value: 'ridge'
+            }, {
+                title: 'Inset',
+                value: 'inset'
+            }, {
+                title: 'Outset',
+                value: 'outset'
+            }];
+
+            /*
+             * watch 'wbModel' and apply the changes into setting panel
+             */
+            var ctrl = this;
+            $scope.$watch('wbModel', function (model) {
+                /*
+                 * Set style
+                 */
+                var border = model.style.border || {};
+                ctrl.style = border.style;
+
+                /*
+                 * Set color
+                 */
+                ctrl.color = border.color;
+
+                /*
+                 * Set width
+                 * width is a string such as '10px 25% 2vh 4px'
+                 */
+                ctrl.width = {};
+                var width = fillWidthFromString(ctrl.width, border.width || 'medium');
+                if (width) {
+                    ctrl.widthAll = width;
+                    ctrl.width.top = width;
+                    ctrl.width.right = width;
+                    ctrl.width.bottom = width;
+                    ctrl.width.left = width;
+                }
+
+                /*
+                 * Set radius
+                 * radius is a string such as '10px 25% 2vh 4px'
+                 */
+                ctrl.radius = {};
+                var radius = fillRadiusFromString(ctrl.radius, border.radius || '0px');
+                if (radius) {
+                    ctrl.radiusAll = radius;
+                    ctrl.radius.topLeft = radius;
+                    ctrl.radius.topRight = radius;
+                    ctrl.radius.bottomLeft = radius;
+                    ctrl.radius.bottomRight = radius;
+                }
+            });
+
+            /*
+             * border style
+             */
+            this.styleChanged = function (newStyle) {
+                $scope.wbModel.style.border.style = newStyle;
+            };
+
+            /*
+             * border color
+             */
+            this.colorChanged = function (newColor) {
+                $scope.wbModel.style.border.color = newColor;
+            };
+
+            /*
+             * Settings about border width
+             */
+            this.widthAllChanged = function (val) {
+                setAllWidth(this.width, val || 'medium');//medium is default value of width
+                $scope.wbModel.style.border.width = createDimWidthStr(this.width);
+            };
+
+            this.widthChanged = function () {
+                $scope.wbModel.style.border.width = createDimWidthStr(this.width);
+            };
+
+            function setAllWidth(dim, val) {
+                if (dim) {
+                    dim.top = val;
+                    dim.right = val;
+                    dim.bottom = val;
+                    dim.left = val;
+                }
+            }
+
+            function createDimWidthStr(dim) {
+                if (dim) {
+                    var output =
+                        dim.top + ' ' +
+                        dim.right + ' ' +
+                        dim.bottom + ' ' +
+                        dim.left;
+                    return output;
+                }
+            }
+
+            /*
+             * splite 'width' to its components
+             * check different state Based on CSS rules. see for example:
+             * https://www.w3schools.com/CSSref/pr_border-width.asp
+             */
+            function fillWidthFromString(dim, str) {
+                var dimAll;
+                var dimsArray = str.split(' ');
+
+                // 'medium' is selected
+                if (dimsArray.length === 1) {
+                    dimAll = str;
+                    return dimAll;
+                }
+
+                //Items are 4 and equal
+                else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+                    dimAll = dimsArray[0];
+                    dim.top = dimAll;
+                    dim.right = dimAll;
+                    dim.bottom = dimAll;
+                    dim.left = dimAll;
+                }
+
+                //Items are 4 and different
+                else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
+                    dim.top = dimsArray[0];
+                    dim.right = dimsArray[1];
+                    dim.bottom = dimsArray[2];
+                    dim.left = dimsArray[3];
+                }
+
+                //Items are 3
+                else if (dimsArray.length === 3) {
+                    dim.top = dimsArray[0];
+                    dim.right = dimsArray[1];
+                    dim.left = dimsArray[1];
+                    dim.bottom = dimsArray[2];
+                }
+
+                //Items are 2
+                else if (dimsArray.length === 2) {
+                    dim.top = dimsArray[0];
+                    dim.bottom = dimsArray[0];
+                    dim.right = dimsArray[1];
+                    dim.left = dimsArray[1];
+                }
+
+                //Items are 1
+                else if (dimsArray.length === 1) {
+                    dim.top = dimsArray[0];
+                    dim.right = dimsArray[0];
+                    dim.bottom = dimsArray[0];
+                    dim.left = dimsArray[0];
+                }
+
+                //All items are undefined. In this case default value is 'medium'.
+                else if (!dimsArray.length) {
+                    dimAll = 'medium';
+                }
+                return dimAll;
+            }
+
+            /*
+             * Settings about border radius
+             */
+            this.radiusAllChanged = function (val) {
+                setAllRadius(this.radius, val || '0px');//0px is default value of radius
+                $scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
+            };
+
+            this.radiusChanged = function () {
+                $scope.wbModel.style.border.radius = createDimeRadiusStr(this.radius);
+            };
+
+            function setAllRadius(dim, val) {
+                if (dim) {
+                    dim.topLeft = val;
+                    dim.topRight = val;
+                    dim.bottomRight = val;
+                    dim.bottomLeft = val;
+                }
+            }
+
+            function createDimeRadiusStr(dim) {
+                if (dim) {
+                    var output =
+                        dim.topLeft + ' ' +
+                        dim.topRight + ' ' +
+                        dim.bottomRight + ' ' +
+                        dim.bottomLeft;
+                    return output;
+                }
+            }
+
+            /*
+             * splite 'radius' to its components
+             * check different state Based on CSS rules. see for example:
+             * https://www.w3schools.com/CSSref/css3_pr_border-radius.asp
+             */
+            function fillRadiusFromString(dim, str) {
+
+                var dimAll;
+                var dimsArray = str.split(' ');
+
+                // 0px is selected
+                if (dimsArray.length === 1) {
+                    dimAll = str;
+                    return dimAll;
+                }
+
+                //Items are 4 and equal
+                else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+                    dimAll = dimsArray[0];
+                    dim.topLeft = dimAll;
+                    dim.topRight = dimAll;
+                    dim.bottomRight = dimAll;
+                    dim.bottomLeft = dimAll;
+                }
+
+                //Items are 4 and different
+                else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
+                    dim.topLeft = dimsArray[0];
+                    dim.topRight = dimsArray[1];
+                    dim.bottomRight = dimsArray[2];
+                    dim.bottomLeft = dimsArray[3];
+                }
+
+                //Items are 3
+                else if (dimsArray.length === 3) {
+                    dim.topLeft = dimsArray[0];
+                    dim.topRight = dimsArray[1];
+                    dim.bottomLeft = dimsArray[1];
+                    dim.bottomRight = dimsArray[2];
+                }
+
+                //Items are 2
+                else if (dimsArray.length === 2) {
+                    dim.topLeft = dimsArray[0];
+                    dim.bottomRight = dimsArray[0];
+                    dim.topRight = dimsArray[1];
+                    dim.bottomLeft = dimsArray[1];
+                }
+
+                //Items are 1
+                else if (dimsArray.length === 1) {
+                    dim.topLeft = dimsArray[0];
+                    dim.topRight = dimsArray[0];
+                    dim.bottomRight = dimsArray[0];
+                    dim.bottomLeft = dimsArray[0];
+                }
+
+                //All items are undefined. In this case default value is 'medium'.
+                else if (!dimsArray.length) {
+                    dimAll = '0px';
+                }
+                return dimAll;
+            }
+
+        }
+    });
+
+    /**
+     * @ngdoc Widget Settings
+     * @name layout
+     * @description Manages element layout
+     * 
+     * Layout is consists of the following attributes for a group:
+     * 
+     * <ul>
+     *     <li>direction</li>
+     *     <li>direction-inverse</li>
+     *     <li>wrap</li>
+     *     <li>wrap-inverse</li>
+     *     <li>align</li>
+     *     <li>justify</li>
+     * </ul>
+     * 
+     * and following ones for a widget (or group):
+     * 
+     * <ul>
+     *     <li>grow</li>
+     *     <li>shrink</li>
+     *     <li>order</li>
+     * </ul>
+     * 
+     * See the layout documents for more details.
+     * 
+     * @see wb-layout
+     */
+    $settings.newPage({
+        type: 'layout',
+        label: 'Layout',
+        icon: 'dashboard',
+        description: 'Manages layout of the current item.',
+        templateUrl: 'views/settings/wb-layout.html',
+        controllerAs: 'ctrl',
+        /*
+         * Manages setting page 
+         * 
+         * @ngInject
+         */
+        controller: function ($scope) {
+            this.direction_ = [{
+                title: 'column',
+                icon: 'wb-horizontal-boxes',
+                value: 'column'
+            }, {
+                title: 'row',
+                icon: 'wb-vertical-boxes',
+                value: 'row'
+            }];
+
+            this.justify_ = {
+                    'row': [{
+                        title: 'Start',
+                        icon: 'sort_start_horiz',
+                        value: 'start'
+                    }, {
+                        title: 'End',
+                        icon: 'sort_end_horiz',
+                        value: 'end'
+                    }, {
+                        title: 'Center',
+                        icon: 'sort_center_horiz',
+                        value: 'center'
+                    }, {
+                        title: 'Space Around',
+                        icon: 'sort_space_around_horiz',
+                        value: 'space-around'
+                    }, {
+                        title: 'Space Between',
+                        icon: 'sort_space_between_horiz',
+                        value: 'space-between'
+                    }],
+                    'column': [{
+                        title: 'Start',
+                        icon: 'sort_start_vert',
+                        value: 'start'
+                    }, {
+                        title: 'End',
+                        icon: 'sort_end_vert',
+                        value: 'end'
+                    }, {
+                        title: 'Center',
+                        icon: 'sort_center_vert',
+                        value: 'center'
+                    }, {
+                        title: 'Space Around',
+                        icon: 'sort_space_around_vert',
+                        value: 'space-around'
+                    }, {
+                        title: 'Space Between',
+                        icon: 'sort_space_between_vert',
+                        value: 'space-between'
+                    }]
+            };
+
+            this.align_ = {
+                    'column': [{
+                        title: 'Stretch',
+                        icon: 'format_align_justify',
+                        value: 'stretch'
+                    }, {
+                        title: 'Start',
+                        icon: 'format_align_left',
+                        value: 'start'
+                    }, {
+                        title: 'End',
+                        icon: 'format_align_right',
+                        value: 'end'
+                    }, {
+                        title: 'Center',
+                        icon: 'format_align_center',
+                        value: 'center'
+                    }],
+                    'row': [{
+                        title: 'Stretch',
+                        icon: 'align_justify_vertical',
+                        value: 'stretch'
+                    }, {
+                        title: 'Start',
+                        icon: 'align_start_vertical',
+                        value: 'start'
+                    }, {
+                        title: 'End',
+                        icon: 'align_end_vertical',
+                        value: 'end'
+                    }, {
+                        title: 'Center',
+                        icon: 'align_center_vertical',
+                        value: 'center'
+                    }]
+            };
+
+            this.selfAlign_ = {
+                    'column': [{
+                        title: 'Stretch',
+                        icon: 'format_align_justify',
+                        value: 'stretch'
+                    }, {
+                        title: 'Start',
+                        icon: 'format_align_left',
+                        value: 'start'
+                    }, {
+                        title: 'End',
+                        icon: 'format_align_right',
+                        value: 'end'
+                    }, {
+                        title: 'Center',
+                        icon: 'format_align_center',
+                        value: 'center'
+                    }],
+                    'row': [{
+                        title: 'Stretch',
+                        icon: 'align_justify_vertical',
+                        value: 'stretch'
+                    }, {
+                        title: 'Start',
+                        icon: 'align_start_vertical',
+                        value: 'start'
+                    }, {
+                        title: 'End',
+                        icon: 'align_end_vertical',
+                        value: 'end'
+                    }, {
+                        title: 'Center',
+                        icon: 'align_center_vertical',
+                        value: 'center'
+                    }]
+            };
+
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
+            var ctrl = this;
+            $scope.$watch('wbModel', function (model) {
+                var layout = model.style.layout || {};
+                ctrl.direction = layout.direction;
+                ctrl.align = layout.align;
+                ctrl.wrap = layout.wrap;
+                ctrl.alignSelf = layout.align_self;
+                ctrl.justify = layout.justify;
+            });
+
+            /*
+             * This part updates the wbModel whenever the layout properties are changed in view
+             */
+            this.directionChanged = function () {
+                $scope.wbModel.style.layout.direction = this.direction;
+            };
+
+            this.wrapChanged = function () {
+                $scope.wbModel.style.layout.wrap = this.wrap;
+            };
+
+            this.alignChanged = function () {
+                $scope.wbModel.style.layout.align = this.align;
+            };
+
+            this.justifyChanged = function () {
+                $scope.wbModel.style.layout.justify = this.justify;
+            };
+
+            this.alignSelfChanged = function () {
+                $scope.wbModel.style.layout.align_self = this.alignSelf;
+            };
+        }
+    });
+    //TODO: Masood, 2018: Move this controller to a separated controller.
+    $settings.newPage({
+        type: 'marginPadding',
+        label: 'Margin/Padding',
+        icon: 'border_clear',
+        templateUrl: 'views/settings/wb-margin-padding.html',
+        controllerAs: 'ctrl',
+        /** 
+         * @ngInject
+         * @ngDoc Controllers
+         * @name marginPaddingCtrl
+         * @description manages settings view of margin and padding
+         * 
+         * Manage view with multiple editor of margin elements.
+         */
+        controller: function ($scope) {
+            $scope.margin = {};
+            $scope.padding = {};
+
+            /**
+             * All settings about margin and padding
+             * 
+             * Note: we normally add JSDoc to the global functions.
+             * 
+             * @memberof marginPaddingCtrl
+             */
+            function updateAllMargin(val) {
+                if(!val){
+                    return;
+                }
+                setAllMargin($scope.margin, val);//default value of margin
+                $scope.wbModel.style.margin = createDimeStr($scope.margin);
+            }
+
+            /**
+             * Sets all paddding to the equal value
+             * 
+             * @memberof marginPaddingCtrl
+             */
+            function updateAllPadding(val) {
+                if(!val){
+                    return;
+                }
+                setAllMargin($scope.padding, val);//default value of padding
+                $scope.wbModel.style.padding = createDimeStr($scope.padding);
+            }
+
+            /*
+             * This is internal function and does not need add jsdoc
+             * 
+             * this function set value to the dimension
+             */
+            function setAllMargin(dim, val) {
+                if (dim) {
+                    dim.top = val;
+                    dim.right = val;
+                    dim.bottom = val;
+                    dim.left = val;
+                }
+            }
+
+            function updateMargin(newMargin) {
+                $scope.wbModel.style.margin = createDimeStr(newMargin);
+            }
+
+            function updatePadding(newPadding) {
+                $scope.wbModel.style.padding = createDimeStr(newPadding);
+            }
+
+            function createDimeStr(dim) {
+                if (dim) {
+                    var output =
+                        dim.top + ' ' +
+                        dim.right + ' ' +
+                        dim.bottom + ' ' +
+                        dim.left;
+                    return output;
+                }
+            }
+            function setModel(model) {
+                //margin is a string such as '10px 25% 2vh 4px'
+                var margin = fillFromString($scope.margin, model.style.margin);
+                if (margin) {
+                    $scope.marginAll = margin;
+                    $scope.margin.top = margin;
+                    $scope.margin.right = margin;
+                    $scope.margin.bottom = margin;
+                    $scope.margin.left = margin;
+                }
+
+                var padding = fillFromString($scope.padding, model.style.padding);
+                if (padding) {
+                    $scope.paddingAll = padding;
+                    $scope.padding.top = padding;
+                    $scope.padding.right = padding;
+                    $scope.padding.bottom = padding;
+                    $scope.padding.left = padding;
+                }
+            }
+
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
+            $scope.$watch('wbModel', setModel);
+
+            /*
+             * splite margin/padding to its components
+             * check different state Based on CSS rules. see for example:
+             * https://www.w3schools.com/cssref/pr_margin.asp
+             * https://www.w3schools.com/cssref/pr_padding.asp
+             */
+
+            function fillFromString(dim, str) {
+                str = str || '';
+                var dimAll;
+                var dimsArray = str.split(' ');
+
+                // 0px is selected
+                if (dimsArray.length === 1) {
+                    dimAll = str;
+                    return dimAll;
+                }
+
+                //All 4 items is equal
+                else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+                    dimAll = dimsArray[0];
+                }
+
+                //Items are 4 and different
+                else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
+                    dim.top = dimsArray[0];
+                    dim.right = dimsArray[1];
+                    dim.bottom = dimsArray[2];
+                    dim.left = dimsArray[3];
+                }
+
+                //Items are 3
+                else if (dimsArray.length === 3) {
+                    dim.top = dimsArray[0];
+                    dim.right = dimsArray[1];
+                    dim.left = dimsArray[1];
+                    dim.bottom = dimsArray[2];
+                }
+
+                //Items are 2
+                else if (dimsArray.length === 2) {
+                    dim.top = dimsArray[0];
+                    dim.bottom = dimsArray[0];
+                    dim.right = dimsArray[1];
+                    dim.left = dimsArray[1];
+                }
+
+                //Items are 1
+                else if (dimsArray.length === 1) {
+                    dim.top = dimsArray[0];
+                    dim.right = dimsArray[0];
+                    dim.bottom = dimsArray[0];
+                    dim.left = dimsArray[0];
+                }
+
+                //All items are undefined. In this case default value is 0px.
+                else if (!dimsArray.length) {
+                    dimAll = '0px';
+                }
+                return dimAll;
+            }
+            
+            this.updateAllMargin = updateAllMargin;
+            this.updateAllPadding = updateAllPadding;
+            this.updateMargin = updateMargin;
+            this.updatePadding = updatePadding;
+        }
+    });
+
+    $settings.newPage({
+        type: 'size',
+        label: 'Size',
+        icon: 'photo_size_select_large',
+        templateUrl: 'views/settings/wb-size.html',
+        controllerAs: 'ctrl',
+
+        /*
+         * @ngInject
+         */
+        controller: function ($scope) {
+
+            // Sample of size object in wbModel
+            /*
 		     wbModel: {
 			style: {
 			    size: {
@@ -4635,96 +4662,96 @@ angular.module('am-wb-core')
 			    };
 			}
 		     }
-		     */
+             */
 
-		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
 
-		    var ctrl = this;
-		    $scope.$watch('wbModel', function (model) {
-			ctrl.width = model.style.size.width;
-			ctrl.height = model.style.size.height;
-			ctrl.minWidth = model.style.size.minWidth;
-			ctrl.minHeight = model.style.size.minHeight;
-			ctrl.maxWidth = model.style.size.maxWidth;
-			ctrl.maxHeight = model.style.size.maxHeight;
-		    }, true);
+            var ctrl = this;
+            $scope.$watch('wbModel', function (model) {
+                ctrl.width = model.style.size.width;
+                ctrl.height = model.style.size.height;
+                ctrl.minWidth = model.style.size.minWidth;
+                ctrl.minHeight = model.style.size.minHeight;
+                ctrl.maxWidth = model.style.size.maxWidth;
+                ctrl.maxHeight = model.style.size.maxHeight;
+            }, true);
 
-		    /*
-		     * This part updates the wbModel whenever the size properties are changed in view
-		     */
-		    this.widthChanged = function () {
-			$scope.wbModel.style.size.width = this.width;
-		    };
+            /*
+             * This part updates the wbModel whenever the size properties are changed in view
+             */
+            this.widthChanged = function () {
+                $scope.wbModel.style.size.width = this.width;
+            };
 
-		    this.heightChanged = function () {
-			if (this.height === '0px') {
-			    $scope.wbModel.style.size.height = '50px';
-			} else if (this.height === '0vh') {
-			   $scope.wbModel.style.size.height = '50vh'; 
-			} else if (this.height === '0in') {
-			   $scope.wbModel.style.size.height = '50in'; 
-			} else if (this.height === '0cm') {
-			   $scope.wbModel.style.size.height = '20cm'; 
-			} else if (this.height === '0%') {
-			   $scope.wbModel.style.size.height = '50%'; 
-			} else {
-			    $scope.wbModel.style.size.height = this.height;
-			}
-		    };
+            this.heightChanged = function () {
+                if (this.height === '0px') {
+                    $scope.wbModel.style.size.height = '50px';
+                } else if (this.height === '0vh') {
+                    $scope.wbModel.style.size.height = '50vh'; 
+                } else if (this.height === '0in') {
+                    $scope.wbModel.style.size.height = '50in'; 
+                } else if (this.height === '0cm') {
+                    $scope.wbModel.style.size.height = '20cm'; 
+                } else if (this.height === '0%') {
+                    $scope.wbModel.style.size.height = '50%'; 
+                } else {
+                    $scope.wbModel.style.size.height = this.height;
+                }
+            };
 
-		    this.minWidthChanged = function () {
-			$scope.wbModel.style.size.minWidth = this.minWidth;
-		    };
+            this.minWidthChanged = function () {
+                $scope.wbModel.style.size.minWidth = this.minWidth;
+            };
 
-		    this.minHeightChanged = function () {
-			$scope.wbModel.style.size.minHeight = this.minHeight;
-		    };
+            this.minHeightChanged = function () {
+                $scope.wbModel.style.size.minHeight = this.minHeight;
+            };
 
-		    this.maxWidthChanged = function () {
-			$scope.wbModel.style.size.maxWidth = this.maxWidth;
-		    };
+            this.maxWidthChanged = function () {
+                $scope.wbModel.style.size.maxWidth = this.maxWidth;
+            };
 
-		    this.maxHeightChanged = function () {
-			$scope.wbModel.style.size.maxHeight = this.maxHeight;
-		    };
-		}
-	    });
+            this.maxHeightChanged = function () {
+                $scope.wbModel.style.size.maxHeight = this.maxHeight;
+            };
+        }
+    });
 
-	    $settings.newPage({
-		type: 'shadow',
-		label: 'Shadow',
-		icon: 'brightness_low',
-		description: 'Show different shadows (zero or more) around the widget',
-		templateUrl: 'views/settings/wb-shadow.html',
-		/*
-		 * @ngInject
-		 */
-		controller: function ($scope) {
+    $settings.newPage({
+        type: 'shadow',
+        label: 'Shadow',
+        icon: 'brightness_low',
+        description: 'Show different shadows (zero or more) around the widget',
+        templateUrl: 'views/settings/wb-shadow.html',
+        /*
+         * @ngInject
+         */
+        controller: function ($scope) {
 
 
-		    this.remove = function (index) {
-			$scope.wbModel.style.shadows.splice(index, 1);
-		    };
+            this.remove = function (index) {
+                $scope.wbModel.style.shadows.splice(index, 1);
+            };
 
-		    this.addShadow = function () {
-			if (!$scope.wbModel.style.shadows) {
-			    $scope.wbModel.style.shadows = [];
-			}
-			$scope.wbModel.style.shadows.push({
-			    hShift: '0px',
-			    vShift: '0px',
-			    blur: '0px',
-			    spread: '0px',
-			    color: 'rgb(0,0,0)'
-			});
-		    };
+            this.addShadow = function () {
+                if (!$scope.wbModel.style.shadows) {
+                    $scope.wbModel.style.shadows = [];
+                }
+                $scope.wbModel.style.shadows.push({
+                    hShift: '0px',
+                    vShift: '0px',
+                    blur: '0px',
+                    spread: '0px',
+                    color: 'rgb(0,0,0)'
+                });
+            };
 
-		},
-		controllerAs: 'ctrl'
-	    });
-	});
+        },
+        controllerAs: 'ctrl'
+    });
+});
 
 /**
  * plugin.js
@@ -6466,7 +6493,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-length.html',
-    "<div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <wb-icon ng-if=icon> {{icon}} </wb-icon> <span flex ng-if=title translate>{{::title}} <md-tooltip ng-if=description>{{::description}}</md-tooltip> </span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input type=number ng-model=internalValue> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select style=max-width:75px ng-model=internalUnit> <md-option ng-repeat=\"type in ::types track by $index\" value={{::type}}> {{::type}} </md-option> </md-select> </md-input-container> </div> <md-slider-container ng-disabled=!ctrl.isNumerical() style=\"margin:0px; padding:0px; height:30px\" aria-label=\"display length vlaue with slider\" id=wb-ui-setting-length-slider> <md-slider min=0 max=99 ng-model=internalValue> </md-slider> </md-slider-container> </div>"
+    "<div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <wb-icon ng-if=icon>{{icon}}</wb-icon> <span flex ng-if=title translate=\"\">{{::title}} <md-tooltip ng-if=description>{{::description}}</md-tooltip> </span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input type=number ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select style=max-width:75px ng-model=internalUnit ng-change=\"updateLength(internalUnit, internalValue)\"> <md-option ng-repeat=\"type in ::types track by $index\" value={{::type}}> {{::type}} </md-option> </md-select> </md-input-container> </div> <md-slider-container ng-disabled=!ctrl.isNumerical() style=\"margin:0px; padding:0px; height:30px\" aria-label=\"display length vlaue with slider\" id=wb-ui-setting-length-slider> <md-slider min=0 max=99 ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-slider> </md-slider-container> </div>"
   );
 
 
@@ -6558,7 +6585,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-margin-padding.html',
-    " <md-subheader class=md-hue-3> <span translate>Margin</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all margins\" ng-model=marginAll ng-change=ctrl.updateAllMargin(marginAll) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider>  <wb-ui-setting-length title=Top icon=border_top ng-model=margin.top ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=margin.right ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=margin.bottom ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=margin.left ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Padding</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all paddings\" ng-model=paddingAll ng-change=ctrl.updateAllPadding(paddingAll) extra-values=\"['inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider> <md-divider></md-divider>  <wb-ui-setting-length title=Top icon=border_top ng-model=padding.top ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=padding.right ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=padding.bottom ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=padding.left ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>"
+    " <md-subheader class=md-hue-3> <span translate>Margin</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all margins\" ng-model=marginAll ng-change=ctrl.updateAllMargin(marginAll) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Top icon=border_top ng-model=margin.top ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=margin.right ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=margin.bottom ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=margin.left ng-change=ctrl.updateMargin(margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Padding</span> </md-subheader>  <wb-ui-setting-length title=All icon=select_all description=\"Set all paddings\" ng-model=paddingAll ng-change=ctrl.updateAllPadding(paddingAll) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Top icon=border_top ng-model=padding.top ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=padding.right ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=padding.bottom ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=padding.left ng-change=ctrl.updatePadding(padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>"
   );
 
 

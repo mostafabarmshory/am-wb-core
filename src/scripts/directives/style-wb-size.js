@@ -29,7 +29,7 @@ angular.module('am-wb-core')
 	 * @name wb-size
 	 * @description Apply margin into the element
 	 */
-	.directive('wbSize', function ($q, $wbUtil, $rootElement, $document, $compile) {
+	.directive('wbSize', function ($q, $wbUtil, $rootElement, $document, $compile, $mdMedia) {
 
 	    function postLink($scope, $element, $attrs, $ctrls) {
 		var button;
@@ -39,6 +39,8 @@ angular.module('am-wb-core')
 		var lock = false;
 		var watchSelection = null;
 		var watchSize = null;
+		var watchMedia = null;
+		var localSize = null;
 
 		// main ctrl
 		var ctrl = $ctrls[0];
@@ -156,17 +158,38 @@ angular.module('am-wb-core')
 		    });
 		}
 
-
-		// Watch size
-		watchSize = $scope.$watch($attrs.wbSize + '.size', function (size) {
+		function reloadSize () {
+		    var size = localSize;
 		    if (isRoot() || !size || lock) {
 			return;
 		    }
-		    $element.css(size);
+		    //check screen size and do appropriate work related to mobile mode
+		    if (!$mdMedia('gt-sm')) {
+			$element.css({
+			    width: 'auto',
+			    height: 'auto',
+			    minWidth: 'auto',
+			    maxWidth: 'auto',
+			    minHeight: 'auto',
+			    maxHeight: 'auto'
+			});
+		    } else {
+			$element.css(size);
+		    }
 		    if (optionButton) {
 			bindToElement(getBound());
 		    }
+		}
+
+		// Watch size
+		watchSize = $scope.$watch($attrs.wbSize + '.size', function (size) {
+		    localSize = size;
+		    reloadSize();
 		}, true);
+		
+		watchMedia = $scope.$watch (function () {
+		   return ($mdMedia('gt-sm')); 
+		}, reloadSize);
 
 		ctrl.on('delete', distroy);
 		watchSelection = $scope.$watch(function () {
