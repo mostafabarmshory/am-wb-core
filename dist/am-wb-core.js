@@ -2165,16 +2165,17 @@ angular.module('am-wb-core')
 	return {
 		templateUrl : 'views/directives/wb-ui-choose.html',
 		restrict : 'E',
+		controllerAs: 'ctrl',
 		scope : {
 			items : '=items',
 			selected : '=selected'
 		},
 		controller : function($scope) {
-			$scope.selectedIndex = 0;
+			this.selectedIndex = 0;
 			if ($scope.selected !== null) {
 				for ( var item in $scope.items) {
 					if (item.value === $scope.selected) {
-						$scope.selectedIndex = $scope.items.indexOf(item);
+						this.selectedIndex = $scope.items.indexOf(item);
 					}
 				}
 			} else {
@@ -2182,9 +2183,15 @@ angular.module('am-wb-core')
 			}
 
 			// listen to active tab and update selected attribute.
-			$scope.$watch('selectedIndex', function(current) {
-				$scope.selected = $scope.items[current].value;
-			});
+			// $scope.$watch('selectedIndex', function(current) {
+			//	$scope.selected = $scope.items[current].value;
+			// });
+			
+			
+			// listen to active tab and update selected attribute.
+			this.tabChanged = function (current) {
+			    $scope.selected = $scope.items[current].value;
+			};
 		}
 	};
 });
@@ -2301,7 +2308,7 @@ angular.module('am-wb-core')
 				{name: 'Initial', value: 'initial'},
 				{name: 'Inherit', value: 'inherit'},
 				{name: 'Nothing', value: ''}
-				];
+			];
 
 		}
 	};
@@ -2700,9 +2707,13 @@ angular.module('am-wb-core')
                     scope.valueColor = ngModelCtrl.$modelValue;
                 };
 
-                scope.$watch('valueColor', function (newValue) {
-                    ngModelCtrl.$setViewValue(newValue);
-                });
+//                scope.$watch('valueColor', function (newValue) {
+//                    ngModelCtrl.$setViewValue(newValue);
+//                });
+		
+		scope.colorChanged = function (newColor) {
+		   ngModelCtrl.$setViewValue(newColor); 
+		};
             }
 
             return {
@@ -2910,9 +2921,12 @@ function settingPostLink($scope, $element, $attrs, $ctrl){
     ngModelCtrl.$render = function(){
         $scope.value = ngModelCtrl.$viewValue;
     };
-    $scope.$watch('value', function(value){
-        ngModelCtrl.$setViewValue(value);
-    });
+//    $scope.$watch('value', function(value){
+//        ngModelCtrl.$setViewValue(value);
+//    });
+    $scope.valueChanged = function (newValue) {
+	ngModelCtrl.$setViewValue(newValue);
+    };
 }
 
 /**
@@ -6423,7 +6437,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-choose.html',
-    "<md-tabs class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in items\"> <md-tab-label> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs>"
+    "<md-tabs class=wb-tab-as-choose-button md-selected=ctrl.selectedIndex ng-change=ctrl.tabChanged(selectedIndex)> <md-tab ng-repeat=\"item in items\"> <md-tab-label> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs>"
   );
 
 
@@ -6468,7 +6482,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-color.html',
-    "<div layout=row> <wb-icon ng-if=icon layout-padding>{{icon}} </wb-icon> <div md-color-picker ng-model=valueColor label={{title}} default random=true md-color-clear-button=true md-color-generic-palette=false md-color-history=false flex> </div> </div>"
+    "<div layout=row> <wb-icon ng-if=icon layout-padding>{{icon}} </wb-icon> <div md-color-picker ng-model=valueColor ng-change=colorChanged(valueColor) label={{title}} default random=true md-color-clear-button=true md-color-generic-palette=false md-color-history=false flex> </div> </div>"
   );
 
 
@@ -6478,7 +6492,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-dropdown-value.html',
-    " <md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-select style=\"margin: 0px\" ng-model=value> <md-option ng-repeat=\"item in items\" ng-value=item.value> {{item.title}} </md-option> </md-select> </md-list-item>"
+    " <md-list-item> <wb-icon ng-hide=\"icon===undefined || icon===null || icon===''\">{{icon}}</wb-icon> <p ng-hide=\"title===undefined || title===null || title===''\">{{title}}</p> <md-select style=\"margin: 0px\" ng-model=value> <md-option ng-repeat=\"item in items\" ng-value=item.value> {{item.title}} </md-option> </md-select> </md-list-item>"
   );
 
 
@@ -6488,7 +6502,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-image.html',
-    "<div class=\"wb-ui-setting-image wb-ui-setting-image-container\" layout=row> <div class=wb-ui-setting-image-preview ng-click=ctrl.showImagePicker($event) ng-if=wbUiSettingPreview> <img ng-show=value class=wb-ui-setting-image-result ng-src=\"{{value}}\"> </div> <md-input-container class=md-icon-float flex> <label ng-if=title> <span translate=\"\">{{title}}</span> </label> <input type=input ng-model=value class=wb-ui-setting-image-input ng-mousedown=\"(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)\"> </md-input-container> <md-button class=\"md-icon-button wb-ui-setting-image-clear\" ng-if=\"wbUiSettingClearButton && value\" ng-click=ctrl.clearValue($event); aria-label=\"Clear image\"> <md-icon md-svg-icon=clear.svg></md-icon> </md-button> </div>"
+    "<div class=\"wb-ui-setting-image wb-ui-setting-image-container\" layout=row> <div class=wb-ui-setting-image-preview ng-click=ctrl.showImagePicker($event) ng-if=wbUiSettingPreview> <img ng-show=value class=wb-ui-setting-image-result ng-src=\"{{value}}\"> </div> <md-input-container class=md-icon-float flex> <label ng-if=title> <span translate=\"\">{{title}}</span> </label> <input type=input ng-model=value ng-change=valueChanged(value) class=wb-ui-setting-image-input ng-mousedown=\"(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)\"> </md-input-container> <md-button class=\"md-icon-button wb-ui-setting-image-clear\" ng-if=\"wbUiSettingClearButton && value\" ng-click=ctrl.clearValue($event); aria-label=\"Clear image\"> <md-icon md-svg-icon=clear.svg></md-icon> </md-button> </div>"
   );
 
 

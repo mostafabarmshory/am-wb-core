@@ -62,7 +62,11 @@ angular.module('am-wb-core')
                 }
                 
                 $scope.updateLength = function(unit, value) {
-                    ngModel.$setViewValue(value+unit);
+		    if ($scope.lengthValues.includes(unit)) {
+			ngModel.$setViewValue(value+unit);
+		    } else {
+			ngModel.$setViewValue(unit);
+		    }
                 };
 
                 /*
