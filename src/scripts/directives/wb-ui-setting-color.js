@@ -48,9 +48,13 @@ angular.module('am-wb-core')
                     scope.valueColor = ngModelCtrl.$modelValue;
                 };
 
-                scope.$watch('valueColor', function (newValue) {
-                    ngModelCtrl.$setViewValue(newValue);
-                });
+//                scope.$watch('valueColor', function (newValue) {
+//                    ngModelCtrl.$setViewValue(newValue);
+//                });
+		
+		scope.colorChanged = function (newColor) {
+		   ngModelCtrl.$setViewValue(newColor); 
+		};
             }
 
             return {
