@@ -96,6 +96,10 @@ angular.module('am-wb-core')
 		ctrl.isEditable = function(){
 			return  $scope.group.isEditable();
 		};
+		
+		ctrl.isRoot = function () {
+		    return null;
+		};
 
 		ctrl.isSelected = function(){
 			return $scope.group.isChildSelected(ctrl);

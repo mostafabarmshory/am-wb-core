@@ -87,10 +87,17 @@ the following items can be set for customizing container layout:
 
 
 <!--selfAlign--> 
-<!--TODO: maso, 2018: get parent align--> 
 <wb-ui-setting-choose
+    ng-if="ctrl.parentDirection==='row'"
     title="Self Vert."
     items="ctrl.selfAlign_['row']" 
+    ng-model="ctrl.alignSelf"
+    ng-change="ctrl.alignSelfChanged()"> 
+</wb-ui-setting-choose>
+<wb-ui-setting-choose
+    ng-if="ctrl.parentDirection==='column'"
+    title="Self Vert."
+    items="ctrl.selfAlign_['column']" 
     ng-model="ctrl.alignSelf"
     ng-change="ctrl.alignSelfChanged()"> 
 </wb-ui-setting-choose>

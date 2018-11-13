@@ -25,68 +25,76 @@
 
 angular.module('am-wb-core')
 
-/**
- * @ngdoc Directives
- * @name wb-setting-page
- * @description Display a setting of a model
- * 
- */
-.directive('wbSettingPage', function($widget, $settings, $wbUtil, $controller, $compile, $mdTheming) {
-	function postLink($scope, $element, $attrs, $ctrls) {
+	/**
+	 * @ngdoc Directives
+	 * @name wb-setting-page
+	 * @description Display a setting of a model
+	 * 
+	 */
+	.directive('wbSettingPage', function ($widget, $settings, $wbUtil, $controller, $compile, $mdTheming) {
+	    function postLink($scope, $element, $attrs, $ctrls) {
 
-
-		function loadSetting(page){
-            $wbUtil.getTemplateFor(page)
-            .then(function(templateSrc){
-                var element = angular.element(templateSrc);
-                var scope = $scope.$new();
-                if (angular.isDefined(page.controller)) {
-                    var controller = $controller(page.controller, {
-                        $scope : scope,
-                        $element : element
-                    });
-                    if (page.controllerAs) {
-                        scope[page.controllerAs] = controller;
-                    }
-                    element.data('$ngControllerController', controller);
-                }
-                $compile(element)(scope);
-                $mdTheming(element);
-                $element.empty();
-                $element.append(element);
-            });
+		var wbWidget = null;
+		function loadSetting(page) {
+		    $wbUtil.getTemplateFor(page)
+			    .then(function (templateSrc) {
+				var element = angular.element(templateSrc);
+				var scope = $scope.$new();
+				if (angular.isDefined(page.controller)) {
+				    var controller = $controller(page.controller, {
+					$scope: scope,
+					$element: element,
+				    });
+				    if (page.controllerAs) {
+					scope[page.controllerAs] = controller;
+				    }
+				    element.data('$ngControllerController', controller);
+				}
+				$compile(element)(scope);
+				$mdTheming(element);
+				$element.empty();
+				$element.append(element);
+			    });
 		}
 
 		function loadModel(model) {
-			$scope.wbModel = model;
+		    wbWidget = model;
+		    if (wbWidget) {
+			$scope.wbModel = wbWidget.getModel();
+			$scope.wbWidget = wbWidget;
+		    } else {
+			$scope.wbModel = null;
+			$scope.wbWidget = null;
+		    }
 		}
-		
-		$scope.$watch('type',  function(type) {
-			if (!type) {
-				return;
-			}
-			var setting = $settings.page(type);
-			loadSetting(setting);
+
+		$scope.$watch('type', function (type) {
+		    if (!type) {
+			return;
+		    }
+		    var setting = $settings.page(type);
+		    loadSetting(setting);
 		});
 
 		// Load ngModel
 		var ngModelCtrl = $ctrls[0];
-		ngModelCtrl.$render = function() {
-			if (ngModelCtrl.$viewValue) {
-				loadModel(ngModelCtrl.$viewValue);
-			}
+		ngModelCtrl.$render = function () {
+		    if (ngModelCtrl.$viewValue) {
+			loadModel(ngModelCtrl.$viewValue);
+		    }
+		    //TODO: maso, 2018: Do appropriate work
 		};
-	}
+	    }
 
-	// create directive
-	return {
-		restrict : 'E',
-		replace : true,
-		template : '<div layout="column"></div>',
-		link : postLink,
-		scope : {
-			type : '@wbType'
+	    // create directive
+	    return {
+		restrict: 'E',
+		replace: true,
+		template: '<div layout="column"></div>',
+		link: postLink,
+		scope: {
+		    type: '@wbType'
 		},
-		require : [ 'ngModel' ]
-	};
-});
+		require: ['ngModel']
+	    };
+	});
