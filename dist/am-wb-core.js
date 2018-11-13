@@ -1485,6 +1485,7 @@ angular.module('am-wb-core')
 			$scope.editable = true;
 			if(ctrl.isRoot()) {
 				delete $scope.lastSelectedItem;
+				ctrl.setSelected(true);
 			}
 		}
 
@@ -4527,7 +4528,9 @@ angular.module('am-wb-core')
 			    ctrl.alignSelf = layout.align_self;
 			    ctrl.justify = layout.justify;
 			    ctrl.parentWidget = $scope.wbWidget.getParent();
-			    ctrl.parentDirection = ctrl.parentWidget.getModel().style.layout.direction;
+			    if (ctrl.parentWidget) {
+				ctrl.parentDirection = ctrl.parentWidget.getModel().style.layout.direction;
+			    }
 			    //TODO: maso, 2018: Safe above code for null value
 			} 
 			//TODO: maso, 2018: handle else sectipn
@@ -5936,7 +5939,7 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
      */
     function clean(model, force)
     {
-	if (!model.type) {
+	if (!model.type || model.type === 'Page') {
 	    model.type = 'Group';
 	}
 	if (model.version === 'wb1' && !force) {
