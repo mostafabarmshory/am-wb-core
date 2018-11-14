@@ -68,7 +68,7 @@ of a widget:
 	overflow: hidden;
     position: relative;
 	min-width: 32px;
-	min-height: 32px;
+	min-height: 1px;
 }
 
 .wb-widget-edit {
