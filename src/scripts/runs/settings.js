@@ -83,7 +83,38 @@ angular.module('am-wb-core')
 		label: 'Background',
 		icon: 'image',
 		description: '',
-		templateUrl: 'views/settings/wb-background.html'
+		templateUrl: 'views/settings/wb-background.html',
+		controllerAs: 'ctrl',
+		
+		/*
+		 * @ngInject
+		 * @description This controller controls the background attribute. If the user choose an image for 
+		 * the background then sets a default values to the background property. These values are used to show 
+		 * the image in a suitable form; and if the user remove the background image then remove those values 
+		 * from the background.
+		 */
+		controller: function ($scope) {
+		    var background;
+		    this.imageChanged = function () {
+			background = $scope.wbModel.style.background;
+			if (!background.image || background.image.length === 0) {
+			    $scope.wbModel.style.background = {
+				image: '',
+				size: '',
+				repeat: '',
+				position: ''
+			    };
+			    
+			} else {
+			    $scope.wbModel.style.background = {
+				image: background.image,
+				size: 'cover',
+				repeat: 'no-repeat',
+				position: 'center center'
+			    };
+			}
+		    };
+		}
 	    });
 
 	    $settings.newPage({

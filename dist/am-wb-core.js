@@ -4043,7 +4043,34 @@ angular.module('am-wb-core')
 		label: 'Background',
 		icon: 'image',
 		description: '',
-		templateUrl: 'views/settings/wb-background.html'
+		templateUrl: 'views/settings/wb-background.html',
+		controllerAs: 'ctrl',
+		
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+		    var background;
+		    this.imageChanged = function () {
+			background = $scope.wbModel.style.background;
+			if (!background.image || background.image.length === 0) {
+			    $scope.wbModel.style.background = {
+				image: '',
+				size: '',
+				repeat: '',
+				position: ''
+			    };
+			    
+			} else {
+			    $scope.wbModel.style.background = {
+				image: background.image,
+				size: 'cover',
+				repeat: 'no-repeat',
+				position: 'center center'
+			    };
+			}
+		    };
+		}
 	    });
 
 	    $settings.newPage({
@@ -6676,7 +6703,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-background.html',
-    " <wb-ui-setting-image title=\"Background image\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.style.background.image> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
+    " <wb-ui-setting-image title=\"Background image\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.style.background.image ng-change=ctrl.imageChanged()> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.style.background.color> </wb-ui-setting-color> <wb-ui-setting-background-size value=wbModel.style.background.size> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat value=wbModel.style.background.repeat> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment value=wbModel.style.background.attachment> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin value=wbModel.style.background.origin> </wb-ui-setting-background-origin> <wb-ui-setting-background-position value=wbModel.style.background.position> </wb-ui-setting-background-position>"
   );
 
 
