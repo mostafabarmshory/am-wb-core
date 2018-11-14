@@ -824,19 +824,19 @@ angular.module('am-wb-core')
 		    };
 
 		    this.heightChanged = function () {
-			if (this.height === '0px') {
-			    $scope.wbModel.style.size.height = '50px';
-			} else if (this.height === '0vh') {
-			    $scope.wbModel.style.size.height = '50vh';
-			} else if (this.height === '0in') {
-			    $scope.wbModel.style.size.height = '50in';
-			} else if (this.height === '0cm') {
-			    $scope.wbModel.style.size.height = '20cm';
-			} else if (this.height === '0%') {
-			    $scope.wbModel.style.size.height = '50%';
-			} else {
+//			if (this.height === '-1px') {
+//			    $scope.wbModel.style.size.height = '50px';
+//			} else if (this.height === '0vh') {
+//			    $scope.wbModel.style.size.height = '50vh';
+//			} else if (this.height === '0in') {
+//			    $scope.wbModel.style.size.height = '50in';
+//			} else if (this.height === '0cm') {
+//			    $scope.wbModel.style.size.height = '20cm';
+//			} else if (this.height === '0%') {
+//			    $scope.wbModel.style.size.height = '50%';
+//			} else {
 			    $scope.wbModel.style.size.height = this.height;
-			}
+//			}
 		    };
 
 		    this.minWidthChanged = function () {

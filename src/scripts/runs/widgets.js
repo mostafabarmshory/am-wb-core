@@ -25,41 +25,47 @@
 
 angular.module('am-wb-core')
 
-/**
- * Load widgets
- */
-.run(function($widget) {
+	/**
+	 * Load widgets
+	 */
+	.run(function ($widget) {
 
-
-	// Group
-	$widget.newWidget({
+	    // Group
+	    $widget.newWidget({
 		// widget description
 		type: 'Group',
-		title: 'Group',	
-		description : 'Panel contains list of widgets.',
-		icon : 'wb-widget-group',
+		title: 'Group',
+		description: 'Panel contains list of widgets.',
+		icon: 'wb-widget-group',
 		groups: ['basic'],
-		model: {},
+		model: {
+		    style: {
+			size: {
+			    height: "30px"
+			},
+			margin: '1px'
+		    }
+		},
 		// functional properties
-		template : '<wb-group ng-model="wbModel"></wb-group>',
-		help : 'http://dpq.co.ir/more-information-link',
+		template: '<wb-group ng-model="wbModel"></wb-group>',
+		help: 'http://dpq.co.ir/more-information-link',
 		helpId: 'wb-widget-group'
-	});
-	// HTML text
-	$widget.newWidget({
+	    });
+	    // HTML text
+	    $widget.newWidget({
 		// widget description
 		type: 'HtmlText',
-		title : 'Text',
-		description : 'An text block.',
-		icon : 'wb-widget-html',
+		title: 'Text',
+		description: 'An text block.',
+		icon: 'wb-widget-html',
 		groups: ['basic'],
-		model : {
-			text : '<h2>Text element</h2><p>Click on the text box to edit.</p>'
+		model: {
+		    text: '<h2>Text element</h2><p>Click on the text box to edit.</p>'
 		},
 		// help id
-		help : 'http://dpq.co.ir',
+		help: 'http://dpq.co.ir',
 		helpId: 'wb-widget-html',
 		// functional properties
-		templateUrl : 'views/widgets/wb-html.html'
+		templateUrl: 'views/widgets/wb-html.html'
+	    });
 	});
-});
