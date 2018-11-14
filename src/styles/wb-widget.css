@@ -8,7 +8,7 @@ of a widget:
 ***************************************************************************************/
 .wb-group {
 	min-width: 32px;
-	min-height: 1px;
+	min-height: 32px;
 }
 
 /*
@@ -68,7 +68,7 @@ of a widget:
 	overflow: hidden;
         position: relative;
 	min-width: 32px;
-	min-height: 1px;
+	min-height: 32px;
 }
 
 .wb-widget-edit {

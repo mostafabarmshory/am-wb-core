@@ -4936,7 +4936,17 @@ angular.module('am-wb-core')
 	 */
 	.run(function ($widget) {
 
-	    // Group
+	    /*
+	    * @ngdoc Widgets
+	    * @name Group
+	    * @description Parent widget of other widgets
+	    * default setting:
+	       {
+		   style: {
+			margin: '1px'
+		   }
+	       }    
+	    */
 	    $widget.newWidget({
 		// widget description
 		type: 'Group',
@@ -4946,9 +4956,6 @@ angular.module('am-wb-core')
 		groups: ['basic'],
 		model: {
 		    style: {
-			size: {
-			    height: "30px"
-			},
 			margin: '1px'
 		    }
 		},
