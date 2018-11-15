@@ -75,13 +75,29 @@ angular.module('am-wb-core')
 			}
 		}
 
+		/**
+		 * Delete the widget
+		 * 
+		 * This function just used in edit mode
+		 */
 		ctrl.delete = function(){
+		    if(!ctrl.isEditable()){
+		        return;
+		    }
 			fire('delete');
 			$scope.group.removeChild($scope.wbModel, ctrl);
 			callbacks = {};
 		};
 
+		/**
+		 * Clone current widget
+		 * 
+		 * This method works in edit mode only.
+		 */
 		ctrl.clone = function(){
+            if(!ctrl.isEditable()){
+                return;
+            }
 			return $wbUtil.clean(angular.copy($scope.wbModel));
 		};
 
@@ -95,6 +111,10 @@ angular.module('am-wb-core')
 
 		ctrl.isEditable = function(){
 			return  $scope.group.isEditable();
+		};
+		
+		ctrl.isRoot = function () {
+		    return null;
 		};
 
 		ctrl.isSelected = function(){

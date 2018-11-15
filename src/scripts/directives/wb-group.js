@@ -84,6 +84,7 @@ angular.module('am-wb-core')
 			$scope.editable = true;
 			if(ctrl.isRoot()) {
 				delete $scope.lastSelectedItem;
+				ctrl.setSelected(true);
 			}
 		}
 

@@ -25,41 +25,58 @@
 
 angular.module('am-wb-core')
 
-/**
+/*
  * Load widgets
  */
-.run(function($widget) {
+.run(function ($widget) {
 
-
-	// Group
-	$widget.newWidget({
-		// widget description
-		type: 'Group',
-		title: 'Group',	
-		description : 'Panel contains list of widgets.',
-		icon : 'wb-widget-group',
-		groups: ['basic'],
-		model: {},
-		// functional properties
-		template : '<wb-group ng-model="wbModel"></wb-group>',
-		help : 'http://dpq.co.ir/more-information-link',
-		helpId: 'wb-widget-group'
-	});
-	// HTML text
-	$widget.newWidget({
-		// widget description
-		type: 'HtmlText',
-		title : 'Text',
-		description : 'An text block.',
-		icon : 'wb-widget-html',
-		groups: ['basic'],
-		model : {
-			text : '<h2>Text element</h2><p>Click on the text box to edit.</p>'
-		},
-		// help id
-		help : 'http://dpq.co.ir',
-		helpId: 'wb-widget-html',
-		// functional properties
-		templateUrl : 'views/widgets/wb-html.html'
-	});
+    /**
+     * @ngdoc Widgets
+     * @name Group
+     * @description Parent widget of other widgets
+     * 
+     * default setting:
+     * - margin: '1px'
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'Group',
+        title: 'Group',
+        description: 'Panel contains list of widgets.',
+        icon: 'wb-widget-group',
+        groups: ['basic'],
+        model: {
+            style: {
+                margin: '1px'
+            }
+        },
+        // functional properties
+        template: '<wb-group ng-model="wbModel"></wb-group>',
+        help: 'http://dpq.co.ir/more-information-link',
+        helpId: 'wb-widget-group'
+    });
+    /**
+     * @ngdoc Widgets
+     * @name Text
+     * @description Add rich text to page
+     * 
+     * This is a RTF to add to a page.
+     * 
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'HtmlText',
+        title: 'Text',
+        description: 'An text block.',
+        icon: 'wb-widget-html',
+        groups: ['basic'],
+        model: {
+            text: '<h2>Text element</h2><p>Click on the text box to edit.</p>'
+        },
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-html',
+        // functional properties
+        templateUrl: 'views/widgets/wb-html.html'
+    });
 });

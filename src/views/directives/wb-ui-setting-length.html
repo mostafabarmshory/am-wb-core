@@ -6,7 +6,7 @@
         layout-align="end center">
         <wb-icon ng-if="icon">{{icon}}</wb-icon>
         <span flex ng-if="title" translate="">{{::title}}
-            <md-tooltip ng-if="description">{{::description}}</md-tooltip>
+            <md-tooltip ng-if="description" md-delay="1500">{{::description}}</md-tooltip>
         </span>
         <md-input-container 
             ng-show="ctrl.isNumerical()"

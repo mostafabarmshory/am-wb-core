@@ -13,8 +13,9 @@
                     ng-repeat="item in ::xitems"
                     md-on-select="selectionChanged()">
 			<md-tab-label>
-				<md-tooltip 
-                                    ng-if="::item.title">
+				<md-tooltip
+                                    ng-if="::item.title"
+                                    md-delay="1500">
                                     <span translate="">{{::item.title}}</span>  
                                 </md-tooltip>
 				<wb-icon >{{::item.icon}}</wb-icon>

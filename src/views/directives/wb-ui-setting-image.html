@@ -20,6 +20,7 @@
 		<input
 			type="input"
 			ng-model="value" 
+                        ng-change="valueChanged(value)"
 			class='wb-ui-setting-image-input' 
 			ng-mousedown="(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)" />
 	</md-input-container>

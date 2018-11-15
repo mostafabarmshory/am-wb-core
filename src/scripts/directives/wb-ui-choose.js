@@ -38,16 +38,17 @@ angular.module('am-wb-core')
 	return {
 		templateUrl : 'views/directives/wb-ui-choose.html',
 		restrict : 'E',
+		controllerAs: 'ctrl',
 		scope : {
 			items : '=items',
 			selected : '=selected'
 		},
 		controller : function($scope) {
-			$scope.selectedIndex = 0;
+			this.selectedIndex = 0;
 			if ($scope.selected !== null) {
 				for ( var item in $scope.items) {
 					if (item.value === $scope.selected) {
-						$scope.selectedIndex = $scope.items.indexOf(item);
+						this.selectedIndex = $scope.items.indexOf(item);
 					}
 				}
 			} else {
@@ -55,9 +56,15 @@ angular.module('am-wb-core')
 			}
 
 			// listen to active tab and update selected attribute.
-			$scope.$watch('selectedIndex', function(current) {
-				$scope.selected = $scope.items[current].value;
-			});
+			// $scope.$watch('selectedIndex', function(current) {
+			//	$scope.selected = $scope.items[current].value;
+			// });
+			
+			
+			// listen to active tab and update selected attribute.
+			this.tabChanged = function (current) {
+			    $scope.selected = $scope.items[current].value;
+			};
 		}
 	};
 });

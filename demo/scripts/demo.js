@@ -30,7 +30,7 @@
  * 
  */
 angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
-.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbFloat) {
+.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbFloat, WbWidget) {
 	$http.get('examples/html.json')
 	.then(function(res) {
 		// NOTE: maso, 2018: clean data model
@@ -39,11 +39,13 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 
 	// load setting of model
 	$scope.loadSettings = function(model, ctrl){
-		$scope.selectedModel = model;
-		$scope.selectedCtrl = ctrl;
+	    var wbWidget = new WbWidget(model, ctrl);
+	    
+		$scope.selectedWidget = wbWidget;
+		//$scope.selectedCtrl = ctrl;
 		if(ctrl){
 			$scope.actions = ctrl.getActions();
-		}else {
+		} else {
 			$scope.actions = [];
 		}
 	};
@@ -106,7 +108,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 						$wbFloat.hide();
 					}
 				});
-				watch2 = parent.$watch('selectedModel', function(value){
+				watch2 = parent.$watch('selectedWidget', function(value){
 					$scope.model = value;
 				});
 			},
@@ -139,7 +141,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 						$wbFloat.hide();
 					}
 				});
-				watch2 = parent.$watch('selectedModel', function(value){
+				watch2 = parent.$watch('selectedWidget', function(value){
 					$scope.model = value;
 				});
 			},

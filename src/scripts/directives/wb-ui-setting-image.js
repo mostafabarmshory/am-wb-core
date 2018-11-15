@@ -31,9 +31,12 @@ function settingPostLink($scope, $element, $attrs, $ctrl){
     ngModelCtrl.$render = function(){
         $scope.value = ngModelCtrl.$viewValue;
     };
-    $scope.$watch('value', function(value){
-        ngModelCtrl.$setViewValue(value);
-    });
+//    $scope.$watch('value', function(value){
+//        ngModelCtrl.$setViewValue(value);
+//    });
+    $scope.valueChanged = function (newValue) {
+	ngModelCtrl.$setViewValue(newValue);
+    };
 }
 
 /**

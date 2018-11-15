@@ -77,13 +77,6 @@ module.exports = function(config) {
 			}]
 		},
 
-		preprocessors: {
-			// source files, that you wanna generate coverage for
-			// do not include tests or libraries
-			// (these files will be instrumented by Istanbul)
-			'src/scripts/**/*.js': ['coverage']
-		},
-
 		// list of files / patterns to exclude
 		exclude: [],
 
@@ -94,7 +87,6 @@ module.exports = function(config) {
 		// Which plugins to enable
 		pluginszz: [
 			'karma-jasmine',
-			'karma-coverage',
 
 			'karma-chrome-launcher',
 			'karma-edge-launcher',

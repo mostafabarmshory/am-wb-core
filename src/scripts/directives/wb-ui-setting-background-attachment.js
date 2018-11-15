@@ -48,7 +48,7 @@ angular.module('am-wb-core')
 				{name: 'Initial', value: 'initial'},
 				{name: 'Inherit', value: 'inherit'},
 				{name: 'Nothing', value: ''}
-				];
+			];
 
 		}
 	};
