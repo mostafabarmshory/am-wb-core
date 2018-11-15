@@ -50,9 +50,9 @@ angular.module('am-wb-core')
 		 * 
 		 * @returns
 		 */
-		function loadSetting(model) {
+		function loadSetting(wbWidget) {
 			// load pages
-			var widget = $widget.getWidget(model);
+			var widget = $widget.getWidget(wbWidget.getModel());
 			var settingKeys = $settings.getSettingsFor(widget);
 
 			// hide all settings
@@ -73,9 +73,8 @@ angular.module('am-wb-core')
 			}
 			
 			// set model in view
-			$scope.wbModel = model;
+			$scope.wbModel = wbWidget;
 		}
-
 
 		ngModelCtrl.$render = function() {
 			if(ngModelCtrl.$viewValue) {

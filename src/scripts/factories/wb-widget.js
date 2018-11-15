@@ -24,48 +24,37 @@
 'use strict';
 
 angular.module('am-wb-core')
+	/**
+	 * @ngdoc Factories
+	 * @name wb-widget
+	 * @description 
+	 * 
+	 */
+	.factory('WbWidget', function () {
+	    var wbWidget = function (model, ctrl) {
+		this.$ctrl = ctrl;
+		this.$model = model;
+	    };
 
-        /**
-         * @ngdoc Directives
-         * @name wbUiSettingColor
-         * @description a setting section to set color.
-         *
-         */
-        .directive('wbUiSettingColor', function ($mdTheming){
+	    wbWidget.prototype.getType = function () {
+		return this.$model.type;
+	    };
 
+	    wbWidget.prototype.getModel = function () {
+		return this.$model;
+	    };
 
-            function postLink(scope, element, attr, ctrls) {
-                var ngModelCtrl = ctrls[0];
-                $mdTheming(element);
+	    wbWidget.prototype.getCtrl = function () {
+		return this.$ctrl;
+	    };
+	    
+	    wbWidget.prototype.getParent = function () {
+		if (this.$ctrl.isRoot()) {
+		    return null;
+		} 
+		var parentCtrl = this.$ctrl.getParent();
+		return new wbWidget(parentCtrl.getModel(), parentCtrl);
+	    };
 
-                /*
-                 * convert to index
-                 */
-
-
-
-                ngModelCtrl.$render = function () {
-                    scope.valueColor = ngModelCtrl.$modelValue;
-                };
-
-//                scope.$watch('valueColor', function (newValue) {
-//                    ngModelCtrl.$setViewValue(newValue);
-//                });
-		
-		scope.colorChanged = function (newColor) {
-		   ngModelCtrl.$setViewValue(newColor); 
-		};
-            }
-
-            return {
-                templateUrl: 'views/directives/wb-ui-setting-color.html',
-                restrict: 'E',
-                scope: {
-                    title: '@title',
-                    icon: '@icon'
-                },
-                require: ['ngModel'],
-                link: postLink
-
-            };
-        });
+	    return wbWidget;
+	});

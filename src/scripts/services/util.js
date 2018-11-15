@@ -269,7 +269,7 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
      */
     function clean(model, force)
     {
-	if (!model.type) {
+	if (!model.type || model.type === 'Page') {
 	    model.type = 'Group';
 	}
 	if (model.version === 'wb1' && !force) {
