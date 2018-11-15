@@ -33,105 +33,110 @@ describe('Setting layout', function () {
     // load the service's module
     beforeEach(module('am-wb-core'));
     beforeEach(inject(function (_$settings_, _$rootScope_, _$injector_) {
-	$settings = _$settings_;
-	$rootScope = _$rootScope_;
-	$injector = _$injector_;
+        $settings = _$settings_;
+        $rootScope = _$rootScope_;
+        $injector = _$injector_;
     }));
-    
+
     it('should not change original model', function () {
-		var page = $settings.getPage('layout');
-		var scope = $rootScope.$new();
-		var ctrl = {};
-		
-		// TODO: check if the controller is a function
-		$injector.invoke(page.controller, ctrl, {
-		    '$scope': scope
-		});
-		
-		// scope.wbModel shouldn't have layout property
-		scope.wbModel = {
-		    style:{}
-		};
-		scope.$digest();
-		expect(angular.isDefined(scope.wbModel.style.layout)).toBe(false);
-		
-		
-		/*
-		 * When the model is changed to the new one, old model shouldn't have changed.
-		 * Also, the new model(in this case) shouldn't have layout property
-		 */ 
-		var wbModelNew = {
-		    style:{}
-		};
-		var wbModel = scope.wbModel;
-		scope.wbModel = wbModelNew;
-		scope.$digest();
-		
-		expect(angular.isDefined(wbModel.style.layout)).toBe(false);
-		expect(angular.isDefined(scope.wbModel.style.layout)).toBe(false);
-		
-		
-		/*
-		 * When the model is changed to the new one, old model shouldn't have changed.
-		 * Also, the new model(based on the new model) should have new properties.
-		 */
-		var wbModelNew1 = {
-		    style:{
-			layout: {
-			    align: 'stretch',
-			    wrap: 'true',
-			    align_self: 'stretch',
-			    direction: 'column',
-			    justify: 'start'
-			}
-		    }
-		};
-		wbModel = scope.wbModel;
-		scope.wbModel = wbModelNew1;
-		scope.$digest();
-		
-		expect(angular.isDefined(wbModel.style.layout)).toBe(false);
-		expect(angular.isDefined(scope.wbModel.style.layout)).toBe(true);
-		expect(ctrl.align).toBe('stretch');
-		expect(ctrl.wrap).toBe('true');
-		expect(ctrl.alignSelf).toBe('stretch');
-		expect(ctrl.direction).toBe('column');
-		expect(ctrl.justify).toBe('start');
-		
-		
-		/*
-		 * When the model is changed to the new one, old model shouldn't have changed.
-		 * Also, the new model(based on the new model) should have new properties.
-		 */
-		var wbModelNew2 = {
-		    style:{
-			layout: {
-			    align: 'center',
-			    wrap: 'false',
-			    align_self: 'center',
-			    direction: 'row',
-			    justify: 'end'
-			}
-		    }
-		};
-		wbModel = scope.wbModel;
-		scope.wbModel = wbModelNew2;
-		scope.$digest();
-		
-		expect(angular.isDefined(wbModel.style.layout)).toBe(true);
-		expect(wbModel.style.layout.align).toBe('stretch');
-		expect(wbModel.style.layout.wrap).toBe('true');
-		expect(wbModel.style.layout.align_self).toBe('stretch');
-		expect(wbModel.style.layout.direction).toBe('column');
-		expect(wbModel.style.layout.justify).toBe('start');
-		
-		expect(angular.isDefined(scope.wbModel.style.layout)).toBe(true);
-		expect(ctrl.align).toBe('center');
-		expect(ctrl.wrap).toBe('false');
-		expect(ctrl.alignSelf).toBe('center');
-		expect(ctrl.direction).toBe('row');
-		expect(ctrl.justify).toBe('end');
-		
-		
-	});
+        var page = $settings.getPage('layout');
+        var scope = $rootScope.$new();
+        var ctrl = {};
+
+        // TODO: check if the controller is a function
+        $injector.invoke(page.controller, ctrl, {
+            '$scope': scope
+        });
+
+        // scope.wbModel shouldn't have layout property
+        scope.wbModel = {
+                style:{}
+        };
+        scope.wbWidget = {
+                getParent: function(){
+                    return null;
+                }
+        }
+        scope.$digest();
+        expect(angular.isDefined(scope.wbModel.style.layout)).toBe(false);
+
+
+        /*
+         * When the model is changed to the new one, old model shouldn't have changed.
+         * Also, the new model(in this case) shouldn't have layout property
+         */ 
+        var wbModelNew = {
+                style:{}
+        };
+        var wbModel = scope.wbModel;
+        scope.wbModel = wbModelNew;
+        scope.$digest();
+
+        expect(angular.isDefined(wbModel.style.layout)).toBe(false);
+        expect(angular.isDefined(scope.wbModel.style.layout)).toBe(false);
+
+
+        /*
+         * When the model is changed to the new one, old model shouldn't have changed.
+         * Also, the new model(based on the new model) should have new properties.
+         */
+        var wbModelNew1 = {
+                style:{
+                    layout: {
+                        align: 'stretch',
+                        wrap: 'true',
+                        align_self: 'stretch',
+                        direction: 'column',
+                        justify: 'start'
+                    }
+                }
+        };
+        wbModel = scope.wbModel;
+        scope.wbModel = wbModelNew1;
+        scope.$digest();
+
+        expect(angular.isDefined(wbModel.style.layout)).toBe(false);
+        expect(angular.isDefined(scope.wbModel.style.layout)).toBe(true);
+        expect(ctrl.align).toBe('stretch');
+        expect(ctrl.wrap).toBe('true');
+        expect(ctrl.alignSelf).toBe('stretch');
+        expect(ctrl.direction).toBe('column');
+        expect(ctrl.justify).toBe('start');
+
+
+        /*
+         * When the model is changed to the new one, old model shouldn't have changed.
+         * Also, the new model(based on the new model) should have new properties.
+         */
+        var wbModelNew2 = {
+                style:{
+                    layout: {
+                        align: 'center',
+                        wrap: 'false',
+                        align_self: 'center',
+                        direction: 'row',
+                        justify: 'end'
+                    }
+                }
+        };
+        wbModel = scope.wbModel;
+        scope.wbModel = wbModelNew2;
+        scope.$digest();
+
+        expect(angular.isDefined(wbModel.style.layout)).toBe(true);
+        expect(wbModel.style.layout.align).toBe('stretch');
+        expect(wbModel.style.layout.wrap).toBe('true');
+        expect(wbModel.style.layout.align_self).toBe('stretch');
+        expect(wbModel.style.layout.direction).toBe('column');
+        expect(wbModel.style.layout.justify).toBe('start');
+
+        expect(angular.isDefined(scope.wbModel.style.layout)).toBe(true);
+        expect(ctrl.align).toBe('center');
+        expect(ctrl.wrap).toBe('false');
+        expect(ctrl.alignSelf).toBe('center');
+        expect(ctrl.direction).toBe('row');
+        expect(ctrl.justify).toBe('end');
+
+
+    });
 });

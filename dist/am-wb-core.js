@@ -3829,40 +3829,40 @@ angular.module('am-wb-core')
 'use strict';
 
 angular.module('am-wb-core')
-	/**
-	 * @ngdoc Factories
-	 * @name wb-widget
-	 * @description 
-	 * 
-	 */
-	.factory('WbWidget', function () {
-	    var wbWidget = function (model, ctrl) {
-		this.$ctrl = ctrl;
-		this.$model = model;
-	    };
+/**
+ * @ngdoc Factories
+ * @name wb-widget
+ * @description Generic data type of a widget
+ * 
+ */
+.factory('WbWidget', function () {
+    var wbWidget = function (model, ctrl) {
+        this.$ctrl = ctrl;
+        this.$model = model;
+    };
 
-	    wbWidget.prototype.getType = function () {
-		return this.$model.type;
-	    };
+    wbWidget.prototype.getType = function () {
+        return this.$model.type;
+    };
 
-	    wbWidget.prototype.getModel = function () {
-		return this.$model;
-	    };
+    wbWidget.prototype.getModel = function () {
+        return this.$model;
+    };
 
-	    wbWidget.prototype.getCtrl = function () {
-		return this.$ctrl;
-	    };
-	    
-	    wbWidget.prototype.getParent = function () {
-		if (this.$ctrl.isRoot()) {
-		    return null;
-		} 
-		var parentCtrl = this.$ctrl.getParent();
-		return new wbWidget(parentCtrl.getModel(), parentCtrl);
-	    };
+    wbWidget.prototype.getCtrl = function () {
+        return this.$ctrl;
+    };
 
-	    return wbWidget;
-	});
+    wbWidget.prototype.getParent = function () {
+        if (this.$ctrl.isRoot()) {
+            return null;
+        } 
+        var parentCtrl = this.$ctrl.getParent();
+        return new wbWidget(parentCtrl.getModel(), parentCtrl);
+    };
+
+    return wbWidget;
+});
 /* 
  * The MIT License (MIT)
  * 
@@ -4064,6 +4064,10 @@ angular.module('am-wb-core')
 		
 		/*
 		 * @ngInject
+		 * @description This controller controls the background attribute. If the user choose an image for 
+		 * the background then sets a default values to the background property. These values are used to show 
+		 * the image in a suitable form; and if the user remove the background image then remove those values 
+		 * from the background.
 		 */
 		controller: function ($scope) {
 		    var background;
@@ -4974,57 +4978,61 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-	/**
-	 * Load widgets
-	 */
-	.run(function ($widget) {
+/*
+ * Load widgets
+ */
+.run(function ($widget) {
 
-	    /*
-	    * @ngdoc Widgets
-	    * @name Group
-	    * @description Parent widget of other widgets
-	    * default setting:
-	       {
-		   style: {
-			margin: '1px'
-		   }
-	       }    
-	    */
-	    $widget.newWidget({
-		// widget description
-		type: 'Group',
-		title: 'Group',
-		description: 'Panel contains list of widgets.',
-		icon: 'wb-widget-group',
-		groups: ['basic'],
-		model: {
-		    style: {
-			margin: '1px'
-		    }
-		},
-		// functional properties
-		template: '<wb-group ng-model="wbModel"></wb-group>',
-		help: 'http://dpq.co.ir/more-information-link',
-		helpId: 'wb-widget-group'
-	    });
-	    // HTML text
-	    $widget.newWidget({
-		// widget description
-		type: 'HtmlText',
-		title: 'Text',
-		description: 'An text block.',
-		icon: 'wb-widget-html',
-		groups: ['basic'],
-		model: {
-		    text: '<h2>Text element</h2><p>Click on the text box to edit.</p>'
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-html',
-		// functional properties
-		templateUrl: 'views/widgets/wb-html.html'
-	    });
-	});
+    /**
+     * @ngdoc Widgets
+     * @name Group
+     * @description Parent widget of other widgets
+     * 
+     * default setting:
+     * - margin: '1px'
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'Group',
+        title: 'Group',
+        description: 'Panel contains list of widgets.',
+        icon: 'wb-widget-group',
+        groups: ['basic'],
+        model: {
+            style: {
+                margin: '1px'
+            }
+        },
+        // functional properties
+        template: '<wb-group ng-model="wbModel"></wb-group>',
+        help: 'http://dpq.co.ir/more-information-link',
+        helpId: 'wb-widget-group'
+    });
+    /**
+     * @ngdoc Widgets
+     * @name Text
+     * @description Add rich text to page
+     * 
+     * This is a RTF to add to a page.
+     * 
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'HtmlText',
+        title: 'Text',
+        description: 'An text block.',
+        icon: 'wb-widget-html',
+        groups: ['basic'],
+        model: {
+            text: '<h2>Text element</h2><p>Click on the text box to edit.</p>'
+        },
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-html',
+        // functional properties
+        templateUrl: 'views/widgets/wb-html.html'
+    });
+});
 
 /* 
  * The MIT License (MIT)
