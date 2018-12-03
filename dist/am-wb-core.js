@@ -3480,13 +3480,29 @@ angular.module('am-wb-core')
 			}
 		}
 
+		/**
+		 * Delete the widget
+		 * 
+		 * This function just used in edit mode
+		 */
 		ctrl.delete = function(){
+		    if(!ctrl.isEditable()){
+		        return;
+		    }
 			fire('delete');
 			$scope.group.removeChild($scope.wbModel, ctrl);
 			callbacks = {};
 		};
 
+		/**
+		 * Clone current widget
+		 * 
+		 * This method works in edit mode only.
+		 */
 		ctrl.clone = function(){
+            if(!ctrl.isEditable()){
+                return;
+            }
 			return $wbUtil.clean(angular.copy($scope.wbModel));
 		};
 
@@ -3813,40 +3829,40 @@ angular.module('am-wb-core')
 'use strict';
 
 angular.module('am-wb-core')
-	/**
-	 * @ngdoc Factories
-	 * @name wb-widget
-	 * @description 
-	 * 
-	 */
-	.factory('WbWidget', function () {
-	    var wbWidget = function (model, ctrl) {
-		this.$ctrl = ctrl;
-		this.$model = model;
-	    };
+/**
+ * @ngdoc Factories
+ * @name wb-widget
+ * @description Generic data type of a widget
+ * 
+ */
+.factory('WbWidget', function () {
+    var wbWidget = function (model, ctrl) {
+        this.$ctrl = ctrl;
+        this.$model = model;
+    };
 
-	    wbWidget.prototype.getType = function () {
-		return this.$model.type;
-	    };
+    wbWidget.prototype.getType = function () {
+        return this.$model.type;
+    };
 
-	    wbWidget.prototype.getModel = function () {
-		return this.$model;
-	    };
+    wbWidget.prototype.getModel = function () {
+        return this.$model;
+    };
 
-	    wbWidget.prototype.getCtrl = function () {
-		return this.$ctrl;
-	    };
-	    
-	    wbWidget.prototype.getParent = function () {
-		if (this.$ctrl.isRoot()) {
-		    return null;
-		} 
-		var parentCtrl = this.$ctrl.getParent();
-		return new wbWidget(parentCtrl.getModel(), parentCtrl);
-	    };
+    wbWidget.prototype.getCtrl = function () {
+        return this.$ctrl;
+    };
 
-	    return wbWidget;
-	});
+    wbWidget.prototype.getParent = function () {
+        if (this.$ctrl.isRoot()) {
+            return null;
+        } 
+        var parentCtrl = this.$ctrl.getParent();
+        return new wbWidget(parentCtrl.getModel(), parentCtrl);
+    };
+
+    return wbWidget;
+});
 /* 
  * The MIT License (MIT)
  * 
@@ -4962,10 +4978,10 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-	/**
-	 * Load widgets
-	 */
-	.run(function ($widget) {
+/*
+ * Load widgets
+ */
+.run(function ($widget) {
 
 	    /*
 	    * @ngdoc Widgets
