@@ -46,7 +46,7 @@ angular.module('am-wb-core')
 		type: 'Group',
 		title: 'Group',
 		description: 'Panel contains list of widgets.',
-		icon: 'wb-widget-group',
+		icon: 'widgets',
 		groups: ['basic'],
 		model: {
 		    style: {

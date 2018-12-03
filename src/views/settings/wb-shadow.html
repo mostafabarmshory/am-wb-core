@@ -15,10 +15,11 @@
         class='md-hue-3'>
         <div layout='row' layout-align='end center'>
 
-            <p style="font-size: 14px" flex>Shadow {{$index + 1}}</p>
+            <p style="font-size: 14px" flex tab-index="0">Shadow {{$index + 1}}</p>
             <md-button 
                 flex='10' 
                 class="md-icon-button" 
+                aria-label="Delete shadow"
                 ng-click="ctrl.remove($index)">
                 <wb-icon>delete</wb-icon>
             </md-button>
