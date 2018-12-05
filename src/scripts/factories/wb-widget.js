@@ -23,43 +23,46 @@
  */
 'use strict';
 
-angular.module('am-wb-core')
-/**
- * @ngdoc Factories
- * @name wb-widget
- * @description Generic data type of a widget
- * 
+/*
+ * NOTE: the widget (or group) controller is replaced with the following one.
  */
-.factory('WbWidget', function () {
-    var wbWidget = function (model, ctrl, scope) {
-        this.$ctrl = ctrl;
-        this.$model = model;
-        this.$scope = scope;
-    };
-
-    wbWidget.prototype.getType = function () {
-        return this.$model.type;
-    };
-
-    wbWidget.prototype.getModel = function () {
-        return this.$model;
-    };
-
-    wbWidget.prototype.getCtrl = function () {
-        return this.$ctrl;
-    };
-
-    wbWidget.prototype.getParent = function () {
-        if (this.$ctrl.isRoot()) {
-            return null;
-        } 
-        var parentCtrl = this.$ctrl.getParent();
-        return new wbWidget(parentCtrl.getModel(), parentCtrl);
-    };
-    
-    wbWidget.prototype.getScope = function () {
-        return this.$scope;
-    };
-
-    return wbWidget;
-});
+// angular.module('am-wb-core')
+// /**
+// * @ngdoc Factories
+// * @name wb-widget
+// * @description Generic data type of a widget
+// *
+// */
+// .factory('WbWidget', function () {
+// var wbWidget = function (model, ctrl, scope) {
+// this.$ctrl = ctrl;
+// this.$model = model;
+// this.$scope = scope;
+// };
+//
+// wbWidget.prototype.getType = function () {
+// return this.$model.type;
+// };
+//
+// wbWidget.prototype.getModel = function () {
+// return this.$model;
+// };
+//
+// wbWidget.prototype.getCtrl = function () {
+// return this.$ctrl;
+// };
+//
+// wbWidget.prototype.getParent = function () {
+// if (this.$ctrl.isRoot()) {
+// return null;
+// }
+// var parentCtrl = this.$ctrl.getParent();
+// return new wbWidget(parentCtrl.getModel(), parentCtrl);
+// };
+//    
+// wbWidget.prototype.getScope = function () {
+// return this.$scope;
+// };
+//
+// return wbWidget;
+// });
