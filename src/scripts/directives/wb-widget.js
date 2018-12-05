@@ -33,6 +33,8 @@ angular.module('am-wb-core')
  * This is widget containers.
  * 
  * All primary actions of a widget are supported (such as remove and setting).
+ * 
+ * @deprecated
  */
 .directive('wbWidget', function($wbUtil) {
 	function postLink($scope, $element, $attrs, $ctrls, $transclude) {
@@ -51,107 +53,6 @@ angular.module('am-wb-core')
 		$scope.group = group;
 	}
 
-	/**
-	 * @ngdoc Controllers
-	 * @name wbWidgetCtrl
-	 * @description Controller of a widget
-	 * 
-	 * 
-	 * @ngInject
-	 */
-	function wbWidgetCtrl($scope/*, $element*/) {
-		var callbacks = {};
-		var ctrl = this;
-
-		function fire(type){
-			if(angular.isDefined(callbacks[type])){
-				for(var i = 0; i < callbacks[type].length; i++){
-					try{
-						callbacks[type][i]();
-					} catch (error){
-//						console.log(error);
-					}
-				}
-			}
-		}
-
-		/**
-		 * Delete the widget
-		 * 
-		 * This function just used in edit mode
-		 */
-		ctrl.delete = function(){
-		    if(!ctrl.isEditable()){
-		        return;
-		    }
-			fire('delete');
-			$scope.group.removeChild($scope.wbModel, ctrl);
-			callbacks = {};
-		};
-
-		/**
-		 * Clone current widget
-		 * 
-		 * This method works in edit mode only.
-		 */
-		ctrl.clone = function(){
-            if(!ctrl.isEditable()){
-                return;
-            }
-			return $wbUtil.clean(angular.copy($scope.wbModel));
-		};
-
-		ctrl.getModel = function(){
-			return $scope.wbModel;
-		};
-
-		ctrl.getParent = function(){
-			return $scope.group;
-		};
-
-		ctrl.isEditable = function(){
-			return  $scope.group.isEditable();
-		};
-		
-		ctrl.isRoot = function () {
-		    return null;
-		};
-
-		ctrl.isSelected = function(){
-			return $scope.group.isChildSelected(ctrl);
-		};
-
-		ctrl.setSelected = function(flag) {
-			if(flag) {
-				$scope.group.childSelected(this);
-			}
-		};
-
-		ctrl.getActions = function(){
-			return [{
-				title: 'Delete',
-				icon: 'delete',
-				action: ctrl.delete,
-				description: 'Delete widget (Delete)'
-			},{
-				title: 'Clone',
-				icon: 'content_copy',
-				action: function(){
-					var model = $wbUtil.clean(angular.copy($scope.wbModel));
-					var index = $scope.group.indexOfChild($scope.wbModel);
-					$scope.group.addChild(index, model);
-				},
-				description: 'Duplicate widget (ctrl+D)'
-			}];
-		};
-
-		ctrl.on = function(type, callback){
-			if(!angular.isArray(callbacks[type])){
-				callbacks[type] = [];
-			}
-			callbacks[type].push(callback);
-		};
-	}
 
 	return {
 		templateUrl : 'views/directives/wb-widget.html',
@@ -159,7 +60,7 @@ angular.module('am-wb-core')
 		replace : true,
 		transclude: true,
 		link : postLink,
-		controller : wbWidgetCtrl,
+		controller : 'wbWidgetCtrl',
 		controllerAs: 'ctrl',
 		require:['wbWidget', '^^wbGroup', 'ngModel']
 	};

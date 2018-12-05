@@ -198,6 +198,19 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 		priority: 100
 	});
 
+	$widget.newWidget({
+	    type: 'hello-button',
+	    title: 'Hello button',
+        description : 'An HTML block which is used to test widgets explorer. Do not use in real usage   .',
+        icon : 'wb-widget-html',
+        template: '<md-button ng-click="ctrl.hi()">Say Hello</md-button>',
+        controller: function(){
+            this.hi = function(){
+                alert("Hello");
+            }
+        },
+        controllerAs: 'ctrl'
+	});
 
 	for(var i = 0; i < 5; i++){
 		// HTML text

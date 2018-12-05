@@ -31,9 +31,10 @@ angular.module('am-wb-core')
  * 
  */
 .factory('WbWidget', function () {
-    var wbWidget = function (model, ctrl) {
+    var wbWidget = function (model, ctrl, scope) {
         this.$ctrl = ctrl;
         this.$model = model;
+        this.$scope = scope;
     };
 
     wbWidget.prototype.getType = function () {
@@ -54,6 +55,10 @@ angular.module('am-wb-core')
         } 
         var parentCtrl = this.$ctrl.getParent();
         return new wbWidget(parentCtrl.getModel(), parentCtrl);
+    };
+    
+    wbWidget.prototype.getScope = function () {
+        return this.$scope;
     };
 
     return wbWidget;
