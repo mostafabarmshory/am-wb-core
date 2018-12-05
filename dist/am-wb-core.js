@@ -4983,56 +4983,52 @@ angular.module('am-wb-core')
  */
 .run(function ($widget) {
 
-    /**
-     * @ngdoc Widgets
-     * @name Group
-     * @description Parent widget of other widgets
-     * 
-     * default setting:
-     * - margin: '1px'
-     */
-    $widget.newWidget({
-        // widget description
-        type: 'Group',
-        title: 'Group',
-        description: 'Panel contains list of widgets.',
-        icon: 'wb-widget-group',
-        groups: ['basic'],
-        model: {
-            style: {
-                margin: '1px'
-            }
-        },
-        // functional properties
-        template: '<wb-group ng-model="wbModel"></wb-group>',
-        help: 'http://dpq.co.ir/more-information-link',
-        helpId: 'wb-widget-group'
-    });
-    /**
-     * @ngdoc Widgets
-     * @name Text
-     * @description Add rich text to page
-     * 
-     * This is a RTF to add to a page.
-     * 
-     */
-    $widget.newWidget({
-        // widget description
-        type: 'HtmlText',
-        title: 'Text',
-        description: 'An text block.',
-        icon: 'wb-widget-html',
-        groups: ['basic'],
-        model: {
-            text: '<h2>Text element</h2><p>Click on the text box to edit.</p>'
-        },
-        // help id
-        help: 'http://dpq.co.ir',
-        helpId: 'wb-widget-html',
-        // functional properties
-        templateUrl: 'views/widgets/wb-html.html'
-    });
-});
+	    /*
+	    * @ngdoc Widgets
+	    * @name Group
+	    * @description Parent widget of other widgets
+	    * default setting:
+	       {
+		   style: {
+			margin: '1px'
+		   }
+	       }    
+	    */
+	    $widget.newWidget({
+		// widget description
+		type: 'Group',
+		title: 'Group',
+		description: 'Panel contains list of widgets.',
+		icon: 'widgets',
+		groups: ['basic'],
+		model: {
+		    style: {
+			margin: '1px'
+		    }
+		},
+		// functional properties
+		template: '<wb-group ng-model="wbModel"></wb-group>',
+		help: 'http://dpq.co.ir/more-information-link',
+		helpId: 'wb-widget-group'
+	    });
+	    // HTML text
+	    $widget.newWidget({
+		// widget description
+		type: 'HtmlText',
+		title: 'Text',
+		description: 'An text block.',
+		icon: 'wb-widget-html',
+		groups: ['basic'],
+		model: {
+		    text: '<h2>Text element</h2><p>Click on the text box to edit.</p>'
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-html',
+		// functional properties
+		templateUrl: 'views/widgets/wb-html.html'
+	    });
+	});
 
 /* 
  * The MIT License (MIT)
@@ -6556,12 +6552,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource-single-page.html',
-    "<md-dialog aria-label=\"Select item/items\" style=\"width:50%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <md-button ng-if=openHelp ng-click=openHelp($event) aria-label=\"Show help\"> <span translate>Learn more</span> </md-button> <span flex></span> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> <md-button class=md-primary ng-click=answer()> <span translate>OK</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
+    "<md-dialog aria-label=\"Select item/items\" style=\"width:50%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <md-button ng-if=openHelp ng-click=openHelp($event) aria-label=\"Show help\"> <span translate=\"\">Learn more</span> </md-button> <span flex></span> <md-button ng-click=cancel() aria-label=Cancel> <span translate=\"\">Close</span> </md-button> <md-button class=md-primary aria-label=Done ng-click=answer()> <span translate=\"\">Ok</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
   );
 
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"Select item/items\" style=\"width:70%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <md-sidenav class=md-sidenav-left md-component-id=left md-is-locked-open=true md-whiteframe=4 layout=column ng-hide=\"pages.length === 1\"> <div style=\"text-align: center\"> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> <md-devider></md-devider> <md-content> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </md-content> </md-sidenav> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <span flex></span> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> <md-button class=md-primary ng-click=answer()> <span translate>OK</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
+    "<md-dialog aria-label=\"Select item/items\" style=\"width:70%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <md-sidenav class=md-sidenav-left md-component-id=left md-is-locked-open=true md-whiteframe=4 layout=column ng-hide=\"pages.length === 1\"> <div style=\"text-align: center\"> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> <md-devider></md-devider> <md-content> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </md-content> </md-sidenav> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <span flex></span> <md-button aria-label=Cancel ng-click=cancel()> <span translate=\"\">Close</span> </md-button> <md-button class=md-primary aria-label=Done ng-click=answer()> <span translate=\"\">Ok</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
   );
 
 
@@ -6655,7 +6651,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-length.html',
-    "<div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <wb-icon ng-if=icon>{{icon}}</wb-icon> <span flex ng-if=title translate=\"\">{{::title}} <md-tooltip ng-if=description md-delay=1500>{{::description}}</md-tooltip> </span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input type=number ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select style=max-width:75px ng-model=internalUnit ng-change=\"updateLength(internalUnit, internalValue)\"> <md-option ng-repeat=\"type in ::types track by $index\" value={{::type}}> {{::type}} </md-option> </md-select> </md-input-container> </div> <md-slider-container ng-disabled=!ctrl.isNumerical() style=\"margin:0px; padding:0px; height:30px\" aria-label=\"display length vlaue with slider\" id=wb-ui-setting-length-slider> <md-slider min=0 max=99 ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-slider> </md-slider-container> </div>"
+    "<div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <wb-icon ng-if=icon>{{icon}}</wb-icon> <span flex ng-if=title translate=\"\">{{::title}} <md-tooltip ng-if=description md-delay=1500>{{::description}}</md-tooltip> </span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input type=number ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select style=max-width:75px ng-model=internalUnit ng-change=\"updateLength(internalUnit, internalValue)\"> <md-option ng-repeat=\"type in ::types track by $index\" value={{::type}}> {{::type}} </md-option> </md-select> </md-input-container> </div> <md-slider-container ng-disabled=!ctrl.isNumerical() style=\"margin:0px; padding:0px; height:30px\" aria-label=\"Choosing vlaue with slider\" id=wb-ui-setting-length-slider> <md-slider min=0 max=99 ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-slider> </md-slider-container> </div>"
   );
 
 
@@ -6732,7 +6728,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-border.html',
-    " <md-subheader class=md-hue-3> <span translate>Style and Color</span> </md-subheader>  <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=ctrl.style ng-change=ctrl.styleChanged(ctrl.style)> <md-option ng-repeat=\"style in ::styles\" value={{::style.value}}> {{::style.title}} </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=\"{{'Color'| translate}}\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=ctrl.color ng-change=ctrl.colorChanged(ctrl.color)> </wb-ui-setting-color>  <md-subheader class=md-hue-3> <span translate>Width</span> </md-subheader> <wb-ui-setting-length title=All icon=border_all description=\"Set all sides width\" ng-model=ctrl.widthAll ng-change=ctrl.widthAllChanged(ctrl.widthAll) extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=Top icon=border_top ng-model=ctrl.width.top ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Right icon=border_right ng-model=ctrl.width.right ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=ctrl.width.bottom ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Left icon=border_left ng-model=ctrl.width.left ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Radius</span> </md-subheader> <wb-ui-setting-length title=All icon=full_rounded description=\"Set all sides radius\" ng-model=ctrl.radiusAll ng-change=ctrl.radiusAllChanged(ctrl.radiusAll) extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=\"Top left\" icon=corner_top_left ng-model=ctrl.radius.topLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Top right\" icon=corner_top_right ng-model=ctrl.radius.topRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom right\" icon=corner_bottom_right ng-model=ctrl.radius.bottomRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom left\" icon=corner_bottom_left ng-model=ctrl.radius.bottomLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
+    " <md-subheader class=md-hue-3> <span translate=\"\">Style and Color</span> </md-subheader>  <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=ctrl.style ng-change=ctrl.styleChanged(ctrl.style)> <md-option ng-repeat=\"style in ::styles\" value={{::style.value}}> {{::style.title}} </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=\"{{'Color'| translate}}\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=ctrl.color ng-change=ctrl.colorChanged(ctrl.color)> </wb-ui-setting-color>  <md-subheader class=md-hue-3> <span translate=\"\">Width</span> </md-subheader> <wb-ui-setting-length title=All icon=border_all description=\"Set all sides width\" ng-model=ctrl.widthAll ng-change=ctrl.widthAllChanged(ctrl.widthAll) extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=Top icon=border_top ng-model=ctrl.width.top ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Right icon=border_right ng-model=ctrl.width.right ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=ctrl.width.bottom ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Left icon=border_left ng-model=ctrl.width.left ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate=\"\">Radius</span> </md-subheader> <wb-ui-setting-length title=All icon=full_rounded description=\"Set all sides radius\" ng-model=ctrl.radiusAll ng-change=ctrl.radiusAllChanged(ctrl.radiusAll) extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=\"Top left\" icon=corner_top_left ng-model=ctrl.radius.topLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Top right\" icon=corner_top_right ng-model=ctrl.radius.topRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom right\" icon=corner_bottom_right ng-model=ctrl.radius.bottomRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom left\" icon=corner_bottom_left ng-model=ctrl.radius.bottomLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
   );
 
 
@@ -6762,7 +6758,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-shadow.html',
-    " <div layout=row flex> <md-button ng-click=ctrl.addShadow()> <span translate=\"\">New shadow</span> </md-button> </div>  <div ng-repeat=\"shadow in wbModel.style.shadows track by $index\" layout=column> <md-toolbar style=\"padding-top:0px; padding-bottom:0px; padding-left: 16px; padding-right: 16px; min-height: 16px\" class=md-hue-3> <div layout=row layout-align=\"end center\"> <p style=\"font-size: 14px\" flex>Shadow {{$index + 1}}</p> <md-button flex=10 class=md-icon-button ng-click=ctrl.remove($index)> <wb-icon>delete</wb-icon> </md-button> </div> </md-toolbar> <div layout=column> <wb-ui-setting-length title=\"Horizontal Shift\" ng-model=shadow.hShift> </wb-ui-setting-length> <wb-ui-setting-length title=\"Vertical Shift\" ng-model=shadow.vShift> </wb-ui-setting-length> <wb-ui-setting-length title=Blur ng-model=shadow.blur> </wb-ui-setting-length> <wb-ui-setting-length title=Spread ng-model=shadow.spread> </wb-ui-setting-length> <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=shadow.color> </wb-ui-setting-color> <md-checkbox ng-model=shadow.inset aria-label=Inset> <span translate=\"\">Inset</span> </md-checkbox> </div> </div>"
+    " <div layout=row flex> <md-button ng-click=ctrl.addShadow()> <span translate=\"\">New shadow</span> </md-button> </div>  <div ng-repeat=\"shadow in wbModel.style.shadows track by $index\" layout=column> <md-toolbar style=\"padding-top:0px; padding-bottom:0px; padding-left: 16px; padding-right: 16px; min-height: 16px\" class=md-hue-3> <div layout=row layout-align=\"end center\"> <p style=\"font-size: 14px\" flex tab-index=0>Shadow {{$index + 1}}</p> <md-button flex=10 class=md-icon-button aria-label=\"Delete shadow\" ng-click=ctrl.remove($index)> <wb-icon>delete</wb-icon> </md-button> </div> </md-toolbar> <div layout=column> <wb-ui-setting-length title=\"Horizontal Shift\" ng-model=shadow.hShift> </wb-ui-setting-length> <wb-ui-setting-length title=\"Vertical Shift\" ng-model=shadow.vShift> </wb-ui-setting-length> <wb-ui-setting-length title=Blur ng-model=shadow.blur> </wb-ui-setting-length> <wb-ui-setting-length title=Spread ng-model=shadow.spread> </wb-ui-setting-length> <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=shadow.color> </wb-ui-setting-color> <md-checkbox ng-model=shadow.inset aria-label=Inset> <span translate=\"\">Inset</span> </md-checkbox> </div> </div>"
   );
 
 
@@ -6772,7 +6768,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/sheets/wb-themplates.html',
-    "<md-bottom-sheet class=\"md-list md-has-header\" md-colors=\"{backgroundColor: 'background-900'}\"> <div style=\"padding: 16px\">  <div layout=row layout-align=\"start center\" style=\"padding: 0px 8px; margin: 0px\"> <span translate>Start a new page</span> <span flex></span> <span translate>Template gallery</span> <md-divider></md-divider> <md-button aria-label=\"Hide template sheet\" class=md-icon-button ng-click=hideTemplates($event)> <wb-icon>keyboard_arrow_down </wb-icon></md-button> <md-menu> <md-button aria-label=\"Open them interactions menu\" class=md-icon-button ng-click=$mdMenu.open($event)> <wb-icon>more_vert </wb-icon></md-button> <md-menu-content width=4 md-colors=\"{backgroundColor: 'background'}\"> <md-menu-item> <md-button ng-click=hideTemplates($event)> <span translate>Hide templates</span> </md-button> </md-menu-item> </md-menu-content> </md-menu> </div>  <md-content layout=row md-colors=\"{backgroundColor: 'background-900'}\"> <div layout=column ng-repeat=\"template in templates\" ng-click=loadTemplate(template) layout-padding style=\"cursor: pointer\"> <img width=215px height=152px ng-src={{template.thumbnail}} style=\"border-bottom-width: 1px; border: solid\"> {{template.name}} </div> </md-content> </div> </md-bottom-sheet>"
+    "<md-bottom-sheet class=\"md-list md-has-header\" md-colors=\"{backgroundColor: 'background-900'}\"> <div style=\"padding: 16px\">  <div layout=row layout-align=\"start center\" style=\"padding: 0px 8px; margin: 0px\"> <span translate>Start a new page</span> <span flex></span> <span translate>Template gallery</span> <md-divider></md-divider> <md-button aria-label=\"Hide template sheet\" class=md-icon-button ng-click=hideTemplates($event)> <wb-icon>keyboard_arrow_down </wb-icon></md-button> <md-menu> <md-button aria-label=\"Open the interactions menu\" class=md-icon-button ng-click=$mdMenu.open($event)> <wb-icon>more_vert </wb-icon></md-button> <md-menu-content width=4 md-colors=\"{backgroundColor: 'background'}\"> <md-menu-item> <md-button ng-click=hideTemplates($event)> <span translate>Hide templates</span> </md-button> </md-menu-item> </md-menu-content> </md-menu> </div>  <md-content layout=row md-colors=\"{backgroundColor: 'background-900'}\"> <div layout=column ng-repeat=\"template in templates\" ng-click=loadTemplate(template) layout-padding style=\"cursor: pointer\"> <img width=215px height=152px ng-src={{template.thumbnail}} style=\"border-bottom-width: 1px; border: solid\"> {{template.name}} </div> </md-content> </div> </md-bottom-sheet>"
   );
 
 
