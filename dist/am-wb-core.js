@@ -425,6 +425,7 @@ var WbWidgetGroupCtrl = function($scope, $element, $wbUtil, $parse, $controller,
     var ctrl = this;
     this.on('modelChanged', function(){
         ctrl.loadWidgets(ctrl.getModel());
+        ctrl.loadEvents(ctrl.getModel());
     });
 };
 WbWidgetGroupCtrl.prototype = new WbAbstractWidget()
@@ -475,6 +476,32 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function(model){
     });
 };
 
+WbWidgetGroupCtrl.prototype.loadEvents = function (model) {
+    var ctrl = this;
+    var $element = this.getElement();
+    if (!model || !angular.isArray(model.event)) {
+        return;
+    }
+    var events = {};
+
+    model.event.forEach(function (e) {
+        switch (e.key) {
+        case 'onClick': {
+            var body = '\'use strict\';' + e.value;
+            var onClick = new Function(body);
+            events.onClick = onClick;
+        }
+        }
+    });
+    $element.on('click', function () {
+        if (ctrl.isEditable()) {
+            return;
+        }
+        if (events.onClick) {
+            eval(events.onClick);
+        }
+    });
+};
 
 WbWidgetGroupCtrl.prototype.childSelected = function(ctrl) {
     if(!this.isRoot()){
@@ -3791,18 +3818,23 @@ angular.module('am-wb-core')
  * 
  * @ngInject
  */
-function AbstractWidgetLocator() {
-    var abstractWidgetLocator = function () {
+function AbstractWidgetLocator($rootElement) {
+
+    /**
+     * Creates new instance of the widget locator
+     */
+    function abstractWidgetLocator() {
         this.callbacks = [];
-        this.element = null;
-        // TODO:
-    };
+        this.elements = [];
+    }
 
     abstractWidgetLocator.prototype.setVisible = function (visible) {
         this.visible = visible;
         if (visible) {
+            this.show();
             this.fire('show');
         } else {
+            this.hide();
             this.fire('hide');
         }
     };
@@ -3813,18 +3845,23 @@ function AbstractWidgetLocator() {
 
     abstractWidgetLocator.prototype.setWidget = function (widget) {
         this.widget = widget;
+        this.fire('widgetChanged');
     };
 
     abstractWidgetLocator.prototype.getWidget = function () {
         return this.widget;
     };
-    
-    abstractWidgetLocator.prototype.setElement = function (element) {
-        this.element = element;
+
+    abstractWidgetLocator.prototype.setElements = function (elements) {
+        this.elements = elements;
+        angular.forEach(elements, function (element) {
+            $rootElement.append(element);
+            element.hide();
+        });
     };
-    
-    abstractWidgetLocator.prototype.getElement = function () {
-        return this.element;
+
+    abstractWidgetLocator.prototype.getElements = function () {
+        return this.elements;
     };
 
     abstractWidgetLocator.prototype.on = function (type, callback) {
@@ -3846,6 +3883,27 @@ function AbstractWidgetLocator() {
         }
     };
 
+    abstractWidgetLocator.prototype.hide = function () {
+        angular.forEach(this.elements, function (element) {
+            element.hide();
+        });
+    }
+
+    abstractWidgetLocator.prototype.show = function (bound) {
+        angular.forEach(this.elements, function (element) {
+            element.show();
+        });
+    }
+
+    abstractWidgetLocator.prototype.destroy = function () {
+        this.fire('distroied');
+        angular.forEach(this.elements, function () {
+            element.remove();
+        });
+        this.elements = [];
+        this.callbacks = [];
+    }
+
     return abstractWidgetLocator;
 }
 
@@ -3861,22 +3919,77 @@ function AbstractWidgetLocator() {
  */
 function CursorWidgetLocator(AbstractWidgetLocator) {
 
-    var cursorWidgetLocator = function () {
-        // TODO:
-        var element = angular
-                .element('<div class="wb-widget-locator-cursor"></div>');
-        this.setElement(element);
+    var cursorWidgetLocator = function (options) {
+        options = options || {};
+        AbstractWidgetLocator.apply(this, options);
+
+        // load templates
+        var template = options.template
+                || '<div class="wb-widget-locator-cursor"></div>';
+
+        // load elements
+        this.topElement = angular.element(template);
+        this.topElement.attr('id', 'top');
+        
+        this.rightElement = angular.element(template);
+        this.rightElement.attr('id', 'right');
+        
+        this.buttomElement = angular.element(template);
+        this.buttomElement.attr('id', 'buttom');
+        
+        this.leftElement = angular.element(template);
+        this.leftElement.attr('id', 'left');
+
+        // init controller
+        this.setElements([ this.topElement, this.rightElement,
+                this.buttomElement, this.leftElement ]);
         var ctrl = this;
-        this.on('show', function () {
-            var el = ctrl.getElement();
-            el.show();
-        });
-        this.on('hide', function () {
-            var el = ctrl.getElement();
-            el.hide();
+        this.on('widgetChanged', function () {
+            ctrl.updateView();
         });
     };
     cursorWidgetLocator.prototype = new AbstractWidgetLocator();
+
+    cursorWidgetLocator.prototype.updateView = function () {
+        var widget = this.getWidget();
+        if (!widget) {
+            this.hide();
+            return;
+        }
+        this.show();
+
+        var widgetElement = widget.getElement();
+        var offset = widgetElement.offset();
+
+        var elements = this.elements;
+        var bound = {
+            top : offset.top,
+            left : offset.left,
+            width : widgetElement.width(),
+            height : widgetElement.height(),
+        };
+        this.topElement.css({
+            top : bound.top + 1,
+            left : bound.left + 1,
+            width : bound.width - 2
+        });
+        this.rightElement.css({
+            top : bound.top + 1,
+            left : bound.left + bound.width - 2,
+            height : bound.height - 2
+        });
+        this.buttomElement.css({
+            top : bound.top + bound.height - 1,
+            left : bound.left + 1,
+            width : bound.width - 2
+        });
+        this.leftElement.css({
+            top : bound.top + 1,
+            left : bound.left + 1,
+            height : bound.height - 2
+        });
+
+    };
     return cursorWidgetLocator;
 }
 
