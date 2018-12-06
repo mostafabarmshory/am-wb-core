@@ -85,12 +85,6 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         // layout
         css = _.merge(css, convertToWidgetCssLayout(style.layout || {}));
 
-        // margin
-        css = _.merge(css, style.margin || {});
-
-        // padding
-        css = _.merge(css, style.padding || {});
-
         // background
         css = _.merge(css, convertToWidgetCssBackground(style.background || {}));
 
@@ -102,6 +96,8 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         
         // color, cursor, opacity
         css = _.merge(css, {
+            padding: style.padding,
+            margin: style.margin,
             color: style.color || 'initial',
             cursor: style.cursor || 'auto',
             opacity: style.opacity || '1'

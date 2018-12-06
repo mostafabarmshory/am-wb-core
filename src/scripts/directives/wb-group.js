@@ -40,14 +40,8 @@ angular.module('am-wb-core')
         // Loads wbGroup
         var ctrl = $ctrls[0];
 
-        // Loads wbGroup
-        var wbGroupCtrl = $ctrls[1];
-        if(wbGroupCtrl){
-            $scope.container = wbGroupCtrl;
-        }
-
         // Load ngModel
-        var ngModelCtrl = $ctrls[2];
+        var ngModelCtrl = $ctrls[1];
         ngModelCtrl.$render = function() {
             ctrl.setModel(ngModelCtrl.$viewValue);
         };
@@ -55,24 +49,24 @@ angular.module('am-wb-core')
         /*
          * Watch for editable in root element
          */
-        if(!wbGroupCtrl){
-            $scope.$watch('wbEditable', function(editable){
-                ctrl.setEditable(editable);
-            });
-        }
+        $scope.$watch('wbEditable', function(editable){
+            ctrl.setEditable(editable);
+        });
 
         if($scope.wbOnModelSelect) {
             var onModelSelectionFu = $parse($scope.wbOnModelSelect);
             ctrl.on('widgetSelected', function($event){
                 var widgets = $event.widgets;
-                var ctrl = widgets[0];
-                $scope.$eval(function() {
-                    onModelSelectionFu($scope.$parent, {
+                var locals = {
                         '$event': $event,
-                        '$model': ctrl.getModel(),
-                        '$ctrl': ctrl,
                         'widgets': widgets
-                    });
+                };
+                if(angular.isArray(widgets) && widgets.length){
+                    locals.$model =ctrl.getModel();
+                    locals.$ctrl = ctrl;
+                }
+                $scope.$eval(function() {
+                    onModelSelectionFu($scope.$parent, locals);
                 });
             });
         }
@@ -92,6 +86,6 @@ angular.module('am-wb-core')
         link : wbGroupLink,
         controllerAs: 'ctrl',
         controller: 'WbWidgetGroupCtrl',
-        require:['wbGroup', '?^^wbGroup', 'ngModel']
+        require:['wbGroup', 'ngModel']
     };
 });
