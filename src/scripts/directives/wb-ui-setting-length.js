@@ -25,95 +25,97 @@
 
 angular.module('am-wb-core')
 
-        /**
-         * @ngdoc Directives
-         * @name wbUiSettingLength
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingLength
+ */
+.directive('wbUiSettingLength', function () {
+
+    function postLink($scope, $element, $attrs, ngModel) {
+        ngModel.$render = function () {
+            pars(ngModel.$modelValue);
+        };
+
+        // Add all length by default
+        $scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
+        $scope.extraValues = $scope.extraValues || [];
+        var types = $scope.extraValues;
+        if (types) { 
+            types = types.concat($scope.lengthValues);
+            if (types.includes('length')) {
+                var index = types.indexOf('length');
+                types.splice(index, 1);
+            }
+        } else {
+            types = $scope.lengthValues;
+        }
+
+        $scope.types = types;
+
+        function pars(value) {
+            if (!value) {
+                $scope.internalUnit = types[0];
+                $scope.internalValue = 0;
+            } else {
+                split(value);
+            }
+        }
+
+        $scope.updateLength = function(unit, value) {
+            if ($scope.lengthValues.includes(unit)) {
+                ngModel.$setViewValue(value+unit);
+            } else {
+                ngModel.$setViewValue(unit);
+            }
+        };
+
+        /*
+         * @param {type} val
+         * @returns {undefined}
+         * decsription  Splite value to 'unit' and 'value'
          */
-        .directive('wbUiSettingLength', function () {
-
-            function postLink($scope, $element, $attrs, ngModel) {
-                ngModel.$render = function () {
-                    pars(ngModel.$modelValue);
-                };
-
-                // Add all length by default
-                $scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
-                $scope.extraValues = $scope.extraValues || [];
-                var types = $scope.extraValues;
-                if (types) { 
-                    types = types.concat($scope.lengthValues);
-                    if (types.includes('length')) {
-                        var index = types.indexOf('length');
-                        types.splice(index, 1);
-                    }
-                } else {
-                    types = $scope.lengthValues;
-                }
-
-                $scope.types = types;
-
-                function pars(value) {
-                    if (!value) {
-                        $scope.internalUnit = types[0];
-                        $scope.internalValue = 0;
-                    } else {
-                        split(value);
-                    }
-                }
-                
-                $scope.updateLength = function(unit, value) {
-		    if ($scope.lengthValues.includes(unit)) {
-			ngModel.$setViewValue(value+unit);
-		    } else {
-			ngModel.$setViewValue(unit);
-		    }
-                };
-
+        function split(val) {
+            if ($scope.extraValues.includes(val)) {
+                $scope.internalUnit = val;
+            } else {
                 /*
-                 * @param {type} val
-                 * @returns {undefined}
-                 * decsription  Splite value to 'unit' and 'value'
+                 * A regex which groups the val into the value and unit(such as 10px -> 10 , px).
+                 * This regex also support signed float format such as (+10.75%, -100.76em)
                  */
-                function split(val) {
-                    if ($scope.extraValues.includes(val)) {
-                        $scope.internalUnit = val;
-                    } else {
-                        /*
-                         * A regex which groups the val into the value and unit(such as 10px -> 10 , px).
-                         * This regex also support signed float format such as (+10.75%, -100.76em)
-                         */
-                        var regex = /^([+-]?\d+\.?\d*)([a-zA-Z%]*)$/;
-                        var matches = regex.exec(val);
-                        $scope.internalValue = Number(matches[1]);
-                        $scope.internalUnit = matches[2];
-                    }
+                var regex = /^([+-]?\d+\.?\d*)([a-zA-Z%]*)$/;
+                var matches = regex.exec(val);
+                if(angular.isArray(matches)){
+                    $scope.internalValue = Number(matches[1]);
+                    $scope.internalUnit = matches[2];
                 }
             }
+        }
+    }
 
-            return {
-                templateUrl: 'views/directives/wb-ui-setting-length.html',
-                restrict: 'E',
-                replace: true,
-                scope: {
-                    title: '@title',
-                    icon: '@?',
-                    description: '@?',
-                    extraValues: '<?'
-                },
-                /*
-                 * @ngInject
-                 */
-                controller: function ($scope) {
-                    /**
-                     * Check if the current unit is numerical
-                     */
-                    this.isNumerical = function () {
-                          return $scope.lengthValues.includes($scope.internalUnit);
-                    };
-
-                },
-                controllerAs: 'ctrl',
-                link: postLink,
-                require: 'ngModel'
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-length.html',
+        restrict: 'E',
+        replace: true,
+        scope: {
+            title: '@title',
+            icon: '@?',
+            description: '@?',
+            extraValues: '<?'
+        },
+        /*
+         * @ngInject
+         */
+        controller: function ($scope) {
+            /**
+             * Check if the current unit is numerical
+             */
+            this.isNumerical = function () {
+                return $scope.lengthValues.includes($scope.internalUnit);
             };
-        });
+
+        },
+        controllerAs: 'ctrl',
+        link: postLink,
+        require: 'ngModel'
+    };
+});

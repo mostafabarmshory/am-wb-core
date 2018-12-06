@@ -132,7 +132,7 @@ function AbstractWidgetLocator($rootElement) {
  * 
  * @ngInject
  */
-function CursorWidgetLocator(AbstractWidgetLocator) {
+function CursorWidgetLocator(AbstractWidgetLocator, $rootScope) {
 
     var cursorWidgetLocator = function (options) {
         options = options || {};
@@ -140,32 +140,54 @@ function CursorWidgetLocator(AbstractWidgetLocator) {
 
         // load templates
         var template = options.template
-                || '<div class="wb-widget-locator-cursor"></div>';
+        || '<div class="wb-widget-locator-cursor"></div>';
 
         // load elements
         this.topElement = angular.element(template);
         this.topElement.attr('id', 'top');
-        
+
         this.rightElement = angular.element(template);
         this.rightElement.attr('id', 'right');
-        
+
         this.buttomElement = angular.element(template);
         this.buttomElement.attr('id', 'buttom');
-        
+
         this.leftElement = angular.element(template);
         this.leftElement.attr('id', 'left');
 
         // init controller
         this.setElements([ this.topElement, this.rightElement,
-                this.buttomElement, this.leftElement ]);
+            this.buttomElement, this.leftElement ]);
         var ctrl = this;
+        function getBound() {
+            var $element = ctrl.getWidget().getElement();
+            var off = $element.offset();
+            return {
+                left: off.left,
+                top: off.top,
+                width: $element.outerWidth(),
+                height: $element.outerHeight()
+            };
+        }
         this.on('widgetChanged', function () {
-            ctrl.updateView();
+            if(ctrl._oldWidgetWatch) {
+                ctrl._oldWidgetWatch();
+            }
+            var widge = ctrl.getWidget();
+            if(widge) {
+                widge.getScope().$watch(getBound, function (bound) {
+                    if (!bound) {
+                        return;
+                    }
+                    ctrl.updateView(bound);
+                }, true);
+            }
+            ctrl.updateView(getBound());
         });
     };
     cursorWidgetLocator.prototype = new AbstractWidgetLocator();
 
-    cursorWidgetLocator.prototype.updateView = function () {
+    cursorWidgetLocator.prototype.updateView = function (bound) {
         var widget = this.getWidget();
         if (!widget) {
             this.hide();
@@ -173,16 +195,6 @@ function CursorWidgetLocator(AbstractWidgetLocator) {
         }
         this.show();
 
-        var widgetElement = widget.getElement();
-        var offset = widgetElement.offset();
-
-        var elements = this.elements;
-        var bound = {
-            top : offset.top,
-            left : offset.left,
-            width : widgetElement.width(),
-            height : widgetElement.height(),
-        };
         this.topElement.css({
             top : bound.top + 1,
             left : bound.left + 1,
