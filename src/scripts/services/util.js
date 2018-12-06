@@ -76,8 +76,8 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
     /**
      * Converts data into a valid CSS attributes
      */
-    function convertToWidgetCss(wbModel) {
-        var style = wbModel.style || {};
+    function convertToWidgetCss(style) {
+        var style = style || {};
         var css = {};
         // size
         css = _.merge(css, style.size || {});
@@ -95,7 +95,7 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         css = _.merge(css, convertToWidgetCssBackground(style.background || {}));
 
         // border
-        css = _.merge(css, convertToWidgetCssBoarder(style.background || {}));
+        css = _.merge(css, convertToWidgetCssBoarder(style.border || {}));
 
         // shadows
         css = _.merge(css, convertToWidgetCssShadows(style.shadows || {}));
