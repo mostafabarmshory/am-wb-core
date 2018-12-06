@@ -209,12 +209,7 @@ angular.module('am-wb-core')
 
                 'dnd-moved="ctrl.delete()" '+
 
-                'md-theme-watch="true" '+
-                'ng-class="{ '+
-                '    \'wb-widget-edit\': ctrl.isEditable(), '+
-                '    \'wb-widget-select\': ctrl.isSelected() '+
-                '}" '+
-                '>' + template + '</div>';
+                'md-theme-watch="true">' + template + '</div>';
             }
             element = angular.element(template);
 
