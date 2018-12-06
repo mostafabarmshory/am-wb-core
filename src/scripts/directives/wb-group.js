@@ -30,7 +30,7 @@ angular.module('am-wb-core')
  * @description Render a list of widget
  * 
  */
-.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings) {
+.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $parse) {
 
     /*
      * Link widget view
@@ -58,6 +58,22 @@ angular.module('am-wb-core')
         if(!wbGroupCtrl){
             $scope.$watch('wbEditable', function(editable){
                 ctrl.setEditable(editable);
+            });
+        }
+
+        if($scope.wbOnModelSelect) {
+            var onModelSelectionFu = $parse($scope.wbOnModelSelect);
+            ctrl.on('widgetSelected', function($event){
+                var widgets = $event.widgets;
+                var ctrl = widgets[0];
+                $scope.$eval(function() {
+                    onModelSelectionFu($scope.$parent, {
+                        '$event': $event,
+                        '$model': ctrl.getModel(),
+                        '$ctrl': ctrl,
+                        'widgets': widgets
+                    });
+                });
             });
         }
     }

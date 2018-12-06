@@ -29,29 +29,6 @@
 					]
 				}
 			]
-		},
-		{
-			"type": "Group",
-			"name": "Chile 1",
-			"contents": [
-				{
-					"type": "Group",
-					"name": "Chile 2",
-					"contents": [
-						{
-							"type": "Group",
-							"name": "Chile 3",
-							"contents": [
-								{
-									"type": "HtmlText",
-									"name": "Widget",
-									"text": "<h2>HTML Text In 4th group1</h2>"
-								}
-							]
-						}
-					]
-				}
-			]
 		}
 	]
 }

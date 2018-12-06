@@ -44,12 +44,13 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
         $scope.model = $wbUtil.clean(res.data);
     });
     
-    $scope.widgetUnderCursor = function(widget){
-        cursorWidgetLocator.setWidget(widget);
+    $scope.widgetUnderCursor = function($event){
+        cursorWidgetLocator.setWidget($event.widget);
     }
 
     // load setting of model
-    $scope.loadSettings = function(widgets){
+    $scope.loadSettings = function($event){
+        var widgets = $event.widgets;
         if(widgets.length) {
             $scope.selectedWidget = widgets[0];
             $scope.actions = widget.getActions();

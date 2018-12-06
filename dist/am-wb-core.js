@@ -152,8 +152,29 @@ angular.module('am-wb-core')
 var WbAbstractWidget = function(){
     this.actions = [];
     this.callbacks = [];
+    this.contents = [];
     this.$scope = null;
     this.$element = null;
+}
+
+WbAbstractWidget.prototype.destroy = function() {
+    // remove callbacks
+    this.callbacks = [];
+    this.actions = [];
+
+    // destroy children
+    angular.forEach(this.contents, function(widget){
+        widget.destroy();
+    });
+    this.contents = [];
+
+    // destroy view
+    this.$element.remove();
+    this.$element = null;
+
+    // remove scope
+    this.$scope.$destroy();
+    this.$scope = null;
 }
 
 WbAbstractWidget.prototype.setElement = function($element) {
@@ -164,16 +185,26 @@ WbAbstractWidget.prototype.getElement = function() {
     return this.$element;
 }
 
-WbAbstractWidget.prototype.fire = function(type){
-    if(angular.isDefined(this.callbacks[type])){
-        for(var i = 0; i < this.callbacks[type].length; i++){
-            try{
-                this.callbacks[type][i]();
-            } catch (error){
-                console.log(error);
-            }
-        }
+WbAbstractWidget.prototype.fire = function(type, params){
+    if(!angular.isDefined(this.callbacks[type])){
+        return;
     }
+    // create event
+    var event = _.merge({}, params || {});
+    event.source = this;
+    event.type = type;
+
+    // fire
+    var callbacks = this.callbacks[type];
+    angular.forEach(callbacks, function(callback){
+        try{
+            callback(event);
+            // TODO: check propagations
+        } catch (error){
+            // NOTE: remove on release
+            console.log(error);
+        }
+    });
 };
 
 /**
@@ -218,14 +249,15 @@ WbAbstractWidget.prototype.setModel = function(model){
  * on the render phease.
  */
 WbAbstractWidget.prototype.getParent = function(){
-    return this.$scope.container;
+    return this.parent;
+};
+
+WbAbstractWidget.prototype.setParent = function(widget){
+    return this.parent = widget;
 };
 
 WbAbstractWidget.prototype.isEditable = function(){
-    if(this.isRoot()){
-        return this.$scope.editable;
-    }
-    return this.getParent().isEditable();
+    return this.editable;
 };
 
 WbAbstractWidget.prototype.setScope = function($scope){
@@ -236,15 +268,32 @@ WbAbstractWidget.prototype.getScope = function(){
 };
 
 WbAbstractWidget.prototype.setEditable = function(editable){
-    this.$scope.editable = editable;
-    if(editable){
-        if(this.isRoot()) {
-            delete this.lastSelectedItem;
-            this.setSelected(true);
-        }
-    } else {
-        this.childSelected(null);
+    if(this.editable === editable){
+        return;
     }
+    this.editable = editable;
+    var $element = this.getElement();
+    if(this.isRoot()) {
+        delete this.lastSelectedItem;
+        this.setSelected(true);
+    }
+    if(editable){
+        // Lesson on click
+        var ctrl = this;
+        this.widgetSelectHandler = function(event) {
+            ctrl.setSelected(true);
+            event.stopPropagation();
+        }
+        $element.on('click', this.widgetSelectHandler);
+    } else {
+        // remove selection handler
+        $element.off('click', this.widgetSelectHandler);
+        delete this.widgetSelectHandler;
+    }
+    // propagate to child
+    angular.forEach(this.contents, function(widget){
+        widget.setEditable(editable);
+    });
 };
 
 /**
@@ -253,17 +302,9 @@ WbAbstractWidget.prototype.setEditable = function(editable){
  * This function just used in edit mode
  */
 WbAbstractWidget.prototype.delete = function(){
-    if(!this.isEditable()){
-        return;
-    }
     this.fire('delete');
     this.getParent() //
-    .removeChild(this.getModel(), this);
-    // Make a promise to remove
-// .then(function(){
-// ctrl.fire('delete');
-// ctrl.distroy();
-// });
+    .removeChild(this);
 };
 
 
@@ -307,16 +348,6 @@ WbAbstractWidget.prototype.getActions = function(){
     return this.actions;
 };
 
-/**
- * Gets widget actions
- */
-WbAbstractWidget.prototype.addOnModelSelectCallback = function(callback){
-    // TODO: maso, 2018: add to a list of callback
-    this.onModelSelectCallback  = callback; 
-};
-
-
-
 
 /**
  * @ngdoc Controllers
@@ -326,16 +357,10 @@ WbAbstractWidget.prototype.addOnModelSelectCallback = function(callback){
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function($scope, $element, $wbUtil, $parse) {
+var WbWidgetCtrl = function($scope, $element, $wbUtil) {
     WbAbstractWidget.call(this);
     this.setElement($element);
     this.setScope($scope);
-
-
-    // Support selection function
-    if($scope.wbOnModelSelect) {
-        this.addOnModelSelectCallback($parse($scope.wbOnModelSelect));
-    }
 
     var ctrl = this;
 
@@ -361,31 +386,24 @@ var WbWidgetCtrl = function($scope, $element, $wbUtil, $parse) {
         description: 'Duplicate widget (ctrl+D)'
     });
 
-    $scope.$watch('wbModel', function(model){
-        ctrl.setModel(model);
-    });
-
-    // TODO: maso, 2018: watch style (only in edit mod)
-    $scope.$watch('wbModel.style', function(style){
-        var cssStyle = $wbUtil.convertToWidgetCss(style || {}   );
-        $element.css(cssStyle);
-    }, true);
-
-    $element.on('click', function (event) {
-        // Check edit mode
-        if(ctrl.isEditable()){
-            ctrl.setSelected(true);
-            event.stopPropagation();
-            $scope.$apply();
+    this.on('modelChanged', function(){
+        var model = ctrl.getModel();
+        var $element = ctrl.getElement();
+        // to support old widget
+        ctrl.getScope().wbModel = model;
+        // update style
+        if(!model){
             return;
         }
+        var cssStyle = $wbUtil.convertToWidgetCss(model.style || {}   );
+        $element.css(cssStyle);
     });
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget()
 
 
 /**
- * @ngdoc Controlles
+ * @ngdoc Controllers
  * @name WbWidgetGroupCtrl
  * @description Manages a group widget
  * 
@@ -403,51 +421,13 @@ var WbWidgetGroupCtrl = function($scope, $element, $wbUtil, $parse, $controller,
     this.$widget = $widget;
     this.$q = $q;
     this.$mdTheming = $mdTheming;
-    
+
     var ctrl = this;
     this.on('modelChanged', function(){
         ctrl.loadWidgets(ctrl.getModel());
     });
 };
 WbWidgetGroupCtrl.prototype = new WbAbstractWidget()
-
-
-// /**
-// * Delete data model and widget display
-// *
-// * @name delete
-// * @memberof wbGroupCtrl
-// */
-// ctrl.delete = function(){
-// if(this.isRoot()){
-// //TODO: mao, 2018: clear all elements
-// return;
-// }
-// $scope.parentCtrl.removeChild($scope.wbModel, this);
-// fire('delete');
-// };
-
-
-
-// ctrl.isEditable = function(){
-// if(this.isRoot()){
-// return $scope.editable;
-// }
-// return $scope.parentCtrl.isEditable();
-// };
-
-// ctrl.isSelected = function(){
-// return this.isChildSelected(this);
-// };
-
-// ctrl.setSelected = function(flag) {
-// if(!this.isRoot()){
-// return $scope.parentCtrl.childSelected(this);
-// }
-// if(flag) {
-// this.childSelected(this);
-// }
-// };
 
 /**
  * Check if the widget is selected
@@ -460,32 +440,37 @@ WbWidgetGroupCtrl.prototype.isChildSelected = function(widget){
 };
 
 WbWidgetGroupCtrl.prototype.loadWidgets = function(model){
-    var $element = this.getElement();
-    $element.empty();
+    // destroy all children
+    angular.forEach(this.contents, function(widget){
+        widget.distroy();
+    });
+    this.contents = [];
+
+    // check for new contents
     if(!model || !angular.isArray(model.contents)){
         return;
     }
-    
+
+    // create contents
     var $widget = this.$widget;
     var $mdTheming = this.$mdTheming;
     var parentWidget = this;
     var $q = this.$q;
 
     var compilesJob = [];
-    var elements = [];
     model.contents.forEach(function(item, index) {
         var job = $widget.compile(item, parentWidget)//
-        .then(function(element) {
-            $mdTheming(element);
-            elements[index] = element;
+        .then(function(widget) {
+            parentWidget.contents[index] = widget;
         });
         compilesJob.push(job);
     });
 
     return $q.all(compilesJob)//
     .then(function() {
-        elements.forEach(function(element) {
-            $element.append(element);
+        var $element = parentWidget.getElement();
+        parentWidget.contents.forEach(function(widget) {
+            $element.append(widget.getElement());
         });
     });
 };
@@ -500,15 +485,9 @@ WbWidgetGroupCtrl.prototype.childSelected = function(ctrl) {
     }
     this.lastSelectedItem = ctrl;
     // maso, 2018: call the parent controller function
-    if(this.onModelSelectionFu) {
-        this.$scope.$eval(function() {
-            this.onModelSelectionFu(this.$scope.$parent, {
-                '$model': ctrl.getModel(),
-                '$ctrl': ctrl,
-                'widgets': [ctrl]
-            });
-        });
-    }
+    this.fire('widgetSelected', {
+        widgets: [ctrl]
+    });
 };
 
 /**
@@ -516,18 +495,19 @@ WbWidgetGroupCtrl.prototype.childSelected = function(ctrl) {
  * 
  * Data model and visual element related to the input model will be removed.
  */
-WbWidgetGroupCtrl.prototype.removeChild = function(childCtrl) {
-    var index = this.indexOfChild(childCtrl);
+WbWidgetGroupCtrl.prototype.removeChild = function(widget) {
+    var index = this.indexOfChild(widget);
     if (index > -1) {
-        if(this.isChildSelected(childCtrl)){
+        // remove selection
+        if(this.isChildSelected(widget)){
             this.childSelected(null);
         }
-        childCtrl.getElement().remove();
+        // remove model
         this.getModel().contents.splice(index, 1);
-        // TODO: replace with promise
-        return true;
+
+        // destroy widget
+        widget.destroy();
     }
-    // TODO: replace with promise
     return false;
 };
 
@@ -537,9 +517,6 @@ WbWidgetGroupCtrl.prototype.removeChild = function(childCtrl) {
 WbWidgetGroupCtrl.prototype.addChild = function(index, item) {
     var model = this.getModel();
     var parentElement = this.getElement();
-    if(!angular.isArray(model.contents)){
-        model.contents = [];
-    }
 
     // add widget
     $widget.compile(item, this)//
@@ -568,7 +545,7 @@ WbWidgetGroupCtrl.prototype.indexOfChild = function(widget) {
 };
 
 WbWidgetGroupCtrl.prototype.getAllowedTypes = function(){
-    return $scope.wbAllowedTypesl;
+    return this.$scope.wbAllowedTypesl;
 };
 
 
@@ -576,1149 +553,1149 @@ WbWidgetGroupCtrl.prototype.getAllowedTypes = function(){
 
 
 
-// submit the controller
+//submit the controller
 angular.module('am-wb-core')//
 .controller('WbWidgetCtrl',WbWidgetCtrl)//
 .controller('WbWidgetGroupCtrl',WbWidgetGroupCtrl);
 
 
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-background
- * @description Apply background into the element
- */
-.directive('wbBackground', function() {
-	/*
-	 * Sets background attributes into element
-	 * 
-	 */
-	function setBackgroud($element, style){
-		if (!style) {
-			return;
-		}
-		var cssValue = {};
-		if(style.background){
-			cssValue.background = style.background;
-		}
-		cssValue['background-image'] = (style.image) ? 'url(\''+style.image+'\')' : 'none';
-		cssValue['background-color'] = style.color || 'initial';
-		cssValue['background-size'] = style.size || 'auto';
-		cssValue['background-repeat'] = style.repeat || 'repeat';
-		cssValue['background-position'] = style.position || '0px 0px';
-		cssValue['background-attachment'] = style.attachment || 'scroll';
-		cssValue['background-origin'] = style.origin || 'padding-box';
-		cssValue['background-clip'] = style.clip || 'border-box';
-		
-		$element.css(cssValue);
-	}
-
-	function postLink($scope, $element, $attrs) {
-		return $scope.$watch($attrs.wbBackground + '.background', function(config){
-			return setBackgroud($element, config);
-		}, true);
-	}
-
-	return {
-		restrict : 'A',
-		link : postLink
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-border
- * @description Apply border into the element
- * 
- * Following attributes from CSS is set:
- * <ul>
- * <li>border-style from style</li>
- * <li>border-width from width</li>
- * <li>border-color from color</li>
- * <li>border-radius from radius</li>
- * </ul>
- * 
- * CSS model from CSS3 is accepted as standard
- * 
- * <pre><code>
- * 	{
- * 		style: solid,
- * 		width: 2px,
- * 		color: lightgrey,
- * 		radius: 5px
- * 	}
- * </code></pre>
- * 
- * @see https://www.w3schools.com/css/css_border.asp
- */
-.directive('wbBorder', function() {
-	return {
-		restrict : 'A',
-		link : function($scope, $element, $attrs) {
-			$scope.$watch($attrs.wbBorder + '.border', function(style) {
-				if (!style) {
-					return;
-				}
-				var conf = {};
-				if (style.style) {
-					conf['border-style'] = style.style;
-				}
-				if (style.width) {
-					conf['border-width'] = style.width;
-				}
-				if (style.color) {
-					conf['border-color'] = style.color;
-				}
-				if (style.radius) {
-					conf['border-radius'] = style.radius;
-				}
-				$element.css(conf);
-			}, true);
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-        /**
-         * @ngdoc Directives
-         * @name wb-color
-         * @description Apply color into the element
-         */
-        .directive('wbColor', function () {
-            return {
-                restrict: 'A',
-                link: function (scope, element, attributes) {
-                    return scope.$watch(attributes.wbColor, function (style) {
-                        var color = '';
-
-                        if (!style) {
-                            return;
-                        } else if (!style.color) {
-                            color = 'initial';
-                        } else {
-                            color = style.color;
-                        }
-
-                        element.css('color', color);
-
-                    }, true);
-                }
-            };
-        });
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-        /**
-         * @ngdoc Directives
-         * @name wb-cursor
-         * @description Apply cursor into the element
-         */
-        .directive('wbCursor', function () {
-            return {
-                restrict: 'A',
-                link: function (scope, element, attributes) {
-                    return scope.$watch(attributes.wbCursor, function (style) {
-                        var cursor = '';
-
-                        if (!style) {
-                            return;
-                        } else if (!style.cursor) {
-                            cursor = 'auto';
-                        } else {
-                            cursor = style.cursor;
-                        }
-
-                        element.css('cursor', cursor);
-
-                    }, true);
-                }
-            };
-        });
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-events
- * @description Applies events to the current element
- * 
- * If there is an event section in the data model, then this directive parses
- * and applies to the current element.
- * 
- * 	<div
- * 		wb-events="events">
- * 	</div>
- */
-.directive('wbEvents', function() {
-	function postLink($scope, $element, $attrs, $ctrls) {
-		// load ctrl
-		var ctrl = $ctrls[0] || $ctrls[1];
-
-		$element.on('click', function (event) {
-			// Check edit mode
-			if(ctrl && ctrl.isEditable()){
-				ctrl.setSelected(true);
-				event.stopPropagation();
-				$scope.$apply();
-				return;
-			}
-			// TODO: maso, 2018: do actions
-		});
-	}
-	return {
-		restrict : 'A',
-		link : postLink,
-		require:['?wbWidget', '?wbGroup']
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-layout
- * @description Apply layout into an element
- * 
- * Group and page are the main goles of this directive. By adding the wbLayout,
- * widget are able to manages it layout automatically.
- * 
- * Note that, in smal screen devices, the colume layout apply as default.
- */
-.directive('wbLayout', function ($mdMedia, $wbUtil) {
-
-    /**
-     * Adds layout config into the element
-     * 
-     * @param element
-     * @param layout
-     * @returns
-     */
-    function applyLayout(element, layout) {
-        // apply to element
-        element.css($wbUtil.convertToWidgetCssLayout(layout));
-    }
-
-    /**
-     * Link view with attributes
-     * 
-     * 
-     * @param scope
-     * @param element
-     * @param attrs
-     * @returns
-     */
-    function postLink($scope, $element, $attrs) {
-        // Watch for layout
-        var layoutData = null;
-        $scope.$watch($attrs.wbLayout + '.layout', function (layout) {
-            if (layout) {
-                layoutData = layout;
-                applyLayout($element, layoutData);
-            }
-        }, true);
-
-        //Watch for media size
-        $scope.$watch (function () {
-            return ($mdMedia('gt-sm'));
-        }, function () {
-            if (layoutData) {
-                applyLayout($element, layoutData);
-            }
-        });
-    }
-
-    /*
-     * Directive
-     */
-    return {
-        restrict: 'A',
-        link: postLink,
-        require: []
-    };
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-margin
- * @description Apply margin into the element
- */
-.directive('wbMargin', function() {
-	return {
-		restrict : 'A',
-		link : function(scope, element, attributes) {
-			return scope.$watch(attributes.wbMargin, function(style) {
-				if (!style) {
-					return;
-				}
-				if (style.margin) {
-					element.css('margin', style.margin);
-				}
-			}, true);
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-        /**
-         * @ngdoc Directives
-         * @name wb-opacity
-         * @description Apply opacity into the element
-         */
-        .directive('wbOpacity', function () {
-            return {
-                restrict: 'A',
-                link: function (scope, element, attributes) {
-                    return scope.$watch(attributes.wbOpacity, function (style) {
-                        var opacity = '';
-
-                        if (!style) {
-                            return;
-                        } else if (!style.opacity) {
-                            opacity = '1';
-                        } else {
-                            opacity = style.opacity;
-                        }
-
-                        element.css('opacity', opacity);
-
-                    }, true);
-                }
-            };
-        });
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-padding
- * @description Apply padding into the element
- */
-.directive('wbPadding', function() {
-	return {
-		restrict : 'A',
-		link : function(scope, element, attributes) {
-			return scope.$watch(attributes.wbPadding, function(style) {
-				if (!style) {
-					return;
-				}
-				if (style.padding) {
-					element.css('padding', style.padding);
-				}
-			}, true);
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-        /**
-         * @ngdoc Directives
-         * @name wb-shadows
-         * @description Apply shadow into the element
-         */
-        .directive('wbShadows', function () {
-            return {
-                restrict: 'A',
-                link: function (scope, element, attributes) {
-                    return scope.$watch(attributes.wbShadows, function (style) {
-                        var shadowStr = '';
-
-                        if (!style || !angular.isArray(style.shadows) || style.shadows.length === 0) {
-                            shadowStr = 'none';
-                        } else {
-                            angular.forEach(style.shadows, function (shadow, index) {
-                                shadowStr += createShadowStr(shadow);
-                                if(index + 1 < style.shadows.length){
-                                    shadowStr += ', ';
-                                }
-                            });
-                        }
-
-                        function createShadowStr(shadow) {
-
-                            var hShift = shadow.hShift || '0px';
-                            var vShift = shadow.vShift || '0px';
-                            var blur = shadow.blur || '0px';
-                            var spread = shadow.spread || '0px';
-                            var color = shadow.color || 'black';
-                            
-                            var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
-                            
-                            if(shadow.inset) {
-                                boxShadow = boxShadow.concat(' ' + 'inset');
-                            }
-                            
-                            return boxShadow;
-                        }
-
-                        element.css('box-shadow', shadowStr);
-
-                    }, true);
-                }
-            };
-        });
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-	/**
-	 * @ngdoc Directives
-	 * @name wb-size
-	 * @description Apply margin into the element
-	 */
-	.directive('wbSize', function ($q, $wbUtil, $rootElement, $document, $compile, $mdMedia) {
-
-	    function postLink($scope, $element, $attrs, $ctrls) {
-		var button;
-		var optionButton;
-		var dimension = {};
-		var position = {};
-		var lock = false;
-		var watchSelection = null;
-		var watchSize = null;
-		var watchMedia = null;
-		var localSize = null;
-
-		// main ctrl
-		var ctrl = $ctrls[0];
-
-
-		function isRoot() {
-		    return ctrl.isRoot();
-		}
-
-		function distroy() {
-		    watchSize();
-		    watchSelection();
-
-		    if (button) {
-			button.remove();
-		    }
-		    if (optionButton) {
-			optionButton.remove();
-		    }
-		}
-
-		function getBound() {
-		    var off = $element.offset();
-		    return {
-			left: off.left,
-			top: off.top,
-			width: $element.innerWidth(),
-			height: $element.innerHeight()
-		    };
-		}
-
-		function bindToElement(bound) {
-		    button.css('left', bound.left + bound.width - 15 + 'px');
-		    button.css('top', bound.top + bound.height - 16 + 'px');
-
-		    optionButton.css('left', bound.left + 'px');
-		    optionButton.css('top', bound.top + 'px');
-		}
-
-		function mousemove($event) {
-		    var deltaWidth = dimension.width - (position.x - $event.clientX);
-		    var deltaHeight = dimension.height - (position.y - $event.clientY);
-		    var newDimensions = {
-			width: deltaWidth + 'px',
-			height: deltaHeight + 'px'
-		    };
-		    if ($scope.wbModel.style.size.height === 'auto') {
-			newDimensions.height = 'auto';
-		    }
-		    $element.css(newDimensions);
-		    if ($scope.wbModel) {
-			$scope.wbModel.style.size.width = newDimensions.width;
-			$scope.wbModel.style.size.height = newDimensions.height;
-		    }
-		    bindToElement(getBound());
-		    $scope.$apply();
-		    return false;
-		}
-
-		function mouseup() {
-		    $document.unbind('mousemove', mousemove);
-		    $document.unbind('mouseup', mouseup);
-		    lock = false;
-		}
-
-		function mousedown($event) {
-		    $event.stopImmediatePropagation();
-		    position.x = $event.clientX;
-		    position.y = $event.clientY;
-		    lock = true;
-		    dimension.width = $element.prop('offsetWidth');
-		    dimension.height = $element.prop('offsetHeight');
-		    $document.bind('mousemove', mousemove);
-		    $document.bind('mouseup', mouseup);
-		    return false;
-		}
-
-		function checkButton() {
-		    if (button) {
-			return $q.resolve();
-		    }
-		    button = angular.element('<span></span>');
-		    $rootElement.append(button);
-		    button.css({
-			width: '15px',
-			height: '15px',
-			position: 'absolute',
-			visibility: 'hidden',
-			cursor: 'nwse-resize'
-		    });
-		    button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-		    button.on('mousedown', mousedown);
-
-		    var oj = $wbUtil.getTemplateFor({
-			templateUrl: 'views/partials/wb-widget-options.html'
-		    }).then(function (template) {
-			optionButton = angular.element(template);
-			$rootElement.append(optionButton);
-			optionButton.css({
-			    position: 'absolute',
-			    visibility: 'hidden'
-			});
-			$compile(optionButton)($scope);
-			bindToElement(getBound());
-		    });
-
-		    return $q.all([oj]).then(function () {
-			$scope.$watch(getBound, function (bound) {
-			    if (!bound) {
-				return;
-			    }
-			    bindToElement(getBound());
-			}, true);
-
-		    });
-		}
-
-		function reloadSize () {
-		    var size = localSize;
-		    if (isRoot() || !size || lock) {
-			return;
-		    }
-		    //check screen size and do appropriate work related to mobile mode
-		    if (!$mdMedia('gt-sm')) {
-			$element.css({
-			    width: 'auto',
-			    height: 'auto',
-			    minWidth: 'auto',
-			    maxWidth: 'auto',
-			    minHeight: 'auto',
-			    maxHeight: 'auto'
-			});
-		    } else {
-			$element.css(size);
-		    }
-		    if (optionButton) {
-			bindToElement(getBound());
-		    }
-		}
-
-		// Watch size
-		watchSize = $scope.$watch($attrs.wbSize + '.size', function (size) {
-		    localSize = size;
-		    reloadSize();
-		}, true);
-		
-		watchMedia = $scope.$watch (function () {
-		   return ($mdMedia('gt-sm')); 
-		}, reloadSize);
-
-		ctrl.on('delete', distroy);
-		watchSelection = $scope.$watch(function () {
-		    return ctrl.isSelected();
-		}, function (value) {
-		    if (value) {
-			checkButton()
-				.then(function () {
-				    if (!isRoot()) {
-					button.css('visibility', 'visible');
-				    }
-				    optionButton.css('visibility', 'visible');
-				});
-		    } else {
-			if (optionButton) {
-			    button.css('visibility', 'hidden');
-			    optionButton.css('visibility', 'hidden');
-			}
-		    }
-		});
-	    }
-
-	    return {
-		restrict: 'A',
-		link: postLink,
-		priority: 1,
-		require: ['^wbGroup']
-	    };
-	});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-layout
- * @description Apply layout into an element
- * 
- * Group and page are the main goles of this directive. By adding the wbLayout,
- * widget are able to manages it layout automatically.
- * 
- * Note that, in smal screen devices, the colume layout apply as default.
- */
-.directive('wbWidgetLayout', function() {
-
-    /**
-     * Adds layout config into the element
-     * 
-     * @param element
-     * @param config
-     * @returns
-     */
-    function applyLayout(element, layout) {
-        var flexLayout = {};
-        /*
-         * Widget
-         */
-        flexLayout.order = layout.order >= 0? layout.order : 0;
-        flexLayout['flex-grow'] = layout.grow >= 0? layout.grow : 0;
-        flexLayout['flex-shrink'] = layout.shrink >= 0? layout.shrink : 1;
-        // TODO: maso, 2018: compute based on size
-        flexLayout['flex-basis'] = 'auto';
-
-        // align-self
-        // auto | flex-start | flex-end | center | baseline | stretch;
-        var alignSelf;
-        switch(layout.align_self){
-        case 'start':
-            alignSelf = 'flex-start';
-            break;
-        case 'end':
-            alignSelf = 'flex-end';
-            break;
-        case 'center':
-            alignSelf = 'center';
-            break;
-        case 'baseline':
-            alignSelf = 'baseline';
-            break;
-        case 'stretch':
-            alignSelf = 'stretch';
-            break;
-        default:
-            alignSelf = 'auto';
-        }
-        flexLayout['align-self']= alignSelf;
-
-        // apply to element
-        element.css(flexLayout);
-    }
-
-    /**
-     * Link view with attributes
-     * 
-     * 
-     * @param scope
-     * @param element
-     * @param attrs
-     * @returns
-     */
-    function postLink($scope, $element, $attrs) {
-        // Watch for layout
-        $scope.$watch($attrs.wbWidgetLayout+'.layout', function(layout) {
-            if(layout){
-                applyLayout($element, layout);
-            }
-        }, true);
-    }
-
-    /*
-     * Directive
-     */
-    return {
-        restrict : 'A',
-        link : postLink,
-        require:[]
-    };
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-widget-size
- * @description Apply margin into the element
- * 
- * @deprecated
- */
-.directive('wbWidgetSize', function ($q, $wbUtil, $rootElement, $document, $compile) {
-
-    function postLink($scope, $element, $attrs, $ctrls) {
-        var button;
-        var optionButton;
-        var dimension = {};
-        var position = {};
-        var lock = false;
-        var watchSize = null;
-        var watchSelection = null;
-
-        // main ctrl
-        var ctrl = $ctrls[0];
-
-        function distroy() {
-            watchSize();
-            watchSelection();
-
-            if (button) {
-                button.remove();
-            }
-            if (optionButton) {
-                optionButton.remove();
-            }
-        }
-
-        function getBound() {
-            var off = $element.offset();
-            return {
-                left: off.left,
-                top: off.top,
-                width: $element.innerWidth(),
-                height: $element.innerHeight()
-            };
-        }
-
-        function bindToElement(bound) {
-            button.css('left', bound.left + bound.width - 15 + 'px');
-            button.css('top', bound.top + bound.height - 16 + 'px');
-
-            optionButton.css('left', bound.left + 'px');
-            optionButton.css('top', bound.top + 'px');
-        }
-
-        function mousemove($event) {
-            var deltaWidth = dimension.width - (position.x - $event.clientX);
-            var deltaHeight = dimension.height - (position.y - $event.clientY);
-            var newDimensions = {
-                    width: deltaWidth + 'px',
-                    height: deltaHeight + 'px'
-            };
-            if ($scope.wbModel.style.size.height === 'auto') {
-                newDimensions.height = 'auto';
-            }
-            $element.css(newDimensions);
-            if ($scope.wbModel) {
-                $scope.wbModel.style.size.width = newDimensions.width;
-                $scope.wbModel.style.size.height = newDimensions.height;
-            }
-            bindToElement(getBound());
-            $scope.$apply();
-            return false;
-        }
-
-        function mouseup() {
-            $document.unbind('mousemove', mousemove);
-            $document.unbind('mouseup', mouseup);
-            lock = false;
-        }
-
-        function mousedown($event) {
-            $event.stopImmediatePropagation();
-            position.x = $event.clientX;
-            position.y = $event.clientY;
-            lock = true;
-            dimension.width = $element.prop('offsetWidth');
-            dimension.height = $element.prop('offsetHeight');
-            $document.bind('mousemove', mousemove);
-            $document.bind('mouseup', mouseup);
-            return false;
-        }
-
-        function checkButton() {
-            if (button) {
-                return $q.resolve();
-            }
-            button = angular.element('<span></span>');
-            $rootElement.append(button);
-            button.css({
-                width: '15px',
-                height: '15px',
-                position: 'absolute',
-                visibility: 'hidden',
-                cursor: 'nwse-resize'
-            });
-            button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-            button.on('mousedown', mousedown);
-
-            var oj = $wbUtil.getTemplateFor({
-                templateUrl: 'views/partials/wb-widget-options.html'
-            }).then(function (template) {
-                optionButton = angular.element(template);
-                $rootElement.append(optionButton);
-                optionButton.css({
-                    position: 'absolute',
-                    visibility: 'hidden'
-                });
-                $compile(optionButton)($scope);
-                bindToElement(getBound());
-            });
-
-            return $q.all([oj]).then(function () {
-                $scope.$watch(getBound, function (bound) {
-                    if (!bound) {
-                        return;
-                    }
-                    bindToElement(getBound());
-                }, true);
-
-            });
-        }
-
-
-//      ctrl.on('delete', distroy);
-        // Watch size
-        watchSize = $scope.$watch($attrs.wbWidgetSize + '.size', function (size) {
-            if (!size || lock) {
-                return;
-            }
-            $element.css(size);
-            if (optionButton) {
-                bindToElement(getBound());
-            }
-        }, true);
-
-        watchSelection = $scope.$watch(function () {
-            return ctrl.isSelected();
-        }, function (value) {
-            if (value) {
-                checkButton()
-                .then(function () {
-                    button.css('visibility', 'visible');
-                    optionButton.css('visibility', 'visible');
-                });
-            } else {
-                if (optionButton) {
-                    button.css('visibility', 'hidden');
-                    optionButton.css('visibility', 'hidden');
-                }
-            }
-        });
-    }
-
-    return {
-        restrict: 'A',
-        link: postLink,
-        require: ['^wbWidget']
-    };
-});
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+///**
+// * @ngdoc Directives
+// * @name wb-background
+// * @description Apply background into the element
+// */
+//.directive('wbBackground', function() {
+//	/*
+//	 * Sets background attributes into element
+//	 * 
+//	 */
+//	function setBackgroud($element, style){
+//		if (!style) {
+//			return;
+//		}
+//		var cssValue = {};
+//		if(style.background){
+//			cssValue.background = style.background;
+//		}
+//		cssValue['background-image'] = (style.image) ? 'url(\''+style.image+'\')' : 'none';
+//		cssValue['background-color'] = style.color || 'initial';
+//		cssValue['background-size'] = style.size || 'auto';
+//		cssValue['background-repeat'] = style.repeat || 'repeat';
+//		cssValue['background-position'] = style.position || '0px 0px';
+//		cssValue['background-attachment'] = style.attachment || 'scroll';
+//		cssValue['background-origin'] = style.origin || 'padding-box';
+//		cssValue['background-clip'] = style.clip || 'border-box';
+//		
+//		$element.css(cssValue);
+//	}
+//
+//	function postLink($scope, $element, $attrs) {
+//		return $scope.$watch($attrs.wbBackground + '.background', function(config){
+//			return setBackgroud($element, config);
+//		}, true);
+//	}
+//
+//	return {
+//		restrict : 'A',
+//		link : postLink
+//	};
+//});
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+///**
+// * @ngdoc Directives
+// * @name wb-border
+// * @description Apply border into the element
+// * 
+// * Following attributes from CSS is set:
+// * <ul>
+// * <li>border-style from style</li>
+// * <li>border-width from width</li>
+// * <li>border-color from color</li>
+// * <li>border-radius from radius</li>
+// * </ul>
+// * 
+// * CSS model from CSS3 is accepted as standard
+// * 
+// * <pre><code>
+// * 	{
+// * 		style: solid,
+// * 		width: 2px,
+// * 		color: lightgrey,
+// * 		radius: 5px
+// * 	}
+// * </code></pre>
+// * 
+// * @see https://www.w3schools.com/css/css_border.asp
+// */
+//.directive('wbBorder', function() {
+//	return {
+//		restrict : 'A',
+//		link : function($scope, $element, $attrs) {
+//			$scope.$watch($attrs.wbBorder + '.border', function(style) {
+//				if (!style) {
+//					return;
+//				}
+//				var conf = {};
+//				if (style.style) {
+//					conf['border-style'] = style.style;
+//				}
+//				if (style.width) {
+//					conf['border-width'] = style.width;
+//				}
+//				if (style.color) {
+//					conf['border-color'] = style.color;
+//				}
+//				if (style.radius) {
+//					conf['border-radius'] = style.radius;
+//				}
+//				$element.css(conf);
+//			}, true);
+//		}
+//	};
+//});
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+//        /**
+//         * @ngdoc Directives
+//         * @name wb-color
+//         * @description Apply color into the element
+//         */
+//        .directive('wbColor', function () {
+//            return {
+//                restrict: 'A',
+//                link: function (scope, element, attributes) {
+//                    return scope.$watch(attributes.wbColor, function (style) {
+//                        var color = '';
+//
+//                        if (!style) {
+//                            return;
+//                        } else if (!style.color) {
+//                            color = 'initial';
+//                        } else {
+//                            color = style.color;
+//                        }
+//
+//                        element.css('color', color);
+//
+//                    }, true);
+//                }
+//            };
+//        });
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+//        /**
+//         * @ngdoc Directives
+//         * @name wb-cursor
+//         * @description Apply cursor into the element
+//         */
+//        .directive('wbCursor', function () {
+//            return {
+//                restrict: 'A',
+//                link: function (scope, element, attributes) {
+//                    return scope.$watch(attributes.wbCursor, function (style) {
+//                        var cursor = '';
+//
+//                        if (!style) {
+//                            return;
+//                        } else if (!style.cursor) {
+//                            cursor = 'auto';
+//                        } else {
+//                            cursor = style.cursor;
+//                        }
+//
+//                        element.css('cursor', cursor);
+//
+//                    }, true);
+//                }
+//            };
+//        });
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+///**
+// * @ngdoc Directives
+// * @name wb-events
+// * @description Applies events to the current element
+// * 
+// * If there is an event section in the data model, then this directive parses
+// * and applies to the current element.
+// * 
+// * 	<div
+// * 		wb-events="events">
+// * 	</div>
+// */
+//.directive('wbEvents', function() {
+//	function postLink($scope, $element, $attrs, $ctrls) {
+//		// load ctrl
+//		var ctrl = $ctrls[0] || $ctrls[1];
+//
+//		$element.on('click', function (event) {
+//			// Check edit mode
+//			if(ctrl && ctrl.isEditable()){
+//				ctrl.setSelected(true);
+//				event.stopPropagation();
+//				$scope.$apply();
+//				return;
+//			}
+//			// TODO: maso, 2018: do actions
+//		});
+//	}
+//	return {
+//		restrict : 'A',
+//		link : postLink,
+//		require:['?wbWidget', '?wbGroup']
+//	};
+//});
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+///**
+// * @ngdoc Directives
+// * @name wb-layout
+// * @description Apply layout into an element
+// * 
+// * Group and page are the main goles of this directive. By adding the wbLayout,
+// * widget are able to manages it layout automatically.
+// * 
+// * Note that, in smal screen devices, the colume layout apply as default.
+// */
+//.directive('wbLayout', function ($mdMedia, $wbUtil) {
+//
+//    /**
+//     * Adds layout config into the element
+//     * 
+//     * @param element
+//     * @param layout
+//     * @returns
+//     */
+//    function applyLayout(element, layout) {
+//        // apply to element
+//        element.css($wbUtil.convertToWidgetCssLayout(layout));
+//    }
+//
+//    /**
+//     * Link view with attributes
+//     * 
+//     * 
+//     * @param scope
+//     * @param element
+//     * @param attrs
+//     * @returns
+//     */
+//    function postLink($scope, $element, $attrs) {
+//        // Watch for layout
+//        var layoutData = null;
+//        $scope.$watch($attrs.wbLayout + '.layout', function (layout) {
+//            if (layout) {
+//                layoutData = layout;
+//                applyLayout($element, layoutData);
+//            }
+//        }, true);
+//
+//        //Watch for media size
+//        $scope.$watch (function () {
+//            return ($mdMedia('gt-sm'));
+//        }, function () {
+//            if (layoutData) {
+//                applyLayout($element, layoutData);
+//            }
+//        });
+//    }
+//
+//    /*
+//     * Directive
+//     */
+//    return {
+//        restrict: 'A',
+//        link: postLink,
+//        require: []
+//    };
+//});
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+///**
+// * @ngdoc Directives
+// * @name wb-margin
+// * @description Apply margin into the element
+// */
+//.directive('wbMargin', function() {
+//	return {
+//		restrict : 'A',
+//		link : function(scope, element, attributes) {
+//			return scope.$watch(attributes.wbMargin, function(style) {
+//				if (!style) {
+//					return;
+//				}
+//				if (style.margin) {
+//					element.css('margin', style.margin);
+//				}
+//			}, true);
+//		}
+//	};
+//});
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+//        /**
+//         * @ngdoc Directives
+//         * @name wb-opacity
+//         * @description Apply opacity into the element
+//         */
+//        .directive('wbOpacity', function () {
+//            return {
+//                restrict: 'A',
+//                link: function (scope, element, attributes) {
+//                    return scope.$watch(attributes.wbOpacity, function (style) {
+//                        var opacity = '';
+//
+//                        if (!style) {
+//                            return;
+//                        } else if (!style.opacity) {
+//                            opacity = '1';
+//                        } else {
+//                            opacity = style.opacity;
+//                        }
+//
+//                        element.css('opacity', opacity);
+//
+//                    }, true);
+//                }
+//            };
+//        });
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+///**
+// * @ngdoc Directives
+// * @name wb-padding
+// * @description Apply padding into the element
+// */
+//.directive('wbPadding', function() {
+//	return {
+//		restrict : 'A',
+//		link : function(scope, element, attributes) {
+//			return scope.$watch(attributes.wbPadding, function(style) {
+//				if (!style) {
+//					return;
+//				}
+//				if (style.padding) {
+//					element.css('padding', style.padding);
+//				}
+//			}, true);
+//		}
+//	};
+//});
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+//        /**
+//         * @ngdoc Directives
+//         * @name wb-shadows
+//         * @description Apply shadow into the element
+//         */
+//        .directive('wbShadows', function () {
+//            return {
+//                restrict: 'A',
+//                link: function (scope, element, attributes) {
+//                    return scope.$watch(attributes.wbShadows, function (style) {
+//                        var shadowStr = '';
+//
+//                        if (!style || !angular.isArray(style.shadows) || style.shadows.length === 0) {
+//                            shadowStr = 'none';
+//                        } else {
+//                            angular.forEach(style.shadows, function (shadow, index) {
+//                                shadowStr += createShadowStr(shadow);
+//                                if(index + 1 < style.shadows.length){
+//                                    shadowStr += ', ';
+//                                }
+//                            });
+//                        }
+//
+//                        function createShadowStr(shadow) {
+//
+//                            var hShift = shadow.hShift || '0px';
+//                            var vShift = shadow.vShift || '0px';
+//                            var blur = shadow.blur || '0px';
+//                            var spread = shadow.spread || '0px';
+//                            var color = shadow.color || 'black';
+//                            
+//                            var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
+//                            
+//                            if(shadow.inset) {
+//                                boxShadow = boxShadow.concat(' ' + 'inset');
+//                            }
+//                            
+//                            return boxShadow;
+//                        }
+//
+//                        element.css('box-shadow', shadowStr);
+//
+//                    }, true);
+//                }
+//            };
+//        });
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+//	/**
+//	 * @ngdoc Directives
+//	 * @name wb-size
+//	 * @description Apply margin into the element
+//	 */
+//	.directive('wbSize', function ($q, $wbUtil, $rootElement, $document, $compile, $mdMedia) {
+//
+//	    function postLink($scope, $element, $attrs, $ctrls) {
+//		var button;
+//		var optionButton;
+//		var dimension = {};
+//		var position = {};
+//		var lock = false;
+//		var watchSelection = null;
+//		var watchSize = null;
+//		var watchMedia = null;
+//		var localSize = null;
+//
+//		// main ctrl
+//		var ctrl = $ctrls[0];
+//
+//
+//		function isRoot() {
+//		    return ctrl.isRoot();
+//		}
+//
+//		function distroy() {
+//		    watchSize();
+//		    watchSelection();
+//
+//		    if (button) {
+//			button.remove();
+//		    }
+//		    if (optionButton) {
+//			optionButton.remove();
+//		    }
+//		}
+//
+//		function getBound() {
+//		    var off = $element.offset();
+//		    return {
+//			left: off.left,
+//			top: off.top,
+//			width: $element.innerWidth(),
+//			height: $element.innerHeight()
+//		    };
+//		}
+//
+//		function bindToElement(bound) {
+//		    button.css('left', bound.left + bound.width - 15 + 'px');
+//		    button.css('top', bound.top + bound.height - 16 + 'px');
+//
+//		    optionButton.css('left', bound.left + 'px');
+//		    optionButton.css('top', bound.top + 'px');
+//		}
+//
+//		function mousemove($event) {
+//		    var deltaWidth = dimension.width - (position.x - $event.clientX);
+//		    var deltaHeight = dimension.height - (position.y - $event.clientY);
+//		    var newDimensions = {
+//			width: deltaWidth + 'px',
+//			height: deltaHeight + 'px'
+//		    };
+//		    if ($scope.wbModel.style.size.height === 'auto') {
+//			newDimensions.height = 'auto';
+//		    }
+//		    $element.css(newDimensions);
+//		    if ($scope.wbModel) {
+//			$scope.wbModel.style.size.width = newDimensions.width;
+//			$scope.wbModel.style.size.height = newDimensions.height;
+//		    }
+//		    bindToElement(getBound());
+//		    $scope.$apply();
+//		    return false;
+//		}
+//
+//		function mouseup() {
+//		    $document.unbind('mousemove', mousemove);
+//		    $document.unbind('mouseup', mouseup);
+//		    lock = false;
+//		}
+//
+//		function mousedown($event) {
+//		    $event.stopImmediatePropagation();
+//		    position.x = $event.clientX;
+//		    position.y = $event.clientY;
+//		    lock = true;
+//		    dimension.width = $element.prop('offsetWidth');
+//		    dimension.height = $element.prop('offsetHeight');
+//		    $document.bind('mousemove', mousemove);
+//		    $document.bind('mouseup', mouseup);
+//		    return false;
+//		}
+//
+//		function checkButton() {
+//		    if (button) {
+//			return $q.resolve();
+//		    }
+//		    button = angular.element('<span></span>');
+//		    $rootElement.append(button);
+//		    button.css({
+//			width: '15px',
+//			height: '15px',
+//			position: 'absolute',
+//			visibility: 'hidden',
+//			cursor: 'nwse-resize'
+//		    });
+//		    button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
+//		    button.on('mousedown', mousedown);
+//
+//		    var oj = $wbUtil.getTemplateFor({
+//			templateUrl: 'views/partials/wb-widget-options.html'
+//		    }).then(function (template) {
+//			optionButton = angular.element(template);
+//			$rootElement.append(optionButton);
+//			optionButton.css({
+//			    position: 'absolute',
+//			    visibility: 'hidden'
+//			});
+//			$compile(optionButton)($scope);
+//			bindToElement(getBound());
+//		    });
+//
+//		    return $q.all([oj]).then(function () {
+//			$scope.$watch(getBound, function (bound) {
+//			    if (!bound) {
+//				return;
+//			    }
+//			    bindToElement(getBound());
+//			}, true);
+//
+//		    });
+//		}
+//
+//		function reloadSize () {
+//		    var size = localSize;
+//		    if (isRoot() || !size || lock) {
+//			return;
+//		    }
+//		    //check screen size and do appropriate work related to mobile mode
+//		    if (!$mdMedia('gt-sm')) {
+//			$element.css({
+//			    width: 'auto',
+//			    height: 'auto',
+//			    minWidth: 'auto',
+//			    maxWidth: 'auto',
+//			    minHeight: 'auto',
+//			    maxHeight: 'auto'
+//			});
+//		    } else {
+//			$element.css(size);
+//		    }
+//		    if (optionButton) {
+//			bindToElement(getBound());
+//		    }
+//		}
+//
+//		// Watch size
+//		watchSize = $scope.$watch($attrs.wbSize + '.size', function (size) {
+//		    localSize = size;
+//		    reloadSize();
+//		}, true);
+//		
+//		watchMedia = $scope.$watch (function () {
+//		   return ($mdMedia('gt-sm')); 
+//		}, reloadSize);
+//
+//		ctrl.on('delete', distroy);
+//		watchSelection = $scope.$watch(function () {
+//		    return ctrl.isSelected();
+//		}, function (value) {
+//		    if (value) {
+//			checkButton()
+//				.then(function () {
+//				    if (!isRoot()) {
+//					button.css('visibility', 'visible');
+//				    }
+//				    optionButton.css('visibility', 'visible');
+//				});
+//		    } else {
+//			if (optionButton) {
+//			    button.css('visibility', 'hidden');
+//			    optionButton.css('visibility', 'hidden');
+//			}
+//		    }
+//		});
+//	    }
+//
+//	    return {
+//		restrict: 'A',
+//		link: postLink,
+//		priority: 1,
+//		require: ['^wbGroup']
+//	    };
+//	});
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+///**
+// * @ngdoc Directives
+// * @name wb-layout
+// * @description Apply layout into an element
+// * 
+// * Group and page are the main goles of this directive. By adding the wbLayout,
+// * widget are able to manages it layout automatically.
+// * 
+// * Note that, in smal screen devices, the colume layout apply as default.
+// */
+//.directive('wbWidgetLayout', function() {
+//
+//    /**
+//     * Adds layout config into the element
+//     * 
+//     * @param element
+//     * @param config
+//     * @returns
+//     */
+//    function applyLayout(element, layout) {
+//        var flexLayout = {};
+//        /*
+//         * Widget
+//         */
+//        flexLayout.order = layout.order >= 0? layout.order : 0;
+//        flexLayout['flex-grow'] = layout.grow >= 0? layout.grow : 0;
+//        flexLayout['flex-shrink'] = layout.shrink >= 0? layout.shrink : 1;
+//        // TODO: maso, 2018: compute based on size
+//        flexLayout['flex-basis'] = 'auto';
+//
+//        // align-self
+//        // auto | flex-start | flex-end | center | baseline | stretch;
+//        var alignSelf;
+//        switch(layout.align_self){
+//        case 'start':
+//            alignSelf = 'flex-start';
+//            break;
+//        case 'end':
+//            alignSelf = 'flex-end';
+//            break;
+//        case 'center':
+//            alignSelf = 'center';
+//            break;
+//        case 'baseline':
+//            alignSelf = 'baseline';
+//            break;
+//        case 'stretch':
+//            alignSelf = 'stretch';
+//            break;
+//        default:
+//            alignSelf = 'auto';
+//        }
+//        flexLayout['align-self']= alignSelf;
+//
+//        // apply to element
+//        element.css(flexLayout);
+//    }
+//
+//    /**
+//     * Link view with attributes
+//     * 
+//     * 
+//     * @param scope
+//     * @param element
+//     * @param attrs
+//     * @returns
+//     */
+//    function postLink($scope, $element, $attrs) {
+//        // Watch for layout
+//        $scope.$watch($attrs.wbWidgetLayout+'.layout', function(layout) {
+//            if(layout){
+//                applyLayout($element, layout);
+//            }
+//        }, true);
+//    }
+//
+//    /*
+//     * Directive
+//     */
+//    return {
+//        restrict : 'A',
+//        link : postLink,
+//        require:[]
+//    };
+//});
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+///**
+// * @ngdoc Directives
+// * @name wb-widget-size
+// * @description Apply margin into the element
+// * 
+// * @deprecated
+// */
+//.directive('wbWidgetSize', function ($q, $wbUtil, $rootElement, $document, $compile) {
+//
+//    function postLink($scope, $element, $attrs, $ctrls) {
+//        var button;
+//        var optionButton;
+//        var dimension = {};
+//        var position = {};
+//        var lock = false;
+//        var watchSize = null;
+//        var watchSelection = null;
+//
+//        // main ctrl
+//        var ctrl = $ctrls[0];
+//
+//        function distroy() {
+//            watchSize();
+//            watchSelection();
+//
+//            if (button) {
+//                button.remove();
+//            }
+//            if (optionButton) {
+//                optionButton.remove();
+//            }
+//        }
+//
+//        function getBound() {
+//            var off = $element.offset();
+//            return {
+//                left: off.left,
+//                top: off.top,
+//                width: $element.innerWidth(),
+//                height: $element.innerHeight()
+//            };
+//        }
+//
+//        function bindToElement(bound) {
+//            button.css('left', bound.left + bound.width - 15 + 'px');
+//            button.css('top', bound.top + bound.height - 16 + 'px');
+//
+//            optionButton.css('left', bound.left + 'px');
+//            optionButton.css('top', bound.top + 'px');
+//        }
+//
+//        function mousemove($event) {
+//            var deltaWidth = dimension.width - (position.x - $event.clientX);
+//            var deltaHeight = dimension.height - (position.y - $event.clientY);
+//            var newDimensions = {
+//                    width: deltaWidth + 'px',
+//                    height: deltaHeight + 'px'
+//            };
+//            if ($scope.wbModel.style.size.height === 'auto') {
+//                newDimensions.height = 'auto';
+//            }
+//            $element.css(newDimensions);
+//            if ($scope.wbModel) {
+//                $scope.wbModel.style.size.width = newDimensions.width;
+//                $scope.wbModel.style.size.height = newDimensions.height;
+//            }
+//            bindToElement(getBound());
+//            $scope.$apply();
+//            return false;
+//        }
+//
+//        function mouseup() {
+//            $document.unbind('mousemove', mousemove);
+//            $document.unbind('mouseup', mouseup);
+//            lock = false;
+//        }
+//
+//        function mousedown($event) {
+//            $event.stopImmediatePropagation();
+//            position.x = $event.clientX;
+//            position.y = $event.clientY;
+//            lock = true;
+//            dimension.width = $element.prop('offsetWidth');
+//            dimension.height = $element.prop('offsetHeight');
+//            $document.bind('mousemove', mousemove);
+//            $document.bind('mouseup', mouseup);
+//            return false;
+//        }
+//
+//        function checkButton() {
+//            if (button) {
+//                return $q.resolve();
+//            }
+//            button = angular.element('<span></span>');
+//            $rootElement.append(button);
+//            button.css({
+//                width: '15px',
+//                height: '15px',
+//                position: 'absolute',
+//                visibility: 'hidden',
+//                cursor: 'nwse-resize'
+//            });
+//            button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
+//            button.on('mousedown', mousedown);
+//
+//            var oj = $wbUtil.getTemplateFor({
+//                templateUrl: 'views/partials/wb-widget-options.html'
+//            }).then(function (template) {
+//                optionButton = angular.element(template);
+//                $rootElement.append(optionButton);
+//                optionButton.css({
+//                    position: 'absolute',
+//                    visibility: 'hidden'
+//                });
+//                $compile(optionButton)($scope);
+//                bindToElement(getBound());
+//            });
+//
+//            return $q.all([oj]).then(function () {
+//                $scope.$watch(getBound, function (bound) {
+//                    if (!bound) {
+//                        return;
+//                    }
+//                    bindToElement(getBound());
+//                }, true);
+//
+//            });
+//        }
+//
+//
+////      ctrl.on('delete', distroy);
+//        // Watch size
+//        watchSize = $scope.$watch($attrs.wbWidgetSize + '.size', function (size) {
+//            if (!size || lock) {
+//                return;
+//            }
+//            $element.css(size);
+//            if (optionButton) {
+//                bindToElement(getBound());
+//            }
+//        }, true);
+//
+//        watchSelection = $scope.$watch(function () {
+//            return ctrl.isSelected();
+//        }, function (value) {
+//            if (value) {
+//                checkButton()
+//                .then(function () {
+//                    button.css('visibility', 'visible');
+//                    optionButton.css('visibility', 'visible');
+//                });
+//            } else {
+//                if (optionButton) {
+//                    button.css('visibility', 'hidden');
+//                    optionButton.css('visibility', 'hidden');
+//                }
+//            }
+//        });
+//    }
+//
+//    return {
+//        restrict: 'A',
+//        link: postLink,
+//        require: ['^wbWidget']
+//    };
+//});
 /* 
  * The MIT License (MIT)
  * 
@@ -1751,7 +1728,7 @@ angular.module('am-wb-core')
  * @description Render a list of widget
  * 
  */
-.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings) {
+.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $parse) {
 
     /*
      * Link widget view
@@ -1779,6 +1756,22 @@ angular.module('am-wb-core')
         if(!wbGroupCtrl){
             $scope.$watch('wbEditable', function(editable){
                 ctrl.setEditable(editable);
+            });
+        }
+
+        if($scope.wbOnModelSelect) {
+            var onModelSelectionFu = $parse($scope.wbOnModelSelect);
+            ctrl.on('widgetSelected', function($event){
+                var widgets = $event.widgets;
+                var ctrl = widgets[0];
+                $scope.$eval(function() {
+                    onModelSelectionFu($scope.$parent, {
+                        '$event': $event,
+                        '$model': ctrl.getModel(),
+                        '$ctrl': ctrl,
+                        'widgets': widgets
+                    });
+                });
             });
         }
     }
@@ -3462,73 +3455,73 @@ angular.module('am-wb-core')
 	};
 });
 
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbWidget
- * @description Widgets container
- * 
- * This is widget containers.
- * 
- * All primary actions of a widget are supported (such as remove and setting).
- * 
- * @deprecated
- */
-.directive('wbWidget', function($wbUtil) {
-	function postLink($scope, $element, $attrs, $ctrls, $transclude) {
-		// Modify angular transclude function
-		// see:
-		// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
-		// FIXME: maso, 2017: use regular dom insted of ng-transclude
-		$transclude($scope, function(clone/*, $scope*/) {
-			if(clone){
-				$element.append(clone);
-			}
-		});
-
-		// set wbGroup
-		var group = $ctrls[1];
-		$scope.group = group;
-	}
-
-
-	return {
-		templateUrl : 'views/directives/wb-widget.html',
-		restrict : 'E',
-		replace : true,
-		transclude: true,
-		link : postLink,
-		controller : 'wbWidgetCtrl',
-		controllerAs: 'ctrl',
-		require:['wbWidget', '^^wbGroup', 'ngModel']
-	};
-});
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//'use strict';
+//
+//angular.module('am-wb-core')
+//
+///**
+// * @ngdoc Directives
+// * @name wbWidget
+// * @description Widgets container
+// * 
+// * This is widget containers.
+// * 
+// * All primary actions of a widget are supported (such as remove and setting).
+// * 
+// * @deprecated
+// */
+//.directive('wbWidget', function($wbUtil) {
+//	function postLink($scope, $element, $attrs, $ctrls, $transclude) {
+//		// Modify angular transclude function
+//		// see:
+//		// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
+//		// FIXME: maso, 2017: use regular dom insted of ng-transclude
+//		$transclude($scope, function(clone/*, $scope*/) {
+//			if(clone){
+//				$element.append(clone);
+//			}
+//		});
+//
+//		// set wbGroup
+//		var group = $ctrls[1];
+//		$scope.group = group;
+//	}
+//
+//
+//	return {
+//		templateUrl : 'views/directives/wb-widget.html',
+//		restrict : 'E',
+//		replace : true,
+//		transclude: true,
+//		link : postLink,
+//		controller : 'wbWidgetCtrl',
+//		controllerAs: 'ctrl',
+//		require:['wbWidget', '^^wbGroup', 'ngModel']
+//	};
+//});
 /* 
  * The MIT License (MIT)
  * 
@@ -3788,46 +3781,151 @@ angular.module('am-wb-core')
  */
 'use strict';
 
-angular.module('am-wb-core')
 /**
  * @ngdoc Factories
- * @name wb-widget
- * @description Generic data type of a widget
+ * @name AbstractWidgetLocator
+ * @description Locates a widget on the view
  * 
+ * It is used to display extra information about a widget on the screen. For
+ * example it is used to show widget actions on the fly.
+ * 
+ * @ngInject
  */
-.factory('WbWidget', function () {
-    var wbWidget = function (model, ctrl, scope) {
-        this.$ctrl = ctrl;
-        this.$model = model;
-        this.$scope = scope;
+function AbstractWidgetLocator() {
+    var abstractWidgetLocator = function () {
+        this.callbacks = [];
+        this.element = null;
+        // TODO:
     };
 
-    wbWidget.prototype.getType = function () {
-        return this.$model.type;
+    abstractWidgetLocator.prototype.setVisible = function (visible) {
+        this.visible = visible;
+        if (visible) {
+            this.fire('show');
+        } else {
+            this.fire('hide');
+        }
     };
 
-    wbWidget.prototype.getModel = function () {
-        return this.$model;
+    abstractWidgetLocator.prototype.isVisible = function () {
+        return this.visible;
     };
 
-    wbWidget.prototype.getCtrl = function () {
-        return this.$ctrl;
+    abstractWidgetLocator.prototype.setWidget = function (widget) {
+        this.widget = widget;
     };
 
-    wbWidget.prototype.getParent = function () {
-        if (this.$ctrl.isRoot()) {
-            return null;
-        } 
-        var parentCtrl = this.$ctrl.getParent();
-        return new wbWidget(parentCtrl.getModel(), parentCtrl);
+    abstractWidgetLocator.prototype.getWidget = function () {
+        return this.widget;
     };
     
-    wbWidget.prototype.getScope = function () {
-        return this.$scope;
+    abstractWidgetLocator.prototype.setElement = function (element) {
+        this.element = element;
+    };
+    
+    abstractWidgetLocator.prototype.getElement = function () {
+        return this.element;
     };
 
-    return wbWidget;
-});
+    abstractWidgetLocator.prototype.on = function (type, callback) {
+        if (!angular.isArray(this.callbacks[type])) {
+            this.callbacks[type] = [];
+        }
+        this.callbacks[type].push(callback);
+    };
+
+    abstractWidgetLocator.prototype.fire = function (type) {
+        if (angular.isDefined(this.callbacks[type])) {
+            for (var i = 0; i < this.callbacks[type].length; i++) {
+                try {
+                    this.callbacks[type][i]();
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        }
+    };
+
+    return abstractWidgetLocator;
+}
+
+/**
+ * @ngdoc Factories
+ * @name AbstractWidgetLocator
+ * @description Locates a widget on the view
+ * 
+ * It is used to display extra information about a widget on the screen. For
+ * example it is used to show widget actions on the fly.
+ * 
+ * @ngInject
+ */
+function CursorWidgetLocator(AbstractWidgetLocator) {
+
+    var cursorWidgetLocator = function () {
+        // TODO:
+        var element = angular
+                .element('<div class="wb-widget-locator-cursor"></div>');
+        this.setElement(element);
+        var ctrl = this;
+        this.on('show', function () {
+            var el = ctrl.getElement();
+            el.show();
+        });
+        this.on('hide', function () {
+            var el = ctrl.getElement();
+            el.hide();
+        });
+    };
+    cursorWidgetLocator.prototype = new AbstractWidgetLocator();
+    return cursorWidgetLocator;
+}
+
+/**
+ * @ngdoc Factories
+ * @name AbstractWidgetLocator
+ * @description Locates a widget on the view
+ * 
+ * It is used to display extra information about a widget on the screen. For
+ * example it is used to show widget actions on the fly.
+ * 
+ * @ngInject
+ */
+function BoundWidgetLocator() {
+
+    var boundWidgetLocator = function () {
+        // TODO:
+    };
+
+    boundWidgetLocator.prototype = new AbstractWidgetLocator();
+
+    return boundWidgetLocator;
+}
+
+/**
+ * @ngdoc Factories
+ * @name AbstractWidgetLocator
+ * @description Locates a widget on the view
+ * 
+ * It is used to display extra information about a widget on the screen. For
+ * example it is used to show widget actions on the fly.
+ * 
+ * @ngInject
+ */
+function ActionsWidgetLocator() {
+    var actionsWidgetLocator = function () {
+        // TODO:
+    }
+    actionsWidgetLocator.prototype = new AbstractWidgetLocator();
+
+    return actionsWidgetLocator;
+}
+
+angular.module('am-wb-core')//
+.factory('CursorWidgetLocator', CursorWidgetLocator)//
+.factory('BoundWidgetLocator', BoundWidgetLocator)//
+.factory('ActionsWidgetLocator', ActionsWidgetLocator)//
+.factory('AbstractWidgetLocator', AbstractWidgetLocator);
+
 /* 
  * The MIT License (MIT)
  * 
@@ -4969,7 +5067,7 @@ angular.module('am-wb-core')
             }
         },
         // functional properties
-        template: '<wb-group ng-model="wbModel"></wb-group>',
+        templateUrl: 'views/directives/wb-group.html',
         help: 'http://dpq.co.ir/more-information-link',
         helpId: 'wb-widget-group'
     });
@@ -6443,8 +6541,6 @@ angular.module('am-wb-core')
         // 1- create scope
         var parentScope = parentWidget.getScope();
         childScope = parentScope.$new(false, parentScope);
-        childScope.container = parentWidget;
-        childScope.wbModel = model;
 
         // 2- create element
         return $q.when($wbUtil.getTemplateFor(widget))//
@@ -6460,25 +6556,24 @@ angular.module('am-wb-core')
 
                 'dnd-moved="ctrl.delete()" '+
 
-                'md-theme-watch="true" '+
-                'ng-class="{ '+
-                '    \'wb-widget-edit\': ctrl.isEditable(), '+
-                '    \'wb-widget-select\': ctrl.isSelected() '+
-                '}" '+
-                '>' + template + '</div>';
+                'md-theme-watch="true">' + template + '</div>';
             }
-            element = angular.element(template);
+
+            var ctrl;
 
             // 3- bind controller
+            element = angular.element(template);
             var link = $compile(element);
-
             var wlocals = _.merge({
                 $scope : childScope,
                 $element : element,
-                wbParentWidget: parentWidget,
-                wbModel: model
             });
-            var ctrl = $controller('WbWidgetCtrl', wlocals);
+            if (model.type !== 'Group') {
+                ctrl = $controller('WbWidgetCtrl', wlocals);
+            } else {
+                ctrl = $controller('WbWidgetGroupCtrl', wlocals);
+            }
+
             // extend element controller
             if (angular.isDefined(widget.controller)) {
                 angular.extend(ctrl, $controller(widget.controller, wlocals));
@@ -6491,7 +6586,12 @@ angular.module('am-wb-core')
             // bind ctrl
             element.data('$ngControllerController', ctrl);
             link(childScope);
-            return element;
+            ctrl.setElement(element);
+            ctrl.setParent(parentWidget);
+            ctrl.setModel(model);
+            
+            // return widget
+            return ctrl;
         });
     }
 
@@ -6807,11 +6907,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-group.html',
-    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"dropCallback(index, item, external, type)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" ng-class=\"{\n" +
-    "\t\t'wb-group-root': ctrl.isRoot(),\n" +
-    "\t\t'wb-group-edit': ctrl.isEditable(),\n" +
-    "\t\t'wb-group-select': ctrl.isSelected()\n" +
-    "\t}\" md-theme-watch=true></div>"
+    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"dropCallback(index, item, external, type)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" md-theme-watch=true></div>"
   );
 
 

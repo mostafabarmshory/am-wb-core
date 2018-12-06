@@ -192,8 +192,6 @@ angular.module('am-wb-core')
         // 1- create scope
         var parentScope = parentWidget.getScope();
         childScope = parentScope.$new(false, parentScope);
-        childScope.container = parentWidget;
-        childScope.wbModel = model;
 
         // 2- create element
         return $q.when($wbUtil.getTemplateFor(widget))//
@@ -211,18 +209,22 @@ angular.module('am-wb-core')
 
                 'md-theme-watch="true">' + template + '</div>';
             }
-            element = angular.element(template);
+
+            var ctrl;
 
             // 3- bind controller
+            element = angular.element(template);
             var link = $compile(element);
-
             var wlocals = _.merge({
                 $scope : childScope,
                 $element : element,
-                wbParentWidget: parentWidget,
-                wbModel: model
             });
-            var ctrl = $controller('WbWidgetCtrl', wlocals);
+            if (model.type !== 'Group') {
+                ctrl = $controller('WbWidgetCtrl', wlocals);
+            } else {
+                ctrl = $controller('WbWidgetGroupCtrl', wlocals);
+            }
+
             // extend element controller
             if (angular.isDefined(widget.controller)) {
                 angular.extend(ctrl, $controller(widget.controller, wlocals));
@@ -235,7 +237,12 @@ angular.module('am-wb-core')
             // bind ctrl
             element.data('$ngControllerController', ctrl);
             link(childScope);
-            return element;
+            ctrl.setElement(element);
+            ctrl.setParent(parentWidget);
+            ctrl.setModel(model);
+            
+            // return widget
+            return ctrl;
         });
     }
 

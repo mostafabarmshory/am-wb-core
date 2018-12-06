@@ -524,6 +524,22 @@ of a widget:
 	min-height: 1rem;
 }
 
+/**************************************************************************************
+                                     Widget locator
+***************************************************************************************/
+
+.wb-widget-locator-cursor {
+	display: block;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100px;
+	height: 100px;
+	background: red;
+}
+
+
+
 .wb-widgets-module {
 	padding: 8px;
 	margin: 4px;
@@ -546,7 +562,6 @@ of a widget:
 #am-wb-widget-setting .md-tab.md-disabled{
 	display: none;
 }
-
 
 div.tinymce {
 }
