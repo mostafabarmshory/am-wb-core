@@ -9,7 +9,7 @@
 	"contents": [
 		{
 			"type": "Group",
-			"name": "Chile 1",
+			"name": "Child 1",
 			"contents": [
 				{
 					"type": "Group",
@@ -23,11 +23,14 @@
 									"type": "HtmlText",
 									"name": "Widget",
 									"text": "<h2>HTML Text In 4th group0</h2>",
-                                                                        "events": {
+                                                                        "event": [{
                                                                             "onClick": "alert('Wow!! Click event')" 
-                                                                        }
+                                                                        }]
 								}
-							]
+							],
+                                                        "event": [{
+                                                                            "onClick": "alert('Wow!! Click event')" 
+                                                        }]
 						}
 					]
 				}
@@ -35,7 +38,7 @@
 		},
 		{
 			"type": "Group",
-			"name": "Chile 1",
+			"name": "Child 1",
 			"contents": [
 				{
 					"type": "Group",
