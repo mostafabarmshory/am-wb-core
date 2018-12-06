@@ -16,7 +16,7 @@ of a widget:
  */
 .wb-group-root {
 	overflow: auto !important;
-        min-height: 32px;
+	min-height: 32px;
 }
 
 .wb-group-root.wb-group-edit {
@@ -29,15 +29,17 @@ of a widget:
 .wb-group-edit {
 	border: 1px dashed #aaaaaa;
 }
+
 .wb-group-edit {
 	padding: 8px;
 }
-.wb-group-edit.wb-flex-row > * {
-    margin: 0px 4px;
+
+.wb-group-edit.wb-flex-row>* {
+	margin: 0px 4px;
 }
 
-.wb-group-edit.wb-flex-column > * {
-    margin: 4px 0px;
+.wb-group-edit.wb-flex-column>* {
+	margin: 4px 0px;
 }
 
 /*
@@ -55,7 +57,6 @@ of a widget:
 	box-shadow: 0px 0px 4px 4px #aaaaaa;
 }
 
-
 /**************************************************************************************
                                      Widget layout
 
@@ -66,7 +67,7 @@ of a widget:
 ***************************************************************************************/
 .wb-widget {
 	overflow: hidden;
-        position: relative;
+	position: relative;
 	min-width: 32px;
 	min-height: 32px;
 }
@@ -99,16 +100,6 @@ of a widget:
 	margin: 0px;
 }
 
-
-
-
-
-
-
-
-
-
-
 .md-button.md-icon-button.md-mini {
 	line-height: 1rem;
 	width: 1.5rem;
@@ -130,14 +121,25 @@ of a widget:
 /**************************************************************************************
                                      Widget locator
 ***************************************************************************************/
-
 .wb-widget-locator-cursor {
 	display: block;
 	position: fixed;
-	top: 0px;
-	left: 0px;
-	width: 100px;
-	height: 100px;
-	background: red;
+	transition: all 0.3s ease;
+	background: black;
 }
 
+#top.wb-widget-locator-cursor {
+	height: 1px;
+}
+
+#right.wb-widget-locator-cursor {
+	width: 1px;
+}
+
+#buttom.wb-widget-locator-cursor {
+	height: 1px;
+}
+
+#left.wb-widget-locator-cursor {
+	width: 1px;
+}
