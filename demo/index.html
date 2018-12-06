@@ -72,11 +72,9 @@
                             ng-click="runAction(action)">
                             <wb-icon>{{action.icon}}</wb-icon>
                         </md-button>
-
-
-
                     </section>
                     <wb-group
+                    	wb-on-model-under-cursor="widgetUnderCursor(widget)"
                         wb-on-model-select="loadSettings($model, $ctrl)"
                         wb-editable="editable"
                         ng-model="model"
@@ -164,7 +162,7 @@
         <script src="scripts/directives/wb-widgets-explorer.js"></script>
         <script src="scripts/directives/wb-widgets-list.js"></script>
         <script src="scripts/directives/wb-widgets-module.js"></script>
-        <script src="scripts/factories/wb-widget.js"></script>
+        <script src="scripts/factories/widget-locator-directive.js"></script>
         <script src="scripts/filters/wb-unsafe.js"></script>
         <script src="scripts/runs/resources.js"></script>
         <script src="scripts/runs/settings.js"></script>
@@ -175,7 +173,7 @@
         <script src="scripts/services/settings.js"></script>
         <script src="scripts/services/ui.js"></script>
         <script src="scripts/services/util.js"></script>
-        <script src="scripts/services/widget.js"></script>
+        <script src="scripts/services/widget-service.js"></script>
         <script src="scripts/tinymce.js"></script>
         <script src="scripts/demo.js"></script>
         <!-- endinjector -->

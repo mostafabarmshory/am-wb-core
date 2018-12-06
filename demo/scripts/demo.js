@@ -30,17 +30,33 @@
  * 
  */
 angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
-.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbFloat) {
+.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbFloat, CursorWidgetLocator) {
+    
+    /*
+     * Display an area of a widget with extra informations. It must be set to
+     * visible.
+     */
+    var cursorWidgetLocator = new CursorWidgetLocator();
+    
     $http.get('examples/html.json')
     .then(function(res) {
         // NOTE: maso, 2018: clean data model
         $scope.model = $wbUtil.clean(res.data);
     });
+    
+    $scope.widgetUnderCursor = function(widget){
+        cursorWidgetLocator.setWidget(widget);
+    }
 
     // load setting of model
-    $scope.loadSettings = function(widget){
-        $scope.selectedWidget = widget;
-        $scope.actions = widget.getActions();
+    $scope.loadSettings = function(widgets){
+        if(widgets.length) {
+            $scope.selectedWidget = widgets[0];
+            $scope.actions = widget.getActions();
+        } else {
+            $scope.selectedWidget = null;
+            $scope.actions = null;
+        }
     };
 
 
@@ -160,6 +176,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
             openSettings();
             openContent();
         }
+        cursorWidgetLocator.setVisible(value);
     });
 })
 
@@ -247,8 +264,8 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
     /**
      * Show help
      * 
-     * By adding a function into the $window service, you can display help of
-     * an widget
+     * By adding a function into the $window service, you can display help of an
+     * widget
      */
     $window.openHelp = function (object){
         alert('Adding openHelp to $window to display help:'+object.helpId);
