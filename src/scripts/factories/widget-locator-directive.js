@@ -34,29 +34,62 @@
  * @ngInject
  */
 function AbstractWidgetLocator() {
-    var abstractWidgetLocator = function(){
+    var abstractWidgetLocator = function () {
+        this.callbacks = [];
+        this.element = null;
         // TODO:
     };
-    
+
     abstractWidgetLocator.prototype.setVisible = function (visible) {
         this.visible = visible;
+        if (visible) {
+            this.fire('show');
+        } else {
+            this.fire('hide');
+        }
     };
-    
+
     abstractWidgetLocator.prototype.isVisible = function () {
         return this.visible;
     };
-    
+
     abstractWidgetLocator.prototype.setWidget = function (widget) {
         this.widget = widget;
     };
-    
+
     abstractWidgetLocator.prototype.getWidget = function () {
         return this.widget;
     };
     
+    abstractWidgetLocator.prototype.setElement = function (element) {
+        this.element = element;
+    };
+    
+    abstractWidgetLocator.prototype.getElement = function () {
+        return this.element;
+    };
+
+    abstractWidgetLocator.prototype.on = function (type, callback) {
+        if (!angular.isArray(this.callbacks[type])) {
+            this.callbacks[type] = [];
+        }
+        this.callbacks[type].push(callback);
+    };
+
+    abstractWidgetLocator.prototype.fire = function (type) {
+        if (angular.isDefined(this.callbacks[type])) {
+            for (var i = 0; i < this.callbacks[type].length; i++) {
+                try {
+                    this.callbacks[type][i]();
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        }
+    };
+
     return abstractWidgetLocator;
 }
-
 
 /**
  * @ngdoc Factories
@@ -69,9 +102,21 @@ function AbstractWidgetLocator() {
  * @ngInject
  */
 function CursorWidgetLocator(AbstractWidgetLocator) {
-    
-    var cursorWidgetLocator = function(){
+
+    var cursorWidgetLocator = function () {
         // TODO:
+        var element = angular
+                .element('<div class="wb-widget-locator-cursor"></div>');
+        this.setElement(element);
+        var ctrl = this;
+        this.on('show', function () {
+            var el = ctrl.getElement();
+            el.show();
+        });
+        this.on('hide', function () {
+            var el = ctrl.getElement();
+            el.hide();
+        });
     };
     cursorWidgetLocator.prototype = new AbstractWidgetLocator();
     return cursorWidgetLocator;
@@ -89,12 +134,12 @@ function CursorWidgetLocator(AbstractWidgetLocator) {
  */
 function BoundWidgetLocator() {
 
-    var boundWidgetLocator = function(){
+    var boundWidgetLocator = function () {
         // TODO:
     };
-    
+
     boundWidgetLocator.prototype = new AbstractWidgetLocator();
-    
+
     return boundWidgetLocator;
 }
 
@@ -109,12 +154,11 @@ function BoundWidgetLocator() {
  * @ngInject
  */
 function ActionsWidgetLocator() {
-    var actionsWidgetLocator = function(){
+    var actionsWidgetLocator = function () {
         // TODO:
     }
     actionsWidgetLocator.prototype = new AbstractWidgetLocator();
-    
-    
+
     return actionsWidgetLocator;
 }
 

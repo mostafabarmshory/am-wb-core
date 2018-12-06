@@ -53,6 +53,8 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
         if(widgets.length) {
             $scope.selectedWidget = widgets[0];
             $scope.actions = widget.getActions();
+            cursorWidgetLocator.setWidget($scope.selectedWidget);
+            cursorWidgetLocator.setVisible(true);
         } else {
             $scope.selectedWidget = null;
             $scope.actions = null;

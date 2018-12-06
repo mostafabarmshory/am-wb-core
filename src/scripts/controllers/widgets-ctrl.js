@@ -442,7 +442,7 @@ WbWidgetGroupCtrl.prototype.indexOfChild = function(widget) {
 };
 
 WbWidgetGroupCtrl.prototype.getAllowedTypes = function(){
-    return $scope.wbAllowedTypesl;
+    return this.$scope.wbAllowedTypesl;
 };
 
 
