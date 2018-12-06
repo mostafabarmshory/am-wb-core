@@ -152,22 +152,30 @@ angular.module('am-wb-core')
 var WbAbstractWidget = function () {
     this.actions = [];
     this.callbacks = [];
-    this.contents = [];
+    this.childWidgets = [];
     this.$scope = null;
     this.$element = null;
 
-    this.on('modelChanged', function ($event) {
+    /*
+     * Update view based on new model
+     */
+    function updateView($event) {
         var ctrl = $event.source;
         var model = ctrl.getModel();
         var $element = ctrl.getElement();
+
         // to support old widget
         ctrl.getScope().wbModel = model;
+
         // update style
         if (model) {
             ctrl.loadStyle(model.style);
             ctrl.loadEvents(model.event);
         }
-    });
+    }
+
+    this.on('modelChanged', updateView);
+    this.on('modelUpdate', updateView);
 };
 
 WbAbstractWidget.prototype.loadStyle = function (style) {
@@ -204,10 +212,10 @@ WbAbstractWidget.prototype.destroy = function () {
     this.actions = [];
 
     // destroy children
-    angular.forEach(this.contents, function (widget) {
+    angular.forEach(this.childWidgets, function (widget) {
         widget.destroy();
     });
-    this.contents = [];
+    this.childWidgets = [];
 
     // destroy view
     this.$element.remove();
@@ -265,10 +273,9 @@ WbAbstractWidget.prototype.on = function (type, callback) {
  * This method works in edit mode only.
  */
 WbAbstractWidget.prototype.clone = function () {
-    if (!this.isEditable()) {
-        return;
-    }
-    return angular.copy(this.getModel());
+    var index = this.getParent().indexOfChild(this);
+    this.getParent()//
+        .addChild(index, angular.copy(this.getModel()));
 };
 
 WbAbstractWidget.prototype.getModel = function () {
@@ -326,9 +333,9 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
             event.stopPropagation();
         }
         $element.on('click', this.widgetSelectHandler);
-        // watch for model update
+        // TODO: remove watch for model update and fire in setting
         this._modelWatche = this.getScope().$watch('wbModel', function(){
-            ctrl.fire('modelChanged');
+            ctrl.fire('modelUpdate');
         }, true);
     } else {
         // remove selection handler
@@ -340,7 +347,7 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
         }
     }
     // propagate to child
-    angular.forEach(this.contents, function (widget) {
+    angular.forEach(this.childWidgets, function (widget) {
         widget.setEditable(editable);
     });
 };
@@ -429,9 +436,7 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil) {
         title: 'Clone',
         icon: 'content_copy',
         action: function () {
-            var model = $wbUtil.clean(angular.copy($scope.wbModel));
-            var index = $scope.group.indexOfChild($scope.wbModel);
-            $scope.group.addChild(index, model);
+            ctrl.clone();
         },
         description: 'Duplicate widget (ctrl+D)'
     });
@@ -479,10 +484,10 @@ WbWidgetGroupCtrl.prototype.isChildSelected = function (widget) {
 
 WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
     // destroy all children
-    angular.forEach(this.contents, function (widget) {
-        widget.distroy();
+    angular.forEach(this.childWidgets, function (widget) {
+        widget.destroy();
     });
-    this.contents = [];
+    this.childWidgets = [];
 
     // check for new contents
     if (!model || !angular.isArray(model.contents)) {
@@ -499,7 +504,7 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
     model.contents.forEach(function (item, index) {
         var job = $widget.compile(item, parentWidget)//
         .then(function (widget) {
-            parentWidget.contents[index] = widget;
+            parentWidget.childWidgets[index] = widget;
         });
         compilesJob.push(job);
     });
@@ -507,7 +512,7 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
     return $q.all(compilesJob)//
     .then(function () {
         var $element = parentWidget.getElement();
-        parentWidget.contents.forEach(function (widget) {
+        parentWidget.childWidgets.forEach(function (widget) {
             $element.append(widget.getElement());
         });
     });
@@ -525,7 +530,7 @@ WbWidgetGroupCtrl.prototype.childSelected = function (ctrl) {
     this.lastSelectedItem = ctrl;
     // maso, 2018: call the parent controller function
     this.fire('widgetSelected', {
-        widgets: [ctrl]
+        widgets: ctrl? [ctrl] : []
     });
 };
 
@@ -536,13 +541,18 @@ WbWidgetGroupCtrl.prototype.childSelected = function (ctrl) {
  */
 WbWidgetGroupCtrl.prototype.removeChild = function (widget) {
     var index = this.indexOfChild(widget);
+    
     if (index > -1) {
         // remove selection
         if (this.isChildSelected(widget)) {
             this.childSelected(null);
         }
         // remove model
-        this.getModel().contents.splice(index, 1);
+        this.childWidgets.splice(index, 1);
+        
+        var model = this.getModel();
+        index = model.contents.indexOf(widget.getModel());
+        model.contents.splice(index, 1);
 
         // destroy widget
         widget.destroy();
@@ -555,18 +565,18 @@ WbWidgetGroupCtrl.prototype.removeChild = function (widget) {
  */
 WbWidgetGroupCtrl.prototype.addChild = function (index, item) {
     var model = this.getModel();
-    var parentElement = this.getElement();
+    var ctrl = this;
 
     // add widget
-    $widget.compile(item, this)//
-    .then(function (newElement) {
-        var nodes = parentElement[0].childNodes;
-        if (index < nodes.length) {
-            newElement.insertBefore(nodes[index]);
+    this.$widget.compile(item, this)//
+    .then(function (newWidget) {
+        if (index < ctrl.childWidgets.length) {
+            newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
         } else {
-            parentElement.append(newElement);
+            ctrl.getElement().append(newElement);
         }
         model.contents.splice(index, 0, item);
+        ctrl.childWidgets.splice(index, 0, newWidget);
     });
     // TODO: replace with promise
     return true;
@@ -576,11 +586,10 @@ WbWidgetGroupCtrl.prototype.addChild = function (index, item) {
  * Finds index of child element
  */
 WbWidgetGroupCtrl.prototype.indexOfChild = function (widget) {
-    var model = this.getModel();
-    if (!model || !angular.isArray(model) || model.length == 0) {
+    if (!this.childWidgets || !this.childWidgets.length) {
         return -1;
     }
-    return model.contents.indexOf(widget.getModel());
+    return this.childWidgets.indexOf(widget);
 };
 
 WbWidgetGroupCtrl.prototype.getAllowedTypes = function () {
@@ -592,7 +601,7 @@ WbWidgetGroupCtrl.prototype.getAllowedTypes = function () {
 
 
 
-// submit the controller
+//submit the controller
 angular.module('am-wb-core')//
 .controller('WbWidgetCtrl', WbWidgetCtrl)//
 .controller('WbWidgetGroupCtrl', WbWidgetGroupCtrl);
@@ -1777,14 +1786,8 @@ angular.module('am-wb-core')
         // Loads wbGroup
         var ctrl = $ctrls[0];
 
-        // Loads wbGroup
-        var wbGroupCtrl = $ctrls[1];
-        if(wbGroupCtrl){
-            $scope.container = wbGroupCtrl;
-        }
-
         // Load ngModel
-        var ngModelCtrl = $ctrls[2];
+        var ngModelCtrl = $ctrls[1];
         ngModelCtrl.$render = function() {
             ctrl.setModel(ngModelCtrl.$viewValue);
         };
@@ -1792,24 +1795,24 @@ angular.module('am-wb-core')
         /*
          * Watch for editable in root element
          */
-        if(!wbGroupCtrl){
-            $scope.$watch('wbEditable', function(editable){
-                ctrl.setEditable(editable);
-            });
-        }
+        $scope.$watch('wbEditable', function(editable){
+            ctrl.setEditable(editable);
+        });
 
         if($scope.wbOnModelSelect) {
             var onModelSelectionFu = $parse($scope.wbOnModelSelect);
             ctrl.on('widgetSelected', function($event){
                 var widgets = $event.widgets;
-                var ctrl = widgets[0];
-                $scope.$eval(function() {
-                    onModelSelectionFu($scope.$parent, {
+                var locals = {
                         '$event': $event,
-                        '$model': ctrl.getModel(),
-                        '$ctrl': ctrl,
                         'widgets': widgets
-                    });
+                };
+                if(angular.isArray(widgets) && widgets.length){
+                    locals.$model =ctrl.getModel();
+                    locals.$ctrl = ctrl;
+                }
+                $scope.$eval(function() {
+                    onModelSelectionFu($scope.$parent, locals);
                 });
             });
         }
@@ -1829,7 +1832,7 @@ angular.module('am-wb-core')
         link : wbGroupLink,
         controllerAs: 'ctrl',
         controller: 'WbWidgetGroupCtrl',
-        require:['wbGroup', '?^^wbGroup', 'ngModel']
+        require:['wbGroup', 'ngModel']
     };
 });
 
@@ -6007,12 +6010,6 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         // layout
         css = _.merge(css, convertToWidgetCssLayout(style.layout || {}));
 
-        // margin
-        css = _.merge(css, style.margin || {});
-
-        // padding
-        css = _.merge(css, style.padding || {});
-
         // background
         css = _.merge(css, convertToWidgetCssBackground(style.background || {}));
 
@@ -6024,6 +6021,8 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         
         // color, cursor, opacity
         css = _.merge(css, {
+            padding: style.padding,
+            margin: style.margin,
             color: style.color || 'initial',
             cursor: style.cursor || 'auto',
             opacity: style.opacity || '1'
