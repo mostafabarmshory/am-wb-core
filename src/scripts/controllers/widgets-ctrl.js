@@ -299,6 +299,7 @@ var WbWidgetGroupCtrl = function($scope, $element, $wbUtil, $parse, $controller,
     var ctrl = this;
     this.on('modelChanged', function(){
         ctrl.loadWidgets(ctrl.getModel());
+        ctrl.loadEvents(ctrl.getModel());
     });
 };
 WbWidgetGroupCtrl.prototype = new WbAbstractWidget()
@@ -349,6 +350,32 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function(model){
     });
 };
 
+WbWidgetGroupCtrl.prototype.loadEvents = function (model) {
+    var ctrl = this;
+    var $element = this.getElement();
+    if (!model || !angular.isArray(model.event)) {
+        return;
+    }
+    var events = {};
+
+    model.event.forEach(function (e) {
+        switch (e.key) {
+        case 'onClick': {
+            var body = '\'use strict\';' + e.value;
+            var onClick = new Function(body);
+            events.onClick = onClick;
+        }
+        }
+    });
+    $element.on('click', function () {
+        if (ctrl.isEditable()) {
+            return;
+        }
+        if (events.onClick) {
+            eval(events.onClick);
+        }
+    });
+};
 
 WbWidgetGroupCtrl.prototype.childSelected = function(ctrl) {
     if(!this.isRoot()){
