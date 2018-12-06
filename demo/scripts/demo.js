@@ -46,7 +46,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
     
     $scope.widgetUnderCursor = function($event){
         cursorWidgetLocator.setWidget($event.widget);
-    }
+    };
 
     // load setting of model
     $scope.loadSettings = function($event){
