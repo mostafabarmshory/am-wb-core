@@ -22,7 +22,10 @@
 								{
 									"type": "HtmlText",
 									"name": "Widget",
-									"text": "<h2>HTML Text In 4th group0</h2>"
+									"text": "<h2>HTML Text In 4th group0</h2>",
+                                                                        "events": {
+                                                                            "onClick": "alert('Wow!! Click event')" 
+                                                                        }
 								}
 							]
 						}

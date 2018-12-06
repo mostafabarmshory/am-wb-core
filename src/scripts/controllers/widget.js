@@ -28,15 +28,15 @@ var WbAbstractWidget = function(){
     this.callbacks = [];
     this.$scope = null;
     this.$element = null;
-}
+};
 
 WbAbstractWidget.prototype.setElement = function($element) {
     this.$element = $element;
-}
+};
 
 WbAbstractWidget.prototype.getElement = function() {
     return this.$element;
-}
+};
 
 WbAbstractWidget.prototype.fire = function(type){
     if(angular.isDefined(this.callbacks[type])){
@@ -148,7 +148,7 @@ WbAbstractWidget.prototype.delete = function(){
  */
 WbAbstractWidget.prototype.isRoot = function () {
     var parent = this.getParent();
-    return angular.isUndefined(parent) || parent == null;
+    return angular.isUndefined(parent) || parent === null;
 };
 
 WbAbstractWidget.prototype.isSelected = function(){
@@ -255,7 +255,7 @@ var WbWidgetCtrl = function($scope, $element, $wbUtil, $parse) {
         }
     });
 };
-WbWidgetCtrl.prototype = new WbAbstractWidget()
+WbWidgetCtrl.prototype = new WbAbstractWidget();
 
 
 /**
@@ -281,9 +281,10 @@ var WbWidgetGroupCtrl = function($scope, $element, $wbUtil, $parse, $controller,
     var ctrl = this;
     this.on('modelChanged', function(){
         ctrl.loadWidgets(ctrl.getModel());
+	ctrl.loadEvents(ctrl.getModel());
     });
 };
-WbWidgetGroupCtrl.prototype = new WbAbstractWidget()
+WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
 
 
 // /**
@@ -364,6 +365,9 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function(model){
     });
 };
 
+WbWidgetGroupCtrl.prototype.loadEvents = function(model){
+    model.contents.forEach(function(item, index) {});
+};
 
 WbWidgetGroupCtrl.prototype.childSelected = function(ctrl) {
     if(!this.isRoot()){
@@ -435,7 +439,7 @@ WbWidgetGroupCtrl.prototype.addChild = function(index, item) {
  */
 WbWidgetGroupCtrl.prototype.indexOfChild = function(widget) {
     var model = this.getModel();
-    if(!model || !angular.isArray(model) || model.length == 0){
+    if(!model || !angular.isArray(model) || model.length === 0){
         return -1;
     }
     return model.contents.indexOf(widget.getModel());
