@@ -296,7 +296,7 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil) {
     var ctrl = this;
 
     // delete action
-    this.actions.push({
+    this.addAction({
         title: 'Delete',
         icon: 'delete',
         action: function () {
@@ -306,7 +306,7 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil) {
     });
 
     // add child action
-    this.actions.push({
+    this.addAction({
         title: 'Clone',
         icon: 'content_copy',
         action: function () {
@@ -315,7 +315,7 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil) {
         description: 'Duplicate widget (ctrl+D)'
     });
 };
-WbWidgetCtrl.prototype = new WbAbstractWidget()
+WbWidgetCtrl.prototype = new WbAbstractWidget();
 
 
 /**
@@ -328,12 +328,10 @@ WbWidgetCtrl.prototype = new WbAbstractWidget()
  * @ngInject
  */
 var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $parse, $controller, $widget, $mdTheming, $q) {
-    angular.extend(this, $controller('WbWidgetCtrl', {
-        '$scope': $scope,
-        '$element': $element
-    }));
-
-
+    WbAbstractWidget.call(this);
+    this.setElement($element);
+    this.setScope($scope);
+    
     this.$widget = $widget;
     this.$q = $q;
     this.$mdTheming = $mdTheming;
@@ -343,8 +341,28 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $parse, $controller
     this.on('modelChanged', function () {
         ctrl.loadWidgets(ctrl.getModel());
     });
+
+    // delete action
+    this.addAction({
+        title: 'Delete',
+        icon: 'delete',
+        action: function () {
+            ctrl.delete();
+        },
+        description: 'Delete widget (Delete)'
+    });
+
+    // add child action
+    this.addAction({
+        title: 'Clone',
+        icon: 'content_copy',
+        action: function () {
+            ctrl.clone();
+        },
+        description: 'Duplicate widget (ctrl+D)'
+    });
 };
-WbWidgetGroupCtrl.prototype = new WbAbstractWidget()
+WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
 
 /**
  * Check if the widget is selected
@@ -451,6 +469,9 @@ WbWidgetGroupCtrl.prototype.addChild = function (index, item) {
         }
         model.contents.splice(index, 0, item);
         ctrl.childWidgets.splice(index, 0, newWidget);
+        
+        // init the widget
+        newWidget.setEditable(ctrl.isEditable());
     });
     // TODO: replace with promise
     return true;

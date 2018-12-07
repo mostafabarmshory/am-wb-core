@@ -58,6 +58,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
             cursorWidgetLocator.setWidget(widget);
             cursorWidgetLocator.setVisible(true);
         } else {
+            cursorWidgetLocator.setWidget(null);
             $scope.selectedWidget = null;
             $scope.actions = null;
         }

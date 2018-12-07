@@ -237,7 +237,6 @@ angular.module('am-wb-core')
             // bind ctrl
             element.data('$ngControllerController', ctrl);
             link(childScope);
-            ctrl.setElement(element);
             ctrl.setParent(parentWidget);
             ctrl.setModel(model);
             

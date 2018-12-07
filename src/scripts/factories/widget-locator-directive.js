@@ -181,20 +181,16 @@ function CursorWidgetLocator(AbstractWidgetLocator, $rootScope) {
                     }
                     ctrl.updateView(bound);
                 }, true);
+                ctrl.updateView(getBound());
+                ctrl.show();
+            } else {
+                ctrl.hide();
             }
-            ctrl.updateView(getBound());
         });
     };
     cursorWidgetLocator.prototype = new AbstractWidgetLocator();
 
     cursorWidgetLocator.prototype.updateView = function (bound) {
-        var widget = this.getWidget();
-        if (!widget) {
-            this.hide();
-            return;
-        }
-        this.show();
-
         this.topElement.css({
             top : bound.top + 1,
             left : bound.left + 1,
