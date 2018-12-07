@@ -1,10 +1,10 @@
 /**************************************************************************************
-                                     Widget layout
+                                     Group layout
 
-A widget is wraped in several dive to instruct a view. Here is the hierarchial structure
+A group is wrapped in several dive to instruct a view. Here is the hierarchical structure
 of a widget:
 
--> widget
+-> group
 ***************************************************************************************/
 .wb-group {
 	min-width: 32px;
@@ -19,48 +19,11 @@ of a widget:
 	min-height: 32px;
 }
 
-.wb-group-root.wb-group-edit {
-	border: 1px solid black !important;
-}
-
-/*
- * Added to a group if is in edit mode
- */
-.wb-group-edit {
-	border: 1px dashed #aaaaaa;
-}
-
-.wb-group-edit {
-	padding: 8px;
-}
-
-.wb-group-edit.wb-flex-row>* {
-	margin: 0px 4px;
-}
-
-.wb-group-edit.wb-flex-column>* {
-	margin: 4px 0px;
-}
-
-/*
- * Add animation on mouse hover in edit mode
- */
-.wb-group-edit:hover {
-	border: 1px dashed black;
-}
-
-/*
- * Added if group is selected
- */
-.wb-group-select {
-	border: 1px solid black !important;
-	box-shadow: 0px 0px 4px 4px #aaaaaa;
-}
 
 /**************************************************************************************
                                      Widget layout
 
-A widget is wraped in several dive to instruct a view. Here is the hierarchial structure
+A widget is wrapped in several dive to instruct a view. Here is the hierarchical structure
 of a widget:
 
 -> widget
@@ -70,19 +33,6 @@ of a widget:
 	position: relative;
 	min-width: 32px;
 	min-height: 32px;
-}
-
-.wb-widget-edit {
-	border: 1px dashed #8f9494;
-}
-
-.wb-widget-edit:hover {
-	border: 1px dashed black;
-}
-
-.wb-widget-select {
-	border: 1px solid black !important;
-	box-shadow: 0px 0px 4px 4px #aaaaaa;
 }
 
 /*
@@ -100,32 +50,20 @@ of a widget:
 	margin: 0px;
 }
 
-.md-button.md-icon-button.md-mini {
-	line-height: 1rem;
-	width: 1.5rem;
-	height: 1.5rem;
-	min-height: 1rem;
-	margin: 0px;
-	padding: 0px;
-	margin-left: 4px;
-}
-
-.wb-icon-mini {
-	padding: 0px;
-	margin: 0px;
-	font-size: 1rem;
-	line-height: 1rem;
-	min-height: 1rem;
-}
-
 /**************************************************************************************
-                                     Widget locator
+                                     Widget locators
+Locators are used to display area of a widget or attache some extra meta information on
+in the edit mode. This part of the the CSS fix basic settings of the widgets.
 ***************************************************************************************/
+
+/*
+ * Bound
+ */
 .wb-widget-locator-cursor {
 	display: block;
 	position: fixed;
 	transition: all 0.3s ease;
-	background: black;
+	background: red;
 }
 
 #top.wb-widget-locator-cursor {
@@ -141,5 +79,31 @@ of a widget:
 }
 
 #left.wb-widget-locator-cursor {
+	width: 1px;
+}
+
+/*
+ * Bound
+ */
+.wb-widget-locator-bound {
+	display: block;
+	position: fixed;
+	transition: all 0.3s ease;
+	background: black;
+}
+
+#top.wb-widget-locator-bound {
+	height: 1px;
+}
+
+#right.wb-widget-locator-bound {
+	width: 1px;
+}
+
+#buttom.wb-widget-locator-bound {
+	height: 1px;
+}
+
+#left.wb-widget-locator-bound {
 	width: 1px;
 }

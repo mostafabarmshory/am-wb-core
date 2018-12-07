@@ -23,6 +23,9 @@
  */
 'use strict';
 
+
+angular.module('am-wb-core')//
+
 /**
  * @ngdoc Factories
  * @name AbstractWidgetLocator
@@ -31,9 +34,215 @@
  * It is used to display extra information about a widget on the screen. For
  * example it is used to show widget actions on the fly.
  * 
- * @ngInject
  */
-function AbstractWidgetLocator($rootElement) {
+.factory('CursorWidgetLocator', function(AbstractWidgetLocator, $rootScope) {
+
+    var cursorWidgetLocator = function (options) {
+        options = options || {};
+        AbstractWidgetLocator.apply(this, options);
+
+        // load templates
+        var template = options.template
+                || '<div class="wb-widget-locator-cursor"></div>';
+
+        // load elements
+        this.topElement = angular.element(template);
+        this.topElement.attr('id', 'top');
+
+        this.rightElement = angular.element(template);
+        this.rightElement.attr('id', 'right');
+
+        this.buttomElement = angular.element(template);
+        this.buttomElement.attr('id', 'buttom');
+
+        this.leftElement = angular.element(template);
+        this.leftElement.attr('id', 'left');
+
+        // init controller
+        this.setElements([ this.topElement, this.rightElement,
+                this.buttomElement, this.leftElement ]);
+        var ctrl = this;
+        function getBound() {
+            var $element = ctrl.getWidget().getElement();
+            var off = $element.offset();
+            return {
+                left : off.left,
+                top : off.top,
+                width : $element.outerWidth(),
+                height : $element.outerHeight()
+            };
+        }
+        this.on('widgetChanged', function () {
+            if (ctrl._oldWidgetWatch) {
+                ctrl._oldWidgetWatch();
+            }
+            var widge = ctrl.getWidget();
+            if (widge) {
+                widge.getScope().$watch(getBound, function (bound) {
+                    if (!bound) {
+                        return;
+                    }
+                    ctrl.updateView(bound);
+                }, true);
+                ctrl.updateView(getBound());
+                ctrl.show();
+            } else {
+                ctrl.hide();
+            }
+        });
+    };
+    cursorWidgetLocator.prototype = new AbstractWidgetLocator();
+
+    cursorWidgetLocator.prototype.updateView = function (bound) {
+        this.topElement.css({
+            top : bound.top + 1,
+            left : bound.left + 1,
+            width : bound.width - 2
+        });
+        this.rightElement.css({
+            top : bound.top + 1,
+            left : bound.left + bound.width - 2,
+            height : bound.height - 2
+        });
+        this.buttomElement.css({
+            top : bound.top + bound.height - 1,
+            left : bound.left + 1,
+            width : bound.width - 2
+        });
+        this.leftElement.css({
+            top : bound.top + 1,
+            left : bound.left + 1,
+            height : bound.height - 2
+        });
+
+    };
+    return cursorWidgetLocator;
+})//
+
+/**
+ * @ngdoc Factories
+ * @name AbstractWidgetLocator
+ * @description Locates a widget on the view
+ * 
+ * It is used to display extra information about a widget on the screen. For
+ * example it is used to show widget actions on the fly.
+ * 
+ */
+.factory('BoundWidgetLocator', function (AbstractWidgetLocator, $rootScope) {
+
+    var boundWidgetLocator = function (options) {
+        options = options || {};
+        AbstractWidgetLocator.apply(this, options);
+
+        // load templates
+        var template = options.template
+                || '<div class="wb-widget-locator-bound"></div>';
+
+        // load elements
+        this.topElement = angular.element(template);
+        this.topElement.attr('id', 'top');
+
+        this.rightElement = angular.element(template);
+        this.rightElement.attr('id', 'right');
+
+        this.buttomElement = angular.element(template);
+        this.buttomElement.attr('id', 'buttom');
+
+        this.leftElement = angular.element(template);
+        this.leftElement.attr('id', 'left');
+
+        // init controller
+        this.setElements([ this.topElement, this.rightElement,
+                this.buttomElement, this.leftElement ]);
+        var ctrl = this;
+        function getBound() {
+            var $element = ctrl.getWidget().getElement();
+            var off = $element.offset();
+            return {
+                left : off.left,
+                top : off.top,
+                width : $element.outerWidth(),
+                height : $element.outerHeight()
+            };
+        }
+        this.on('widgetChanged', function () {
+            if (ctrl._oldWidgetWatch) {
+                ctrl._oldWidgetWatch();
+            }
+            var widge = ctrl.getWidget();
+            if (widge) {
+                widge.getScope().$watch(getBound, function (bound) {
+                    if (!bound) {
+                        return;
+                    }
+                    ctrl.updateView(bound);
+                }, true);
+                ctrl.updateView(getBound());
+                ctrl.show();
+            } else {
+                ctrl.hide();
+            }
+        });
+    };
+    boundWidgetLocator.prototype = new AbstractWidgetLocator();
+
+    boundWidgetLocator.prototype.updateView = function (bound) {
+        this.topElement.css({
+            top : bound.top + 1,
+            left : bound.left + 1,
+            width : bound.width - 2
+        });
+        this.rightElement.css({
+            top : bound.top + 1,
+            left : bound.left + bound.width - 2,
+            height : bound.height - 2
+        });
+        this.buttomElement.css({
+            top : bound.top + bound.height - 1,
+            left : bound.left + 1,
+            width : bound.width - 2
+        });
+        this.leftElement.css({
+            top : bound.top + 1,
+            left : bound.left + 1,
+            height : bound.height - 2
+        });
+
+    };
+    return boundWidgetLocator;
+})//
+
+
+
+
+/**
+ * @ngdoc Factories
+ * @name AbstractWidgetLocator
+ * @description Locates a widget on the view
+ * 
+ * It is used to display extra information about a widget on the screen. For
+ * example it is used to show widget actions on the fly.
+ * 
+ */
+.factory('ActionsWidgetLocator', function (CursorWidgetLocator) {
+    var actionsWidgetLocator = function () {
+        // TODO:
+    }
+    actionsWidgetLocator.prototype = new AbstractWidgetLocator();
+
+    return actionsWidgetLocator;
+})//
+
+/**
+ * @ngdoc Factories
+ * @name AbstractWidgetLocator
+ * @description Locates a widget on the view
+ * 
+ * It is used to display extra information about a widget on the screen. For
+ * example it is used to show widget actions on the fly.
+ * 
+ */
+.factory('AbstractWidgetLocator', function ($rootElement) {
 
     /**
      * Creates new instance of the widget locator
@@ -120,144 +329,4 @@ function AbstractWidgetLocator($rootElement) {
     }
 
     return abstractWidgetLocator;
-}
-
-/**
- * @ngdoc Factories
- * @name AbstractWidgetLocator
- * @description Locates a widget on the view
- * 
- * It is used to display extra information about a widget on the screen. For
- * example it is used to show widget actions on the fly.
- * 
- * @ngInject
- */
-function CursorWidgetLocator(AbstractWidgetLocator, $rootScope) {
-
-    var cursorWidgetLocator = function (options) {
-        options = options || {};
-        AbstractWidgetLocator.apply(this, options);
-
-        // load templates
-        var template = options.template
-        || '<div class="wb-widget-locator-cursor"></div>';
-
-        // load elements
-        this.topElement = angular.element(template);
-        this.topElement.attr('id', 'top');
-
-        this.rightElement = angular.element(template);
-        this.rightElement.attr('id', 'right');
-
-        this.buttomElement = angular.element(template);
-        this.buttomElement.attr('id', 'buttom');
-
-        this.leftElement = angular.element(template);
-        this.leftElement.attr('id', 'left');
-
-        // init controller
-        this.setElements([ this.topElement, this.rightElement,
-            this.buttomElement, this.leftElement ]);
-        var ctrl = this;
-        function getBound() {
-            var $element = ctrl.getWidget().getElement();
-            var off = $element.offset();
-            return {
-                left: off.left,
-                top: off.top,
-                width: $element.outerWidth(),
-                height: $element.outerHeight()
-            };
-        }
-        this.on('widgetChanged', function () {
-            if(ctrl._oldWidgetWatch) {
-                ctrl._oldWidgetWatch();
-            }
-            var widge = ctrl.getWidget();
-            if(widge) {
-                widge.getScope().$watch(getBound, function (bound) {
-                    if (!bound) {
-                        return;
-                    }
-                    ctrl.updateView(bound);
-                }, true);
-                ctrl.updateView(getBound());
-                ctrl.show();
-            } else {
-                ctrl.hide();
-            }
-        });
-    };
-    cursorWidgetLocator.prototype = new AbstractWidgetLocator();
-
-    cursorWidgetLocator.prototype.updateView = function (bound) {
-        this.topElement.css({
-            top : bound.top + 1,
-            left : bound.left + 1,
-            width : bound.width - 2
-        });
-        this.rightElement.css({
-            top : bound.top + 1,
-            left : bound.left + bound.width - 2,
-            height : bound.height - 2
-        });
-        this.buttomElement.css({
-            top : bound.top + bound.height - 1,
-            left : bound.left + 1,
-            width : bound.width - 2
-        });
-        this.leftElement.css({
-            top : bound.top + 1,
-            left : bound.left + 1,
-            height : bound.height - 2
-        });
-
-    };
-    return cursorWidgetLocator;
-}
-
-/**
- * @ngdoc Factories
- * @name AbstractWidgetLocator
- * @description Locates a widget on the view
- * 
- * It is used to display extra information about a widget on the screen. For
- * example it is used to show widget actions on the fly.
- * 
- * @ngInject
- */
-function BoundWidgetLocator() {
-
-    var boundWidgetLocator = function () {
-        // TODO:
-    };
-
-    boundWidgetLocator.prototype = new AbstractWidgetLocator();
-
-    return boundWidgetLocator;
-}
-
-/**
- * @ngdoc Factories
- * @name AbstractWidgetLocator
- * @description Locates a widget on the view
- * 
- * It is used to display extra information about a widget on the screen. For
- * example it is used to show widget actions on the fly.
- * 
- * @ngInject
- */
-function ActionsWidgetLocator() {
-    var actionsWidgetLocator = function () {
-        // TODO:
-    }
-    actionsWidgetLocator.prototype = new AbstractWidgetLocator();
-
-    return actionsWidgetLocator;
-}
-
-angular.module('am-wb-core')//
-.factory('CursorWidgetLocator', CursorWidgetLocator)//
-.factory('BoundWidgetLocator', BoundWidgetLocator)//
-.factory('ActionsWidgetLocator', ActionsWidgetLocator)//
-.factory('AbstractWidgetLocator', AbstractWidgetLocator);
+});

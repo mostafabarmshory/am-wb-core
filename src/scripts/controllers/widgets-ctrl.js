@@ -178,15 +178,28 @@ WbAbstractWidget.prototype.setParent = function (widget) {
     return this.parent = widget;
 };
 
-WbAbstractWidget.prototype.isEditable = function () {
-    return this.editable;
-};
-
 WbAbstractWidget.prototype.setScope = function ($scope) {
     this.$scope = $scope;
 };
 WbAbstractWidget.prototype.getScope = function () {
     return this.$scope;
+};
+
+WbAbstractWidget.prototype.setUnderCursor = function (widget) {
+    if(!this.isRoot()){
+        this.getParent().setUnderCursor(widget);
+    }
+    if(this._widgetUnderCursor === widget){
+        return;
+    }
+    this._widgetUnderCursor = widget;
+    this.fire('widgetUnderCursor', {
+        widget: this._widgetUnderCursor 
+    });
+};
+
+WbAbstractWidget.prototype.isEditable = function () {
+    return this.editable;
 };
 
 WbAbstractWidget.prototype.setEditable = function (editable) {
@@ -206,7 +219,15 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
             ctrl.setSelected(true);
             event.stopPropagation();
         }
+        this.widgetMouseEnterHandler = function(event) {
+            if(event.sourceWidget) {
+                return;
+            }
+            event.sourceWidget = ctrl;
+            ctrl.setUnderCursor(ctrl);
+        }
         $element.on('click', this.widgetSelectHandler);
+        $element.on('mouseenter', this.widgetMouseEnterHandler);
         // TODO: remove watch for model update and fire in setting
         this._modelWatche = this.getScope().$watch('wbModel', function(){
             ctrl.fire('modelUpdate');
@@ -214,6 +235,7 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
     } else {
         // remove selection handler
         $element.off('click', this.widgetSelectHandler);
+        $element.off('mouseenter', this.widgetMouseEnterHandler);
         delete this.widgetSelectHandler;
         if(this._modelWatche){
             this._modelWatche();

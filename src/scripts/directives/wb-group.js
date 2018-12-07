@@ -70,6 +70,16 @@ angular.module('am-wb-core')
                 });
             });
         }
+        if($scope.wbOnModelUnderCursor){
+            var wbOnModelUnderCursorFu = $parse($scope.wbOnModelUnderCursor);
+            ctrl.on('widgetUnderCursor', function($event){
+                $scope.$eval(function() {
+                    wbOnModelUnderCursorFu($scope.$parent, {
+                        '$event': $event,
+                    });
+                });
+            });
+        }
     }
 
 
@@ -80,6 +90,7 @@ angular.module('am-wb-core')
         scope : {
             wbEditable : '=?',
             wbOnModelSelect : '@?',
+            wbOnModelUnderCursor : '@?',
             wbAllowedTypes: '<?',
             wbLocals: '<?'
         },

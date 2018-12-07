@@ -30,13 +30,14 @@
  * 
  */
 angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
-.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbFloat, CursorWidgetLocator) {
+.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbFloat, BoundWidgetLocator, CursorWidgetLocator) {
     
     /*
      * Display an area of a widget with extra informations. It must be set to
      * visible.
      */
     var cursorWidgetLocator = new CursorWidgetLocator();
+    var selectWidgetLocator = new BoundWidgetLocator();
     
     $http.get('examples/html.json')
     .then(function(res) {
@@ -46,6 +47,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
     
     $scope.widgetUnderCursor = function($event){
         cursorWidgetLocator.setWidget($event.widget);
+        cursorWidgetLocator.setVisible(true);
     };
 
     // load setting of model
@@ -55,10 +57,10 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
             var widget =  widgets[0];
             $scope.selectedWidget = widget;
             $scope.actions = widget.getActions();
-            cursorWidgetLocator.setWidget(widget);
-            cursorWidgetLocator.setVisible(true);
+            selectWidgetLocator.setWidget(widget);
+            selectWidgetLocator.setVisible(true);
         } else {
-            cursorWidgetLocator.setWidget(null);
+            selectWidgetLocator.setWidget(null);
             $scope.selectedWidget = null;
             $scope.actions = null;
         }
@@ -182,6 +184,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
             openContent();
         }
         cursorWidgetLocator.setVisible(value);
+        selectWidgetLocator.setVisible(value);
     });
 })
 
