@@ -80,6 +80,10 @@ angular.module('am-wb-core')
                 });
             });
         }
+        
+        $scope.$watch('wbAllowedTypes', function(wbAllowedTypes){
+           ctrl.setAllowedTypes(wbAllowedTypes); 
+        });
     }
 
 

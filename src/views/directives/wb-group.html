@@ -14,7 +14,7 @@
 	dnd-list="wbModel.contents"
 	dnd-allowed-types="ctrl.getAllowedTypes()"
 	dnd-external-sources="true"
-	dnd-drop="dropCallback(index, item, external, type)"
+	dnd-drop="ctrl.addChild(index, item)"
 	dnd-horizontal-list="wbModel.style.layout.direction==='row'"
 
 	md-theme-watch="true"></div>

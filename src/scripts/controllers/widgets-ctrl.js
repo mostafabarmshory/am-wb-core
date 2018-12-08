@@ -487,7 +487,7 @@ WbWidgetGroupCtrl.prototype.addChild = function (index, item) {
         if (index < ctrl.childWidgets.length) {
             newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
         } else {
-            ctrl.getElement().append(newElement);
+            ctrl.getElement().append(newWidget.getElement());
         }
         model.contents.splice(index, 0, item);
         ctrl.childWidgets.splice(index, 0, newWidget);
@@ -509,8 +509,20 @@ WbWidgetGroupCtrl.prototype.indexOfChild = function (widget) {
     return this.childWidgets.indexOf(widget);
 };
 
+/**
+ * List of allowed child
+ * 
+ * @memeberof WbWidgetGroupCtrl
+ */
 WbWidgetGroupCtrl.prototype.getAllowedTypes = function () {
-    return this.$scope.wbAllowedTypesl;
+    if(!this.isRoot()){
+        return this.getParent().getAllowedTypes();
+    }
+    return this.allowedTypes;
+};
+
+WbWidgetGroupCtrl.prototype.setAllowedTypes = function (allowedTypes) {
+    return this.allowedTypes = allowedTypes;
 };
 
 
@@ -520,6 +532,6 @@ WbWidgetGroupCtrl.prototype.getAllowedTypes = function () {
 
 //submit the controller
 angular.module('am-wb-core')//
-.controller('WbWidgetCtrl', WbWidgetCtrl)//
-.controller('WbWidgetGroupCtrl', WbWidgetGroupCtrl);
+    .controller('WbWidgetCtrl', WbWidgetCtrl)//
+    .controller('WbWidgetGroupCtrl', WbWidgetGroupCtrl);
 
