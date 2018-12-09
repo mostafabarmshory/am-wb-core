@@ -609,6 +609,7 @@ WbWidgetGroupCtrl.prototype.addChild = function (index, item) {
     var ctrl = this;
 
     // add widget
+    item = this.$wbUtil.clean(item);
     this.$widget.compile(item, this)//
     .then(function (newWidget) {
         if (index < ctrl.childWidgets.length) {
