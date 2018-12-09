@@ -225,9 +225,10 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
             }
             event.sourceWidget = ctrl;
             ctrl.setUnderCursor(ctrl);
+            return false;
         }
         $element.on('click', this.widgetSelectHandler);
-        $element.on('mouseenter', this.widgetMouseEnterHandler);
+        $element.on('mousemove', this.widgetMouseEnterHandler);
         // TODO: remove watch for model update and fire in setting
         this._modelWatche = this.getScope().$watch('wbModel', function(){
             ctrl.fire('modelUpdate');
@@ -235,7 +236,7 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
     } else {
         // remove selection handler
         $element.off('click', this.widgetSelectHandler);
-        $element.off('mouseenter', this.widgetMouseEnterHandler);
+        $element.off('mousemove', this.widgetMouseEnterHandler);
         delete this.widgetSelectHandler;
         if(this._modelWatche){
             this._modelWatche();
