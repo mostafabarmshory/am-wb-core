@@ -308,15 +308,37 @@ angular.module('am-wb-core')//
     };
 
     abstractWidgetLocator.prototype.hide = function () {
-        angular.forEach(this.elements, function (element) {
-            element.hide();
-        });
+    	this.setVisible(false);
     }
 
-    abstractWidgetLocator.prototype.show = function (bound) {
+    abstractWidgetLocator.prototype.show = function () {
+    	this.setVisible(true);
+    }
+    
+    abstractWidgetLocator.prototype.setVisible = function (visible) {
+    	this.visible = visible;
+    	visible = this.visible && this.enable;
         angular.forEach(this.elements, function (element) {
-            element.show();
+            if(visible) {
+            	element.show();
+            } else {
+            	element.hide();
+            }
         });
+    }
+    
+    abstractWidgetLocator.prototype.isVisible = function () {
+    	return this.visible;
+    }
+    
+    
+    abstractWidgetLocator.prototype.setEnable = function (enable) {
+    	this.enable = enable;
+    	this.setVisible(this.enable && this.visible);
+    }
+    
+    abstractWidgetLocator.prototype.isEnable = function () {
+    	return this.enable;
     }
 
     abstractWidgetLocator.prototype.destroy = function () {
