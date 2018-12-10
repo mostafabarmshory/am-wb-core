@@ -90,10 +90,19 @@ angular.module('am-wb-core')//
 	 * @memberof CursorWidgetLocator
 	 */
 	WidgetLocatorManager.prototype.destroy = function() {
-		angular.forEach(this.locators, function(locator) {
+		if(this.cursorLocator) {
+			this.cursorLocator.destroy();
+		}
+		angular.forEach(this.selectLocators, function(locator) {
 			locator.destroy();
 		});
-		this.locators = [];
+		angular.forEach(this.pathLocators, function(locator) {
+			locator.destroy();
+		});
+		
+		this.selectLocators = [];
+		delete this.cursorLocator;
+		this.pathLocators = [];
 	}
 
 	/**
@@ -106,7 +115,13 @@ angular.module('am-wb-core')//
 			return;
 		}
 		this.visible = visible;
-		angular.forEach(this.locators, function(locator) {
+		if(this.cursorLocator) {
+				this.cursorLocator.setVisible(visible);
+		}
+		angular.forEach(this.selectLocators, function(locator) {
+			locator.setVisible(visible);
+		});
+		angular.forEach(this.pathLocators, function(locator) {
 			locator.setVisible(visible);
 		});
 	}
