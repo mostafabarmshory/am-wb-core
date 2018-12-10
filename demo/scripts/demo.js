@@ -30,14 +30,21 @@
  * 
  */
 angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
-.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbFloat, BoundWidgetLocator, CursorWidgetLocator) {
+.controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbFloat, WidgetLocatorManager) {
     
     /*
      * Display an area of a widget with extra informations. It must be set to
      * visible.
      */
-    var cursorWidgetLocator = new CursorWidgetLocator();
-    var selectWidgetLocator = new BoundWidgetLocator();
+    var widgetLocator = new WidgetLocatorManager({
+    	selectionEnable: true,
+    	selectionPath: true,
+    	cursorEnable: true,
+    	cursorPath: false,
+    	actionEnable: false
+    });
+    this.widgetLocator = widgetLocator;
+    
     
     $http.get('examples/html.json')
     .then(function(res) {
@@ -46,21 +53,18 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
     });
     
     $scope.widgetUnderCursor = function($event){
-        cursorWidgetLocator.setWidget($event.widget);
-        cursorWidgetLocator.setVisible(true);
+    	widgetLocator.setCursorWidget($event.widget);
     };
 
     // load setting of model
     $scope.loadSettings = function($event){
+        widgetLocator.setSelectedWidgets($event.widgets);
         var widgets = $event.widgets;
         if(widgets.length) {
             var widget =  widgets[0];
             $scope.selectedWidget = widget;
             $scope.actions = widget.getActions();
-            selectWidgetLocator.setWidget(widget);
-            selectWidgetLocator.setVisible(true);
         } else {
-            selectWidgetLocator.setWidget(null);
             $scope.selectedWidget = null;
             $scope.actions = null;
         }
@@ -183,8 +187,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
             openSettings();
             openContent();
         }
-        cursorWidgetLocator.setVisible(value);
-        selectWidgetLocator.setVisible(value);
+        widgetLocator.setVisible(value);
     });
 })
 
