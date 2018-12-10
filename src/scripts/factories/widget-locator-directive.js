@@ -26,307 +26,325 @@
 
 angular.module('am-wb-core')//
 
-/**
- * @ngdoc Factories
- * @name AbstractWidgetLocator
- * @description Locates a widget on the view
- * 
- * It is used to display extra information about a widget on the screen. For
- * example it is used to show widget actions on the fly.
- * 
- */
-.factory('CursorWidgetLocator', function(AbstractWidgetLocator, $rootScope) {
+	/**
+	 * @ngdoc Factories
+	 * @name AbstractWidgetLocator
+	 * @description Locates a widget on the view
+	 * 
+	 * It is used to display extra information about a widget on the screen. For
+	 * example it is used to show widget actions on the fly.
+	 * 
+	 */
+	.factory('CursorWidgetLocator', function (AbstractWidgetLocator, $rootScope) {
 
-    var cursorWidgetLocator = function (options) {
-        options = options || {};
-        AbstractWidgetLocator.apply(this, options);
+	    var cursorWidgetLocator = function (options) {
+		options = options || {};
+		AbstractWidgetLocator.apply(this, options);
 
-        // load templates
-        var template = options.template
-                || '<div class="wb-widget-locator-cursor"></div>';
+		// load templates
+		var template = options.template
+			|| '<div class="wb-widget-locator-cursor"></div>';
 
-        // load elements
-        this.topElement = angular.element(template);
-        this.topElement.attr('id', 'top');
+		// load elements
+		this.topElement = angular.element(template);
+		this.topElement.attr('id', 'top');
 
-        this.rightElement = angular.element(template);
-        this.rightElement.attr('id', 'right');
+		this.rightElement = angular.element(template);
+		this.rightElement.attr('id', 'right');
 
-        this.buttomElement = angular.element(template);
-        this.buttomElement.attr('id', 'buttom');
+		this.buttomElement = angular.element(template);
+		this.buttomElement.attr('id', 'buttom');
 
-        this.leftElement = angular.element(template);
-        this.leftElement.attr('id', 'left');
+		this.leftElement = angular.element(template);
+		this.leftElement.attr('id', 'left');
 
-        // init controller
-        this.setElements([ this.topElement, this.rightElement,
-                this.buttomElement, this.leftElement ]);
-        var ctrl = this;
-        function getBound() {
-            var $element = ctrl.getWidget().getElement();
-            var off = $element.offset();
-            return {
-                left : off.left,
-                top : off.top,
-                width : $element.outerWidth(),
-                height : $element.outerHeight()
-            };
-        }
-        this.on('widgetChanged', function () {
-            if (ctrl._oldWidgetWatch) {
-                ctrl._oldWidgetWatch();
-            }
-            var widge = ctrl.getWidget();
-            if (widge) {
-                widge.getScope().$watch(getBound, function (bound) {
-                    if (!bound) {
-                        return;
-                    }
-                    ctrl.updateView(bound);
-                }, true);
-                ctrl.updateView(getBound());
-                ctrl.show();
-            } else {
-                ctrl.hide();
-            }
-        });
-    };
-    cursorWidgetLocator.prototype = new AbstractWidgetLocator();
+		// init controller
+		this.setElements([this.topElement, this.rightElement,
+		    this.buttomElement, this.leftElement]);
+		var ctrl = this;
+		function getBound() {
+		    var $element = ctrl.getWidget().getElement();
+		    var off = $element.offset();
+		    return {
+			left: off.left,
+			top: off.top,
+			width: $element.outerWidth(),
+			height: $element.outerHeight()
+		    };
+		}
+		this.on('widgetChanged', function () {
+		    if (ctrl._oldWidgetWatch) {
+			ctrl._oldWidgetWatch();
+		    }
+		    var widge = ctrl.getWidget();
+		    if (widge) {
+			widge.getScope().$watch(getBound, function (bound) {
+			    if (!bound) {
+				return;
+			    }
+			    ctrl.updateView(bound);
+			}, true);
+			ctrl.updateView(getBound());
+			ctrl.show();
+		    } else {
+			ctrl.hide();
+		    }
+		});
+	    };
+	    cursorWidgetLocator.prototype = new AbstractWidgetLocator();
 
-    cursorWidgetLocator.prototype.updateView = function (bound) {
-        this.topElement.css({
-            top : bound.top + 1,
-            left : bound.left + 1,
-            width : bound.width - 2
-        });
-        this.rightElement.css({
-            top : bound.top + 1,
-            left : bound.left + bound.width - 2,
-            height : bound.height - 2
-        });
-        this.buttomElement.css({
-            top : bound.top + bound.height - 1,
-            left : bound.left + 1,
-            width : bound.width - 2
-        });
-        this.leftElement.css({
-            top : bound.top + 1,
-            left : bound.left + 1,
-            height : bound.height - 2
-        });
+	    cursorWidgetLocator.prototype.updateView = function (bound) {
+		this.topElement.css({
+		    top: bound.top + 1,
+		    left: bound.left + 1,
+		    width: bound.width - 2
+		});
+		this.rightElement.css({
+		    top: bound.top + 1,
+		    left: bound.left + bound.width - 2,
+		    height: bound.height - 2
+		});
+		this.buttomElement.css({
+		    top: bound.top + bound.height - 1,
+		    left: bound.left + 1,
+		    width: bound.width - 2
+		});
+		this.leftElement.css({
+		    top: bound.top + 1,
+		    left: bound.left + 1,
+		    height: bound.height - 2
+		});
 
-    };
-    return cursorWidgetLocator;
-})//
+	    };
+	    return cursorWidgetLocator;
+	})//
 
-/**
- * @ngdoc Factories
- * @name AbstractWidgetLocator
- * @description Locates a widget on the view
- * 
- * It is used to display extra information about a widget on the screen. For
- * example it is used to show widget actions on the fly.
- * 
- */
-.factory('BoundWidgetLocator', function (AbstractWidgetLocator, $rootScope) {
+	/**
+	 * @ngdoc Factories
+	 * @name AbstractWidgetLocator
+	 * @description Locates a widget on the view
+	 * 
+	 * It is used to display extra information about a widget on the screen. For
+	 * example it is used to show widget actions on the fly.
+	 * 
+	 */
+	.factory('BoundWidgetLocator', function (AbstractWidgetLocator) {
 
-    var boundWidgetLocator = function (options) {
-        options = options || {};
-        AbstractWidgetLocator.apply(this, options);
+	    var boundWidgetLocator = function (options) {
+		options = options || {};
+		AbstractWidgetLocator.apply(this, options);
 
-        // load templates
-        var template = options.template
-                || '<div class="wb-widget-locator-bound"></div>';
+		// load headerTemplate
+		var headerTag = '<div style="position: absolute; background: black; color: red; border: 1px solid black;">header</div>';
+		this.titleElement = angular.element(headerTag);
 
-        // load elements
-        this.topElement = angular.element(template);
-        this.topElement.attr('id', 'top');
+		// load templates
+		var template = options.template
+			|| '<div class="wb-widget-locator-bound"></div>';
 
-        this.rightElement = angular.element(template);
-        this.rightElement.attr('id', 'right');
+		// load elements
+		this.topElement = angular.element(template);
+		this.topElement.attr('id', 'top');
 
-        this.buttomElement = angular.element(template);
-        this.buttomElement.attr('id', 'buttom');
+		this.rightElement = angular.element(template);
+		this.rightElement.attr('id', 'right');
 
-        this.leftElement = angular.element(template);
-        this.leftElement.attr('id', 'left');
+		this.buttomElement = angular.element(template);
+		this.buttomElement.attr('id', 'buttom');
 
-        // init controller
-        this.setElements([ this.topElement, this.rightElement,
-                this.buttomElement, this.leftElement ]);
-        var ctrl = this;
-        function getBound() {
-            var $element = ctrl.getWidget().getElement();
-            var off = $element.offset();
-            return {
-                left : off.left,
-                top : off.top,
-                width : $element.outerWidth(),
-                height : $element.outerHeight()
-            };
-        }
-        this.on('widgetChanged', function () {
-            if (ctrl._oldWidgetWatch) {
-                ctrl._oldWidgetWatch();
-            }
-            var widge = ctrl.getWidget();
-            if (widge) {
-                widge.getScope().$watch(getBound, function (bound) {
-                    if (!bound) {
-                        return;
-                    }
-                    ctrl.updateView(bound);
-                }, true);
-                ctrl.updateView(getBound());
-                ctrl.show();
-            } else {
-                ctrl.hide();
-            }
-        });
-    };
-    boundWidgetLocator.prototype = new AbstractWidgetLocator();
+		this.leftElement = angular.element(template);
+		this.leftElement.attr('id', 'left');
 
-    boundWidgetLocator.prototype.updateView = function (bound) {
-        this.topElement.css({
-            top : bound.top + 1,
-            left : bound.left + 1,
-            width : bound.width - 2
-        });
-        this.rightElement.css({
-            top : bound.top + 1,
-            left : bound.left + bound.width - 2,
-            height : bound.height - 2
-        });
-        this.buttomElement.css({
-            top : bound.top + bound.height - 1,
-            left : bound.left + 1,
-            width : bound.width - 2
-        });
-        this.leftElement.css({
-            top : bound.top + 1,
-            left : bound.left + 1,
-            height : bound.height - 2
-        });
+		// init controller
+		this.setElements([this.titleElement, this.topElement, this.rightElement,
+		    this.buttomElement, this.leftElement]);
+		var ctrl = this;
+		function getBound() {
+		    var $element = ctrl.getWidget().getElement();
+		    var off = $element.offset();
+		    return {
+			left: off.left,
+			top: off.top,
+			width: $element.outerWidth(),
+			height: $element.outerHeight()
+		    };
+		}
 
-    };
-    return boundWidgetLocator;
-})//
+		this.on('widgetChanged', function () {
+		    if (ctrl._oldWidgetWatch) {
+			ctrl._oldWidgetWatch();
+		    }
+		    var widget = ctrl.getWidget();
+		    if (widget) {
+			widget.getScope().$watch(getBound, function (bound) {
+			    if (!bound) {
+				return;
+			    }
+			    ctrl.updateView(bound);
+			}, true);
+			ctrl.updateView(getBound());
+			ctrl.show();
+			
+			var model = widget.getModel();
+			ctrl.titleElement.html(model.label || model.type);
+		    } else {
+			ctrl.hide();
+		    }
+		});
+	    };
+	    boundWidgetLocator.prototype = new AbstractWidgetLocator();
+
+	    boundWidgetLocator.prototype.updateView = function (bound) {
+		this.topElement.css({
+		    top: bound.top + 1,
+		    left: bound.left + 1,
+		    width: bound.width - 2
+		});
+		this.rightElement.css({
+		    top: bound.top + 1,
+		    left: bound.left + bound.width - 2,
+		    height: bound.height - 2
+		});
+		this.buttomElement.css({
+		    top: bound.top + bound.height - 1,
+		    left: bound.left + 1,
+		    width: bound.width - 2
+		});
+		this.leftElement.css({
+		    top: bound.top + 1,
+		    left: bound.left + 1,
+		    height: bound.height - 2
+		});
+		if (bound.top < 32) {
+		    this.titleElement.css({
+			top: bound.top + bound.height,
+			left: bound.left + bound.width- this.titleElement.width() - 5
+		    });
+		} else {
+		    this.titleElement.css({
+			top: bound.top -  this.titleElement.height(),
+			left: bound.left + bound.width - this.titleElement.width() - 5
+		    });
+		}
+	    };
+	    return boundWidgetLocator;
+	})//
 
 
 
 
-/**
- * @ngdoc Factories
- * @name AbstractWidgetLocator
- * @description Locates a widget on the view
- * 
- * It is used to display extra information about a widget on the screen. For
- * example it is used to show widget actions on the fly.
- * 
- */
-.factory('ActionsWidgetLocator', function (CursorWidgetLocator) {
-    var actionsWidgetLocator = function () {
-        // TODO:
-    }
-    actionsWidgetLocator.prototype = new AbstractWidgetLocator();
+	/**
+	 * @ngdoc Factories
+	 * @name AbstractWidgetLocator
+	 * @description Locates a widget on the view
+	 * 
+	 * It is used to display extra information about a widget on the screen. For
+	 * example it is used to show widget actions on the fly.
+	 * 
+	 */
+	.factory('ActionsWidgetLocator', function (CursorWidgetLocator) {
+	    var actionsWidgetLocator = function () {
+		// TODO:
+	    }
+	    actionsWidgetLocator.prototype = new AbstractWidgetLocator();
 
-    return actionsWidgetLocator;
-})//
+	    return actionsWidgetLocator;
+	})//
 
-/**
- * @ngdoc Factories
- * @name AbstractWidgetLocator
- * @description Locates a widget on the view
- * 
- * It is used to display extra information about a widget on the screen. For
- * example it is used to show widget actions on the fly.
- * 
- */
-.factory('AbstractWidgetLocator', function ($rootElement) {
+	/**
+	 * @ngdoc Factories
+	 * @name AbstractWidgetLocator
+	 * @description Locates a widget on the view
+	 * 
+	 * It is used to display extra information about a widget on the screen. For
+	 * example it is used to show widget actions on the fly.
+	 * 
+	 */
+	.factory('AbstractWidgetLocator', function ($rootElement) {
 
-    /**
-     * Creates new instance of the widget locator
-     */
-    function abstractWidgetLocator() {
-        this.callbacks = [];
-        this.elements = [];
-    }
+	    /**
+	     * Creates new instance of the widget locator
+	     */
+	    function abstractWidgetLocator() {
+		this.callbacks = [];
+		this.elements = [];
+	    }
 
-    abstractWidgetLocator.prototype.setVisible = function (visible) {
-        this.visible = visible;
-        if (visible) {
-            this.show();
-            this.fire('show');
-        } else {
-            this.hide();
-            this.fire('hide');
-        }
-    };
+	    abstractWidgetLocator.prototype.setVisible = function (visible) {
+		this.visible = visible;
+		if (visible) {
+		    this.show();
+		    this.fire('show');
+		} else {
+		    this.hide();
+		    this.fire('hide');
+		}
+	    };
 
-    abstractWidgetLocator.prototype.isVisible = function () {
-        return this.visible;
-    };
+	    abstractWidgetLocator.prototype.isVisible = function () {
+		return this.visible;
+	    };
 
-    abstractWidgetLocator.prototype.setWidget = function (widget) {
-        this.widget = widget;
-        this.fire('widgetChanged');
-    };
+	    abstractWidgetLocator.prototype.setWidget = function (widget) {
+		this.widget = widget;
+		this.fire('widgetChanged');
+	    };
 
-    abstractWidgetLocator.prototype.getWidget = function () {
-        return this.widget;
-    };
+	    abstractWidgetLocator.prototype.getWidget = function () {
+		return this.widget;
+	    };
 
-    abstractWidgetLocator.prototype.setElements = function (elements) {
-        this.elements = elements;
-        angular.forEach(elements, function (element) {
-            $rootElement.append(element);
-            element.hide();
-        });
-    };
+	    abstractWidgetLocator.prototype.setElements = function (elements) {
+		this.elements = elements;
+		angular.forEach(elements, function (element) {
+		    $rootElement.append(element);
+		    element.hide();
+		});
+	    };
 
-    abstractWidgetLocator.prototype.getElements = function () {
-        return this.elements;
-    };
+	    abstractWidgetLocator.prototype.getElements = function () {
+		return this.elements;
+	    };
 
-    abstractWidgetLocator.prototype.on = function (type, callback) {
-        if (!angular.isArray(this.callbacks[type])) {
-            this.callbacks[type] = [];
-        }
-        this.callbacks[type].push(callback);
-    };
+	    abstractWidgetLocator.prototype.on = function (type, callback) {
+		if (!angular.isArray(this.callbacks[type])) {
+		    this.callbacks[type] = [];
+		}
+		this.callbacks[type].push(callback);
+	    };
 
-    abstractWidgetLocator.prototype.fire = function (type) {
-        if (angular.isDefined(this.callbacks[type])) {
-            for (var i = 0; i < this.callbacks[type].length; i++) {
-                try {
-                    this.callbacks[type][i]();
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-        }
-    };
+	    abstractWidgetLocator.prototype.fire = function (type) {
+		if (angular.isDefined(this.callbacks[type])) {
+		    for (var i = 0; i < this.callbacks[type].length; i++) {
+			try {
+			    this.callbacks[type][i]();
+			} catch (error) {
+			    console.log(error);
+			}
+		    }
+		}
+	    };
 
-    abstractWidgetLocator.prototype.hide = function () {
-        angular.forEach(this.elements, function (element) {
-            element.hide();
-        });
-    }
+	    abstractWidgetLocator.prototype.hide = function () {
+		angular.forEach(this.elements, function (element) {
+		    element.hide();
+		});
+	    }
 
-    abstractWidgetLocator.prototype.show = function (bound) {
-        angular.forEach(this.elements, function (element) {
-            element.show();
-        });
-    }
+	    abstractWidgetLocator.prototype.show = function (bound) {
+		angular.forEach(this.elements, function (element) {
+		    element.show();
+		});
+	    }
 
-    abstractWidgetLocator.prototype.destroy = function () {
-        this.fire('distroied');
-        angular.forEach(this.elements, function () {
-            element.remove();
-        });
-        this.elements = [];
-        this.callbacks = [];
-    }
+	    abstractWidgetLocator.prototype.destroy = function () {
+		this.fire('distroied');
+		angular.forEach(this.elements, function (element) {
+		    element.remove();
+		});
+		this.elements = [];
+		this.callbacks = [];
+	    }
 
-    return abstractWidgetLocator;
-});
+	    return abstractWidgetLocator;
+	});
