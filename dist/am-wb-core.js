@@ -3131,7 +3131,13 @@ angular.module('am-wb-core')//
 			return;
 		}
 		this.visible = visible;
-		angular.forEach(this.locators, function(locator) {
+		if(this.cursorLocator) {
+				this.cursorLocator.setVisible(visible);
+		}
+		angular.forEach(this.selectLocators, function(locator) {
+			locator.setVisible(visible);
+		});
+		angular.forEach(this.pathLocators, function(locator) {
 			locator.setVisible(visible);
 		});
 	}
