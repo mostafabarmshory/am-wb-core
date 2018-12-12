@@ -1950,21 +1950,6 @@ angular.module('am-wb-core')
  */
 'use strict';
 
-/*
- * Setting post link
- */
-function settingPostLink($scope, $element, $attrs, $ctrl){
-    var ngModelCtrl = $ctrl[0];
-    ngModelCtrl.$render = function(){
-        $scope.value = ngModelCtrl.$viewValue;
-    };
-//    $scope.$watch('value', function(value){
-//        ngModelCtrl.$setViewValue(value);
-//    });
-    $scope.valueChanged = function (newValue) {
-	ngModelCtrl.$setViewValue(newValue);
-    };
-}
 
 /**
  * @ngdoc Controllers
@@ -1972,18 +1957,18 @@ function settingPostLink($scope, $element, $attrs, $ctrl){
  * @ngInject
  */
 function wbUiSettingGeneralCtrl($scope) {
-    var ctrl = this;
+	var ctrl = this;
 
-    // TODO: maso, 2018:load from user config
-    $scope.wbUiSettingClearButton = true;
-    $scope.wbUiSettingPreview = true;
+	// TODO: maso, 2018:load from user config
+	$scope.wbUiSettingClearButton = true;
+	$scope.wbUiSettingPreview = true;
 
-    function clearValue(/*$event*/){
-        // General option
-        $scope.value = null;
-    }
+	function clearValue(/*$event*/){
+		// General option
+		this.valueChanged(null);
+	}
 
-    ctrl.clearValue = clearValue;
+	ctrl.clearValue = clearValue;
 }
 
 
@@ -1993,27 +1978,28 @@ function wbUiSettingGeneralCtrl($scope) {
  * @ngInject
  */
 function wbUiSettingImageCtrl($scope, $resource, $controller){
-    var ctrl = this;
+	var ctrl = this;
 
-    angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
-        $scope : $scope
-    }));
+	angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
+		$scope : $scope
+	}));
 
-    function showImagePicker(){
-        return $resource.get('image', {
-            style: {
-                icon: 'image',
-                title: 'Select image',
-                description: 'Select image from resources.'
-            },
-            data: $scope.value
-        })//
-        .then(function(value){
-            $scope.value = value;
-        });
-    }
+	function showImagePicker(){
+		return $resource.get('image', {
+			style: {
+				icon: 'image',
+				title: 'Select image',
+				description: 'Select image from resources.'
+			},
+			data: $scope.value
+		})//
+		.then(function(value){
+			$scope.value = value;
+			ctrl.valueChanged(value);
+		});
+	}
 
-    ctrl.showImagePicker = showImagePicker;
+	ctrl.showImagePicker = showImagePicker;
 }
 
 
@@ -2022,8 +2008,8 @@ function wbUiSettingImageCtrl($scope, $resource, $controller){
 //- wbUiSettingPreview
 
 angular.module('am-wb-core')
-.controller('wbUiSettingGeneralCtrl', wbUiSettingGeneralCtrl)
-.controller('wbUiSettingImageCtrl', wbUiSettingImageCtrl)
+	.controller('wbUiSettingGeneralCtrl', wbUiSettingGeneralCtrl)
+	.controller('wbUiSettingImageCtrl', wbUiSettingImageCtrl)
 
 /**
  * @ngdoc Directives
@@ -2035,18 +2021,27 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingImage', function () {
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-image.html',
-        restrict: 'E',
-        scope: {
-            title: '@title',
-            icon: '@icon'
-        },
-        require:['ngModel'],
-        link: settingPostLink,
-        controller: 'wbUiSettingImageCtrl',
-        controllerAs: 'ctrl'
-    };
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-image.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			icon: '@icon'
+		},
+		require:['wbUiSettingImage', 'ngModel'],
+		link: function ($scope, $element, $attrs, $ctrl){
+			var ctrl = $ctrl[0];
+			var ngModelCtrl = $ctrl[1];
+			ngModelCtrl.$render = function(){
+				$scope.value = ngModelCtrl.$viewValue;
+			};
+			ctrl.valueChanged = function (newValue) {
+				ngModelCtrl.$setViewValue(newValue);
+			};
+		},
+		controller: 'wbUiSettingImageCtrl',
+		controllerAs: 'ctrl'
+	};
 });
 
 /* 
@@ -6279,7 +6274,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-image.html',
-    "<div class=\"wb-ui-setting-image wb-ui-setting-image-container\" layout=row> <div class=wb-ui-setting-image-preview ng-click=ctrl.showImagePicker($event) ng-if=wbUiSettingPreview> <img ng-show=value class=wb-ui-setting-image-result ng-src=\"{{value}}\"> </div> <md-input-container class=md-icon-float flex> <label ng-if=title> <span translate=\"\">{{title}}</span> </label> <input type=input ng-model=value ng-change=valueChanged(value) class=wb-ui-setting-image-input ng-mousedown=\"(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)\"> </md-input-container> <md-button class=\"md-icon-button wb-ui-setting-image-clear\" ng-if=\"wbUiSettingClearButton && value\" ng-click=ctrl.clearValue($event); aria-label=\"Clear image\"> <md-icon md-svg-icon=clear.svg></md-icon> </md-button> </div>"
+    "<div class=\"wb-ui-setting-image wb-ui-setting-image-container\" layout=row> <div class=wb-ui-setting-image-preview ng-click=ctrl.showImagePicker($event) ng-if=wbUiSettingPreview> <img ng-show=value class=wb-ui-setting-image-result ng-src=\"{{value}}\"> </div> <md-input-container class=md-icon-float flex> <label ng-if=title> <span translate=\"\">{{title}}</span> </label> <input type=input ng-model=value ng-change=ctrl.valueChanged(value) class=wb-ui-setting-image-input ng-mousedown=\"(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)\"> </md-input-container> <md-button class=\"md-icon-button wb-ui-setting-image-clear\" ng-if=\"wbUiSettingClearButton && value\" ng-click=ctrl.clearValue($event); aria-label=\"Clear image\"> <md-icon md-svg-icon=clear.svg></md-icon> </md-button> </div>"
   );
 
 
