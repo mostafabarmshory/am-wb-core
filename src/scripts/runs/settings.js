@@ -30,7 +30,6 @@ angular.module('am-wb-core')
 	 */
 	.run(function ($settings) {
 
-
 	    $settings.newPage({
 		type: 'general',
 		label: 'General',
@@ -120,7 +119,16 @@ angular.module('am-wb-core')
 	    $settings.newPage({
 		type: 'SEO',
 		label: 'SEO',
-		templateUrl: 'views/settings/wb-seo.html'
+		templateUrl: 'views/settings/wb-seo.html',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+		   this.isRoot = function () {
+		       return $scope.wbWidget.isRoot();
+		   }; 
+		}
 	    });
 
 	    $settings.newPage({
