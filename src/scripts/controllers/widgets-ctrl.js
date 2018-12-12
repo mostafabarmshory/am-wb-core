@@ -60,13 +60,14 @@ WbAbstractWidget.prototype.loadStyle = function (style) {
 WbAbstractWidget.prototype.loadEvents = function (event) {
     var ctrl = this;
     var $element = this.getElement();
+    var $http = this.$http;
     if (!angular.isDefined(event)) {
         return;
     }
     var eventFuncs = {};
 
     if (event.onClick) {
-        var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1];' + event.onClick;
+        var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2];' + event.onClick;
         eventFuncs.onClick = new Function(body);
     }
 
@@ -75,7 +76,11 @@ WbAbstractWidget.prototype.loadEvents = function (event) {
             return;
         }
         if (eventFuncs.onClick) {
-            eventFuncs.onClick(event, ctrl);
+            eventFuncs.onClick(event, ctrl, {
+		    post: function(url, obj){
+			return $http.post(url, obj);
+		    }
+	    });
         }
     });
 };
@@ -156,6 +161,14 @@ WbAbstractWidget.prototype.getModel = function () {
     return this.wbModel;
 };
 
+WbAbstractWidget.prototype.getType = function () {
+    return this.wbModel.type;
+};
+
+WbAbstractWidget.prototype.getId = function () {
+    return this.wbModel.id;
+};
+
 WbAbstractWidget.prototype.setModel = function (model) {
     if (model === this.wbModel) {
         return;
@@ -218,7 +231,7 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
         this.widgetSelectHandler = function (event) {
             ctrl.setSelected(true);
             event.stopPropagation();
-        }
+        };
         this.widgetMouseEnterHandler = function(event) {
             if(event.sourceWidget) {
                 return;
@@ -226,7 +239,7 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
             event.sourceWidget = ctrl;
             ctrl.setUnderCursor(ctrl);
             return false;
-        }
+        };
         $element.on('click', this.widgetSelectHandler);
         $element.on('mousemove', this.widgetMouseEnterHandler);
         // TODO: remove watch for model update and fire in setting
@@ -268,7 +281,7 @@ WbAbstractWidget.prototype.delete = function () {
  */
 WbAbstractWidget.prototype.isRoot = function () {
     var parent = this.getParent();
-    return angular.isUndefined(parent) || parent == null;
+    return angular.isUndefined(parent) || parent === null;
 };
 
 WbAbstractWidget.prototype.isSelected = function () {
@@ -310,11 +323,12 @@ WbAbstractWidget.prototype.getActions = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http) {
     WbAbstractWidget.call(this);
     this.setElement($element);
     this.setScope($scope);
     this.$wbUtil = $wbUtil;
+    this.$http = $http;
 
     var ctrl = this;
 
@@ -350,7 +364,7 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $parse, $controller, $widget, $mdTheming, $q) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http) {
     WbAbstractWidget.call(this);
     this.setElement($element);
     this.setScope($scope);
@@ -359,6 +373,7 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $parse, $controller
     this.$q = $q;
     this.$mdTheming = $mdTheming;
     this.$wbUtil = $wbUtil;
+    this.$http = $http;
 
     var ctrl = this;
     this.on('modelChanged', function () {
@@ -395,6 +410,15 @@ WbWidgetGroupCtrl.prototype.isChildSelected = function (widget) {
         return widget === this.lastSelectedItem;
     }
     return this.getParent().isChildSelected(widget);
+};
+
+WbWidgetGroupCtrl.prototype.getChildById = function (id) {
+    var widgets = this.childWidgets;
+    for (var i = 0; i < widgets.length; i++) {
+	if (widgets[i].getId() === id) {
+	    return widgets[i];
+	}
+    }
 };
 
 WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
