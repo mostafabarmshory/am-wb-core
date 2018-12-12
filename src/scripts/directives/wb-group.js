@@ -68,6 +68,7 @@ angular.module('am-wb-core')
                 $scope.$eval(function() {
                     onModelSelectionFu($scope.$parent, locals);
                 });
+		//$scope.$digest();
             });
         }
         if($scope.wbOnModelUnderCursor){
@@ -75,7 +76,7 @@ angular.module('am-wb-core')
             ctrl.on('widgetUnderCursor', function($event){
                 $scope.$eval(function() {
                     wbOnModelUnderCursorFu($scope.$parent, {
-                        '$event': $event,
+                        '$event': $event
                     });
                 });
             });

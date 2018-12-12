@@ -74,6 +74,7 @@ The user can get the value using getValue().
 ### post
 
 'post' is used to send information to the server.
+Ex. $http.post(url,object);
 
 
 
