@@ -68,7 +68,7 @@ angular.module('am-wb-core')
                 $scope.$eval(function() {
                     onModelSelectionFu($scope.$parent, locals);
                 });
-		//$scope.$digest();
+                // $scope.$digest();
             });
         }
         if($scope.wbOnModelUnderCursor){
