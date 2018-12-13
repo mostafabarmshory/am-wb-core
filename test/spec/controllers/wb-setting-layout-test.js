@@ -99,7 +99,8 @@ describe('Setting layout', function () {
         expect(angular.isDefined(scope.wbModel.style.layout)).toBe(true);
         expect(ctrl.align).toBe('stretch');
         expect(ctrl.wrap).toBe('true');
-        expect(ctrl.alignSelf).toBe('stretch');
+        expect(angular.isDefined(ctrl.alignSelf)).toBe(false);
+        expect(angular.isDefined(ctrl.alignSelf)).toBe(false);
         expect(ctrl.direction).toBe('column');
         expect(ctrl.justify).toBe('start');
 
@@ -133,7 +134,7 @@ describe('Setting layout', function () {
         expect(angular.isDefined(scope.wbModel.style.layout)).toBe(true);
         expect(ctrl.align).toBe('center');
         expect(ctrl.wrap).toBe('false');
-        expect(ctrl.alignSelf).toBe('center');
+	expect(angular.isDefined(ctrl.alignSelf)).toBe(false);
         expect(ctrl.direction).toBe('row');
         expect(ctrl.justify).toBe('end');
 
