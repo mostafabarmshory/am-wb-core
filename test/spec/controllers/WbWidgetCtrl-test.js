@@ -25,28 +25,45 @@
 
 describe('WbWidgetCtrl ', function () {
 	// instantiate service
-	var $cotroller;
 	var $rootScope;
 	var $widget;
+
+	function MockRootWidget() {
+		// TODO;
+		this.scope = $rootScope.$new()
+	};
+
+	MockRootWidget.prototype.getScope = function(){
+		return this.scope;
+	}
+
 
 
 	// load the service's module
 	beforeEach(module('am-wb-core'));
-	beforeEach(inject(function (_$rootScope_, _$cotroller_, _$widget_) {
-		$cotroller = _$cotroller_;
+	beforeEach(inject(function (_$rootScope_, _$widget_) {
 		$rootScope = _$rootScope_;
 		$widget = _$widget_;
 	}));
 
 	it('should support add and remove callback on events', function () {
+		var root = new MockRootWidget();
 		// Create new instance
 		var textWidget = $widget.compile({
 			type: 'HtmlText',
 			id: 'test',
 			name: 'Widget',
 			text: '<h2>HTML Text In 4th group0</h2>',
-		});
+		}, root);
 		expect(textWidget).not.toBe(null);
 		expect(textWidget.getId()).toBe('test');
+		
+		var flag = true;
+		var callback = function() {
+			flag = true;
+		};
+		
+		textWidget.on('something', callback);
+//		textWidget.off('something', )
 	});
 });

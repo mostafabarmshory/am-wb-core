@@ -68,7 +68,7 @@ module.exports = function(config) {
 
 		// optionally, configure the reporter
 		coverageReporter: {
-			dir : 'src/scripts',
+			dir : 'coverage',
 			reporters: [{
 				type : 'lcovonly',
 				file : 'lcov.info'
