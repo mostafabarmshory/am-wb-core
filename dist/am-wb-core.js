@@ -758,7 +758,7 @@ angular.module('am-wb-core')
                 $scope.$eval(function() {
                     onModelSelectionFu($scope.$parent, locals);
                 });
-		$scope.$digest();
+		//$scope.$digest();
             });
         }
         if($scope.wbOnModelUnderCursor){
@@ -766,7 +766,7 @@ angular.module('am-wb-core')
             ctrl.on('widgetUnderCursor', function($event){
                 $scope.$eval(function() {
                     wbOnModelUnderCursorFu($scope.$parent, {
-                        '$event': $event,
+                        '$event': $event
                     });
                 });
             });
@@ -3917,7 +3917,60 @@ angular.module('am-wb-core')
 				value: 'center'
 			    }]
 		    };
+		    /*
+		     * watch 'wbModel' and apply the changes in setting panel
+		     */
+		    var ctrl = this;
+		    $scope.$watch('wbModel', function (model) {
+			if (model) {
+			    var layout = model.style.layout || {};
+			    ctrl.direction = layout.direction;
+			    ctrl.align = layout.align;
+			    ctrl.wrap = layout.wrap;
+			    ctrl.justify = layout.justify;
+			    ctrl.parentWidget = $scope.wbWidget.getParent();
+			    if (ctrl.parentWidget) {
+				ctrl.parentDirection = ctrl.parentWidget.getModel().style.layout.direction;
+			    }
+			    //TODO: maso, 2018: Safe above code for null value
+			} 
+			//TODO: maso, 2018: handle else sectipn
+		    });
 
+		    /*
+		     * This part updates the wbModel whenever the layout properties are changed in view
+		     */
+		    this.directionChanged = function () {
+			$scope.wbModel.style.layout.direction = this.direction;
+		    };
+
+		    this.wrapChanged = function () {
+			$scope.wbModel.style.layout.wrap = this.wrap;
+		    };
+
+		    this.alignChanged = function () {
+			$scope.wbModel.style.layout.align = this.align;
+		    };
+
+		    this.justifyChanged = function () {
+			$scope.wbModel.style.layout.justify = this.justify;
+		    };
+		}
+	    });
+	    
+	     $settings.newPage({
+		type: 'layout-self',
+		label: 'Self Layout',
+		icon: 'dashboard',
+		description: 'Manages layout of the current item.',
+		templateUrl: 'views/settings/wb-layout-self.html',
+		controllerAs: 'ctrl',
+		/*
+		 * Manages setting page 
+		 * 
+		 * @ngInject
+		 */
+		controller: function ($scope) {
 		    this.selfAlign_ = {
 			'column': [{
 				title: 'Stretch',
@@ -3962,11 +4015,7 @@ angular.module('am-wb-core')
 		    $scope.$watch('wbModel', function (model) {
 			if (model) {
 			    var layout = model.style.layout || {};
-			    ctrl.direction = layout.direction;
-			    ctrl.align = layout.align;
-			    ctrl.wrap = layout.wrap;
 			    ctrl.alignSelf = layout.align_self;
-			    ctrl.justify = layout.justify;
 			    ctrl.parentWidget = $scope.wbWidget.getParent();
 			    if (ctrl.parentWidget) {
 				ctrl.parentDirection = ctrl.parentWidget.getModel().style.layout.direction;
@@ -3977,29 +4026,15 @@ angular.module('am-wb-core')
 		    });
 
 		    /*
-		     * This part updates the wbModel whenever the layout properties are changed in view
+		     * This part updates the wbModel whenever the layout-self property is changed in view
 		     */
-		    this.directionChanged = function () {
-			$scope.wbModel.style.layout.direction = this.direction;
-		    };
-
-		    this.wrapChanged = function () {
-			$scope.wbModel.style.layout.wrap = this.wrap;
-		    };
-
-		    this.alignChanged = function () {
-			$scope.wbModel.style.layout.align = this.align;
-		    };
-
-		    this.justifyChanged = function () {
-			$scope.wbModel.style.layout.justify = this.justify;
-		    };
 
 		    this.alignSelfChanged = function () {
 			$scope.wbModel.style.layout.align_self = this.alignSelf;
 		    };
 		}
 	    });
+	    
 	    //TODO: Masood, 2018: Move this controller to a separated controller.
 	    $settings.newPage({
 		type: 'marginPadding',
@@ -4949,9 +4984,9 @@ angular.module('am-wb-core')
 	 * Default settings
 	 */
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'general'/*, 'description'*/, 'border',
-		'background', 'layout', 'marginPadding', 'size', 'shadow', 'SEO' ];
+		'background', 'layout', 'layout-self', 'marginPadding', 'size', 'shadow', 'SEO' ];
 	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'border',
-		'background', 'marginPadding', 'layout', 'size', 'shadow', 'SEO' ];
+		'background', 'marginPadding', 'layout-self', 'size', 'shadow', 'SEO' ];
 
 	/**
 	 * Setting page storage
@@ -6395,8 +6430,13 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/settings/wb-layout-self.html',
+    " <wb-ui-setting-choose ng-if=\"ctrl.parentDirection==='row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['row']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.parentDirection==='column'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['column']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose>"
+  );
+
+
   $templateCache.put('views/settings/wb-layout.html',
-    " <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group'\" title=Direction icon=wb-direction items=ctrl.direction_ ng-model=ctrl.direction ng-change=ctrl.directionChanged()> </wb-ui-setting-choose>  <md-switch ng-if=\"wbModel.type === 'Group'\" ng-model=ctrl.wrap ng-change=ctrl.wrapChanged() aria-label=\"Layout wrap\"> <span ng-if=\"ctrl.direction === 'row'\" translate=\"\">Multi row</span> <span ng-if=\"ctrl.direction !== 'row'\" translate=\"\">Multi column</span> </md-switch>  <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group' && ctrl.direction==='row'\" title=Vert. items=\"ctrl.align_['row']\" ng-model=ctrl.align ng-change=ctrl.alignChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group' && ctrl.direction==='column'\" title=Horz. items=\"ctrl.align_['column']\" ng-model=ctrl.align ng-change=ctrl.alignChanged()> </wb-ui-setting-choose>  <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group' && ctrl.direction==='row'\" title=\"Vert.'\" items=\"ctrl.justify_['row']\" ng-model=ctrl.justify ng-change=ctrl.justifyChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group' && ctrl.direction==='column'\" title=Horz. items=\"ctrl.justify_['column']\" ng-model=ctrl.justify ng-change=ctrl.justifyChanged()> </wb-ui-setting-choose>  <wb-ui-setting-choose ng-if=\"ctrl.parentDirection==='row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['row']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.parentDirection==='column'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['column']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose>"
+    " <wb-ui-setting-choose title=Direction icon=wb-direction items=ctrl.direction_ ng-model=ctrl.direction ng-change=ctrl.directionChanged()> </wb-ui-setting-choose>  <md-switch ng-model=ctrl.wrap ng-change=ctrl.wrapChanged() aria-label=\"Layout wrap\"> <span ng-if=\"ctrl.direction === 'row'\" translate=\"\">Multi row</span> <span ng-if=\"ctrl.direction !== 'row'\" translate=\"\">Multi column</span> </md-switch>  <wb-ui-setting-choose ng-if=\"ctrl.direction==='row'\" title=Vert. items=\"ctrl.align_['row']\" ng-model=ctrl.align ng-change=ctrl.alignChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.direction==='column'\" title=Horz. items=\"ctrl.align_['column']\" ng-model=ctrl.align ng-change=ctrl.alignChanged()> </wb-ui-setting-choose>  <wb-ui-setting-choose ng-if=\"ctrl.direction==='row'\" title=\"Vert.'\" items=\"ctrl.justify_['row']\" ng-model=ctrl.justify ng-change=ctrl.justifyChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.direction==='column'\" title=Horz. items=\"ctrl.justify_['column']\" ng-model=ctrl.justify ng-change=ctrl.justifyChanged()> </wb-ui-setting-choose>"
   );
 
 
