@@ -113,14 +113,22 @@ WbAbstractWidget.prototype.getElement = function () {
     return this.$element;
 };
 
+/**
+ * Call all callbacks on the given event type.
+ * 
+ * @param type of the event
+ * @param params to add to the event
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.fire = function (type, params) {
     if (!angular.isDefined(this.callbacks[type])) {
         return;
     }
     // create event
-    var event = _.merge({}, params || {});
-    event.source = this;
-    event.type = type;
+    var event = _.merge({
+        source: this,
+        type: type
+    }, params || {});
 
     // fire
     var callbacks = this.callbacks[type];
@@ -138,6 +146,8 @@ WbAbstractWidget.prototype.fire = function (type, params) {
 /**
  * Adds new callback of type
  * 
+ * @param type of the event
+ * @param callback to call on the event
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.on = function (type, callback) {
@@ -145,6 +155,44 @@ WbAbstractWidget.prototype.on = function (type, callback) {
         this.callbacks[type] = [];
     }
     this.callbacks[type].push(callback);
+};
+
+/**
+ * Remove the callback
+ * 
+ * Here is list of allowed types:
+ * 
+ * <ul>
+ * 	<li>modelChanged</li>
+ * 	<li>modelUpdated</li>
+ * 	<li>widgetIsEditable</li>
+ * 	<li>widgetIsNotEditable</li>
+ * 	<li>widgetDeleted</li>
+ * 	<li>widgetUnderCursor</li>
+ * 	<li>widgetSelected</li>
+ * </ul>
+ * 
+ * Following event propagate on the root too
+ * 
+ * <ul>
+ * 	<li>widgetUnderCursor</li>
+ * 	<li>widgetSelected</li>
+ * </ul>
+ * 
+ * @param type of the event
+ * @param callback to remove
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.off = function (type, callback) {
+	if (!angular.isArray(this.callbacks[type])) {
+		return;
+	}
+	// remove callback
+	var callbacks = this.callbacks[type];
+	var index = callbacks.indexOf(callback);
+	if(index > -1) {
+		callbacks.array.splice(index,1);
+	}
 };
 
 
@@ -264,6 +312,12 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
     angular.forEach(this.childWidgets, function (widget) {
         widget.setEditable(editable);
     });
+    
+    if(editable) {
+    	this.fire('widgetIsEditable');
+    } else {
+    	this.fire('widgetIsNotEditable');
+    }
 };
 
 /**
@@ -273,8 +327,9 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
  */
 WbAbstractWidget.prototype.delete = function () {
     this.fire('delete');
-    this.getParent() //
-    .removeChild(this);
+    this.getParent().removeChild(this);
+
+    this.fire('widgetDeleted');
 };
 
 
@@ -300,6 +355,10 @@ WbAbstractWidget.prototype.setSelected = function (flag) {
         return;
     }
     this.getParent().childSelected(this);
+
+    if(flag){
+    	this.fire('widgetSelected');
+    }
 };
 
 /**
