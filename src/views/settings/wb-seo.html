@@ -3,12 +3,13 @@
 Some widgets need simple description in text. This is a setting to manage
 these attributes. Here is list of attributes:
 
-- {Text} label 
-- {Text} type
-- {text} id
+- {Text} id 
+- {Text} label
+- {URL} category SEE: schema.org
 - {Text} description 
 - {Text} keywords
-- {url} cover
+- {Text} property
+- {URL} cover
 
 These attributes are useful in SEO.
 -->
@@ -31,7 +32,7 @@ These attributes are useful in SEO.
     <label translate="">Type</label>
     <input 
         type="text" 
-        ng-model="wbModel.type">
+        ng-model="wbModel.category">
 </md-input-container>
 
 <md-input-container>
@@ -56,7 +57,8 @@ These attributes are useful in SEO.
 </md-input-container>
 
 
-<wb-ui-setting-image ng-if="ctrl.isRoot()"
+<wb-ui-setting-image 
+	ng-if="ctrl.isRoot()"
     title="Cover" 
     wb-ui-setting-clear-button="true"
     wb-ui-setting-preview="true"
