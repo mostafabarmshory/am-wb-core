@@ -1,0 +1,563 @@
+/*
+ * in fullscreen mode in dialog, this css class in large screen, 
+ * makes dialog width about 60% of screen.
+ */
+@media ( min-width : 959px) {
+	md-dialog.md-dialog-fullscreen {
+		min-height: 80%;
+		min-width: 60%;
+		border-radius: 0;
+	}
+}
+
+
+/*
+Rules for sizing the icon.
+*/
+.wb-18 {
+	font-size: 18px;
+}
+
+.wb-24 {
+	font-size: 24px;
+}
+
+.wb-36 {
+	font-size: 36px;
+}
+
+.wb-48 {
+	font-size: 48px;
+}
+
+.wb-64 {
+	font-size: 64px;
+}
+
+.wb-128 {
+	font-size: 128px;
+}
+
+
+.wb-s24 {
+	width: 24px;
+	height: 24px;
+}
+
+.wb-s36 {
+	width: 36px;
+	height: 36px;
+}
+
+.wb-s48 {
+	width: 48px;
+	height: 48px;
+}
+
+.wb-s64 {
+	width: 64px;
+	height: 64px;
+}
+
+.wb-s128 {
+	width: 128px;
+	height: 128px;
+}
+
+/*
+ * Set position ot the panel
+ */
+.jsPanel {
+	z-index: 70 !important;
+}
+.wb-setting-panel{
+    padding: 0px;
+}
+.wb-setting-panel wb-icon{
+    margin-right: 8px !important;
+    margin-top: 0px;
+    margin-bottom:0px ;
+}
+
+.wb-setting-panel md-list-item{
+    padding-right: 16px;
+}
+
+.wb-setting-panel .md-list-item-inner{
+    padding-right: 0px;
+}
+
+.wb-input-container-without-label {
+    margin: 0px;
+}
+
+.wb-sub-divider{
+    margin-left: 48px;
+    border-top-style: dotted;
+}
+/*
+Rules for align
+*/
+.wb-rtl {
+	direction: rtl;
+}
+
+.wb-ltr {
+	direction: ltr;
+}
+/**************************************************************************************
+Drag and drap 
+
+See: https://github.com/marceljuenemann/angular-drag-and-drop-lists
+***************************************************************************************/
+
+/*
+ * When an element is dragged over the list, a new placeholder child element 
+ * will be added. This element is of type li and has the class dndPlaceholder 
+ * set. Alternatively, you can define your own placeholder by creating a 
+ * child element with dndPlaceholder class.
+ */
+.dndPlaceholder {
+	list-style: none;
+	min-width: 36px;
+	min-height: 36px;
+	margin: 5px;
+	font-size: 1.25rem;
+	background-color: #c8dadf;
+	padding: 10px 10px;
+	outline: 2px dashed #92b0b3;
+	outline-offset: -10px;
+}
+
+/*
+ * This class will be added to the list while an element is being dragged over the list.
+ */
+.dndDragover {
+	
+}
+
+/*
+ * This class will be added to the element while the element is being dragged. 
+ * It will affect both the element you see while dragging and the source 
+ * element that stays at it's position. Do not try to hide the source element
+ * with this class, because that will abort the drag operation.
+*/
+.dndDragging {
+	background: #c8dadf !important;
+}
+
+/*
+ * This class will be added to the element after the drag operation was started, 
+ * meaning it only affects the original element that is still at it's source 
+ * position, and not the "element" that the user is dragging with his mouse pointer
+ */
+.dndDraggingSource {
+    /* display: none; */
+}
+/*
+md-input-container.md-icon-float {
+	-webkit-transition: margin-top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+	transition: margin-top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
+}
+md-input-container.md-icon-float > label {
+	pointer-events: none;
+	position: absolute; 
+}
+*/
+md-input-container.md-icon-float>ng-md-icon {
+	top: 8px;
+	left: 2px;
+	right: auto;
+}
+
+[dir=rtl] md-input-container.md-icon-float>ng-md-icon {
+	left: auto;
+}
+
+[dir=rtl] md-input-container.md-icon-float>ng-md-icon {
+	right: 2px;
+}
+/*
+md-input-container.md-icon-left > label:not(.md-no-float):not(.md-container-ignore),
+md-input-container.md-icon-left > label .md-placeholder, md-input-container.md-icon-right > label:not(.md-no-float):not(.md-container-ignore),
+md-input-container.md-icon-right > label .md-placeholder {
+	width: calc(100% - 36px - 18px); 
+}
+
+md-input-container.md-icon-left {
+	padding-left: 36px;
+	padding-right: 0; 
+}
+[dir=rtl] md-input-container.md-icon-left {
+	padding-left: 0; 
+}
+[dir=rtl] md-input-container.md-icon-left {
+	padding-right: 36px; 
+}
+md-input-container.md-icon-left > label {
+	left: 36px;
+	right: auto; 
+}
+[dir=rtl] md-input-container.md-icon-left > label {
+	left: auto; 
+}
+[dir=rtl] md-input-container.md-icon-left > label {
+	right: 36px; 
+}
+md-input-container.md-icon-right {
+	padding-left: 0;
+	padding-right: 36px; 
+}
+[dir=rtl] md-input-container.md-icon-right {
+	padding-left: 36px; 
+}
+[dir=rtl] md-input-container.md-icon-right {
+	padding-right: 0; 
+}
+*/
+md-input-container.md-icon-right>ng-md-icon:last-of-type {
+	margin: 0;
+	right: 2px;
+	left: auto;
+}
+
+[dir=rtl] md-input-container.md-icon-right>ng-md-icon:last-of-type {
+	right: auto;
+}
+
+[dir=rtl] md-input-container.md-icon-right>ng-md-icon:last-of-type {
+	left: 2px;
+}
+/*
+md-input-container.md-icon-left.md-icon-right {
+	padding-left: 36px;
+	padding-right: 36px; 
+}
+
+
+md-input-container.md-icon-left.md-icon-right > label:not(.md-no-float):not(.md-container-ignore),
+md-input-container.md-icon-left.md-icon-right > label .md-placeholder {
+	width: calc(100% - (36px * 2)); 
+}
+*/
+
+/*
+ * Fill the icon with color in high contrast
+ */
+@media screen and (-ms-high-contrast: active) {
+	md-input-container.md-default-theme>ng-md-icon {
+		fill: #fff;
+	}
+}
+
+
+/* md-input-container > ng-md-icon { */
+/*     position: absolute; */
+/*     top: 5px; */
+/*     left: 2px; */
+/* } */
+
+md-input-container > ng-md-icon + input {
+    margin-left: 0px !important;
+}
+
+/* md-input-container.md-icon-float > ng-md-icon { */
+/*     top: 26px; */
+/*     left: 2px; */
+/* } */
+
+/* md-input-container.md-icon-float > ng-md-icon + input { */
+/*     margin-left: 36px; */
+/* } */
+
+.md-button.md-icon-button.md-mini {
+	line-height: 1rem;
+	width: 1.5rem;
+	height: 1.5rem;
+	min-height: 1rem;
+	margin: 0px;
+	padding: 0px;
+	margin-left: 4px;
+}
+
+.wb-icon-mini {
+	padding: 0px;
+	margin: 0px;
+	font-size: 1rem;
+	line-height: 1rem;
+	min-height: 1rem;
+}
+
+
+/*
+ * Truncate text if overflow
+ */
+.wb-text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/**
+ * css for customizing angular-material-tabs as choose button for wb-ui-choose directive
+ *
+ * Created by mgh on 2/24/17.
+ */
+
+.wb-tab-as-choose-button .md-tab {
+    float: right;
+}
+
+.wb-tab-as-choose-button md-pagination-wrapper {
+    left: initial;
+    height: initial;
+    right: 0;
+}
+
+.wb-tab-as-choose-button md-tab-item{
+    padding: 6px;
+    margin-left: 4px;
+    margin-bottom: 1px;
+}
+
+.wb-tab-as-choose-button wb-icon {
+ margin-right: 0px !important;
+}
+
+.wb-tab-as-choose-button md-next-button{
+    display: none;
+}
+
+.wb-tab-as-choose-button md-prev-button{
+    display: none;
+}
+
+.wb-tab-as-choose-button md-tabs-canvas{
+    margin: 0px;
+}
+.color-picker-hide-textbox{
+    direction: rtl;
+    margin: 0px;
+    padding: 0px;
+}
+.color-picker-hide-textbox md-input-container {
+    visibility: hidden;
+    width: 10px !important;
+    height: 32px;
+}
+
+
+.wb-ui-setting-image {
+/*  */
+}
+
+.wb-ui-setting-image-container {
+	position: relative;
+}
+
+.wb-ui-setting-image-container .wb-ui-setting-image-input::-ms-clear {
+	display: none;
+}
+
+
+.wb-ui-setting-image-container .wb-ui-setting-image-preview {
+/* 	cursor: pointer;
+	border-radius: 50%;
+	border-width: 2px;
+	width: 32px;
+	height: 32px;
+	margin-right: 8px;
+	 */
+  content: '';
+  width: 24px;
+  height: 24px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.14), 0 2px 2px 0 rgba(0, 0, 0, 0.098), 0 1px 5px 0 rgba(0, 0, 0, 0.084);
+  position: relative;
+  top: 22px;
+  overflow: hidden;
+  background-color: #fff;
+  background-image: -webkit-linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd), -webkit-linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd);
+  background-image: linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd), linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+}
+
+.wb-ui-setting-image-container .wb-ui-setting-image-preview .wb-ui-setting-image-result {
+  position: absolute;
+  height: 100%;
+  opacity: 1;
+  background: #ff0000;
+}
+
+
+
+.wb-ui-setting-image-container .wb-ui-setting-image-clear {
+  position: absolute;
+  bottom: 42px;
+  right: -16px;
+  left: auto;
+}
+
+[dir=rtl] .wb-ui-setting-image-container .wb-ui-setting-image-clear {
+  right: auto;
+  left: -16px;
+}
+
+/* 
+.wb-ui-setting-image-preview>img {
+	border-size: 1px; 
+	border-style: solid;
+}
+
+.wb-ui-setting-image-preview[dir='rtl'] {
+	margin-left: 8px;
+} */
+/**************************************************************************************
+                                     Group layout
+
+A group is wrapped in several dive to instruct a view. Here is the hierarchical structure
+of a widget:
+
+-> group
+***************************************************************************************/
+.wb-group {
+	min-width: 32px;
+	min-height: 32px;
+}
+
+/*
+ * Added to a group if is the root element
+ */
+.wb-group-root {
+	overflow: auto !important;
+	min-height: 32px;
+}
+
+
+/**************************************************************************************
+                                     Widget layout
+
+A widget is wrapped in several dive to instruct a view. Here is the hierarchical structure
+of a widget:
+
+-> widget
+***************************************************************************************/
+.wb-widget {
+	overflow: hidden;
+	position: relative;
+	min-width: 32px;
+	min-height: 32px;
+}
+
+/*
+ * Body of a widget to fill
+ */
+.wb-widget-fill {
+	position: relative;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	width: 100%;
+	height: 100%;
+	padding: 0px;
+	margin: 0px;
+}
+
+/**************************************************************************************
+                                     Widget locators
+Locators are used to display area of a widget or attache some extra meta information on
+in the edit mode. This part of the the CSS fix basic settings of the widgets.
+***************************************************************************************/
+
+/*
+ * Bound
+ */
+.wb-widget-locator-cursor {
+	display: block;
+	position: fixed;
+	transition: all 0.3s ease;
+	background: red;
+}
+
+#top.wb-widget-locator-cursor {
+	height: 1px;
+}
+
+#right.wb-widget-locator-cursor {
+	width: 1px;
+}
+
+#buttom.wb-widget-locator-cursor {
+	height: 1px;
+}
+
+#left.wb-widget-locator-cursor {
+	width: 1px;
+}
+
+/*
+ * Bound
+ */
+.wb-widget-locator-bound {
+	display: block;
+	position: fixed;
+	transition: all 0.3s ease;
+	background: black;
+}
+
+#top.wb-widget-locator-bound {
+	height: 1px;
+}
+
+#right.wb-widget-locator-bound {
+	width: 1px;
+}
+
+#buttom.wb-widget-locator-bound {
+	height: 1px;
+}
+
+#left.wb-widget-locator-bound {
+	width: 1px;
+}
+
+.wb-widgets-module {
+	padding: 8px;
+	margin: 4px;
+}
+
+.wb-widgets-module>* {
+    margin: 0;
+    padding: 0;
+}
+
+.wb-widgets-module> p {
+	font-size: 14px;
+}
+
+/*
+ * Hide if the tab is disabled. 
+ *
+ * This is replacement
+ */
+#am-wb-widget-setting .md-tab.md-disabled{
+	display: none;
+}
+
+div.tinymce {
+}
+
+/*
+ * First child is an special and we should remove
+ * top margin and padding
+ */
+.wb-widget-text :first-child  {
+	margin-top: 0px  !important;
+	padding-top: 0px !important;
+}
+
+.wb-widget-text :last-child {
+	margin-bottom: 0px  !important;
+	padding-bottom: 0px !important;
+}
