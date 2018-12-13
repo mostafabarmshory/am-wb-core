@@ -29,7 +29,6 @@ the following items can be set for customizing container layout:
 -->
 <!-- direction -->
 <wb-ui-setting-choose 
-    ng-if="wbModel.type === 'Group'"
     title="Direction" 
     icon="wb-direction" 
     items="ctrl.direction_"
@@ -40,7 +39,6 @@ the following items can be set for customizing container layout:
 
 <!-- wrap -->
 <md-switch 
-    ng-if="wbModel.type === 'Group'"
     ng-model="ctrl.wrap" 
     ng-change="ctrl.wrapChanged()"
     aria-label="Layout wrap">
@@ -55,14 +53,14 @@ the following items can be set for customizing container layout:
 
 <!--Align Items--> 
 <wb-ui-setting-choose 
-    ng-if="wbModel.type === 'Group' && ctrl.direction==='row'"
+    ng-if="ctrl.direction==='row'"
     title="Vert."
     items="ctrl.align_['row']" 
     ng-model="ctrl.align"
     ng-change="ctrl.alignChanged()">
 </wb-ui-setting-choose>
 <wb-ui-setting-choose 
-    ng-if="wbModel.type === 'Group' && ctrl.direction==='column'"
+    ng-if="ctrl.direction==='column'"
     title="Horz."
     items="ctrl.align_['column']" 
     ng-model="ctrl.align"
@@ -71,33 +69,16 @@ the following items can be set for customizing container layout:
 
 <!--Justify Content--> 
 <wb-ui-setting-choose 
-    ng-if="wbModel.type === 'Group' && ctrl.direction==='row'"
+    ng-if="ctrl.direction==='row'"
     title="Vert.'"
     items="ctrl.justify_['row']" 
     ng-model="ctrl.justify"
     ng-change="ctrl.justifyChanged()">
 </wb-ui-setting-choose>
 <wb-ui-setting-choose 
-    ng-if="wbModel.type === 'Group' && ctrl.direction==='column'"
+    ng-if="ctrl.direction==='column'"
     title="Horz."
     items="ctrl.justify_['column']" 
     ng-model="ctrl.justify"
     ng-change="ctrl.justifyChanged()">
-</wb-ui-setting-choose>
-
-
-<!--selfAlign--> 
-<wb-ui-setting-choose
-    ng-if="ctrl.parentDirection==='row'"
-    title="Self Vert."
-    items="ctrl.selfAlign_['row']" 
-    ng-model="ctrl.alignSelf"
-    ng-change="ctrl.alignSelfChanged()"> 
-</wb-ui-setting-choose>
-<wb-ui-setting-choose
-    ng-if="ctrl.parentDirection==='column'"
-    title="Self Vert."
-    items="ctrl.selfAlign_['column']" 
-    ng-model="ctrl.alignSelf"
-    ng-change="ctrl.alignSelfChanged()"> 
 </wb-ui-setting-choose>
