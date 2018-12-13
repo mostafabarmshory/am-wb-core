@@ -27,6 +27,7 @@ describe('WbWidgetCtrl ', function () {
 	// instantiate service
 	var $rootScope;
 	var $widget;
+	var $httpBackend;
 
 	function MockRootWidget() {
 		// TODO;
@@ -41,29 +42,45 @@ describe('WbWidgetCtrl ', function () {
 
 	// load the service's module
 	beforeEach(module('am-wb-core'));
-	beforeEach(inject(function (_$rootScope_, _$widget_) {
+	beforeEach(inject(function (_$rootScope_, _$widget_, _$httpBackend_) {
 		$rootScope = _$rootScope_;
 		$widget = _$widget_;
+		$httpBackend = _$httpBackend_;
 	}));
 
-	it('should support add and remove callback on events', function () {
+	it('should support add and remove callback on events', function (done) {
 		var root = new MockRootWidget();
 		// Create new instance
-		var textWidget = $widget.compile({
+		$widget.compile({
 			type: 'HtmlText',
 			id: 'test',
 			name: 'Widget',
 			text: '<h2>HTML Text In 4th group0</h2>',
-		}, root);
-		expect(textWidget).not.toBe(null);
-		expect(textWidget.getId()).toBe('test');
-		
-		var flag = true;
-		var callback = function() {
-			flag = true;
-		};
-		
-		textWidget.on('something', callback);
-//		textWidget.off('something', )
+		}, root)
+		.then(function(widget){
+			expect(widget).not.toBe(null);
+			expect(widget.getId()).toBe('test');
+			
+			var flag = true;
+			var callback = function() {
+				flag = true;
+			};
+			
+			widget.on('something', callback);
+			widget.fire('simething');
+			expect(flag).toBe(true);
+			
+			flag = false;
+			widget.off('something', callback);
+			widget.fire('simething');
+			expect(flag).toBe(false);
+			
+			done();
+		});
+		$httpBackend//
+			.expect('GET', 'views/widgets/wb-html.html')//
+			.respond(200, "<div></div>");
+		expect($httpBackend.flush).not.toThrow();
+		$rootScope.$apply();
 	});
 });

@@ -191,7 +191,7 @@ WbAbstractWidget.prototype.off = function (type, callback) {
 	var callbacks = this.callbacks[type];
 	var index = callbacks.indexOf(callback);
 	if(index > -1) {
-		callbacks.array.splice(index,1);
+		callbacks.splice(index,1);
 	}
 };
 

@@ -597,7 +597,14 @@ module.exports = function(grunt) {
         karma : {
             unit : {
                 configFile : 'test/karma.unit.conf.js',
-                singleRun : true
+                singleRun : true,
+        	    preprocessors: {
+        	        'src/**/*.js': ['coverage']
+        	    },
+        		reporters: [
+        			'progress', 
+        			'coverage'
+        		],
             },
             build : {
                 configFile : 'test/karma.build.conf.js',
@@ -608,7 +615,7 @@ module.exports = function(grunt) {
                 port : 9999,
                 singleRun : false,
                 browsers : [ 'Chrome' ],
-		preprocessors: {}
+                preprocessors: {}
             }
         },
 

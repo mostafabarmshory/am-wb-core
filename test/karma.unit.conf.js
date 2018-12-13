@@ -60,12 +60,6 @@ module.exports = function(config) {
 			'test/spec/**/*.js'
 		],
 
-		// coverage reporter generates the coverage
-		reporters: [
-			'progress', 
-			'coverage'
-		],
-
 		// optionally, configure the reporter
 		coverageReporter: {
 			dir : 'coverage',
