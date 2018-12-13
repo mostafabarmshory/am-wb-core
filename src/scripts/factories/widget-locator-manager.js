@@ -150,11 +150,13 @@ angular.module('am-wb-core')//
 		
 		// set widgets
 		var ctrl = this;
-		angular.forEach(this.selectLocators, function(locator, index){
-			locator.setWidget(widgets[index]);
+		var locator;
+		for(var i = 0; i < widgets.length; i++){
+			locator = this.selectLocators[i];
+			locator.setWidget(widgets[i]);
 			locator.setVisible(ctrl.isVisible());
 			locator.setEnable(true);
-		});
+		}
 	}
 	
 	/**

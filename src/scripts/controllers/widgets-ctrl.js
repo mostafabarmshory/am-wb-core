@@ -307,7 +307,7 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
 		var ctrl = this;
 		this.widgetSelectHandler = function (event) {
 			ctrl.setSelected(true);
-			ctrl.getScope().$digest();
+			ctrl.getScope().$apply();
 			return false;
 		};
 		this.widgetMouseEnterHandler = function(event) {
@@ -316,7 +316,7 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
 			}
 			event.sourceWidget = ctrl;
 			ctrl.setUnderCursor(ctrl);
-			ctrl.getScope().$digest();
+			ctrl.getScope().$apply();
 			return false;
 		};
 		$element.on('click', this.widgetSelectHandler);
@@ -353,10 +353,8 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
  * This function just used in edit mode
  */
 WbAbstractWidget.prototype.delete = function () {
-	this.fire('delete');
-	this.getParent().removeChild(this);
-
 	this.fire('widgetDeleted');
+	this.getParent().removeChild(this);
 };
 
 
