@@ -137,6 +137,8 @@ WbAbstractWidget.prototype.fire = function (type, params) {
 
 /**
  * Adds new callback of type
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.on = function (type, callback) {
     if (!angular.isArray(this.callbacks[type])) {
@@ -230,7 +232,8 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
         var ctrl = this;
         this.widgetSelectHandler = function (event) {
             ctrl.setSelected(true);
-            event.stopPropagation();
+            ctrl.getScope().$digest();
+            return false;
         };
         this.widgetMouseEnterHandler = function(event) {
             if(event.sourceWidget) {
@@ -238,6 +241,7 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
             }
             event.sourceWidget = ctrl;
             ctrl.setUnderCursor(ctrl);
+            ctrl.getScope().$digest();
             return false;
         };
         $element.on('click', this.widgetSelectHandler);
