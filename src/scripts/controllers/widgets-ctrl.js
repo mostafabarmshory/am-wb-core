@@ -238,6 +238,10 @@ WbAbstractWidget.prototype.getModel = function () {
 	return this.wbModel;
 };
 
+WbAbstractWidget.prototype.getTitle = function () {
+	return this.wbModel.label;
+};
+
 WbAbstractWidget.prototype.getType = function () {
 	return this.wbModel.type;
 };
