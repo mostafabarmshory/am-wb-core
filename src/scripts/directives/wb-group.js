@@ -29,6 +29,17 @@ angular.module('am-wb-core')
  * @name wb-group
  * @description Render a list of widget
  * 
+ * ## wbOnModelSelect
+ * 
+ * If a widget select with in the group then the wbOnModelSelect parameter will
+ * be evaluated with the following attributes:
+ * 
+ * - $event : the related event
+ * - $ctrl : the widget (to support legacy)
+ * - $model: the model (to support legace)
+ * 
+ * NOTE: The root widget will be passed as first selected item. The function will be
+ * evaluated in non edit mode.
  */
 .directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $parse) {
 
@@ -55,6 +66,14 @@ angular.module('am-wb-core')
 
         if($scope.wbOnModelSelect) {
             var onModelSelectionFu = $parse($scope.wbOnModelSelect);
+            $scope.$eval(function() {
+                // TODO: maso, 2018: An event factory is required
+                onModelSelectionFu($scope.$parent, {
+                    '$event': {
+                        widgets:[ctrl]
+                    }
+                });
+            });
             ctrl.on('widgetSelected', function($event){
                 var widgets = $event.widgets;
                 var locals = {
@@ -68,7 +87,6 @@ angular.module('am-wb-core')
                 $scope.$eval(function() {
                     onModelSelectionFu($scope.$parent, locals);
                 });
-                // $scope.$digest();
             });
         }
         if($scope.wbOnModelUnderCursor){

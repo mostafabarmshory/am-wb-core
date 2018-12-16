@@ -32,6 +32,7 @@
 angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 .controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbFloat, WidgetLocatorManager) {
     
+    var ctrl = this;
     /*
      * Display an area of a widget with extra informations. It must be set to
      * visible.
@@ -58,8 +59,18 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
 
     // load setting of model
     $scope.loadSettings = function($event){
-        widgetLocator.setSelectedWidgets($event.widgets);
         var widgets = $event.widgets;
+        
+        // set root widget
+        if(ctrl.rootWidget == null && widgets.length) {
+            ctrl.rootWidget = widgets[0].getRoot();
+        }
+        
+        // update locators
+        if(widgets.length === 1 && widgets[0] === ctrl.rootWidget){
+            return;
+        }
+        widgetLocator.setSelectedWidgets($event.widgets);
         if(widgets.length) {
             var widget =  widgets[0];
             $scope.selectedWidget = widget;
