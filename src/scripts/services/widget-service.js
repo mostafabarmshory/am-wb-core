@@ -129,9 +129,12 @@ angular.module('am-wb-core')
     /**
      * Registers new widget
      * 
+     * The old widget will be override if a new widget with the same type is registered.
+     * 
      * @See the following page for more information:
      * 
      *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
+     *    
      * 
      * @memberof $widget
      * @param widget to add
@@ -139,8 +142,7 @@ angular.module('am-wb-core')
      */
     function newWidget(widget) {
         if (widget.type in contentElementAsso) {
-            // XXX: maso, 2017: throw exception
-            return;
+            // TODO: maso, 2017: Add log for duplication
         }
         // fix widget data
         widget.model = widget.model || {style:{}};
@@ -194,7 +196,7 @@ angular.module('am-wb-core')
         childScope = parentScope.$new(false, parentScope);
 
         // 2- create element
-        return $q.when($wbUtil.getTemplateFor(widget))//
+        return $wbUtil.getTemplateFor(widget)//
         .then(function(template) {
             if (model.type !== 'Group') {
                 template = '<div class="wb-widget" name="{{wbModel.name}}" '+
@@ -282,4 +284,40 @@ angular.module('am-wb-core')
 
     // utils
     service.compile = compile;
+    
+    /**
+     * Gets list of all children from the widget
+     * 
+     * The list is consist of all children and sub-children from the given 
+     * widget.
+     * 
+     * @params widget {AbstractWidgetCtrl} the widget
+     * @return List of widgets
+     * @memberof $widget
+     */
+    this.getChildren = function(widget) {
+        // Check if it is group
+        var widgets = [];
+        if(widget.getType() !== 'Group') {
+            return widgets;
+        }
+        
+        // load list of widgets
+        var groups = [];
+        groups.push(widget);
+        while(groups.length) {
+            widget = groups.pop();
+            var children = widget.getChildren();
+            for(var i = 0; i < children.length; i++) {
+                var child = children[i];
+                widgets.push(child);
+                if(child.getType() === 'Group') {
+                    groups.push(child);
+                }
+            }
+        }
+        
+        //return the list
+        return widgets;
+    }
 });
