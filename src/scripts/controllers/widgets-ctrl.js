@@ -258,9 +258,13 @@ WbAbstractWidget.prototype.off = function (type, callback) {
     }
 };
 
+WbAbstractWidget.prototype.getDirection = function () {
+    return this.getParent().getModel().style.layout.direction;
+}; 
+
 WbAbstractWidget.prototype.getModel = function () {
     return this.wbModel;
-};
+}; 
 
 WbAbstractWidget.prototype.getTitle = function () {
     return this.wbModel.label;
