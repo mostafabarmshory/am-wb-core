@@ -64,13 +64,11 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
         // set root widget
         if(ctrl.rootWidget == null && widgets.length) {
             ctrl.rootWidget = widgets[0].getRoot();
-        }
-        
-        // update locators
-        if(widgets.length === 1 && widgets[0] === ctrl.rootWidget){
+            widgetLocator.setRootWidget(ctrl.rootWidget);
             return;
         }
-        widgetLocator.setSelectedWidgets($event.widgets);
+        
+        widgetLocator.setSelectedWidgets(widgets);
         if(widgets.length) {
             var widget =  widgets[0];
             $scope.selectedWidget = widget;
