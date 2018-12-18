@@ -315,18 +315,18 @@ WbAbstractWidget.prototype.getScope = function () {
     return this.$scope;
 };
 
-WbAbstractWidget.prototype.setUnderCursor = function (widget) {
-    if(!this.isRoot()){
-        this.getParent().setUnderCursor(widget);
-    }
-    if(this._widgetUnderCursor === widget){
-        return;
-    }
-    this._widgetUnderCursor = widget;
-    this.fire('widgetUnderCursor', {
-        widget: this._widgetUnderCursor 
-    });
-};
+//WbAbstractWidget.prototype.setUnderCursor = function (widget) {
+//    if(!this.isRoot()){
+//        this.getParent().setUnderCursor(widget);
+//    }
+//    if(this._widgetUnderCursor === widget){
+//        return;
+//    }
+//    this._widgetUnderCursor = widget;
+//    this.fire('widgetUnderCursor', {
+//        widget: this._widgetUnderCursor 
+//    });
+//};
 
 WbAbstractWidget.prototype.isEditable = function () {
     return this.editable;
@@ -355,7 +355,7 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
                 return;
             }
             event.sourceWidget = ctrl;
-            ctrl.setUnderCursor(ctrl);
+//            ctrl.setUnderCursor(ctrl);
             ctrl.getScope().$apply();
             return false;
         };
@@ -472,6 +472,30 @@ WbAbstractWidget.prototype.getActions = function () {
     return this.actions;
 };
 
+
+/**
+ * Returns bounding client rectangle
+ * 
+ * @return bounding rectangle
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.getBoundingClientRect = function () {
+  var $element = this.getElement();
+  var rect = $element[0].getBoundingClientRect();
+  var offset = $element.offset();
+  return {
+      // rect
+      width : rect.width,
+      height : rect.height,
+      x : rect.x,
+      y : rect.y,
+      // offset
+      top : $element.offset().top,
+      right : offset.rigth,
+      bottom : offset.bottom,
+      left : offset.left
+  };
+};
 
 /**
  * @ngdoc Controllers

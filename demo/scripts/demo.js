@@ -53,9 +53,9 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
         $scope.model = $wbUtil.clean(res.data);
     });
     
-    $scope.widgetUnderCursor = function($event){
-    	widgetLocator.setCursorWidget($event.widget);
-    };
+//    $scope.widgetUnderCursor = function($event){
+//    	widgetLocator.setCursorWidget($event.widget);
+//    };
 
     // load setting of model
     $scope.loadSettings = function($event){
@@ -85,8 +85,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
     };
 
     // load widgets
-    $widget.widgets()
-    .then(function(list){
+    $widget.widgets().then(function(list){
         $scope.widgets = list.items;
     });
 
@@ -195,6 +194,9 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
             openWidgets();
             openSettings();
             openContent();
+            if(!widgetLocator.isEnable()){
+                widgetLocator.setEnable(true);
+            }
         }
         widgetLocator.setVisible(value);
     });

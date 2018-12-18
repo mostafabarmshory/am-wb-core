@@ -42,13 +42,14 @@ angular.module('am-wb-core')//
         AbstractWidgetLocator.apply(this, options);
 
         // load headerTemplate
-        var headerTag = '<div style="position: absolute; background: black; color: red; border: 1px solid black;">header</div>';
-        this.titleElement = angular.element(headerTag);
 
         // load templates
         var template = options.template
-        || '<div class="wb-widget-locator-bound"></div>';
+        || '<div class="wb-widget-locator selection"></div>';
 
+        this.titleElement = angular.element(template);
+        this.titleElement.attr('id', 'header');
+        
         // load elements
         this.topElement = angular.element(template);
         this.topElement.attr('id', 'top');
@@ -65,39 +66,6 @@ angular.module('am-wb-core')//
         // init controller
         this.setElements([this.titleElement, this.topElement, this.rightElement,
             this.buttomElement, this.leftElement]);
-        var ctrl = this;
-        function getBound() {
-            var $element = ctrl.getWidget().getElement();
-            var off = $element.offset();
-            return {
-                left: off.left,
-                top: off.top,
-                width: $element.outerWidth(),
-                height: $element.outerHeight()
-            };
-        }
-
-        this.on('widgetChanged', function () {
-            if (ctrl._oldWidgetWatch) {
-                ctrl._oldWidgetWatch();
-            }
-            var widget = ctrl.getWidget();
-            if (widget) {
-                ctrl._oldWidgetWatch = widget.getScope().$watch(getBound, function (bound) {
-                    if (!bound) {
-                        return;
-                    }
-                    ctrl.updateView(bound);
-                }, true);
-                ctrl.updateView(getBound());
-                ctrl.show();
-
-                var model = widget.getModel();
-                ctrl.titleElement.html(model.label || model.type);
-            } else {
-                ctrl.hide();
-            }
-        });
     };
     selectionWidgetLocator.prototype = new AbstractWidgetLocator();
 
@@ -133,6 +101,8 @@ angular.module('am-wb-core')//
                 left: bound.left + bound.width - this.titleElement.width() - 5
             });
         }
+        var widget = this.getWidget();
+        this.titleElement[0].innerHTML = '<span>'+ (widget.getTitle() || widget.getId() || widget.getType()) + '</span>'
     };
     return selectionWidgetLocator;
 });

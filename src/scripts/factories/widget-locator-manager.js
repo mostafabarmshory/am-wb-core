@@ -39,7 +39,7 @@ angular
  * 
  * For each item in selection a selection locator will be created.
  */
-.factory('WidgetLocatorManager',function (BoundWidgetLocator, SelectionWidgetLocator) {
+.factory('WidgetLocatorManager',function ($widget, BoundWidgetLocator, SelectionWidgetLocator) {
 
     /**
      * Get path of a widget to the root
@@ -60,25 +60,22 @@ angular
      */
     function WidgetLocatorManager(options) {
         options = options || {};
+        this.setEnable(false);
         // attributes
         this.selectionLocators = [];
         this.boundLocators = [];
 
         // selection options
-        this.SelectionLocator = options.selectionLocator
-        || SelectionWidgetLocator;
-        this.SelectionLocatorOption = options.selectionLocatorOption
-        || {};
+        this.SelectionLocator = options.selectionLocator || SelectionWidgetLocator;
+        this.SelectionLocatorOption = options.selectionLocatorOption || {};
         this.boundEnable = true;
         if (angular.isDefined(options.selectionEnable)) {
             this.selectionEnable = options.selectionEnable;
         }
 
         // bound options
-        this.BoundLocator = options.boundLocator
-        || BoundWidgetLocator;
-        this.BoundLocatorOption = options.boundLocatorOption
-        || {};
+        this.BoundLocator = options.boundLocator || BoundWidgetLocator;
+        this.BoundLocatorOption = options.boundLocatorOption || {};
         this.boundEnable = true;
         if (angular.isDefined(options.boundEnable)) {
             this.boundEnable = options.boundEnable;
@@ -86,7 +83,7 @@ angular
     }
 
     /**
-     * Destroies all locators and remove from view
+     * Distracts all locators and remove from view
      * 
      * @memberof CursorWidgetLocator
      */
@@ -111,14 +108,12 @@ angular
      *            locators
      * @memberof CursorWidgetLocator
      */
-    WidgetLocatorManager.prototype.setVisible = function (
-            visible) {
+    WidgetLocatorManager.prototype.setVisible = function (visible) {
         if (this.visible === visible) {
             return;
         }
         this.visible = visible;
-        angular.forEach(this.selectionLocators, function (
-                locator) {
+        angular.forEach(this.selectionLocators, function (locator) {
             locator.setVisible(visible);
         });
         angular.forEach(this.boundLocators, function (locator) {
@@ -134,6 +129,22 @@ angular
      */
     WidgetLocatorManager.prototype.isVisible = function () {
         return this.visible;
+    }
+
+
+    WidgetLocatorManager.prototype.setEnable = function (enable) {
+        if (this.enable === enable) {
+            return;
+        }
+        this.enable = enable;
+        if(this.enable){
+            this.updateSelectionLocators();
+            this.updateBoundLocators();
+        }
+    }
+
+    WidgetLocatorManager.prototype.isEnable = function () {
+        return this.enable;
     }
 
     /**
@@ -158,7 +169,7 @@ angular
      * @memberof CursorWidgetLocator
      */
     WidgetLocatorManager.prototype.getSelectedWidgets = function () {
-        return this.selectedWidgets;
+        return this.selectedWidgets || [];
     }
 
     /**
@@ -168,8 +179,7 @@ angular
      *            {WbWidgetCtrl} root widget
      * @memberof WidgetLocatorManager
      */
-    WidgetLocatorManager.prototype.setRootWidget = function (
-            rootWidget) {
+    WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {
         this.rootWidget = rootWidget;
         if (this.isEnable()) {
             this.updateBoundLocators();
@@ -198,8 +208,7 @@ angular
 
         // add new
         while (this.selectionLocators.length < widgets.length) {
-            locator = new this.SelectionLocator(
-                    this.SelectionLocatorOption);
+            locator = new this.SelectionLocator(this.SelectionLocatorOption);
             locator.setEnable(true);
             this.selectionLocators.push(locator);
         }
@@ -231,8 +240,7 @@ angular
 
         // add new
         while (this.boundLocators.length < widgets.length) {
-            locator = new this.BoundLocator(
-                    this.BoundLocatorOption);
+            locator = new this.BoundLocator(this.BoundLocatorOption);
             locator.setEnable(true);
             this.boundLocators.push(locator);
         }

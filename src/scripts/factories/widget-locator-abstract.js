@@ -23,9 +23,7 @@
  */
 'use strict';
 
-
 angular.module('am-wb-core')//
-
 
 /**
  * @ngdoc Factories
@@ -38,124 +36,200 @@ angular.module('am-wb-core')//
  */
 .factory('AbstractWidgetLocator', function ($rootElement) {
 
-	/**
-	 * Creates new instance of the widget locator
-	 */
-	function abstractWidgetLocator() {
-		this.callbacks = [];
-		this.elements = [];
-	}
+    /**
+     * Creates new instance of the widget locator
+     */
+    function abstractWidgetLocator() {
+        this.callbacks = [];
+        this.elements = [];
+        this.observedWidgets = [];
 
-	abstractWidgetLocator.prototype.setVisible = function (visible) {
-		this.visible = visible;
-		if (visible) {
-			this.show();
-			this.fire('show');
-		} else {
-			this.hide();
-			this.fire('hide');
-		}
-	};
+        // Creates listeneres
+        var ctrl;
+        this.widgetDeletedListener = function () {
+            ctrl.setWidget(null);
+            fire('widgetDeleted')
+        };
+        this.widgetSelectedListener = function () {
+            ctrl.addClass('selected');
+            ctrl.removeClass('mouseover');
+            fire('widgetSelected')
+        }
+        this.widgetUnselected = function () {
+            ctrl.removeClass('selected');
+            if (ctrl.mouseover) {
+                ctrl.addClass('mouseover');
+            }
+            fire('widgetMouseover')
+        }
+        this.widgetMouseover = function () {
+            ctrl.addClass('mouseover');
+            ctrl.mouseover = true;
+            fire('widgetMouseover')
+        }
+        this.widgetMouseout = function () {
+            ctrl.addClass('mouseout');
+            ctrl.mouseover = false;
+            fire('widgetMouseout')
+        }
+    }
 
-	abstractWidgetLocator.prototype.isVisible = function () {
-		return this.visible;
-	};
+    abstractWidgetLocator.prototype.setVisible = function (visible) {
+        this.visible = visible;
+        if (visible) {
+            this.show();
+            this.fire('show');
+        } else {
+            this.hide();
+            this.fire('hide');
+        }
+    };
 
-	abstractWidgetLocator.prototype.setWidget = function (widget) {
-		var ctrl = this;
-		function widgetDeleted(){
-			ctrl.setWidget(null);
-		};
-		// remove old listener
-		if(this.widget) {
-			this.widget.off('widgetDeleted', widgetDeleted);
-		}
-		// set widget
-		this.widget = widget;
-		this.fire('widgetChanged');
-		// add listener
-		if(this.widget){
-			this.widget.on('widgetDeleted', widgetDeleted);
-		}
-	};
+    abstractWidgetLocator.prototype.isVisible = function () {
+        return this.visible;
+    };
 
-	abstractWidgetLocator.prototype.getWidget = function () {
-		return this.widget;
-	};
+    abstractWidgetLocator.prototype.setWidget = function (widget) {
+        this.disconnect();
+        this.widget = widget;
+        this.observe(this.widget);
+        this.fire('widgetChanged');
+    };
 
-	abstractWidgetLocator.prototype.setElements = function (elements) {
-		this.elements = elements;
-		angular.forEach(elements, function (element) {
-			$rootElement.append(element);
-			element.hide();
-		});
-	};
+    abstractWidgetLocator.prototype.getWidget = function () {
+        return this.widget;
+    };
 
-	abstractWidgetLocator.prototype.getElements = function () {
-		return this.elements;
-	};
+    abstractWidgetLocator.prototype.setElements = function (elements) {
+        this.elements = elements;
+        angular.forEach(elements, function (element) {
+            $rootElement.append(element);
+            element.hide();
+        });
+    };
 
-	abstractWidgetLocator.prototype.on = function (type, callback) {
-		if (!angular.isArray(this.callbacks[type])) {
-			this.callbacks[type] = [];
-		}
-		this.callbacks[type].push(callback);
-	};
+    abstractWidgetLocator.prototype.getElements = function () {
+        return this.elements;
+    };
 
-	abstractWidgetLocator.prototype.fire = function (type) {
-		if (angular.isDefined(this.callbacks[type])) {
-			for (var i = 0; i < this.callbacks[type].length; i++) {
-				try {
-					this.callbacks[type][i]();
-				} catch (error) {
-					console.log(error);
-				}
-			}
-		}
-	};
+    abstractWidgetLocator.prototype.on = function (type, callback) {
+        if (!angular.isArray(this.callbacks[type])) {
+            this.callbacks[type] = [];
+        }
+        this.callbacks[type].push(callback);
+    };
 
-	abstractWidgetLocator.prototype.hide = function () {
-		this.setVisible(false);
-	}
+    abstractWidgetLocator.prototype.fire = function (type) {
+        if (angular.isDefined(this.callbacks[type])) {
+            for (var i = 0; i < this.callbacks[type].length; i++) {
+                try {
+                    this.callbacks[type][i]();
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        }
+    };
 
-	abstractWidgetLocator.prototype.show = function () {
-		this.setVisible(true);
-	}
+    abstractWidgetLocator.prototype.hide = function () {
+        this.setVisible(false);
+    }
 
-	abstractWidgetLocator.prototype.setVisible = function (visible) {
-		this.visible = visible;
-		visible = this.visible && this.enable;
-		angular.forEach(this.elements, function (element) {
-			if(visible) {
-				element.show();
-			} else {
-				element.hide();
-			}
-		});
-	}
+    abstractWidgetLocator.prototype.show = function () {
+        this.setVisible(true);
+    }
 
-	abstractWidgetLocator.prototype.isVisible = function () {
-		return this.visible;
-	}
+    abstractWidgetLocator.prototype.setVisible = function (visible) {
+        this.visible = visible;
+        visible = this.visible && this.enable;
+        angular.forEach(this.elements, function (element) {
+            if (visible) {
+                element.show();
+            } else {
+                element.hide();
+            }
+        });
+    }
 
+    abstractWidgetLocator.prototype.isVisible = function () {
+        return this.visible;
+    }
 
-	abstractWidgetLocator.prototype.setEnable = function (enable) {
-		this.enable = enable;
-		this.setVisible(this.enable && this.visible);
-	}
+    /**
+     * Enable locator
+     * 
+     * If the locater is enable, then it watch for regular widget event and fire
+     * it to internal listeneres.
+     * 
+     * @param enable
+     *            {boolean} the flag to enable and disable.
+     * @memberof AbstractWidgetLocator
+     */
+    abstractWidgetLocator.prototype.setEnable = function (enable) {
+        if (this.enable == enable) {
+            return;
+        }
+        this.enable = enable;
+        this.setVisible(this.enable && this.visible);
+        if (this.enable) {
+            this.disconnect();
+        } else {
+            this.observe(this.getWidget());
+        }
+    }
 
-	abstractWidgetLocator.prototype.isEnable = function () {
-		return this.enable;
-	}
+    abstractWidgetLocator.prototype.isEnable = function () {
+        return this.enable;
+    }
 
-	abstractWidgetLocator.prototype.destroy = function () {
-		this.fire('distroied');
-		angular.forEach(this.elements, function (element) {
-			element.remove();
-		});
-		this.elements = [];
-		this.callbacks = [];
-	}
+    abstractWidgetLocator.prototype.destroy = function () {
+        this.fire('distroied');
+        angular.forEach(this.elements, function (element) {
+            element.remove();
+        });
+        this.elements = [];
+        this.callbacks = [];
+    }
 
-	return abstractWidgetLocator;
+    abstractWidgetLocator.prototype.addClass = function (value) {
+        var elements = this.getElements();
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].addClass(value);
+        }
+    };
+
+    abstractWidgetLocator.prototype.removeClass = function (value) {
+        var elements = this.getElements();
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].removeClass(value);
+        }
+    };
+
+    abstractWidgetLocator.prototype.disconnect = function () {
+        for (var i = 0; i < this.observedWidgets.length; i++) {
+            var widget = this.observedWidgets[i];
+            widget.off('deleted', this.widgetDeletedListener);
+            widget.off('selected', this.widgetSelectedListener);
+            widget.off('unselected', this.widgetUnselectedListener);
+            widget.off('mouseover', this.widgetMouseoverListener);
+            widget.off('mouseout', this.widgetMouseoutListener);
+        }
+        this.observedWidgets = [];
+    };
+
+    abstractWidgetLocator.prototype.observe = function (widget) {
+        if (!widget) {
+            return;
+        }
+        // add listener
+        this.observedWidgets.push(widget);
+        widget.on('deleted', this.widgetDeletedListener);
+        widget.on('selected', this.widgetSelected);
+        widget.on('unselected', this.widgetUnselected);
+        widget.on('mouseover', this.widgetMouseover);
+        widget.on('mouseout', this.widgetMouseout);
+        this.updateView(widget.getBoundingClientRect());
+    };
+
+    return abstractWidgetLocator;
 });

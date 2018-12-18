@@ -39,8 +39,8 @@ angular.module('am-wb-core')//
 		AbstractWidgetLocator.apply(this, options);
 
 		// load templates
-		var template = options.template
-		|| '<div class="wb-widget-locator-cursor"></div>';
+		var template = options.template 
+		|| '<div class="wb-widget-locator bound"></div>';
 
 		// load elements
 		this.topElement = angular.element(template);
@@ -58,35 +58,6 @@ angular.module('am-wb-core')//
 		// init controller
 		this.setElements([this.topElement, this.rightElement,
 			this.buttomElement, this.leftElement]);
-		var ctrl = this;
-		function getBound() {
-			var $element = ctrl.getWidget().getElement();
-			var off = $element.offset();
-			return {
-				left: off.left,
-				top: off.top,
-				width: $element.outerWidth(),
-				height: $element.outerHeight()
-			};
-		}
-		this.on('widgetChanged', function () {
-			if (ctrl._oldWidgetWatch) {
-				ctrl._oldWidgetWatch();
-			}
-			var widget = ctrl.getWidget();
-			if (widget) {
-				ctrl._oldWidgetWatch = widget.getScope().$watch(getBound, function (bound) {
-					if (!bound) {
-						return;
-					}
-					ctrl.updateView(bound);
-				}, true);
-				ctrl.updateView(getBound());
-				ctrl.show();
-			} else {
-				ctrl.hide();
-			}
-		});
 	};
 	boundWidgetLocator.prototype = new AbstractWidgetLocator();
 
