@@ -620,12 +620,16 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
         compilesJob.push(job);
     });
 
+    var ctrl = this;
     return $q.all(compilesJob)//
     .then(function () {
         var $element = parentWidget.getElement();
         parentWidget.childWidgets.forEach(function (widget) {
             $element.append(widget.getElement());
         });
+    })
+    .finally(function(){
+        ctrl.fire('loaded');
     });
 };
 

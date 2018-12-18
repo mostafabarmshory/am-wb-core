@@ -433,7 +433,6 @@ of a widget:
 	min-height: 32px;
 }
 
-
 /**************************************************************************************
                                      Widget layout
 
@@ -469,56 +468,65 @@ of a widget:
 Locators are used to display area of a widget or attache some extra meta information on
 in the edit mode. This part of the the CSS fix basic settings of the widgets.
 ***************************************************************************************/
-
-/*
- * Bound
- */
-.wb-widget-locator-cursor {
+.wb-widget-locator {
 	display: block;
-	position: fixed;
+	position: absolute;
 	transition: all 0.3s ease;
-	background: red;
-}
-
-#top.wb-widget-locator-cursor {
-	height: 1px;
-}
-
-#right.wb-widget-locator-cursor {
-	width: 1px;
-}
-
-#buttom.wb-widget-locator-cursor {
-	height: 1px;
-}
-
-#left.wb-widget-locator-cursor {
-	width: 1px;
 }
 
 /*
  * Bound
  */
-.wb-widget-locator-bound {
-	display: block;
-	position: fixed;
-	transition: all 0.3s ease;
+.wb-widget-locator.bound {
+	background: #babdb6;
+}
+
+.wb-widget-locator.bound.mouseover {
+	background: !important;
+}
+
+#top.wb-widget-locator.bound {
+	height: 1px;
+}
+
+#right.wb-widget-locator.bound {
+	width: 1px;
+}
+
+#buttom.wb-widget-locator.bound {
+	height: 1px;
+}
+
+#left.wb-widget-locator.bound {
+	width: 1px;
+}
+
+/*
+ * Selection
+ */
+.wb-widget-locator.selection {
 	background: black;
+	color: white;
+	font-size: 10px;
 }
 
-#top.wb-widget-locator-bound {
+#header.wb-widget-locator.selection {
+	padding: 1px;
+}
+
+#top.wb-widget-locator.selection {
 	height: 1px;
 }
 
-#right.wb-widget-locator-bound {
+#right.wb-widget-locator.selection {
 	width: 1px;
 }
 
-#buttom.wb-widget-locator-bound {
+#buttom.wb-widget-locator.selection {
 	height: 1px;
 }
 
-#left.wb-widget-locator-bound {
+#left.wb-widget-locator.selection {
 	width: 1px;
 }
 
