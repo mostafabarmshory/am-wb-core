@@ -373,9 +373,9 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
     });
 
     if(editable) {
-        this.fire('widgetIsEditable');
+        this.fire('editable');
     } else {
-        this.fire('widgetIsNotEditable');
+        this.fire('noneditable');
     }
 };
 
@@ -386,7 +386,7 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
  */
 WbAbstractWidget.prototype.delete = function () {
     // remove itself
-    this.fire('widgetDeleted');
+    this.fire('deleted');
     this.getParent()
         .removeChild(this);
 };
@@ -475,9 +475,12 @@ WbAbstractWidget.prototype.setSelected = function (flag) {
         return;
     }
     this.getParent().childSelected(this);
-
+    
+    // fire events
     if(flag){
-        this.fire('widgetSelected');
+        this.fire('selected');
+    } else {
+        this.fire('unselected');
     }
 };
 
@@ -637,7 +640,7 @@ WbWidgetGroupCtrl.prototype.childSelected = function (ctrl) {
     }
     this.lastSelectedItem = ctrl;
     // maso, 2018: call the parent controller function
-    this.fire('widgetSelected', {
+    this.fire('selected', {
         widgets: ctrl? [ctrl] : []
     });
 };
@@ -720,7 +723,7 @@ WbWidgetGroupCtrl.prototype.delete = function () {
     });
     
     // remove itself
-    this.fire('widgetDeleted');
+    this.fire('deleted');
     if(!this.isRoot()){
         this.getParent()
             .removeChild(this);
