@@ -384,21 +384,13 @@ WbAbstractWidget.prototype.off = function (type, callback) {
     }
 };
 
-
-/**
- * Clone current widget
- * 
- * This method works in edit mode only.
- */
-WbAbstractWidget.prototype.clone = function () {
-    var index = this.getParent().indexOfChild(this);
-    this.getParent()//
-    .addChild(index, angular.copy(this.getModel()));
-};
+WbAbstractWidget.prototype.getDirection = function () {
+    return this.getParent().getModel().style.layout.direction;
+}; 
 
 WbAbstractWidget.prototype.getModel = function () {
     return this.wbModel;
-};
+}; 
 
 WbAbstractWidget.prototype.getTitle = function () {
     return this.wbModel.label;
@@ -525,6 +517,39 @@ WbAbstractWidget.prototype.delete = function () {
         .removeChild(this);
 };
 
+/**
+ * Clone current widget
+ * This method works in edit mode only.
+ */
+WbAbstractWidget.prototype.clone = function () {
+    var index = this.getParent().indexOfChild(this);
+    this.getParent()//
+    .addChild(index, angular.copy(this.getModel()));
+};
+
+/**
+ * move next current widget
+ * This method moves widget one to next.
+ */
+WbAbstractWidget.prototype.moveNext = function () {};
+
+/**
+ * move before current widget
+ * This method moves widget one to before
+ */
+WbAbstractWidget.prototype.moveBefore = function () {};
+
+/**
+ * move up current widget
+ * This method moves widget to the first of it's parent
+ */
+WbAbstractWidget.prototype.moveFirst = function () {};
+
+/**
+ * move down current widget
+ * This method moves widget to the last of it's parent
+ */
+WbAbstractWidget.prototype.moveLast = function () {};
 
 /**
  * Checks if the widget is root
@@ -613,28 +638,6 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http) {
     this.setScope($scope);
     this.$wbUtil = $wbUtil;
     this.$http = $http;
-
-    var ctrl = this;
-
-    // delete action
-    this.addAction({
-        title: 'Delete',
-        icon: 'delete',
-        action: function () {
-            ctrl.delete();
-        },
-        description: 'Delete widget (Delete)'
-    });
-
-    // add child action
-    this.addAction({
-        title: 'Clone',
-        icon: 'content_copy',
-        action: function () {
-            ctrl.clone();
-        },
-        description: 'Duplicate widget (ctrl+D)'
-    });
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
@@ -658,31 +661,6 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
     this.$mdTheming = $mdTheming;
     this.$wbUtil = $wbUtil;
     this.$http = $http;
-
-    var ctrl = this;
-    this.on('modelChanged', function () {
-        ctrl.loadWidgets(ctrl.getModel());
-    });
-
-    // delete action
-    this.addAction({
-        title: 'Delete',
-        icon: 'delete',
-        action: function () {
-            ctrl.delete();
-        },
-        description: 'Delete widget (Delete)'
-    });
-
-    // add child action
-    this.addAction({
-        title: 'Clone',
-        icon: 'content_copy',
-        action: function () {
-            ctrl.clone();
-        },
-        description: 'Duplicate widget (ctrl+D)'
-    });
 };
 WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
 
