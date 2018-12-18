@@ -95,60 +95,60 @@ describe('Service $widget', function () {
         $rootScope.$apply();
     });
 
-//  XXX: maso, 2018: fail on several internal promi
-//  it('should returns children of a group', function (done) {
-//  var root = new MockRootWidget();
-//  // Create new instance
-//  $widget.compile({
-//  type : 'Group',
-//  contents : [ {
-//  type : 'HtmlText',
-//  text : '<h2>HTML Text In 4th group0</h2>',
-//  }, {
-//  type : 'HtmlText',
-//  text : '<h2>HTML Text In 4th group0</h2>',
-//  } ]
-//  }, root).then(function (widget) {
-//  // wait for children
-//  widget.on('loaded', function(){
-//  expect(widget).not.toBe(null);
-//  var children = $widget.getChildren(widget);
-//  expect(children.length).toBe(2);
-//  done();
-//  });
-//  });
-//  $rootScope.$apply();
-//  $timeout.flush();
-//  });
+    // XXX: maso, 2018: fail on several internal promi
+    it('should returns children of a group', function (done) {
+        var root = new MockRootWidget();
+        // Create new instance
+        $widget.compile({
+            type : 'Group',
+            contents : [ {
+                type : 'HtmlText',
+                text : '<h2>HTML Text In 4th group0</h2>',
+            }, {
+                type : 'HtmlText',
+                text : '<h2>HTML Text In 4th group0</h2>',
+            } ]
+        }, root).then(function (widget) {
+            // wait for children
+            $timeout(function () {
+                expect(widget).not.toBe(null);
+                var children = $widget.getChildren(widget);
+                expect(children.length).toBe(2);
+                done();
+            }, 300);
+        });
+        $rootScope.$apply();
+        $timeout.flush();
+    });
 
-//    it('should returns sub-children of a group', function (done) {
-//        var root = new MockRootWidget();
-//        // Create new instance
-//        $widget.compile({
-//            type : 'Group',
-//            contents : [ {
-//                type : 'Group',
-//                contents : [ {
-//                    type : 'Group',
-//                    contents : [ {
-//                        type : 'HtmlText',
-//                        text : '<h2>HTML Text In 4th group0</h2>',
-//                    }, {
-//                        type : 'HtmlText',
-//                        text : '<h2>HTML Text In 4th group0</h2>',
-//                    } ]
-//                } ]
-//            } ]
-//        }, root).then(function (widget) {
-//            $timeout(function () {        
-//                expect(widget).not.toBe(null);
-//                var children = $widget.getChildren(widget);
-//                expect(children.length).toBe(4);
-//                done();
-//            }, 300);
-//        });
-//        $rootScope.$apply();
-//        $timeout.flush();
-//    });
+    it('should returns sub-children of a group', function (done) {
+        var root = new MockRootWidget();
+        // Create new instance
+        $widget.compile({
+            type : 'Group',
+            contents : [ {
+                type : 'Group',
+                contents : [ {
+                    type : 'Group',
+                    contents : [ {
+                        type : 'HtmlText',
+                        text : '<h2>HTML Text In 4th group0</h2>',
+                    }, {
+                        type : 'HtmlText',
+                        text : '<h2>HTML Text In 4th group0</h2>',
+                    } ]
+                } ]
+            } ]
+        }, root).then(function (widget) {
+            $timeout(function () {
+                expect(widget).not.toBe(null);
+                var children = $widget.getChildren(widget);
+                expect(children.length).toBe(4);
+                done();
+            }, 300);
+        });
+        $rootScope.$apply();
+        $timeout.flush();
+    });
 
 });

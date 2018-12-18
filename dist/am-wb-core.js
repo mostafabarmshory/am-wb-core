@@ -433,18 +433,18 @@ WbAbstractWidget.prototype.getScope = function () {
     return this.$scope;
 };
 
-//WbAbstractWidget.prototype.setUnderCursor = function (widget) {
-//    if(!this.isRoot()){
-//        this.getParent().setUnderCursor(widget);
-//    }
-//    if(this._widgetUnderCursor === widget){
-//        return;
-//    }
-//    this._widgetUnderCursor = widget;
-//    this.fire('widgetUnderCursor', {
-//        widget: this._widgetUnderCursor 
-//    });
-//};
+// WbAbstractWidget.prototype.setUnderCursor = function (widget) {
+// if(!this.isRoot()){
+// this.getParent().setUnderCursor(widget);
+// }
+// if(this._widgetUnderCursor === widget){
+// return;
+// }
+// this._widgetUnderCursor = widget;
+// this.fire('widgetUnderCursor', {
+// widget: this._widgetUnderCursor
+// });
+// };
 
 WbAbstractWidget.prototype.isEditable = function () {
     return this.editable;
@@ -473,7 +473,7 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
                 return;
             }
             event.sourceWidget = ctrl;
-//            ctrl.setUnderCursor(ctrl);
+// ctrl.setUnderCursor(ctrl);
             ctrl.getScope().$apply();
             return false;
         };
@@ -518,8 +518,7 @@ WbAbstractWidget.prototype.delete = function () {
 };
 
 /**
- * Clone current widget
- * This method works in edit mode only.
+ * Clone current widget This method works in edit mode only.
  */
 WbAbstractWidget.prototype.clone = function () {
     var index = this.getParent().indexOfChild(this);
@@ -528,26 +527,22 @@ WbAbstractWidget.prototype.clone = function () {
 };
 
 /**
- * move next current widget
- * This method moves widget one to next.
+ * move next current widget This method moves widget one to next.
  */
 WbAbstractWidget.prototype.moveNext = function () {};
 
 /**
- * move before current widget
- * This method moves widget one to before
+ * move before current widget This method moves widget one to before
  */
 WbAbstractWidget.prototype.moveBefore = function () {};
 
 /**
- * move up current widget
- * This method moves widget to the first of it's parent
+ * move up current widget This method moves widget to the first of it's parent
  */
 WbAbstractWidget.prototype.moveFirst = function () {};
 
 /**
- * move down current widget
- * This method moves widget to the last of it's parent
+ * move down current widget This method moves widget to the last of it's parent
  */
 WbAbstractWidget.prototype.moveLast = function () {};
 
@@ -688,6 +683,11 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
     this.$mdTheming = $mdTheming;
     this.$wbUtil = $wbUtil;
     this.$http = $http;
+    
+    var ctrl = this;
+    this.on('modelChanged', function(){
+        ctrl.loadWidgets(ctrl.getModel());
+    });
 };
 WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
 
