@@ -23,6 +23,15 @@ Here, There is an example shows how the events are stored in model:
     }
 
 
+### What events are supported?
+
+The following events are supported and available to the user.
+
+- click : The event occurs when the user clicks on an element.
+- mousemove: The event occurs when the pointer is moving while it is over an element.
+- mouseout : The event occurs when a user moves the mouse pointer out of an element, or out of one of its children.
+- mouseover: The event occurs when the pointer is moved onto an element, or onto one of its children.
+
 ## 2- $widget
 
 $widget provides some methods to the user. Depends on what type the widget is, the user can use them.

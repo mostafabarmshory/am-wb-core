@@ -51,6 +51,12 @@ var WbAbstractWidget = function () {
 
     this.on('modelChanged', updateView);
     this.on('modelUpdate', updateView);
+    
+    this.on('select', widgetSelect);
+    this.on('unselect', widgetUnselect);
+    this.on('delete', widgetDelete);
+    this.on('newchild', widgetNewChild);
+    
 };
 
 /**
@@ -163,7 +169,25 @@ WbAbstractWidget.prototype.destroy = function () {
 };
 
 WbAbstractWidget.prototype.setElement = function ($element) {
+    this.disconnect();
     this.$element = $element;
+    this.connect();
+};
+
+WbAbstractWidget.prototype.disconnect = function () {
+    var $element = this.getElement();
+    $element.off('select');
+    $element.off('unselect');
+    $element.off('delete');
+    $element.off('newchild');
+};
+
+WbAbstractWidget.prototype.connect = function () {
+    var $element = this.getElement();
+    $element.on('select');
+    $element.on('unselect');
+    $element.on('delete');
+    $element.on('newchild');
 };
 
 WbAbstractWidget.prototype.getElement = function () {
