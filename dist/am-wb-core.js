@@ -338,6 +338,11 @@ WbAbstractWidget.prototype.fire = function (type, params) {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.on = function (type, callback) {
+    if(!angular.isFunction(callback)){
+        throw {
+            message: "Callback must be a function"
+        };
+    }
     if (!angular.isArray(this.callbacks[type])) {
         this.callbacks[type] = [];
     }
@@ -963,7 +968,7 @@ angular.module('am-wb-core')
                     }
                 });
             });
-            ctrl.on('widgetSelected', function($event){
+            ctrl.on('selected', function($event){
                 var widgets = $event.widgets;
                 var locals = {
                         '$event': $event,
@@ -2941,32 +2946,32 @@ angular.module('am-wb-core')//
         this.observedWidgets = [];
 
         // Creates listeneres
-        var ctrl;
+        var ctrl = this;
         this.widgetDeletedListener = function () {
             ctrl.setWidget(null);
-            fire('widgetDeleted')
+            ctrl.fire('widgetDeleted')
         };
         this.widgetSelectedListener = function () {
             ctrl.addClass('selected');
             ctrl.removeClass('mouseover');
-            fire('widgetSelected')
+            ctrl.fire('widgetSelected')
         }
-        this.widgetUnselected = function () {
+        this.widgetUnselectedListener = function () {
             ctrl.removeClass('selected');
             if (ctrl.mouseover) {
                 ctrl.addClass('mouseover');
             }
-            fire('widgetMouseover')
+            ctrl.fire('widgetMouseover')
         }
-        this.widgetMouseover = function () {
+        this.widgetMouseoverListener = function () {
             ctrl.addClass('mouseover');
             ctrl.mouseover = true;
-            fire('widgetMouseover')
+            ctrl.fire('widgetMouseover')
         }
-        this.widgetMouseout = function () {
+        this.widgetMouseoutListener = function () {
             ctrl.addClass('mouseout');
             ctrl.mouseover = false;
-            fire('widgetMouseout')
+            ctrl.fire('widgetMouseout')
         }
     }
 
@@ -3120,10 +3125,10 @@ angular.module('am-wb-core')//
         // add listener
         this.observedWidgets.push(widget);
         widget.on('deleted', this.widgetDeletedListener);
-        widget.on('selected', this.widgetSelected);
-        widget.on('unselected', this.widgetUnselected);
-        widget.on('mouseover', this.widgetMouseover);
-        widget.on('mouseout', this.widgetMouseout);
+        widget.on('selected', this.widgetSelectedListener);
+        widget.on('unselected', this.widgetUnselectedListener);
+        widget.on('mouseover', this.widgetMouseoverListener);
+        widget.on('mouseout', this.widgetMouseoutListener);
         this.updateView(widget.getBoundingClientRect());
     };
 

@@ -212,6 +212,11 @@ WbAbstractWidget.prototype.fire = function (type, params) {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.on = function (type, callback) {
+    if(!angular.isFunction(callback)){
+        throw {
+            message: "Callback must be a function"
+        };
+    }
     if (!angular.isArray(this.callbacks[type])) {
         this.callbacks[type] = [];
     }

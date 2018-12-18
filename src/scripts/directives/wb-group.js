@@ -74,7 +74,7 @@ angular.module('am-wb-core')
                     }
                 });
             });
-            ctrl.on('widgetSelected', function($event){
+            ctrl.on('selected', function($event){
                 var widgets = $event.widgets;
                 var locals = {
                         '$event': $event,
