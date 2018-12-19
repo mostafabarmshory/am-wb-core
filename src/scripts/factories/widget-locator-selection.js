@@ -69,7 +69,8 @@ angular.module('am-wb-core')//
     };
     selectionWidgetLocator.prototype = new AbstractWidgetLocator();
 
-    selectionWidgetLocator.prototype.updateView = function (bound) {
+    selectionWidgetLocator.prototype.updateView = function () {
+        var bound = this.getWidget().getBoundingClientRect();
         this.topElement.css({
             top: bound.top + 1,
             left: bound.left + 1,

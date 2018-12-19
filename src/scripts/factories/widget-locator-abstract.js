@@ -63,17 +63,18 @@ angular.module('am-wb-core')//
                 if (ctrl.mouseover) {
                     ctrl.addClass('mouseover');
                 }
-                ctrl.fire('widgetMouseover', $event);
+                ctrl.fire('widgetUnselected', $event);
             },
             'mouseover' : function ($event) {
                 ctrl.addClass('mouseover');
                 ctrl.mouseover = true;
-                ctrl.fire('widgetMouseover', $event)
             },
             'mouseout' : function ($event) {
                 ctrl.addClass('mouseout');
                 ctrl.mouseover = false;
-                ctrl.fire('widgetMouseout', $event)
+            },
+            'resize' : function ($event) {
+                this.updateView();
             }
         };
     }
@@ -151,7 +152,7 @@ angular.module('am-wb-core')//
         this.visible = visible;
         visible = this.visible && this.enable;
         if (visible) {
-            this.updateView(this.getWidget().getBoundingClientRect());
+            this.updateView();
             this.fire('show');
         } else {
             this.fire('hide');
@@ -238,7 +239,7 @@ angular.module('am-wb-core')//
         angular.forEach(this.widgetListeners, function (listener, type) {
             widget.on(type, listener);
         });
-        this.updateView(widget.getBoundingClientRect());
+        this.updateView();
     };
 
     return abstractWidgetLocator;

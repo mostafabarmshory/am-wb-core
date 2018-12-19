@@ -61,7 +61,8 @@ angular.module('am-wb-core')//
 	};
 	boundWidgetLocator.prototype = new AbstractWidgetLocator();
 
-	boundWidgetLocator.prototype.updateView = function (bound) {
+	boundWidgetLocator.prototype.updateView = function () {
+	    var bound = this.getWidget().getBoundingClientRect();
 		this.topElement.css({
 			top: bound.top + 1,
 			left: bound.left + 1,
