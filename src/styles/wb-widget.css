@@ -119,3 +119,10 @@ in the edit mode. This part of the the CSS fix basic settings of the widgets.
 #left.wb-widget-locator.selection {
 	width: 1px;
 }
+
+#size.wb-widget-locator.selection {
+	height: 10px;
+	width: 10px;
+	border-radius: 100%;
+	cursor: se-resize; 
+}

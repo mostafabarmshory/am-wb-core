@@ -35,7 +35,7 @@ angular.module('am-wb-core')//
  * example it is used to show widget actions on the fly.
  * 
  */
-.factory('SelectionWidgetLocator', function (AbstractWidgetLocator) {
+.factory('SelectionWidgetLocator', function (AbstractWidgetLocator, $document) {
 
     var selectionWidgetLocator = function (options) {
         options = options || {};
@@ -49,7 +49,7 @@ angular.module('am-wb-core')//
 
         this.titleElement = angular.element(template);
         this.titleElement.attr('id', 'header');
-        
+
         // load elements
         this.topElement = angular.element(template);
         this.topElement.attr('id', 'top');
@@ -63,9 +63,67 @@ angular.module('am-wb-core')//
         this.leftElement = angular.element(template);
         this.leftElement.attr('id', 'left');
 
+        this.sizeElement = angular.element(template);
+        this.sizeElement.attr('id', 'size');
+
         // init controller
         this.setElements([this.titleElement, this.topElement, this.rightElement,
-            this.buttomElement, this.leftElement]);
+            this.buttomElement, this.leftElement, this.sizeElement]);
+        
+        
+        
+        var position = {};
+        var lock = false;
+        var dimension = {};
+        var ctrl = this;
+        
+
+        function mousemove($event) {
+            var deltaWidth = dimension.width - (position.x - $event.clientX);
+            var deltaHeight = dimension.height - (position.y - $event.clientY);
+            var newDimensions = {
+                    width: deltaWidth + 'px',
+                    height: deltaHeight + 'px'
+            };
+            
+            var widget = ctrl.getWidget();
+            var model = widget.getModel();
+            var $element = widget.getElement();
+            var $scope = widget.getScope();
+            
+            if (model.style.size.height === 'auto') {
+                newDimensions.height = 'auto';
+            }
+            $element.css(newDimensions);
+            
+            model.style.size.width = newDimensions.width;
+            model.style.size.height = newDimensions.height;
+
+            $scope.$apply();
+            return false;
+        }
+
+        function mouseup() {
+            $document.unbind('mousemove', mousemove);
+            $document.unbind('mouseup', mouseup);
+            lock = false;
+        }
+
+        function mousedown($event) {
+            $event.stopImmediatePropagation();
+            position.x = $event.clientX;
+            position.y = $event.clientY;
+            lock = true;
+            var $element = ctrl.getWidget().getElement();
+            dimension.width = $element.prop('offsetWidth');
+            dimension.height = $element.prop('offsetHeight');
+            $document.bind('mousemove', mousemove);
+            $document.bind('mouseup', mouseup);
+            return false;
+        }
+
+
+        this.sizeElement.on('mousedown', mousedown);
     };
     selectionWidgetLocator.prototype = new AbstractWidgetLocator();
 
@@ -104,6 +162,12 @@ angular.module('am-wb-core')//
         }
         var widget = this.getWidget();
         this.titleElement[0].innerHTML = '<span>'+ (widget.getTitle() || widget.getId() || widget.getType()) + '</span>'
+        
+        
+        this.sizeElement.css({
+            top: bound.top + bound.height - 7,
+            left: bound.left + bound.width - 7 ,
+        })
     };
     return selectionWidgetLocator;
 });
