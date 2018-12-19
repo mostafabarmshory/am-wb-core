@@ -229,13 +229,38 @@ angular
         var widgets;
         var i;
         var locator;
-
+        var widget;
+        
+        /*
+         * Adds new locator for new widget
+         */
+        var ctrl = this;
+        function newLocator($event){
+            var locator;
+            if(ctrl.boundLocators.length > this.activeBoundLocators){
+                locator = ctrl.boundLocators[this.activeBoundLocators];
+            } else {
+                locator = new ctrl.BoundLocator(ctrl.BoundLocatorOption);
+            }
+            locator.setWidget($event.widget);
+            locator.setEnable(ctrl.isEnable());
+            locator.setVisible(ctrl.isVisible());
+            this.activeBoundLocators++;
+        }
+        
         // list widgets
         widgets = $widget.getChildren(this.getRootWidget());
-
+        this.activeBoundLocators = widgets.length;
+        
         // disable extra
         for (i = 0; i < this.boundLocators.length; i++) {
             this.boundLocators[i].setEnable(i < widgets.length);
+
+            // remove listener
+            widget = this.boundLocators[i].getWidget();
+            if(widget){
+                widget.off('newchild', newLocator);
+            }
         }
 
         // add new
@@ -250,9 +275,11 @@ angular
             var locator = this.boundLocators[i];
             locator.setWidget(widgets[i]);
             locator.setVisible(this.visible);
+            
+            // add listener
+            widgets[i].on('newchild', newLocator);
         }
-
-    }
+    };
 
     return WidgetLocatorManager;
 });

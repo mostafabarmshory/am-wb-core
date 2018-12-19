@@ -38,42 +38,54 @@ angular.module('am-wb-core')//
 
     /**
      * Creates new instance of the widget locator
+     * 
+     * @memberof AbstractWidgetLocator
      */
     function abstractWidgetLocator() {
         this.callbacks = [];
         this.elements = [];
         this.observedWidgets = [];
 
-        // Creates listeneres
+        // Creates listeners
         var ctrl = this;
-        this.widgetDeletedListener = function () {
-            ctrl.setWidget(null);
-            ctrl.fire('widgetDeleted')
-        };
-        this.widgetSelectedListener = function () {
-            ctrl.addClass('selected');
-            ctrl.removeClass('mouseover');
-            ctrl.fire('widgetSelected')
-        }
-        this.widgetUnselectedListener = function () {
-            ctrl.removeClass('selected');
-            if (ctrl.mouseover) {
+        this.widgetListeners = {
+            'delete' : function ($event) {
+                ctrl.setWidget(null);
+                ctrl.fire('widgetDeleted', $event);
+            },
+            'select' : function () {
+                ctrl.addClass('selected');
+                ctrl.removeClass('mouseover');
+                ctrl.fire('widgetSelected', $event);
+            },
+            'unselect' : function () {
+                ctrl.removeClass('selected');
+                if (ctrl.mouseover) {
+                    ctrl.addClass('mouseover');
+                }
+                ctrl.fire('widgetMouseover', $event);
+            },
+            'mouseover' : function () {
                 ctrl.addClass('mouseover');
+                ctrl.mouseover = true;
+                ctrl.fire('widgetMouseover', $event)
+            },
+            'mouseout' : function () {
+                ctrl.addClass('mouseout');
+                ctrl.mouseover = false;
+                ctrl.fire('widgetMouseout', $event)
             }
-            ctrl.fire('widgetMouseover')
-        }
-        this.widgetMouseoverListener = function () {
-            ctrl.addClass('mouseover');
-            ctrl.mouseover = true;
-            ctrl.fire('widgetMouseover')
-        }
-        this.widgetMouseoutListener = function () {
-            ctrl.addClass('mouseout');
-            ctrl.mouseover = false;
-            ctrl.fire('widgetMouseout')
-        }
+        };
     }
+    ;
 
+    /**
+     * Set the locator visible
+     * 
+     * @param visible
+     *            {boolean} the visibility of the page
+     * @memberof AbstractWidgetLocator
+     */
     abstractWidgetLocator.prototype.setVisible = function (visible) {
         this.visible = visible;
         if (visible) {
@@ -85,6 +97,12 @@ angular.module('am-wb-core')//
         }
     };
 
+    /**
+     * Checks if the locator is visible
+     * 
+     * @return true if the locator is visible
+     * @memberof AbstractWidgetLocator
+     */
     abstractWidgetLocator.prototype.isVisible = function () {
         return this.visible;
     };
@@ -208,11 +226,9 @@ angular.module('am-wb-core')//
     abstractWidgetLocator.prototype.disconnect = function () {
         for (var i = 0; i < this.observedWidgets.length; i++) {
             var widget = this.observedWidgets[i];
-            widget.off('deleted', this.widgetDeletedListener);
-            widget.off('selected', this.widgetSelectedListener);
-            widget.off('unselected', this.widgetUnselectedListener);
-            widget.off('mouseover', this.widgetMouseoverListener);
-            widget.off('mouseout', this.widgetMouseoutListener);
+            angular.forEach(this.widgetListeners, function (listener, type) {
+                widget.off(type, listener);
+            });
         }
         this.observedWidgets = [];
     };
@@ -223,11 +239,9 @@ angular.module('am-wb-core')//
         }
         // add listener
         this.observedWidgets.push(widget);
-        widget.on('deleted', this.widgetDeletedListener);
-        widget.on('selected', this.widgetSelectedListener);
-        widget.on('unselected', this.widgetUnselectedListener);
-        widget.on('mouseover', this.widgetMouseoverListener);
-        widget.on('mouseout', this.widgetMouseoutListener);
+        angular.forEach(this.widgetListeners, function (listener, type) {
+            widget.off(type, listener);
+        });
         this.updateView(widget.getBoundingClientRect());
     };
 
