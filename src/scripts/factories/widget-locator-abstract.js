@@ -94,6 +94,7 @@ angular.module('am-wb-core')//
         this.disconnect();
         this.widget = widget;
         this.observe(this.widget);
+        this.updateView();
         this.fire('widgetChanged');
     };
 

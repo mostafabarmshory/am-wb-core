@@ -240,17 +240,7 @@ angular
          */
         var ctrl = this;
         function newLocator($event){
-            var locator;
-            if(ctrl.boundLocators.length > ctrl.activeBoundLocators){
-                locator = ctrl.boundLocators[ctrl.activeBoundLocators];
-            } else {
-                locator = new ctrl.BoundLocator(ctrl.BoundLocatorOption);
-                ctrl.boundLocators.push(locator);
-            }
-            locator.setWidget($event.widget);
-            locator.setEnable(ctrl.isEnable());
-            locator.setVisible(ctrl.isVisible());
-            ctrl.activeBoundLocators++;
+            ctrl.updateBoundLocators();
         }
         
         // list widgets
