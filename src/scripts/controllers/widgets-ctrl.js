@@ -45,7 +45,6 @@ var WbAbstractWidget = function () {
 	// update style
 	if (model) {
 	    ctrl.loadStyle(model.style);
-	    ctrl.loadEvents(model.event);
 	    ctrl.loadSeo(model);
 	}
     }
@@ -208,6 +207,7 @@ WbAbstractWidget.prototype.getElement = function () {
     return this.$element;
 };
 
+
 /**
  * Call all callbacks on the given event type.
  * 
@@ -306,6 +306,7 @@ WbAbstractWidget.prototype.getDirection = function () {
 WbAbstractWidget.prototype.getModel = function () {
     return this.wbModel;
 };
+
 
 WbAbstractWidget.prototype.getEvent = function () {
     return this.wbModel.event;
