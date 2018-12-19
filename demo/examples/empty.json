@@ -9,9 +9,9 @@
 		"layout": {}
 	},
 	"event": {
-		"on-click":{},
-		"on-mouse-enter":{},
-		"on-mouse-exit":{}
+		"click":"",
+		"mouseover":"",
+		"mouseout":""
 	},
 	"contents": []
 }
