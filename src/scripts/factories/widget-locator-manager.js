@@ -98,7 +98,7 @@ angular
 
         this.selectionLocators = [];
         this.boundLocators = [];
-    }
+    };
 
     /**
      * Sets visibility of locators
@@ -129,7 +129,7 @@ angular
      */
     WidgetLocatorManager.prototype.isVisible = function () {
         return this.visible;
-    }
+    };
 
 
     WidgetLocatorManager.prototype.setEnable = function (enable) {
@@ -141,17 +141,17 @@ angular
             this.updateSelectionLocators();
             this.updateBoundLocators();
         }
-    }
+    };
 
     WidgetLocatorManager.prototype.isEnable = function () {
         return this.enable;
-    }
+    };
 
     /**
      * Sets widgets which are selected
      * 
      * @param widgets
-     *            {Array of WbWidgetCtr} which are selected
+     *            {WbWidgetCtr} which are selected
      * @memberof CursorWidgetLocator
      */
     WidgetLocatorManager.prototype.setSelectedWidgets = function (widgets) {
@@ -164,7 +164,7 @@ angular
         if (this.isEnable()) {
             this.updateSelectionLocators();
         }
-    }
+    };
 
     /**
      * Gets selected widgets
@@ -174,7 +174,7 @@ angular
      */
     WidgetLocatorManager.prototype.getSelectedWidgets = function () {
         return this.selectedWidgets || [];
-    }
+    };
 
     /**
      * Sets the root widget
@@ -209,7 +209,7 @@ angular
         if (this.isEnable()) {
             this.updateBoundLocators();
         }
-    }
+    };
 
     /**
      * Gets the root widget
@@ -219,7 +219,7 @@ angular
      */
     WidgetLocatorManager.prototype.getRootWidget = function () {
         return this.rootWidget;
-    }
+    };
 
     WidgetLocatorManager.prototype.updateSelectionLocators = function () {
         var widgets = this.getSelectedWidgets();
@@ -244,7 +244,8 @@ angular
             locator.setWidget(widgets[i]);
             locator.setVisible(this.visible);
         }
-    }
+    };
+    
     /**
      * Update all locators
      * 
