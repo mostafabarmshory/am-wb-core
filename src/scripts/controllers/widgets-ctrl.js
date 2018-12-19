@@ -725,6 +725,9 @@ WbWidgetGroupCtrl.prototype.addChild = function (index, item) {
 
 		// init the widget
 		newWidget.setEditable(ctrl.isEditable());
+		ctrl.fire('newchild', {
+		    widget: newWidget
+		});
 	    });
     // TODO: replace with promise
     return true;

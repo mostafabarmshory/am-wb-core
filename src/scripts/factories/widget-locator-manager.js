@@ -154,8 +154,12 @@ angular
      *            {Array of WbWidgetCtr} which are selected
      * @memberof CursorWidgetLocator
      */
-    WidgetLocatorManager.prototype.setSelectedWidgets = function (
-            widgets) {
+    WidgetLocatorManager.prototype.setSelectedWidgets = function (widgets) {
+        var rootWidget = this.getRootWidget();
+        if(!rootWidget && widgets.length){
+            rootWidget = widgets[0].getRoot();
+            this.setRootWidget(rootWidget);
+        }
         this.selectedWidgets = widgets;
         if (this.isEnable()) {
             this.updateSelectionLocators();

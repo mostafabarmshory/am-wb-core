@@ -53,22 +53,11 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
         $scope.model = $wbUtil.clean(res.data);
     });
     
-//    $scope.widgetUnderCursor = function($event){
-//    	widgetLocator.setCursorWidget($event.widget);
-//    };
-
     // load setting of model
     $scope.loadSettings = function($event){
+        widgetLocator.setSelectedWidgets($event.widgets || []);
+        // TODO: maso, 2018: support list of widget in settings too
         var widgets = $event.widgets;
-        
-        // set root widget
-        if(ctrl.rootWidget === null && widgets.length) {
-            ctrl.rootWidget = widgets[0].getRoot();
-            widgetLocator.setRootWidget(ctrl.rootWidget);
-            return;
-        }
-        
-        widgetLocator.setSelectedWidgets(widgets);
         if(widgets.length) {
             var widget =  widgets[0];
             $scope.selectedWidget = widget;
