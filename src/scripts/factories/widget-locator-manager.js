@@ -184,7 +184,28 @@ angular
      * @memberof WidgetLocatorManager
      */
     WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {
+        if(!this.mutationObserver){
+            var ctrl = this;
+            this.mutationObserver = new MutationObserver(function(){
+                if(!ctrl.isEnable()){
+                    return;
+                }
+                ctrl.updateSelectionLocators();
+                ctrl.updateBoundLocators();
+            });
+        }
+        if(this.rootWidget) {
+            this.mutationObserver.disconnect(this.rootWidget.getElement()[0]);
+        }
         this.rootWidget = rootWidget;
+        if(this.rootWidget) {
+            this.mutationObserver.observe(this.rootWidget.getElement()[0], {
+                attributes:    true,
+                childList: true,
+                subtree: true
+//                attributeFilter: ["style"]
+            });
+        }
         if (this.isEnable()) {
             this.updateBoundLocators();
         }
