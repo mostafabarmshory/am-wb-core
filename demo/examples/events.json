@@ -1,0 +1,22 @@
+{
+    "type": "Group",
+    "name": "Group main",
+    "style": {
+        "margin": "60px"
+    },
+    "contents": [
+        {
+            "type": "HtmlText",
+            "name": "Widget",
+            "text": "<h2>HTML Text In 4th group0</h2>",
+            "style": {
+                "margin": "60px"
+            },
+            "event": {
+                "click": "alert('Wow!! Click event');",
+                "mouseover": {},
+                "mouseout": "alert('Mouse out');"
+            }
+        }
+    ]
+}

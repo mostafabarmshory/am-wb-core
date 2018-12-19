@@ -29,6 +29,8 @@ var WbAbstractWidget = function () {
     this.childWidgets = [];
     this.$scope = null;
     this.$element = null;
+    this.eventFunctions = {};
+
 
     /*
      * Update view based on new model
@@ -36,7 +38,6 @@ var WbAbstractWidget = function () {
     function updateView($event) {
 	var ctrl = $event.source;
 	var model = ctrl.getModel();
-	var $element = ctrl.getElement();
 
 	// to support old widget
 	ctrl.getScope().wbModel = model;
@@ -52,19 +53,30 @@ var WbAbstractWidget = function () {
     this.on('modelChanged', updateView);
     this.on('modelUpdate', updateView);
 
-    this.clickListener = function ($event) {
-	if (this.isEditable()) {
-	    this.setSelected(true);
-	} else {
-	    //evalWidgetEvent('click', $event);
+    var ctrl = this;
+    this.eventListeners = {
+	click: function ($event) {
+	    if (ctrl.isEditable()) {
+		ctrl.setSelected(true);
+	    } else {
+		ctrl.evalWidgetEvent('click', $event);
+	    }
+	    ctrl.fire('click', $event);
+	},
+
+	mouseout: function ($event) {
+	    ctrl.fire('mouseout', $event);
+	    if (!ctrl.isEditable()) {
+		ctrl.evalWidgetEvent('mouseout', $event);
+	    }
+	},
+	mouseover: function ($event) {
+	    ctrl.fire('mouseover', $event);
+	    if (!ctrl.isEditable()) {
+		ctrl.evalWidgetEvent('mouseover', $event);
+	    }
 	}
-	this.fire('click', $event);
     };
-
-    this.mousemoveListener = function ($event) {
-	this.fire('mousemove', $event);
-    };
-
 };
 
 /**
@@ -125,32 +137,22 @@ WbAbstractWidget.prototype.loadStyle = function (style) {
  *            {object} part of the widget data model
  * @memberof WbAbstractWidget
  */
-WbAbstractWidget.prototype.loadEvents = function (event) {
-    var ctrl = this;
-    var $element = this.getElement();
-    var $http = this.$http;
-    if (!angular.isDefined(event)) {
-	return;
+WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
+    var eventFunction;
+    if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
+	var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2];' + this.getEvent()[type];
+	this.eventFunctions[type] = new Function(body);
     }
-    var eventFuncs = {};
-
-    if (event.onClick) {
-	var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2];' + event.onClick;
-	eventFuncs.onClick = new Function(body);
+    eventFunction = this.eventFunctions[type];
+    if (eventFunction) {
+	var $http = this.$http;
+	var ctrl = this;
+	eventFunction(event, ctrl, {
+	    post: function (url, obj) {
+		return $http.post(url, obj);
+	    }
+	});
     }
-
-    $element.on('click', function (event) {
-	if (ctrl.isEditable()) {
-	    return;
-	}
-	if (eventFuncs.onClick) {
-	    eventFuncs.onClick(event, ctrl, {
-		post: function (url, obj) {
-		    return $http.post(url, obj);
-		}
-	    });
-	}
-    });
 };
 
 /**
@@ -187,10 +189,9 @@ WbAbstractWidget.prototype.disconnect = function () {
     if (!$element) {
 	return;
     }
-    $element.off('click', this.clickListener);
-    $element.off('mousemove', this.mousemoveListenter);
-    $element.off('mouseout', this.mouseoutListenter);
-    $element.off('mouseover', this.mouseoverListenter);
+    angular.forEach(this.eventListeners, function (listener, key) {
+	$element.off(key, listener);
+    });
 };
 
 WbAbstractWidget.prototype.connect = function () {
@@ -198,10 +199,9 @@ WbAbstractWidget.prototype.connect = function () {
     if (!$element) {
 	return;
     }
-    $element.on('click', this.clickListener);
-//    $element.on('unselect');
-//    $element.on('delete');
-//    $element.on('newchild');
+    angular.forEach(this.eventListeners, function (listener, key) {
+	$element.on(key, listener);
+    });
 };
 
 WbAbstractWidget.prototype.getElement = function () {
@@ -243,10 +243,8 @@ WbAbstractWidget.prototype.fire = function (type, params) {
 /**
  * Adds new callback of type
  * 
- * @param type
- *            of the event
- * @param callback
- *            to call on the event
+ * @param typeof the event
+ * @param callback to call on the event
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.on = function (type, callback) {
@@ -308,6 +306,11 @@ WbAbstractWidget.prototype.getDirection = function () {
 WbAbstractWidget.prototype.getModel = function () {
     return this.wbModel;
 };
+
+WbAbstractWidget.prototype.getEvent = function () {
+    return this.wbModel.event;
+};
+
 
 WbAbstractWidget.prototype.getTitle = function () {
     return this.wbModel.label;

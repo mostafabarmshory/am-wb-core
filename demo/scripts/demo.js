@@ -47,7 +47,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
     this.widgetLocator = widgetLocator;
     
     
-    $http.get('examples/html.json')
+    $http.get('examples/events.json')
     .then(function(res) {
         // NOTE: maso, 2018: clean data model
         $scope.model = $wbUtil.clean(res.data);
@@ -62,7 +62,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
         var widgets = $event.widgets;
         
         // set root widget
-        if(ctrl.rootWidget == null && widgets.length) {
+        if(ctrl.rootWidget === null && widgets.length) {
             ctrl.rootWidget = widgets[0].getRoot();
             widgetLocator.setRootWidget(ctrl.rootWidget);
             return;
