@@ -59,6 +59,7 @@ var WbAbstractWidget = function () {
 	click: function ($event) {
 	    if (ctrl.isEditable()) {
 		ctrl.setSelected(true);
+		$event.stopPropagation();
 	    } else {
 		ctrl.evalWidgetEvent('click', $event);
 	    }

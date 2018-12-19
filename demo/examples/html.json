@@ -3,7 +3,7 @@
 	"name": "Root",
 	"style": {
 		"layout": {
-			"direction": "row"
+			"direction": "column"
 		}
 	},
 	"contents": [
