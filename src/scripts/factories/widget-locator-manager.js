@@ -241,15 +241,16 @@ angular
         var ctrl = this;
         function newLocator($event){
             var locator;
-            if(ctrl.boundLocators.length > this.activeBoundLocators){
-                locator = ctrl.boundLocators[this.activeBoundLocators];
+            if(ctrl.boundLocators.length > ctrl.activeBoundLocators){
+                locator = ctrl.boundLocators[ctrl.activeBoundLocators];
             } else {
                 locator = new ctrl.BoundLocator(ctrl.BoundLocatorOption);
+                ctrl.boundLocators.push(locator);
             }
             locator.setWidget($event.widget);
             locator.setEnable(ctrl.isEnable());
             locator.setVisible(ctrl.isVisible());
-            this.activeBoundLocators++;
+            ctrl.activeBoundLocators++;
         }
         
         // list widgets
@@ -258,6 +259,7 @@ angular
             return;
         }
         widgets = $widget.getChildren(rootWidget);
+        widgets.push(rootWidget);
         this.activeBoundLocators = widgets.length;
         
         // disable extra
