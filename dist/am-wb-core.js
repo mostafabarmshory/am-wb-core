@@ -3625,7 +3625,7 @@ angular.module('am-wb-core')//
  * example it is used to show widget actions on the fly.
  * 
  */
-.factory('SelectionWidgetLocator', function (AbstractWidgetLocator) {
+.factory('SelectionWidgetLocator', function (AbstractWidgetLocator, $document) {
 
     var selectionWidgetLocator = function (options) {
         options = options || {};
@@ -3662,14 +3662,11 @@ angular.module('am-wb-core')//
         
         
         
-
-        function bindToElement(bound) {
-            button.css('left', bound.left + bound.width - 15 + 'px');
-            button.css('top', bound.top + bound.height - 16 + 'px');
-
-            optionButton.css('left', bound.left + 'px');
-            optionButton.css('top', bound.top + 'px');
-        }
+        var position = {};
+        var lock = false;
+        var dimension = {};
+        var ctrl = this;
+        
 
         function mousemove($event) {
             var deltaWidth = dimension.width - (position.x - $event.clientX);
@@ -3678,15 +3675,20 @@ angular.module('am-wb-core')//
                     width: deltaWidth + 'px',
                     height: deltaHeight + 'px'
             };
-            if ($scope.wbModel.style.size.height === 'auto') {
+            
+            var widget = ctrl.getWidget();
+            var model = widget.getModel();
+            var $element = widget.getElement();
+            var $scope = widget.getScope();
+            
+            if (model.style.size.height === 'auto') {
                 newDimensions.height = 'auto';
             }
             $element.css(newDimensions);
-            if ($scope.wbModel) {
-                $scope.wbModel.style.size.width = newDimensions.width;
-                $scope.wbModel.style.size.height = newDimensions.height;
-            }
-            bindToElement(getBound());
+            
+            model.style.size.width = newDimensions.width;
+            model.style.size.height = newDimensions.height;
+
             $scope.$apply();
             return false;
         }
@@ -3702,6 +3704,7 @@ angular.module('am-wb-core')//
             position.x = $event.clientX;
             position.y = $event.clientY;
             lock = true;
+            var $element = ctrl.getWidget().getElement();
             dimension.width = $element.prop('offsetWidth');
             dimension.height = $element.prop('offsetHeight');
             $document.bind('mousemove', mousemove);
@@ -3752,9 +3755,9 @@ angular.module('am-wb-core')//
         
         
         this.sizeElement.css({
-            top: bound.top + bound.height - 5,
-            left: bound.left + bound.width - 5,
-        });
+            top: bound.top + bound.height - 7,
+            left: bound.left + bound.width - 7 ,
+        })
     };
     return selectionWidgetLocator;
 });
