@@ -53,49 +53,31 @@ angular.module('am-wb-core')//
                 ctrl.setWidget(null);
                 ctrl.fire('widgetDeleted', $event);
             },
-            'select' : function () {
+            'select' : function ($event) {
                 ctrl.addClass('selected');
                 ctrl.removeClass('mouseover');
                 ctrl.fire('widgetSelected', $event);
             },
-            'unselect' : function () {
+            'unselect' : function ($event) {
                 ctrl.removeClass('selected');
                 if (ctrl.mouseover) {
                     ctrl.addClass('mouseover');
                 }
                 ctrl.fire('widgetMouseover', $event);
             },
-            'mouseover' : function () {
+            'mouseover' : function ($event) {
                 ctrl.addClass('mouseover');
                 ctrl.mouseover = true;
                 ctrl.fire('widgetMouseover', $event)
             },
-            'mouseout' : function () {
+            'mouseout' : function ($event) {
                 ctrl.addClass('mouseout');
                 ctrl.mouseover = false;
                 ctrl.fire('widgetMouseout', $event)
             }
         };
     }
-    ;
 
-    /**
-     * Set the locator visible
-     * 
-     * @param visible
-     *            {boolean} the visibility of the page
-     * @memberof AbstractWidgetLocator
-     */
-    abstractWidgetLocator.prototype.setVisible = function (visible) {
-        this.visible = visible;
-        if (visible) {
-            this.show();
-            this.fire('show');
-        } else {
-            this.hide();
-            this.fire('hide');
-        }
-    };
 
     /**
      * Checks if the locator is visible
@@ -157,9 +139,23 @@ angular.module('am-wb-core')//
         this.setVisible(true);
     }
 
+
+    /**
+     * Set the locator visible
+     * 
+     * @param visible
+     *            {boolean} the visibility of the page
+     * @memberof AbstractWidgetLocator
+     */
     abstractWidgetLocator.prototype.setVisible = function (visible) {
         this.visible = visible;
         visible = this.visible && this.enable;
+        if (visible) {
+            this.updateView(this.getWidget().getBoundingClientRect());
+            this.fire('show');
+        } else {
+            this.fire('hide');
+        }
         angular.forEach(this.elements, function (element) {
             if (visible) {
                 element.show();
@@ -240,7 +236,7 @@ angular.module('am-wb-core')//
         // add listener
         this.observedWidgets.push(widget);
         angular.forEach(this.widgetListeners, function (listener, type) {
-            widget.off(type, listener);
+            widget.on(type, listener);
         });
         this.updateView(widget.getBoundingClientRect());
     };
