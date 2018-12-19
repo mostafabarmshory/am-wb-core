@@ -58,7 +58,7 @@ var WbAbstractWidget = function () {
     this.eventListeners = {
 	click: function ($event) {
 	    if (ctrl.isEditable()) {
-		ctrl.setSelected(true);
+		ctrl.setSelected(true, $event);
 		$event.stopPropagation();
 	    } else {
 		ctrl.evalWidgetEvent('click', $event);
@@ -384,7 +384,6 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
 	return;
     }
     this.editable = editable;
-    var $element = this.getElement();
     if (this.isRoot()) {
 	delete this.lastSelectedItem;
 	this.setSelected(true);
@@ -503,7 +502,10 @@ WbAbstractWidget.prototype.setSelected = function (flag, $event) {
     if (this.isRoot()) {
 	return;
     }
-
+    if (this.selected === flag) {
+	return;
+    }
+    
     // fire events
     this.selected = flag;
     if (flag) {
@@ -674,16 +676,23 @@ WbWidgetGroupCtrl.prototype.childSelected = function (ctrl, $event) {
     if (!this.isRoot()) {
 	return this.getParent().childSelected(ctrl, $event);
     }
-    if (this.lastSelectedItem) {
-	this.lastSelectedItem.setSelected(false);
+    $event = $event || {};
+    if (!$event.shiftKey) {
+	angular.forEach(this.lastSelectedItems, function (widget) {
+	    widget.setSelected(false);
+	});
+	this.lastSelectedItems = [];
     }
-    if (ctrl === this.lastSelectedItem) {
+    
+    if (this.lastSelectedItems.indexOf(ctrl) >= 0) {
 	return;
     }
-    this.lastSelectedItem = ctrl;
+    
+    this.lastSelectedItems.push(ctrl);
+    
     // maso, 2018: call the parent controller function
     this.fire('select', {
-	widgets: ctrl ? [ctrl] : []
+	widgets: this.lastSelectedItems
     });
 };
 
