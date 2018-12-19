@@ -17,8 +17,9 @@ Here, There is an example shows how the events are stored in model:
     {
         "type": "Group", // or every widget
         "event": {
-            "onClick": "write code here",
-            "onMouseOut": "write code here"
+            "click": "write code here",
+            "mouseout": "write code here",
+            "mouseover": "write code here"
         } 
     }
 
@@ -28,7 +29,6 @@ Here, There is an example shows how the events are stored in model:
 The following events are supported and available to the user.
 
 - click : The event occurs when the user clicks on an element.
-- mousemove: The event occurs when the pointer is moving while it is over an element.
 - mouseout : The event occurs when a user moves the mouse pointer out of an element, or out of one of its children.
 - mouseover: The event occurs when the pointer is moved onto an element, or onto one of its children.
 

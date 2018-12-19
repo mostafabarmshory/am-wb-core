@@ -36,7 +36,7 @@
 										"margin": "60px"
 									},
 									"event": {
-										"onClick": "alert('Wow!! Click event:' + ($widget || 'not found')); $widget.destroy();"
+										"click": "alert('Wow!! Click event');"
 									}
 								}
 							]
