@@ -1,0 +1,15 @@
+<!--selfAlign--> 
+<wb-ui-setting-choose
+    ng-if="ctrl.parentDirection==='row'"
+    title="Self Vert."
+    items="ctrl.selfAlign_['row']" 
+    ng-model="ctrl.alignSelf"
+    ng-change="ctrl.alignSelfChanged()"> 
+</wb-ui-setting-choose>
+<wb-ui-setting-choose
+    ng-if="ctrl.parentDirection==='column'"
+    title="Self Vert."
+    items="ctrl.selfAlign_['column']" 
+    ng-model="ctrl.alignSelf"
+    ng-change="ctrl.alignSelfChanged()"> 
+</wb-ui-setting-choose>

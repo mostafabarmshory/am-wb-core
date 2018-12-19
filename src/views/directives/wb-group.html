@@ -14,25 +14,7 @@
 	dnd-list="wbModel.contents"
 	dnd-allowed-types="ctrl.getAllowedTypes()"
 	dnd-external-sources="true"
-	dnd-drop="dropCallback(index, item, external, type)"
+	dnd-drop="ctrl.addChild(index, item)"
 	dnd-horizontal-list="wbModel.style.layout.direction==='row'"
-	
-	wb-size="wbModel.style"
-	wb-layout="wbModel.style"
-	wb-align="wbModel.style"
-	wb-margin="wbModel.style"
-	wb-padding="wbModel.style"
-	wb-background="wbModel.style"
-	wb-border="wbModel.style"
-	wb-shadows="wbModel.style"
-	wb-color="wbModel.style"
-	wb-cursor="wbModel.style"
-	wb-opacity="wbModel.style"
-	wb-events="wbModel.event"
-	
-	ng-class="{
-		'wb-group-root': ctrl.isRoot(),
-		'wb-group-edit': ctrl.isEditable(),
-		'wb-group-select': ctrl.isSelected()
-	}"
+
 	md-theme-watch="true"></div>

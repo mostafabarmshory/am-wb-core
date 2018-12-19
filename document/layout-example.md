@@ -1,17 +1,38 @@
-Let's start with a very very simple example, solving an almost daily problem: perfect centering. It couldn't be any simpler if you use flexbox.
+Let's start with a very very simple example, solving an almost daily problem: perfect centering. It couldn't be any simpler if you use group.
 
-	.parent {
-	  display: flex;
-	  height: 300px; /* Or whatever */
+
+	{
+		"type":"Group",
+		"style":{
+			"layout":{
+				"direction": "column"
+			}
+		},
+		"contents":[{
+			"type": "HtmlText",
+			"text": "Center!?",
+			"style": {
+				"margin": "auto",
+				"size":{
+					"width": "100px",
+					"height": "100px"
+				}
+			}
+		}]
 	}
 
-	.child {
-	  width: 100px;  /* Or whatever */
-	  height: 100px; /* Or whatever */
-	  margin: auto;  /* Magic! */
-	}
+<!-- Here is replacement in CSS -->
+<!-- 	.parent { -->
+<!-- 	  display: flex; -->
+<!-- 	  height: 300px; /* Or whatever */ -->
+<!-- 	} -->
+<!-- 	.child { -->
+<!-- 	  width: 100px;  /* Or whatever */ -->
+<!-- 	  height: 100px; /* Or whatever */ -->
+<!-- 	  margin: auto;  /* Magic! */ -->
+<!-- 	}  -->
 
-This relies on the fact a margin set to `auto` in a flex container absorb extra space. So setting a vertical margin of auto will make the item perfectly centered in both axis.
+This relies on the fact a margin set to `auto` in a group absorb extra space. So setting a vertical margin of auto will make the item perfectly centered in both axis.
 
 Now let's use some more properties. Consider a list of 6 items, all with a fixed dimensions in a matter of aesthetics but they could be auto-sized. We want them to be evenly and nicely distributed on the horizontal axis so that when we resize the browser, everything is fine (without media queries!).
 

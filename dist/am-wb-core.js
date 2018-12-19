@@ -149,1256 +149,794 @@ angular.module('am-wb-core')
  */
 'use strict';
 
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-background
- * @description Apply background into the element
- */
-.directive('wbBackground', function() {
-	/*
-	 * Sets background attributes into element
-	 * 
-	 */
-	function setBackgroud($element, style){
-		if (!style) {
-			return;
-		}
-		var cssValue = {};
-		if(style.background){
-			cssValue.background = style.background;
-		}
-		cssValue['background-image'] = (style.image) ? 'url(\''+style.image+'\')' : 'none';
-		cssValue['background-color'] = style.color || 'initial';
-		cssValue['background-size'] = style.size || 'auto';
-		cssValue['background-repeat'] = style.repeat || 'repeat';
-		cssValue['background-position'] = style.position || '0px 0px';
-		cssValue['background-attachment'] = style.attachment || 'scroll';
-		cssValue['background-origin'] = style.origin || 'padding-box';
-		cssValue['background-clip'] = style.clip || 'border-box';
-		
-		$element.css(cssValue);
-	}
+var WbAbstractWidget = function () {
+    this.actions = [];
+    this.callbacks = [];
+    this.childWidgets = [];
+    this.$scope = null;
+    this.$element = null;
+    this.eventFunctions = {};
+    this.dynamicStyle = {};
 
-	function postLink($scope, $element, $attrs) {
-		return $scope.$watch($attrs.wbBackground + '.background', function(config){
-			return setBackgroud($element, config);
-		}, true);
-	}
-
-	return {
-		restrict : 'A',
-		link : postLink
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-border
- * @description Apply border into the element
- * 
- * Following attributes from CSS is set:
- * <ul>
- * <li>border-style from style</li>
- * <li>border-width from width</li>
- * <li>border-color from color</li>
- * <li>border-radius from radius</li>
- * </ul>
- * 
- * CSS model from CSS3 is accepted as standard
- * 
- * <pre><code>
- * 	{
- * 		style: solid,
- * 		width: 2px,
- * 		color: lightgrey,
- * 		radius: 5px
- * 	}
- * </code></pre>
- * 
- * @see https://www.w3schools.com/css/css_border.asp
- */
-.directive('wbBorder', function() {
-	return {
-		restrict : 'A',
-		link : function($scope, $element, $attrs) {
-			$scope.$watch($attrs.wbBorder + '.border', function(style) {
-				if (!style) {
-					return;
-				}
-				var conf = {};
-				if (style.style) {
-					conf['border-style'] = style.style;
-				}
-				if (style.width) {
-					conf['border-width'] = style.width;
-				}
-				if (style.color) {
-					conf['border-color'] = style.color;
-				}
-				if (style.radius) {
-					conf['border-radius'] = style.radius;
-				}
-				$element.css(conf);
-			}, true);
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-        /**
-         * @ngdoc Directives
-         * @name wb-color
-         * @description Apply color into the element
-         */
-        .directive('wbColor', function () {
-            return {
-                restrict: 'A',
-                link: function (scope, element, attributes) {
-                    return scope.$watch(attributes.wbColor, function (style) {
-                        var color = '';
-
-                        if (!style) {
-                            return;
-                        } else if (!style.color) {
-                            color = 'initial';
-                        } else {
-                            color = style.color;
-                        }
-
-                        element.css('color', color);
-
-                    }, true);
-                }
-            };
-        });
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-        /**
-         * @ngdoc Directives
-         * @name wb-cursor
-         * @description Apply cursor into the element
-         */
-        .directive('wbCursor', function () {
-            return {
-                restrict: 'A',
-                link: function (scope, element, attributes) {
-                    return scope.$watch(attributes.wbCursor, function (style) {
-                        var cursor = '';
-
-                        if (!style) {
-                            return;
-                        } else if (!style.cursor) {
-                            cursor = 'auto';
-                        } else {
-                            cursor = style.cursor;
-                        }
-
-                        element.css('cursor', cursor);
-
-                    }, true);
-                }
-            };
-        });
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-events
- * @description Applies events to the current element
- * 
- * If there is an event section in the data model, then this directive parses
- * and applies to the current element.
- * 
- * 	<div
- * 		wb-events="events">
- * 	</div>
- */
-.directive('wbEvents', function() {
-	function postLink($scope, $element, $attrs, $ctrls) {
-		// load ctrl
-		var ctrl = $ctrls[0] || $ctrls[1];
-
-		$element.on('click', function (event) {
-			// Check edit mode
-			if(ctrl && ctrl.isEditable()){
-				ctrl.setSelected(true);
-				event.stopPropagation();
-				$scope.$apply();
-				return;
-			}
-			// TODO: maso, 2018: do actions
-		});
-	}
-	return {
-		restrict : 'A',
-		link : postLink,
-		require:['?wbWidget', '?wbGroup']
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-	/**
-	 * @ngdoc Directives
-	 * @name wb-layout
-	 * @description Apply layout into an element
-	 * 
-	 * Group and page are the main goles of this directive. By adding the wbLayout,
-	 * widget are able to manages it layout automatically.
-	 * 
-	 * Note that, in smal screen devices, the colume layout apply as default.
-	 */
-	.directive('wbLayout', function ($mdMedia) {
-
-	    /**
-	     * Adds layout config into the element
-	     * 
-	     * @param element
-	     * @param layout
-	     * @returns
-	     */
-	    function applyLayout(element, layout) {
-		var flexLayout = {};
-
-		/*
-		 * Group
-		 * 
-		 * check if is group apply flex flow
-		 */
-		{
-
-		    flexLayout.display = 'flex';
-		    // row
-		    if (layout.direction === 'row' && $mdMedia('gt-sm')) {
-			flexLayout['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
-			flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
-			flexLayout['overflow-y'] = 'visible';
-		    } else {
-			flexLayout['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
-			flexLayout['overflow-x'] = 'visible';
-			flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
-		    }
-
-
-		    // wrap
-		    if (layout.wrap) {
-			flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
-			// wrap align
-			var alignContent;
-			switch (layout.wrap_align) {
-			    case 'start':
-				alignContent = 'flex-start';
-				break;
-			    case 'end':
-				alignContent = 'flex-end';
-				break;
-			    case 'center':
-				alignContent = 'center';
-				break;
-			    case 'space-between':
-				alignContent = 'space-between';
-				break;
-			    case 'space-around':
-				alignContent = 'space-around';
-				break;
-			    case 'stretch':
-				alignContent = 'stretch';
-				break;
-			    default:
-				alignContent = 'stretch';
-			}
-			flexLayout['align-content'] = alignContent;
-		    } else {
-			flexLayout['flex-wrap'] = 'nowrap';
-		    }
-
-
-		    // justify
-		    var justify;
-		    switch (layout.justify) {
-			case 'start':
-			    justify = 'flex-start';
-			    break;
-			case 'end':
-			    justify = 'flex-end';
-			    break;
-			case 'center':
-			    justify = 'center';
-			    break;
-			case 'space-between':
-			    justify = 'space-between';
-			    break;
-			case 'space-around':
-			    justify = 'space-around';
-			    break;
-			case 'space-evenly':
-			    justify = 'space-evenly';
-			    break;
-			default:
-			    justify = 'flex-start';
-		    }
-		    flexLayout['justify-content'] = justify;
-
-		    // align
-		    var align;
-		    switch (layout.align) {
-			case 'start':
-			    align = 'flex-start';
-			    break;
-			case 'end':
-			    align = 'flex-end';
-			    break;
-			case 'center':
-			    align = 'center';
-			    break;
-			case 'baseline':
-			    align = 'baseline';
-			    break;
-			case 'stretch':
-			    align = 'stretch';
-			    break;
-			default:
-			    align = 'stretch';
-		    }
-		    flexLayout['align-items'] = align;
-		}
-
-		/*
-		 * Widget
-		 */
-		{
-		    flexLayout.order = layout.order >= 0 ? layout.order : 0;
-		    flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
-		    flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
-		    // TODO: maso, 2018: compute based on size
-		    flexLayout['flex-basis'] = 'auto';
-
-		    // align-self
-		    // auto | flex-start | flex-end | center | baseline | stretch;
-		    var alignSelf;
-		    switch (layout.align_self) {
-			case 'start':
-			    alignSelf = 'flex-start';
-			    break;
-			case 'end':
-			    alignSelf = 'flex-end';
-			    break;
-			case 'center':
-			    alignSelf = 'center';
-			    break;
-			case 'baseline':
-			    alignSelf = 'baseline';
-			    break;
-			case 'stretch':
-			    alignSelf = 'stretch';
-			    break;
-			default:
-			    alignSelf = 'auto';
-		    }
-		    flexLayout['align-self'] = alignSelf;
-		}
-
-		// apply to element
-		element.css(flexLayout);
-	    }
-
-	    /**
-	     * Link view with attributes
-	     * 
-	     * 
-	     * @param scope
-	     * @param element
-	     * @param attrs
-	     * @returns
-	     */
-	    function postLink($scope, $element, $attrs) {
-		// Watch for layout
-		var layoutData = null;
-		$scope.$watch($attrs.wbLayout + '.layout', function (layout) {
-		    if (layout) {
-			layoutData = layout;
-			applyLayout($element, layoutData);
-		    }
-		}, true);
-		
-		//Watch for media size
-		$scope.$watch (function () {
-		    return ($mdMedia('gt-sm'));
-		}, function () {
-		    if (layoutData) {
-			applyLayout($element, layoutData);
-		    }
-		});
-	    }
-
-	    /*
-	     * Directive
-	     */
-	    return {
-		restrict: 'A',
-		link: postLink,
-		require: []
-	    };
-	});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-margin
- * @description Apply margin into the element
- */
-.directive('wbMargin', function() {
-	return {
-		restrict : 'A',
-		link : function(scope, element, attributes) {
-			return scope.$watch(attributes.wbMargin, function(style) {
-				if (!style) {
-					return;
-				}
-				if (style.margin) {
-					element.css('margin', style.margin);
-				}
-			}, true);
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-        /**
-         * @ngdoc Directives
-         * @name wb-opacity
-         * @description Apply opacity into the element
-         */
-        .directive('wbOpacity', function () {
-            return {
-                restrict: 'A',
-                link: function (scope, element, attributes) {
-                    return scope.$watch(attributes.wbOpacity, function (style) {
-                        var opacity = '';
-
-                        if (!style) {
-                            return;
-                        } else if (!style.opacity) {
-                            opacity = '1';
-                        } else {
-                            opacity = style.opacity;
-                        }
-
-                        element.css('opacity', opacity);
-
-                    }, true);
-                }
-            };
-        });
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-padding
- * @description Apply padding into the element
- */
-.directive('wbPadding', function() {
-	return {
-		restrict : 'A',
-		link : function(scope, element, attributes) {
-			return scope.$watch(attributes.wbPadding, function(style) {
-				if (!style) {
-					return;
-				}
-				if (style.padding) {
-					element.css('padding', style.padding);
-				}
-			}, true);
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-        /**
-         * @ngdoc Directives
-         * @name wb-shadows
-         * @description Apply shadow into the element
-         */
-        .directive('wbShadows', function () {
-            return {
-                restrict: 'A',
-                link: function (scope, element, attributes) {
-                    return scope.$watch(attributes.wbShadows, function (style) {
-                        var shadowStr = '';
-
-                        if (!style || !angular.isArray(style.shadows) || style.shadows.length === 0) {
-                            shadowStr = 'none';
-                        } else {
-                            angular.forEach(style.shadows, function (shadow, index) {
-                                shadowStr += createShadowStr(shadow);
-                                if(index + 1 < style.shadows.length){
-                                    shadowStr += ', ';
-                                }
-                            });
-                        }
-
-                        function createShadowStr(shadow) {
-
-                            var hShift = shadow.hShift || '0px';
-                            var vShift = shadow.vShift || '0px';
-                            var blur = shadow.blur || '0px';
-                            var spread = shadow.spread || '0px';
-                            var color = shadow.color || 'black';
-                            
-                            var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
-                            
-                            if(shadow.inset) {
-                                boxShadow = boxShadow.concat(' ' + 'inset');
-                            }
-                            
-                            return boxShadow;
-                        }
-
-                        element.css('box-shadow', shadowStr);
-
-                    }, true);
-                }
-            };
-        });
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-	/**
-	 * @ngdoc Directives
-	 * @name wb-size
-	 * @description Apply margin into the element
-	 */
-	.directive('wbSize', function ($q, $wbUtil, $rootElement, $document, $compile, $mdMedia) {
-
-	    function postLink($scope, $element, $attrs, $ctrls) {
-		var button;
-		var optionButton;
-		var dimension = {};
-		var position = {};
-		var lock = false;
-		var watchSelection = null;
-		var watchSize = null;
-		var watchMedia = null;
-		var localSize = null;
-
-		// main ctrl
-		var ctrl = $ctrls[0];
-
-
-		function isRoot() {
-		    return ctrl.isRoot();
-		}
-
-		function distroy() {
-		    watchSize();
-		    watchSelection();
-
-		    if (button) {
-			button.remove();
-		    }
-		    if (optionButton) {
-			optionButton.remove();
-		    }
-		}
-
-		function getBound() {
-		    var off = $element.offset();
-		    return {
-			left: off.left,
-			top: off.top,
-			width: $element.innerWidth(),
-			height: $element.innerHeight()
-		    };
-		}
-
-		function bindToElement(bound) {
-		    button.css('left', bound.left + bound.width - 15 + 'px');
-		    button.css('top', bound.top + bound.height - 16 + 'px');
-
-		    optionButton.css('left', bound.left + 'px');
-		    optionButton.css('top', bound.top + 'px');
-		}
-
-		function mousemove($event) {
-		    var deltaWidth = dimension.width - (position.x - $event.clientX);
-		    var deltaHeight = dimension.height - (position.y - $event.clientY);
-		    var newDimensions = {
-			width: deltaWidth + 'px',
-			height: deltaHeight + 'px'
-		    };
-		    if ($scope.wbModel.style.size.height === 'auto') {
-			newDimensions.height = 'auto';
-		    }
-		    $element.css(newDimensions);
-		    if ($scope.wbModel) {
-			$scope.wbModel.style.size.width = newDimensions.width;
-			$scope.wbModel.style.size.height = newDimensions.height;
-		    }
-		    bindToElement(getBound());
-		    $scope.$apply();
-		    return false;
-		}
-
-		function mouseup() {
-		    $document.unbind('mousemove', mousemove);
-		    $document.unbind('mouseup', mouseup);
-		    lock = false;
-		}
-
-		function mousedown($event) {
-		    $event.stopImmediatePropagation();
-		    position.x = $event.clientX;
-		    position.y = $event.clientY;
-		    lock = true;
-		    dimension.width = $element.prop('offsetWidth');
-		    dimension.height = $element.prop('offsetHeight');
-		    $document.bind('mousemove', mousemove);
-		    $document.bind('mouseup', mouseup);
-		    return false;
-		}
-
-		function checkButton() {
-		    if (button) {
-			return $q.resolve();
-		    }
-		    button = angular.element('<span></span>');
-		    $rootElement.append(button);
-		    button.css({
-			width: '15px',
-			height: '15px',
-			position: 'absolute',
-			visibility: 'hidden',
-			cursor: 'nwse-resize'
-		    });
-		    button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-		    button.on('mousedown', mousedown);
-
-		    var oj = $wbUtil.getTemplateFor({
-			templateUrl: 'views/partials/wb-widget-options.html'
-		    }).then(function (template) {
-			optionButton = angular.element(template);
-			$rootElement.append(optionButton);
-			optionButton.css({
-			    position: 'absolute',
-			    visibility: 'hidden'
-			});
-			$compile(optionButton)($scope);
-			bindToElement(getBound());
-		    });
-
-		    return $q.all([oj]).then(function () {
-			$scope.$watch(getBound, function (bound) {
-			    if (!bound) {
-				return;
-			    }
-			    bindToElement(getBound());
-			}, true);
-
-		    });
-		}
-
-		function reloadSize () {
-		    var size = localSize;
-		    if (isRoot() || !size || lock) {
-			return;
-		    }
-		    //check screen size and do appropriate work related to mobile mode
-		    if (!$mdMedia('gt-sm')) {
-			$element.css({
-			    width: 'auto',
-			    height: 'auto',
-			    minWidth: 'auto',
-			    maxWidth: 'auto',
-			    minHeight: 'auto',
-			    maxHeight: 'auto'
-			});
-		    } else {
-			$element.css(size);
-		    }
-		    if (optionButton) {
-			bindToElement(getBound());
-		    }
-		}
-
-		// Watch size
-		watchSize = $scope.$watch($attrs.wbSize + '.size', function (size) {
-		    localSize = size;
-		    reloadSize();
-		}, true);
-		
-		watchMedia = $scope.$watch (function () {
-		   return ($mdMedia('gt-sm')); 
-		}, reloadSize);
-
-		ctrl.on('delete', distroy);
-		watchSelection = $scope.$watch(function () {
-		    return ctrl.isSelected();
-		}, function (value) {
-		    if (value) {
-			checkButton()
-				.then(function () {
-				    if (!isRoot()) {
-					button.css('visibility', 'visible');
-				    }
-				    optionButton.css('visibility', 'visible');
-				});
-		    } else {
-			if (optionButton) {
-			    button.css('visibility', 'hidden');
-			    optionButton.css('visibility', 'hidden');
-			}
-		    }
-		});
-	    }
-
-	    return {
-		restrict: 'A',
-		link: postLink,
-		priority: 1,
-		require: ['^wbGroup']
-	    };
-	});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-layout
- * @description Apply layout into an element
- * 
- * Group and page are the main goles of this directive. By adding the wbLayout,
- * widget are able to manages it layout automatically.
- * 
- * Note that, in smal screen devices, the colume layout apply as default.
- */
-.directive('wbWidgetLayout', function() {
-
-    /**
-     * Adds layout config into the element
-     * 
-     * @param element
-     * @param config
-     * @returns
-     */
-    function applyLayout(element, layout) {
-        var flexLayout = {};
-        /*
-         * Widget
-         */
-        flexLayout.order = layout.order >= 0? layout.order : 0;
-        flexLayout['flex-grow'] = layout.grow >= 0? layout.grow : 0;
-        flexLayout['flex-shrink'] = layout.shrink >= 0? layout.shrink : 1;
-        // TODO: maso, 2018: compute based on size
-        flexLayout['flex-basis'] = 'auto';
-
-        // align-self
-        // auto | flex-start | flex-end | center | baseline | stretch;
-        var alignSelf;
-        switch(layout.align_self){
-        case 'start':
-            alignSelf = 'flex-start';
-            break;
-        case 'end':
-            alignSelf = 'flex-end';
-            break;
-        case 'center':
-            alignSelf = 'center';
-            break;
-        case 'baseline':
-            alignSelf = 'baseline';
-            break;
-        case 'stretch':
-            alignSelf = 'stretch';
-            break;
-        default:
-            alignSelf = 'auto';
-        }
-        flexLayout['align-self']= alignSelf;
-
-        // apply to element
-        element.css(flexLayout);
-    }
-
-    /**
-     * Link view with attributes
-     * 
-     * 
-     * @param scope
-     * @param element
-     * @param attrs
-     * @returns
-     */
-    function postLink($scope, $element, $attrs) {
-        // Watch for layout
-        $scope.$watch($attrs.wbWidgetLayout+'.layout', function(layout) {
-            if(layout){
-                applyLayout($element, layout);
-            }
-        }, true);
-    }
 
     /*
-     * Directive
+     * Update view based on new model
      */
-    return {
-        restrict : 'A',
-        link : postLink,
-        require:[]
-    };
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
+    function updateView($event) {
+	var ctrl = $event.source;
+	var model = ctrl.getModel();
 
-angular.module('am-wb-core')
-	/**
-	 * @ngdoc Directives
-	 * @name wb-widget-size
-	 * @description Apply margin into the element
-	 */
-	.directive('wbWidgetSize', function ($q, $wbUtil, $rootElement, $document, $compile) {
+	// to support old widget
+	ctrl.getScope().wbModel = model;
 
-	    function postLink($scope, $element, $attrs, $ctrls) {
-		var button;
-		var optionButton;
-		var dimension = {};
-		var position = {};
-		var lock = false;
-		var watchSize = null;
-		var watchSelection = null;
+	// update style
+	if (model) {
+	    ctrl.loadStyle(angular.merge({}, ctrl.dynamicStyle, model.style));
+	    ctrl.loadSeo(model);
+	}
+    }
 
-		// main ctrl
-		var ctrl = $ctrls[0];
+    this.on('modelChanged', updateView);
+    this.on('modelUpdate', updateView);
+    this.on('styleChanged', updateView);
 
-		function distroy() {
-		    watchSize();
-		    watchSelection();
-
-		    if (button) {
-			button.remove();
-		    }
-		    if (optionButton) {
-			optionButton.remove();
-		    }
-		}
-
-		function getBound() {
-		    var off = $element.offset();
-		    return {
-			left: off.left,
-			top: off.top,
-			width: $element.innerWidth(),
-			height: $element.innerHeight()
-		    };
-		}
-
-		function bindToElement(bound) {
-		    button.css('left', bound.left + bound.width - 15 + 'px');
-		    button.css('top', bound.top + bound.height - 16 + 'px');
-
-		    optionButton.css('left', bound.left + 'px');
-		    optionButton.css('top', bound.top + 'px');
-		}
-
-		function mousemove($event) {
-		    var deltaWidth = dimension.width - (position.x - $event.clientX);
-		    var deltaHeight = dimension.height - (position.y - $event.clientY);
-		    var newDimensions = {
-			width: deltaWidth + 'px',
-			height: deltaHeight + 'px'
-		    };
-		    if ($scope.wbModel.style.size.height === 'auto') {
-			newDimensions.height = 'auto';
-		    }
-		    $element.css(newDimensions);
-		    if ($scope.wbModel) {
-			$scope.wbModel.style.size.width = newDimensions.width;
-			$scope.wbModel.style.size.height = newDimensions.height;
-		    }
-		    bindToElement(getBound());
-		    $scope.$apply();
-		    return false;
-		}
-
-		function mouseup() {
-		    $document.unbind('mousemove', mousemove);
-		    $document.unbind('mouseup', mouseup);
-		    lock = false;
-		}
-
-		function mousedown($event) {
-		    $event.stopImmediatePropagation();
-		    position.x = $event.clientX;
-		    position.y = $event.clientY;
-		    lock = true;
-		    dimension.width = $element.prop('offsetWidth');
-		    dimension.height = $element.prop('offsetHeight');
-		    $document.bind('mousemove', mousemove);
-		    $document.bind('mouseup', mouseup);
-		    return false;
-		}
-
-		function checkButton() {
-		    if (button) {
-			return $q.resolve();
-		    }
-		    button = angular.element('<span></span>');
-		    $rootElement.append(button);
-		    button.css({
-			width: '15px',
-			height: '15px',
-			position: 'absolute',
-			visibility: 'hidden',
-			cursor: 'nwse-resize'
-		    });
-		    button.html('<svg version="1.1" viewBox="0 0 15 15" height="15" width="15"><circle cx="12.5" cy="2.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="7.5" r="2" fill="#777777"></circle><circle cx="12.5" cy="7.5" r="2" fill="#424242"></circle><circle cx="2.5" cy="12.5" r="2" fill="#777777"></circle><circle cx="7.5" cy="12.5" r="2" fill="#424242"></circle><circle cx="12.5" cy="12.5" r="2" fill="#212121"></circle></svg>');
-		    button.on('mousedown', mousedown);
-
-		    var oj = $wbUtil.getTemplateFor({
-			templateUrl: 'views/partials/wb-widget-options.html'
-		    }).then(function (template) {
-			optionButton = angular.element(template);
-			$rootElement.append(optionButton);
-			optionButton.css({
-			    position: 'absolute',
-			    visibility: 'hidden'
-			});
-			$compile(optionButton)($scope);
-			bindToElement(getBound());
-		    });
-
-		    return $q.all([oj]).then(function () {
-			$scope.$watch(getBound, function (bound) {
-			    if (!bound) {
-				return;
-			    }
-			    bindToElement(getBound());
-			}, true);
-
-		    });
-		}
-
-
-		ctrl.on('delete', distroy);
-		// Watch size
-		watchSize = $scope.$watch($attrs.wbWidgetSize + '.size', function (size) {
-		    if (!size || lock) {
-			return;
-		    }
-		    $element.css(size);
-		    if (optionButton) {
-			bindToElement(getBound());
-		    }
-		}, true);
-
-		watchSelection = $scope.$watch(function () {
-		    return ctrl.isSelected();
-		}, function (value) {
-		    if (value) {
-			checkButton()
-				.then(function () {
-				    button.css('visibility', 'visible');
-				    optionButton.css('visibility', 'visible');
-				});
-		    } else {
-			if (optionButton) {
-			    button.css('visibility', 'hidden');
-			    optionButton.css('visibility', 'hidden');
-			}
-		    }
-		});
+    var ctrl = this;
+    this.eventListeners = {
+	click: function ($event) {
+	    if (ctrl.isEditable()) {
+		ctrl.setSelected(true, $event);
+		$event.stopPropagation();
+	    } else {
+		ctrl.evalWidgetEvent('click', $event);
 	    }
+	    ctrl.fire('click', $event);
+	},
 
-	    return {
-		restrict: 'A',
-		link: postLink,
-		require: ['^wbWidget']
-	    };
+	mouseout: function ($event) {
+	    ctrl.fire('mouseout', $event);
+	    if (!ctrl.isEditable()) {
+		ctrl.evalWidgetEvent('mouseout', $event);
+	    }
+	},
+	mouseover: function ($event) {
+	    ctrl.fire('mouseover', $event);
+	    if (!ctrl.isEditable()) {
+		ctrl.evalWidgetEvent('mouseover', $event);
+	    }
+	}
+    };
+};
+
+/**
+ * Loads SEO information from the model and update the element
+ * 
+ * NOTE: this is utility class and can move into a service
+ * 
+ * @param model
+ *            {object} to load from
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.loadSeo = function (model) {
+    var $element = this.getElement();
+    $element.attr('id', model.id);
+
+    // Add item scope
+    if (model.category) {
+	$element.attr('itemscope', '');
+	$element.attr('itemtype', model.category);
+    } else {
+	$element.removeAttr('itemscope');
+	$element.removeAttr('itemtype');
+    }
+
+    // Add item property
+    if (model.property) {
+	$element.attr('itemprop', model.property);
+    } else {
+	$element.removeAttr('itemprop');
+    }
+
+    // TODO: support of
+// - {Text} label (https://schema.org/title)
+// - {Text} description (https://schema.org/description)
+// - {Text} keywords (https://schema.org/keywords)
+};
+
+/**
+ * Loads style from the input model.
+ * 
+ * The style is a part of widget data model.
+ * 
+ * NOTE: this is utility class and can move into a service
+ * 
+ * @param style
+ *            {object} part of widget model
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.loadStyle = function (style) {
+    var cssStyle = this.$wbUtil.convertToWidgetCss(style || {});
+    this.$element.css(cssStyle);
+};
+
+/**
+ * Loads events for the widget
+ * 
+ * @param event
+ *            {object} part of the widget data model
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
+    var eventFunction;
+    if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
+	var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2];' + this.getEvent()[type];
+	this.eventFunctions[type] = new Function(body);
+    }
+    eventFunction = this.eventFunctions[type];
+    if (eventFunction) {
+	var $http = this.$http;
+	var ctrl = this;
+	eventFunction(event, ctrl, {
+	    post: function (url, obj) {
+		return $http.post(url, obj);
+	    }
 	});
+    }
+};
+
+/**
+ * Remove the widgets
+ */
+WbAbstractWidget.prototype.destroy = function () {
+    // remove callbacks
+    this.callbacks = [];
+    this.actions = [];
+
+    // destroy children
+    angular.forEach(this.childWidgets, function (widget) {
+	widget.destroy();
+    });
+    this.childWidgets = [];
+
+    // destroy view
+    this.$element.remove();
+    this.$element = null;
+
+    // remove scope
+    this.$scope.$destroy();
+    this.$scope = null;
+};
+
+WbAbstractWidget.prototype.setElement = function ($element) {
+    this.disconnect();
+    this.$element = $element;
+    this.connect();
+};
+
+WbAbstractWidget.prototype.disconnect = function () {
+    var $element = this.getElement();
+    if (!$element) {
+	return;
+    }
+    angular.forEach(this.eventListeners, function (listener, key) {
+	$element.off(key, listener);
+    });
+};
+
+WbAbstractWidget.prototype.connect = function () {
+    var $element = this.getElement();
+    if (!$element) {
+	return;
+    }
+    angular.forEach(this.eventListeners, function (listener, key) {
+	$element.on(key, listener);
+    });
+};
+
+WbAbstractWidget.prototype.getElement = function () {
+    return this.$element;
+};
+
+
+/**
+ * Call all callbacks on the given event type.
+ * 
+ * @param type
+ *            of the event
+ * @param params
+ *            to add to the event
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.fire = function (type, params) {
+    if (!angular.isDefined(this.callbacks[type])) {
+	return;
+    }
+    // create event
+    var event = _.merge({
+	source: this,
+	type: type
+    }, params || {});
+
+    // fire
+    var callbacks = this.callbacks[type];
+    angular.forEach(callbacks, function (callback) {
+	try {
+	    callback(event);
+	    // TODO: check propagations
+	} catch (error) {
+	    // NOTE: remove on release
+	    console.log(error);
+	}
+    });
+};
+
+/**
+ * Adds new callback of type
+ * 
+ * @param typeof the event
+ * @param callback to call on the event
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.on = function (type, callback) {
+    if (!angular.isFunction(callback)) {
+	throw {
+	    message: "Callback must be a function"
+	};
+    }
+    if (!angular.isArray(this.callbacks[type])) {
+	this.callbacks[type] = [];
+    }
+    this.callbacks[type].push(callback);
+};
+
+/**
+ * Remove the callback
+ * 
+ * Here is list of allowed types:
+ * 
+ * <ul>
+ * <li>modelChanged</li>
+ * <li>modelUpdated</li>
+ * <li>widgetIsEditable</li>
+ * <li>widgetIsNotEditable</li>
+ * <li>widgetDeleted: fire by each widget</li>
+ * <li>widgetUnderCursor</li>
+ * <li>widgetSelected</li>
+ * </ul>
+ * 
+ * Following event propagate on the root too
+ * 
+ * <ul>
+ * <li>widgetUnderCursor</li>
+ * <li>widgetSelected</li>
+ * </ul>
+ * 
+ * @param type
+ *            of the event
+ * @param callback
+ *            to remove
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.off = function (type, callback) {
+    if (!angular.isArray(this.callbacks[type])) {
+	return;
+    }
+    // remove callback
+    var callbacks = this.callbacks[type];
+    var index = callbacks.indexOf(callback);
+    if (index > -1) {
+	callbacks.splice(index, 1);
+    }
+};
+
+WbAbstractWidget.prototype.getDirection = function () {
+    return this.getParent().getModel().style.layout.direction;
+};
+
+WbAbstractWidget.prototype.getModel = function () {
+    return this.wbModel;
+};
+
+
+WbAbstractWidget.prototype.getEvent = function () {
+    return this.wbModel.event;
+};
+
+
+WbAbstractWidget.prototype.getTitle = function () {
+    return this.wbModel.label;
+};
+
+WbAbstractWidget.prototype.getType = function () {
+    return this.wbModel.type;
+};
+
+WbAbstractWidget.prototype.getId = function () {
+    return this.wbModel.id;
+};
+
+WbAbstractWidget.prototype.style = function (style) {
+    _.merge(this.dynamicStyle, style);
+    this.fire('styleChanged');
+};
+
+WbAbstractWidget.prototype.setModel = function (model) {
+    if (model === this.wbModel) {
+	return;
+    }
+    this.wbModel = model;
+    this.fire('modelChanged');
+};
+
+/**
+ * Get parent widget
+ * 
+ * Parent widget is called container in this model. It is attached dynamically
+ * on the render phease.
+ */
+WbAbstractWidget.prototype.getParent = function () {
+    return this.parent;
+};
+
+WbAbstractWidget.prototype.setParent = function (widget) {
+    return this.parent = widget;
+};
+
+WbAbstractWidget.prototype.setScope = function ($scope) {
+    this.$scope = $scope;
+};
+WbAbstractWidget.prototype.getScope = function () {
+    return this.$scope;
+};
+
+// WbAbstractWidget.prototype.setUnderCursor = function (widget) {
+// if(!this.isRoot()){
+// this.getParent().setUnderCursor(widget);
+// }
+// if(this._widgetUnderCursor === widget){
+// return;
+// }
+// this._widgetUnderCursor = widget;
+// this.fire('widgetUnderCursor', {
+// widget: this._widgetUnderCursor
+// });
+// };
+
+WbAbstractWidget.prototype.isEditable = function () {
+    return this.editable;
+};
+
+WbAbstractWidget.prototype.setEditable = function (editable) {
+    if (this.editable === editable) {
+	return;
+    }
+    this.editable = editable;
+    if (this.isRoot()) {
+	delete this.lastSelectedItem;
+	this.setSelected(true);
+    }
+    if (editable) {
+	// Lesson on click
+	var ctrl = this;
+
+	// TODO: remove watch for model update and fire in setting
+	this._modelWatche = this.getScope().$watch('wbModel', function () {
+	    ctrl.fire('modelUpdate');
+	}, true);
+    } else {
+	// remove selection handler
+	if (this._modelWatche) {
+	    this._modelWatche();
+	    delete this._modelWatche;
+	}
+    }
+    // propagate to child
+    angular.forEach(this.childWidgets, function (widget) {
+	widget.setEditable(editable);
+    });
+
+    if (editable) {
+	this.fire('editable');
+    } else {
+	this.fire('noneditable');
+    }
+};
+
+/**
+ * Delete the widget
+ * 
+ * This function just used in edit mode
+ */
+WbAbstractWidget.prototype.delete = function () {
+    // remove itself
+    this.fire('delete');
+    this.getParent()
+	    .removeChild(this);
+};
+
+/**
+ * Clone current widget This method works in edit mode only.
+ */
+WbAbstractWidget.prototype.clone = function () {
+    var index = this.getParent().indexOfChild(this);
+    this.getParent()//
+	    .addChild(index, angular.copy(this.getModel()));
+};
+
+/**
+ * This method moves widget one to next.
+ */
+WbAbstractWidget.prototype.moveNext = function () {};
+
+/**
+ * This method moves widget one to before
+ */
+WbAbstractWidget.prototype.moveBefore = function () {};
+
+/**
+ * This method moves widget to the first of it's parent
+ */
+WbAbstractWidget.prototype.moveFirst = function () {};
+
+/**
+ * This method moves widget to the last of it's parent
+ */
+WbAbstractWidget.prototype.moveLast = function () {};
+
+/**
+ * Checks if the widget is root
+ * 
+ * If there is no parent controller then this is a root one.
+ */
+WbAbstractWidget.prototype.isRoot = function () {
+    var parent = this.getParent();
+    return angular.isUndefined(parent) || parent === null;
+};
+
+/**
+ * Gets root widgets of the widget
+ * 
+ * @return the root widget
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.getRoot = function () {
+    // check if the root is set
+    if (this.rootWidget) {
+	return this.rootWidget;
+    }
+    // find root if is empty
+    this.rootWidget = this;
+    while (!this.rootWidget.isRoot()) {
+	this.rootWidget = this.rootWidget.getParent();
+    }
+    return this.rootWidget;
+};
+
+
+/**
+ * Checks if the widget is selected.
+ * 
+ * NOTE: it is not possible to select root widget
+ * 
+ * @return true if the widget is selected.
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.isSelected = function () {
+    return this.selected;
+};
+
+WbAbstractWidget.prototype.setSelected = function (flag, $event) {
+    if (this.isRoot()) {
+	return;
+    }
+    if (this.selected === flag) {
+	return;
+    }
+    
+    // fire events
+    this.selected = flag;
+    if (flag) {
+	this.getParent().childSelected(this, $event);
+	this.fire('select');
+    } else {
+	this.fire('unselect');
+    }
+};
+
+/**
+ * Add new action in actions list
+ * 
+ * @memberof WbWidgetCtrl
+ */
+WbAbstractWidget.prototype.addAction = function (action) {
+    this.actions.push(action);
+};
+
+/**
+ * Gets widget actions
+ */
+WbAbstractWidget.prototype.getActions = function () {
+    return this.actions;
+};
+
+
+/**
+ * Returns bounding client rectangle
+ * 
+ * @return bounding rectangle
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.getBoundingClientRect = function () {
+    var $element = this.getElement();
+    var rect = $element[0].getBoundingClientRect();
+    var offset = $element.offset();
+    return {
+	// rect
+	width: rect.width,
+	height: rect.height,
+	x: rect.x,
+	y: rect.y,
+	// offset
+	top: $element.offset().top,
+	right: offset.rigth,
+	bottom: offset.bottom,
+	left: offset.left
+    };
+};
+
+/**
+ * @ngdoc Controllers
+ * @name wbWidgetCtrl
+ * @description Controller of a widget
+ * 
+ * 
+ * @ngInject
+ */
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http) {
+    WbAbstractWidget.call(this);
+    this.setElement($element);
+    this.setScope($scope);
+    this.$wbUtil = $wbUtil;
+    this.$http = $http;
+};
+WbWidgetCtrl.prototype = new WbAbstractWidget();
+
+
+/**
+ * @ngdoc Controllers
+ * @name WbWidgetGroupCtrl
+ * @description Manages a group widget
+ * 
+ * This is a group controller
+ * 
+ * @ngInject
+ */
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http) {
+    WbAbstractWidget.call(this);
+    this.setElement($element);
+    this.setScope($scope);
+
+    this.$widget = $widget;
+    this.$q = $q;
+    this.$mdTheming = $mdTheming;
+    this.$wbUtil = $wbUtil;
+    this.$http = $http;
+
+    var ctrl = this;
+    this.on('modelChanged', function () {
+	ctrl.loadWidgets(ctrl.getModel());
+    });
+};
+WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
+
+/**
+ * Check if the widget is selected
+ */
+WbWidgetGroupCtrl.prototype.isChildSelected = function (widget) {
+    if (this.isRoot()) {
+	return widget === this.lastSelectedItem;
+    }
+    return this.getParent().isChildSelected(widget);
+};
+
+WbWidgetGroupCtrl.prototype.getChildById = function (id) {
+    var widgets = this.childWidgets;
+    for (var i = 0; i < widgets.length; i++) {
+	if (widgets[i].getId() === id) {
+	    return widgets[i];
+	}
+    }
+};
+
+/**
+ * Gets all children of the group
+ * 
+ * @return list of all widgets
+ */
+WbWidgetGroupCtrl.prototype.getChildren = function () {
+    return this.childWidgets;
+};
+
+WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
+    // destroy all children
+    angular.forEach(this.childWidgets, function (widget) {
+	widget.destroy();
+    });
+    this.childWidgets = [];
+
+    // check for new contents
+    if (!model || !angular.isArray(model.contents)) {
+	return;
+    }
+
+    // create contents
+    var $widget = this.$widget;
+    var $mdTheming = this.$mdTheming;
+    var parentWidget = this;
+    var $q = this.$q;
+
+    var compilesJob = [];
+    model.contents.forEach(function (item, index) {
+	var job = $widget.compile(item, parentWidget)//
+		.then(function (widget) {
+		    parentWidget.childWidgets[index] = widget;
+		});
+	compilesJob.push(job);
+    });
+
+    var ctrl = this;
+    return $q.all(compilesJob)//
+	    .then(function () {
+		var $element = parentWidget.getElement();
+		parentWidget.childWidgets.forEach(function (widget) {
+		    $element.append(widget.getElement());
+		});
+	    })
+	    .finally(function () {
+		ctrl.fire('loaded');
+	    });
+};
+
+
+
+WbWidgetGroupCtrl.prototype.childSelected = function (ctrl, $event) {
+    if (!this.isRoot()) {
+	return this.getParent().childSelected(ctrl, $event);
+    }
+    $event = $event || {};
+    if (!$event.shiftKey) {
+	angular.forEach(this.lastSelectedItems, function (widget) {
+	    widget.setSelected(false);
+	});
+	this.lastSelectedItems = [];
+    }
+    
+    if (this.lastSelectedItems.indexOf(ctrl) >= 0) {
+	return;
+    }
+    
+    this.lastSelectedItems.push(ctrl);
+    
+    // maso, 2018: call the parent controller function
+    this.fire('select', {
+	widgets: this.lastSelectedItems
+    });
+};
+
+/**
+ * Removes a widget
+ * 
+ * Data model and visual element related to the input model will be removed.
+ */
+WbWidgetGroupCtrl.prototype.removeChild = function (widget) {
+    var index = this.indexOfChild(widget);
+
+    if (index > -1) {
+	// remove selection
+	if (this.isChildSelected(widget)) {
+	    this.childSelected(null);
+	}
+	// remove model
+	this.childWidgets.splice(index, 1);
+
+	var model = this.getModel();
+	index = model.contents.indexOf(widget.getModel());
+	model.contents.splice(index, 1);
+
+	// destroy widget
+	widget.destroy();
+    }
+    return false;
+};
+
+/**
+ * Adds dragged widget
+ */
+WbWidgetGroupCtrl.prototype.addChild = function (index, item) {
+    var model = this.getModel();
+    var ctrl = this;
+
+    // add widget
+    item = this.$wbUtil.clean(item);
+    this.$widget.compile(item, this)//
+	    .then(function (newWidget) {
+		if (index < ctrl.childWidgets.length) {
+		    newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
+		} else {
+		    ctrl.getElement().append(newWidget.getElement());
+		}
+		model.contents.splice(index, 0, item);
+		ctrl.childWidgets.splice(index, 0, newWidget);
+
+		// init the widget
+		newWidget.setEditable(ctrl.isEditable());
+		ctrl.fire('newchild', {
+		    widget: newWidget
+		});
+	    });
+    // TODO: replace with promise
+    return true;
+};
+
+/**
+ * Finds index of child element
+ */
+WbWidgetGroupCtrl.prototype.indexOfChild = function (widget) {
+    if (!this.childWidgets || !this.childWidgets.length) {
+	return -1;
+    }
+    return this.childWidgets.indexOf(widget);
+};
+
+
+/**
+ * Delete the widget
+ * 
+ * This function just used in edit mode
+ * 
+ * @memberof WbWidgetGroupCtrl
+ */
+WbWidgetGroupCtrl.prototype.delete = function () {
+    // remove all children
+    var widgets = this.getChilren();
+    angular.forEach(widgets, function (widget) {
+	widget.delete();
+    });
+
+    // remove itself
+    this.fire('delete');
+    if (!this.isRoot()) {
+	this.getParent()
+		.removeChild(this);
+    }
+};
+
+/**
+ * List of allowed child
+ * 
+ * @memeberof WbWidgetGroupCtrl
+ */
+WbWidgetGroupCtrl.prototype.getAllowedTypes = function () {
+    if (!this.isRoot()) {
+	return this.getParent().getAllowedTypes();
+    }
+    return this.allowedTypes;
+};
+
+WbWidgetGroupCtrl.prototype.setAllowedTypes = function (allowedTypes) {
+    return this.allowedTypes = allowedTypes;
+};
+
+
+
+
+
+
+// submit the controller
+angular.module('am-wb-core')//
+	.controller('WbWidgetCtrl', WbWidgetCtrl)//
+	.controller('WbWidgetGroupCtrl', WbWidgetGroupCtrl);
+
+
 /* 
  * The MIT License (MIT)
  * 
@@ -1430,316 +968,88 @@ angular.module('am-wb-core')
  * @name wb-group
  * @description Render a list of widget
  * 
+ * ## wbOnModelSelect
+ * 
+ * If a widget select with in the group then the wbOnModelSelect parameter will
+ * be evaluated with the following attributes:
+ * 
+ * - $event : the related event
+ * - $ctrl : the widget (to support legacy)
+ * - $model: the model (to support legace)
+ * 
+ * NOTE: The root widget will be passed as first selected item. The function will be
+ * evaluated in non edit mode.
  */
-.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $q, $mdTheming, $parse) {
+.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $parse) {
 
-	/*
-	 * Link widget view
-	 */
-	function wbGroupLink($scope, $element, $attrs, $ctrls) {
+    /*
+     * Link widget view
+     */
+    function wbGroupLink($scope, $element, $attrs, $ctrls) {
 
-		// Loads wbGroup
-		var ctrl = $ctrls[0];
+        // Loads wbGroup
+        var ctrl = $ctrls[0];
 
-		// Loads wbGroup
-		var wbGroupCtrl = $ctrls[1];
-		$scope.parentCtrl = wbGroupCtrl;
+        // Load ngModel
+        var ngModelCtrl = $ctrls[1];
+        ngModelCtrl.$render = function() {
+            ctrl.setModel(ngModelCtrl.$viewValue);
+        };
 
-		// Load ngModel
-		var ngModelCtrl = $ctrls[2];
-		ngModelCtrl.$render = function() {
-			reloadView(ngModelCtrl.$viewValue);
-		};
+        /*
+         * Watch for editable in root element
+         */
+        $scope.$watch('wbEditable', function(editable){
+            ctrl.setEditable(editable);
+        });
 
-		/*
-		 * Loads view
-		 */
-		function reloadView(model) {
-			$element.empty();
-			$scope.wbModel = model;
-			if(!model || !angular.isArray(model.contents)){
-				return;
-			}
-			var compilesJob = [];
-			var elements = [];
-			var locals = ctrl.getLocals();
-			model.contents.forEach(function(item, index) {
-				compilesJob.push($widget.compile(item, $scope, $element, locals)//
-						.then(function(element) {
-							$mdTheming(element);
-							elements[index] = element;
-						}));
-			});
-			return $q.all(compilesJob)//
-			.then(function() {
-				elements.forEach(function(element) {
-					$element.append(element);
-				});
-			});
-		}
-
-		/*
-		 * Load edit mode
-		 */
-		function loadEditMode(){
-			$scope.editable = true;
-			if(ctrl.isRoot()) {
-				delete $scope.lastSelectedItem;
-				ctrl.setSelected(true);
-			}
-		}
-
-		/*
-		 * Removes edit mode
-		 */
-		function removeEditMode(){
-			$scope.editable = false;
-			ctrl.childSelected(null);
-		}
+        if($scope.wbOnModelSelect) {
+            var onModelSelectionFu = $parse($scope.wbOnModelSelect);
+            $scope.$eval(function() {
+                // TODO: maso, 2018: An event factory is required
+                onModelSelectionFu($scope.$parent, {
+                    '$event': {
+                        widgets:[ctrl]
+                    }
+                });
+            });
+            ctrl.on('select', function($event){
+                var widgets = $event.widgets;
+                var locals = {
+                        '$event': $event,
+                        'widgets': widgets
+                };
+                if(angular.isArray(widgets) && widgets.length){
+                    locals.$model =ctrl.getModel();
+                    locals.$ctrl = ctrl;
+                }
+                $scope.$eval(function() {
+                    onModelSelectionFu($scope.$parent, locals);
+                });
+            });
+        }
+        
+        $scope.$watch('wbAllowedTypes', function(wbAllowedTypes){
+           ctrl.setAllowedTypes(wbAllowedTypes); 
+        });
+    }
 
 
-		/*
-		 * Watch for editable
-		 */
-		if(!wbGroupCtrl){
-			$scope.$watch('wbEditable', function(value, old){
-				if(value === old){
-					return;
-				}
-				if(value){
-					loadEditMode();
-				} else {
-					removeEditMode();
-				}
-			});
-			$scope.root = true;
-		}
-
-		$scope.dropCallback = function(index, item/*, external, type*/){
-			return ctrl.addChild(index, item);
-		};
-	}
-
-	/**
-	 * @ngdoc Controllers
-	 * @name wbGroupCtrl
-	 * @description Adding basic functionality into a widget.
-	 * 
-	 * Manages model data of a widget.
-	 * 
-	 * @ngInject
-	 */
-	function wbGroupCtrl($scope, $element) {
-		var ctrl = this;
-		var callbacks = {};
-		var onModelSelectionFu = null;
-		if($scope.wbOnModelSelect) {
-			onModelSelectionFu = $parse($scope.wbOnModelSelect);
-		}
-
-		function fire(type){
-			if(angular.isDefined(callbacks[type])){
-				for(var i = 0; i < callbacks[type].length; i++){
-					try{
-						callbacks[type][i]();
-					} catch (e){
-						/*console.log(error);*/
-					}
-				}
-			}
-		}
-
-		/**
-		 * Delete data model and widget display
-		 * 
-		 * @name delete
-		 * @memberof wbGroupCtrl
-		 */
-		ctrl.delete = function(){
-			if(ctrl.isRoot()){
-				// TODO: mao, 2018: clear all elements
-				return;
-			}
-			$scope.parentCtrl.removeChild($scope.wbModel, ctrl);
-			fire('delete');
-		};
-
-		/**
-		 * Clone and return a new model from the current one
-		 * 
-		 * NOTE: this is a deep clone of the current widget.
-		 * 
-		 * @name cloneModel
-		 * @memberof wbGroupCtrl
-		 * @return model {Object} which is cloned from the current one
-		 */
-		ctrl.clone = function(){
-			return $wbUtil.clean(angular.copy($scope.wbModel));
-		};
-
-		ctrl.getModel = function(){
-			return $scope.wbModel;
-		};
-
-		ctrl.getParent = function(){
-			return $scope.parentCtrl;
-		};
-
-		ctrl.isRoot = function(){
-			return !$scope.parentCtrl;
-		};
-
-		ctrl.isEditable = function(){
-			if($scope.parentCtrl){
-				return $scope.parentCtrl.isEditable();
-			}
-			return $scope.editable;
-		};
-
-		ctrl.isSelected = function(){
-			return ctrl.isChildSelected(ctrl);
-		};
-
-		ctrl.setSelected = function(flag) {
-			if($scope.parentCtrl){
-				return $scope.parentCtrl.childSelected(ctrl);
-			}
-			if(flag) {
-				ctrl.childSelected(ctrl);
-			}
-		};
-
-		ctrl.isChildSelected = function(ctrl){
-			if($scope.parentCtrl){
-				return $scope.parentCtrl.isChildSelected(ctrl);
-			}
-			return ctrl === $scope.lastSelectedItem;
-		};
-
-		ctrl.childSelected = function(ctrl) {
-			if($scope.parentCtrl){
-				return $scope.parentCtrl.childSelected(ctrl);
-			}
-			if(ctrl === $scope.lastSelectedItem) {
-				return;
-			}
-			$scope.lastSelectedItem = ctrl;
-			// maso, 2018: call the parent controller function
-			if(onModelSelectionFu) {
-				var callback = function() {
-					var local = {};
-					if(ctrl) {
-						local = {
-								'$model': ctrl.getModel(),
-								'$ctrl': ctrl
-						};
-					}
-					onModelSelectionFu($scope.$parent, local);
-				};
-				$scope.$eval(callback);
-			}
-		};
-
-
-		/**
-		 * Removes a widget
-		 * 
-		 * Data model and visual element related to the input model will be
-		 * removed.
-		 */
-		ctrl.removeChild = function(model, childCtrl) {
-			var index = ctrl.indexOfChild(model);
-			if (index > -1) {
-				if(ctrl.isChildSelected(childCtrl)){
-					ctrl.childSelected(null);
-					// delete controller
-				}
-				$element.children(':nth-child('+(index+1)+')').remove();
-				$scope.wbModel.contents.splice(index, 1);
-				return true;
-			}
-			return false;
-		};
-
-		ctrl.getLocals = function(){
-			if($scope.parentCtrl){
-				return $scope.parentCtrl.getLocals();
-			}
-			return $scope.wbLocals;
-		};
-
-		/**
-		 * Adds dragged widget
-		 */
-		ctrl.addChild = function(index, item) {
-			$wbUtil.clean(item);
-			// add widget
-			$widget.compile(item, $scope, null, ctrl.getLocals())//
-			.then(function(newElement) {
-				var nodes  = $element[0].childNodes;
-				if (index < nodes.length) {
-					newElement.insertBefore(nodes[index]);
-				} else {
-					$element.append(newElement);
-				}
-				if(!angular.isArray($scope.wbModel.contents)){
-					$scope.wbModel.contents = [];
-				}
-				$scope.wbModel.contents.splice(index, 0, item);
-			});
-			return true;
-		};
-
-		ctrl.indexOfChild = function(item) {
-			return $scope.wbModel.contents.indexOf(item);
-		};
-
-		ctrl.getAllowedTypes = function(){
-			return $scope.wbAllowedTypesl;
-		};
-
-		ctrl.on = function(type, callback){
-			if(!angular.isArray(callbacks[type])){
-				callbacks[type] = [];
-			}
-			callbacks[type].push(callback);
-		};
-
-		ctrl.getActions = function(){
-			return [{
-				title: 'Delete',
-				icon: 'delete',
-				action: ctrl.delete
-			},{
-				title: 'Clone',
-				icon: 'content_copy',
-				action: function(){
-					if(ctrl.isRoot()){
-						return;
-					}
-					var model = ctrl.clone();
-					var index = $scope.parentCtrl.indexOfChild($scope.wbModel);
-					$scope.parentCtrl.addChild(index, model);
-				}
-			}];
-		};
-	}
-
-	return {
-		templateUrl : 'views/directives/wb-group.html',
-		restrict : 'E',
-		replace : true,
-		scope : {
-			wbEditable : '=?',
-			wbOnModelSelect : '@?',
-			wbAllowedTypes: '<?',
-			wbLocals: '<?'
-		},
-		link : wbGroupLink,
-		controllerAs: 'ctrl',
-		controller: wbGroupCtrl,
-		require:['wbGroup', '?^^wbGroup', 'ngModel']
-	};
+    return {
+        templateUrl : 'views/directives/wb-group.html',
+        restrict : 'E',
+        replace : true,
+        scope : {
+            wbEditable : '=?',
+            wbOnModelSelect : '@?',
+            wbAllowedTypes: '<?',
+            wbLocals: '<?'
+        },
+        link : wbGroupLink,
+        controllerAs: 'ctrl',
+        controller: 'WbWidgetGroupCtrl',
+        require:['wbGroup', 'ngModel']
+    };
 });
 
 /* 
@@ -2921,21 +2231,6 @@ angular.module('am-wb-core')
  */
 'use strict';
 
-/*
- * Setting post link
- */
-function settingPostLink($scope, $element, $attrs, $ctrl){
-    var ngModelCtrl = $ctrl[0];
-    ngModelCtrl.$render = function(){
-        $scope.value = ngModelCtrl.$viewValue;
-    };
-//    $scope.$watch('value', function(value){
-//        ngModelCtrl.$setViewValue(value);
-//    });
-    $scope.valueChanged = function (newValue) {
-	ngModelCtrl.$setViewValue(newValue);
-    };
-}
 
 /**
  * @ngdoc Controllers
@@ -2943,18 +2238,18 @@ function settingPostLink($scope, $element, $attrs, $ctrl){
  * @ngInject
  */
 function wbUiSettingGeneralCtrl($scope) {
-    var ctrl = this;
+	var ctrl = this;
 
-    // TODO: maso, 2018:load from user config
-    $scope.wbUiSettingClearButton = true;
-    $scope.wbUiSettingPreview = true;
+	// TODO: maso, 2018:load from user config
+	$scope.wbUiSettingClearButton = true;
+	$scope.wbUiSettingPreview = true;
 
-    function clearValue(/*$event*/){
-        // General option
-        $scope.value = null;
-    }
+	function clearValue(/*$event*/){
+		// General option
+		this.valueChanged(null);
+	}
 
-    ctrl.clearValue = clearValue;
+	ctrl.clearValue = clearValue;
 }
 
 
@@ -2964,27 +2259,28 @@ function wbUiSettingGeneralCtrl($scope) {
  * @ngInject
  */
 function wbUiSettingImageCtrl($scope, $resource, $controller){
-    var ctrl = this;
+	var ctrl = this;
 
-    angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
-        $scope : $scope
-    }));
+	angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
+		$scope : $scope
+	}));
 
-    function showImagePicker(){
-        return $resource.get('image', {
-            style: {
-                icon: 'image',
-                title: 'Select image',
-                description: 'Select image from resources.'
-            },
-            data: $scope.value
-        })//
-        .then(function(value){
-            $scope.value = value;
-        });
-    }
+	function showImagePicker(){
+		return $resource.get('image', {
+			style: {
+				icon: 'image',
+				title: 'Select image',
+				description: 'Select image from resources.'
+			},
+			data: $scope.value
+		})//
+		.then(function(value){
+			$scope.value = value;
+			ctrl.valueChanged(value);
+		});
+	}
 
-    ctrl.showImagePicker = showImagePicker;
+	ctrl.showImagePicker = showImagePicker;
 }
 
 
@@ -2993,8 +2289,8 @@ function wbUiSettingImageCtrl($scope, $resource, $controller){
 //- wbUiSettingPreview
 
 angular.module('am-wb-core')
-.controller('wbUiSettingGeneralCtrl', wbUiSettingGeneralCtrl)
-.controller('wbUiSettingImageCtrl', wbUiSettingImageCtrl)
+	.controller('wbUiSettingGeneralCtrl', wbUiSettingGeneralCtrl)
+	.controller('wbUiSettingImageCtrl', wbUiSettingImageCtrl)
 
 /**
  * @ngdoc Directives
@@ -3006,18 +2302,27 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingImage', function () {
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-image.html',
-        restrict: 'E',
-        scope: {
-            title: '@title',
-            icon: '@icon'
-        },
-        require:['ngModel'],
-        link: settingPostLink,
-        controller: 'wbUiSettingImageCtrl',
-        controllerAs: 'ctrl'
-    };
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-image.html',
+		restrict: 'E',
+		scope: {
+			title: '@title',
+			icon: '@icon'
+		},
+		require:['wbUiSettingImage', 'ngModel'],
+		link: function ($scope, $element, $attrs, $ctrl){
+			var ctrl = $ctrl[0];
+			var ngModelCtrl = $ctrl[1];
+			ngModelCtrl.$render = function(){
+				$scope.value = ngModelCtrl.$viewValue;
+			};
+			ctrl.valueChanged = function (newValue) {
+				ngModelCtrl.$setViewValue(newValue);
+			};
+		},
+		controller: 'wbUiSettingImageCtrl',
+		controllerAs: 'ctrl'
+	};
 });
 
 /* 
@@ -3047,98 +2352,100 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-        /**
-         * @ngdoc Directives
-         * @name wbUiSettingLength
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingLength
+ */
+.directive('wbUiSettingLength', function () {
+
+    function postLink($scope, $element, $attrs, ngModel) {
+        ngModel.$render = function () {
+            pars(ngModel.$modelValue);
+        };
+
+        // Add all length by default
+        $scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
+        $scope.extraValues = $scope.extraValues || [];
+        var types = $scope.extraValues;
+        if (types) { 
+            types = types.concat($scope.lengthValues);
+            if (types.includes('length')) {
+                var index = types.indexOf('length');
+                types.splice(index, 1);
+            }
+        } else {
+            types = $scope.lengthValues;
+        }
+
+        $scope.types = types;
+
+        function pars(value) {
+            if (!value) {
+                $scope.internalUnit = types[0];
+                $scope.internalValue = 0;
+            } else {
+                split(value);
+            }
+        }
+
+        $scope.updateLength = function(unit, value) {
+            if ($scope.lengthValues.includes(unit)) {
+                ngModel.$setViewValue(value+unit);
+            } else {
+                ngModel.$setViewValue(unit);
+            }
+        };
+
+        /*
+         * @param {type} val
+         * @returns {undefined}
+         * decsription  Splite value to 'unit' and 'value'
          */
-        .directive('wbUiSettingLength', function () {
-
-            function postLink($scope, $element, $attrs, ngModel) {
-                ngModel.$render = function () {
-                    pars(ngModel.$modelValue);
-                };
-
-                // Add all length by default
-                $scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
-                $scope.extraValues = $scope.extraValues || [];
-                var types = $scope.extraValues;
-                if (types) { 
-                    types = types.concat($scope.lengthValues);
-                    if (types.includes('length')) {
-                        var index = types.indexOf('length');
-                        types.splice(index, 1);
-                    }
-                } else {
-                    types = $scope.lengthValues;
-                }
-
-                $scope.types = types;
-
-                function pars(value) {
-                    if (!value) {
-                        $scope.internalUnit = types[0];
-                        $scope.internalValue = 0;
-                    } else {
-                        split(value);
-                    }
-                }
-                
-                $scope.updateLength = function(unit, value) {
-		    if ($scope.lengthValues.includes(unit)) {
-			ngModel.$setViewValue(value+unit);
-		    } else {
-			ngModel.$setViewValue(unit);
-		    }
-                };
-
+        function split(val) {
+            if ($scope.extraValues.includes(val)) {
+                $scope.internalUnit = val;
+            } else {
                 /*
-                 * @param {type} val
-                 * @returns {undefined}
-                 * decsription  Splite value to 'unit' and 'value'
+                 * A regex which groups the val into the value and unit(such as 10px -> 10 , px).
+                 * This regex also support signed float format such as (+10.75%, -100.76em)
                  */
-                function split(val) {
-                    if ($scope.extraValues.includes(val)) {
-                        $scope.internalUnit = val;
-                    } else {
-                        /*
-                         * A regex which groups the val into the value and unit(such as 10px -> 10 , px).
-                         * This regex also support signed float format such as (+10.75%, -100.76em)
-                         */
-                        var regex = /^([+-]?\d+\.?\d*)([a-zA-Z%]*)$/;
-                        var matches = regex.exec(val);
-                        $scope.internalValue = Number(matches[1]);
-                        $scope.internalUnit = matches[2];
-                    }
+                var regex = /^([+-]?\d+\.?\d*)([a-zA-Z%]*)$/;
+                var matches = regex.exec(val);
+                if(angular.isArray(matches)){
+                    $scope.internalValue = Number(matches[1]);
+                    $scope.internalUnit = matches[2];
                 }
             }
+        }
+    }
 
-            return {
-                templateUrl: 'views/directives/wb-ui-setting-length.html',
-                restrict: 'E',
-                replace: true,
-                scope: {
-                    title: '@title',
-                    icon: '@?',
-                    description: '@?',
-                    extraValues: '<?'
-                },
-                /*
-                 * @ngInject
-                 */
-                controller: function ($scope) {
-                    /**
-                     * Check if the current unit is numerical
-                     */
-                    this.isNumerical = function () {
-                          return $scope.lengthValues.includes($scope.internalUnit);
-                    };
-
-                },
-                controllerAs: 'ctrl',
-                link: postLink,
-                require: 'ngModel'
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-length.html',
+        restrict: 'E',
+        replace: true,
+        scope: {
+            title: '@title',
+            icon: '@?',
+            description: '@?',
+            extraValues: '<?'
+        },
+        /*
+         * @ngInject
+         */
+        controller: function ($scope) {
+            /**
+             * Check if the current unit is numerical
+             */
+            this.isNumerical = function () {
+                return $scope.lengthValues.includes($scope.internalUnit);
             };
-        });
+
+        },
+        controllerAs: 'ctrl',
+        link: postLink,
+        require: 'ngModel'
+    };
+});
 
 /* 
  * The MIT License (MIT)
@@ -3432,172 +2739,6 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wbWidget
- * @description Widgets container
- * 
- * This is widget containers.
- * 
- * All primary actions of a widget are supported (such as remove and setting).
- */
-.directive('wbWidget', function($wbUtil) {
-	function postLink($scope, $element, $attrs, $ctrls, $transclude) {
-		// Modify angular transclude function
-		// see:
-		// http://angular-tips.com/blog/2014/03/transclusion-and-scopes/
-		// FIXME: maso, 2017: use regular dom insted of ng-transclude
-		$transclude($scope, function(clone/*, $scope*/) {
-			if(clone){
-				$element.append(clone);
-			}
-		});
-
-		// set wbGroup
-		var group = $ctrls[1];
-		$scope.group = group;
-	}
-
-	/**
-	 * @ngdoc Controllers
-	 * @name wbWidgetCtrl
-	 * @description Controller of a widget
-	 * 
-	 * 
-	 * @ngInject
-	 */
-	function wbWidgetCtrl($scope/*, $element*/) {
-		var callbacks = {};
-		var ctrl = this;
-
-		function fire(type){
-			if(angular.isDefined(callbacks[type])){
-				for(var i = 0; i < callbacks[type].length; i++){
-					try{
-						callbacks[type][i]();
-					} catch (error){
-//						console.log(error);
-					}
-				}
-			}
-		}
-
-		/**
-		 * Delete the widget
-		 * 
-		 * This function just used in edit mode
-		 */
-		ctrl.delete = function(){
-		    if(!ctrl.isEditable()){
-		        return;
-		    }
-			fire('delete');
-			$scope.group.removeChild($scope.wbModel, ctrl);
-			callbacks = {};
-		};
-
-		/**
-		 * Clone current widget
-		 * 
-		 * This method works in edit mode only.
-		 */
-		ctrl.clone = function(){
-            if(!ctrl.isEditable()){
-                return;
-            }
-			return $wbUtil.clean(angular.copy($scope.wbModel));
-		};
-
-		ctrl.getModel = function(){
-			return $scope.wbModel;
-		};
-
-		ctrl.getParent = function(){
-			return $scope.group;
-		};
-
-		ctrl.isEditable = function(){
-			return  $scope.group.isEditable();
-		};
-		
-		ctrl.isRoot = function () {
-		    return null;
-		};
-
-		ctrl.isSelected = function(){
-			return $scope.group.isChildSelected(ctrl);
-		};
-
-		ctrl.setSelected = function(flag) {
-			if(flag) {
-				$scope.group.childSelected(this);
-			}
-		};
-
-		ctrl.getActions = function(){
-			return [{
-				title: 'Delete',
-				icon: 'delete',
-				action: ctrl.delete,
-				description: 'Delete widget (Delete)'
-			},{
-				title: 'Clone',
-				icon: 'content_copy',
-				action: function(){
-					var model = $wbUtil.clean(angular.copy($scope.wbModel));
-					var index = $scope.group.indexOfChild($scope.wbModel);
-					$scope.group.addChild(index, model);
-				},
-				description: 'Duplicate widget (ctrl+D)'
-			}];
-		};
-
-		ctrl.on = function(type, callback){
-			if(!angular.isArray(callbacks[type])){
-				callbacks[type] = [];
-			}
-			callbacks[type].push(callback);
-		};
-	}
-
-	return {
-		templateUrl : 'views/directives/wb-widget.html',
-		restrict : 'E',
-		replace : true,
-		transclude: true,
-		link : postLink,
-		controller : wbWidgetCtrl,
-		controllerAs: 'ctrl',
-		require:['wbWidget', '^^wbGroup', 'ngModel']
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
  * @name wb-widgets-explorer
  * @description Widgets explorers
  * 
@@ -3828,41 +2969,801 @@ angular.module('am-wb-core')
  */
 'use strict';
 
-angular.module('am-wb-core')
+angular.module('am-wb-core')//
+
 /**
  * @ngdoc Factories
- * @name wb-widget
- * @description Generic data type of a widget
+ * @name AbstractWidgetLocator
+ * @description Locates a widget on the view
+ * 
+ * It is used to display extra information about a widget on the screen. For
+ * example it is used to show widget actions on the fly.
  * 
  */
-.factory('WbWidget', function () {
-    var wbWidget = function (model, ctrl) {
-        this.$ctrl = ctrl;
-        this.$model = model;
+.factory('AbstractWidgetLocator', function ($rootElement) {
+
+    /**
+     * Creates new instance of the widget locator
+     * 
+     * @memberof AbstractWidgetLocator
+     */
+    function abstractWidgetLocator() {
+        this.callbacks = [];
+        this.elements = [];
+        this.observedWidgets = [];
+
+        // Creates listeners
+        var ctrl = this;
+        this.widgetListeners = {
+            'delete' : function ($event) {
+                ctrl.setWidget(null);
+                ctrl.fire('widgetDeleted', $event);
+            },
+            'select' : function ($event) {
+                ctrl.addClass('selected');
+                ctrl.removeClass('mouseover');
+                ctrl.fire('widgetSelected', $event);
+            },
+            'unselect' : function ($event) {
+                ctrl.removeClass('selected');
+                if (ctrl.mouseover) {
+                    ctrl.addClass('mouseover');
+                }
+                ctrl.fire('widgetUnselected', $event);
+            },
+            'mouseover' : function ($event) {
+                ctrl.addClass('mouseover');
+                ctrl.mouseover = true;
+            },
+            'mouseout' : function ($event) {
+                ctrl.removeClass('mouseover');
+                ctrl.mouseover = false;
+            },
+            'resize' : function ($event) {
+                this.updateView();
+            }
+        };
+    }
+
+
+    /**
+     * Checks if the locator is visible
+     * 
+     * @return true if the locator is visible
+     * @memberof AbstractWidgetLocator
+     */
+    abstractWidgetLocator.prototype.isVisible = function () {
+        return this.visible;
     };
 
-    wbWidget.prototype.getType = function () {
-        return this.$model.type;
+    abstractWidgetLocator.prototype.setWidget = function (widget) {
+        this.disconnect();
+        this.widget = widget;
+        this.observe(this.widget);
+        this.updateView();
+        this.fire('widgetChanged');
     };
 
-    wbWidget.prototype.getModel = function () {
-        return this.$model;
+    abstractWidgetLocator.prototype.getWidget = function () {
+        return this.widget;
     };
 
-    wbWidget.prototype.getCtrl = function () {
-        return this.$ctrl;
+    abstractWidgetLocator.prototype.setElements = function (elements) {
+        this.elements = elements;
+        angular.forEach(elements, function (element) {
+            $rootElement.append(element);
+            element.hide();
+        });
     };
 
-    wbWidget.prototype.getParent = function () {
-        if (this.$ctrl.isRoot()) {
-            return null;
-        } 
-        var parentCtrl = this.$ctrl.getParent();
-        return new wbWidget(parentCtrl.getModel(), parentCtrl);
+    abstractWidgetLocator.prototype.getElements = function () {
+        return this.elements;
     };
 
-    return wbWidget;
+    abstractWidgetLocator.prototype.on = function (type, callback) {
+        if (!angular.isArray(this.callbacks[type])) {
+            this.callbacks[type] = [];
+        }
+        this.callbacks[type].push(callback);
+    };
+
+    abstractWidgetLocator.prototype.fire = function (type) {
+        if (angular.isDefined(this.callbacks[type])) {
+            for (var i = 0; i < this.callbacks[type].length; i++) {
+                try {
+                    this.callbacks[type][i]();
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        }
+    };
+
+    abstractWidgetLocator.prototype.hide = function () {
+        this.setVisible(false);
+    }
+
+    abstractWidgetLocator.prototype.show = function () {
+        this.setVisible(true);
+    }
+
+
+    /**
+     * Set the locator visible
+     * 
+     * @param visible
+     *            {boolean} the visibility of the page
+     * @memberof AbstractWidgetLocator
+     */
+    abstractWidgetLocator.prototype.setVisible = function (visible) {
+        this.visible = visible;
+        visible = this.visible && this.enable;
+        if (visible) {
+            this.updateView();
+            this.fire('show');
+        } else {
+            this.fire('hide');
+        }
+        angular.forEach(this.elements, function (element) {
+            if (visible) {
+                element.show();
+            } else {
+                element.hide();
+            }
+        });
+    }
+
+    abstractWidgetLocator.prototype.isVisible = function () {
+        return this.visible;
+    }
+
+    /**
+     * Enable locator
+     * 
+     * If the locater is enable, then it watch for regular widget event and fire
+     * it to internal listeneres.
+     * 
+     * @param enable
+     *            {boolean} the flag to enable and disable.
+     * @memberof AbstractWidgetLocator
+     */
+    abstractWidgetLocator.prototype.setEnable = function (enable) {
+        if (this.enable == enable) {
+            return;
+        }
+        this.enable = enable;
+        this.setVisible(this.enable && this.visible);
+        if (this.enable) {
+            this.disconnect();
+        } else {
+            this.observe(this.getWidget());
+        }
+    }
+
+    abstractWidgetLocator.prototype.isEnable = function () {
+        return this.enable;
+    }
+
+    abstractWidgetLocator.prototype.destroy = function () {
+        this.fire('distroied');
+        angular.forEach(this.elements, function (element) {
+            element.remove();
+        });
+        this.elements = [];
+        this.callbacks = [];
+    }
+
+    abstractWidgetLocator.prototype.addClass = function (value) {
+        var elements = this.getElements();
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].addClass(value);
+        }
+    };
+
+    abstractWidgetLocator.prototype.removeClass = function (value) {
+        var elements = this.getElements();
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].removeClass(value);
+        }
+    };
+
+    abstractWidgetLocator.prototype.disconnect = function () {
+        for (var i = 0; i < this.observedWidgets.length; i++) {
+            var widget = this.observedWidgets[i];
+            angular.forEach(this.widgetListeners, function (listener, type) {
+                widget.off(type, listener);
+            });
+        }
+        this.observedWidgets = [];
+    };
+
+    abstractWidgetLocator.prototype.observe = function (widget) {
+        if (!widget) {
+            return;
+        }
+        // add listener
+        this.observedWidgets.push(widget);
+        angular.forEach(this.widgetListeners, function (listener, type) {
+            widget.on(type, listener);
+        });
+        this.updateView();
+    };
+
+    return abstractWidgetLocator;
 });
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name BoundWidgetLocator
+ * @description Locates a widget bound
+ * 
+ */
+.factory('BoundWidgetLocator', function (AbstractWidgetLocator, $rootScope) {
+
+	var boundWidgetLocator = function (options) {
+		options = options || {};
+		AbstractWidgetLocator.apply(this, options);
+
+		// load templates
+		var template = options.template 
+		|| '<div class="wb-widget-locator bound"></div>';
+
+		// load elements
+		this.topElement = angular.element(template);
+		this.topElement.attr('id', 'top');
+
+		this.rightElement = angular.element(template);
+		this.rightElement.attr('id', 'right');
+
+		this.buttomElement = angular.element(template);
+		this.buttomElement.attr('id', 'buttom');
+
+		this.leftElement = angular.element(template);
+		this.leftElement.attr('id', 'left');
+
+		// init controller
+		this.setElements([this.topElement, this.rightElement,
+			this.buttomElement, this.leftElement]);
+	};
+	boundWidgetLocator.prototype = new AbstractWidgetLocator();
+
+	boundWidgetLocator.prototype.updateView = function () {
+	    var bound = this.getWidget().getBoundingClientRect();
+		this.topElement.css({
+			top: bound.top + 1,
+			left: bound.left + 1,
+			width: bound.width - 2
+		});
+		this.rightElement.css({
+			top: bound.top + 1,
+			left: bound.left + bound.width - 2,
+			height: bound.height - 2
+		});
+		this.buttomElement.css({
+			top: bound.top + bound.height - 1,
+			left: bound.left + 1,
+			width: bound.width - 2
+		});
+		this.leftElement.css({
+			top: bound.top + 1,
+			left: bound.left + 1,
+			height: bound.height - 2
+		});
+
+	};
+	return boundWidgetLocator;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular
+.module('am-wb-core')
+
+
+/**
+ * @ngdoc Factories
+ * @name CursorWidgetLocator
+ * @description Manages list of locators
+ * 
+ * 
+ * There are two type of widgets locator: selection and bound.
+ * 
+ * For each widget a bound locator will be created.
+ * 
+ * For each item in selection a selection locator will be created.
+ */
+.factory('WidgetLocatorManager',function ($widget, BoundWidgetLocator, SelectionWidgetLocator) {
+
+    /**
+     * Get path of a widget to the root
+     */
+    function getPathOf(widget) {
+        var widgets = [];
+        while (widget != null) {
+            widgets.push(widget);
+            widget = widget.getParent();
+        }
+        return widgets;
+    }
+
+    /**
+     * Creates new instance of the manager
+     * 
+     * @memberof CursorWidgetLocator
+     */
+    function WidgetLocatorManager(options) {
+        options = options || {};
+        this.setEnable(false);
+        // attributes
+        this.selectionLocators = [];
+        this.boundLocators = [];
+
+        // selection options
+        this.SelectionLocator = options.selectionLocator || SelectionWidgetLocator;
+        this.SelectionLocatorOption = options.selectionLocatorOption || {};
+        this.boundEnable = true;
+        if (angular.isDefined(options.selectionEnable)) {
+            this.selectionEnable = options.selectionEnable;
+        }
+
+        // bound options
+        this.BoundLocator = options.boundLocator || BoundWidgetLocator;
+        this.BoundLocatorOption = options.boundLocatorOption || {};
+        this.boundEnable = true;
+        if (angular.isDefined(options.boundEnable)) {
+            this.boundEnable = options.boundEnable;
+        }
+    }
+
+    /**
+     * Distracts all locators and remove from view
+     * 
+     * @memberof CursorWidgetLocator
+     */
+    WidgetLocatorManager.prototype.destroy = function () {
+        angular.forEach(this.selectionLocators, function (
+                locator) {
+            locator.destroy();
+        });
+        angular.forEach(this.boundLocators, function (locator) {
+            locator.destroy();
+        });
+
+        this.selectionLocators = [];
+        this.boundLocators = [];
+    };
+
+    /**
+     * Sets visibility of locators
+     * 
+     * @param visible
+     *            {boolean} defines the visibility of the
+     *            locators
+     * @memberof CursorWidgetLocator
+     */
+    WidgetLocatorManager.prototype.setVisible = function (visible) {
+        if (this.visible === visible) {
+            return;
+        }
+        this.visible = visible;
+        angular.forEach(this.selectionLocators, function (locator) {
+            locator.setVisible(visible);
+        });
+        angular.forEach(this.boundLocators, function (locator) {
+            locator.setVisible(visible);
+        });
+    }
+
+    /**
+     * Checks if the manager is in visible state
+     * 
+     * @return true if the manager is visible.
+     * @memberof CursorWidgetLocator
+     */
+    WidgetLocatorManager.prototype.isVisible = function () {
+        return this.visible;
+    };
+
+
+    WidgetLocatorManager.prototype.setEnable = function (enable) {
+        if (this.enable === enable) {
+            return;
+        }
+        this.enable = enable;
+        if(this.enable){
+            this.updateSelectionLocators();
+            this.updateBoundLocators();
+        }
+    };
+
+    WidgetLocatorManager.prototype.isEnable = function () {
+        return this.enable;
+    };
+
+    /**
+     * Sets widgets which are selected
+     * 
+     * @param widgets
+     *            {WbWidgetCtr} which are selected
+     * @memberof CursorWidgetLocator
+     */
+    WidgetLocatorManager.prototype.setSelectedWidgets = function (widgets) {
+        var rootWidget = this.getRootWidget();
+        if(!rootWidget && widgets.length){
+            rootWidget = widgets[0].getRoot();
+            this.setRootWidget(rootWidget);
+        }
+        this.selectedWidgets = widgets;
+        if (this.isEnable()) {
+            this.updateSelectionLocators();
+        }
+    };
+
+    /**
+     * Gets selected widgets
+     * 
+     * @return widgets
+     * @memberof CursorWidgetLocator
+     */
+    WidgetLocatorManager.prototype.getSelectedWidgets = function () {
+        return this.selectedWidgets || [];
+    };
+
+    /**
+     * Sets the root widget
+     * 
+     * @param rootWidget
+     *            {WbWidgetCtrl} root widget
+     * @memberof WidgetLocatorManager
+     */
+    WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {
+        if(!this.mutationObserver){
+            var ctrl = this;
+            this.mutationObserver = new MutationObserver(function(){
+                if(!ctrl.isEnable()){
+                    return;
+                }
+                ctrl.updateSelectionLocators();
+                ctrl.updateBoundLocators();
+            });
+        }
+        if(this.rootWidget) {
+            this.mutationObserver.disconnect(this.rootWidget.getElement()[0]);
+        }
+        this.rootWidget = rootWidget;
+        if(this.rootWidget) {
+            this.mutationObserver.observe(this.rootWidget.getElement()[0], {
+                attributes:    true,
+                childList: true,
+                subtree: true
+//                attributeFilter: ["style"]
+            });
+        }
+        if (this.isEnable()) {
+            this.updateBoundLocators();
+        }
+    };
+
+    /**
+     * Gets the root widget
+     * 
+     * @return the root widget
+     * @memberof WidgetLocatorManager
+     */
+    WidgetLocatorManager.prototype.getRootWidget = function () {
+        return this.rootWidget;
+    };
+
+    WidgetLocatorManager.prototype.updateSelectionLocators = function () {
+        var widgets = this.getSelectedWidgets();
+        var locator;
+        var i;
+        // disable extra
+        for (i = 0; i < this.selectionLocators.length; i++) {
+            this.selectionLocators[i]
+            .setEnable(i < widgets.length);
+        }
+
+        // add new
+        while (this.selectionLocators.length < widgets.length) {
+            locator = new this.SelectionLocator(this.SelectionLocatorOption);
+            locator.setEnable(true);
+            this.selectionLocators.push(locator);
+        }
+
+        // set widgets
+        for (i = 0; i < widgets.length; i++) {
+            locator = this.selectionLocators[i];
+            locator.setWidget(widgets[i]);
+            locator.setVisible(this.visible);
+        }
+    };
+    
+    /**
+     * Update all locators
+     * 
+     * @memberof WidgetLocatorManager
+     */
+    WidgetLocatorManager.prototype.updateBoundLocators = function () {
+        var widgets;
+        var i;
+        var locator;
+        var widget;
+        
+        /*
+         * Adds new locator for new widget
+         */
+        var ctrl = this;
+        function newLocator($event){
+            ctrl.updateBoundLocators();
+        }
+        
+        // list widgets
+        var rootWidget = this.getRootWidget();
+        if(!rootWidget){
+            return;
+        }
+        widgets = $widget.getChildren(rootWidget);
+        widgets.push(rootWidget);
+        this.activeBoundLocators = widgets.length;
+        
+        // disable extra
+        for (i = 0; i < this.boundLocators.length; i++) {
+            this.boundLocators[i].setEnable(i < widgets.length);
+
+            // remove listener
+            widget = this.boundLocators[i].getWidget();
+            if(widget){
+                widget.off('newchild', newLocator);
+            }
+        }
+
+        // add new
+        while (this.boundLocators.length < widgets.length) {
+            locator = new this.BoundLocator(this.BoundLocatorOption);
+            locator.setEnable(true);
+            this.boundLocators.push(locator);
+        }
+
+        // set widgets
+        for (i = 0; i < widgets.length; i++) {
+            var locator = this.boundLocators[i];
+            locator.setWidget(widgets[i]);
+            locator.setVisible(this.visible);
+            
+            // add listener
+            widgets[i].on('newchild', newLocator);
+        }
+    };
+
+    return WidgetLocatorManager;
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name AbstractWidgetLocator
+ * @description Locates a widget on the view
+ * 
+ * It is used to display extra information about a widget on the screen. For
+ * example it is used to show widget actions on the fly.
+ * 
+ */
+.factory('SelectionWidgetLocator', function (AbstractWidgetLocator, $document) {
+
+    var selectionWidgetLocator = function (options) {
+        options = options || {};
+        AbstractWidgetLocator.apply(this, options);
+
+        // load headerTemplate
+
+        // load templates
+        var template = options.template
+        || '<div class="wb-widget-locator selection"></div>';
+
+        this.titleElement = angular.element(template);
+        this.titleElement.attr('id', 'header');
+
+        // load elements
+        this.topElement = angular.element(template);
+        this.topElement.attr('id', 'top');
+
+        this.rightElement = angular.element(template);
+        this.rightElement.attr('id', 'right');
+
+        this.buttomElement = angular.element(template);
+        this.buttomElement.attr('id', 'buttom');
+
+        this.leftElement = angular.element(template);
+        this.leftElement.attr('id', 'left');
+
+        this.sizeElement = angular.element(template);
+        this.sizeElement.attr('id', 'size');
+
+        // init controller
+        this.setElements([this.titleElement, this.topElement, this.rightElement,
+            this.buttomElement, this.leftElement, this.sizeElement]);
+        
+        
+        
+        var position = {};
+        var lock = false;
+        var dimension = {};
+        var ctrl = this;
+        
+
+        function mousemove($event) {
+            var deltaWidth = dimension.width - (position.x - $event.clientX);
+            var deltaHeight = dimension.height - (position.y - $event.clientY);
+            var newDimensions = {
+                    width: deltaWidth + 'px',
+                    height: deltaHeight + 'px'
+            };
+            
+            var widget = ctrl.getWidget();
+            var model = widget.getModel();
+            var $element = widget.getElement();
+            var $scope = widget.getScope();
+            
+            if (model.style.size.height === 'auto') {
+                newDimensions.height = 'auto';
+            }
+            $element.css(newDimensions);
+            
+            model.style.size.width = newDimensions.width;
+            model.style.size.height = newDimensions.height;
+
+            $scope.$apply();
+            return false;
+        }
+
+        function mouseup() {
+            $document.unbind('mousemove', mousemove);
+            $document.unbind('mouseup', mouseup);
+            lock = false;
+        }
+
+        function mousedown($event) {
+            $event.stopImmediatePropagation();
+            position.x = $event.clientX;
+            position.y = $event.clientY;
+            lock = true;
+            var $element = ctrl.getWidget().getElement();
+            dimension.width = $element.prop('offsetWidth');
+            dimension.height = $element.prop('offsetHeight');
+            $document.bind('mousemove', mousemove);
+            $document.bind('mouseup', mouseup);
+            return false;
+        }
+
+
+        this.sizeElement.on('mousedown', mousedown);
+    };
+    selectionWidgetLocator.prototype = new AbstractWidgetLocator();
+
+    selectionWidgetLocator.prototype.updateView = function () {
+        var bound = this.getWidget().getBoundingClientRect();
+        this.topElement.css({
+            top: bound.top + 1,
+            left: bound.left + 1,
+            width: bound.width - 2
+        });
+        this.rightElement.css({
+            top: bound.top + 1,
+            left: bound.left + bound.width - 2,
+            height: bound.height - 2
+        });
+        this.buttomElement.css({
+            top: bound.top + bound.height - 1,
+            left: bound.left + 1,
+            width: bound.width - 2
+        });
+        this.leftElement.css({
+            top: bound.top + 1,
+            left: bound.left + 1,
+            height: bound.height - 2
+        });
+        if (bound.top < 32) {
+            this.titleElement.css({
+                top: bound.top + bound.height,
+                left: bound.left + bound.width- this.titleElement.width() - 5
+            });
+        } else {
+            this.titleElement.css({
+                top: bound.top -  this.titleElement.height(),
+                left: bound.left + bound.width - this.titleElement.width() - 5
+            });
+        }
+        var widget = this.getWidget();
+        this.titleElement[0].innerHTML = '<span>'+ (widget.getTitle() || widget.getId() || widget.getType()) + '</span>'
+        
+        
+        this.sizeElement.css({
+            top: bound.top + bound.height - 7,
+            left: bound.left + bound.width - 7 ,
+        })
+    };
+    return selectionWidgetLocator;
+});
+
+
 /* 
  * The MIT License (MIT)
  * 
@@ -4006,7 +3907,6 @@ angular.module('am-wb-core')
 	 */
 	.run(function ($settings) {
 
-
 	    $settings.newPage({
 		type: 'general',
 		label: 'General',
@@ -4096,7 +3996,16 @@ angular.module('am-wb-core')
 	    $settings.newPage({
 		type: 'SEO',
 		label: 'SEO',
-		templateUrl: 'views/settings/wb-seo.html'
+		templateUrl: 'views/settings/wb-seo.html',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+		   this.isRoot = function () {
+		       return $scope.wbWidget.isRoot();
+		   }; 
+		}
 	    });
 
 	    $settings.newPage({
@@ -4524,7 +4433,60 @@ angular.module('am-wb-core')
 				value: 'center'
 			    }]
 		    };
+		    /*
+		     * watch 'wbModel' and apply the changes in setting panel
+		     */
+		    var ctrl = this;
+		    $scope.$watch('wbModel', function (model) {
+			if (model) {
+			    var layout = model.style.layout || {};
+			    ctrl.direction = layout.direction;
+			    ctrl.align = layout.align;
+			    ctrl.wrap = layout.wrap;
+			    ctrl.justify = layout.justify;
+			    ctrl.parentWidget = $scope.wbWidget.getParent();
+			    if (ctrl.parentWidget) {
+				ctrl.parentDirection = ctrl.parentWidget.getModel().style.layout.direction;
+			    }
+			    //TODO: maso, 2018: Safe above code for null value
+			} 
+			//TODO: maso, 2018: handle else sectipn
+		    });
 
+		    /*
+		     * This part updates the wbModel whenever the layout properties are changed in view
+		     */
+		    this.directionChanged = function () {
+			$scope.wbModel.style.layout.direction = this.direction;
+		    };
+
+		    this.wrapChanged = function () {
+			$scope.wbModel.style.layout.wrap = this.wrap;
+		    };
+
+		    this.alignChanged = function () {
+			$scope.wbModel.style.layout.align = this.align;
+		    };
+
+		    this.justifyChanged = function () {
+			$scope.wbModel.style.layout.justify = this.justify;
+		    };
+		}
+	    });
+	    
+	     $settings.newPage({
+		type: 'layout-self',
+		label: 'Self Layout',
+		icon: 'dashboard',
+		description: 'Manages layout of the current item.',
+		templateUrl: 'views/settings/wb-layout-self.html',
+		controllerAs: 'ctrl',
+		/*
+		 * Manages setting page 
+		 * 
+		 * @ngInject
+		 */
+		controller: function ($scope) {
 		    this.selfAlign_ = {
 			'column': [{
 				title: 'Stretch',
@@ -4569,11 +4531,7 @@ angular.module('am-wb-core')
 		    $scope.$watch('wbModel', function (model) {
 			if (model) {
 			    var layout = model.style.layout || {};
-			    ctrl.direction = layout.direction;
-			    ctrl.align = layout.align;
-			    ctrl.wrap = layout.wrap;
 			    ctrl.alignSelf = layout.align_self;
-			    ctrl.justify = layout.justify;
 			    ctrl.parentWidget = $scope.wbWidget.getParent();
 			    if (ctrl.parentWidget) {
 				ctrl.parentDirection = ctrl.parentWidget.getModel().style.layout.direction;
@@ -4584,29 +4542,15 @@ angular.module('am-wb-core')
 		    });
 
 		    /*
-		     * This part updates the wbModel whenever the layout properties are changed in view
+		     * This part updates the wbModel whenever the layout-self property is changed in view
 		     */
-		    this.directionChanged = function () {
-			$scope.wbModel.style.layout.direction = this.direction;
-		    };
-
-		    this.wrapChanged = function () {
-			$scope.wbModel.style.layout.wrap = this.wrap;
-		    };
-
-		    this.alignChanged = function () {
-			$scope.wbModel.style.layout.align = this.align;
-		    };
-
-		    this.justifyChanged = function () {
-			$scope.wbModel.style.layout.justify = this.justify;
-		    };
 
 		    this.alignSelfChanged = function () {
 			$scope.wbModel.style.layout.align_self = this.alignSelf;
 		    };
 		}
 	    });
+	    
 	    //TODO: Masood, 2018: Move this controller to a separated controller.
 	    $settings.newPage({
 		type: 'marginPadding',
@@ -5004,7 +4948,7 @@ angular.module('am-wb-core')
             }
         },
         // functional properties
-        template: '<wb-group ng-model="wbModel"></wb-group>',
+        templateUrl: 'views/directives/wb-group.html',
         help: 'http://dpq.co.ir/more-information-link',
         helpId: 'wb-widget-group'
     });
@@ -5556,9 +5500,9 @@ angular.module('am-wb-core')
 	 * Default settings
 	 */
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'general'/*, 'description'*/, 'border',
-		'background', 'layout', 'marginPadding', 'size', 'shadow', 'SEO' ];
+		'background', 'layout', 'layout-self', 'marginPadding', 'size', 'shadow', 'SEO' ];
 	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'border',
-		'background', 'marginPadding', 'layout', 'size', 'shadow' ];
+		'background', 'marginPadding', 'layout-self', 'size', 'shadow', 'SEO' ];
 
 	/**
 	 * Setting page storage
@@ -5759,38 +5703,38 @@ angular.module('am-wb-core').service('$wbUi', function($mdDialog, $q, $http) {
 /**
  * Utility class of WB
  */
-angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, $sce) {
+angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, $sce, $mdMedia) {
     'use strict';
     var service = this;
 
     function cleanMap(oldStyle, newStyle, map) {
-	for (var i = 0; i < map.length; i++) {
-	    if (oldStyle[map[i][0]]) {
-		newStyle[map[i][1]] = oldStyle[map[i][0]];
-		delete oldStyle[map[i][0]];
-	    }
-	}
+        for (var i = 0; i < map.length; i++) {
+            if (oldStyle[map[i][0]]) {
+                newStyle[map[i][1]] = oldStyle[map[i][0]];
+                delete oldStyle[map[i][0]];
+            }
+        }
     }
 
     function getTemplateOf(page)
     {
-	var template;
-	var templateUrl;
-	if (angular.isDefined(template = page.template)) {
-	    if (angular.isFunction(template)) {
-		template = template(page.params);
-	    }
-	} else if (angular
-		.isDefined(templateUrl = page.templateUrl)) {
-	    if (angular.isFunction(templateUrl)) {
-		templateUrl = templateUrl(page.params);
-	    }
-	    if (angular.isDefined(templateUrl)) {
-		page.loadedTemplateUrl = $sce.valueOf(templateUrl);
-		template = $templateRequest(templateUrl);
-	    }
-	}
-	return template;
+        var template;
+        var templateUrl;
+        if (angular.isDefined(template = page.template)) {
+            if (angular.isFunction(template)) {
+                template = template(page.params);
+            }
+        } else if (angular
+                .isDefined(templateUrl = page.templateUrl)) {
+            if (angular.isFunction(templateUrl)) {
+                templateUrl = templateUrl(page.params);
+            }
+            if (angular.isDefined(templateUrl)) {
+                page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+                template = $templateRequest(templateUrl);
+            }
+        }
+        return template;
     }
 
     /**
@@ -5804,195 +5748,443 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
      */
     function getTemplateFor(page)
     {
-	return $q.when(getTemplateOf(page));
+        return $q.when(getTemplateOf(page));
+    }
+
+    /**
+     * Converts data into a valid CSS attributes
+     */
+    function convertToWidgetCss(style) {
+        var style = style || {};
+        var css = {};
+        // size
+        css = _.merge(css, style.size || {});
+
+        // layout
+        css = _.merge(css, convertToWidgetCssLayout(style.layout || {}));
+
+        // background
+        css = _.merge(css, convertToWidgetCssBackground(style.background || {}));
+
+        // border
+        css = _.merge(css, convertToWidgetCssBoarder(style.border || {}));
+
+        // shadows
+        css = _.merge(css, convertToWidgetCssShadows(style.shadows || {}));
+        
+        // color, cursor, opacity
+        css = _.merge(css, {
+            padding: style.padding,
+            margin: style.margin,
+            color: style.color || 'initial',
+            cursor: style.cursor || 'auto',
+            opacity: style.opacity || '1'
+        });
+        
+        return css;
+    }
+
+    function createShadowStr(shadow) {
+        var hShift = shadow.hShift || '0px';
+        var vShift = shadow.vShift || '0px';
+        var blur = shadow.blur || '0px';
+        var spread = shadow.spread || '0px';
+        var color = shadow.color || 'black';
+        
+        var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
+        
+        if(shadow.inset) {
+            boxShadow = boxShadow.concat(' ' + 'inset');
+        }
+        
+        return boxShadow;
+    }
+
+    function convertToWidgetCssShadows(shadows) {
+        var shadowStr = '';
+
+        if (!angular.isArray(shadows) || shadows.length === 0) {
+            shadowStr = 'none';
+        } else {
+            angular.forEach(shadows, function (shadow, index) {
+                shadowStr += createShadowStr(shadow);
+                if(index + 1 < style.shadows.length){
+                    shadowStr += ', ';
+                }
+            });
+        }
+
+        return {
+            'box-shadow': shadowStr
+        };
+    }
+    
+    function convertToWidgetCssBoarder(style) {
+        var conf = {};
+        if (style.style) {
+            conf['border-style'] = style.style;
+        }
+        if (style.width) {
+            conf['border-width'] = style.width;
+        }
+        if (style.color) {
+            conf['border-color'] = style.color;
+        }
+        if (style.radius) {
+            conf['border-radius'] = style.radius;
+        }
+        
+        return conf;
+    }
+
+    function convertToWidgetCssBackground(style){
+        var cssValue = {};
+        if(style.background){
+            cssValue.background = style.background;
+        }
+        cssValue['background-image'] = (style.image) ? 'url(\''+style.image+'\')' : 'none';
+        cssValue['background-color'] = style.color || 'initial';
+        cssValue['background-size'] = style.size || 'auto';
+        cssValue['background-repeat'] = style.repeat || 'repeat';
+        cssValue['background-position'] = style.position || '0px 0px';
+        cssValue['background-attachment'] = style.attachment || 'scroll';
+        cssValue['background-origin'] = style.origin || 'padding-box';
+        cssValue['background-clip'] = style.clip || 'border-box';
+
+        return cssValue;
+    }
+
+    /**
+     * Converts data into a layout CSS3
+     */
+    function convertToWidgetCssLayout(layout){
+        var flexLayout = {};
+        /*
+         * Group
+         * 
+         * check if is group apply flex flow
+         */
+        {
+            flexLayout.display = 'flex';
+            // row
+            if (layout.direction === 'row' && $mdMedia('gt-sm')) {
+                flexLayout['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
+                flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
+                flexLayout['overflow-y'] = 'visible';
+            } else {
+                flexLayout['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
+                flexLayout['overflow-x'] = 'visible';
+                flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+            }
+
+
+            // wrap
+            if (layout.wrap) {
+                flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
+                // wrap align
+                var alignContent;
+                switch (layout.wrap_align) {
+                case 'start':
+                    alignContent = 'flex-start';
+                    break;
+                case 'end':
+                    alignContent = 'flex-end';
+                    break;
+                case 'center':
+                    alignContent = 'center';
+                    break;
+                case 'space-between':
+                    alignContent = 'space-between';
+                    break;
+                case 'space-around':
+                    alignContent = 'space-around';
+                    break;
+                case 'stretch':
+                    alignContent = 'stretch';
+                    break;
+                default:
+                    alignContent = 'stretch';
+                }
+                flexLayout['align-content'] = alignContent;
+            } else {
+                flexLayout['flex-wrap'] = 'nowrap';
+            }
+
+
+            // justify
+            var justify;
+            switch (layout.justify) {
+            case 'start':
+                justify = 'flex-start';
+                break;
+            case 'end':
+                justify = 'flex-end';
+                break;
+            case 'center':
+                justify = 'center';
+                break;
+            case 'space-between':
+                justify = 'space-between';
+                break;
+            case 'space-around':
+                justify = 'space-around';
+                break;
+            case 'space-evenly':
+                justify = 'space-evenly';
+                break;
+            default:
+                justify = 'flex-start';
+            }
+            flexLayout['justify-content'] = justify;
+
+            // align
+            var align;
+            switch (layout.align) {
+            case 'start':
+                align = 'flex-start';
+                break;
+            case 'end':
+                align = 'flex-end';
+                break;
+            case 'center':
+                align = 'center';
+                break;
+            case 'baseline':
+                align = 'baseline';
+                break;
+            case 'stretch':
+                align = 'stretch';
+                break;
+            default:
+                align = 'stretch';
+            }
+            flexLayout['align-items'] = align;
+        }
+
+        /*
+         * Widget
+         */
+        {
+            flexLayout.order = layout.order >= 0 ? layout.order : 0;
+            flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
+            flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
+            // TODO: maso, 2018: compute based on size
+            flexLayout['flex-basis'] = 'auto';
+
+            // align-self
+            // auto | flex-start | flex-end | center | baseline | stretch;
+            var alignSelf;
+            switch (layout.align_self) {
+            case 'start':
+                alignSelf = 'flex-start';
+                break;
+            case 'end':
+                alignSelf = 'flex-end';
+                break;
+            case 'center':
+                alignSelf = 'center';
+                break;
+            case 'baseline':
+                alignSelf = 'baseline';
+                break;
+            case 'stretch':
+                alignSelf = 'stretch';
+                break;
+            default:
+                alignSelf = 'auto';
+            }
+            flexLayout['align-self'] = alignSelf;
+        }
+
+        return flexLayout;
     }
 
     function cleanEvetns(model)
     {
-	// event
-	if (!model.event) {
-	    model.event = {};
-	}
+        // event
+        if (!model.event) {
+            model.event = {};
+        }
     }
 
     function cleanLayout(model)
     {
-	if (!model.style.layout) {
-	    model.style.layout = {};
-	}
-	if (model.type === 'Group' || model.type === 'Page') {
-	    // convert
-	    var newStyle = model.style.layout;
-	    var oldStyle = model.style;
+        if (!model.style.layout) {
+            model.style.layout = {};
+        }
+        if (model.type === 'Group' || model.type === 'Page') {
+            // convert
+            var newStyle = model.style.layout;
+            var oldStyle = model.style;
 
-	    if (oldStyle.flexDirection) {
-		if (oldStyle.flexDirection === 'wb-flex-row') {
-		    newStyle.direction = 'row';
-		} else {
-		    newStyle.direction = 'column';
-		}
-		delete oldStyle.flexDirection;
-	    }
-	    if (!newStyle.direction) {
-		newStyle.direction = 'column';
-	    }
+            if (oldStyle.flexDirection) {
+                if (oldStyle.flexDirection === 'wb-flex-row') {
+                    newStyle.direction = 'row';
+                } else {
+                    newStyle.direction = 'column';
+                }
+                delete oldStyle.flexDirection;
+            }
+            if (!newStyle.direction) {
+                newStyle.direction = 'column';
+            }
 
-	    switch (oldStyle.flexAlignItem) {
-		case 'wb-flex-align-items-center':
-		    newStyle.align = 'center';
-		    break;
-		case 'wb-flex-align-items-end':
-		    newStyle.align = 'end';
-		    break;
-		case 'wb-flex-align-items-start':
-		    newStyle.align = 'start';
-		    break;
-		case 'wb-flex-align-items-stretch':
-		    newStyle.align = 'stretch';
-		    break;
-		default:
-		    newStyle.align = 'stretch';
-	    }
-	    delete oldStyle.flexAlignItem;
+            switch (oldStyle.flexAlignItem) {
+            case 'wb-flex-align-items-center':
+                newStyle.align = 'center';
+                break;
+            case 'wb-flex-align-items-end':
+                newStyle.align = 'end';
+                break;
+            case 'wb-flex-align-items-start':
+                newStyle.align = 'start';
+                break;
+            case 'wb-flex-align-items-stretch':
+                newStyle.align = 'stretch';
+                break;
+            default:
+                newStyle.align = 'stretch';
+            }
+            delete oldStyle.flexAlignItem;
 
-	    switch (oldStyle.justifyContent) {
-		case 'wb-flex-justify-content-center':
-		    newStyle.justify = 'center';
-		    break;
-		case 'wb-flex-justify-content-end':
-		    newStyle.justify = 'end';
-		    break;
-		case 'wb-flex-justify-content-start':
-		    newStyle.justify = 'start';
-		    break;
-		case 'wb-flex-justify-content-space-between':
-		    newStyle.justify = 'space-between';
-		    break;
-		case 'wb-flex-justify-content-space-around':
-		    newStyle.justify = 'space-around';
-		    break;
-		default:
-		    newStyle.justify = 'center';
-	    }
-	    delete oldStyle.justifyContent;
-	}
+            switch (oldStyle.justifyContent) {
+            case 'wb-flex-justify-content-center':
+                newStyle.justify = 'center';
+                break;
+            case 'wb-flex-justify-content-end':
+                newStyle.justify = 'end';
+                break;
+            case 'wb-flex-justify-content-start':
+                newStyle.justify = 'start';
+                break;
+            case 'wb-flex-justify-content-space-between':
+                newStyle.justify = 'space-between';
+                break;
+            case 'wb-flex-justify-content-space-around':
+                newStyle.justify = 'space-around';
+                break;
+            default:
+                newStyle.justify = 'center';
+            }
+            delete oldStyle.justifyContent;
+        }
     }
 
     function cleanSize(model)
     {
-	if (!model.style.size) {
-	    model.style.size = {};
-	}
-	var newStyle = model.style.size;
-	var oldStyle = model.style;
-	var map = [['width', 'width'],
-	    ['height', 'height']];
-	cleanMap(oldStyle, newStyle, map);
+        if (!model.style.size) {
+            model.style.size = {};
+        }
+        var newStyle = model.style.size;
+        var oldStyle = model.style;
+        var map = [['width', 'width'],
+            ['height', 'height']];
+        cleanMap(oldStyle, newStyle, map);
     }
 
     function cleanBackground(model)
     {
-	if (!model.style.background) {
-	    model.style.background = {};
-	}
-	var newStyle = model.style.background;
-	var oldStyle = model.style;
-	var map = [['backgroundImage', 'image'],
-	    ['backgroundColor', 'color'],
-	    ['backgroundSize', 'size'],
-	    ['backgroundRepeat', 'repeat'],
-	    ['backgroundPosition', 'position']];
-	cleanMap(oldStyle, newStyle, map);
+        if (!model.style.background) {
+            model.style.background = {};
+        }
+        var newStyle = model.style.background;
+        var oldStyle = model.style;
+        var map = [['backgroundImage', 'image'],
+            ['backgroundColor', 'color'],
+            ['backgroundSize', 'size'],
+            ['backgroundRepeat', 'repeat'],
+            ['backgroundPosition', 'position']];
+        cleanMap(oldStyle, newStyle, map);
     }
 
     function cleanBorder(model)
     {
-	if (!model.style.border) {
-	    model.style.border = {};
-	}
-	var oldStyle = model.style;
-	var newStyle = model.style.border;
+        if (!model.style.border) {
+            model.style.border = {};
+        }
+        var oldStyle = model.style;
+        var newStyle = model.style.border;
 
-	if (oldStyle.borderRadius) {
-	    if (oldStyle.borderRadius.uniform) {
-		newStyle.radius = oldStyle.borderRadius.all + 'px';
-	    }
-	    // TODO: maso, 2018: support other models
-	}
-	// delete old values
-	delete model.style.borderColor;
-	delete model.style.borderRadius;
-	delete model.style.borderStyleColorWidth;
-	delete model.style.borderStyle;
-	delete model.style.borderWidth;
+        if (oldStyle.borderRadius) {
+            if (oldStyle.borderRadius.uniform) {
+                newStyle.radius = oldStyle.borderRadius.all + 'px';
+            }
+            // TODO: maso, 2018: support other models
+        }
+        // delete old values
+        delete model.style.borderColor;
+        delete model.style.borderRadius;
+        delete model.style.borderStyleColorWidth;
+        delete model.style.borderStyle;
+        delete model.style.borderWidth;
     }
 
     function cleanSpace(model)
     {
-	// Margin and padding
-	if (model.style.padding && angular.isObject(model.style.padding)) {
-	    var padding = '';
-	    if (model.style.padding.isUniform) {
-		padding = model.style.padding.uniform;
-	    } else {
-		padding = model.style.padding.top || '0px' + ' ' +
-			model.style.padding.right || '0px' + ' ' +
-			model.style.padding.bottom || '0px' + ' ' +
-			model.style.padding.left || '0px' + ' ';
-	    }
-	    model.style.padding = padding;
-	}
+        // Margin and padding
+        if (model.style.padding && angular.isObject(model.style.padding)) {
+            var padding = '';
+            if (model.style.padding.isUniform) {
+                padding = model.style.padding.uniform;
+            } else {
+                padding = model.style.padding.top || '0px' + ' ' +
+                model.style.padding.right || '0px' + ' ' +
+                model.style.padding.bottom || '0px' + ' ' +
+                model.style.padding.left || '0px' + ' ';
+            }
+            model.style.padding = padding;
+        }
 
-	if (model.style.margin && angular.isObject(model.style.margin)) {
-	    var margin = '';
-	    if (model.style.margin.isUniform) {
-		margin = model.style.margin.uniform;
-	    } else {
-		margin = model.style.margin.top || '0px' + ' ' +
-			model.style.margin.right || '0px' + ' ' +
-			model.style.margin.bottom || '0px' + ' ' +
-			model.style.margin.left || '0px' + ' ';
-	    }
-	    model.style.margin = margin;
-	}
+        if (model.style.margin && angular.isObject(model.style.margin)) {
+            var margin = '';
+            if (model.style.margin.isUniform) {
+                margin = model.style.margin.uniform;
+            } else {
+                margin = model.style.margin.top || '0px' + ' ' +
+                model.style.margin.right || '0px' + ' ' +
+                model.style.margin.bottom || '0px' + ' ' +
+                model.style.margin.left || '0px' + ' ';
+            }
+            model.style.margin = margin;
+        }
 
     }
 
     function cleanAlign(model)
     {
-	if (!model.style.align) {
-	    model.style.align = {};
-	}
+        if (!model.style.align) {
+            model.style.align = {};
+        }
     }
 
     function cleanStyle(model)
     {
-	if (!model.style) {
-	    model.style = {};
-	}
-	cleanLayout(model);
-	cleanSize(model);
-	cleanBackground(model);
-	cleanBorder(model);
-	cleanSpace(model);
-	cleanAlign(model);
+        if (!model.style) {
+            model.style = {};
+        }
+        cleanLayout(model);
+        cleanSize(model);
+        cleanBackground(model);
+        cleanBorder(model);
+        cleanSpace(model);
+        cleanAlign(model);
     }
 
     function cleanInternal(model)
     {
-	cleanEvetns(model);
-	cleanStyle(model);
-	if (model.type === 'Group' || model.type === 'Page') {
-	    if (!model.contents) {
-		model.contents = [];
-	    }
-	    if (model.contents.length) {
-		for (var i = 0; i < model.contents.length; i++) {
-		    cleanInternal(model.contents[i]);
-		}
-	    }
-	}
-	return model;
+        cleanEvetns(model);
+        cleanStyle(model);
+        if (model.type === 'Group' || model.type === 'Page') {
+            if (!model.contents) {
+                model.contents = [];
+            }
+            if (model.contents.length) {
+                for (var i = 0; i < model.contents.length; i++) {
+                    cleanInternal(model.contents[i]);
+                }
+            }
+        }
+        return model;
     }
 
     /**
@@ -6003,15 +6195,15 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
      */
     function clean(model, force)
     {
-	if (!model.type || model.type === 'Page') {
-	    model.type = 'Group';
-	}
-	if (model.version === 'wb1' && !force) {
-	    return model;
-	}
-	var newModel = cleanInternal(model);
-	newModel.version = 'wb1';
-	return newModel;
+        if (!model.type || model.type === 'Page') {
+            model.type = 'Group';
+        }
+        if (model.version === 'wb1' && !force) {
+            return model;
+        }
+        var newModel = cleanInternal(model);
+        newModel.version = 'wb1';
+        return newModel;
     }
 
     service.cleanMap = cleanMap;
@@ -6028,6 +6220,8 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
 
     service.getTemplateFor = getTemplateFor;
     service.getTemplateOf = getTemplateOf;
+    service.convertToWidgetCss = convertToWidgetCss;
+    service.convertToWidgetCssLayout = convertToWidgetCssLayout;
 });
 
 /* 
@@ -6065,232 +6259,293 @@ angular.module('am-wb-core')
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$widget', function(
-		$wbUtil,
-		$q, $sce, $templateRequest, $compile, $controller) {
+        $wbUtil,
+        $q, $sce, $templateRequest, $compile, $controller) {
 
-	var _group_repo = [];
-	var contentElementAsso = [];
-	var elementKey = [];
-	var service = this;
+    var _group_repo = [];
+    var contentElementAsso = [];
+    var elementKey = [];
+    var service = this;
 
-	var notFoundWidget = {
-			templateUrl : 'views/widgets/wb-notfound.html',
-			label : 'Not found',
-			description : 'Element not found'
-	};
-	var container = {
-			type : 'Page',
-			label : 'Page',
-			description : 'Panel contains list of widgets.',
-			image : 'images/wb/content.svg'
-	};
+    var notFoundWidget = {
+            templateUrl : 'views/widgets/wb-notfound.html',
+            label : 'Not found',
+            description : 'Element not found'
+    };
+    var container = {
+            type : 'Page',
+            label : 'Page',
+            description : 'Panel contains list of widgets.',
+            image : 'images/wb/content.svg'
+    };
 
-	function _group(groupId){
-		for(var i = 0; i < _group_repo.length; i++){
-			if(_group_repo[i].id === groupId){
-				return _group_repo[i];
-			}
-		}
-		var group = {
-				id: groupId
-		};
-		_group_repo.push(group);
-		return group;
-	}
+    function _group(groupId){
+        for(var i = 0; i < _group_repo.length; i++){
+            if(_group_repo[i].id === groupId){
+                return _group_repo[i];
+            }
+        }
+        var group = {
+                id: groupId
+        };
+        _group_repo.push(group);
+        return group;
+    }
 
-	function _newGroup(group){
-		var g = _group(group.id);
-		angular.extend(g, group);
-	}
+    function _newGroup(group){
+        var g = _group(group.id);
+        angular.extend(g, group);
+    }
 
-	function _groups(){
-		return _group_repo;
-	}
+    function _groups(){
+        return _group_repo;
+    }
 
-	function _widget(model){
-		if (model.type in contentElementAsso) {
-			return contentElementAsso[model.type];
-		}
-		if (model.type === 'Page') {
-			return container;
-		}
-		return notFoundWidget;
-	}
-	/**
-	 * Finds a widget related to the input model.
-	 * 
-	 * Widget type is stored in the widget data model. This function get the
-	 * model type from the input data type and return related widget.
-	 * 
-	 * NotFoundElement widget is returned if the widget type is not found.
-	 * 
-	 * @memberof $widget
-	 * @param model to find a widget
-	 * @returns promise to find a widget
-	 */
-	function widget(model) {
-		return $q.when(_widget(model));
-	}
+    function _widget(model){
+        if (model.type in contentElementAsso) {
+            return contentElementAsso[model.type];
+        }
+        if (model.type === 'Page') {
+            return container;
+        }
+        return notFoundWidget;
+    }
+    /**
+     * Finds a widget related to the input model.
+     * 
+     * Widget type is stored in the widget data model. This function get the
+     * model type from the input data type and return related widget.
+     * 
+     * NotFoundElement widget is returned if the widget type is not found.
+     * 
+     * @memberof $widget
+     * @param model to find a widget
+     * @returns promise to find a widget
+     */
+    function widget(model) {
+        return $q.when(_widget(model));
+    }
 
-	/**
-	 * Returns list of all registerd widgets.
-	 * 
-	 * @memberof $widget
-	 * @returns promise to load all widgets
-	 */
-	function widgets() {
-		var widgets = {};
-		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-		widgets.items = [];
-		elementKey.forEach(function(type) {
-			widgets.items.push(contentElementAsso[type]);
-		});
-		return $q.when(widgets);
-	}
+    /**
+     * Returns list of all registerd widgets.
+     * 
+     * @memberof $widget
+     * @returns promise to load all widgets
+     */
+    function widgets() {
+        var widgets = {};
+        // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+        widgets.items = [];
+        elementKey.forEach(function(type) {
+            widgets.items.push(contentElementAsso[type]);
+        });
+        return $q.when(widgets);
+    }
 
-	/**
-	 * List of all registered widgets
-	 * 
-	 * @memberof $widget
-	 * @returns keys {array} list of all keys
-	 */
-	function getWidgetsKey(){
-		return elementKey;
-	}
+    /**
+     * List of all registered widgets
+     * 
+     * @memberof $widget
+     * @returns keys {array} list of all keys
+     */
+    function getWidgetsKey(){
+        return elementKey;
+    }
 
-	/**
-	 * Registers new widget
-	 * 
-	 * @See the following page for more information:
-	 * 
-	 *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
-	 * 
-	 * @memberof $widget
-	 * @param widget to add
-	 * @return the service
-	 */
-	function newWidget(widget) {
-		if (widget.type in contentElementAsso) {
-			// XXX: maso, 2017: throw exception
-			return;
-		}
-		// fix widget data
-		widget.model = widget.model || {style:{}};
-		widget.model.type = widget.type;
-		widget.model.name = widget.model.name || widget.title; 
+    /**
+     * Registers new widget
+     * 
+     * The old widget will be override if a new widget with the same type is registered.
+     * 
+     * @See the following page for more information:
+     * 
+     *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
+     *    
+     * 
+     * @memberof $widget
+     * @param widget to add
+     * @return the service
+     */
+    function newWidget(widget) {
+        if (widget.type in contentElementAsso) {
+            // TODO: maso, 2017: Add log for duplication
+        }
+        // fix widget data
+        widget.model = widget.model || {style:{}};
+        widget.model.type = widget.type;
+        widget.model.name = widget.model.name || widget.title; 
 
-		contentElementAsso[widget.type] = widget;
-		elementKey.push(widget.type);
-		return service;
-	}
+        contentElementAsso[widget.type] = widget;
+        elementKey.push(widget.type);
+        return service;
+    }
 
-	/**
-	 * Compile element 
-	 * 
-	 * @name show
-	 * @memberof $widget
-	 * @param optionsOrPreset
-	 *            {object}
-	 *            <ul>
-	 *            <li>templateUrl - {string=}: The URL of a template that will
-	 *            be used as the content of the dialog.</li>
-	 *            <li>template- {string=}: HTML template to show in the dialog.
-	 *            This must be trusted HTML with respect to Angular's $sce
-	 *            service. This template should never be constructed with any
-	 *            kind of user input or user data.</li>
-	 *            <li>contentElement:</li>
-	 *            <li>scope - {object=}: the scope to link the template
-	 *            controller to. If none is specified, it will create a new
-	 *            isolate scope. This scope will be destroyed when the dialog is
-	 *            removed unless preserveScope is set to true.</li>
-	 *            <li>controller - {function|string=}: The controller to
-	 *            associate with the dialog. The controller will be injected
-	 *            with the local $mdDialog, which passes along a scope for the
-	 *            dialog.</li>
-	 *            <li>controllerAs - {string=}: An alias to assign the
-	 *            controller to on the scope.</li>
-	 *            <li>parent - {element=}: The element to append the dialog to.
-	 *            Defaults to appending to the root element of the application.</li>
-	 *            </ul>
-	 * @param parenScope
-	 * @return promise A promise that resolve created element
-	 */
-	function compile(model, parenScope, parentElement, locals){
-		var widget = _widget(model);
-		var childScope = null;
-		var element = null;
+    /**
+     * Compile element 
+     * 
+     * @name show
+     * @memberof $widget
+     * @param model
+     *            {object}
+     *            <ul>
+     *            <li>templateUrl - {string=}: The URL of a template that will
+     *            be used as the content of the dialog.</li>
+     *            <li>template- {string=}: HTML template to show in the dialog.
+     *            This must be trusted HTML with respect to Angular's $sce
+     *            service. This template should never be constructed with any
+     *            kind of user input or user data.</li>
+     *            <li>contentElement:</li>
+     *            <li>scope - {object=}: the scope to link the template
+     *            controller to. If none is specified, it will create a new
+     *            isolate scope. This scope will be destroyed when the dialog is
+     *            removed unless preserveScope is set to true.</li>
+     *            <li>controller - {function|string=}: The controller to
+     *            associate with the dialog. The controller will be injected
+     *            with the local $mdDialog, which passes along a scope for the
+     *            dialog.</li>
+     *            <li>controllerAs - {string=}: An alias to assign the
+     *            controller to on the scope.</li>
+     *            <li>parent - {element=}: The element to append the dialog to.
+     *            Defaults to appending to the root element of the application.</li>
+     *            </ul>
+     * @param parentWidget
+     *     {WbWidget} the parent
+     * @return promise A promise that resolve created element
+     */
+    function compile(model, parentWidget){
+        var widget = _widget(model);
+        var childScope = null;
+        var element = null;
 
-		// 1- create scope
-		childScope = parenScope.$new(false, parenScope);
-		childScope.wbModel = model;
+        // 1- create scope
+        var parentScope = parentWidget.getScope();
+        childScope = parentScope.$new(false, parentScope);
 
-		// 2- create element
-		return $q.when($wbUtil.getTemplateFor(widget))//
-		.then(function(template) {
-			if (model.type !== 'Group') {
-				template = '<wb-widget ng-model="wbModel">' + template + '</wb-widget>';
-			}
-			element = angular.element(template);
-			if(parentElement) {
-				parentElement.append(element);
-			}
-			// 3- bind controller
-			var link = $compile(element);
-			if (angular.isDefined(widget.controller)) {
-				var wlocals = _.merge({
-					// TODO: maso, 2017: bind wbModel, wbParent,
-					// and wbEditable
-					$scope : childScope,
-					$element : element
-				}, locals || {});
-				var controller = $controller(widget.controller, wlocals);
-				if (widget.controllerAs) {
-					childScope[widget.controllerAs] = controller;
-				}
-				element.data('$ngControllerController', controller);
-			}
-			link(childScope);
-			return element;
-		});
-	}
+        // 2- create element
+        return $wbUtil.getTemplateFor(widget)//
+        .then(function(template) {
+            if (model.type !== 'Group') {
+                template = '<div class="wb-widget" name="{{wbModel.name}}" '+
 
-	/**
-	 * Creates new serialized data of widget
-	 * 
-	 * @memberof $widget
-	 * @param widget
-	 * @returns
-	 */
-	function widgetData(widget){
-		return angular.copy(widget.model);
-	}
+                'dnd-disable-if="!ctrl.isEditable()" '+
+                'dnd-draggable="wbModel" '+
+                'dnd-type="wbModel.type" '+
+                'dnd-effect-allowed="copyMove" '+
+                'dnd-callback="1" '+
 
-	// widgets
-	service.newWidget = newWidget;
-	service.widget = widget;
-	service.widgets = widgets;
-	service.widgetData = widgetData;
-	service.getWidgetsKey = getWidgetsKey;
+                'dnd-moved="ctrl.delete()" '+
 
-	// new api
-	service.getWidget = _widget;
-	service.getWidgets =  function(){
-		var widgets = {};
-		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-		widgets.items = [];
-		elementKey.forEach(function(type) {
-			widgets.items.push(contentElementAsso[type]);
-		});
-		return widgets;
-	};
+                'md-theme-watch="true">' + template + '</div>';
+            }
 
-	// widget groups
-	service.group = _group;
-	service.groups = _groups;
-	service.newGroup = _newGroup;
+            var ctrl;
 
-	// utils
-	service.compile = compile;
+            // 3- bind controller
+            element = angular.element(template);
+            var link = $compile(element);
+            var wlocals = _.merge({
+                $scope : childScope,
+                $element : element,
+            });
+            if (model.type !== 'Group') {
+                ctrl = $controller('WbWidgetCtrl', wlocals);
+            } else {
+                ctrl = $controller('WbWidgetGroupCtrl', wlocals);
+            }
+
+            // extend element controller
+            if (angular.isDefined(widget.controller)) {
+                angular.extend(ctrl, $controller(widget.controller, wlocals));
+            }
+            if (widget.controllerAs) {
+                childScope[widget.controllerAs] = ctrl;
+            }
+            childScope['ctrl'] = ctrl;
+
+            // bind ctrl
+            element.data('$ngControllerController', ctrl);
+            link(childScope);
+            ctrl.setParent(parentWidget);
+            ctrl.setModel(model);
+            
+            // return widget
+            return ctrl;
+        });
+    }
+
+    /**
+     * Creates new serialized data of widget
+     * 
+     * @memberof $widget
+     * @param widget
+     * @returns
+     */
+    function widgetData(widget){
+        return angular.copy(widget.model);
+    }
+
+    // widgets
+    service.newWidget = newWidget;
+    service.widget = widget;
+    service.widgets = widgets;
+    service.widgetData = widgetData;
+    service.getWidgetsKey = getWidgetsKey;
+
+    // new api
+    service.getWidget = _widget;
+    service.getWidgets =  function(){
+        var widgets = {};
+        // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+        widgets.items = [];
+        elementKey.forEach(function(type) {
+            widgets.items.push(contentElementAsso[type]);
+        });
+        return widgets;
+    };
+
+    // widget groups
+    service.group = _group;
+    service.groups = _groups;
+    service.newGroup = _newGroup;
+
+    // utils
+    service.compile = compile;
+    
+    /**
+     * Gets list of all children from the widget
+     * 
+     * The list is consist of all children and sub-children from the given 
+     * widget.
+     * 
+     * @params widget {AbstractWidgetCtrl} the widget
+     * @return List of widgets
+     * @memberof $widget
+     */
+    this.getChildren = function(widget) {
+        // Check if it is group
+        var widgets = [];
+        if(widget.getType() !== 'Group') {
+            return widgets;
+        }
+        
+        // load list of widgets
+        var groups = [];
+        groups.push(widget);
+        while(groups.length) {
+            widget = groups.pop();
+            var children = widget.getChildren();
+            for(var i = 0; i < children.length; i++) {
+                var child = children[i];
+                widgets.push(child);
+                if(child.getType() === 'Group') {
+                    groups.push(child);
+                }
+            }
+        }
+        
+        //return the list
+        return widgets;
+    }
 });
 
 /* 
@@ -6556,21 +6811,17 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource-single-page.html',
-    "<md-dialog aria-label=\"Select item/items\" style=\"width:50%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <md-button ng-if=openHelp ng-click=openHelp($event) aria-label=\"Show help\"> <span translate>Learn more</span> </md-button> <span flex></span> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> <md-button class=md-primary ng-click=answer()> <span translate>OK</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
+    "<md-dialog aria-label=\"Select item/items\" style=\"width:50%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <md-button ng-if=openHelp ng-click=openHelp($event) aria-label=\"Show help\"> <span translate=\"\">Learn more</span> </md-button> <span flex></span> <md-button ng-click=cancel() aria-label=Cancel> <span translate=\"\">Close</span> </md-button> <md-button class=md-primary aria-label=Done ng-click=answer()> <span translate=\"\">Ok</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
   );
 
 
   $templateCache.put('views/dialogs/wb-select-resource.html',
-    "<md-dialog aria-label=\"Select item/items\" style=\"width:70%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <md-sidenav class=md-sidenav-left md-component-id=left md-is-locked-open=true md-whiteframe=4 layout=column ng-hide=\"pages.length === 1\"> <div style=\"text-align: center\"> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> <md-devider></md-devider> <md-content> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </md-content> </md-sidenav> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <span flex></span> <md-button ng-click=cancel()> <span translate>Close</span> </md-button> <md-button class=md-primary ng-click=answer()> <span translate>OK</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
+    "<md-dialog aria-label=\"Select item/items\" style=\"width:70%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <md-sidenav class=md-sidenav-left md-component-id=left md-is-locked-open=true md-whiteframe=4 layout=column ng-hide=\"pages.length === 1\"> <div style=\"text-align: center\"> <wb-icon size=64px ng-if=style.icon>{{style.icon}}</wb-icon> <h2 style=\"text-align: center\" translate>{{style.title}}</h2> <p style=\"text-align: center\" translate>{{style.description}}</p> </div> <md-devider></md-devider> <md-content> <md-list style=\"padding:0px; margin: 0px\"> <md-list-item ng-repeat=\"page in pages | orderBy:priority\" ng-click=\"loadPage(page, $event);\" md-colors=\"_selectedIndex===$index ? {background:'accent'} : {}\"> <wb-icon>{{page.icon || 'attachment'}}</wb-icon> <p>{{page.label | translate}}</p> </md-list-item> </md-list> </md-content> </md-sidenav> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <span flex></span> <md-button aria-label=Cancel ng-click=cancel()> <span translate=\"\">Close</span> </md-button> <md-button class=md-primary aria-label=Done ng-click=answer()> <span translate=\"\">Ok</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
   );
 
 
   $templateCache.put('views/directives/wb-group.html',
-    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"dropCallback(index, item, external, type)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" wb-size=wbModel.style wb-layout=wbModel.style wb-align=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-shadows=wbModel.style wb-color=wbModel.style wb-cursor=wbModel.style wb-opacity=wbModel.style wb-events=wbModel.event ng-class=\"{\n" +
-    "\t\t'wb-group-root': ctrl.isRoot(),\n" +
-    "\t\t'wb-group-edit': ctrl.isEditable(),\n" +
-    "\t\t'wb-group-select': ctrl.isSelected()\n" +
-    "\t}\" md-theme-watch=true></div>"
+    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"ctrl.addChild(index, item)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" md-theme-watch=true></div>"
   );
 
 
@@ -6650,12 +6901,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-image.html',
-    "<div class=\"wb-ui-setting-image wb-ui-setting-image-container\" layout=row> <div class=wb-ui-setting-image-preview ng-click=ctrl.showImagePicker($event) ng-if=wbUiSettingPreview> <img ng-show=value class=wb-ui-setting-image-result ng-src=\"{{value}}\"> </div> <md-input-container class=md-icon-float flex> <label ng-if=title> <span translate=\"\">{{title}}</span> </label> <input type=input ng-model=value ng-change=valueChanged(value) class=wb-ui-setting-image-input ng-mousedown=\"(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)\"> </md-input-container> <md-button class=\"md-icon-button wb-ui-setting-image-clear\" ng-if=\"wbUiSettingClearButton && value\" ng-click=ctrl.clearValue($event); aria-label=\"Clear image\"> <md-icon md-svg-icon=clear.svg></md-icon> </md-button> </div>"
+    "<div class=\"wb-ui-setting-image wb-ui-setting-image-container\" layout=row> <div class=wb-ui-setting-image-preview ng-click=ctrl.showImagePicker($event) ng-if=wbUiSettingPreview> <img ng-show=value class=wb-ui-setting-image-result ng-src=\"{{value}}\"> </div> <md-input-container class=md-icon-float flex> <label ng-if=title> <span translate=\"\">{{title}}</span> </label> <input type=input ng-model=value ng-change=ctrl.valueChanged(value) class=wb-ui-setting-image-input ng-mousedown=\"(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)\"> </md-input-container> <md-button class=\"md-icon-button wb-ui-setting-image-clear\" ng-if=\"wbUiSettingClearButton && value\" ng-click=ctrl.clearValue($event); aria-label=\"Clear image\"> <md-icon md-svg-icon=clear.svg></md-icon> </md-button> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-length.html',
-    "<div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <wb-icon ng-if=icon>{{icon}}</wb-icon> <span flex ng-if=title translate=\"\">{{::title}} <md-tooltip ng-if=description md-delay=1500>{{::description}}</md-tooltip> </span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input type=number ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select style=max-width:75px ng-model=internalUnit ng-change=\"updateLength(internalUnit, internalValue)\"> <md-option ng-repeat=\"type in ::types track by $index\" value={{::type}}> {{::type}} </md-option> </md-select> </md-input-container> </div> <md-slider-container ng-disabled=!ctrl.isNumerical() style=\"margin:0px; padding:0px; height:30px\" aria-label=\"display length vlaue with slider\" id=wb-ui-setting-length-slider> <md-slider min=0 max=99 ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-slider> </md-slider-container> </div>"
+    "<div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <wb-icon ng-if=icon>{{icon}}</wb-icon> <span flex ng-if=title translate=\"\">{{::title}} <md-tooltip ng-if=description md-delay=1500>{{::description}}</md-tooltip> </span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input type=number ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select style=max-width:75px ng-model=internalUnit ng-change=\"updateLength(internalUnit, internalValue)\"> <md-option ng-repeat=\"type in ::types track by $index\" value={{::type}}> {{::type}} </md-option> </md-select> </md-input-container> </div> <md-slider-container ng-disabled=!ctrl.isNumerical() style=\"margin:0px; padding:0px; height:30px\" aria-label=\"Choosing vlaue with slider\" id=wb-ui-setting-length-slider> <md-slider min=0 max=99 ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-slider> </md-slider-container> </div>"
   );
 
 
@@ -6681,14 +6932,6 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-ui-setting-video.html',
     "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-video</wb-icon> </md-button> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
-  );
-
-
-  $templateCache.put('views/directives/wb-widget.html',
-    "<div class=wb-widget name={{wbModel.name}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-type=wbModel.type dnd-effect-allowed=copyMove dnd-callback=1 dnd-moved=ctrl.delete() wb-widget-size=wbModel.style wb-widget-layout=wbModel.style wb-margin=wbModel.style wb-padding=wbModel.style wb-background=wbModel.style wb-border=wbModel.style wb-shadows=wbModel.style wb-color=wbModel.style wb-cursor=wbModel.style wb-opacity=wbModel.style wb-events=wbModel.event md-theme-watch=true ng-class=\"{\n" +
-    "\t\t'wb-widget-edit': ctrl.isEditable(),\n" +
-    "\t\t'wb-widget-select': ctrl.isSelected()\n" +
-    "\t}\" transclude></div>"
   );
 
 
@@ -6732,7 +6975,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-border.html',
-    " <md-subheader class=md-hue-3> <span translate>Style and Color</span> </md-subheader>  <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=ctrl.style ng-change=ctrl.styleChanged(ctrl.style)> <md-option ng-repeat=\"style in ::styles\" value={{::style.value}}> {{::style.title}} </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=\"{{'Color'| translate}}\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=ctrl.color ng-change=ctrl.colorChanged(ctrl.color)> </wb-ui-setting-color>  <md-subheader class=md-hue-3> <span translate>Width</span> </md-subheader> <wb-ui-setting-length title=All icon=border_all description=\"Set all sides width\" ng-model=ctrl.widthAll ng-change=ctrl.widthAllChanged(ctrl.widthAll) extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=Top icon=border_top ng-model=ctrl.width.top ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Right icon=border_right ng-model=ctrl.width.right ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=ctrl.width.bottom ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Left icon=border_left ng-model=ctrl.width.left ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate>Radius</span> </md-subheader> <wb-ui-setting-length title=All icon=full_rounded description=\"Set all sides radius\" ng-model=ctrl.radiusAll ng-change=ctrl.radiusAllChanged(ctrl.radiusAll) extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=\"Top left\" icon=corner_top_left ng-model=ctrl.radius.topLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Top right\" icon=corner_top_right ng-model=ctrl.radius.topRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom right\" icon=corner_bottom_right ng-model=ctrl.radius.bottomRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom left\" icon=corner_bottom_left ng-model=ctrl.radius.bottomLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
+    " <md-subheader class=md-hue-3> <span translate=\"\">Style and Color</span> </md-subheader>  <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=ctrl.style ng-change=ctrl.styleChanged(ctrl.style)> <md-option ng-repeat=\"style in ::styles\" value={{::style.value}}> {{::style.title}} </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=\"{{'Color'| translate}}\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=ctrl.color ng-change=ctrl.colorChanged(ctrl.color)> </wb-ui-setting-color>  <md-subheader class=md-hue-3> <span translate=\"\">Width</span> </md-subheader> <wb-ui-setting-length title=All icon=border_all description=\"Set all sides width\" ng-model=ctrl.widthAll ng-change=ctrl.widthAllChanged(ctrl.widthAll) extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=Top icon=border_top ng-model=ctrl.width.top ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Right icon=border_right ng-model=ctrl.width.right ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=ctrl.width.bottom ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Left icon=border_left ng-model=ctrl.width.left ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length>  <md-subheader class=md-hue-3> <span translate=\"\">Radius</span> </md-subheader> <wb-ui-setting-length title=All icon=full_rounded description=\"Set all sides radius\" ng-model=ctrl.radiusAll ng-change=ctrl.radiusAllChanged(ctrl.radiusAll) extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=\"Top left\" icon=corner_top_left ng-model=ctrl.radius.topLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Top right\" icon=corner_top_right ng-model=ctrl.radius.topRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom right\" icon=corner_bottom_right ng-model=ctrl.radius.bottomRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom left\" icon=corner_bottom_left ng-model=ctrl.radius.bottomLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length>"
   );
 
 
@@ -6741,8 +6984,13 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/settings/wb-layout-self.html',
+    " <wb-ui-setting-choose ng-if=\"ctrl.parentDirection==='row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['row']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.parentDirection==='column'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['column']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose>"
+  );
+
+
   $templateCache.put('views/settings/wb-layout.html',
-    " <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group'\" title=Direction icon=wb-direction items=ctrl.direction_ ng-model=ctrl.direction ng-change=ctrl.directionChanged()> </wb-ui-setting-choose>  <md-switch ng-if=\"wbModel.type === 'Group'\" ng-model=ctrl.wrap ng-change=ctrl.wrapChanged() aria-label=\"Layout wrap\"> <span ng-if=\"ctrl.direction === 'row'\" translate=\"\">Multi row</span> <span ng-if=\"ctrl.direction !== 'row'\" translate=\"\">Multi column</span> </md-switch>  <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group' && ctrl.direction==='row'\" title=Vert. items=\"ctrl.align_['row']\" ng-model=ctrl.align ng-change=ctrl.alignChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group' && ctrl.direction==='column'\" title=Horz. items=\"ctrl.align_['column']\" ng-model=ctrl.align ng-change=ctrl.alignChanged()> </wb-ui-setting-choose>  <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group' && ctrl.direction==='row'\" title=\"Vert.'\" items=\"ctrl.justify_['row']\" ng-model=ctrl.justify ng-change=ctrl.justifyChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"wbModel.type === 'Group' && ctrl.direction==='column'\" title=Horz. items=\"ctrl.justify_['column']\" ng-model=ctrl.justify ng-change=ctrl.justifyChanged()> </wb-ui-setting-choose>  <wb-ui-setting-choose ng-if=\"ctrl.parentDirection==='row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['row']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.parentDirection==='column'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['column']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose>"
+    " <wb-ui-setting-choose title=Direction icon=wb-direction items=ctrl.direction_ ng-model=ctrl.direction ng-change=ctrl.directionChanged()> </wb-ui-setting-choose>  <md-switch ng-model=ctrl.wrap ng-change=ctrl.wrapChanged() aria-label=\"Layout wrap\"> <span ng-if=\"ctrl.direction === 'row'\" translate=\"\">Multi row</span> <span ng-if=\"ctrl.direction !== 'row'\" translate=\"\">Multi column</span> </md-switch>  <wb-ui-setting-choose ng-if=\"ctrl.direction==='row'\" title=Vert. items=\"ctrl.align_['row']\" ng-model=ctrl.align ng-change=ctrl.alignChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.direction==='column'\" title=Horz. items=\"ctrl.align_['column']\" ng-model=ctrl.align ng-change=ctrl.alignChanged()> </wb-ui-setting-choose>  <wb-ui-setting-choose ng-if=\"ctrl.direction==='row'\" title=\"Vert.'\" items=\"ctrl.justify_['row']\" ng-model=ctrl.justify ng-change=ctrl.justifyChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.direction==='column'\" title=Horz. items=\"ctrl.justify_['column']\" ng-model=ctrl.justify ng-change=ctrl.justifyChanged()> </wb-ui-setting-choose>"
   );
 
 
@@ -6757,12 +7005,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-seo.html',
-    " <md-input-container> <label translate=\"\">Label</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate=\"\">Category</label> <input ng-model=wbModel.category> </md-input-container> <md-input-container> <label translate=\"\">Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate=\"\">Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image title=Cover wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.cover> </wb-ui-setting-image>"
+    " <md-input-container> <label translate=\"\">Id</label> <input ng-model=wbModel.id> </md-input-container> <md-input-container> <label translate=\"\">Label</label> <input ng-model=wbModel.label> </md-input-container> <md-input-container> <label translate=\"\">Type</label> <input ng-model=wbModel.category> </md-input-container> <md-input-container> <label translate=\"\">Property</label> <input ng-model=wbModel.property> </md-input-container> <md-input-container> <label translate=\"\">Description</label> <input ng-model=wbModel.description> </md-input-container> <md-input-container> <label translate=\"\">Keywords</label> <input ng-model=wbModel.keywords> </md-input-container> <wb-ui-setting-image ng-if=ctrl.isRoot() title=Cover wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=wbModel.cover> </wb-ui-setting-image>"
   );
 
 
   $templateCache.put('views/settings/wb-shadow.html',
-    " <div layout=row flex> <md-button ng-click=ctrl.addShadow()> <span translate=\"\">New shadow</span> </md-button> </div>  <div ng-repeat=\"shadow in wbModel.style.shadows track by $index\" layout=column> <md-toolbar style=\"padding-top:0px; padding-bottom:0px; padding-left: 16px; padding-right: 16px; min-height: 16px\" class=md-hue-3> <div layout=row layout-align=\"end center\"> <p style=\"font-size: 14px\" flex>Shadow {{$index + 1}}</p> <md-button flex=10 class=md-icon-button ng-click=ctrl.remove($index)> <wb-icon>delete</wb-icon> </md-button> </div> </md-toolbar> <div layout=column> <wb-ui-setting-length title=\"Horizontal Shift\" ng-model=shadow.hShift> </wb-ui-setting-length> <wb-ui-setting-length title=\"Vertical Shift\" ng-model=shadow.vShift> </wb-ui-setting-length> <wb-ui-setting-length title=Blur ng-model=shadow.blur> </wb-ui-setting-length> <wb-ui-setting-length title=Spread ng-model=shadow.spread> </wb-ui-setting-length> <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=shadow.color> </wb-ui-setting-color> <md-checkbox ng-model=shadow.inset aria-label=Inset> <span translate=\"\">Inset</span> </md-checkbox> </div> </div>"
+    " <div layout=row flex> <md-button ng-click=ctrl.addShadow()> <span translate=\"\">New shadow</span> </md-button> </div>  <div ng-repeat=\"shadow in wbModel.style.shadows track by $index\" layout=column> <md-toolbar style=\"padding-top:0px; padding-bottom:0px; padding-left: 16px; padding-right: 16px; min-height: 16px\" class=md-hue-3> <div layout=row layout-align=\"end center\"> <p style=\"font-size: 14px\" flex tab-index=0>Shadow {{$index + 1}}</p> <md-button flex=10 class=md-icon-button aria-label=\"Delete shadow\" ng-click=ctrl.remove($index)> <wb-icon>delete</wb-icon> </md-button> </div> </md-toolbar> <div layout=column> <wb-ui-setting-length title=\"Horizontal Shift\" ng-model=shadow.hShift> </wb-ui-setting-length> <wb-ui-setting-length title=\"Vertical Shift\" ng-model=shadow.vShift> </wb-ui-setting-length> <wb-ui-setting-length title=Blur ng-model=shadow.blur> </wb-ui-setting-length> <wb-ui-setting-length title=Spread ng-model=shadow.spread> </wb-ui-setting-length> <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=shadow.color> </wb-ui-setting-color> <md-checkbox ng-model=shadow.inset aria-label=Inset> <span translate=\"\">Inset</span> </md-checkbox> </div> </div>"
   );
 
 
@@ -6772,7 +7020,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/sheets/wb-themplates.html',
-    "<md-bottom-sheet class=\"md-list md-has-header\" md-colors=\"{backgroundColor: 'background-900'}\"> <div style=\"padding: 16px\">  <div layout=row layout-align=\"start center\" style=\"padding: 0px 8px; margin: 0px\"> <span translate>Start a new page</span> <span flex></span> <span translate>Template gallery</span> <md-divider></md-divider> <md-button aria-label=\"Hide template sheet\" class=md-icon-button ng-click=hideTemplates($event)> <wb-icon>keyboard_arrow_down </wb-icon></md-button> <md-menu> <md-button aria-label=\"Open them interactions menu\" class=md-icon-button ng-click=$mdMenu.open($event)> <wb-icon>more_vert </wb-icon></md-button> <md-menu-content width=4 md-colors=\"{backgroundColor: 'background'}\"> <md-menu-item> <md-button ng-click=hideTemplates($event)> <span translate>Hide templates</span> </md-button> </md-menu-item> </md-menu-content> </md-menu> </div>  <md-content layout=row md-colors=\"{backgroundColor: 'background-900'}\"> <div layout=column ng-repeat=\"template in templates\" ng-click=loadTemplate(template) layout-padding style=\"cursor: pointer\"> <img width=215px height=152px ng-src={{template.thumbnail}} style=\"border-bottom-width: 1px; border: solid\"> {{template.name}} </div> </md-content> </div> </md-bottom-sheet>"
+    "<md-bottom-sheet class=\"md-list md-has-header\" md-colors=\"{backgroundColor: 'background-900'}\"> <div style=\"padding: 16px\">  <div layout=row layout-align=\"start center\" style=\"padding: 0px 8px; margin: 0px\"> <span translate>Start a new page</span> <span flex></span> <span translate>Template gallery</span> <md-divider></md-divider> <md-button aria-label=\"Hide template sheet\" class=md-icon-button ng-click=hideTemplates($event)> <wb-icon>keyboard_arrow_down </wb-icon></md-button> <md-menu> <md-button aria-label=\"Open the interactions menu\" class=md-icon-button ng-click=$mdMenu.open($event)> <wb-icon>more_vert </wb-icon></md-button> <md-menu-content width=4 md-colors=\"{backgroundColor: 'background'}\"> <md-menu-item> <md-button ng-click=hideTemplates($event)> <span translate>Hide templates</span> </md-button> </md-menu-item> </md-menu-content> </md-menu> </div>  <md-content layout=row md-colors=\"{backgroundColor: 'background-900'}\"> <div layout=column ng-repeat=\"template in templates\" ng-click=loadTemplate(template) layout-padding style=\"cursor: pointer\"> <img width=215px height=152px ng-src={{template.thumbnail}} style=\"border-bottom-width: 1px; border: solid\"> {{template.name}} </div> </md-content> </div> </md-bottom-sheet>"
   );
 
 

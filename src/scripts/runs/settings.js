@@ -30,7 +30,6 @@ angular.module('am-wb-core')
 	 */
 	.run(function ($settings) {
 
-
 	    $settings.newPage({
 		type: 'general',
 		label: 'General',
@@ -120,7 +119,16 @@ angular.module('am-wb-core')
 	    $settings.newPage({
 		type: 'SEO',
 		label: 'SEO',
-		templateUrl: 'views/settings/wb-seo.html'
+		templateUrl: 'views/settings/wb-seo.html',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+		   this.isRoot = function () {
+		       return $scope.wbWidget.isRoot();
+		   }; 
+		}
 	    });
 
 	    $settings.newPage({
@@ -548,7 +556,60 @@ angular.module('am-wb-core')
 				value: 'center'
 			    }]
 		    };
+		    /*
+		     * watch 'wbModel' and apply the changes in setting panel
+		     */
+		    var ctrl = this;
+		    $scope.$watch('wbModel', function (model) {
+			if (model) {
+			    var layout = model.style.layout || {};
+			    ctrl.direction = layout.direction;
+			    ctrl.align = layout.align;
+			    ctrl.wrap = layout.wrap;
+			    ctrl.justify = layout.justify;
+			    ctrl.parentWidget = $scope.wbWidget.getParent();
+			    if (ctrl.parentWidget) {
+				ctrl.parentDirection = ctrl.parentWidget.getModel().style.layout.direction;
+			    }
+			    //TODO: maso, 2018: Safe above code for null value
+			} 
+			//TODO: maso, 2018: handle else sectipn
+		    });
 
+		    /*
+		     * This part updates the wbModel whenever the layout properties are changed in view
+		     */
+		    this.directionChanged = function () {
+			$scope.wbModel.style.layout.direction = this.direction;
+		    };
+
+		    this.wrapChanged = function () {
+			$scope.wbModel.style.layout.wrap = this.wrap;
+		    };
+
+		    this.alignChanged = function () {
+			$scope.wbModel.style.layout.align = this.align;
+		    };
+
+		    this.justifyChanged = function () {
+			$scope.wbModel.style.layout.justify = this.justify;
+		    };
+		}
+	    });
+	    
+	     $settings.newPage({
+		type: 'layout-self',
+		label: 'Self Layout',
+		icon: 'dashboard',
+		description: 'Manages layout of the current item.',
+		templateUrl: 'views/settings/wb-layout-self.html',
+		controllerAs: 'ctrl',
+		/*
+		 * Manages setting page 
+		 * 
+		 * @ngInject
+		 */
+		controller: function ($scope) {
 		    this.selfAlign_ = {
 			'column': [{
 				title: 'Stretch',
@@ -593,11 +654,7 @@ angular.module('am-wb-core')
 		    $scope.$watch('wbModel', function (model) {
 			if (model) {
 			    var layout = model.style.layout || {};
-			    ctrl.direction = layout.direction;
-			    ctrl.align = layout.align;
-			    ctrl.wrap = layout.wrap;
 			    ctrl.alignSelf = layout.align_self;
-			    ctrl.justify = layout.justify;
 			    ctrl.parentWidget = $scope.wbWidget.getParent();
 			    if (ctrl.parentWidget) {
 				ctrl.parentDirection = ctrl.parentWidget.getModel().style.layout.direction;
@@ -608,29 +665,15 @@ angular.module('am-wb-core')
 		    });
 
 		    /*
-		     * This part updates the wbModel whenever the layout properties are changed in view
+		     * This part updates the wbModel whenever the layout-self property is changed in view
 		     */
-		    this.directionChanged = function () {
-			$scope.wbModel.style.layout.direction = this.direction;
-		    };
-
-		    this.wrapChanged = function () {
-			$scope.wbModel.style.layout.wrap = this.wrap;
-		    };
-
-		    this.alignChanged = function () {
-			$scope.wbModel.style.layout.align = this.align;
-		    };
-
-		    this.justifyChanged = function () {
-			$scope.wbModel.style.layout.justify = this.justify;
-		    };
 
 		    this.alignSelfChanged = function () {
 			$scope.wbModel.style.layout.align_self = this.alignSelf;
 		    };
 		}
 	    });
+	    
 	    //TODO: Masood, 2018: Move this controller to a separated controller.
 	    $settings.newPage({
 		type: 'marginPadding',

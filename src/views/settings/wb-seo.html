@@ -3,47 +3,65 @@
 Some widgets need simple description in text. This is a setting to manage
 these attributes. Here is list of attributes:
 
-- {Text} label 
-- {Text} type
+- {Text} id 
+- {Text} label
+- {URL} category SEE: schema.org
 - {Text} description 
 - {Text} keywords
-- {url} cover
+- {Text} property
+- {URL} cover
 
 These attributes are useful in SEO.
 -->
+
 <md-input-container>
-  <label translate="">Label</label>
-  <input 
-  	type="text" 
-  	ng-model="wbModel.label">
+    <label translate="">Id</label>
+    <input 
+        type="text" 
+        ng-model="wbModel.id">
 </md-input-container>
 
 <md-input-container>
-  <label translate="">Category</label>
-  <input 
-  	type="text" 
-  	ng-model="wbModel.category">
+    <label translate="">Label</label>
+    <input 
+        type="text" 
+        ng-model="wbModel.label">
 </md-input-container>
 
 <md-input-container>
-  <label translate="">Description</label>
-  <input 
-  	type="text" 
-  	ng-model="wbModel.description">
+    <label translate="">Type</label>
+    <input 
+        type="text" 
+        ng-model="wbModel.category">
 </md-input-container>
 
 <md-input-container>
-  <label translate="">Keywords</label>
-  <input 
-  	type="text" 
-  	ng-model="wbModel.keywords">
+    <label translate="">Property</label>
+    <input 
+        type="text" 
+        ng-model="wbModel.property">
+</md-input-container>
+
+<md-input-container>
+    <label translate="">Description</label>
+    <input 
+        type="text" 
+        ng-model="wbModel.description">
+</md-input-container>
+
+<md-input-container>
+    <label translate="">Keywords</label>
+    <input 
+        type="text" 
+        ng-model="wbModel.keywords">
 </md-input-container>
 
 
-<wb-ui-setting-image
-	title="Cover" 
+<wb-ui-setting-image 
+	ng-if="ctrl.isRoot()"
+    title="Cover" 
     wb-ui-setting-clear-button="true"
     wb-ui-setting-preview="true"
-	ng-model="wbModel.cover">
+    ng-model="wbModel.cover">
 </wb-ui-setting-image>
-	
+

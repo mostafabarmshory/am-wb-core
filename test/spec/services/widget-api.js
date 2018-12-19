@@ -24,23 +24,131 @@
 'use strict';
 
 describe('Service $widget', function () {
+    // instantiate service
+    var $rootScope;
+    var $widget;
+    var $httpBackend;
+    var $timeout;
 
-	// load the service's module
-	beforeEach(module('am-wb-core'));
+    /*
+     * Mock of the root widget
+     */
+    function MockRootWidget() {
+        this.scope = $rootScope.$new();
+        this.getScope = function () {
+            return this.scope;
+        };
+    }
+    ;
 
-	// instantiate service
-	var $widget;
-	beforeEach(inject(function (_$widget_) {
-		$widget = _$widget_;
-	}));
+    // load the service's module
+    beforeEach(module('am-wb-core'));
 
-	it('should add a new widget', function () {
-		expect(angular.isFunction($widget.newWidget)).toBe(true);
-	});
-	it('should find a related widget for a model', function () {
-		expect(angular.isFunction($widget.widget)).toBe(true);
-	});
-	it('should list all widget', function () {
-		expect(angular.isFunction($widget.widgets)).toBe(true);
-	});
+    // instantiate service
+    beforeEach(inject(function (_$rootScope_, _$widget_, _$httpBackend_,
+            _$timeout_) {
+        $rootScope = _$rootScope_;
+        $widget = _$widget_;
+        $httpBackend = _$httpBackend_;
+        $timeout = _$timeout_;
+
+        $widget.newWidget({
+            type : 'Group',
+            description : 'Panel contains list of widgets.',
+            template : '<div></div>',
+        });
+        $widget.newWidget({
+            type : 'HtmlText',
+            template : '<div></div>'
+        });
+    }));
+
+    it('should add a new widget', function () {
+        expect(angular.isFunction($widget.newWidget)).toBe(true);
+    });
+    it('should find a related widget for a model', function () {
+        expect(angular.isFunction($widget.widget)).toBe(true);
+    });
+
+    it('should list all widget', function () {
+        expect(angular.isFunction($widget.widgets)).toBe(true);
+    });
+
+    it('should get children and sub-children from a widget', function () {
+        expect(angular.isFunction($widget.getChildren)).toBe(true);
+    });
+
+    it('should returns empty list of children for a widget', function (done) {
+        var root = new MockRootWidget();
+        // Create new instance
+        $widget.compile({
+            type : 'HtmlText',
+            id : 'test',
+            name : 'Widget',
+            text : '<h2>HTML Text In 4th group0</h2>',
+        }, root).then(function (widget) {
+            expect(widget).not.toBe(null);
+            var children = $widget.getChildren(widget);
+            expect(children.length).toBe(0);
+            done();
+        });
+        $rootScope.$apply();
+    });
+
+    // XXX: maso, 2018: fail on several internal promi
+    it('should returns children of a group', function (done) {
+        var root = new MockRootWidget();
+        // Create new instance
+        $widget.compile({
+            type : 'Group',
+            contents : [ {
+                type : 'HtmlText',
+                text : '<h2>HTML Text In 4th group0</h2>',
+            }, {
+                type : 'HtmlText',
+                text : '<h2>HTML Text In 4th group0</h2>',
+            } ]
+        }, root).then(function (widget) {
+            // wait for children
+            $timeout(function () {
+                expect(widget).not.toBe(null);
+                var children = $widget.getChildren(widget);
+                expect(children.length).toBe(2);
+                done();
+            }, 300);
+        });
+        $rootScope.$apply();
+        $timeout.flush();
+    });
+
+    it('should returns sub-children of a group', function (done) {
+        var root = new MockRootWidget();
+        // Create new instance
+        $widget.compile({
+            type : 'Group',
+            contents : [ {
+                type : 'Group',
+                contents : [ {
+                    type : 'Group',
+                    contents : [ {
+                        type : 'HtmlText',
+                        text : '<h2>HTML Text In 4th group0</h2>',
+                    }, {
+                        type : 'HtmlText',
+                        text : '<h2>HTML Text In 4th group0</h2>',
+                    } ]
+                } ]
+            } ]
+        }, root).then(function (widget) {
+            $timeout(function () {
+                expect(widget).not.toBe(null);
+                var children = $widget.getChildren(widget);
+                expect(children.length).toBe(4);
+                done();
+            }, 300);
+        });
+        $rootScope.$apply();
+        $timeout.flush();
+    });
+
 });

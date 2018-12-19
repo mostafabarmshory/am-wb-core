@@ -45,7 +45,6 @@
         <link rel="stylesheet" href="styles/wb-ui-setting-image.css">
         <link rel="stylesheet" href="styles/wb-widget.css">
         <link rel="stylesheet" href="styles/wb-widgets-module.css">
-        <link rel="stylesheet" href="styles/widget-group.css">
         <link rel="stylesheet" href="styles/widget-text.css">
         <link rel="stylesheet" href="styles/font-awesome.css">
         <link rel="stylesheet" href="styles/main.css">
@@ -72,12 +71,10 @@
                             ng-click="runAction(action)">
                             <wb-icon>{{action.icon}}</wb-icon>
                         </md-button>
-
-
-
                     </section>
                     <wb-group
-                        wb-on-model-select="loadSettings($model, $ctrl)"
+                    	wb-on-model-under-cursor="widgetUnderCursor($event)"
+                        wb-on-model-select="loadSettings($event)"
                         wb-editable="editable"
                         ng-model="model"
                         flex>
@@ -122,19 +119,7 @@
         <!-- injector:js -->
         <script src="scripts/app.js"></script>
         <script src="scripts/configs/icons.js"></script>
-        <script src="scripts/directives/style-wb-background.js"></script>
-        <script src="scripts/directives/style-wb-border.js"></script>
-        <script src="scripts/directives/style-wb-color.js"></script>
-        <script src="scripts/directives/style-wb-cursor.js"></script>
-        <script src="scripts/directives/style-wb-events.js"></script>
-        <script src="scripts/directives/style-wb-layout.js"></script>
-        <script src="scripts/directives/style-wb-margin.js"></script>
-        <script src="scripts/directives/style-wb-opacity.js"></script>
-        <script src="scripts/directives/style-wb-padding.js"></script>
-        <script src="scripts/directives/style-wb-shadow.js"></script>
-        <script src="scripts/directives/style-wb-size.js"></script>
-        <script src="scripts/directives/style-wb-widget-layout.js"></script>
-        <script src="scripts/directives/style-wb-widget-size.js"></script>
+        <script src="scripts/controllers/widgets-ctrl.js"></script>
         <script src="scripts/directives/wb-group.js"></script>
         <script src="scripts/directives/wb-icon.js"></script>
         <script src="scripts/directives/wb-infinateScroll.js"></script>
@@ -159,11 +144,13 @@
         <script src="scripts/directives/wb-ui-setting-on-off-switch.js"></script>
         <script src="scripts/directives/wb-ui-setting-text.js"></script>
         <script src="scripts/directives/wb-ui-setting-video.js"></script>
-        <script src="scripts/directives/wb-widget.js"></script>
         <script src="scripts/directives/wb-widgets-explorer.js"></script>
         <script src="scripts/directives/wb-widgets-list.js"></script>
         <script src="scripts/directives/wb-widgets-module.js"></script>
-        <script src="scripts/factories/wb-widget.js"></script>
+        <script src="scripts/factories/widget-locator-abstract.js"></script>
+        <script src="scripts/factories/widget-locator-bound.js"></script>
+        <script src="scripts/factories/widget-locator-manager.js"></script>
+        <script src="scripts/factories/widget-locator-selection.js"></script>
         <script src="scripts/filters/wb-unsafe.js"></script>
         <script src="scripts/runs/resources.js"></script>
         <script src="scripts/runs/settings.js"></script>
@@ -174,7 +161,7 @@
         <script src="scripts/services/settings.js"></script>
         <script src="scripts/services/ui.js"></script>
         <script src="scripts/services/util.js"></script>
-        <script src="scripts/services/widget.js"></script>
+        <script src="scripts/services/widget-service.js"></script>
         <script src="scripts/tinymce.js"></script>
         <script src="scripts/demo.js"></script>
         <!-- endinjector -->

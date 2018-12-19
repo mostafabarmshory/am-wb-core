@@ -1,58 +1,154 @@
 {
 	"type": "Group",
 	"name": "Root",
-	"style":{
-		"layout":{
-			"direction": "row"
+	"style": {
+		"layout": {
+			"direction": "column"
 		}
 	},
 	"contents": [
 		{
-			"type": "HtmlText",
-			"name": "Widget",
-			"text": "<h2>HTML Text 1</h2>",
-                        "style": {
-                            "shadows": [
-                                {
-                                    "hShift": "0px",
-                                    "vShift": "0px",
-                                    "blur": "2px",
-                                    "spread": "1px",
-                                    "color": "rgb(0,0,0,0.5)"
-                                }
-                            ],
-                            "margin": "10px",
-                            "color": "red",
-                            "cursor": "grab",
-                            "opacity": "0.1"
-                        }
-		},
-		{
 			"type": "Group",
 			"name": "Chile 1",
+			"style": {
+				"margin": "60px"
+			},
 			"contents": [
-				{
-					"type": "HtmlText",
-					"name": "Widget",
-					"text": "<h2>HTML Text 2</h2>"
-				},
 				{
 					"type": "Group",
 					"name": "Chile 2",
+					"style": {
+						"margin": "60px"
+					},
 					"contents": [
-						{
-							"type": "HtmlText",
-							"name": "Widget",
-							"text": "<h2>HTML Text 3</h2>"
-						},
 						{
 							"type": "Group",
 							"name": "Chile 3",
+							"style": {
+								"margin": "60px"
+							},
 							"contents": [
 								{
 									"type": "HtmlText",
 									"name": "Widget",
-									"text": "<h2>HTML Text 4</h2>"
+									"text": "<h2>HTML Text In 4th group0</h2>",
+									"style": {
+										"margin": "60px"
+									},
+									"event": {
+										"click": "alert('Wow!! Click event');"
+									}
+								}
+							]
+						}
+					]
+				}
+			]
+		},{
+			"type": "Group",
+			"name": "Chile 1",
+			"style": {
+				"margin": "60px"
+			},
+			"contents": [
+				{
+					"type": "Group",
+					"name": "Chile 2",
+					"style": {
+						"margin": "60px"
+					},
+					"contents": [
+						{
+							"type": "Group",
+							"name": "Chile 3",
+							"style": {
+								"margin": "60px"
+							},
+							"contents": [
+								{
+									"type": "HtmlText",
+									"name": "Widget",
+									"text": "<h2>HTML Text In 4th group0</h2>",
+									"style": {
+										"margin": "60px"
+									},
+									"event": {
+										"onClick": "alert('Wow!! Click event:' + ($widget || 'not found')); $widget.destroy();"
+									}
+								}
+							]
+						}
+					]
+				}
+			]
+		},{
+			"type": "Group",
+			"name": "Chile 1",
+			"style": {
+				"margin": "60px"
+			},
+			"contents": [
+				{
+					"type": "Group",
+					"name": "Chile 2",
+					"style": {
+						"margin": "60px"
+					},
+					"contents": [
+						{
+							"type": "Group",
+							"name": "Chile 3",
+							"style": {
+								"margin": "60px"
+							},
+							"contents": [
+								{
+									"type": "HtmlText",
+									"name": "Widget",
+									"text": "<h2>HTML Text In 4th group0</h2>",
+									"style": {
+										"margin": "60px"
+									},
+									"event": {
+										"onClick": "alert('Wow!! Click event:' + ($widget || 'not found')); $widget.destroy();"
+									}
+								}
+							]
+						}
+					]
+				}
+			]
+		},{
+			"type": "Group",
+			"name": "Chile 1",
+			"style": {
+				"margin": "60px"
+			},
+			"contents": [
+				{
+					"type": "Group",
+					"name": "Chile 2",
+					"style": {
+						"margin": "60px"
+					},
+					"contents": [
+						{
+							"type": "Group",
+							"name": "Chile 3",
+							"style": {
+								"margin": "60px"
+							},
+							"contents": [
+								{
+									"type": "HtmlText",
+									"name": "Widget",
+									"text": "<h2>HTML Text In 4th group0</h2>",
+									"style": {
+										"margin": "60px"
+									},
+									"event": {
+										"onClick": "alert('Wow!! Click event:' + ($widget || 'not found')); $widget.destroy();"
+									}
 								}
 							]
 						}
