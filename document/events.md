@@ -28,6 +28,9 @@ The following events are supported and available to the user.
 - mouseout : The event occurs when a user moves the mouse pointer out of an element, or out of one of its children.
 - mouseover: The event occurs when the pointer is moved onto an element, or onto one of its children.
 
+The user also is provided some useful methods he/she could use to define some styles on the widget in these events.
+To see information about these functions, go to api section under $widget. (in programming.md file)
+
 ### events for the developers
 
 The following events are supported and available to the developer. These events just work in editing mode.

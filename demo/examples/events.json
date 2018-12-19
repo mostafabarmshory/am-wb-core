@@ -14,8 +14,8 @@
             },
             "event": {
                 "click": "alert('Wow!! Click event');",
-                "mouseover": "",
-                "mouseout": "alert('Mouse out');"
+                "mouseover": "$widget.style({\"background\": {\"color\": \"red\"}});",
+                "mouseout": "$widget.style({\"background\": {\"color\": null}});"
             }
         }
     ]

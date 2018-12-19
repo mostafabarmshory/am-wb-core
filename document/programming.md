@@ -74,6 +74,24 @@ The user can get a special child using getChildById(id).
 If the type is for example 'Input' or 'Textarea' the widget has this method.
 The user can get the value using getValue().
 
+### style()
+
+style method is provided to the user to define dynamic styles. In this case the user can define some styles
+on events. 
+
+Example:
+
+            "event": {
+                "click": "alert('Wow!! Click event');",
+                "mouseover": "$widget.style({\"background\": {\"color\": \"red\"}});",
+                "mouseout": "$widget.style({\"background\": {\"color\": null}});"
+            }
+
+Note: 
+Now, if the user change the style and then want to come back to the old style it needs to define 
+a new style and set the corresponding attributes to the null. It's shown on the example above.
+
+
 
 ## 3- $http
 

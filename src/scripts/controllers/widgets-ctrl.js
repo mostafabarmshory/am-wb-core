@@ -30,6 +30,7 @@ var WbAbstractWidget = function () {
     this.$scope = null;
     this.$element = null;
     this.eventFunctions = {};
+    this.dynamicStyle = {};
 
 
     /*
@@ -44,13 +45,14 @@ var WbAbstractWidget = function () {
 
 	// update style
 	if (model) {
-	    ctrl.loadStyle(model.style);
+	    ctrl.loadStyle(angular.merge({}, ctrl.dynamicStyle, model.style));
 	    ctrl.loadSeo(model);
 	}
     }
 
     this.on('modelChanged', updateView);
     this.on('modelUpdate', updateView);
+    this.on('styleChanged', updateView);
 
     var ctrl = this;
     this.eventListeners = {
@@ -325,10 +327,9 @@ WbAbstractWidget.prototype.getId = function () {
     return this.wbModel.id;
 };
 
-WbAbstractWidget.prototype.setDynamicStyle = function (style) {
-    var modelStyle = this.wbModel.style;
-    var newStyle = _.merge(style, modelStyle);
-    
+WbAbstractWidget.prototype.style = function (style) {
+    _.merge(this.dynamicStyle, style);
+    this.fire('styleChanged');
 };
 
 WbAbstractWidget.prototype.setModel = function (model) {
