@@ -64,11 +64,15 @@ in the edit mode. This part of the the CSS fix basic settings of the widgets.
  * Bound
  */
 .wb-widget-locator.bound {
-	background: #babdb6;
+	background: #f0f0f0;
 }
 
 .wb-widget-locator.bound.mouseover {
-	background: !important;
+	background: #babdb6 !important;
+}
+
+.wb-widget-locator.bound.selected {
+	display: none !important;
 }
 
 #top.wb-widget-locator.bound {

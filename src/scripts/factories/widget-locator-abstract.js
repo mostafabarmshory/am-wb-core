@@ -70,7 +70,7 @@ angular.module('am-wb-core')//
                 ctrl.mouseover = true;
             },
             'mouseout' : function ($event) {
-                ctrl.addClass('mouseout');
+                ctrl.removeClass('mouseover');
                 ctrl.mouseover = false;
             },
             'resize' : function ($event) {
