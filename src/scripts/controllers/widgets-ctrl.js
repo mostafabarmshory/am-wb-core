@@ -58,7 +58,7 @@ var WbAbstractWidget = function () {
     this.eventListeners = {
 	click: function ($event) {
 	    if (ctrl.isEditable()) {
-		ctrl.setSelected(true);
+		ctrl.setSelected(true, $event);
 		$event.stopPropagation();
 	    } else {
 		ctrl.evalWidgetEvent('click', $event);
@@ -384,7 +384,6 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
 	return;
     }
     this.editable = editable;
-    var $element = this.getElement();
     if (this.isRoot()) {
 	delete this.lastSelectedItem;
 	this.setSelected(true);
@@ -496,20 +495,21 @@ WbAbstractWidget.prototype.getRoot = function () {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.isSelected = function () {
-    if (this.isRoot()) {
-	return false;
-    }
-    return this.getParent().isChildSelected(this);
+    return this.selected;
 };
 
-WbAbstractWidget.prototype.setSelected = function (flag) {
+WbAbstractWidget.prototype.setSelected = function (flag, $event) {
     if (this.isRoot()) {
 	return;
     }
-    this.getParent().childSelected(this);
-
+    if (this.selected === flag) {
+	return;
+    }
+    
     // fire events
+    this.selected = flag;
     if (flag) {
+	this.getParent().childSelected(this, $event);
 	this.fire('select');
     } else {
 	this.fire('unselect');
@@ -672,17 +672,27 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
 
 
 
-WbWidgetGroupCtrl.prototype.childSelected = function (ctrl) {
+WbWidgetGroupCtrl.prototype.childSelected = function (ctrl, $event) {
     if (!this.isRoot()) {
-	return this.getParent().childSelected(ctrl);
+	return this.getParent().childSelected(ctrl, $event);
     }
-    if (ctrl === this.lastSelectedItem) {
+    $event = $event || {};
+    if (!$event.shiftKey) {
+	angular.forEach(this.lastSelectedItems, function (widget) {
+	    widget.setSelected(false);
+	});
+	this.lastSelectedItems = [];
+    }
+    
+    if (this.lastSelectedItems.indexOf(ctrl) >= 0) {
 	return;
     }
-    this.lastSelectedItem = ctrl;
+    
+    this.lastSelectedItems.push(ctrl);
+    
     // maso, 2018: call the parent controller function
     this.fire('select', {
-	widgets: ctrl ? [ctrl] : []
+	widgets: this.lastSelectedItems
     });
 };
 
