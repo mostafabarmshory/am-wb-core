@@ -14,7 +14,7 @@
             },
             "event": {
                 "click": "alert('Wow!! Click event');",
-                "mouseover": {},
+                "mouseover": "",
                 "mouseout": "alert('Mouse out');"
             }
         }

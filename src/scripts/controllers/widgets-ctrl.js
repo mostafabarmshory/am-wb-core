@@ -325,6 +325,12 @@ WbAbstractWidget.prototype.getId = function () {
     return this.wbModel.id;
 };
 
+WbAbstractWidget.prototype.setDynamicStyle = function (style) {
+    var modelStyle = this.wbModel.style;
+    var newStyle = _.merge(style, modelStyle);
+    
+};
+
 WbAbstractWidget.prototype.setModel = function (model) {
     if (model === this.wbModel) {
 	return;
