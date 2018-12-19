@@ -34,29 +34,37 @@ var WbAbstractWidget = function () {
      * Update view based on new model
      */
     function updateView($event) {
-        var ctrl = $event.source;
-        var model = ctrl.getModel();
-        var $element = ctrl.getElement();
+	var ctrl = $event.source;
+	var model = ctrl.getModel();
+	var $element = ctrl.getElement();
 
-        // to support old widget
-        ctrl.getScope().wbModel = model;
+	// to support old widget
+	ctrl.getScope().wbModel = model;
 
-        // update style
-        if (model) {
-            ctrl.loadStyle(model.style);
-            ctrl.loadEvents(model.event);
-            ctrl.loadSeo(model);
-        }
+	// update style
+	if (model) {
+	    ctrl.loadStyle(model.style);
+	    ctrl.loadEvents(model.event);
+	    ctrl.loadSeo(model);
+	}
     }
 
     this.on('modelChanged', updateView);
     this.on('modelUpdate', updateView);
-    
-    this.on('select', widgetSelect);
-    this.on('unselect', widgetUnselect);
-    this.on('delete', widgetDelete);
-    this.on('newchild', widgetNewChild);
-    
+
+    this.clickListener = function ($event) {
+	if (this.isEditable()) {
+	    this.setSelected(true);
+	} else {
+	    //evalWidgetEvent('click', $event);
+	}
+	this.fire('click', $event);
+    };
+
+    this.mousemoveListener = function ($event) {
+	this.fire('mousemove', $event);
+    };
+
 };
 
 /**
@@ -73,19 +81,19 @@ WbAbstractWidget.prototype.loadSeo = function (model) {
     $element.attr('id', model.id);
 
     // Add item scope
-    if(model.category) {
-        $element.attr('itemscope', '');
-        $element.attr('itemtype', model.category);
+    if (model.category) {
+	$element.attr('itemscope', '');
+	$element.attr('itemtype', model.category);
     } else {
-        $element.removeAttr('itemscope');
-        $element.removeAttr('itemtype');
+	$element.removeAttr('itemscope');
+	$element.removeAttr('itemtype');
     }
 
     // Add item property
-    if(model.property) {
-        $element.attr('itemprop', model.property);
+    if (model.property) {
+	$element.attr('itemprop', model.property);
     } else {
-        $element.removeAttr('itemprop');
+	$element.removeAttr('itemprop');
     }
 
     // TODO: support of
@@ -122,26 +130,26 @@ WbAbstractWidget.prototype.loadEvents = function (event) {
     var $element = this.getElement();
     var $http = this.$http;
     if (!angular.isDefined(event)) {
-        return;
+	return;
     }
     var eventFuncs = {};
 
     if (event.onClick) {
-        var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2];' + event.onClick;
-        eventFuncs.onClick = new Function(body);
+	var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2];' + event.onClick;
+	eventFuncs.onClick = new Function(body);
     }
 
     $element.on('click', function (event) {
-        if (ctrl.isEditable()) {
-            return;
-        }
-        if (eventFuncs.onClick) {
-            eventFuncs.onClick(event, ctrl, {
-                post: function(url, obj){
-                    return $http.post(url, obj);
-                }
-            });
-        }
+	if (ctrl.isEditable()) {
+	    return;
+	}
+	if (eventFuncs.onClick) {
+	    eventFuncs.onClick(event, ctrl, {
+		post: function (url, obj) {
+		    return $http.post(url, obj);
+		}
+	    });
+	}
     });
 };
 
@@ -155,7 +163,7 @@ WbAbstractWidget.prototype.destroy = function () {
 
     // destroy children
     angular.forEach(this.childWidgets, function (widget) {
-        widget.destroy();
+	widget.destroy();
     });
     this.childWidgets = [];
 
@@ -176,18 +184,24 @@ WbAbstractWidget.prototype.setElement = function ($element) {
 
 WbAbstractWidget.prototype.disconnect = function () {
     var $element = this.getElement();
-    $element.off('select');
-    $element.off('unselect');
-    $element.off('delete');
-    $element.off('newchild');
+    if (!$element) {
+	return;
+    }
+    $element.off('click', this.clickListener);
+    $element.off('mousemove', this.mousemoveListenter);
+    $element.off('mouseout', this.mouseoutListenter);
+    $element.off('mouseover', this.mouseoverListenter);
 };
 
 WbAbstractWidget.prototype.connect = function () {
     var $element = this.getElement();
-    $element.on('select');
-    $element.on('unselect');
-    $element.on('delete');
-    $element.on('newchild');
+    if (!$element) {
+	return;
+    }
+    $element.on('click', this.clickListener);
+//    $element.on('unselect');
+//    $element.on('delete');
+//    $element.on('newchild');
 };
 
 WbAbstractWidget.prototype.getElement = function () {
@@ -205,24 +219,24 @@ WbAbstractWidget.prototype.getElement = function () {
  */
 WbAbstractWidget.prototype.fire = function (type, params) {
     if (!angular.isDefined(this.callbacks[type])) {
-        return;
+	return;
     }
     // create event
     var event = _.merge({
-        source: this,
-        type: type
+	source: this,
+	type: type
     }, params || {});
 
     // fire
     var callbacks = this.callbacks[type];
     angular.forEach(callbacks, function (callback) {
-        try {
-            callback(event);
-            // TODO: check propagations
-        } catch (error) {
-            // NOTE: remove on release
-            console.log(error);
-        }
+	try {
+	    callback(event);
+	    // TODO: check propagations
+	} catch (error) {
+	    // NOTE: remove on release
+	    console.log(error);
+	}
     });
 };
 
@@ -236,13 +250,13 @@ WbAbstractWidget.prototype.fire = function (type, params) {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.on = function (type, callback) {
-    if(!angular.isFunction(callback)){
-        throw {
-            message: "Callback must be a function"
-        };
+    if (!angular.isFunction(callback)) {
+	throw {
+	    message: "Callback must be a function"
+	};
     }
     if (!angular.isArray(this.callbacks[type])) {
-        this.callbacks[type] = [];
+	this.callbacks[type] = [];
     }
     this.callbacks[type].push(callback);
 };
@@ -277,23 +291,23 @@ WbAbstractWidget.prototype.on = function (type, callback) {
  */
 WbAbstractWidget.prototype.off = function (type, callback) {
     if (!angular.isArray(this.callbacks[type])) {
-        return;
+	return;
     }
     // remove callback
     var callbacks = this.callbacks[type];
     var index = callbacks.indexOf(callback);
-    if(index > -1) {
-        callbacks.splice(index,1);
+    if (index > -1) {
+	callbacks.splice(index, 1);
     }
 };
 
 WbAbstractWidget.prototype.getDirection = function () {
     return this.getParent().getModel().style.layout.direction;
-}; 
+};
 
 WbAbstractWidget.prototype.getModel = function () {
     return this.wbModel;
-}; 
+};
 
 WbAbstractWidget.prototype.getTitle = function () {
     return this.wbModel.label;
@@ -309,7 +323,7 @@ WbAbstractWidget.prototype.getId = function () {
 
 WbAbstractWidget.prototype.setModel = function (model) {
     if (model === this.wbModel) {
-        return;
+	return;
     }
     this.wbModel = model;
     this.fire('modelChanged');
@@ -355,56 +369,38 @@ WbAbstractWidget.prototype.isEditable = function () {
 
 WbAbstractWidget.prototype.setEditable = function (editable) {
     if (this.editable === editable) {
-        return;
+	return;
     }
     this.editable = editable;
     var $element = this.getElement();
     if (this.isRoot()) {
-        delete this.lastSelectedItem;
-        this.setSelected(true);
+	delete this.lastSelectedItem;
+	this.setSelected(true);
     }
     if (editable) {
-        // Lesson on click
-        var ctrl = this;
-        this.widgetSelectHandler = function (event) {
-            ctrl.setSelected(true);
-            ctrl.getScope().$apply();
-            return false;
-        };
-        this.widgetMouseEnterHandler = function(event) {
-            if(event.sourceWidget) {
-                return;
-            }
-            event.sourceWidget = ctrl;
-// ctrl.setUnderCursor(ctrl);
-            ctrl.getScope().$apply();
-            return false;
-        };
-        $element.on('click', this.widgetSelectHandler);
-        $element.on('mousemove', this.widgetMouseEnterHandler);
-        // TODO: remove watch for model update and fire in setting
-        this._modelWatche = this.getScope().$watch('wbModel', function(){
-            ctrl.fire('modelUpdate');
-        }, true);
+	// Lesson on click
+	var ctrl = this;
+
+	// TODO: remove watch for model update and fire in setting
+	this._modelWatche = this.getScope().$watch('wbModel', function () {
+	    ctrl.fire('modelUpdate');
+	}, true);
     } else {
-        // remove selection handler
-        $element.off('click', this.widgetSelectHandler);
-        $element.off('mousemove', this.widgetMouseEnterHandler);
-        delete this.widgetSelectHandler;
-        if(this._modelWatche){
-            this._modelWatche();
-            delete this._modelWatche;
-        }
+	// remove selection handler
+	if (this._modelWatche) {
+	    this._modelWatche();
+	    delete this._modelWatche;
+	}
     }
     // propagate to child
     angular.forEach(this.childWidgets, function (widget) {
-        widget.setEditable(editable);
+	widget.setEditable(editable);
     });
 
-    if(editable) {
-        this.fire('editable');
+    if (editable) {
+	this.fire('editable');
     } else {
-        this.fire('noneditable');
+	this.fire('noneditable');
     }
 };
 
@@ -417,7 +413,7 @@ WbAbstractWidget.prototype.delete = function () {
     // remove itself
     this.fire('deleted');
     this.getParent()
-        .removeChild(this);
+	    .removeChild(this);
 };
 
 /**
@@ -426,26 +422,26 @@ WbAbstractWidget.prototype.delete = function () {
 WbAbstractWidget.prototype.clone = function () {
     var index = this.getParent().indexOfChild(this);
     this.getParent()//
-    .addChild(index, angular.copy(this.getModel()));
+	    .addChild(index, angular.copy(this.getModel()));
 };
 
 /**
- * move next current widget This method moves widget one to next.
+ * This method moves widget one to next.
  */
 WbAbstractWidget.prototype.moveNext = function () {};
 
 /**
- * move before current widget This method moves widget one to before
+ * This method moves widget one to before
  */
 WbAbstractWidget.prototype.moveBefore = function () {};
 
 /**
- * move up current widget This method moves widget to the first of it's parent
+ * This method moves widget to the first of it's parent
  */
 WbAbstractWidget.prototype.moveFirst = function () {};
 
 /**
- * move down current widget This method moves widget to the last of it's parent
+ * This method moves widget to the last of it's parent
  */
 WbAbstractWidget.prototype.moveLast = function () {};
 
@@ -467,13 +463,13 @@ WbAbstractWidget.prototype.isRoot = function () {
  */
 WbAbstractWidget.prototype.getRoot = function () {
     // check if the root is set
-    if(this.rootWidget) {
-        return this.rootWidget;
+    if (this.rootWidget) {
+	return this.rootWidget;
     }
     // find root if is empty
     this.rootWidget = this;
-    while(!this.rootWidget.isRoot()){
-        this.rootWidget = this.rootWidget.getParent();
+    while (!this.rootWidget.isRoot()) {
+	this.rootWidget = this.rootWidget.getParent();
     }
     return this.rootWidget;
 };
@@ -489,22 +485,22 @@ WbAbstractWidget.prototype.getRoot = function () {
  */
 WbAbstractWidget.prototype.isSelected = function () {
     if (this.isRoot()) {
-        return false;
+	return false;
     }
     return this.getParent().isChildSelected(this);
 };
 
 WbAbstractWidget.prototype.setSelected = function (flag) {
     if (this.isRoot()) {
-        return;
+	return;
     }
     this.getParent().childSelected(this);
-    
+
     // fire events
-    if(flag){
-        this.fire('selected');
+    if (flag) {
+	this.fire('selected');
     } else {
-        this.fire('unselected');
+	this.fire('unselected');
     }
 };
 
@@ -532,21 +528,21 @@ WbAbstractWidget.prototype.getActions = function () {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.getBoundingClientRect = function () {
-  var $element = this.getElement();
-  var rect = $element[0].getBoundingClientRect();
-  var offset = $element.offset();
-  return {
-      // rect
-      width : rect.width,
-      height : rect.height,
-      x : rect.x,
-      y : rect.y,
-      // offset
-      top : $element.offset().top,
-      right : offset.rigth,
-      bottom : offset.bottom,
-      left : offset.left
-  };
+    var $element = this.getElement();
+    var rect = $element[0].getBoundingClientRect();
+    var offset = $element.offset();
+    return {
+	// rect
+	width: rect.width,
+	height: rect.height,
+	x: rect.x,
+	y: rect.y,
+	// offset
+	top: $element.offset().top,
+	right: offset.rigth,
+	bottom: offset.bottom,
+	left: offset.left
+    };
 };
 
 /**
@@ -586,10 +582,10 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
     this.$mdTheming = $mdTheming;
     this.$wbUtil = $wbUtil;
     this.$http = $http;
-    
+
     var ctrl = this;
-    this.on('modelChanged', function(){
-        ctrl.loadWidgets(ctrl.getModel());
+    this.on('modelChanged', function () {
+	ctrl.loadWidgets(ctrl.getModel());
     });
 };
 WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
@@ -599,7 +595,7 @@ WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
  */
 WbWidgetGroupCtrl.prototype.isChildSelected = function (widget) {
     if (this.isRoot()) {
-        return widget === this.lastSelectedItem;
+	return widget === this.lastSelectedItem;
     }
     return this.getParent().isChildSelected(widget);
 };
@@ -607,9 +603,9 @@ WbWidgetGroupCtrl.prototype.isChildSelected = function (widget) {
 WbWidgetGroupCtrl.prototype.getChildById = function (id) {
     var widgets = this.childWidgets;
     for (var i = 0; i < widgets.length; i++) {
-        if (widgets[i].getId() === id) {
-            return widgets[i];
-        }
+	if (widgets[i].getId() === id) {
+	    return widgets[i];
+	}
     }
 };
 
@@ -625,13 +621,13 @@ WbWidgetGroupCtrl.prototype.getChildren = function () {
 WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
     // destroy all children
     angular.forEach(this.childWidgets, function (widget) {
-        widget.destroy();
+	widget.destroy();
     });
     this.childWidgets = [];
 
     // check for new contents
     if (!model || !angular.isArray(model.contents)) {
-        return;
+	return;
     }
 
     // create contents
@@ -642,39 +638,39 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
 
     var compilesJob = [];
     model.contents.forEach(function (item, index) {
-        var job = $widget.compile(item, parentWidget)//
-        .then(function (widget) {
-            parentWidget.childWidgets[index] = widget;
-        });
-        compilesJob.push(job);
+	var job = $widget.compile(item, parentWidget)//
+		.then(function (widget) {
+		    parentWidget.childWidgets[index] = widget;
+		});
+	compilesJob.push(job);
     });
 
     var ctrl = this;
     return $q.all(compilesJob)//
-    .then(function () {
-        var $element = parentWidget.getElement();
-        parentWidget.childWidgets.forEach(function (widget) {
-            $element.append(widget.getElement());
-        });
-    })
-    .finally(function(){
-        ctrl.fire('loaded');
-    });
+	    .then(function () {
+		var $element = parentWidget.getElement();
+		parentWidget.childWidgets.forEach(function (widget) {
+		    $element.append(widget.getElement());
+		});
+	    })
+	    .finally(function () {
+		ctrl.fire('loaded');
+	    });
 };
 
 
 
 WbWidgetGroupCtrl.prototype.childSelected = function (ctrl) {
     if (!this.isRoot()) {
-        return this.getParent().childSelected(ctrl);
+	return this.getParent().childSelected(ctrl);
     }
     if (ctrl === this.lastSelectedItem) {
-        return;
+	return;
     }
     this.lastSelectedItem = ctrl;
     // maso, 2018: call the parent controller function
     this.fire('selected', {
-        widgets: ctrl? [ctrl] : []
+	widgets: ctrl ? [ctrl] : []
     });
 };
 
@@ -687,19 +683,19 @@ WbWidgetGroupCtrl.prototype.removeChild = function (widget) {
     var index = this.indexOfChild(widget);
 
     if (index > -1) {
-        // remove selection
-        if (this.isChildSelected(widget)) {
-            this.childSelected(null);
-        }
-        // remove model
-        this.childWidgets.splice(index, 1);
+	// remove selection
+	if (this.isChildSelected(widget)) {
+	    this.childSelected(null);
+	}
+	// remove model
+	this.childWidgets.splice(index, 1);
 
-        var model = this.getModel();
-        index = model.contents.indexOf(widget.getModel());
-        model.contents.splice(index, 1);
+	var model = this.getModel();
+	index = model.contents.indexOf(widget.getModel());
+	model.contents.splice(index, 1);
 
-        // destroy widget
-        widget.destroy();
+	// destroy widget
+	widget.destroy();
     }
     return false;
 };
@@ -714,18 +710,18 @@ WbWidgetGroupCtrl.prototype.addChild = function (index, item) {
     // add widget
     item = this.$wbUtil.clean(item);
     this.$widget.compile(item, this)//
-    .then(function (newWidget) {
-        if (index < ctrl.childWidgets.length) {
-            newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
-        } else {
-            ctrl.getElement().append(newWidget.getElement());
-        }
-        model.contents.splice(index, 0, item);
-        ctrl.childWidgets.splice(index, 0, newWidget);
+	    .then(function (newWidget) {
+		if (index < ctrl.childWidgets.length) {
+		    newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
+		} else {
+		    ctrl.getElement().append(newWidget.getElement());
+		}
+		model.contents.splice(index, 0, item);
+		ctrl.childWidgets.splice(index, 0, newWidget);
 
-        // init the widget
-        newWidget.setEditable(ctrl.isEditable());
-    });
+		// init the widget
+		newWidget.setEditable(ctrl.isEditable());
+	    });
     // TODO: replace with promise
     return true;
 };
@@ -735,7 +731,7 @@ WbWidgetGroupCtrl.prototype.addChild = function (index, item) {
  */
 WbWidgetGroupCtrl.prototype.indexOfChild = function (widget) {
     if (!this.childWidgets || !this.childWidgets.length) {
-        return -1;
+	return -1;
     }
     return this.childWidgets.indexOf(widget);
 };
@@ -751,15 +747,15 @@ WbWidgetGroupCtrl.prototype.indexOfChild = function (widget) {
 WbWidgetGroupCtrl.prototype.delete = function () {
     // remove all children
     var widgets = this.getChilren();
-    angular.forEach(widgets, function(widget){
-        widget.delete();
+    angular.forEach(widgets, function (widget) {
+	widget.delete();
     });
-    
+
     // remove itself
     this.fire('deleted');
-    if(!this.isRoot()){
-        this.getParent()
-            .removeChild(this);
+    if (!this.isRoot()) {
+	this.getParent()
+		.removeChild(this);
     }
 };
 
@@ -769,8 +765,8 @@ WbWidgetGroupCtrl.prototype.delete = function () {
  * @memeberof WbWidgetGroupCtrl
  */
 WbWidgetGroupCtrl.prototype.getAllowedTypes = function () {
-    if(!this.isRoot()){
-        return this.getParent().getAllowedTypes();
+    if (!this.isRoot()) {
+	return this.getParent().getAllowedTypes();
     }
     return this.allowedTypes;
 };
@@ -786,6 +782,6 @@ WbWidgetGroupCtrl.prototype.setAllowedTypes = function (allowedTypes) {
 
 // submit the controller
 angular.module('am-wb-core')//
-.controller('WbWidgetCtrl', WbWidgetCtrl)//
-.controller('WbWidgetGroupCtrl', WbWidgetGroupCtrl);
+	.controller('WbWidgetCtrl', WbWidgetCtrl)//
+	.controller('WbWidgetGroupCtrl', WbWidgetGroupCtrl);
 
