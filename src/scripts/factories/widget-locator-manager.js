@@ -249,7 +249,11 @@ angular
         }
         
         // list widgets
-        widgets = $widget.getChildren(this.getRootWidget());
+        var rootWidget = this.getRootWidget();
+        if(!rootWidget){
+            return;
+        }
+        widgets = $widget.getChildren(rootWidget);
         this.activeBoundLocators = widgets.length;
         
         // disable extra
