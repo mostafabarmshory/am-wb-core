@@ -495,20 +495,18 @@ WbAbstractWidget.prototype.getRoot = function () {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.isSelected = function () {
-    if (this.isRoot()) {
-	return false;
-    }
-    return this.getParent().isChildSelected(this);
+    return this.selected;
 };
 
-WbAbstractWidget.prototype.setSelected = function (flag) {
+WbAbstractWidget.prototype.setSelected = function (flag, $event) {
     if (this.isRoot()) {
 	return;
     }
-    this.getParent().childSelected(this);
 
     // fire events
+    this.selected = flag;
     if (flag) {
+	this.getParent().childSelected(this, $event);
 	this.fire('select');
     } else {
 	this.fire('unselect');
@@ -671,9 +669,12 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
 
 
 
-WbWidgetGroupCtrl.prototype.childSelected = function (ctrl) {
+WbWidgetGroupCtrl.prototype.childSelected = function (ctrl, $event) {
     if (!this.isRoot()) {
-	return this.getParent().childSelected(ctrl);
+	return this.getParent().childSelected(ctrl, $event);
+    }
+    if (this.lastSelectedItem) {
+	this.lastSelectedItem.setSelected(false);
     }
     if (ctrl === this.lastSelectedItem) {
 	return;
