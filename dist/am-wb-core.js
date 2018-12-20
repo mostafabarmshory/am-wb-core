@@ -1042,8 +1042,7 @@ angular.module('am-wb-core')
         scope : {
             wbEditable : '=?',
             wbOnModelSelect : '@?',
-            wbAllowedTypes: '<?',
-            wbLocals: '<?'
+            wbAllowedTypes: '<?'
         },
         link : wbGroupLink,
         controllerAs: 'ctrl',
@@ -6262,6 +6261,8 @@ angular.module('am-wb-core')
         $wbUtil,
         $q, $sce, $templateRequest, $compile, $controller) {
 
+    
+    this.providers =  {};
     var _group_repo = [];
     var contentElementAsso = [];
     var elementKey = [];
@@ -6422,6 +6423,7 @@ angular.module('am-wb-core')
         childScope = parentScope.$new(false, parentScope);
 
         // 2- create element
+        var service = this;
         return $wbUtil.getTemplateFor(widget)//
         .then(function(template) {
             if (model.type !== 'Group') {
@@ -6446,7 +6448,7 @@ angular.module('am-wb-core')
             var wlocals = _.merge({
                 $scope : childScope,
                 $element : element,
-            });
+            }, service.providers);
             if (model.type !== 'Group') {
                 ctrl = $controller('WbWidgetCtrl', wlocals);
             } else {
@@ -6546,6 +6548,11 @@ angular.module('am-wb-core')
         //return the list
         return widgets;
     }
+    
+    
+    this.addProvider = function(key, value) {
+        this.providers[key] = value;
+    };
 });
 
 /* 

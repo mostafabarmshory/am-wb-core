@@ -103,8 +103,7 @@ angular.module('am-wb-core')
         scope : {
             wbEditable : '=?',
             wbOnModelSelect : '@?',
-            wbAllowedTypes: '<?',
-            wbLocals: '<?'
+            wbAllowedTypes: '<?'
         },
         link : wbGroupLink,
         controllerAs: 'ctrl',
