@@ -41,7 +41,8 @@ angular.module('am-wb-core')//
         options = options || {};
         AbstractWidgetLocator.apply(this, options);
 
-        // load headerTemplate
+        // set anchor
+        this.setAnchor(options.anchor);
 
         // load templates
         var template = options.template

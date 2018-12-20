@@ -2990,39 +2990,50 @@ angular.module('am-wb-core')//
         this.callbacks = [];
         this.elements = [];
         this.observedWidgets = [];
-
+        
         // Creates listeners
         var ctrl = this;
         this.widgetListeners = {
-            'delete' : function ($event) {
-                ctrl.setWidget(null);
-                ctrl.fire('widgetDeleted', $event);
-            },
-            'select' : function ($event) {
-                ctrl.addClass('selected');
-                ctrl.removeClass('mouseover');
-                ctrl.fire('widgetSelected', $event);
-            },
-            'unselect' : function ($event) {
-                ctrl.removeClass('selected');
-                if (ctrl.mouseover) {
+                'delete' : function ($event) {
+                    ctrl.setWidget(null);
+                    ctrl.fire('widgetDeleted', $event);
+                },
+                'select' : function ($event) {
+                    ctrl.addClass('selected');
+                    ctrl.removeClass('mouseover');
+                    ctrl.fire('widgetSelected', $event);
+                },
+                'unselect' : function ($event) {
+                    ctrl.removeClass('selected');
+                    if (ctrl.mouseover) {
+                        ctrl.addClass('mouseover');
+                    }
+                    ctrl.fire('widgetUnselected', $event);
+                },
+                'mouseover' : function ($event) {
                     ctrl.addClass('mouseover');
+                    ctrl.mouseover = true;
+                },
+                'mouseout' : function ($event) {
+                    ctrl.removeClass('mouseover');
+                    ctrl.mouseover = false;
+                },
+                'resize' : function ($event) {
+                    this.updateView();
                 }
-                ctrl.fire('widgetUnselected', $event);
-            },
-            'mouseover' : function ($event) {
-                ctrl.addClass('mouseover');
-                ctrl.mouseover = true;
-            },
-            'mouseout' : function ($event) {
-                ctrl.removeClass('mouseover');
-                ctrl.mouseover = false;
-            },
-            'resize' : function ($event) {
-                this.updateView();
-            }
         };
     }
+
+    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
+        this.anchor = anchor;
+    };
+
+    abstractWidgetLocator.prototype.getAnchor = function (auncher) {
+//        if(this.anchor){
+//            return this.anchor.parent();
+//        }
+        return $rootElement;
+    };
 
 
     /**
@@ -3049,8 +3060,9 @@ angular.module('am-wb-core')//
 
     abstractWidgetLocator.prototype.setElements = function (elements) {
         this.elements = elements;
+        var anchor = this.getAnchor();
         angular.forEach(elements, function (element) {
-            $rootElement.append(element);
+            anchor.append(element);
             element.hide();
         });
     };
@@ -3230,6 +3242,9 @@ angular.module('am-wb-core')//
 	var boundWidgetLocator = function (options) {
 		options = options || {};
 		AbstractWidgetLocator.apply(this, options);
+
+        // set anchor
+        this.setAnchor(options.anchor);
 
 		// load templates
 		var template = options.template 
@@ -3479,6 +3494,7 @@ angular
         }
         if(this.rootWidget) {
             this.mutationObserver.disconnect(this.rootWidget.getElement()[0]);
+            this.destroy();
         }
         this.rootWidget = rootWidget;
         if(this.rootWidget) {
@@ -3488,6 +3504,9 @@ angular
                 subtree: true
 //                attributeFilter: ["style"]
             });
+            var element = this.rootWidget.getElement();
+            this.SelectionLocatorOption.anchor = this.SelectionLocatorOption.anchor || element;
+            this.BoundLocatorOption.anchor = this.BoundLocatorOption.anchor || element;
         }
         if (this.isEnable()) {
             this.updateBoundLocators();
@@ -3631,7 +3650,8 @@ angular.module('am-wb-core')//
         options = options || {};
         AbstractWidgetLocator.apply(this, options);
 
-        // load headerTemplate
+        // set anchor
+        this.setAnchor(options.anchor);
 
         // load templates
         var template = options.template
@@ -6454,6 +6474,10 @@ angular.module('am-wb-core')
             } else {
                 ctrl = $controller('WbWidgetGroupCtrl', wlocals);
             }
+            // NOTE: can inject widget controller as WidgetCtrl
+            ctrl.setParent(parentWidget);
+            ctrl.setModel(model);
+            wlocals.WidgetCtrl = ctrl;
 
             // extend element controller
             if (angular.isDefined(widget.controller)) {
@@ -6467,8 +6491,6 @@ angular.module('am-wb-core')
             // bind ctrl
             element.data('$ngControllerController', ctrl);
             link(childScope);
-            ctrl.setParent(parentWidget);
-            ctrl.setModel(model);
             
             // return widget
             return ctrl;

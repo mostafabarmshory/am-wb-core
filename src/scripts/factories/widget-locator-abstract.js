@@ -45,39 +45,51 @@ angular.module('am-wb-core')//
         this.callbacks = [];
         this.elements = [];
         this.observedWidgets = [];
-
+        
         // Creates listeners
         var ctrl = this;
         this.widgetListeners = {
-            'delete' : function ($event) {
-                ctrl.setWidget(null);
-                ctrl.fire('widgetDeleted', $event);
-            },
-            'select' : function ($event) {
-                ctrl.addClass('selected');
-                ctrl.removeClass('mouseover');
-                ctrl.fire('widgetSelected', $event);
-            },
-            'unselect' : function ($event) {
-                ctrl.removeClass('selected');
-                if (ctrl.mouseover) {
+                'delete' : function ($event) {
+                    ctrl.setWidget(null);
+                    ctrl.fire('widgetDeleted', $event);
+                },
+                'select' : function ($event) {
+                    ctrl.addClass('selected');
+                    ctrl.removeClass('mouseover');
+                    ctrl.fire('widgetSelected', $event);
+                },
+                'unselect' : function ($event) {
+                    ctrl.removeClass('selected');
+                    if (ctrl.mouseover) {
+                        ctrl.addClass('mouseover');
+                    }
+                    ctrl.fire('widgetUnselected', $event);
+                },
+                'mouseover' : function ($event) {
                     ctrl.addClass('mouseover');
+                    ctrl.mouseover = true;
+                },
+                'mouseout' : function ($event) {
+                    ctrl.removeClass('mouseover');
+                    ctrl.mouseover = false;
+                },
+                'resize' : function ($event) {
+                    this.updateView();
                 }
-                ctrl.fire('widgetUnselected', $event);
-            },
-            'mouseover' : function ($event) {
-                ctrl.addClass('mouseover');
-                ctrl.mouseover = true;
-            },
-            'mouseout' : function ($event) {
-                ctrl.removeClass('mouseover');
-                ctrl.mouseover = false;
-            },
-            'resize' : function ($event) {
-                this.updateView();
-            }
         };
     }
+
+    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
+        this.anchor = anchor;
+    };
+
+    abstractWidgetLocator.prototype.getAnchor = function (auncher) {
+        // TODO: maso, 2018: define the anchor
+//        if(this.anchor){
+//            return this.anchor.parent();
+//        }
+        return $rootElement;
+    };
 
 
     /**
@@ -104,8 +116,9 @@ angular.module('am-wb-core')//
 
     abstractWidgetLocator.prototype.setElements = function (elements) {
         this.elements = elements;
+        var anchor = this.getAnchor();
         angular.forEach(elements, function (element) {
-            $rootElement.append(element);
+            anchor.append(element);
             element.hide();
         });
     };

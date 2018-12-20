@@ -196,6 +196,7 @@ angular
         }
         if(this.rootWidget) {
             this.mutationObserver.disconnect(this.rootWidget.getElement()[0]);
+            this.destroy();
         }
         this.rootWidget = rootWidget;
         if(this.rootWidget) {
@@ -205,6 +206,9 @@ angular
                 subtree: true
 //                attributeFilter: ["style"]
             });
+            var element = this.rootWidget.getElement();
+            this.SelectionLocatorOption.anchor = this.SelectionLocatorOption.anchor || element;
+            this.BoundLocatorOption.anchor = this.BoundLocatorOption.anchor || element;
         }
         if (this.isEnable()) {
             this.updateBoundLocators();

@@ -38,6 +38,9 @@ angular.module('am-wb-core')//
 		options = options || {};
 		AbstractWidgetLocator.apply(this, options);
 
+        // set anchor
+        this.setAnchor(options.anchor);
+
 		// load templates
 		var template = options.template 
 		|| '<div class="wb-widget-locator bound"></div>';

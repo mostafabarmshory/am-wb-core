@@ -229,6 +229,10 @@ angular.module('am-wb-core')
             } else {
                 ctrl = $controller('WbWidgetGroupCtrl', wlocals);
             }
+            // NOTE: can inject widget controller as WidgetCtrl
+            ctrl.setParent(parentWidget);
+            ctrl.setModel(model);
+            wlocals.WidgetCtrl = ctrl;
 
             // extend element controller
             if (angular.isDefined(widget.controller)) {
@@ -242,8 +246,6 @@ angular.module('am-wb-core')
             // bind ctrl
             element.data('$ngControllerController', ctrl);
             link(childScope);
-            ctrl.setParent(parentWidget);
-            ctrl.setModel(model);
             
             // return widget
             return ctrl;
