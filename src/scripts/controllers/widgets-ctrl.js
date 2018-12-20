@@ -312,7 +312,7 @@ WbAbstractWidget.prototype.getModel = function () {
 
 
 WbAbstractWidget.prototype.getEvent = function () {
-    return this.wbModel.event;
+    return this.wbModel.event || {};
 };
 
 

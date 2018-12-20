@@ -1,6 +1,6 @@
 # event
 
-Events is what the user can define over every widgets. For example the user can define 'onClick' 
+Events is what the user can define over every widgets. For example the user can define 'click' 
 event for a widget to do special work when the widget is clicked.
 
 The user could define couple of events. 
