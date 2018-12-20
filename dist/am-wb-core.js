@@ -3029,6 +3029,7 @@ angular.module('am-wb-core')//
     };
 
     abstractWidgetLocator.prototype.getAnchor = function (auncher) {
+        // TODO: maso, 2018: define the anchor
 //        if(this.anchor){
 //            return this.anchor.parent();
 //        }
@@ -3366,7 +3367,7 @@ angular
         // selection options
         this.SelectionLocator = options.selectionLocator || SelectionWidgetLocator;
         this.SelectionLocatorOption = options.selectionLocatorOption || {};
-        this.boundEnable = true;
+        this.selectionEnable = true;
         if (angular.isDefined(options.selectionEnable)) {
             this.selectionEnable = options.selectionEnable;
         }
@@ -3482,28 +3483,28 @@ angular
      * @memberof WidgetLocatorManager
      */
     WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {
-        if(!this.mutationObserver){
-            var ctrl = this;
-            this.mutationObserver = new MutationObserver(function(){
-                if(!ctrl.isEnable()){
-                    return;
-                }
-                ctrl.updateSelectionLocators();
-                ctrl.updateBoundLocators();
-            });
-        }
+//        if(!this.mutationObserver){
+//            var ctrl = this;
+//            this.mutationObserver = new MutationObserver(function(){
+//                if(!ctrl.isEnable()){
+//                    return;
+//                }
+//                ctrl.updateSelectionLocators();
+//                ctrl.updateBoundLocators();
+//            });
+//        }
         if(this.rootWidget) {
-            this.mutationObserver.disconnect(this.rootWidget.getElement()[0]);
+//            this.mutationObserver.disconnect(this.rootWidget.getElement()[0]);
             this.destroy();
         }
         this.rootWidget = rootWidget;
         if(this.rootWidget) {
-            this.mutationObserver.observe(this.rootWidget.getElement()[0], {
-                attributes:    true,
-                childList: true,
-                subtree: true
+//            this.mutationObserver.observe(this.rootWidget.getElement()[0], {
+//                attributes: true,
+//                childList: false,
+//                subtree: true,
 //                attributeFilter: ["style"]
-            });
+//            });
             var element = this.rootWidget.getElement();
             this.SelectionLocatorOption.anchor = this.SelectionLocatorOption.anchor || element;
             this.BoundLocatorOption.anchor = this.BoundLocatorOption.anchor || element;
