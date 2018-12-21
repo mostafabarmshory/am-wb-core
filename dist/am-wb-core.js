@@ -1010,7 +1010,9 @@ angular.module('am-wb-core')
             $scope.$eval(function() {
                 onModelSelectionFu($scope.$parent, locals);
             });
-            $scope.$apply();
+            if($scope.wbEditable){
+                $scope.$apply();
+            }
         }
 
         // Load ngModel
@@ -3057,9 +3059,14 @@ angular.module('am-wb-core')//
     abstractWidgetLocator.prototype.getAnchor = function (auncher) {
         // find custom anchor
         if(this.anchor){
-            var list = $rootElement.find(this.anchor);
-            if(list){
-                return list[0];
+            if(angular.isFunction(this.anchor)){
+                return this.anchor();
+            }
+            if(angular.isString(this.anchor)){
+                var list = $rootElement.find(this.anchor);
+                if(list){
+                    return list[0];
+                }
             }
         }
         // find parent
@@ -3323,26 +3330,32 @@ angular.module('am-wb-core')//
 	boundWidgetLocator.prototype = new AbstractWidgetLocator();
 
 	boundWidgetLocator.prototype.updateView = function () {
-	    var bound = this.getWidget().getBoundingClientRect();
+        var widget = this.getWidget();
+        if(widget.isRoot()){
+            this.setEnable(false);
+            return;
+        }
+	    var bound = widget.getBoundingClientRect();
+	    var space = 2;
 		this.topElement.css({
-			top: bound.top + 1,
-			left: bound.left + 1,
-			width: bound.width - 2
+			top: bound.top + space,
+			left: bound.left + space,
+			width: bound.width - 2*space
 		});
 		this.rightElement.css({
-			top: bound.top + 1,
-			left: bound.left + bound.width - 2,
-			height: bound.height - 2
+			top: bound.top + space,
+			left: bound.left + bound.width - 2*space,
+			height: bound.height - 2*space
 		});
 		this.buttomElement.css({
-			top: bound.top + bound.height - 1,
-			left: bound.left + 1,
-			width: bound.width - 2
+			top: bound.top + bound.height - space,
+			left: bound.left + space,
+			width: bound.width - 2*space
 		});
 		this.leftElement.css({
-			top: bound.top + 1,
-			left: bound.left + 1,
-			height: bound.height - 2
+			top: bound.top + space,
+			left: bound.left + space,
+			height: bound.height - 2*space
 		});
 
 	};
@@ -3799,26 +3812,32 @@ angular.module('am-wb-core')//
     selectionWidgetLocator.prototype = new AbstractWidgetLocator();
 
     selectionWidgetLocator.prototype.updateView = function () {
-        var bound = this.getWidget().getBoundingClientRect();
+        var widget = this.getWidget();
+        if(widget.isRoot()){
+            this.setEnable(false);
+            return;
+        }
+        var bound = widget.getBoundingClientRect();
+        var space = 2;
         this.topElement.css({
-            top: bound.top + 1,
-            left: bound.left + 1,
-            width: bound.width - 2
+            top: bound.top + space,
+            left: bound.left + space,
+            width: bound.width - 2*space
         });
         this.rightElement.css({
-            top: bound.top + 1,
-            left: bound.left + bound.width - 3,
-            height: bound.height - 2
+            top: bound.top + space,
+            left: bound.left + bound.width - 2*space,
+            height: bound.height - 2*space
         });
         this.buttomElement.css({
-            top: bound.top + bound.height - 1,
-            left: bound.left + 1,
-            width: bound.width - 2
+            top: bound.top + bound.height - space,
+            left: bound.left + space,
+            width: bound.width - 2*space
         });
         this.leftElement.css({
-            top: bound.top + 1,
-            left: bound.left + 1,
-            height: bound.height - 2
+            top: bound.top + space,
+            left: bound.left + space,
+            height: bound.height - 2*space
         });
         if (bound.top < 32) {
             this.titleElement.css({

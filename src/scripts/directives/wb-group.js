@@ -72,7 +72,9 @@ angular.module('am-wb-core')
             $scope.$eval(function() {
                 onModelSelectionFu($scope.$parent, locals);
             });
-            $scope.$apply();
+            if($scope.wbEditable){
+                $scope.$apply();
+            }
         }
 
         // Load ngModel

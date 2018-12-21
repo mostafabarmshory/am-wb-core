@@ -65,26 +65,32 @@ angular.module('am-wb-core')//
 	boundWidgetLocator.prototype = new AbstractWidgetLocator();
 
 	boundWidgetLocator.prototype.updateView = function () {
-	    var bound = this.getWidget().getBoundingClientRect();
+        var widget = this.getWidget();
+        if(widget.isRoot()){
+            this.setEnable(false);
+            return;
+        }
+	    var bound = widget.getBoundingClientRect();
+	    var space = 2;
 		this.topElement.css({
-			top: bound.top + 1,
-			left: bound.left + 1,
-			width: bound.width - 2
+			top: bound.top + space,
+			left: bound.left + space,
+			width: bound.width - 2*space
 		});
 		this.rightElement.css({
-			top: bound.top + 1,
-			left: bound.left + bound.width - 2,
-			height: bound.height - 2
+			top: bound.top + space,
+			left: bound.left + bound.width - 2*space,
+			height: bound.height - 2*space
 		});
 		this.buttomElement.css({
-			top: bound.top + bound.height - 1,
-			left: bound.left + 1,
-			width: bound.width - 2
+			top: bound.top + bound.height - space,
+			left: bound.left + space,
+			width: bound.width - 2*space
 		});
 		this.leftElement.css({
-			top: bound.top + 1,
-			left: bound.left + 1,
-			height: bound.height - 2
+			top: bound.top + space,
+			left: bound.left + space,
+			height: bound.height - 2*space
 		});
 
 	};
