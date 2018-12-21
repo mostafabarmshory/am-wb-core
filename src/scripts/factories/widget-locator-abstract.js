@@ -73,8 +73,8 @@ angular.module('am-wb-core')//
                     ctrl.removeClass('mouseover');
                     ctrl.mouseover = false;
                 },
-                'resize' : function ($event) {
-                    this.updateView();
+                'resize-layout' : function ($event) {
+                    ctrl.updateView();
                 }
         };
     }
