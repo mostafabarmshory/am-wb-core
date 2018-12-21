@@ -534,26 +534,25 @@ WbAbstractWidget.prototype.getActions = function () {
 
 
 /**
- * Returns bounding client rectangle
+ * Returns bounding client rectangle to parent
  * 
  * @return bounding rectangle
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.getBoundingClientRect = function () {
-    var $element = this.getElement();
-    var rect = $element[0].getBoundingClientRect();
-    var offset = $element.offset();
+    var element = this.getElement();
+
+    var offset = element.position();
+    var width = element.outerWidth();
+    var height = element.outerHeight();
+    
     return {
 	// rect
-	width: rect.width,
-	height: rect.height,
-	x: rect.x,
-	y: rect.y,
+	width: width,
+	height: height,
 	// offset
-	top: $element.offset().top,
-	right: offset.rigth,
-	bottom: offset.bottom,
-	left: offset.left
+	top: offset.top + parseInt(element.css('marginTop'), 10) + element.scrollTop(),
+	left: offset.left + parseInt(element.css('marginLeft'), 10)
     };
 };
 

@@ -6,6 +6,11 @@ of a widget:
 
 -> group
 ***************************************************************************************/
+wb-group {
+	display: block;
+	/* Position must be relative to support locators */
+	position: relative;
+}
 .wb-group {
 	min-width: 32px;
 	min-height: 32px;

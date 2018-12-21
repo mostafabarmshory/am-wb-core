@@ -64,6 +64,9 @@ angular
         // attributes
         this.selectionLocators = [];
         this.boundLocators = [];
+        
+        this.locatorsMap = new Map();
+        this.widgetMap = new Map();
 
         // selection options
         this.SelectionLocator = options.selectionLocator || SelectionWidgetLocator;
@@ -96,8 +99,13 @@ angular
             locator.destroy();
         });
 
+        // create locators
         this.selectionLocators = [];
         this.boundLocators = [];
+
+        // clean maps
+        this.locatorsMap = new Map();
+        this.widgetMap = new Map();
     };
 
     /**
@@ -207,8 +215,8 @@ angular
 //                attributeFilter: ["style"]
 //            });
             var element = this.rootWidget.getElement();
-            this.SelectionLocatorOption.anchor = this.SelectionLocatorOption.anchor || element;
-            this.BoundLocatorOption.anchor = this.BoundLocatorOption.anchor || element;
+//            this.SelectionLocatorOption.anchor = this.SelectionLocatorOption.anchor || element;
+//            this.BoundLocatorOption.anchor = this.BoundLocatorOption.anchor || element;
         }
         if (this.isEnable()) {
             this.updateBoundLocators();
@@ -275,7 +283,7 @@ angular
             return;
         }
         widgets = $widget.getChildren(rootWidget);
-        widgets.push(rootWidget);
+//        widgets.push(rootWidget);
         this.activeBoundLocators = widgets.length;
         
         // disable extra

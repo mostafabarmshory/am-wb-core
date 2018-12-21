@@ -46,68 +46,92 @@ angular.module('am-wb-core')
     /*
      * Link widget view
      */
-    function wbGroupLink($scope, $element, $attrs, $ctrls) {
+    function wbGroupLink($scope, $element, $attrs, ngModelCtrl) {
 
-        // Loads wbGroup
-        var ctrl = $ctrls[0];
+        var model;
+        var rootWidget;
+        var onSelectionFuction;
+
+        if($scope.wbOnModelSelect) {
+            var onModelSelectionFu = $parse($scope.wbOnModelSelect);
+        }
+
+        /*
+         * Fire if a widget is selected
+         */
+        function fireSelection($event) {
+            var widgets = $event.widgets;
+            var locals = {
+                    '$event': $event,
+                    'widgets': widgets
+            };
+            if(angular.isArray(widgets) && widgets.length){
+                locals.$model =rootWidget.getModel();
+                locals.$ctrl = rootWidget;
+            }
+            $scope.$eval(function() {
+                onModelSelectionFu($scope.$parent, locals);
+            });
+            $scope.$apply();
+        }
 
         // Load ngModel
-        var ngModelCtrl = $ctrls[1];
         ngModelCtrl.$render = function() {
-            ctrl.setModel(ngModelCtrl.$viewValue);
+            model = ngModelCtrl.$viewValue;
+            if(!model){
+                if(rootWidget){
+                    rootWidget.setModel({
+                        type: 'Group'
+                    });
+                }
+                return;
+            }
+            // set new model to the group
+            if(rootWidget){
+                rootWidget.setModel(model);
+            } else {
+                $widget.compile(model)
+                .then(function(widget){
+                    $element.append(widget.getElement());
+                    rootWidget = widget;
+                    widget.on('select', fireSelection);
+                    fireSelection({
+                        widgets:[widget]
+                    });
+                });
+            }
         };
 
         /*
          * Watch for editable in root element
          */
         $scope.$watch('wbEditable', function(editable){
-            ctrl.setEditable(editable);
+            if(rootWidget) {
+                rootWidget.setEditable(editable);
+            }
         });
 
-        if($scope.wbOnModelSelect) {
-            var onModelSelectionFu = $parse($scope.wbOnModelSelect);
-            $scope.$eval(function() {
-                // TODO: maso, 2018: An event factory is required
-                onModelSelectionFu($scope.$parent, {
-                    '$event': {
-                        widgets:[ctrl]
-                    }
-                });
-            });
-            ctrl.on('select', function($event){
-                var widgets = $event.widgets;
-                var locals = {
-                        '$event': $event,
-                        'widgets': widgets
-                };
-                if(angular.isArray(widgets) && widgets.length){
-                    locals.$model =ctrl.getModel();
-                    locals.$ctrl = ctrl;
-                }
-                $scope.$eval(function() {
-                    onModelSelectionFu($scope.$parent, locals);
-                });
-            });
-        }
-        
         $scope.$watch('wbAllowedTypes', function(wbAllowedTypes){
-           ctrl.setAllowedTypes(wbAllowedTypes); 
+            if(rootWidget) {
+                rootWidget.setAllowedTypes(wbAllowedTypes); 
+            }
         });
+
     }
 
 
     return {
-        templateUrl : 'views/directives/wb-group.html',
+//        template : '<div></div>',
         restrict : 'E',
-        replace : true,
+//        replace : true,
         scope : {
             wbEditable : '=?',
             wbOnModelSelect : '@?',
             wbAllowedTypes: '<?'
         },
         link : wbGroupLink,
-        controllerAs: 'ctrl',
-        controller: 'WbWidgetGroupCtrl',
-        require:['wbGroup', 'ngModel']
+//      controllerAs: 'ctrl',
+//      controller: 'WbWidgetGroupCtrl',
+        require:'ngModel'
     };
 });

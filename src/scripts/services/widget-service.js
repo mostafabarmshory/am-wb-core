@@ -33,7 +33,7 @@ angular.module('am-wb-core')
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$widget', function(
-        $wbUtil,
+        $wbUtil, $rootScope,
         $q, $sce, $templateRequest, $compile, $controller) {
 
     
@@ -194,7 +194,13 @@ angular.module('am-wb-core')
         var element = null;
 
         // 1- create scope
-        var parentScope = parentWidget.getScope();
+        var parentScope;
+        if(parentWidget){
+            parentScope = parentWidget.getScope()
+        } else {
+            // this is a root widget
+            parentScope = $rootScope;
+        }
         childScope = parentScope.$new(false, parentScope);
 
         // 2- create element

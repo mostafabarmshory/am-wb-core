@@ -51,37 +51,38 @@
         <!-- endinjector -->
         <!-- endbuild -->
     </head>
-    <body>
-
-        <div
-            layout="row"
-            layout-fill>
-            <div flex>
-                <md-content	    	
-                    layout="column">
-                    <section layout="row" layout-align="center center">
-                        <md-button
-                            ng-class="{'md-primary' : editable}"
-                            class="wb-group-button left"
-                            ng-click="editable = !editable">
-                            <wb-icon>edit</wb-icon>
-                        </md-button>
-                        <md-button
-                            ng-repeat="action in actions"
-                            ng-click="runAction(action)">
-                            <wb-icon>{{action.icon}}</wb-icon>
-                        </md-button>
-                    </section>
-                    <wb-group
-                    	wb-on-model-under-cursor="widgetUnderCursor($event)"
-                        wb-on-model-select="loadSettings($event)"
-                        wb-editable="editable"
-                        ng-model="model"
-                        flex>
-                    </wb-group>
-                </md-content>
-            </div>
+    <body
+    	layout="row">
+        <div style="width: 200px;background: black">
         </div>
+        <div
+        	layout="column"
+        	flex>
+       		<section layout="row" layout-align="center center">
+                <md-button
+                    ng-class="{'md-primary' : editable}"
+                    class="wb-group-button left"
+                    ng-click="editable = !editable">
+                    <wb-icon>edit</wb-icon>
+                </md-button>
+                <md-button
+                    ng-repeat="action in actions"
+                    ng-click="runAction(action)">
+                    <wb-icon>{{action.icon}}</wb-icon>
+                </md-button>
+            </section>
+	        <md-content
+	            flex>
+	            <wb-group
+	            	wb-on-model-under-cursor="widgetUnderCursor($event)"
+	                wb-on-model-select="loadSettings($event)"
+	                wb-editable="editable"
+	                ng-model="model"
+	                flex>
+	            </wb-group>
+	        </md-content>
+        </div>
+        <div style="width: 200px;background: black"></div>
 
 
 

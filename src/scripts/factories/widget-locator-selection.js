@@ -137,7 +137,7 @@ angular.module('am-wb-core')//
         });
         this.rightElement.css({
             top: bound.top + 1,
-            left: bound.left + bound.width - 2,
+            left: bound.left + bound.width - 3,
             height: bound.height - 2
         });
         this.buttomElement.css({
