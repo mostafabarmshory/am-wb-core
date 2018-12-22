@@ -784,7 +784,7 @@ WbWidgetGroupCtrl.prototype.indexOfChild = function (widget) {
  */
 WbWidgetGroupCtrl.prototype.delete = function () {
     // remove all children
-    var widgets = this.getChilren();
+    var widgets = this.getChildren();
     angular.forEach(widgets, function (widget) {
         widget.delete();
     });

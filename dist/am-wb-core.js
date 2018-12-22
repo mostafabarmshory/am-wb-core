@@ -1846,7 +1846,7 @@ WbWidgetGroupCtrl.prototype.indexOfChild = function (widget) {
  */
 WbWidgetGroupCtrl.prototype.delete = function () {
     // remove all children
-    var widgets = this.getChilren();
+    var widgets = this.getChildren();
     angular.forEach(widgets, function (widget) {
         widget.delete();
     });
@@ -6857,7 +6857,7 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         } else {
             angular.forEach(shadows, function (shadow, index) {
                 shadowStr += createShadowStr(shadow);
-                if(index + 1 < style.shadows.length){
+                if(index + 1 < shadows.length){
                     shadowStr += ', ';
                 }
             });
