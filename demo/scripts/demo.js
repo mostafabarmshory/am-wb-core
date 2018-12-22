@@ -38,11 +38,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
      * visible.
      */
     var widgetLocator = new WidgetLocatorManager({
-    	selectionEnable: true,
-    	selectionPath: true,
-    	cursorEnable: true,
-    	cursorPath: false,
-    	actionEnable: false
+    	anchor: '#demo-anchor'
     });
     this.widgetLocator = widgetLocator;
     

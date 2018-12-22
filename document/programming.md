@@ -74,6 +74,10 @@ The user can get a special child using getChildById(id).
 If the type is for example 'Input' or 'Textarea' the widget has this method.
 The user can get the value using getValue().
 
+### getEvent()
+
+Returns the event of a widget. If the event is not defined then return an empty object {}.
+
 ### style()
 
 style method is provided to the user to define dynamic styles. In this case the user can define some styles

@@ -6,6 +6,11 @@ of a widget:
 
 -> group
 ***************************************************************************************/
+wb-group {
+	display: block;
+	/* Position must be relative to support locators */
+	position: relative;
+}
 .wb-group {
 	min-width: 32px;
 	min-height: 32px;
@@ -65,6 +70,7 @@ in the edit mode. This part of the the CSS fix basic settings of the widgets.
  */
 .wb-widget-locator.bound {
 	background: #f0f0f0;
+	z-index: 68;
 }
 
 .wb-widget-locator.bound.mouseover {
@@ -98,6 +104,7 @@ in the edit mode. This part of the the CSS fix basic settings of the widgets.
 	background: black;
 	color: white;
 	font-size: 10px;
+	z-index: 69;
 }
 
 #header.wb-widget-locator.selection {

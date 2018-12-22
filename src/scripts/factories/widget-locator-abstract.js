@@ -45,39 +45,68 @@ angular.module('am-wb-core')//
         this.callbacks = [];
         this.elements = [];
         this.observedWidgets = [];
-
+        
         // Creates listeners
         var ctrl = this;
         this.widgetListeners = {
-            'delete' : function ($event) {
-                ctrl.setWidget(null);
-                ctrl.fire('widgetDeleted', $event);
-            },
-            'select' : function ($event) {
-                ctrl.addClass('selected');
-                ctrl.removeClass('mouseover');
-                ctrl.fire('widgetSelected', $event);
-            },
-            'unselect' : function ($event) {
-                ctrl.removeClass('selected');
-                if (ctrl.mouseover) {
+                'delete' : function ($event) {
+                    ctrl.setWidget(null);
+                    ctrl.fire('widgetDeleted', $event);
+                },
+                'select' : function ($event) {
+                    ctrl.addClass('selected');
+                    ctrl.removeClass('mouseover');
+                    ctrl.fire('widgetSelected', $event);
+                },
+                'unselect' : function ($event) {
+                    ctrl.removeClass('selected');
+                    if (ctrl.mouseover) {
+                        ctrl.addClass('mouseover');
+                    }
+                    ctrl.fire('widgetUnselected', $event);
+                },
+                'mouseover' : function ($event) {
                     ctrl.addClass('mouseover');
+                    ctrl.mouseover = true;
+                },
+                'mouseout' : function ($event) {
+                    ctrl.removeClass('mouseover');
+                    ctrl.mouseover = false;
+                },
+                'resize-layout' : function ($event) {
+                    ctrl.updateView();
                 }
-                ctrl.fire('widgetUnselected', $event);
-            },
-            'mouseover' : function ($event) {
-                ctrl.addClass('mouseover');
-                ctrl.mouseover = true;
-            },
-            'mouseout' : function ($event) {
-                ctrl.removeClass('mouseover');
-                ctrl.mouseover = false;
-            },
-            'resize' : function ($event) {
-                this.updateView();
-            }
         };
     }
+
+    /**
+     * Defines anchor 
+     */
+    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
+        this.anchor = anchor;
+    };
+
+    abstractWidgetLocator.prototype.getAnchor = function (auncher) {
+        // find custom anchor
+        if(this.anchor){
+            if(angular.isFunction(this.anchor)){
+                return this.anchor();
+            }
+            if(angular.isString(this.anchor)){
+                var list = $rootElement.find(this.anchor);
+                if(list){
+                    return list[0];
+                }
+            }
+        }
+        // find parent
+        var widget = this.getWidget();
+        if(widget && widget.getParent()){
+            return widget.getParent().getElement();
+        }
+        // return root
+        return $rootElement;
+    };
 
 
     /**
@@ -90,10 +119,13 @@ angular.module('am-wb-core')//
         return this.visible;
     };
 
+    /**
+     * Sets new widget
+     */
     abstractWidgetLocator.prototype.setWidget = function (widget) {
         this.disconnect();
         this.widget = widget;
-        this.observe(this.widget);
+        this.observe();
         this.updateView();
         this.fire('widgetChanged');
     };
@@ -104,10 +136,6 @@ angular.module('am-wb-core')//
 
     abstractWidgetLocator.prototype.setElements = function (elements) {
         this.elements = elements;
-        angular.forEach(elements, function (element) {
-            $rootElement.append(element);
-            element.hide();
-        });
     };
 
     abstractWidgetLocator.prototype.getElements = function () {
@@ -190,7 +218,7 @@ angular.module('am-wb-core')//
         if (this.enable) {
             this.disconnect();
         } else {
-            this.observe(this.getWidget());
+            this.observe();
         }
     }
 
@@ -198,8 +226,12 @@ angular.module('am-wb-core')//
         return this.enable;
     }
 
+    /**
+     * Removes all resources
+     */
     abstractWidgetLocator.prototype.destroy = function () {
-        this.fire('distroied');
+        this.fire('destroied');
+        this.disconnect();
         angular.forEach(this.elements, function (element) {
             element.remove();
         });
@@ -221,26 +253,41 @@ angular.module('am-wb-core')//
         }
     };
 
+    /**
+     * Remove connection the the current widget
+     */
     abstractWidgetLocator.prototype.disconnect = function () {
-        for (var i = 0; i < this.observedWidgets.length; i++) {
-            var widget = this.observedWidgets[i];
-            angular.forEach(this.widgetListeners, function (listener, type) {
-                widget.off(type, listener);
-            });
+        if(!this.widget){
+            return;
         }
-        this.observedWidgets = [];
+        // remove listeners
+        var widget = this.widget;
+        angular.forEach(this.widgetListeners, function (listener, type) {
+            widget.off(type, listener);
+        });
+        // remove elements
+        var elements = this.getElements();
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].detach();
+        }
     };
 
-    abstractWidgetLocator.prototype.observe = function (widget) {
-        if (!widget) {
+    abstractWidgetLocator.prototype.observe = function () {
+        if (!this.widget) {
             return;
         }
         // add listener
-        this.observedWidgets.push(widget);
+        var widget = this.widget;
         angular.forEach(this.widgetListeners, function (listener, type) {
             widget.on(type, listener);
         });
-        this.updateView();
+        
+        // attache element
+        var anchor = this.getAnchor();
+        var elements = this.getElements();
+        angular.forEach(elements, function (element) {
+            anchor.append(element);
+        });
     };
 
     return abstractWidgetLocator;

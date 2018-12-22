@@ -33,9 +33,11 @@ angular.module('am-wb-core')
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$widget', function(
-        $wbUtil,
+        $wbUtil, $rootScope,
         $q, $sce, $templateRequest, $compile, $controller) {
 
+    
+    this.providers =  {};
     var _group_repo = [];
     var contentElementAsso = [];
     var elementKey = [];
@@ -192,10 +194,17 @@ angular.module('am-wb-core')
         var element = null;
 
         // 1- create scope
-        var parentScope = parentWidget.getScope();
+        var parentScope;
+        if(parentWidget){
+            parentScope = parentWidget.getScope()
+        } else {
+            // this is a root widget
+            parentScope = $rootScope;
+        }
         childScope = parentScope.$new(false, parentScope);
 
         // 2- create element
+        var service = this;
         return $wbUtil.getTemplateFor(widget)//
         .then(function(template) {
             if (model.type !== 'Group') {
@@ -220,12 +229,16 @@ angular.module('am-wb-core')
             var wlocals = _.merge({
                 $scope : childScope,
                 $element : element,
-            });
+            }, service.providers);
             if (model.type !== 'Group') {
                 ctrl = $controller('WbWidgetCtrl', wlocals);
             } else {
                 ctrl = $controller('WbWidgetGroupCtrl', wlocals);
             }
+            // NOTE: can inject widget controller as WidgetCtrl
+            ctrl.setParent(parentWidget);
+            ctrl.setModel(model);
+            wlocals.WidgetCtrl = ctrl;
 
             // extend element controller
             if (angular.isDefined(widget.controller)) {
@@ -239,8 +252,6 @@ angular.module('am-wb-core')
             // bind ctrl
             element.data('$ngControllerController', ctrl);
             link(childScope);
-            ctrl.setParent(parentWidget);
-            ctrl.setModel(model);
             
             // return widget
             return ctrl;
@@ -320,4 +331,9 @@ angular.module('am-wb-core')
         //return the list
         return widgets;
     }
+    
+    
+    this.addProvider = function(key, value) {
+        this.providers[key] = value;
+    };
 });

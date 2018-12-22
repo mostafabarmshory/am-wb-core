@@ -64,11 +64,14 @@ angular
         // attributes
         this.selectionLocators = [];
         this.boundLocators = [];
+        
+        this.locatorsMap = new Map();
+        this.widgetMap = new Map();
 
         // selection options
         this.SelectionLocator = options.selectionLocator || SelectionWidgetLocator;
         this.SelectionLocatorOption = options.selectionLocatorOption || {};
-        this.boundEnable = true;
+        this.selectionEnable = true;
         if (angular.isDefined(options.selectionEnable)) {
             this.selectionEnable = options.selectionEnable;
         }
@@ -96,8 +99,13 @@ angular
             locator.destroy();
         });
 
+        // create locators
         this.selectionLocators = [];
         this.boundLocators = [];
+
+        // clean maps
+        this.locatorsMap = new Map();
+        this.widgetMap = new Map();
     };
 
     /**
@@ -184,27 +192,31 @@ angular
      * @memberof WidgetLocatorManager
      */
     WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {
-        if(!this.mutationObserver){
-            var ctrl = this;
-            this.mutationObserver = new MutationObserver(function(){
-                if(!ctrl.isEnable()){
-                    return;
-                }
-                ctrl.updateSelectionLocators();
-                ctrl.updateBoundLocators();
-            });
-        }
+//        if(!this.mutationObserver){
+//            var ctrl = this;
+//            this.mutationObserver = new MutationObserver(function(){
+//                if(!ctrl.isEnable()){
+//                    return;
+//                }
+//                ctrl.updateSelectionLocators();
+//                ctrl.updateBoundLocators();
+//            });
+//        }
         if(this.rootWidget) {
-            this.mutationObserver.disconnect(this.rootWidget.getElement()[0]);
+//            this.mutationObserver.disconnect(this.rootWidget.getElement()[0]);
+            this.destroy();
         }
         this.rootWidget = rootWidget;
         if(this.rootWidget) {
-            this.mutationObserver.observe(this.rootWidget.getElement()[0], {
-                attributes:    true,
-                childList: true,
-                subtree: true
+//            this.mutationObserver.observe(this.rootWidget.getElement()[0], {
+//                attributes: true,
+//                childList: false,
+//                subtree: true,
 //                attributeFilter: ["style"]
-            });
+//            });
+            var element = this.rootWidget.getElement();
+//            this.SelectionLocatorOption.anchor = this.SelectionLocatorOption.anchor || element;
+//            this.BoundLocatorOption.anchor = this.BoundLocatorOption.anchor || element;
         }
         if (this.isEnable()) {
             this.updateBoundLocators();
@@ -271,7 +283,7 @@ angular
             return;
         }
         widgets = $widget.getChildren(rootWidget);
-        widgets.push(rootWidget);
+//        widgets.push(rootWidget);
         this.activeBoundLocators = widgets.length;
         
         // disable extra
