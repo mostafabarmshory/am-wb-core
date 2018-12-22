@@ -1639,12 +1639,13 @@ WbAbstractWidget.prototype.getBoundingClientRect = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget) {
     WbAbstractWidget.call(this);
     this.setElement($element);
     this.setScope($scope);
     this.$wbUtil = $wbUtil;
     this.$http = $http;
+    this.$widget = $widget;
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
