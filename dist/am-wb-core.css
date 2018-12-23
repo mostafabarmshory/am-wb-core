@@ -484,7 +484,7 @@ in the edit mode. This part of the the CSS fix basic settings of the widgets.
  */
 .wb-widget-locator.bound {
 	background: #f0f0f0;
-	z-index: 68;
+	z-index: 58;
 }
 
 .wb-widget-locator.bound.mouseover {
@@ -518,7 +518,7 @@ in the edit mode. This part of the the CSS fix basic settings of the widgets.
 	background: black;
 	color: white;
 	font-size: 10px;
-	z-index: 69;
+	z-index: 59;
 }
 
 #header.wb-widget-locator.selection {
