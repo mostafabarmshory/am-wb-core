@@ -66,7 +66,7 @@ angular.module('am-wb-core')//
 
 	boundWidgetLocator.prototype.updateView = function () {
         var widget = this.getWidget();
-        if(widget.isRoot()){
+        if(!widget || widget.isRoot()){
             this.setEnable(false);
             return;
         }

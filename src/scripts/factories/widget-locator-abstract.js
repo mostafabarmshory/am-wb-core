@@ -216,9 +216,9 @@ angular.module('am-wb-core')//
         this.enable = enable;
         this.setVisible(this.enable && this.visible);
         if (this.enable) {
-            this.disconnect();
-        } else {
             this.observe();
+        } else {
+            this.disconnect();
         }
     }
 
