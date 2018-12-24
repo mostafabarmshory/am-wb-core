@@ -28,112 +28,104 @@ angular.module('am-wb-core')
  * @ngdoc Directives
  * @name wb-group
  * @description Render a list of widget
- * 
- * ## wbOnModelSelect
+ *  ## wbOnModelSelect
  * 
  * If a widget select with in the group then the wbOnModelSelect parameter will
  * be evaluated with the following attributes:
+ *  - $event : the related event - $ctrl : the widget (to support legacy) -
+ * $model: the model (to support legace)
  * 
- * - $event : the related event
- * - $ctrl : the widget (to support legacy)
- * - $model: the model (to support legace)
- * 
- * NOTE: The root widget will be passed as first selected item. The function will be
- * evaluated in non edit mode.
+ * NOTE: The root widget will be passed as first selected item. The function
+ * will be evaluated in non edit mode.
  */
-.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $parse) {
+.directive('wbGroup',
+		function($compile, $widget, $wbUtil, $controller, $settings, $parse) {
 
-    /*
-     * Link widget view
-     */
-    function wbGroupLink($scope, $element, $attrs, ngModelCtrl) {
+	/*
+	 * Link widget view
+	 */
+	function wbGroupLink($scope, $element, $attrs, ngModelCtrl) {
 
-        var model;
-        var rootWidget;
-        var onSelectionFuction;
+		var model;
+		var rootWidget;
+		var onSelectionFuction;
 
-        if($scope.wbOnModelSelect) {
-            var onModelSelectionFu = $parse($scope.wbOnModelSelect);
-        }
+		if ($scope.wbOnModelSelect) {
+			onSelectionFuction = $parse($scope.wbOnModelSelect);
+		}
 
-        /*
-         * Fire if a widget is selected
-         */
-        function fireSelection($event) {
-            var widgets = $event.widgets;
-            var locals = {
-                    '$event': $event,
-                    'widgets': widgets
-            };
-            if(angular.isArray(widgets) && widgets.length){
-                locals.$model =rootWidget.getModel();
-                locals.$ctrl = rootWidget;
-            }
-            $scope.$eval(function() {
-                onModelSelectionFu($scope.$parent, locals);
-            });
-            if($scope.wbEditable){
-                $scope.$apply();
-            }
-        }
+		/*
+		 * Fire if a widget is selected
+		 */
+		function fireSelection($event) {
+			var widgets = $event.widgets;
+			var locals = {
+					'$event' : $event,
+					'widgets' : widgets
+			};
+			if (angular.isArray(widgets) && widgets.length) {
+				locals.$model = rootWidget.getModel();
+				locals.$ctrl = rootWidget;
+			}
+			$scope.$eval(function() {
+				onSelectionFuction($scope.$parent, locals);
+			});
+			if ($scope.wbEditable) {
+				$scope.$apply();
+			}
+		}
 
-        // Load ngModel
-        ngModelCtrl.$render = function() {
-            model = ngModelCtrl.$viewValue;
-            if(!model){
-                if(rootWidget){
-                    rootWidget.setModel({
-                        type: 'Group'
-                    });
-                }
-                return;
-            }
-            // set new model to the group
-            if(rootWidget){
-                rootWidget.setModel(model);
-            } else {
-                $widget.compile(model)
-                .then(function(widget){
-                    $element.append(widget.getElement());
-                    rootWidget = widget;
-                    widget.on('select', fireSelection);
-                    fireSelection({
-                        widgets:[widget]
-                    });
-                });
-            }
-        };
+		// Load ngModel
+		ngModelCtrl.$render = function() {
+			model = ngModelCtrl.$viewValue;
+			if (!model) {
+				if (rootWidget) {
+					rootWidget.setModel({
+						type : 'Group'
+					});
+				}
+				return;
+			}
+			// set new model to the group
+			if (rootWidget) {
+				rootWidget.setModel(model);
+			} else {
+				$widget.compile(model).then(function(widget) {
+					$element.append(widget.getElement());
+					rootWidget = widget;
+					widget.on('select', fireSelection);
+					fireSelection({
+						widgets : [ widget ]
+					});
+				});
+			}
+		};
 
-        /*
-         * Watch for editable in root element
-         */
-        $scope.$watch('wbEditable', function(editable){
-            if(rootWidget) {
-                rootWidget.setEditable(editable);
-            }
-        });
+		/*
+		 * Watch for editable in root element
+		 */
+		$scope.$watch('wbEditable', function(editable) {
+			if (rootWidget) {
+				rootWidget.setEditable(editable);
+			}
+		});
 
-        $scope.$watch('wbAllowedTypes', function(wbAllowedTypes){
-            if(rootWidget) {
-                rootWidget.setAllowedTypes(wbAllowedTypes); 
-            }
-        });
+		$scope.$watch('wbAllowedTypes', function(wbAllowedTypes) {
+			if (rootWidget) {
+				rootWidget.setAllowedTypes(wbAllowedTypes);
+			}
+		});
 
-    }
+	}
 
-
-    return {
-//        template : '<div></div>',
-        restrict : 'E',
-//        replace : true,
-        scope : {
-            wbEditable : '=?',
-            wbOnModelSelect : '@?',
-            wbAllowedTypes: '<?'
-        },
-        link : wbGroupLink,
-//      controllerAs: 'ctrl',
-//      controller: 'WbWidgetGroupCtrl',
-        require:'ngModel'
-    };
+	return {
+		restrict : 'E',
+		scope : {
+			wbEditable : '=?',
+			wbOnModelSelect : '@?',
+			wbAllowedTypes : '<?'
+		},
+		link : wbGroupLink,
+		require : 'ngModel'
+	};
 });

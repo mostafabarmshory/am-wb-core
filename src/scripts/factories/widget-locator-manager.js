@@ -121,12 +121,14 @@ angular
             return;
         }
         this.visible = visible;
-        angular.forEach(this.selectionLocators, function (locator) {
-            locator.setVisible(visible);
-        });
-        angular.forEach(this.boundLocators, function (locator) {
-            locator.setVisible(visible);
-        });
+//        angular.forEach(this.selectionLocators, function (locator) {
+//            locator.setVisible(visible);
+//        });
+//        angular.forEach(this.boundLocators, function (locator) {
+//            locator.setVisible(visible);
+//        });
+        this.updateBoundLocators();
+        this.updateSelectionLocators();
     }
 
     /**
@@ -192,31 +194,12 @@ angular
      * @memberof WidgetLocatorManager
      */
     WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {
-//        if(!this.mutationObserver){
-//            var ctrl = this;
-//            this.mutationObserver = new MutationObserver(function(){
-//                if(!ctrl.isEnable()){
-//                    return;
-//                }
-//                ctrl.updateSelectionLocators();
-//                ctrl.updateBoundLocators();
-//            });
-//        }
         if(this.rootWidget) {
-//            this.mutationObserver.disconnect(this.rootWidget.getElement()[0]);
             this.destroy();
         }
         this.rootWidget = rootWidget;
         if(this.rootWidget) {
-//            this.mutationObserver.observe(this.rootWidget.getElement()[0], {
-//                attributes: true,
-//                childList: false,
-//                subtree: true,
-//                attributeFilter: ["style"]
-//            });
             var element = this.rootWidget.getElement();
-//            this.SelectionLocatorOption.anchor = this.SelectionLocatorOption.anchor || element;
-//            this.BoundLocatorOption.anchor = this.BoundLocatorOption.anchor || element;
         }
         if (this.isEnable()) {
             this.updateBoundLocators();
@@ -273,8 +256,10 @@ angular
          * Adds new locator for new widget
          */
         var ctrl = this;
-        function newLocator($event){
-            ctrl.updateBoundLocators();
+        if(!this.newLocatorListener) {
+            this.newLocatorListener = function($event){
+                ctrl.updateBoundLocators();
+            }
         }
         
         // list widgets
@@ -283,24 +268,22 @@ angular
             return;
         }
         widgets = $widget.getChildren(rootWidget);
-//        widgets.push(rootWidget);
+        widgets.push(rootWidget);
         this.activeBoundLocators = widgets.length;
         
         // disable extra
-        for (i = 0; i < this.boundLocators.length; i++) {
-            this.boundLocators[i].setEnable(i < widgets.length);
-
+        angular.forEach(this.boundLocators, function(locator){
+            locator.setEnable(i < widgets.length);
             // remove listener
-            widget = this.boundLocators[i].getWidget();
+            var widget = locator.getWidget();
             if(widget){
-                widget.off('newchild', newLocator);
+                widget.off('newchild', ctrl.newLocatorListener);
             }
-        }
+        });
 
         // add new
         while (this.boundLocators.length < widgets.length) {
             locator = new this.BoundLocator(this.BoundLocatorOption);
-            locator.setEnable(true);
             this.boundLocators.push(locator);
         }
 
@@ -308,10 +291,11 @@ angular
         for (i = 0; i < widgets.length; i++) {
             var locator = this.boundLocators[i];
             locator.setWidget(widgets[i]);
+            locator.setEnable(true);
             locator.setVisible(this.visible);
             
             // add listener
-            widgets[i].on('newchild', newLocator);
+            widgets[i].on('newchild', ctrl.newLocatorListener);
         }
     };
 
