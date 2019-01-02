@@ -1,8 +1,11 @@
 <div layout="row">
-    <wb-icon 
-    	ng-show="icon" 
-    	wb-icon-name="{{::icon}}">
-    </wb-icon>
+    <div layout="row">
+        <wb-icon 
+            ng-if="icon" 
+            wb-icon-name="{{::icon}}">
+        </wb-icon>
+        <p ng-if="title" translate>{{::title}}</p>
+    </div>
     <md-tabs
         flex
         class="wb-tab-as-choose-button"
@@ -14,7 +17,7 @@
                     <md-tooltip
                         ng-if="::item.title"
                         md-delay="1500">
-                        <span translate="">{{::item.title}}</span>  
+                        <span translate>{{::item.title}}</span>  
                     </md-tooltip>
                     <wb-icon wb-icon-name="{{::item.icon}}"></wb-icon>
             </md-tab-label>

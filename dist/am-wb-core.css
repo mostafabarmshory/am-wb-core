@@ -307,9 +307,9 @@ md-input-container > ng-md-icon + input {
 }
 
 .wb-tab-as-choose-button md-pagination-wrapper {
-    left: initial;
-    height: initial;
-    right: 0;
+    /*left: 0px;*/
+    /*right: 0px;*/
+    height: auto;
 }
 
 .wb-tab-as-choose-button md-tab-item{
@@ -319,7 +319,8 @@ md-input-container > ng-md-icon + input {
 }
 
 .wb-tab-as-choose-button wb-icon {
- margin-right: 0px !important;
+    margin-right: 0px !important;
+    margin-left: 0px !important;
 }
 
 .wb-tab-as-choose-button md-next-button{
