@@ -563,7 +563,7 @@ angular.module('am-wb-core')
 		    $scope.$watch('wbModel', function (model) {
 			if (model) {
 			    var layout = model.style.layout || {};
-			    ctrl.direction = layout.direction;
+			    ctrl.direction = layout.direction || 'column';
 			    ctrl.align = layout.align;
 			    ctrl.wrap = layout.wrap;
 			    ctrl.justify = layout.justify;
