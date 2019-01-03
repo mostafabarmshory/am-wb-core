@@ -71,7 +71,10 @@ angular.module('am-wb-core')
         icon: 'wb-widget-html',
         groups: ['basic'],
         model: {
-            text: '<h2>Text element</h2><p>Click on the text box to edit.</p>'
+            text: '<h2>Text element</h2><p>Click on the text box to edit.</p>',
+            style: {
+            	padding: '8px'
+            }
         },
         // help id
         help: 'http://dpq.co.ir',
