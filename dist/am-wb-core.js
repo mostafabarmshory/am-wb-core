@@ -1381,8 +1381,17 @@ WbAbstractWidget.prototype.off = function (type, callback) {
     }
 };
 
+/** 
+ * Gets direction of the widget
+ * 
+ * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
+ */
 WbAbstractWidget.prototype.getDirection = function () {
-    return this.getParent().getModel().style.layout.direction;
+    var model = this.getModel();
+    if(!model){
+	return;
+    }
+    return model.style.layout.direction;
 };
 
 WbAbstractWidget.prototype.getModel = function () {
@@ -1996,6 +2005,9 @@ angular.module('am-wb-core')
 		 * Fire if a widget is selected
 		 */
 		function fireSelection($event) {
+			if(!onSelectionFuction) {
+			    return;
+			}
 			var widgets = $event.widgets;
 			var locals = {
 					'$event' : $event,
@@ -7555,6 +7567,9 @@ angular.module('am-wb-core')
             link(childScope);
             
             // return widget
+	    if(angular.isFunction(ctrl.initWidget)){
+		ctrl.initWidget();
+	    }
             return ctrl;
         });
     }

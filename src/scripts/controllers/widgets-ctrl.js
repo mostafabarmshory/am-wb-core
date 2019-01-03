@@ -319,8 +319,17 @@ WbAbstractWidget.prototype.off = function (type, callback) {
     }
 };
 
+/** 
+ * Gets direction of the widget
+ * 
+ * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
+ */
 WbAbstractWidget.prototype.getDirection = function () {
-    return this.getParent().getModel().style.layout.direction;
+    var model = this.getModel();
+    if(!model){
+	return;
+    }
+    return model.style.layout.direction;
 };
 
 WbAbstractWidget.prototype.getModel = function () {

@@ -58,6 +58,9 @@ angular.module('am-wb-core')
 		 * Fire if a widget is selected
 		 */
 		function fireSelection($event) {
+			if(!onSelectionFuction) {
+			    return;
+			}
 			var widgets = $event.widgets;
 			var locals = {
 					'$event' : $event,
