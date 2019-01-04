@@ -2043,7 +2043,12 @@ angular.module('am-wb-core')
 				onSelectionFuction($scope.$parent, locals);
 			});
 			if ($scope.wbEditable) {
-				$scope.$apply();
+				/*
+				 * Catch angular digest exception
+				 */
+				try{					
+					$scope.$apply();
+				} catch(excetpion){}
 			}
 		}
 
@@ -4174,8 +4179,10 @@ angular.module('am-wb-core')//
      * @memberof AbstractWidgetLocator
      */
     abstractWidgetLocator.prototype.setVisible = function (visible) {
+    	if(this.visible === visible) {
+    		return;
+    	}
         this.visible = visible;
-        visible = this.visible && this.enable;
         if (visible) {
             this.updateView();
             this.fire('show');
@@ -4511,12 +4518,6 @@ angular
             return;
         }
         this.visible = visible;
-//        angular.forEach(this.selectionLocators, function (locator) {
-//            locator.setVisible(visible);
-//        });
-//        angular.forEach(this.boundLocators, function (locator) {
-//            locator.setVisible(visible);
-//        });
         this.updateBoundLocators();
         this.updateSelectionLocators();
     }
@@ -4649,6 +4650,7 @@ angular
         if(!this.newLocatorListener) {
             this.newLocatorListener = function($event){
                 ctrl.updateBoundLocators();
+                ctrl.updateSelectionLocators();
             }
         }
         

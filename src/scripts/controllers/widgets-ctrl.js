@@ -22,7 +22,37 @@
  * SOFTWARE.
  */
 'use strict';
-
+/**
+ * @ngdoc Controllers
+ * @name WbAbstractWidget
+ * @descreption root of the widgets
+ * 
+ * This is an abstract implementation of the widgets.
+ * 
+ *  # Events
+ * 
+ * 
+ * Here is list of allowed types:
+ * 
+ * <ul>
+ * <li>modelChanged: some properties of the model is changed.</li>
+ * <li>modelUpdated: A new data model is replaced with the current one.</li>
+ * <li>styleChanged: Computed style of the current widget is update.</li>
+ * <li>widgetIsEditable: Widget is in editable state (so the result of isEditable() is true)</li>
+ * <li>widgetIsNotEditable: widget is not in editable mode any more(so the result of isEditable() is false)</li>
+ * <li>widgetDeleted: the widgets is removed.</li>
+ * <li>widgetUnderCursor: The widget is under the mouse</li>
+ * <li>widgetSelected: the widget is selected</li>
+ * <li>widgetUnselected: the widget is unselected</li>
+ * </ul>
+ * 
+ * Following event propagate on the root too
+ * 
+ * <ul>
+ * <li>widgetUnderCursor</li>
+ * <li>widgetSelected</li>
+ * </ul>
+ */
 var WbAbstractWidget = function () {
 	this.actions = [];
 	this.callbacks = [];
@@ -30,30 +60,13 @@ var WbAbstractWidget = function () {
 	this.$scope = null;
 	this.$element = null;
 	this.eventFunctions = {};
-	this.dynamicStyle = {};
+	this.computedStyle = {};
+	
+	// models
+	this.runtimeModel = {};
+	this.model = {};
 
-
-	/*
-	 * Update view based on new model
-	 */
-	function updateView($event) {
-		var ctrl = $event.source;
-		var model = ctrl.getModel();
-
-		// to support old widget
-		ctrl.getScope().wbModel = model;
-
-		// update style
-		if (model) {
-			ctrl.loadStyle(angular.merge({}, ctrl.dynamicStyle, model.style));
-			ctrl.loadSeo(model);
-		}
-	}
-
-	this.on('modelChanged', updateView);
-	this.on('modelUpdate', updateView);
-	this.on('styleChanged', updateView);
-
+	// event listeners
 	var ctrl = this;
 	this.eventListeners = {
 			click: function ($event) {
@@ -88,13 +101,6 @@ var WbAbstractWidget = function () {
 	});
 
 };
-WbAbstractWidget.prototype.fireResizeLayout = function ($event) {
-	this.fire('resize', $event);
-	var children = this.$widget.getChildren(this.getRoot());
-	angular.forEach(children, function (widget) {
-		widget.fire('resize-layout', $event);
-	});
-};
 
 /**
  * Loads SEO information from the model and update the element
@@ -105,7 +111,11 @@ WbAbstractWidget.prototype.fireResizeLayout = function ($event) {
  *            {object} to load from
  * @memberof WbAbstractWidget
  */
-WbAbstractWidget.prototype.loadSeo = function (model) {
+WbAbstractWidget.prototype.loadSeo = function () {
+	var model = this.getModel();
+	if (!model) {
+		return;
+	}
 	var $element = this.getElement();
 	$element.attr('id', model.id);
 
@@ -126,9 +136,9 @@ WbAbstractWidget.prototype.loadSeo = function (model) {
 	}
 
 	// TODO: support of
-//	- {Text} label (https://schema.org/title)
-//	- {Text} description (https://schema.org/description)
-//	- {Text} keywords (https://schema.org/keywords)
+// - {Text} label (https://schema.org/title)
+// - {Text} description (https://schema.org/description)
+// - {Text} keywords (https://schema.org/keywords)
 };
 
 /**
@@ -136,15 +146,170 @@ WbAbstractWidget.prototype.loadSeo = function (model) {
  * 
  * The style is a part of widget data model.
  * 
- * NOTE: this is utility class and can move into a service
+ * NOTE: this is an internal function and supposed not to call from outside.
  * 
  * @param style
  *            {object} part of widget model
  * @memberof WbAbstractWidget
  */
-WbAbstractWidget.prototype.loadStyle = function (style) {
-	var cssStyle = this.$wbUtil.convertToWidgetCss(style || {});
-	this.$element.css(cssStyle);
+WbAbstractWidget.prototype.loadStyle = function () {
+	var model = this.getModel();
+	var runtimeModel = this.getRuntimeModel();
+	if (!model) {
+		return;
+	}
+	var computedStyle = angular.merge({}, runtimeModel.style, model.style);
+	if(angular.equals(computedStyle, this.computedStyle)){
+		return;
+	}
+	// TODO: maso, 2018:Create event
+	var $event = {}
+	$event.source = this;
+	$event.oldValue = this.computedStyle;
+	$event.newValue = computedStyle;
+
+	// save computedStyle
+	this.computedStyle = computedStyle;
+
+	// load style
+	this.$element.css(this.$wbUtil.convertToWidgetCss(this.computedStyle || {}));
+	this.fire('styleChanged', $event);
+};
+
+
+WbAbstractWidget.prototype.refresh = function() {
+	if(this.isSilent()) {
+		return;
+	}
+	// to support old widget
+	var model = this.getModel();
+	this.getScope().wbModel = model;
+
+	this.loadStyle();
+	this.loadSeo(model);
+}
+
+
+
+WbAbstractWidget.prototype.getModel = function () {
+	return this.wbModel;
+};
+WbAbstractWidget.prototype.setModel = function (model) {
+	if (model === this.wbModel) {
+		return;
+	}
+	this.wbModel = model;
+	this.refresh();
+	this.fire('modelChanged');
+};
+WbAbstractWidget.prototype.hasModelProperty = function(key){
+	objectPath.has(this.getModel(), key);
+};
+WbAbstractWidget.prototype.getModelProperty = function(key){
+	objectPath.get(this.getModel(), key);
+};
+WbAbstractWidget.prototype.setModelProperty = function (key, value){
+	// create the event
+	var $event = {};
+	$event.source = this;
+	$event.key = key;
+	$event.oldValue = this.getModelProperty(key);
+	$event.newValue =  value;
+
+	// Set the address
+	if(angular.isDefined(value)){
+		objectPath.set(this.getModel(), key, value);
+	} else {
+		objectPath.del(this.getModel(), key);
+	}
+
+	// refresh the view
+	this.refresh();
+}
+
+
+WbAbstractWidget.prototype.getRuntimeModel = function () {
+	return this.runtimeModel;
+};
+WbAbstractWidget.prototype.hasProperty = function (key){
+	objectPath.has(this.getRuntimeModel(), key);
+};
+WbAbstractWidget.prototype.getProperty = function (key){
+	objectPath.set(this.getRuntimeModel(), key);
+};
+WbAbstractWidget.prototype.setProperty = function (key, value){
+	// create the event
+	var $event = {};
+	$event.source = this;
+	$event.key = key;
+	$event.oldValue = old;
+	$event.newValue =  value;
+
+	// Set the address
+	var address = 'style.' + key;
+	if(angular.isDefined(value)){
+		objectPath.set(this.getRuntimeModel(), address, value);
+	} else {
+		objectPath.del(this.getRuntimeModel(), address);
+	}
+
+	// refresh the view
+	this.refresh();
+}
+
+/**
+ * Sets or gets style of the widget
+ * 
+ * The function effect on runtime style not the model. To change the model use
+ * #setModelProperty(key,value).
+ * 
+ * NOTE: this function is part of widget API.
+ * 
+ * Set style by key:
+ * 
+ * widget.style('background.color', '#ff00aa');
+ * 
+ * Get style by key:
+ * 
+ * var color = widget.style('background.color');
+ * 
+ * Remove style by key:
+ * 
+ * widget.style('background.color', null);
+ * 
+ * Set style by object:
+ * 
+ * widgt.style({ background: { color: 'red', image: null } });
+ * 
+ * The style object is read only and you can get it as follow:
+ * 
+ * var style = widget.style();
+ */
+WbAbstractWidget.prototype.style = function (style, value) {
+	// there is no argument so act as get
+	if(!angular.isDefined(style)){
+		return angular.copy(this.getProperty('style'));
+	}
+	// style is a key
+	if(angular.isString(style)){
+		if(angular.isDefined(value)){
+			// set style
+			return this.setProperty('style.'+style, value);
+		} else {
+			// get style
+			return this.getProperty('style.' + style);
+		}
+	}
+	// style is object
+	this.setSilent(true);
+	if(angular.isDefined(style)){
+		// XXX: set styles
+		// _.merge(this.dynamicStyle, style);
+		// this.fire('styleChanged');
+		return;
+	}
+	this.setSilent(false);
+	this.updateView();
 };
 
 /**
@@ -227,44 +392,21 @@ WbAbstractWidget.prototype.getElement = function () {
 	return this.$element;
 };
 
+WbAbstractWidget.prototype.setSilent = function(silent) {
+	this.silent = silent;
+}
 
-/**
- * Call all callbacks on the given event type.
- * 
- * @param type
- *            of the event
- * @param params
- *            to add to the event
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.fire = function (type, params) {
-	if (!angular.isDefined(this.callbacks[type])) {
-		return;
-	}
-	// create event
-	var event = _.merge({
-		source: this,
-		type: type
-	}, params || {});
-
-	// fire
-	var callbacks = this.callbacks[type];
-	angular.forEach(callbacks, function (callback) {
-		try {
-			callback(event);
-			// TODO: check propagations
-		} catch (error) {
-			// NOTE: remove on release
-			console.log(error);
-		}
-	});
-};
+WbAbstractWidget.prototype.isSilent = function() {
+	return this.silent;
+}
 
 /**
  * Adds new callback of type
  * 
- * @param typeof the event
- * @param callback to call on the event
+ * @param typeof
+ *            the event
+ * @param callback
+ *            to call on the event
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.on = function (type, callback) {
@@ -281,25 +423,6 @@ WbAbstractWidget.prototype.on = function (type, callback) {
 
 /**
  * Remove the callback
- * 
- * Here is list of allowed types:
- * 
- * <ul>
- * <li>modelChanged</li>
- * <li>modelUpdated</li>
- * <li>widgetIsEditable</li>
- * <li>widgetIsNotEditable</li>
- * <li>widgetDeleted: fire by each widget</li>
- * <li>widgetUnderCursor</li>
- * <li>widgetSelected</li>
- * </ul>
- * 
- * Following event propagate on the root too
- * 
- * <ul>
- * <li>widgetUnderCursor</li>
- * <li>widgetSelected</li>
- * </ul>
  * 
  * @param type
  *            of the event
@@ -319,7 +442,48 @@ WbAbstractWidget.prototype.off = function (type, callback) {
 	}
 };
 
-/** 
+/**
+ * Call all callbacks on the given event type.
+ * 
+ * @param type
+ *            of the event
+ * @param params
+ *            to add to the event
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.fire = function (type, params) {
+	if (this.isSilent() || !angular.isDefined(this.callbacks[type])) {
+		return;
+	}
+	// TODO: maso, 2018: create event object
+	var event = _.merge({
+		source: this,
+		type: type
+	}, params || {});
+
+	// fire
+	var callbacks = this.callbacks[type];
+	for(var i = 0; i < callbacks.length; i++){
+		// TODO: maso, 2018: check if the event is stopped to propagate
+		try {
+			callbacks[i](event);
+		} catch (error) {
+			// NOTE: remove on release
+			console.log(error);
+		}
+	}
+};
+
+WbAbstractWidget.prototype.fireResizeLayout = function ($event) {
+	this.fire('resize', $event);
+	var children = this.$widget.getChildren(this.getRoot());
+	angular.forEach(children, function (widget) {
+		widget.fire('resize-layout', $event);
+	});
+};
+
+
+/**
  * Gets direction of the widget
  * 
  * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
@@ -331,11 +495,6 @@ WbAbstractWidget.prototype.getDirection = function () {
 	}
 	return model.style.layout.direction;
 };
-
-WbAbstractWidget.prototype.getModel = function () {
-	return this.wbModel;
-};
-
 
 WbAbstractWidget.prototype.getEvent = function () {
 	return this.wbModel.event || {};
@@ -352,19 +511,6 @@ WbAbstractWidget.prototype.getType = function () {
 
 WbAbstractWidget.prototype.getId = function () {
 	return this.wbModel.id;
-};
-
-WbAbstractWidget.prototype.style = function (style) {
-	_.merge(this.dynamicStyle, style);
-	this.fire('styleChanged');
-};
-
-WbAbstractWidget.prototype.setModel = function (model) {
-	if (model === this.wbModel) {
-		return;
-	}
-	this.wbModel = model;
-	this.fire('modelChanged');
 };
 
 /**
@@ -388,18 +534,18 @@ WbAbstractWidget.prototype.getScope = function () {
 	return this.$scope;
 };
 
-//WbAbstractWidget.prototype.setUnderCursor = function (widget) {
-//if(!this.isRoot()){
-//this.getParent().setUnderCursor(widget);
-//}
-//if(this._widgetUnderCursor === widget){
-//return;
-//}
-//this._widgetUnderCursor = widget;
-//this.fire('widgetUnderCursor', {
-//widget: this._widgetUnderCursor
-//});
-//};
+// WbAbstractWidget.prototype.setUnderCursor = function (widget) {
+// if(!this.isRoot()){
+// this.getParent().setUnderCursor(widget);
+// }
+// if(this._widgetUnderCursor === widget){
+// return;
+// }
+// this._widgetUnderCursor = widget;
+// this.fire('widgetUnderCursor', {
+// widget: this._widgetUnderCursor
+// });
+// };
 
 WbAbstractWidget.prototype.isEditable = function () {
 	return this.editable;
@@ -895,11 +1041,7 @@ WbWidgetGroupCtrl.prototype.setAllowedTypes = function (allowedTypes) {
 };
 
 
-
-
-
-
-//submit the controller
+// submit the controller
 angular.module('am-wb-core')//
 .controller('WbWidgetCtrl', WbWidgetCtrl)//
 .controller('WbWidgetGroupCtrl', WbWidgetGroupCtrl);

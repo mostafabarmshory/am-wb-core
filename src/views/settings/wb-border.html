@@ -22,20 +22,22 @@ Created by masood.
     <label translate>Style</label>
     <md-select 
         ng-model="ctrl.style"
-        ng-change="ctrl.styleChanged(ctrl.style)">
-        <md-option ng-repeat="style in ::styles" value="{{::style.value}}"> 
-            {{::style.title}}
+        ng-change="ctrl.setStyleBorder('style', ctrl.style)">
+        <md-option 
+        	ng-repeat="style in ::ctrl.styles" 
+        	value="{{::style.value}}"> 
+            <span translate>{{::style.title}}</span>
         </md-option>
     </md-select>
 </md-input-container>
 <!--COLOR SECTION-->
 <wb-ui-setting-color 
-    title="{{'Color'| translate}}" 
+    title="Color" 
     wb-ui-setting-clear-button="true"
     wb-ui-setting-preview="true"
     wb-ui-setting-icon="format_color_fill"
     ng-model="ctrl.color"
-    ng-change="ctrl.colorChanged(ctrl.color)">
+    ng-change="ctrl.setStyleBorder('color', ctrl.color)">
 </wb-ui-setting-color>
 
 <!--WIDTH SECTION-->

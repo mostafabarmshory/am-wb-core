@@ -11,8 +11,8 @@
     title="All"
     icon="select_all"
     description="Set all margins"
-    ng-model="marginAll"
-    ng-change="ctrl.updateAllMargin(marginAll)"
+    ng-model="ctrl.marginAll"
+    ng-change="ctrl.updateAllMargin(ctrl.marginAll)"
     extra-values = "['length' , 'auto' , 'initial', 'inherit']">
 </wb-ui-setting-length>
 
@@ -20,8 +20,8 @@
 <wb-ui-setting-length
     title="Top"
     icon="border_top"
-    ng-model="margin.top"
-    ng-change="ctrl.updateMargin(margin)"
+    ng-model="ctrl.margin.top"
+    ng-change="ctrl.updateMargin(ctrl.margin)"
     extra-values = "['length' , 'auto' , 'initial', 'inherit']">
 </wb-ui-setting-length>
 
@@ -29,8 +29,8 @@
 <wb-ui-setting-length
     title="Right"
     icon="border_right"
-    ng-model="margin.right"
-    ng-change="ctrl.updateMargin(margin)"
+    ng-model="ctrl.margin.right"
+    ng-change="ctrl.updateMargin(ctrl.margin)"
     extra-values = "['length' , 'auto' , 'initial', 'inherit']">
 </wb-ui-setting-length>
 
@@ -38,8 +38,8 @@
 <wb-ui-setting-length
     title="Bottom"
     icon="border_bottom"
-    ng-model="margin.bottom"
-    ng-change="ctrl.updateMargin(margin)"
+    ng-model="ctrl.margin.bottom"
+    ng-change="ctrl.updateMargin(ctrl.margin)"
     extra-values = "['length' , 'auto' , 'initial', 'inherit']">
 </wb-ui-setting-length>
 
@@ -47,8 +47,8 @@
 <wb-ui-setting-length
     title="Left"
     icon="border_left"
-    ng-model="margin.left"
-    ng-change="ctrl.updateMargin(margin)"
+    ng-model="ctrl.margin.left"
+    ng-change="ctrl.updateMargin(ctrl.margin)"
     extra-values = "['length' , 'auto' , 'initial', 'inherit']">
 </wb-ui-setting-length>
 
@@ -64,8 +64,8 @@
     title="All"
     icon="select_all"
     description="Set all paddings"
-    ng-model="paddingAll"
-    ng-change="ctrl.updateAllPadding(paddingAll)"
+    ng-model="ctrl.paddingAll"
+    ng-change="ctrl.updateAllPadding(ctrl.paddingAll)"
     extra-values = "['inherit']">
 </wb-ui-setting-length>
 
@@ -73,8 +73,8 @@
 <wb-ui-setting-length
     title="Top"
     icon="border_top"
-    ng-model="padding.top"
-    ng-change="ctrl.updatePadding(padding)"
+    ng-model="ctrl.padding.top"
+    ng-change="ctrl.updatePadding(ctrl.padding)"
     extra-values = "['inherit']">
 </wb-ui-setting-length>
 
@@ -82,8 +82,8 @@
 <wb-ui-setting-length
     title="Right"
     icon="border_right"
-    ng-model="padding.right"
-    ng-change="ctrl.updatePadding(padding)"
+    ng-model="ctrl.padding.right"
+    ng-change="ctrl.updatePadding(ctrl.padding)"
     extra-values = "['inherit']">
 </wb-ui-setting-length>
 
@@ -91,8 +91,8 @@
 <wb-ui-setting-length
     title="Bottom"
     icon="border_bottom"
-    ng-model="padding.bottom"
-    ng-change="ctrl.updatePadding(padding)"
+    ng-model="ctrl.padding.bottom"
+    ng-change="ctrl.updatePadding(ctrl.padding)"
     extra-values = "['inherit']">
 </wb-ui-setting-length>
 
@@ -100,8 +100,8 @@
 <wb-ui-setting-length
     title="Left"
     icon="border_left"
-    ng-model="padding.left"
-    ng-change="ctrl.updatePadding(padding)"
+    ng-model="ctrl.padding.left"
+    ng-change="ctrl.updatePadding(ctrl.padding)"
     extra-values = "['inherit']">
 </wb-ui-setting-length>
 

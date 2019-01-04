@@ -74,7 +74,12 @@ angular.module('am-wb-core')
 				onSelectionFuction($scope.$parent, locals);
 			});
 			if ($scope.wbEditable) {
-				$scope.$apply();
+				/*
+				 * Catch angular digest exception
+				 */
+				try{					
+					$scope.$apply();
+				} catch(excetpion){}
 			}
 		}
 

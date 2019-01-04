@@ -9,34 +9,50 @@ a panel for background settings and opacity of a widget. these css-attributes ar
 
 Created by mgh.
 @author maso(mostafa.barmshory@dpq.co.ir)
+@author Ali Abdolahi
+@author Masood Zareh
 -->
 <!-- background -->
 <wb-ui-setting-image
     title="Background image" 
     wb-ui-setting-clear-button="true"
     wb-ui-setting-preview="true"
-    ng-model="wbModel.style.background.image"
-    ng-change="ctrl.imageChanged()">
+    ng-model="ctrl.image"
+    ng-change="ctrl.setStyleBackground('image', ctrl.image)">
 </wb-ui-setting-image>
+
 <wb-ui-setting-color 
     title="Background Color" 
     wb-ui-setting-clear-button="true"
     wb-ui-setting-preview="true"
-    ng-model="wbModel.style.background.color">
+    ng-model="ctrl.color"
+    ng-change="ctrl.setStyleBackground('color', ctrl.color)">
 </wb-ui-setting-color>
+
 <wb-ui-setting-background-size
-    value="wbModel.style.background.size">
+    ng-model="ctrl.size"
+    ng-change="ctrl.setStyleBackground('color', ctrl.color)">
 </wb-ui-setting-background-size>
+
 <wb-ui-setting-background-repeat
-    value="wbModel.style.background.repeat">
+    value="wbModel.style.background.repeat"
+    ng-model="ctrl.repeat"
+    ng-change="ctrl.setStyleBackground('repeat', ctrl.repeat)">
 </wb-ui-setting-background-repeat>
+
 <wb-ui-setting-background-attachment
-    value="wbModel.style.background.attachment">
+    value="wbModel.style.background.attachment"
+    ng-model="ctrl.attachment"
+    ng-change="ctrl.setStyleBackground('attachment', ctrl.attachment)">
 </wb-ui-setting-background-attachment>
+
 <wb-ui-setting-background-origin
-    value="wbModel.style.background.origin">
+    ng-model="ctrl.origin"
+    ng-change="ctrl.setStyleBackground('origin', ctrl.origin)">
 </wb-ui-setting-background-origin>
+
 <wb-ui-setting-background-position
-    value="wbModel.style.background.position">
+    ng-model="ctrl.position"
+    ng-change="ctrl.setStyleBackground('position', ctrl.position)">
 </wb-ui-setting-background-position>
 

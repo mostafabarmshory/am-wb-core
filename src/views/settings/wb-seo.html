@@ -18,50 +18,56 @@ These attributes are useful in SEO.
     <label translate="">Id</label>
     <input 
         type="text" 
-        ng-model="wbModel.id">
+        ng-model="ctrl.id"
+    	ng-change="ctrl.setProperty('id', ctrl.id)">
 </md-input-container>
 
 <md-input-container>
     <label translate="">Label</label>
     <input 
         type="text" 
-        ng-model="wbModel.label">
+        ng-model="ctrl.label"
+    	ng-change="ctrl.setProperty('label', ctrl.label)">
 </md-input-container>
 
 <md-input-container>
     <label translate="">Type</label>
     <input 
         type="text" 
-        ng-model="wbModel.category">
+        ng-model="ctrl.category"
+    	ng-change="ctrl.setProperty('category', ctrl.category)">
 </md-input-container>
 
 <md-input-container>
     <label translate="">Property</label>
     <input 
         type="text" 
-        ng-model="wbModel.property">
+        ng-model="ctrl.property"
+    	ng-change="ctrl.setProperty('property', ctrl.property)">
 </md-input-container>
 
 <md-input-container>
     <label translate="">Description</label>
     <input 
         type="text" 
-        ng-model="wbModel.description">
+        ng-model="ctrl.description"
+    	ng-change="ctrl.setProperty('description', ctrl.description)">
 </md-input-container>
 
 <md-input-container>
     <label translate="">Keywords</label>
     <input 
         type="text" 
-        ng-model="wbModel.keywords">
+        ng-model="ctrl.keywords"
+    	ng-change="ctrl.setProperty('keywords', ctrl.keywords)">
 </md-input-container>
-
 
 <wb-ui-setting-image 
 	ng-if="ctrl.isRoot()"
     title="Cover" 
     wb-ui-setting-clear-button="true"
     wb-ui-setting-preview="true"
-    ng-model="wbModel.cover">
+    ng-model="ctrl.cover"
+   	ng-change="ctrl.setProperty('cover', ctrl.cover)">
 </wb-ui-setting-image>
 
