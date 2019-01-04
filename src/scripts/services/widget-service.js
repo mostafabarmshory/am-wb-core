@@ -254,6 +254,9 @@ angular.module('am-wb-core')
             link(childScope);
             
             // return widget
+	    if(angular.isFunction(ctrl.initWidget)){
+		ctrl.initWidget();
+	    }
             return ctrl;
         });
     }

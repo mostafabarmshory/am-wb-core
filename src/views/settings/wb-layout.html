@@ -60,7 +60,7 @@ the following items can be set for customizing container layout:
     ng-change="ctrl.alignChanged()">
 </wb-ui-setting-choose>
 <wb-ui-setting-choose 
-    ng-if="ctrl.direction==='column'"
+    ng-if="ctrl.direction!=='row'"
     title="Horz."
     items="ctrl.align_['column']" 
     ng-model="ctrl.align"
@@ -76,7 +76,7 @@ the following items can be set for customizing container layout:
     ng-change="ctrl.justifyChanged()">
 </wb-ui-setting-choose>
 <wb-ui-setting-choose 
-    ng-if="ctrl.direction==='column'"
+    ng-if="ctrl.direction!=='row'"
     title="Horz."
     items="ctrl.justify_['column']" 
     ng-model="ctrl.justify"

@@ -58,6 +58,9 @@ angular.module('am-wb-core')
 		 * Fire if a widget is selected
 		 */
 		function fireSelection($event) {
+			if(!onSelectionFuction) {
+			    return;
+			}
 			var widgets = $event.widgets;
 			var locals = {
 					'$event' : $event,
@@ -71,7 +74,12 @@ angular.module('am-wb-core')
 				onSelectionFuction($scope.$parent, locals);
 			});
 			if ($scope.wbEditable) {
-				$scope.$apply();
+				/*
+				 * Catch angular digest exception
+				 */
+				try{					
+					$scope.$apply();
+				} catch(excetpion){}
 			}
 		}
 

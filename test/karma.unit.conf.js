@@ -52,6 +52,7 @@ module.exports = function(config) {
 			'bower_components/jspanel4x/dist/jspanel.js',
 			'bower_components/lodash/lodash.js',
 			'bower_components/tinymce/tinymce.js',
+			'bower_components/object-path/index.js',
 			'bower_components/angular-mocks/angular-mocks.js',
 			'bower_components/json-formatter/dist/json-formatter.js',
 			// endbower

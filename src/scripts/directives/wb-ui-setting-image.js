@@ -30,18 +30,26 @@
  * @ngInject
  */
 function wbUiSettingGeneralCtrl($scope) {
-	var ctrl = this;
 
 	// TODO: maso, 2018:load from user config
 	$scope.wbUiSettingClearButton = true;
 	$scope.wbUiSettingPreview = true;
 
-	function clearValue(/*$event*/){
+	this.clearValue = function (/*$event*/){
 		// General option
+		this.value = null;
 		this.valueChanged(null);
 	}
+	
+	this.setValue = function(value){
+		this.value = value;
+		this.valueChanged(value);
+	}
+	
+	this.getValue = function(){
+		this.value;
+	}
 
-	ctrl.clearValue = clearValue;
 }
 
 
@@ -64,11 +72,10 @@ function wbUiSettingImageCtrl($scope, $resource, $controller){
 				title: 'Select image',
 				description: 'Select image from resources.'
 			},
-			data: $scope.value
+			data: ctrl.getValue()
 		})//
 		.then(function(value){
-			$scope.value = value;
-			ctrl.valueChanged(value);
+			ctrl.setValue(value);
 		});
 	}
 
@@ -105,10 +112,16 @@ angular.module('am-wb-core')
 		link: function ($scope, $element, $attrs, $ctrl){
 			var ctrl = $ctrl[0];
 			var ngModelCtrl = $ctrl[1];
+			var lock = false;
 			ngModelCtrl.$render = function(){
-				$scope.value = ngModelCtrl.$viewValue;
+				lock = true;
+				ctrl.setValue(ngModelCtrl.$viewValue);
+				lock = false;
 			};
 			ctrl.valueChanged = function (newValue) {
+				if(lock){
+					return;
+				}
 				ngModelCtrl.$setViewValue(newValue);
 			};
 		},

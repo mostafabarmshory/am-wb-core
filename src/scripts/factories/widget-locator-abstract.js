@@ -178,8 +178,10 @@ angular.module('am-wb-core')//
      * @memberof AbstractWidgetLocator
      */
     abstractWidgetLocator.prototype.setVisible = function (visible) {
+    	if(this.visible === visible) {
+    		return;
+    	}
         this.visible = visible;
-        visible = this.visible && this.enable;
         if (visible) {
             this.updateView();
             this.fire('show');

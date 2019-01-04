@@ -6,9 +6,9 @@
 		ng-click="ctrl.showImagePicker($event)"
 		ng-if="wbUiSettingPreview">
 		<img 
-			ng-show="value"
+			ng-if="ctrl.value"
 			class="wb-ui-setting-image-result" 
-			ng-src="{{value}}"/>
+			ng-src="{{ctrl.value}}"/>
 	</div>
 	<md-input-container
 		class="md-icon-float"
@@ -19,16 +19,16 @@
 		</label>
 		<input
 			type="input"
-			ng-model="value" 
-			ng-change="ctrl.valueChanged(value)"
+			ng-model="ctrl.value" 
+			ng-change="ctrl.setValue(ctrl.value)"
 			class='wb-ui-setting-image-input' 
 			ng-mousedown="(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)" />
 	</md-input-container>
 	
 	<md-button 
 		class="md-icon-button wb-ui-setting-image-clear" 
-		ng-if="wbUiSettingClearButton && value" 
-		ng-click="ctrl.clearValue($event);" 
+		ng-if="wbUiSettingClearButton && ctrl.value" 
+		ng-click="ctrl.clearValue($event)" 
 		aria-label="Clear image">
 		<md-icon md-svg-icon="clear.svg"></md-icon>
 	</md-button>

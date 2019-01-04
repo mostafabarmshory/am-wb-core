@@ -1,7 +1,7 @@
 {
   "name": "am-wb-core",
   "moduleName": "am-wb-core",
-  "version": "2.4.3",
+  "version": "2.4.4",
   "authors": [
     "Mostafa Barmshory <mostafa.barmshory@dpq.co.ir>",
     "Hadi mansouri <mohammad.hadi.mansouri@dpq.co.ir>",
@@ -35,7 +35,8 @@
     "angular-drag-and-drop-lists": "https://github.com/mostafabarmshory/angular-drag-and-drop-lists.git#2.1.x",
     "jspanel4x": "master",
     "lodash": "3.x",
-    "tinymce": "4.8.x"
+    "tinymce": "4.8.x",
+    "object-path": "^0.11.0"
   },
   "devDependencies": {
     "angular-mocks": "1.7.x",

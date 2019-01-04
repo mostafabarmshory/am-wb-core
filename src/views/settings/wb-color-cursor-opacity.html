@@ -8,6 +8,7 @@ Contains:
 
 Created by masood.
 @author masood(masoodzarei64@gmail.com)
+@author maso(mostafa.barmshory@dpq.co.ir)
 -->
 
 <div 
@@ -19,7 +20,8 @@ Created by masood.
         title="Color" 
         wb-ui-setting-clear-button="true"
         wb-ui-setting-preview="true"
-        ng-model="wbModel.style.color">
+        ng-model="ctrl.color"
+    	ng-change="ctrl.setStyle('color', ctrl.color)">
     </wb-ui-setting-color>
 
     <!--CURSOR SECTION-->
@@ -30,9 +32,10 @@ Created by masood.
         <md-input-container layout-align="end center">
             <md-select 
                 style="max-width:75px;"
-                ng-model="wbModel.style.cursor">
+                ng-model="ctrl.cursor"
+    			ng-change="ctrl.setStyle('cursor', ctrl.cursor)">
                 <md-option 
-                    ng-repeat="cursor in ::cursors"
+                    ng-repeat="cursor in ::ctrl.cursors"
                     value="{{::cursor.value}}">
                     {{::cursor.title}}
                 </md-option>
@@ -45,35 +48,18 @@ Created by masood.
     <div 
         layout="column"
         style="min-width: 200px;">
-
         <div 
             layout="row"
             layout-align="end center">
-
             <wb-icon>opacity</wb-icon>
-
             <span flex translate="">Opacity</span>
-
             <md-input-container 
                 style="margin:0px; padding:0px; width:60px; height:30px;">
                 <input 
                     type="text" 
-                    ng-model="wbModel.style.opacity">
+                    ng-model="ctrl.opacity"
+    				ng-change="ctrl.setStyle('opacity', ctrl.opacity)">
             </md-input-container>
         </div>
-
-<!--        <md-slider-container 
-            style="margin:0px; padding:0px; height:30px;"
-            aria-label="display opacity value with slider">
-            <md-slider 
-                    min="0.00"
-                    max="1.00"
-                    step="0.01"
-                    round
-                    ng-model="wbModel.style.opacity">
-            </md-slider>
-        </md-slider-container>-->
-
     </div>
-
 </div>

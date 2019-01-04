@@ -121,12 +121,6 @@ angular
             return;
         }
         this.visible = visible;
-//        angular.forEach(this.selectionLocators, function (locator) {
-//            locator.setVisible(visible);
-//        });
-//        angular.forEach(this.boundLocators, function (locator) {
-//            locator.setVisible(visible);
-//        });
         this.updateBoundLocators();
         this.updateSelectionLocators();
     }
@@ -259,7 +253,17 @@ angular
         if(!this.newLocatorListener) {
             this.newLocatorListener = function($event){
                 ctrl.updateBoundLocators();
+                ctrl.updateSelectionLocators();
             }
+        }
+        if(!this.styleChangeListener){
+        	this.styleChangeListener = function($event) {
+        		if(angular.equals($event.newValue.layout, $event.oldValue.layout)){
+        			return;
+        		}
+                ctrl.updateBoundLocators();
+                ctrl.updateSelectionLocators();
+        	}
         }
         
         // list widgets
@@ -278,6 +282,7 @@ angular
             var widget = locator.getWidget();
             if(widget){
                 widget.off('newchild', ctrl.newLocatorListener);
+                widget.off('styleChanged', ctrl.styleChangeListener);
             }
         });
 
@@ -296,6 +301,7 @@ angular
             
             // add listener
             widgets[i].on('newchild', ctrl.newLocatorListener);
+            widgets[i].on('styleChanged', ctrl.styleChangeListener);
         }
     };
 
