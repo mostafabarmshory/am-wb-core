@@ -79,7 +79,7 @@ angular.module('am-wb-core')//
 		if (!this.widget) {
 			return;
 		}
-		this.widget.getModelProperty('style.background.' + key);
+		return this.widget.getModelProperty('style.background.' + key);
 	};
 
 	this.setStyleSize = function(key, value) {
@@ -93,7 +93,7 @@ angular.module('am-wb-core')//
 		if (!this.widget) {
 			return;
 		}
-		this.widget.getModelProperty('style.size.' + key);
+		return this.widget.getModelProperty('style.size.' + key);
 	};
 	
 	this.setStyleBorder = function(key, value) {
@@ -107,7 +107,7 @@ angular.module('am-wb-core')//
 		if (!this.widget) {
 			return;
 		}
-		this.widget.getModelProperty('style.border.' + key);
+		return this.widget.getModelProperty('style.border.' + key);
 	};
 
 	this.setStyleLayout = function(key, value) {
@@ -121,7 +121,7 @@ angular.module('am-wb-core')//
 		if (!this.widget) {
 			return;
 		}
-		this.widget.getModelProperty('style.layout.' + key);
+		return this.widget.getModelProperty('style.layout.' + key);
 	};
 
 	this.setStyle = function(key, value) {
@@ -135,7 +135,7 @@ angular.module('am-wb-core')//
 		if (!this.widget) {
 			return;
 		}
-		this.widget.getModelProperty('style.' + key);
+		return this.widget.getModelProperty('style.' + key);
 	}
 
 	this.setProperty = function(key, value) {
@@ -149,7 +149,7 @@ angular.module('am-wb-core')//
 		if (!this.widget) {
 			return;
 		}
-		this.widget.getModelProperty(key);
+		return this.widget.getModelProperty(key);
 	}
 
 	this.setElement($element);

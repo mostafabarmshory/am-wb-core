@@ -1141,7 +1141,7 @@ angular.module('am-wb-core')//
 		if (!this.widget) {
 			return;
 		}
-		this.widget.getModelProperty('style.background.' + key);
+		return this.widget.getModelProperty('style.background.' + key);
 	};
 
 	this.setStyleSize = function(key, value) {
@@ -1155,7 +1155,7 @@ angular.module('am-wb-core')//
 		if (!this.widget) {
 			return;
 		}
-		this.widget.getModelProperty('style.size.' + key);
+		return this.widget.getModelProperty('style.size.' + key);
 	};
 	
 	this.setStyleBorder = function(key, value) {
@@ -1169,7 +1169,7 @@ angular.module('am-wb-core')//
 		if (!this.widget) {
 			return;
 		}
-		this.widget.getModelProperty('style.border.' + key);
+		return this.widget.getModelProperty('style.border.' + key);
 	};
 
 	this.setStyleLayout = function(key, value) {
@@ -1183,7 +1183,7 @@ angular.module('am-wb-core')//
 		if (!this.widget) {
 			return;
 		}
-		this.widget.getModelProperty('style.layout.' + key);
+		return this.widget.getModelProperty('style.layout.' + key);
 	};
 
 	this.setStyle = function(key, value) {
@@ -1197,7 +1197,7 @@ angular.module('am-wb-core')//
 		if (!this.widget) {
 			return;
 		}
-		this.widget.getModelProperty('style.' + key);
+		return this.widget.getModelProperty('style.' + key);
 	}
 
 	this.setProperty = function(key, value) {
@@ -1211,7 +1211,7 @@ angular.module('am-wb-core')//
 		if (!this.widget) {
 			return;
 		}
-		this.widget.getModelProperty(key);
+		return this.widget.getModelProperty(key);
 	}
 
 	this.setElement($element);
@@ -1248,7 +1248,6 @@ angular.module('am-wb-core')//
  * @descreption root of the widgets
  * 
  * This is an abstract implementation of the widgets.
- * 
  *  # Events
  * 
  * 
@@ -1258,8 +1257,10 @@ angular.module('am-wb-core')//
  * <li>modelChanged: some properties of the model is changed.</li>
  * <li>modelUpdated: A new data model is replaced with the current one.</li>
  * <li>styleChanged: Computed style of the current widget is update.</li>
- * <li>widgetIsEditable: Widget is in editable state (so the result of isEditable() is true)</li>
- * <li>widgetIsNotEditable: widget is not in editable mode any more(so the result of isEditable() is false)</li>
+ * <li>widgetIsEditable: Widget is in editable state (so the result of
+ * isEditable() is true)</li>
+ * <li>widgetIsNotEditable: widget is not in editable mode any more(so the
+ * result of isEditable() is false)</li>
  * <li>widgetDeleted: the widgets is removed.</li>
  * <li>widgetUnderCursor: The widget is under the mouse</li>
  * <li>widgetSelected: the widget is selected</li>
@@ -1314,8 +1315,8 @@ var WbAbstractWidget = function () {
 	};
 
 	/*
-	 * Add resize observer to the element
-	 */
+     * Add resize observer to the element
+     */
 	this.resizeObserver = new ResizeObserver(function ($event) {
 		ctrl.fireResizeLayout($event);
 	});
@@ -1423,10 +1424,10 @@ WbAbstractWidget.prototype.setModel = function (model) {
 	this.fire('modelChanged');
 };
 WbAbstractWidget.prototype.hasModelProperty = function(key){
-	objectPath.has(this.getModel(), key);
+	return objectPath.has(this.getModel(), key);
 };
 WbAbstractWidget.prototype.getModelProperty = function(key){
-	objectPath.get(this.getModel(), key);
+	return objectPath.get(this.getModel(), key);
 };
 WbAbstractWidget.prototype.setModelProperty = function (key, value){
 	// create the event
@@ -1452,10 +1453,10 @@ WbAbstractWidget.prototype.getRuntimeModel = function () {
 	return this.runtimeModel;
 };
 WbAbstractWidget.prototype.hasProperty = function (key){
-	objectPath.has(this.getRuntimeModel(), key);
+	return objectPath.has(this.getRuntimeModel(), key);
 };
 WbAbstractWidget.prototype.getProperty = function (key){
-	objectPath.set(this.getRuntimeModel(), key);
+	return objectPath.get(this.getRuntimeModel(), key);
 };
 WbAbstractWidget.prototype.setProperty = function (key, value){
 	// create the event
