@@ -208,6 +208,7 @@ angular.module('am-wb-core')
 		controller: function () {
 			this.init = function(){
 				this.image = this.getStyleBackground('image');
+				this.color = this.getStyleBackground('color');
 				this.size = this.getStyleBackground('size');
 				this.repeat = this.getStyleBackground('repeat');
 				this.position = this.getStyleBackground('position');
@@ -229,6 +230,7 @@ angular.module('am-wb-core')
 			
 			this.updateBackground = function(){
 				this.setStyleBackground('image', this.image);
+				this.setStyleBackground('color', this.color);
 				this.setStyleBackground('size', this.size);
 				this.setStyleBackground('repeat', this.image);
 				this.setStyleBackground('position', this.position);

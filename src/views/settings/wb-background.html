@@ -31,17 +31,15 @@ Created by mgh.
 
 <wb-ui-setting-background-size
     ng-model="ctrl.size"
-    ng-change="ctrl.setStyleBackground('color', ctrl.color)">
+    ng-change="ctrl.setStyleBackground('color', ctrl.size)">
 </wb-ui-setting-background-size>
 
 <wb-ui-setting-background-repeat
-    value="wbModel.style.background.repeat"
     ng-model="ctrl.repeat"
     ng-change="ctrl.setStyleBackground('repeat', ctrl.repeat)">
 </wb-ui-setting-background-repeat>
 
 <wb-ui-setting-background-attachment
-    value="wbModel.style.background.attachment"
     ng-model="ctrl.attachment"
     ng-change="ctrl.setStyleBackground('attachment', ctrl.attachment)">
 </wb-ui-setting-background-attachment>
