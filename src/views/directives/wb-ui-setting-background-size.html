@@ -1,9 +1,11 @@
 <md-input-container>
     <label translate="">Background Size</label>
-    <md-select ng-model="value">
+    <md-select 
+        ng-model="size"
+        ng-change="sizeChanged(size)">
         <md-option 
-            ng-repeat="value in items" 
-            value="{{value.value}}"
-            translate="">{{value.name}}</md-option>
+            ng-repeat="item in items" 
+            value="{{item.value}}"
+            translate="">{{item.name}}</md-option>
     </md-select>
 </md-input-container>

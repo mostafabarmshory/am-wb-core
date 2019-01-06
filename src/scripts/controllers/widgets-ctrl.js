@@ -188,7 +188,7 @@ WbAbstractWidget.prototype.refresh = function() {
 
 	this.loadStyle();
 	this.loadSeo(model);
-}
+};
 
 
 
@@ -227,7 +227,7 @@ WbAbstractWidget.prototype.setModelProperty = function (key, value){
 	// refresh the view
 	this.refresh();
 	this.fire('modelUpdated', $event);
-}
+};
 
 
 WbAbstractWidget.prototype.getRuntimeModel = function () {
@@ -257,7 +257,7 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 
 	// refresh the view
 	this.refresh();
-}
+};
 
 /**
  * Sets or gets style of the widget
@@ -396,11 +396,11 @@ WbAbstractWidget.prototype.getElement = function () {
 
 WbAbstractWidget.prototype.setSilent = function(silent) {
 	this.silent = silent;
-}
+};
 
 WbAbstractWidget.prototype.isSilent = function() {
 	return this.silent;
-}
+};
 
 /**
  * Adds new callback of type
@@ -900,7 +900,7 @@ WbWidgetGroupCtrl.prototype.childUnSelected = function(widget, $event){
 	this.fire('select', {
 		widgets: this.lastSelectedItems
 	});
-}
+};
 
 /**
  * Removes a widget

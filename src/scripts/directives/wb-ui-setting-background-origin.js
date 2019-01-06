@@ -26,32 +26,43 @@
 
 angular.module('am-wb-core')
 
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingBackgroundOrigin', function () {
-	return {
+	/**
+	 * @ngdoc Directives
+	 * @name wbUiSettingColor
+	 * @description a setting section to set color.
+	 *
+	 */
+	.directive('wbUiSettingBackgroundOrigin', function () {
+	    function postLink(scope, element, attr, ctrls) {
+		var ngModelCtrl = ctrls[0];
+
+		ngModelCtrl.$render = function () {
+		    scope.origin = ngModelCtrl.$modelValue;
+		};
+
+		scope.originChanged = function (newOrigin) {
+		    ngModelCtrl.$setViewValue(newOrigin);
+		};
+	    }
+
+	    return {
 		templateUrl: 'views/directives/wb-ui-setting-background-origin.html',
 		restrict: 'E',
 		replace: true,
-		scope: {
-			title: '@title',
-			value: '=value'
-		},
+		scope: {},
+		require: ['ngModel'],
+		link: postLink,
 		controller: function ($scope) {
-			$scope.items = [
-				{name: 'Padding-box', value: 'padding-box'},
-				{name: 'Border-box', value: 'border-box'},
-				{name: 'Content-box', value: 'content-box'},
-				{name: 'No-repeat', value: 'no-repeat'},
-				{name: 'Initial', value: 'initial'},
-				{name: 'Inherit', value: 'inherit'},
-				{name: 'Nothing', value: ''}
-				];
+		    $scope.items = [
+			{name: 'Padding-box', value: 'padding-box'},
+			{name: 'Border-box', value: 'border-box'},
+			{name: 'Content-box', value: 'content-box'},
+			{name: 'No-repeat', value: 'no-repeat'},
+			{name: 'Initial', value: 'initial'},
+			{name: 'Inherit', value: 'inherit'},
+			{name: 'Nothing', value: ''}
+		    ];
 
 		}
-	};
-});
+	    };
+	});
