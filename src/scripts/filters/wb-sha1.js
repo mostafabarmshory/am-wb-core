@@ -36,10 +36,12 @@ angular.module('am-wb-core')
  <span>{{ 'text to hash' | wbsha1 }}</span>
  ```
  */
-.filter('wbsha1', function($sce) {
+.filter('wbsha1', function() {
+    // always utf-8
+    var enc = new TextEncoder(); 
 	return function(val) {
 	    if(crypto && crypto.subtle && angular.isFunction(crypto.subtle.digest)){
-	        return crypto.subtle.digest('SHA-1', val);
+	        return crypto.subtle.digest('SHA-1', enc.encode('avatar'+val));
 	    }
 	    // TODO: maso, 2018: support old browsers
 	    return val;
