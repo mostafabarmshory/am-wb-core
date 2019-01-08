@@ -24,14 +24,38 @@
 'use strict';
 
 angular.module('am-wb-core')
-
 /**
- * @ngdoc Filters
- * @name wbunsafe
- * @description # unsafe Filter
+ * @ngdoc Directives
+ * @name ngSrcError
+ * @description Handle ngSrc error
+ * 
+ * 
+ * For example if you are about to set image of a user
+ * 
+ * @example
+ * TO check if the directive works:
+ ```html
+ <img 
+    alt="Test avatar" 
+    ng-src="/this/path/dose/not/exist"
+    ng-src-error="https://www.gravatar.com/avatar/{{ 'avatar id' | wbsha1}}?d=identicon&size=32">
+ ```
+ * @example
+ * In this example we show an account avatar or a random from avatar generator
+ ```html
+  <img 
+      ng-src="/api/v2/user/accounts/{{account.id}}/avatar"
+      ng-src-error="https://www.gravatar.com/avatar/{{account.id}}?">
+  ```
  */
-.filter('wbunsafe', function($sce) {
-	return function(val) {
-		return $sce.trustAsHtml(val);
-	};
+.directive('ngSrcError', function () {
+    return {
+        link : function (scope, element, attrs) {
+            element.bind('error', function () {
+                if (attrs.src != attrs.ngSrcError) {
+                    attrs.$set('src', attrs.ngSrcError);
+                }
+            });
+        }
+    }
 });

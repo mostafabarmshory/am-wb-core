@@ -58,7 +58,9 @@
         <div
         	layout="column"
         	flex>
-       		<section layout="row" layout-align="center center">
+       		<section 
+       			layout="row" 
+       			layout-align="center center">
                 <md-button
                     ng-class="{'md-primary' : editable}"
                     class="wb-group-button left"
@@ -70,6 +72,12 @@
                     ng-click="runAction(action)">
                     <wb-icon>{{action.icon}}</wb-icon>
                 </md-button>
+                <a href="https://en.gravatar.com/site/implement/images/">
+	                <img 
+	                	alt="Test avatar" 
+	                	ng-src="/this/path/dose/not/exist"
+	                	ng-src-error="https://www.gravatar.com/avatar/{{ 'avatar id' | wbsha1}}?d=identicon&size=32">
+               	</a>
             </section>
 	        <md-content
 	            flex>
@@ -124,6 +132,7 @@
         <script src="scripts/configs/icons.js"></script>
         <script src="scripts/controllers/setting-page-ctrl.js"></script>
         <script src="scripts/controllers/widgets-ctrl.js"></script>
+        <script src="scripts/directives/ng-src-error.js"></script>
         <script src="scripts/directives/wb-group.js"></script>
         <script src="scripts/directives/wb-icon.js"></script>
         <script src="scripts/directives/wb-infinateScroll.js"></script>
@@ -155,6 +164,7 @@
         <script src="scripts/factories/widget-locator-bound.js"></script>
         <script src="scripts/factories/widget-locator-manager.js"></script>
         <script src="scripts/factories/widget-locator-selection.js"></script>
+        <script src="scripts/filters/wb-md5.js"></script>
         <script src="scripts/filters/wb-unsafe.js"></script>
         <script src="scripts/runs/resources.js"></script>
         <script src="scripts/runs/settings.js"></script>

@@ -12,7 +12,8 @@
 		"prompt": true,
 		"jsPanel": true,
 		"_": true,
-		"tinymce": true
+		"tinymce": true,
+    	"crypto": false
 	},
 	"extends": "eslint:recommended",
 	"parserOptions": {

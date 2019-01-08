@@ -27,11 +27,21 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Filters
- * @name wbunsafe
- * @description # unsafe Filter
+ * @name wbsha1
+ * @function
+ * @description Hash the input
+ * 
+ * @example
+ ```html
+ <span>{{ 'text to hash' | wbsha1 }}</span>
+ ```
  */
-.filter('wbunsafe', function($sce) {
+.filter('wbsha1', function($sce) {
 	return function(val) {
-		return $sce.trustAsHtml(val);
+	    if(crypto && crypto.subtle && angular.isFunction(crypto.subtle.digest)){
+	        return crypto.subtle.digest('SHA-1', val);
+	    }
+	    // TODO: maso, 2018: support old browsers
+	    return val;
 	};
 });
