@@ -25,48 +25,65 @@
 
 angular.module('am-wb-core')
 
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- * 
- */
-.directive('wbUiSettingBackgroundSize', function() {
-	return {
-		templateUrl : 'views/directives/wb-ui-setting-background-size.html',
-		restrict : 'E',
-		replace : true,
-		scope : {
-			title : '@title',
-			value : '=value'
-		},
+	/**
+	 * @ngdoc Directives
+	 * @name wbUiSettingColor
+	 * @description a setting section to set color.
+	 * 
+	 */
+	.directive('wbUiSettingBackgroundSize', function () {
+
+	    function postLink(scope, element, attr, ctrls) {
+		var ngModelCtrl = ctrls[0];
+		//  $mdTheming(element);
+
+		/*
+		 * convert to index
+		 */
+
+		ngModelCtrl.$render = function () {
+		    scope.size = ngModelCtrl.$modelValue;
+		};
+
+		scope.sizeChanged = function (newSize) {
+		    ngModelCtrl.$setViewValue(newSize);
+		};
+	    }
+
+	    return {
+		templateUrl: 'views/directives/wb-ui-setting-background-size.html',
+		restrict: 'E',
+		replace: true,
+		scope: {},
+		require: ['ngModel'],
+		link: postLink,
 		/*
 		 * @ngInject
 		 */
-		controller : function($scope) {
-			$scope.items = [ {
-				name : 'Automatic',
-				value : 'auto'
+		controller: function ($scope) {
+		    $scope.items = [{
+			    name: 'Automatic',
+			    value: 'auto'
 			}, {
-				name : 'Length',
-				value : 'length'
+			    name: 'Length',
+			    value: 'length'
 			}, {
-				name : 'Cover',
-				value : 'cover'
+			    name: 'Cover',
+			    value: 'cover'
 			}, {
-				name : 'Contain',
-				value : 'contain'
+			    name: 'Contain',
+			    value: 'contain'
 			}, {
-				name : 'Initial',
-				value : 'initial'
+			    name: 'Initial',
+			    value: 'initial'
 			}, {
-				name : 'Inherit',
-				value : 'inherit'
+			    name: 'Inherit',
+			    value: 'inherit'
 			}, {
-				name : 'Nothing',
-				value : ''
+			    name: 'Nothing',
+			    value: ''
 			}];
 
 		}
-	};
-});
+	    };
+	});

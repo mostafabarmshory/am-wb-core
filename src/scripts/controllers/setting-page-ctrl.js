@@ -23,135 +23,138 @@
 
 angular.module('am-wb-core')//
 
-/**
- * @ngdoc Controllers
- * @name MbSettingsCtrl
- * @description Manages settings page
- * 
- * Manages settings pages.
- * 
- */
-.controller('AmWbSettingPageCtrl', function($scope, $element) {
+	/**
+	 * @ngdoc Controllers
+	 * @name MbSettingsCtrl
+	 * @description Manages settings page
+	 * 
+	 * Manages settings pages.
+	 * 
+	 */
+	.controller('AmWbSettingPageCtrl', function ($scope, $element) {
 
-	this.setWidget = function(widget) {
+
+	    this.setWidget = function (widget) {
+		var oldWidget = this.widget;
 		this.widget = widget;
 		if (angular.isFunction(this.init)) {
-			this.init();
+		    this.init(this.widget, oldWidget);
 		}
-	};
+	    };
 
-	this.getWidget = function() {
+	    this.getWidget = function () {
 		return this.widget;
-	};
+	    };
 
-	this.setElement = function(element) {
+	    this.setElement = function (element) {
 		this.element = element;
-	};
+	    };
 
-	this.getElement = function() {
+	    this.getElement = function () {
 		return this.element;
-	};
+	    };
 
-	this.setScope = function(scope) {
+	    this.setScope = function (scope) {
 		this.scope = scope;
-	};
+	    };
 
-	this.getScope = function() {
+	    this.getScope = function () {
 		return this.scope;
-	};
+	    };
 
-	this.isRoot = function() {
+	    this.isRoot = function () {
 		var widget = this.getWidget();
 		if (!widget) {
-			return false;
+		    return false;
 		}
 		return widget.isRoot();
-	};
-	
-	this.setStyleBackground = function(key, value) {
+	    };
+
+	    this.setStyleBackground = function (key, value) {
 		if (!this.widget) {
-			return;
+		    return;
 		}
 		this.widget.setModelProperty('style.background.' + key, value);
-	};
-	
-	this.getStyleBackground = function(key) {
+	    };
+
+	    this.getStyleBackground = function (key) {
 		if (!this.widget) {
-			return;
+		    return;
 		}
 		return this.widget.getModelProperty('style.background.' + key);
-	};
+	    };
 
-	this.setStyleSize = function(key, value) {
+	    this.setStyleSize = function (key, value) {
 		if (!this.widget) {
-			return;
+		    return;
 		}
 		this.widget.setModelProperty('style.size.' + key, value);
-	};
+	    };
 
-	this.getStyleSize = function(key) {
+	    this.getStyleSize = function (key) {
 		if (!this.widget) {
-			return;
+		    return;
 		}
 		return this.widget.getModelProperty('style.size.' + key);
-	};
-	
-	this.setStyleBorder = function(key, value) {
+	    };
+
+	    this.setStyleBorder = function (key, value) {
 		if (!this.widget) {
-			return;
+		    return;
 		}
 		this.widget.setModelProperty('style.border.' + key, value);
-	};
+	    };
 
-	this.getStyleBorder = function(key) {
+	    this.getStyleBorder = function (key) {
 		if (!this.widget) {
-			return;
+		    return;
 		}
 		return this.widget.getModelProperty('style.border.' + key);
-	};
+	    };
 
-	this.setStyleLayout = function(key, value) {
+	    this.setStyleLayout = function (key, value) {
 		if (!this.widget) {
-			return;
+		    return;
 		}
 		this.widget.setModelProperty('style.layout.' + key, value);
-	};
+	    };
 
-	this.getStyleLayout = function(key) {
+	    this.getStyleLayout = function (key) {
 		if (!this.widget) {
-			return;
+		    return;
 		}
 		return this.widget.getModelProperty('style.layout.' + key);
-	};
+	    };
 
-	this.setStyle = function(key, value) {
+	    this.setStyle = function (key, value) {
 		if (!this.widget) {
-			return;
+		    return;
 		}
 		this.widget.setModelProperty('style.' + key, value);
-	}
+	    };
 
-	this.getStyle = function(key) {
+	    this.getStyle = function (key) {
 		if (!this.widget) {
-			return;
+		    return;
 		}
 		return this.widget.getModelProperty('style.' + key);
-	}
+	    };
 
-	this.setProperty = function(key, value) {
+	    this.setProperty = function (key, value) {
 		if (!this.widget) {
-			return;
+		    return;
 		}
 		this.widget.setModelProperty(key, value);
-	}
+	    };
 
-	this.getProperty = function(key) {
+	    this.getProperty = function (key) {
 		if (!this.widget) {
-			return;
+		    return;
 		}
 		return this.widget.getModelProperty(key);
-	}
+	    };
+	    
 
-	this.setElement($element);
-	this.setScope($scope);
-});
+	    this.setElement($element);
+	    this.setScope($scope);
+	});

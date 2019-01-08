@@ -186,7 +186,7 @@ angular.module('am-wb-core')
 				this.color = this.getStyle('color');
 				this.cursor = this.getStyle('cursor');
 				this.opacity = this.getStyle('opacity');
-			}
+			};
 		}
 	});
 
@@ -206,7 +206,7 @@ angular.module('am-wb-core')
 		 * from the background.
 		 */
 		controller: function () {
-			this.init = function(){
+			this.init = function(newWidget, oldWidget){
 				this.image = this.getStyleBackground('image');
 				this.color = this.getStyleBackground('color');
 				this.size = this.getStyleBackground('size');
@@ -226,7 +226,7 @@ angular.module('am-wb-core')
 					this.position = 'center center';
 				}
 				this.updateBackground();
-			}
+			};
 			
 			this.updateBackground = function(){
 				this.setStyleBackground('image', this.image);
@@ -234,8 +234,7 @@ angular.module('am-wb-core')
 				this.setStyleBackground('size', this.size);
 				this.setStyleBackground('repeat', this.image);
 				this.setStyleBackground('position', this.position);
-			}
-			
+			};
 		}
 	});
 
@@ -257,7 +256,7 @@ angular.module('am-wb-core')
 				this.description = this.getProperty('description');
 				this.keywords = this.getProperty('keywords');
 				this.cover = this.getProperty('cover');
-			}
+			};
 		}
 	});
 
@@ -619,7 +618,7 @@ angular.module('am-wb-core')
 				// default value of margin is 0px
 				setAllDim(this.margin, val || '0px');
 				this.updateMargin(this.margin);
-			}
+			};
 
 			/**
 			 * Sets all padding to the equal value
@@ -630,7 +629,7 @@ angular.module('am-wb-core')
 				//default value of padding is 0px
 				setAllDim(this.padding, val);
 				this.updatePadding(this.padding)
-			}
+			};
 
 			this.updateMargin = function(newMargin) {
 				this.setStyle('margin', createDimeStr(newMargin));
@@ -638,13 +637,13 @@ angular.module('am-wb-core')
 
 			this.updatePadding = function(newPadding) {
 				this.setStyle('padding', createDimeStr(newPadding));
-			}
+			};
 
 			this.init = function() {
 				//margin is a string such as '10px 25% 2vh 4px'
 				fillDimFromString(this.margin, this.getStyle('margin'));
 				fillDimFromString(this.padding, this.getStyle('padding'));
-			}
+			};
 		}
 	});
 
@@ -721,7 +720,7 @@ angular.module('am-wb-core')
 
 			this.updateShadows = function(){
 				this.setProperty('style.shadows', this.shadows);
-			}
+			};
 			
 			this.remove = function (index) {
 				this.sahadows.splice(index, 1);

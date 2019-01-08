@@ -44,12 +44,12 @@ angular.module('am-wb-core')
 				var scope = $scope.$new();
 				var controller = $controller('AmWbSettingPageCtrl',{
 					$scope: scope,
-					$element: element,
+					$element: element
 				});
 				if (angular.isDefined(page.controller)) {
 					angular.extend(controller, $controller(page.controller, {
 						$scope: scope,
-						$element: element,
+						$element: element
 					}));
 					if (page.controllerAs) {
 						scope[page.controllerAs] = controller;

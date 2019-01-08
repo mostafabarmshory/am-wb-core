@@ -1,10 +1,11 @@
 <md-input-container>
     <label translate="">Background position</label>
     <md-select 
-    	ng-model="value">
+    	ng-model="position"
+        ng-change="positionChanged(position)">
         <md-option 
-            ng-repeat="value in items" 
-            value="{{value.value}}"
-            translate="">{{value.title}}</md-option>
+            ng-repeat="item in items" 
+            value="{{item.value}}"
+            translate="">{{item.title}}</md-option>
     </md-select>
 </md-input-container>

@@ -36,21 +36,15 @@ angular.module('am-wb-core')
 
             function postLink(scope, element, attr, ctrls) {
                 var ngModelCtrl = ctrls[0];
-                $mdTheming(element);
+//                $mdTheming(element);
 
                 /*
                  * convert to index
                  */
 
-
-
                 ngModelCtrl.$render = function () {
                     scope.valueColor = ngModelCtrl.$modelValue;
                 };
-
-//                scope.$watch('valueColor', function (newValue) {
-//                    ngModelCtrl.$setViewValue(newValue);
-//                });
 		
 		scope.colorChanged = function (newColor) {
 		   ngModelCtrl.$setViewValue(newColor); 

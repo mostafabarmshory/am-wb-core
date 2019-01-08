@@ -25,31 +25,42 @@
 
 angular.module('am-wb-core')
 
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingBackgroundAttachment', function () {
-	return {
+	/**
+	 * @ngdoc Directives
+	 * @name wbUiSettingColor
+	 * @description a setting section to set color.
+	 *
+	 */
+	.directive('wbUiSettingBackgroundAttachment', function () {
+
+	    function postLink(scope, element, attr, ctrls) {
+		var ngModelCtrl = ctrls[0];
+
+		ngModelCtrl.$render = function () {
+		    scope.attachment = ngModelCtrl.$modelValue;
+		};
+
+		scope.attachmentChanged = function (newAttachment) {
+		    ngModelCtrl.$setViewValue(newAttachment);
+		};
+	    }
+	    return {
 		templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
 		restrict: 'E',
 		replace: true,
-		scope: {
-			title: '@title',
-			value: '=value'
-		},
+		scope: {},
+		require: ['ngModel'],
+		link: postLink,
 		controller: function ($scope) {
-			$scope.items = [
-				{name: 'Scroll', value: 'scroll'},
-				{name: 'Fixed', value: 'fixed'},
-				{name: 'Local', value: 'local'},
-				{name: 'Initial', value: 'initial'},
-				{name: 'Inherit', value: 'inherit'},
-				{name: 'Nothing', value: ''}
-			];
+		    $scope.items = [
+			{name: 'Scroll', value: 'scroll'},
+			{name: 'Fixed', value: 'fixed'},
+			{name: 'Local', value: 'local'},
+			{name: 'Initial', value: 'initial'},
+			{name: 'Inherit', value: 'inherit'},
+			{name: 'Nothing', value: ''}
+		    ];
 
 		}
-	};
-});
+	    };
+	});

@@ -1397,7 +1397,6 @@ WbAbstractWidget.prototype.loadStyle = function () {
 	this.fire('styleChanged', $event);
 };
 
-
 WbAbstractWidget.prototype.refresh = function() {
 	if(this.isSilent()) {
 		return;
@@ -1408,13 +1407,12 @@ WbAbstractWidget.prototype.refresh = function() {
 
 	this.loadStyle();
 	this.loadSeo(model);
-}
-
-
+};
 
 WbAbstractWidget.prototype.getModel = function () {
 	return this.wbModel;
 };
+
 WbAbstractWidget.prototype.setModel = function (model) {
 	if (model === this.wbModel) {
 		return;
@@ -1423,12 +1421,15 @@ WbAbstractWidget.prototype.setModel = function (model) {
 	this.refresh();
 	this.fire('modelChanged');
 };
+
 WbAbstractWidget.prototype.hasModelProperty = function(key){
 	return objectPath.has(this.getModel(), key);
 };
+
 WbAbstractWidget.prototype.getModelProperty = function(key){
 	return objectPath.get(this.getModel(), key);
 };
+
 WbAbstractWidget.prototype.setModelProperty = function (key, value){
 	// create the event
 	var $event = {};
@@ -1447,7 +1448,7 @@ WbAbstractWidget.prototype.setModelProperty = function (key, value){
 	// refresh the view
 	this.refresh();
 	this.fire('modelUpdated', $event);
-}
+};
 
 
 WbAbstractWidget.prototype.getRuntimeModel = function () {
@@ -1477,7 +1478,7 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 
 	// refresh the view
 	this.refresh();
-}
+};
 
 /**
  * Sets or gets style of the widget
