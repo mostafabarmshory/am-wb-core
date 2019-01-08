@@ -41,7 +41,7 @@ angular.module('am-wb-core')
     var enc = new TextEncoder(); 
 	return function(val) {
 	    if(crypto && crypto.subtle && angular.isFunction(crypto.subtle.digest)){
-	        return crypto.subtle.digest('SHA-1', enc.encode('avatar'+val));
+	        return crypto.subtle.digest('SHA-1', enc.encode(val));
 	    }
 	    // TODO: maso, 2018: support old browsers
 	    return val;
