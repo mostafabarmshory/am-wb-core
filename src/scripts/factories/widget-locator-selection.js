@@ -64,7 +64,7 @@ angular.module('am-wb-core')//
         this.leftElement = angular.element(template);
         this.leftElement.attr('id', 'left');
 
-        this.sizeElement = angular.element(template);
+        this.sizeElement = angular.element('<img class="wb-widget-locator selection" src="resources/corner-handle.png">');
         this.sizeElement.attr('id', 'size');
 
         // init controller
@@ -172,8 +172,10 @@ angular.module('am-wb-core')//
         
         
         this.sizeElement.css({
-            top: bound.top + bound.height - 7,
-            left: bound.left + bound.width - 7 ,
+
+            top: bound.top + bound.height -13 ,
+            left: bound.left + bound.width -15 ,
+
         })
     };
     return selectionWidgetLocator;
