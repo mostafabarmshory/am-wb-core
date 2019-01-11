@@ -76,7 +76,7 @@
 	                <img 
 	                	alt="Test avatar" 
 	                	ng-src="/this/path/dose/not/exist"
-	                	ng-src-error="https://www.gravatar.com/avatar/{{ 'avatar id' | wbsha1}}?d=identicon&size=32">
+	                	ng-src-error="https://www.gravatar.com/avatar/{{ 'avatar id' | wbmd5 }}?d=identicon&size=32">
                	</a>
             </section>
 	        <md-content
