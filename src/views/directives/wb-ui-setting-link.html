@@ -1,5 +1,10 @@
-    <md-input-container  class="md-icon-float">
-      <input ng-model="url" type="text" placeholder="{{title}}">
-      <wb-icon ng-click="selectlink()" style="display:inline-block; cursor: pointer;">more_horiz</wb-icon>
-    </md-input-container>
+<md-input-container  
+	class="md-icon-float">
+	<lable ng-if="title" translate>{{::title}}</lable>
+	<input 
+		ng-model="url" 
+		ng-change="urlChanged(url)"
+		type="text">
+	<wb-icon ng-click="ctrl.selectlink()">more_horiz</wb-icon>
+</md-input-container>
 
