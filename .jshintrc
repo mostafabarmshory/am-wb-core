@@ -15,6 +15,7 @@
     "angular": false,
     "jsPanel": false,
     "_": false,
-    "tinymce": false
+    "tinymce": false,
+    "crypto": false
   }
 }

@@ -26,9 +26,8 @@
 angular.module('am-wb-core')
 
 /**
- * @ngdoc filter
+ * @ngdoc Filters
  * @name wbunsafe
- * @function
  * @description # unsafe Filter
  */
 .filter('wbunsafe', function($sce) {

@@ -23,46 +23,21 @@
  */
 'use strict';
 
-
 angular.module('am-wb-core')
 
-	/**
-	 * @ngdoc Directives
-	 * @name wbUiSettingColor
-	 * @description a setting section to set color.
-	 *
-	 */
-	.directive('wbUiSettingBackgroundOrigin', function () {
-	    function postLink(scope, element, attr, ctrls) {
-		var ngModelCtrl = ctrls[0];
-
-		ngModelCtrl.$render = function () {
-		    scope.origin = ngModelCtrl.$modelValue;
-		};
-
-		scope.originChanged = function (newOrigin) {
-		    ngModelCtrl.$setViewValue(newOrigin);
-		};
-	    }
-
-	    return {
-		templateUrl: 'views/directives/wb-ui-setting-background-origin.html',
-		restrict: 'E',
-		replace: true,
-		scope: {},
-		require: ['ngModel'],
-		link: postLink,
-		controller: function ($scope) {
-		    $scope.items = [
-			{name: 'Padding-box', value: 'padding-box'},
-			{name: 'Border-box', value: 'border-box'},
-			{name: 'Content-box', value: 'content-box'},
-			{name: 'No-repeat', value: 'no-repeat'},
-			{name: 'Initial', value: 'initial'},
-			{name: 'Inherit', value: 'inherit'},
-			{name: 'Nothing', value: ''}
-		    ];
-
-		}
-	    };
-	});
+/**
+ * @ngdoc Filters
+ * @name wbmd5
+ * @function
+ * @description Hash the input
+ * 
+ * @example 
+ ```html 
+ <span>{{ 'text to hash' | wbmd5 }}</span> 
+ ```
+ */
+.filter('wbmd5', function ($wbCrypto) {
+    return function (val) {
+        return $wbCrypto.md5(val+'');
+    };
+});

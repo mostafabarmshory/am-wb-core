@@ -1,9 +1,11 @@
 <md-input-container>
     <label translate="">Background attachment</label>
-    <md-select ng-model="value">
+    <md-select 
+        ng-model="attachment"
+        ng-change="attachmentChanged(attachment)">
         <md-option 
-            ng-repeat="value in items" 
-            value="{{value.value}}"
-            translate="">{{value.name}}</md-option>
+            ng-repeat="item in items" 
+            value="{{item.value}}"
+            translate="">{{item.name}}</md-option>
     </md-select>
 </md-input-container>

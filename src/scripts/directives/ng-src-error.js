@@ -23,46 +23,39 @@
  */
 'use strict';
 
-
 angular.module('am-wb-core')
-
-	/**
-	 * @ngdoc Directives
-	 * @name wbUiSettingColor
-	 * @description a setting section to set color.
-	 *
-	 */
-	.directive('wbUiSettingBackgroundOrigin', function () {
-	    function postLink(scope, element, attr, ctrls) {
-		var ngModelCtrl = ctrls[0];
-
-		ngModelCtrl.$render = function () {
-		    scope.origin = ngModelCtrl.$modelValue;
-		};
-
-		scope.originChanged = function (newOrigin) {
-		    ngModelCtrl.$setViewValue(newOrigin);
-		};
-	    }
-
-	    return {
-		templateUrl: 'views/directives/wb-ui-setting-background-origin.html',
-		restrict: 'E',
-		replace: true,
-		scope: {},
-		require: ['ngModel'],
-		link: postLink,
-		controller: function ($scope) {
-		    $scope.items = [
-			{name: 'Padding-box', value: 'padding-box'},
-			{name: 'Border-box', value: 'border-box'},
-			{name: 'Content-box', value: 'content-box'},
-			{name: 'No-repeat', value: 'no-repeat'},
-			{name: 'Initial', value: 'initial'},
-			{name: 'Inherit', value: 'inherit'},
-			{name: 'Nothing', value: ''}
-		    ];
-
-		}
-	    };
-	});
+/**
+ * @ngdoc Directives
+ * @name ngSrcError
+ * @description Handle ngSrc error
+ * 
+ * 
+ * For example if you are about to set image of a user
+ * 
+ * @example
+ * TO check if the directive works:
+ ```html
+ <img 
+    alt="Test avatar" 
+    ng-src="/this/path/dose/not/exist"
+    ng-src-error="https://www.gravatar.com/avatar/{{ 'avatar id' | wbsha1}}?d=identicon&size=32">
+ ```
+ * @example
+ * In this example we show an account avatar or a random from avatar generator
+ ```html
+  <img 
+      ng-src="/api/v2/user/accounts/{{account.id}}/avatar"
+      ng-src-error="https://www.gravatar.com/avatar/{{account.id}}?">
+  ```
+ */
+.directive('ngSrcError', function () {
+    return {
+        link : function (scope, element, attrs) {
+            element.bind('error', function () {
+                if (attrs.src != attrs.ngSrcError) {
+                    attrs.$set('src', attrs.ngSrcError);
+                }
+            });
+        }
+    }
+});

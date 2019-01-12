@@ -26,40 +26,52 @@
 
 angular.module('am-wb-core')
 
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingBackgroundPosition', function () {
-	return {
+	/**
+	 * @ngdoc Directives
+	 * @name wbUiSettingColor
+	 * @description a setting section to set color.
+	 *
+	 */
+	.directive('wbUiSettingBackgroundPosition', function () {
+	    
+	    function postLink(scope, element, attr, ctrls) {
+		var ngModelCtrl = ctrls[0];
+
+		ngModelCtrl.$render = function () {
+		    scope.position = ngModelCtrl.$modelValue;
+		};
+
+		scope.positionChanged = function (newPosition) {
+		    ngModelCtrl.$setViewValue(newPosition);
+		};
+	    }
+
+	    return {
 		templateUrl: 'views/directives/wb-ui-setting-background-position.html',
 		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value'
-		},
+		scope: {},
 		controllerAs: 'ctrl',
+		require: ['ngModel'],
+		link: postLink,
 		/*
 		 * 
 		 * @ngInject
 		 */
 		controller: function ($scope) {
-			$scope.items = [
-				{title: 'Left top', value: 'left top'},
-				{title: 'Left center', value: 'left center'},
-				{title: 'Left bottom', value: 'left bottom'},
-				{title: 'Right top', value: 'right top'},
-				{title: 'Right center', value: 'right center'},
-				{title: 'Center top', value: 'center top'},
-				{title: 'Center center', value: 'center center'},
-				{title: 'Center bottom', value: 'center bottom'},
-				{title: 'Initial', value: 'initial'},
-				{title: 'Inherit', value: 'inherit'},
-				{title: 'Nothing', value: ''}
-				];
+		    $scope.items = [
+			{title: 'Left top', value: 'left top'},
+			{title: 'Left center', value: 'left center'},
+			{title: 'Left bottom', value: 'left bottom'},
+			{title: 'Right top', value: 'right top'},
+			{title: 'Right center', value: 'right center'},
+			{title: 'Center top', value: 'center top'},
+			{title: 'Center center', value: 'center center'},
+			{title: 'Center bottom', value: 'center bottom'},
+			{title: 'Initial', value: 'initial'},
+			{title: 'Inherit', value: 'inherit'},
+			{title: 'Nothing', value: ''}
+		    ];
 
 		}
-	};
-});
+	    };
+	});
