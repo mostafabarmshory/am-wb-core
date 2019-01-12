@@ -32,32 +32,49 @@ angular.module('am-wb-core')
  * @description a setting section to set color.
  *
  */
-.directive('wbUiSettingLink', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-link.html',
-		restrict: 'E',
-		replace:true,
-		scope: {
-			title: '@title',
-			url: '=url',
-			icon: '@icon'
-		},
-		controller: function($scope, $resource){
-			function selectlink(){
-				return $resource.get('url', {
-					style: {
-						icon: 'link',
-						title: 'add url',
-						description: 'Select url from resources.'
-					},
-					data: $scope.url
-				})//
-				.then(function(value){
-					$scope.url = value;
-				});
-			}
+.directive('wbUiSettingLink', function ($resource) {
 
-			$scope.selectlink = selectlink;
-		}
-	};
+    function postLink(scope, element, attr, ctrls) {
+        var ngModelCtrl = ctrls[0];
+
+        ngModelCtrl.$render = function () {
+            scope.url = ngModelCtrl.$modelValue;
+        };
+
+        scope.urlChanged = function (url) {
+            ngModelCtrl.$setViewValue(url);
+        };
+    }
+
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-link.html',
+        restrict: 'E',
+        replace: true,
+        scope: {
+            title: '@title',
+            icon: '@icon'
+        },
+        require: ['ngModel'],
+        link: postLink,
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function($scope){
+            this.selectlink = function(){
+                $resource.get('url', {
+                    style: {
+                        icon: 'link',
+                        title: 'Link',
+                        description: 'Select url'
+                    },
+                    data: $scope.url
+                })//
+                .then(function(value){
+                    $scope.url = value;
+                    $scope.urlChanged(value);
+                });
+            };
+        }
+    };
 });
