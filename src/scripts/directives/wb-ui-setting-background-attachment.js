@@ -51,6 +51,9 @@ angular.module('am-wb-core')
 		scope: {},
 		require: ['ngModel'],
 		link: postLink,
+        /*
+         * @ngInject
+         */
 		controller: function ($scope) {
 		    $scope.items = [
 			{name: 'Scroll', value: 'scroll'},

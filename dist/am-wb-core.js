@@ -1085,141 +1085,141 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')//
 
-	/**
-	 * @ngdoc Controllers
-	 * @name MbSettingsCtrl
-	 * @description Manages settings page
-	 * 
-	 * Manages settings pages.
-	 * 
-	 */
-	.controller('AmWbSettingPageCtrl', function ($scope, $element) {
+/**
+ * @ngdoc Controllers
+ * @name MbSettingsCtrl
+ * @description Manages settings page
+ * 
+ * Manages settings pages.
+ * 
+ */
+.controller('AmWbSettingPageCtrl', function ($scope, $element) {
 
 
-	    this.setWidget = function (widget) {
-		var oldWidget = this.widget;
-		this.widget = widget;
-		if (angular.isFunction(this.init)) {
-		    this.init(this.widget, oldWidget);
-		}
-	    };
+    this.setWidget = function (widget) {
+        var oldWidget = this.widget;
+        this.widget = widget;
+        if (angular.isFunction(this.init)) {
+            this.init(this.widget, oldWidget);
+        }
+    };
 
-	    this.getWidget = function () {
-		return this.widget;
-	    };
+    this.getWidget = function () {
+        return this.widget;
+    };
 
-	    this.setElement = function (element) {
-		this.element = element;
-	    };
+    this.setElement = function (element) {
+        this.element = element;
+    };
 
-	    this.getElement = function () {
-		return this.element;
-	    };
+    this.getElement = function () {
+        return this.element;
+    };
 
-	    this.setScope = function (scope) {
-		this.scope = scope;
-	    };
+    this.setScope = function (scope) {
+        this.scope = scope;
+    };
 
-	    this.getScope = function () {
-		return this.scope;
-	    };
+    this.getScope = function () {
+        return this.scope;
+    };
 
-	    this.isRoot = function () {
-		var widget = this.getWidget();
-		if (!widget) {
-		    return false;
-		}
-		return widget.isRoot();
-	    };
+    this.isRoot = function () {
+        var widget = this.getWidget();
+        if (!widget) {
+            return false;
+        }
+        return widget.isRoot();
+    };
 
-	    this.setStyleBackground = function (key, value) {
-		if (!this.widget) {
-		    return;
-		}
-		this.widget.setModelProperty('style.background.' + key, value);
-	    };
+    this.setStyleBackground = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.widget.setModelProperty('style.background.' + key, value);
+    };
 
-	    this.getStyleBackground = function (key) {
-		if (!this.widget) {
-		    return;
-		}
-		return this.widget.getModelProperty('style.background.' + key);
-	    };
+    this.getStyleBackground = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty('style.background.' + key);
+    };
 
-	    this.setStyleSize = function (key, value) {
-		if (!this.widget) {
-		    return;
-		}
-		this.widget.setModelProperty('style.size.' + key, value);
-	    };
+    this.setStyleSize = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.widget.setModelProperty('style.size.' + key, value);
+    };
 
-	    this.getStyleSize = function (key) {
-		if (!this.widget) {
-		    return;
-		}
-		return this.widget.getModelProperty('style.size.' + key);
-	    };
+    this.getStyleSize = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty('style.size.' + key);
+    };
 
-	    this.setStyleBorder = function (key, value) {
-		if (!this.widget) {
-		    return;
-		}
-		this.widget.setModelProperty('style.border.' + key, value);
-	    };
+    this.setStyleBorder = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.widget.setModelProperty('style.border.' + key, value);
+    };
 
-	    this.getStyleBorder = function (key) {
-		if (!this.widget) {
-		    return;
-		}
-		return this.widget.getModelProperty('style.border.' + key);
-	    };
+    this.getStyleBorder = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty('style.border.' + key);
+    };
 
-	    this.setStyleLayout = function (key, value) {
-		if (!this.widget) {
-		    return;
-		}
-		this.widget.setModelProperty('style.layout.' + key, value);
-	    };
+    this.setStyleLayout = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.widget.setModelProperty('style.layout.' + key, value);
+    };
 
-	    this.getStyleLayout = function (key) {
-		if (!this.widget) {
-		    return;
-		}
-		return this.widget.getModelProperty('style.layout.' + key);
-	    };
+    this.getStyleLayout = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty('style.layout.' + key);
+    };
 
-	    this.setStyle = function (key, value) {
-		if (!this.widget) {
-		    return;
-		}
-		this.widget.setModelProperty('style.' + key, value);
-	    };
+    this.setStyle = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.widget.setModelProperty('style.' + key, value);
+    };
 
-	    this.getStyle = function (key) {
-		if (!this.widget) {
-		    return;
-		}
-		return this.widget.getModelProperty('style.' + key);
-	    };
+    this.getStyle = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty('style.' + key);
+    };
 
-	    this.setProperty = function (key, value) {
-		if (!this.widget) {
-		    return;
-		}
-		this.widget.setModelProperty(key, value);
-	    };
+    this.setProperty = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.widget.setModelProperty(key, value);
+    };
 
-	    this.getProperty = function (key) {
-		if (!this.widget) {
-		    return;
-		}
-		return this.widget.getModelProperty(key);
-	    };
-	    
+    this.getProperty = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty(key);
+    };
 
-	    this.setElement($element);
-	    this.setScope($scope);
-	});
+
+    this.setElement($element);
+    this.setScope($scope);
+});
 
 /* 
  * The MIT License (MIT)
@@ -2981,6 +2981,9 @@ angular.module('am-wb-core')
 			value: '=value',
 			icon: '@icon'
 		},
+		/*
+		 * @ngInject
+		 */
 		controller: function($scope, $resource){
 			function selectAudio(){
 				return $resource.get('audio', {
@@ -3052,6 +3055,9 @@ angular.module('am-wb-core')
 		scope: {},
 		require: ['ngModel'],
 		link: postLink,
+        /*
+         * @ngInject
+         */
 		controller: function ($scope) {
 		    $scope.items = [
 			{name: 'Scroll', value: 'scroll'},
@@ -3119,6 +3125,9 @@ angular.module('am-wb-core')
 		scope: {},
 		require: ['ngModel'],
 		link: postLink,
+        /*
+         * @ngInject
+         */
 		controller: function ($scope) {
 		    $scope.items = [
 			{name: 'Padding-box', value: 'padding-box'},
@@ -3264,6 +3273,9 @@ angular.module('am-wb-core')
 		scope: {},
 		require: ['ngModel'],
 		link: postLink,
+        /*
+         * @ngInject
+         */
 		controller: function ($scope) {
 		    $scope.items = [
 			{name: 'Repeat', value: 'repeat'},
@@ -3571,6 +3583,9 @@ angular.module('am-wb-core')
 			value : '=value',
 			icon : '@icon'
 		},
+        /*
+         * @ngInject
+         */
 		controller : function($scope, $resource) {
 			function editData(/*data*/) {
 				return $resource.get('data', {
@@ -3712,63 +3727,6 @@ angular.module('am-wb-core')
 'use strict';
 
 
-/**
- * @ngdoc Controllers
- * 
- * @ngInject
- */
-function wbUiSettingGeneralCtrl($scope) {
-
-	// TODO: maso, 2018:load from user config
-	$scope.wbUiSettingClearButton = true;
-	$scope.wbUiSettingPreview = true;
-
-	this.clearValue = function (/*$event*/){
-		// General option
-		this.value = null;
-		this.valueChanged(null);
-	}
-	
-	this.setValue = function(value){
-		this.value = value;
-		this.valueChanged(value);
-	}
-	
-	this.getValue = function(){
-		this.value;
-	}
-
-}
-
-
-/**
- * @ngdoc Controllers
- * 
- * @ngInject
- */
-function wbUiSettingImageCtrl($scope, $resource, $controller){
-	var ctrl = this;
-
-	angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
-		$scope : $scope
-	}));
-
-	function showImagePicker(){
-		return $resource.get('image', {
-			style: {
-				icon: 'image',
-				title: 'Select image',
-				description: 'Select image from resources.'
-			},
-			data: ctrl.getValue()
-		})//
-		.then(function(value){
-			ctrl.setValue(value);
-		});
-	}
-
-	ctrl.showImagePicker = showImagePicker;
-}
 
 
 //General options
@@ -3776,8 +3734,51 @@ function wbUiSettingImageCtrl($scope, $resource, $controller){
 //- wbUiSettingPreview
 
 angular.module('am-wb-core')
-	.controller('wbUiSettingGeneralCtrl', wbUiSettingGeneralCtrl)
-	.controller('wbUiSettingImageCtrl', wbUiSettingImageCtrl)
+	.controller('wbUiSettingGeneralCtrl', function ($scope) {
+
+	    // TODO: maso, 2018:load from user config
+	    $scope.wbUiSettingClearButton = true;
+	    $scope.wbUiSettingPreview = true;
+
+	    this.clearValue = function (/*$event*/){
+	        // General option
+	        this.value = null;
+	        this.valueChanged(null);
+	    }
+	    
+	    this.setValue = function(value){
+	        this.value = value;
+	        this.valueChanged(value);
+	    }
+	    
+	    this.getValue = function(){
+	        this.value;
+	    }
+
+	})
+	.controller('wbUiSettingImageCtrl', function ($scope, $resource, $controller){
+	    var ctrl = this;
+
+	    angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
+	        $scope : $scope
+	    }));
+
+	    function showImagePicker(){
+	        return $resource.get('image', {
+	            style: {
+	                icon: 'image',
+	                title: 'Select image',
+	                description: 'Select image from resources.'
+	            },
+	            data: ctrl.getValue()
+	        })//
+	        .then(function(value){
+	            ctrl.setValue(value);
+	        });
+	    }
+
+	    ctrl.showImagePicker = showImagePicker;
+	})
 
 /**
  * @ngdoc Directives
@@ -4202,6 +4203,9 @@ angular.module('am-wb-core')
 			value: '=value',
 			icon: '@icon'
 		},
+        /*
+         * @ngInject
+         */
 		controller: function($scope, $resource){
 			function selectVideo(){
 				return $resource.get('video', {

@@ -42,6 +42,9 @@ angular.module('am-wb-core')
 			value : '=value',
 			icon : '@icon'
 		},
+        /*
+         * @ngInject
+         */
 		controller : function($scope, $resource) {
 			function editData(/*data*/) {
 				return $resource.get('data', {
