@@ -14,6 +14,31 @@ Created by masood.
 <div 
     layout="column"
     style="min-width: 200px;">
+	<!--   Widget direction -->
+	
+    <md-input-container layout-align="end center">
+		<md-select 
+			ng-model="ctrl.direction" 
+			ng-change="ctrl.setStyle('direction', ctrl.direction)"
+			style="min-width: 200px;">
+			<md-option 
+				ng-value="'ltr'">
+				<span translate>Left to right</span>
+			</md-option>
+			<md-option 
+				ng-value="'rtl'">
+				<span translate>Right to left</span>
+			</md-option>
+			<md-option 
+				ng-value="'inherit'">
+				<span translate>Inherit</span>
+			</md-option>
+			<md-option 
+				ng-value="'initial'">
+				<span translate>Initial</span>
+			</md-option>
+		</md-select>
+	</md-input-container>
 
     <!--COLOR SECTION-->
     <wb-ui-setting-color 
@@ -46,20 +71,16 @@ Created by masood.
 
     <!--OPACITY SECTION-->
     <div 
-        layout="column"
-        style="min-width: 200px;">
-        <div 
-            layout="row"
-            layout-align="end center">
-            <wb-icon>opacity</wb-icon>
-            <span flex translate="">Opacity</span>
-            <md-input-container 
-                style="margin:0px; padding:0px; width:60px; height:30px;">
-                <input 
-                    type="text" 
-                    ng-model="ctrl.opacity"
-    				ng-change="ctrl.setStyle('opacity', ctrl.opacity)">
-            </md-input-container>
-        </div>
+        layout="row"
+        layout-align="end center">
+        <wb-icon>opacity</wb-icon>
+        <span flex translate="">Opacity</span>
+        <md-input-container 
+            style="margin:0px; padding:0px; width:60px; height:30px;">
+            <input 
+                type="text" 
+                ng-model="ctrl.opacity"
+				ng-change="ctrl.setStyle('opacity', ctrl.opacity)">
+        </md-input-container>
     </div>
 </div>
