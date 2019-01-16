@@ -5686,6 +5686,7 @@ angular.module('am-wb-core')
 			}];
 			
 			this.init = function(){
+			    this.direction = this.getStyle('direction') || 'ltr';
 				this.color = this.getStyle('color');
 				this.cursor = this.getStyle('cursor');
 				this.opacity = this.getStyle('opacity');
@@ -7412,10 +7413,11 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         // shadows
         css = _.merge(css, convertToWidgetCssShadows(style.shadows || {}));
         
-        // color, cursor, opacity
+        // color, cursor, opacity, direction
         css = _.merge(css, {
             padding: style.padding,
             margin: style.margin,
+            direction: style.direction || 'ltr',
             color: style.color || 'initial',
             cursor: style.cursor || 'auto',
             opacity: style.opacity || '1'
@@ -8639,7 +8641,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-color-cursor-opacity.html',
-    " <div layout=column style=\"min-width: 200px\">  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setStyle('color', ctrl.color)\"> </wb-ui-setting-color>  <div layout=row> <wb-icon>mouse</wb-icon> <p translate=\"\">Cursor</p> <span flex></span> <md-input-container layout-align=\"end center\"> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setStyle('cursor', ctrl.cursor)\"> <md-option ng-repeat=\"cursor in ::ctrl.cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </div>  <div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <wb-icon>opacity</wb-icon> <span flex translate=\"\">Opacity</span> <md-input-container style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input ng-model=ctrl.opacity ng-change=\"ctrl.setStyle('opacity', ctrl.opacity)\"> </md-input-container> </div> </div> </div>"
+    " <div layout=column style=\"min-width: 200px\">  <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setStyle('direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setStyle('color', ctrl.color)\"> </wb-ui-setting-color>  <div layout=row> <wb-icon>mouse</wb-icon> <p translate=\"\">Cursor</p> <span flex></span> <md-input-container layout-align=\"end center\"> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setStyle('cursor', ctrl.cursor)\"> <md-option ng-repeat=\"cursor in ::ctrl.cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </div>  <div layout=row layout-align=\"end center\"> <wb-icon>opacity</wb-icon> <span flex translate=\"\">Opacity</span> <md-input-container style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input ng-model=ctrl.opacity ng-change=\"ctrl.setStyle('opacity', ctrl.opacity)\"> </md-input-container> </div> </div>"
   );
 
 
