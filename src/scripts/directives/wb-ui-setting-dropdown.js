@@ -32,14 +32,26 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingDropdown', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon',
-			items:'=items'
-		}
-	};
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
+        restrict: 'E',
+        scope: {
+            title: '@title',
+            icon: '@icon',
+            items:'=items'
+        },
+        require: ['ngModel'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
+
+            ngModelCtrl.$render = function () {
+                scope.value = ngModelCtrl.$modelValue;
+            };
+
+            scope.valueChanged = function (value) {
+                scope.value = value;
+                ngModelCtrl.$setViewValue(value);
+            };
+        }
+    };
 });

@@ -1,5 +1,11 @@
 <md-list-item>
-    <wb-icon ng-hide="icon==undefined || icon==null || icon==''">{{icon}}</wb-icon>
-    <p ng-hide="title==undefined || title==null || title==''">{{title}}</p>
-    <md-switch class="md-secondary" ng-model="value"></md-switch>
+    <wb-icon 
+    	ng-show="icon">{{icon}}</wb-icon>
+    <p 
+    	ng-show="title">{{title}}</p>
+    <md-switch 
+    	class="md-secondary" 
+    	ng-model="value"
+    	ng-change="valueChanged(value)">
+    </md-switch>
 </md-list-item>

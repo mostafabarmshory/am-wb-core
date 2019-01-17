@@ -35,10 +35,21 @@ angular.module('am-wb-core')
 	return {
 		templateUrl: 'views/directives/wb-ui-setting-on-off-switch.html',
 		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon'
-		}
+        scope: {
+            title: '@title',
+            icon: '@icon'
+        },
+        require: ['ngModel'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
+
+            ngModelCtrl.$render = function () {
+                scope.value = ngModelCtrl.$modelValue;
+            };
+
+            scope.valueChanged = function (value) {
+                ngModelCtrl.$setViewValue(value);
+            };
+        }
 	};
 });

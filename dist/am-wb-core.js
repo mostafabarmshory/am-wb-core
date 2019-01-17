@@ -2973,33 +2973,48 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingAudio', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-audio.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon'
-		},
-		/*
-		 * @ngInject
-		 */
-		controller: function($scope, $resource){
-			function selectAudio(){
-				return $resource.get('audio', {
-					style: {
-						title: 'Select Audio'
-					},
-					data: $scope.value
-				})//
-				.then(function(value){
-					$scope.value = value;
-				});
-			}
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-audio.html',
+        restrict: 'E',
+        scope: {
+            title: '@title',
+            icon: '@icon'
+        },
+        require: ['ngModel'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
 
-			$scope.edit = selectAudio;
-		}
-	};
+            ngModelCtrl.$render = function () {
+                scope.value = ngModelCtrl.$modelValue;
+            };
+
+            scope.valueChanged = function (value) {
+                ngModelCtrl.$setViewValue(value);
+            };
+        },
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function($scope, $resource){
+            this.editValue = function(value){
+                var ctrl = this;
+                return $resource.get('audio', {
+                    style: {
+                        title: 'Select Audio'
+                    },
+                    data: value
+                })//
+                .then(function(newValue){
+                    ctrl.updateValue(newValue);
+                });
+            };
+            this.updateValue = function(newValue) {
+                $scope.value = newValue;
+                $scope.valueChanged(newValue);
+            }
+        }
+    };
 });
 
 /* 
@@ -3029,48 +3044,48 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-	/**
-	 * @ngdoc Directives
-	 * @name wbUiSettingColor
-	 * @description a setting section to set color.
-	 *
-	 */
-	.directive('wbUiSettingBackgroundAttachment', function () {
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingBackgroundAttachment', function () {
 
-	    function postLink(scope, element, attr, ctrls) {
-		var ngModelCtrl = ctrls[0];
+    function postLink(scope, element, attr, ctrls) {
+        var ngModelCtrl = ctrls[0];
 
-		ngModelCtrl.$render = function () {
-		    scope.attachment = ngModelCtrl.$modelValue;
-		};
+        ngModelCtrl.$render = function () {
+            scope.attachment = ngModelCtrl.$modelValue;
+        };
 
-		scope.attachmentChanged = function (newAttachment) {
-		    ngModelCtrl.$setViewValue(newAttachment);
-		};
-	    }
-	    return {
-		templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
-		restrict: 'E',
-		replace: true,
-		scope: {},
-		require: ['ngModel'],
-		link: postLink,
+        scope.attachmentChanged = function (newAttachment) {
+            ngModelCtrl.$setViewValue(newAttachment);
+        };
+    }
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
+        restrict: 'E',
+        replace: true,
+        scope: {},
+        require: ['ngModel'],
+        link: postLink,
         /*
          * @ngInject
          */
-		controller: function ($scope) {
-		    $scope.items = [
-			{name: 'Scroll', value: 'scroll'},
-			{name: 'Fixed', value: 'fixed'},
-			{name: 'Local', value: 'local'},
-			{name: 'Initial', value: 'initial'},
-			{name: 'Inherit', value: 'inherit'},
-			{name: 'Nothing', value: ''}
-		    ];
+        controller: function ($scope) {
+            $scope.items = [
+                {name: 'Scroll', value: 'scroll'},
+                {name: 'Fixed', value: 'fixed'},
+                {name: 'Local', value: 'local'},
+                {name: 'Initial', value: 'initial'},
+                {name: 'Inherit', value: 'inherit'},
+                {name: 'Nothing', value: ''}
+                ];
 
-		}
-	    };
-	});
+        }
+    };
+});
 /* 
  * The MIT License (MIT)
  * 
@@ -3689,16 +3704,28 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingDropdown', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon',
-			items:'=items'
-		}
-	};
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
+        restrict: 'E',
+        scope: {
+            title: '@title',
+            icon: '@icon',
+            items:'=items'
+        },
+        require: ['ngModel'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
+
+            ngModelCtrl.$render = function () {
+                scope.value = ngModelCtrl.$modelValue;
+            };
+
+            scope.valueChanged = function (value) {
+                scope.value = value;
+                ngModelCtrl.$setViewValue(value);
+            };
+        }
+    };
 });
 
 /* 
@@ -4105,11 +4132,22 @@ angular.module('am-wb-core')
 	return {
 		templateUrl: 'views/directives/wb-ui-setting-on-off-switch.html',
 		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon'
-		}
+        scope: {
+            title: '@title',
+            icon: '@icon'
+        },
+        require: ['ngModel'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
+
+            ngModelCtrl.$render = function () {
+                scope.value = ngModelCtrl.$modelValue;
+            };
+
+            scope.valueChanged = function (value) {
+                ngModelCtrl.$setViewValue(value);
+            };
+        }
 	};
 });
 
@@ -8502,7 +8540,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-audio.html',
-    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-audio</wb-icon> </md-button> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
+    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=ctrl.editValue(value)> <wb-icon>wb-object-audio</wb-icon> </md-button> <md-input-container> <input ng-model=value ng-change=ctrl.updateValue(value)> </md-input-container> </md-list-item>"
   );
 
 
@@ -8557,7 +8595,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-dropdown.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon === undefined || icon === null || icon === ''\">{{icon}}</wb-icon> <p ng-hide=\"title === undefined || title === null || title === ''\">{{title}}</p> <md-select style=\"margin: 0px\" ng-model=value> <md-option ng-repeat=\"item in items\" value={{item.value}}> {{item.title}} </md-option> </md-select> </md-list-item>"
+    "<div layout=row> <wb-icon ng-show=icon>{{::icon}}</wb-icon> <p style=\"margin: 0px 4px\" ng-show=title>{{::title}}</p> <md-select style=\"margin: 0px\" ng-model=value ng-change=valueChanged(value) flex> <md-option ng-repeat=\"item in items track by $index\" value={{::item.value}}> <span translate>{{::item.title}}</span> </md-option> </md-select> </div>"
   );
 
 
@@ -8582,7 +8620,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-on-off-switch.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-switch class=md-secondary ng-model=value></md-switch> </md-list-item>"
+    "<md-list-item> <wb-icon ng-show=icon>{{icon}}</wb-icon> <p ng-show=title>{{title}}</p> <md-switch class=md-secondary ng-model=value ng-change=valueChanged(value)> </md-switch> </md-list-item>"
   );
 
 

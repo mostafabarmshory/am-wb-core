@@ -25,45 +25,45 @@
 
 angular.module('am-wb-core')
 
-	/**
-	 * @ngdoc Directives
-	 * @name wbUiSettingColor
-	 * @description a setting section to set color.
-	 *
-	 */
-	.directive('wbUiSettingBackgroundAttachment', function () {
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingBackgroundAttachment', function () {
 
-	    function postLink(scope, element, attr, ctrls) {
-		var ngModelCtrl = ctrls[0];
+    function postLink(scope, element, attr, ctrls) {
+        var ngModelCtrl = ctrls[0];
 
-		ngModelCtrl.$render = function () {
-		    scope.attachment = ngModelCtrl.$modelValue;
-		};
+        ngModelCtrl.$render = function () {
+            scope.attachment = ngModelCtrl.$modelValue;
+        };
 
-		scope.attachmentChanged = function (newAttachment) {
-		    ngModelCtrl.$setViewValue(newAttachment);
-		};
-	    }
-	    return {
-		templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
-		restrict: 'E',
-		replace: true,
-		scope: {},
-		require: ['ngModel'],
-		link: postLink,
+        scope.attachmentChanged = function (newAttachment) {
+            ngModelCtrl.$setViewValue(newAttachment);
+        };
+    }
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
+        restrict: 'E',
+        replace: true,
+        scope: {},
+        require: ['ngModel'],
+        link: postLink,
         /*
          * @ngInject
          */
-		controller: function ($scope) {
-		    $scope.items = [
-			{name: 'Scroll', value: 'scroll'},
-			{name: 'Fixed', value: 'fixed'},
-			{name: 'Local', value: 'local'},
-			{name: 'Initial', value: 'initial'},
-			{name: 'Inherit', value: 'inherit'},
-			{name: 'Nothing', value: ''}
-		    ];
+        controller: function ($scope) {
+            $scope.items = [
+                {name: 'Scroll', value: 'scroll'},
+                {name: 'Fixed', value: 'fixed'},
+                {name: 'Local', value: 'local'},
+                {name: 'Initial', value: 'initial'},
+                {name: 'Inherit', value: 'inherit'},
+                {name: 'Nothing', value: ''}
+                ];
 
-		}
-	    };
-	});
+        }
+    };
+});
