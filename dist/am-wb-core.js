@@ -3453,18 +3453,9 @@ angular.module('am-wb-core')
 		/*
 		 * render the data
 		 */
-		function render() {
+		ngModelCtrl.$render  = function() {
 			scope.selectedIndex = toIndex(ngModelCtrl.$modelValue);
-			//ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
 		}
-
-		ngModelCtrl.$render = render;
-
-//		scope.$watch('selectedIndex', function () {
-//			if(angular.isDefined(scope.selectedIndex)){
-//				ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
-//			}
-//		});
 
 		scope.selectionChanged = function(){
 		    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
@@ -3515,44 +3506,36 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-        /**
-         * @ngdoc Directives
-         * @name wbUiSettingColor
-         * @description a setting section to set color.
-         *
-         */
-        .directive('wbUiSettingColor', function ($mdTheming){
-
-
-            function postLink(scope, element, attr, ctrls) {
-                var ngModelCtrl = ctrls[0];
-//                $mdTheming(element);
-
-                /*
-                 * convert to index
-                 */
-
-                ngModelCtrl.$render = function () {
-                    scope.valueColor = ngModelCtrl.$modelValue;
-                };
-		
-		scope.colorChanged = function (newColor) {
-		   ngModelCtrl.$setViewValue(newColor); 
-		};
-            }
-
-            return {
-                templateUrl: 'views/directives/wb-ui-setting-color.html',
-                restrict: 'E',
-                scope: {
-                    title: '@title',
-                    icon: '@icon'
-                },
-                require: ['ngModel'],
-                link: postLink
-
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingColor', function ($mdTheming){
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-color.html',
+        restrict: 'E',
+        scope: {
+            title: '@title',
+            icon: '@icon'
+        },
+        require: ['ngModel'],
+        link: function(scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
+            /*
+             * convert to index
+             */
+            ngModelCtrl.$render = function () {
+                scope.valueColor = ngModelCtrl.$modelValue;
             };
-        });
+
+            scope.colorChanged = function (newColor) {
+                ngModelCtrl.$setViewValue(newColor); 
+            };
+        }
+    };
+});
 
 /* 
  * The MIT License (MIT)
@@ -3595,21 +3578,20 @@ angular.module('am-wb-core')
 		restrict : 'E',
 		scope : {
 			title : '@title',
-			value : '=value',
 			icon : '@icon'
 		},
         /*
          * @ngInject
          */
 		controller : function($scope, $resource) {
-			function editData(/*data*/) {
+			this.editValue = function(value) {
 				return $resource.get('data', {
 					style : {
 						icon: 'insert_chart',
 						title : 'Data sheet',
 						description: 'Edit data of the current sheet'
 					},
-					data : $scope.value
+					data : value
 				}) //
 				.then(function(data) {
 					if(!angular.isDefined($scope.value)){
@@ -3619,8 +3601,7 @@ angular.module('am-wb-core')
 					$scope.value.key = data.key;
 					$scope.value.values = data.values;
 				});
-			}
-			$scope.edit = editData;
+			};
 		}
 	};
 });
