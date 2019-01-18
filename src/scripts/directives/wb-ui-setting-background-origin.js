@@ -52,6 +52,9 @@ angular.module('am-wb-core')
 		scope: {},
 		require: ['ngModel'],
 		link: postLink,
+        /*
+         * @ngInject
+         */
 		controller: function ($scope) {
 		    $scope.items = [
 			{name: 'Padding-box', value: 'padding-box'},

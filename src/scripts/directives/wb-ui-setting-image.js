@@ -24,63 +24,6 @@
 'use strict';
 
 
-/**
- * @ngdoc Controllers
- * 
- * @ngInject
- */
-function wbUiSettingGeneralCtrl($scope) {
-
-	// TODO: maso, 2018:load from user config
-	$scope.wbUiSettingClearButton = true;
-	$scope.wbUiSettingPreview = true;
-
-	this.clearValue = function (/*$event*/){
-		// General option
-		this.value = null;
-		this.valueChanged(null);
-	}
-	
-	this.setValue = function(value){
-		this.value = value;
-		this.valueChanged(value);
-	}
-	
-	this.getValue = function(){
-		this.value;
-	}
-
-}
-
-
-/**
- * @ngdoc Controllers
- * 
- * @ngInject
- */
-function wbUiSettingImageCtrl($scope, $resource, $controller){
-	var ctrl = this;
-
-	angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
-		$scope : $scope
-	}));
-
-	function showImagePicker(){
-		return $resource.get('image', {
-			style: {
-				icon: 'image',
-				title: 'Select image',
-				description: 'Select image from resources.'
-			},
-			data: ctrl.getValue()
-		})//
-		.then(function(value){
-			ctrl.setValue(value);
-		});
-	}
-
-	ctrl.showImagePicker = showImagePicker;
-}
 
 
 //General options
@@ -88,8 +31,51 @@ function wbUiSettingImageCtrl($scope, $resource, $controller){
 //- wbUiSettingPreview
 
 angular.module('am-wb-core')
-	.controller('wbUiSettingGeneralCtrl', wbUiSettingGeneralCtrl)
-	.controller('wbUiSettingImageCtrl', wbUiSettingImageCtrl)
+	.controller('wbUiSettingGeneralCtrl', function ($scope) {
+
+	    // TODO: maso, 2018:load from user config
+	    $scope.wbUiSettingClearButton = true;
+	    $scope.wbUiSettingPreview = true;
+
+	    this.clearValue = function (/*$event*/){
+	        // General option
+	        this.value = null;
+	        this.valueChanged(null);
+	    }
+	    
+	    this.setValue = function(value){
+	        this.value = value;
+	        this.valueChanged(value);
+	    }
+	    
+	    this.getValue = function(){
+	        this.value;
+	    }
+
+	})
+	.controller('wbUiSettingImageCtrl', function ($scope, $resource, $controller){
+	    var ctrl = this;
+
+	    angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
+	        $scope : $scope
+	    }));
+
+	    function showImagePicker(){
+	        return $resource.get('image', {
+	            style: {
+	                icon: 'image',
+	                title: 'Select image',
+	                description: 'Select image from resources.'
+	            },
+	            data: ctrl.getValue()
+	        })//
+	        .then(function(value){
+	            ctrl.setValue(value);
+	        });
+	    }
+
+	    ctrl.showImagePicker = showImagePicker;
+	})
 
 /**
  * @ngdoc Directives

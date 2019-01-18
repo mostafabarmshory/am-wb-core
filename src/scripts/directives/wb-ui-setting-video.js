@@ -43,6 +43,9 @@ angular.module('am-wb-core')
 			value: '=value',
 			icon: '@icon'
 		},
+        /*
+         * @ngInject
+         */
 		controller: function($scope, $resource){
 			function selectVideo(){
 				return $resource.get('video', {

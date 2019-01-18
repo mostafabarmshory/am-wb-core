@@ -94,10 +94,11 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         // shadows
         css = _.merge(css, convertToWidgetCssShadows(style.shadows || {}));
         
-        // color, cursor, opacity
+        // color, cursor, opacity, direction
         css = _.merge(css, {
             padding: style.padding,
             margin: style.margin,
+            direction: style.direction || 'ltr',
             color: style.color || 'initial',
             cursor: style.cursor || 'auto',
             opacity: style.opacity || '1'

@@ -39,18 +39,20 @@ angular.module('am-wb-core')
 		restrict : 'E',
 		scope : {
 			title : '@title',
-			value : '=value',
 			icon : '@icon'
 		},
+        /*
+         * @ngInject
+         */
 		controller : function($scope, $resource) {
-			function editData(/*data*/) {
+			this.editValue = function(value) {
 				return $resource.get('data', {
 					style : {
 						icon: 'insert_chart',
 						title : 'Data sheet',
 						description: 'Edit data of the current sheet'
 					},
-					data : $scope.value
+					data : value
 				}) //
 				.then(function(data) {
 					if(!angular.isDefined($scope.value)){
@@ -60,8 +62,7 @@ angular.module('am-wb-core')
 					$scope.value.key = data.key;
 					$scope.value.values = data.values;
 				});
-			}
-			$scope.edit = editData;
+			};
 		}
 	};
 });

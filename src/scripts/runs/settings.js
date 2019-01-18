@@ -183,6 +183,7 @@ angular.module('am-wb-core')
 			}];
 			
 			this.init = function(){
+			    this.direction = this.getStyle('direction') || 'ltr';
 				this.color = this.getStyle('color');
 				this.cursor = this.getStyle('cursor');
 				this.opacity = this.getStyle('opacity');

@@ -1085,141 +1085,141 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')//
 
-	/**
-	 * @ngdoc Controllers
-	 * @name MbSettingsCtrl
-	 * @description Manages settings page
-	 * 
-	 * Manages settings pages.
-	 * 
-	 */
-	.controller('AmWbSettingPageCtrl', function ($scope, $element) {
+/**
+ * @ngdoc Controllers
+ * @name MbSettingsCtrl
+ * @description Manages settings page
+ * 
+ * Manages settings pages.
+ * 
+ */
+.controller('AmWbSettingPageCtrl', function ($scope, $element) {
 
 
-	    this.setWidget = function (widget) {
-		var oldWidget = this.widget;
-		this.widget = widget;
-		if (angular.isFunction(this.init)) {
-		    this.init(this.widget, oldWidget);
-		}
-	    };
+    this.setWidget = function (widget) {
+        var oldWidget = this.widget;
+        this.widget = widget;
+        if (angular.isFunction(this.init)) {
+            this.init(this.widget, oldWidget);
+        }
+    };
 
-	    this.getWidget = function () {
-		return this.widget;
-	    };
+    this.getWidget = function () {
+        return this.widget;
+    };
 
-	    this.setElement = function (element) {
-		this.element = element;
-	    };
+    this.setElement = function (element) {
+        this.element = element;
+    };
 
-	    this.getElement = function () {
-		return this.element;
-	    };
+    this.getElement = function () {
+        return this.element;
+    };
 
-	    this.setScope = function (scope) {
-		this.scope = scope;
-	    };
+    this.setScope = function (scope) {
+        this.scope = scope;
+    };
 
-	    this.getScope = function () {
-		return this.scope;
-	    };
+    this.getScope = function () {
+        return this.scope;
+    };
 
-	    this.isRoot = function () {
-		var widget = this.getWidget();
-		if (!widget) {
-		    return false;
-		}
-		return widget.isRoot();
-	    };
+    this.isRoot = function () {
+        var widget = this.getWidget();
+        if (!widget) {
+            return false;
+        }
+        return widget.isRoot();
+    };
 
-	    this.setStyleBackground = function (key, value) {
-		if (!this.widget) {
-		    return;
-		}
-		this.widget.setModelProperty('style.background.' + key, value);
-	    };
+    this.setStyleBackground = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.widget.setModelProperty('style.background.' + key, value);
+    };
 
-	    this.getStyleBackground = function (key) {
-		if (!this.widget) {
-		    return;
-		}
-		return this.widget.getModelProperty('style.background.' + key);
-	    };
+    this.getStyleBackground = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty('style.background.' + key);
+    };
 
-	    this.setStyleSize = function (key, value) {
-		if (!this.widget) {
-		    return;
-		}
-		this.widget.setModelProperty('style.size.' + key, value);
-	    };
+    this.setStyleSize = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.widget.setModelProperty('style.size.' + key, value);
+    };
 
-	    this.getStyleSize = function (key) {
-		if (!this.widget) {
-		    return;
-		}
-		return this.widget.getModelProperty('style.size.' + key);
-	    };
+    this.getStyleSize = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty('style.size.' + key);
+    };
 
-	    this.setStyleBorder = function (key, value) {
-		if (!this.widget) {
-		    return;
-		}
-		this.widget.setModelProperty('style.border.' + key, value);
-	    };
+    this.setStyleBorder = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.widget.setModelProperty('style.border.' + key, value);
+    };
 
-	    this.getStyleBorder = function (key) {
-		if (!this.widget) {
-		    return;
-		}
-		return this.widget.getModelProperty('style.border.' + key);
-	    };
+    this.getStyleBorder = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty('style.border.' + key);
+    };
 
-	    this.setStyleLayout = function (key, value) {
-		if (!this.widget) {
-		    return;
-		}
-		this.widget.setModelProperty('style.layout.' + key, value);
-	    };
+    this.setStyleLayout = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.widget.setModelProperty('style.layout.' + key, value);
+    };
 
-	    this.getStyleLayout = function (key) {
-		if (!this.widget) {
-		    return;
-		}
-		return this.widget.getModelProperty('style.layout.' + key);
-	    };
+    this.getStyleLayout = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty('style.layout.' + key);
+    };
 
-	    this.setStyle = function (key, value) {
-		if (!this.widget) {
-		    return;
-		}
-		this.widget.setModelProperty('style.' + key, value);
-	    };
+    this.setStyle = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.widget.setModelProperty('style.' + key, value);
+    };
 
-	    this.getStyle = function (key) {
-		if (!this.widget) {
-		    return;
-		}
-		return this.widget.getModelProperty('style.' + key);
-	    };
+    this.getStyle = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty('style.' + key);
+    };
 
-	    this.setProperty = function (key, value) {
-		if (!this.widget) {
-		    return;
-		}
-		this.widget.setModelProperty(key, value);
-	    };
+    this.setProperty = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.widget.setModelProperty(key, value);
+    };
 
-	    this.getProperty = function (key) {
-		if (!this.widget) {
-		    return;
-		}
-		return this.widget.getModelProperty(key);
-	    };
-	    
+    this.getProperty = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty(key);
+    };
 
-	    this.setElement($element);
-	    this.setScope($scope);
-	});
+
+    this.setElement($element);
+    this.setScope($scope);
+});
 
 /* 
  * The MIT License (MIT)
@@ -2973,30 +2973,48 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingAudio', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-audio.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon'
-		},
-		controller: function($scope, $resource){
-			function selectAudio(){
-				return $resource.get('audio', {
-					style: {
-						title: 'Select Audio'
-					},
-					data: $scope.value
-				})//
-				.then(function(value){
-					$scope.value = value;
-				});
-			}
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-audio.html',
+        restrict: 'E',
+        scope: {
+            title: '@title',
+            icon: '@icon'
+        },
+        require: ['ngModel'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
 
-			$scope.edit = selectAudio;
-		}
-	};
+            ngModelCtrl.$render = function () {
+                scope.value = ngModelCtrl.$modelValue;
+            };
+
+            scope.valueChanged = function (value) {
+                ngModelCtrl.$setViewValue(value);
+            };
+        },
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function($scope, $resource){
+            this.editValue = function(value){
+                var ctrl = this;
+                return $resource.get('audio', {
+                    style: {
+                        title: 'Select Audio'
+                    },
+                    data: value
+                })//
+                .then(function(newValue){
+                    ctrl.updateValue(newValue);
+                });
+            };
+            this.updateValue = function(newValue) {
+                $scope.value = newValue;
+                $scope.valueChanged(newValue);
+            }
+        }
+    };
 });
 
 /* 
@@ -3026,45 +3044,48 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-	/**
-	 * @ngdoc Directives
-	 * @name wbUiSettingColor
-	 * @description a setting section to set color.
-	 *
-	 */
-	.directive('wbUiSettingBackgroundAttachment', function () {
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingBackgroundAttachment', function () {
 
-	    function postLink(scope, element, attr, ctrls) {
-		var ngModelCtrl = ctrls[0];
+    function postLink(scope, element, attr, ctrls) {
+        var ngModelCtrl = ctrls[0];
 
-		ngModelCtrl.$render = function () {
-		    scope.attachment = ngModelCtrl.$modelValue;
-		};
+        ngModelCtrl.$render = function () {
+            scope.attachment = ngModelCtrl.$modelValue;
+        };
 
-		scope.attachmentChanged = function (newAttachment) {
-		    ngModelCtrl.$setViewValue(newAttachment);
-		};
-	    }
-	    return {
-		templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
-		restrict: 'E',
-		replace: true,
-		scope: {},
-		require: ['ngModel'],
-		link: postLink,
-		controller: function ($scope) {
-		    $scope.items = [
-			{name: 'Scroll', value: 'scroll'},
-			{name: 'Fixed', value: 'fixed'},
-			{name: 'Local', value: 'local'},
-			{name: 'Initial', value: 'initial'},
-			{name: 'Inherit', value: 'inherit'},
-			{name: 'Nothing', value: ''}
-		    ];
+        scope.attachmentChanged = function (newAttachment) {
+            ngModelCtrl.$setViewValue(newAttachment);
+        };
+    }
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
+        restrict: 'E',
+        replace: true,
+        scope: {},
+        require: ['ngModel'],
+        link: postLink,
+        /*
+         * @ngInject
+         */
+        controller: function ($scope) {
+            $scope.items = [
+                {name: 'Scroll', value: 'scroll'},
+                {name: 'Fixed', value: 'fixed'},
+                {name: 'Local', value: 'local'},
+                {name: 'Initial', value: 'initial'},
+                {name: 'Inherit', value: 'inherit'},
+                {name: 'Nothing', value: ''}
+                ];
 
-		}
-	    };
-	});
+        }
+    };
+});
 /* 
  * The MIT License (MIT)
  * 
@@ -3119,6 +3140,9 @@ angular.module('am-wb-core')
 		scope: {},
 		require: ['ngModel'],
 		link: postLink,
+        /*
+         * @ngInject
+         */
 		controller: function ($scope) {
 		    $scope.items = [
 			{name: 'Padding-box', value: 'padding-box'},
@@ -3264,6 +3288,9 @@ angular.module('am-wb-core')
 		scope: {},
 		require: ['ngModel'],
 		link: postLink,
+        /*
+         * @ngInject
+         */
 		controller: function ($scope) {
 		    $scope.items = [
 			{name: 'Repeat', value: 'repeat'},
@@ -3426,18 +3453,9 @@ angular.module('am-wb-core')
 		/*
 		 * render the data
 		 */
-		function render() {
+		ngModelCtrl.$render  = function() {
 			scope.selectedIndex = toIndex(ngModelCtrl.$modelValue);
-			//ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
 		}
-
-		ngModelCtrl.$render = render;
-
-//		scope.$watch('selectedIndex', function () {
-//			if(angular.isDefined(scope.selectedIndex)){
-//				ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
-//			}
-//		});
 
 		scope.selectionChanged = function(){
 		    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
@@ -3488,44 +3506,36 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-        /**
-         * @ngdoc Directives
-         * @name wbUiSettingColor
-         * @description a setting section to set color.
-         *
-         */
-        .directive('wbUiSettingColor', function ($mdTheming){
-
-
-            function postLink(scope, element, attr, ctrls) {
-                var ngModelCtrl = ctrls[0];
-//                $mdTheming(element);
-
-                /*
-                 * convert to index
-                 */
-
-                ngModelCtrl.$render = function () {
-                    scope.valueColor = ngModelCtrl.$modelValue;
-                };
-		
-		scope.colorChanged = function (newColor) {
-		   ngModelCtrl.$setViewValue(newColor); 
-		};
-            }
-
-            return {
-                templateUrl: 'views/directives/wb-ui-setting-color.html',
-                restrict: 'E',
-                scope: {
-                    title: '@title',
-                    icon: '@icon'
-                },
-                require: ['ngModel'],
-                link: postLink
-
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingColor', function ($mdTheming){
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-color.html',
+        restrict: 'E',
+        scope: {
+            title: '@title',
+            icon: '@icon'
+        },
+        require: ['ngModel'],
+        link: function(scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
+            /*
+             * convert to index
+             */
+            ngModelCtrl.$render = function () {
+                scope.valueColor = ngModelCtrl.$modelValue;
             };
-        });
+
+            scope.colorChanged = function (newColor) {
+                ngModelCtrl.$setViewValue(newColor); 
+            };
+        }
+    };
+});
 
 /* 
  * The MIT License (MIT)
@@ -3568,18 +3578,20 @@ angular.module('am-wb-core')
 		restrict : 'E',
 		scope : {
 			title : '@title',
-			value : '=value',
 			icon : '@icon'
 		},
+        /*
+         * @ngInject
+         */
 		controller : function($scope, $resource) {
-			function editData(/*data*/) {
+			this.editValue = function(value) {
 				return $resource.get('data', {
 					style : {
 						icon: 'insert_chart',
 						title : 'Data sheet',
 						description: 'Edit data of the current sheet'
 					},
-					data : $scope.value
+					data : value
 				}) //
 				.then(function(data) {
 					if(!angular.isDefined($scope.value)){
@@ -3589,8 +3601,7 @@ angular.module('am-wb-core')
 					$scope.value.key = data.key;
 					$scope.value.values = data.values;
 				});
-			}
-			$scope.edit = editData;
+			};
 		}
 	};
 });
@@ -3674,16 +3685,28 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingDropdown', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon',
-			items:'=items'
-		}
-	};
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
+        restrict: 'E',
+        scope: {
+            title: '@title',
+            icon: '@icon',
+            items:'=items'
+        },
+        require: ['ngModel'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
+
+            ngModelCtrl.$render = function () {
+                scope.value = ngModelCtrl.$modelValue;
+            };
+
+            scope.valueChanged = function (value) {
+                scope.value = value;
+                ngModelCtrl.$setViewValue(value);
+            };
+        }
+    };
 });
 
 /* 
@@ -3712,63 +3735,6 @@ angular.module('am-wb-core')
 'use strict';
 
 
-/**
- * @ngdoc Controllers
- * 
- * @ngInject
- */
-function wbUiSettingGeneralCtrl($scope) {
-
-	// TODO: maso, 2018:load from user config
-	$scope.wbUiSettingClearButton = true;
-	$scope.wbUiSettingPreview = true;
-
-	this.clearValue = function (/*$event*/){
-		// General option
-		this.value = null;
-		this.valueChanged(null);
-	}
-	
-	this.setValue = function(value){
-		this.value = value;
-		this.valueChanged(value);
-	}
-	
-	this.getValue = function(){
-		this.value;
-	}
-
-}
-
-
-/**
- * @ngdoc Controllers
- * 
- * @ngInject
- */
-function wbUiSettingImageCtrl($scope, $resource, $controller){
-	var ctrl = this;
-
-	angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
-		$scope : $scope
-	}));
-
-	function showImagePicker(){
-		return $resource.get('image', {
-			style: {
-				icon: 'image',
-				title: 'Select image',
-				description: 'Select image from resources.'
-			},
-			data: ctrl.getValue()
-		})//
-		.then(function(value){
-			ctrl.setValue(value);
-		});
-	}
-
-	ctrl.showImagePicker = showImagePicker;
-}
 
 
 //General options
@@ -3776,8 +3742,51 @@ function wbUiSettingImageCtrl($scope, $resource, $controller){
 //- wbUiSettingPreview
 
 angular.module('am-wb-core')
-	.controller('wbUiSettingGeneralCtrl', wbUiSettingGeneralCtrl)
-	.controller('wbUiSettingImageCtrl', wbUiSettingImageCtrl)
+	.controller('wbUiSettingGeneralCtrl', function ($scope) {
+
+	    // TODO: maso, 2018:load from user config
+	    $scope.wbUiSettingClearButton = true;
+	    $scope.wbUiSettingPreview = true;
+
+	    this.clearValue = function (/*$event*/){
+	        // General option
+	        this.value = null;
+	        this.valueChanged(null);
+	    }
+	    
+	    this.setValue = function(value){
+	        this.value = value;
+	        this.valueChanged(value);
+	    }
+	    
+	    this.getValue = function(){
+	        this.value;
+	    }
+
+	})
+	.controller('wbUiSettingImageCtrl', function ($scope, $resource, $controller){
+	    var ctrl = this;
+
+	    angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
+	        $scope : $scope
+	    }));
+
+	    function showImagePicker(){
+	        return $resource.get('image', {
+	            style: {
+	                icon: 'image',
+	                title: 'Select image',
+	                description: 'Select image from resources.'
+	            },
+	            data: ctrl.getValue()
+	        })//
+	        .then(function(value){
+	            ctrl.setValue(value);
+	        });
+	    }
+
+	    ctrl.showImagePicker = showImagePicker;
+	})
 
 /**
  * @ngdoc Directives
@@ -4104,11 +4113,22 @@ angular.module('am-wb-core')
 	return {
 		templateUrl: 'views/directives/wb-ui-setting-on-off-switch.html',
 		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon'
-		}
+        scope: {
+            title: '@title',
+            icon: '@icon'
+        },
+        require: ['ngModel'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
+
+            ngModelCtrl.$render = function () {
+                scope.value = ngModelCtrl.$modelValue;
+            };
+
+            scope.valueChanged = function (value) {
+                ngModelCtrl.$setViewValue(value);
+            };
+        }
 	};
 });
 
@@ -4202,6 +4222,9 @@ angular.module('am-wb-core')
 			value: '=value',
 			icon: '@icon'
 		},
+        /*
+         * @ngInject
+         */
 		controller: function($scope, $resource){
 			function selectVideo(){
 				return $resource.get('video', {
@@ -5682,6 +5705,7 @@ angular.module('am-wb-core')
 			}];
 			
 			this.init = function(){
+			    this.direction = this.getStyle('direction') || 'ltr';
 				this.color = this.getStyle('color');
 				this.cursor = this.getStyle('cursor');
 				this.opacity = this.getStyle('opacity');
@@ -7408,10 +7432,11 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         // shadows
         css = _.merge(css, convertToWidgetCssShadows(style.shadows || {}));
         
-        // color, cursor, opacity
+        // color, cursor, opacity, direction
         css = _.merge(css, {
             padding: style.padding,
             margin: style.margin,
+            direction: style.direction || 'ltr',
             color: style.color || 'initial',
             cursor: style.cursor || 'auto',
             opacity: style.opacity || '1'
@@ -8496,7 +8521,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-audio.html',
-    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-audio</wb-icon> </md-button> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
+    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=ctrl.editValue(value)> <wb-icon>wb-object-audio</wb-icon> </md-button> <md-input-container> <input ng-model=value ng-change=ctrl.updateValue(value)> </md-input-container> </md-list-item>"
   );
 
 
@@ -8551,7 +8576,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-dropdown.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon === undefined || icon === null || icon === ''\">{{icon}}</wb-icon> <p ng-hide=\"title === undefined || title === null || title === ''\">{{title}}</p> <md-select style=\"margin: 0px\" ng-model=value> <md-option ng-repeat=\"item in items\" value={{item.value}}> {{item.title}} </md-option> </md-select> </md-list-item>"
+    "<div layout=row> <wb-icon ng-show=icon>{{::icon}}</wb-icon> <p style=\"margin: 0px 4px\" ng-show=title>{{::title}}</p> <md-select style=\"margin: 0px\" ng-model=value ng-change=valueChanged(value) flex> <md-option ng-repeat=\"item in items track by $index\" value={{::item.value}}> <span translate>{{::item.title}}</span> </md-option> </md-select> </div>"
   );
 
 
@@ -8576,7 +8601,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-on-off-switch.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-switch class=md-secondary ng-model=value></md-switch> </md-list-item>"
+    "<md-list-item> <wb-icon ng-show=icon>{{icon}}</wb-icon> <p ng-show=title>{{title}}</p> <md-switch class=md-secondary ng-model=value ng-change=valueChanged(value)> </md-switch> </md-list-item>"
   );
 
 
@@ -8635,7 +8660,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-color-cursor-opacity.html',
-    " <div layout=column style=\"min-width: 200px\">  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setStyle('color', ctrl.color)\"> </wb-ui-setting-color>  <div layout=row> <wb-icon>mouse</wb-icon> <p translate=\"\">Cursor</p> <span flex></span> <md-input-container layout-align=\"end center\"> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setStyle('cursor', ctrl.cursor)\"> <md-option ng-repeat=\"cursor in ::ctrl.cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </div>  <div layout=column style=\"min-width: 200px\"> <div layout=row layout-align=\"end center\"> <wb-icon>opacity</wb-icon> <span flex translate=\"\">Opacity</span> <md-input-container style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input ng-model=ctrl.opacity ng-change=\"ctrl.setStyle('opacity', ctrl.opacity)\"> </md-input-container> </div> </div> </div>"
+    " <div layout=column style=\"min-width: 200px\">  <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setStyle('direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setStyle('color', ctrl.color)\"> </wb-ui-setting-color>  <div layout=row> <wb-icon>mouse</wb-icon> <p translate=\"\">Cursor</p> <span flex></span> <md-input-container layout-align=\"end center\"> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setStyle('cursor', ctrl.cursor)\"> <md-option ng-repeat=\"cursor in ::ctrl.cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </div>  <div layout=row layout-align=\"end center\"> <wb-icon>opacity</wb-icon> <span flex translate=\"\">Opacity</span> <md-input-container style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input ng-model=ctrl.opacity ng-change=\"ctrl.setStyle('opacity', ctrl.opacity)\"> </md-input-container> </div> </div>"
   );
 
 

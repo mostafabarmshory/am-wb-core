@@ -34,28 +34,46 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingAudio', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-audio.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon'
-		},
-		controller: function($scope, $resource){
-			function selectAudio(){
-				return $resource.get('audio', {
-					style: {
-						title: 'Select Audio'
-					},
-					data: $scope.value
-				})//
-				.then(function(value){
-					$scope.value = value;
-				});
-			}
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-audio.html',
+        restrict: 'E',
+        scope: {
+            title: '@title',
+            icon: '@icon'
+        },
+        require: ['ngModel'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
 
-			$scope.edit = selectAudio;
-		}
-	};
+            ngModelCtrl.$render = function () {
+                scope.value = ngModelCtrl.$modelValue;
+            };
+
+            scope.valueChanged = function (value) {
+                ngModelCtrl.$setViewValue(value);
+            };
+        },
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function($scope, $resource){
+            this.editValue = function(value){
+                var ctrl = this;
+                return $resource.get('audio', {
+                    style: {
+                        title: 'Select Audio'
+                    },
+                    data: value
+                })//
+                .then(function(newValue){
+                    ctrl.updateValue(newValue);
+                });
+            };
+            this.updateValue = function(newValue) {
+                $scope.value = newValue;
+                $scope.valueChanged(newValue);
+            }
+        }
+    };
 });
