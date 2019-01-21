@@ -239,6 +239,8 @@ WbAbstractWidget.prototype.hasProperty = function (key){
 WbAbstractWidget.prototype.getProperty = function (key){
 	return objectPath.get(this.getRuntimeModel(), key);
 };
+
+// XXX: maso, 2019: check
 WbAbstractWidget.prototype.setProperty = function (key, value){
 	// create the event
 	var $event = {};
