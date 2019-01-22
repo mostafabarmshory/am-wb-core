@@ -1462,6 +1462,8 @@ WbAbstractWidget.prototype.hasProperty = function (key){
 WbAbstractWidget.prototype.getProperty = function (key){
 	return objectPath.get(this.getRuntimeModel(), key);
 };
+
+// XXX: maso, 2019: check
 WbAbstractWidget.prototype.setProperty = function (key, value){
 	// create the event
 	var $event = {};
@@ -8491,7 +8493,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/dialogs/wb-select-resource-single-page.html',
-    "<md-dialog aria-label=\"Select item/items\" style=\"width:50%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row> <md-button ng-if=openHelp ng-click=openHelp($event) aria-label=\"Show help\"> <span translate=\"\">Learn more</span> </md-button> <span flex></span> <md-button ng-click=cancel() aria-label=Cancel> <span translate=\"\">Close</span> </md-button> <md-button class=md-primary aria-label=Done ng-click=answer()> <span translate=\"\">Ok</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
+    "<md-dialog aria-label=\"Select item/items\" style=\"width:50%; height:70%\"> <form ng-cloak layout=column flex> <md-dialog-content mb-preloading=loadingAnswer flex layout=row> <div layout=column flex> <div id=wb-select-resource-children style=\"margin: 0px; padding: 0px; overflow: auto\" layout=column flex> </div> </div> </md-dialog-content> <md-dialog-actions layout=row>       <span flex></span> <md-button ng-click=cancel() aria-label=Cancel> <span translate=\"\">Close</span> </md-button> <md-button class=md-primary aria-label=Done ng-click=answer()> <span translate=\"\">Ok</span> </md-button> </md-dialog-actions> </form> </md-dialog>"
   );
 
 
