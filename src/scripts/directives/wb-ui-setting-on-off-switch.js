@@ -25,31 +25,31 @@
 
 angular.module('am-wb-core')
 
-/**
- * @ngdoc Directives
- * @name wbUiSettingOnOffSwitch
- * @description a setting section for on/off switch.
- *
- */
-.directive('wbUiSettingOnOffSwitch', function () {
-	return {
+	/**
+	 * @ngdoc Directives
+	 * @name wbUiSettingOnOffSwitch
+	 * @description a setting section for on/off switch.
+	 *
+	 */
+	.directive('wbUiSettingOnOffSwitch', function () {
+	    return {
 		templateUrl: 'views/directives/wb-ui-setting-on-off-switch.html',
 		restrict: 'E',
-        scope: {
-            title: '@title',
-            icon: '@icon'
-        },
-        require: ['ngModel'],
-        link: function (scope, element, attr, ctrls) {
-            var ngModelCtrl = ctrls[0];
+		scope: {
+		    title: '@title',
+		    icon: '@icon'
+		},
+		require: ['ngModel'],
+		link: function (scope, element, attr, ctrls) {
+		    var ngModelCtrl = ctrls[0];
 
-            ngModelCtrl.$render = function () {
-                scope.value = ngModelCtrl.$modelValue;
-            };
+		    ngModelCtrl.$render = function () {
+			scope.value = ngModelCtrl.$modelValue;
+		    };
 
-            scope.valueChanged = function (value) {
-                ngModelCtrl.$setViewValue(value);
-            };
-        }
-	};
-});
+		    scope.valueChanged = function (value) {
+			ngModelCtrl.$setViewValue(value);
+		    };
+		}
+	    };
+	});

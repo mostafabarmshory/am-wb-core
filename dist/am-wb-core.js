@@ -4071,9 +4071,20 @@ angular.module('am-wb-core')
 		restrict: 'E',
 		scope: {
 			title: '@title',
-			value: '=value',
 			icon: '@icon',
 			slider:'@slider'
+		},
+		require: ['ngModel'],
+		link: function (scope, element, attr, ctrls) {
+		    var ngModelCtrl = ctrls[0];
+
+		    ngModelCtrl.$render = function () {
+			scope.value = ngModelCtrl.$modelValue;
+		    };
+
+		    scope.valueChanged = function (value) {
+			ngModelCtrl.$setViewValue(value);
+		    };
 		}
 	};
 });
@@ -4105,34 +4116,34 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-/**
- * @ngdoc Directives
- * @name wbUiSettingOnOffSwitch
- * @description a setting section for on/off switch.
- *
- */
-.directive('wbUiSettingOnOffSwitch', function () {
-	return {
+	/**
+	 * @ngdoc Directives
+	 * @name wbUiSettingOnOffSwitch
+	 * @description a setting section for on/off switch.
+	 *
+	 */
+	.directive('wbUiSettingOnOffSwitch', function () {
+	    return {
 		templateUrl: 'views/directives/wb-ui-setting-on-off-switch.html',
 		restrict: 'E',
-        scope: {
-            title: '@title',
-            icon: '@icon'
-        },
-        require: ['ngModel'],
-        link: function (scope, element, attr, ctrls) {
-            var ngModelCtrl = ctrls[0];
+		scope: {
+		    title: '@title',
+		    icon: '@icon'
+		},
+		require: ['ngModel'],
+		link: function (scope, element, attr, ctrls) {
+		    var ngModelCtrl = ctrls[0];
 
-            ngModelCtrl.$render = function () {
-                scope.value = ngModelCtrl.$modelValue;
-            };
+		    ngModelCtrl.$render = function () {
+			scope.value = ngModelCtrl.$modelValue;
+		    };
 
-            scope.valueChanged = function (value) {
-                ngModelCtrl.$setViewValue(value);
-            };
-        }
-	};
-});
+		    scope.valueChanged = function (value) {
+			ngModelCtrl.$setViewValue(value);
+		    };
+		}
+	    };
+	});
 
 /* 
  * The MIT License (MIT)
@@ -8598,12 +8609,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-number.html',
-    "<md-list-item ng-show=\"slider==undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input style=\"width: 50px\" type=number ng-model=value flex> </md-input-container> </md-list-item> <md-list-item ng-show=\"slider!=undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='' || icon=='wb-blank'\">{{icon}}</wb-icon> <div ng-show=\"icon=='wb-blank'\" style=\"display: inline-block; width: 32px; opacity: 0.0\"></div> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-slider min=0 max=100 ng-model=value flex></md-slider> </md-list-item>"
+    "<md-list-item ng-show=\"slider==undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input style=\"width: 50px\" type=number ng-model=value ng-change=valueChanged(value) flex> </md-input-container> </md-list-item> <md-list-item ng-show=\"slider!=undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='' || icon=='wb-blank'\">{{icon}}</wb-icon> <div ng-show=\"icon=='wb-blank'\" style=\"display: inline-block; width: 32px; opacity: 0.0\"></div> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-slider min=0 max=100 ng-model=value ng-change=valueChanged(value) flex></md-slider> </md-list-item>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-on-off-switch.html',
-    "<md-list-item> <wb-icon ng-show=icon>{{icon}}</wb-icon> <p ng-show=title>{{title}}</p> <md-switch class=md-secondary ng-model=value ng-change=valueChanged(value)> </md-switch> </md-list-item>"
+    "<md-list-item> <wb-icon ng-show=icon>{{icon}}</wb-icon> <p ng-show=title>{{title}}</p> <md-switch class=md-primary ng-model=value ng-change=valueChanged(value)> </md-switch> </md-list-item>"
   );
 
 
