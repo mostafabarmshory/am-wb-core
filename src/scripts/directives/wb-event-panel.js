@@ -103,7 +103,7 @@ angular.module('am-wb-core')
                     $scope.saveEvents();
                 });
             };
-            
+
             this.deleteEvent = function(event) {
                 delete event.code;
                 $scope.saveEvents();

@@ -296,20 +296,20 @@ WbAbstractWidget.prototype.getProperty = function (key){
  * @memberof WbAbstractWidget
  * @name setProperty
  */
-WbAbstractWidget.prototype.setProperty = function (address, value){
+WbAbstractWidget.prototype.setProperty = function (key, value){
 	// create the event
 	var $event = {};
 	$event.source = this;
 	$event.key = key;
-	$event.oldValue = old;
+	$event.oldValue = this.getProperty(key);
 	$event.newValue =  value;
 
 	// Set the address
 	var model = this.getRuntimeModel();
 	if(angular.isDefined(value)){
-		objectPath.set(model, address, value);
+		objectPath.set(model, key, value);
 	} else {
-		objectPath.del(model, address);
+		objectPath.del(model, key);
 	}
 
 	// refresh the view
@@ -381,13 +381,13 @@ WbAbstractWidget.prototype.getStyle = function(key) {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
-    if (!this.isEditable()) {
+    if (this.isEditable()) {
         // User function will not evaluate in edit mode
         return;
     }
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
-		var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2];' + this.getEvent()[type];
+		var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2]; var $media =  arguments[3];' + this.getEvent()[type];
 		this.eventFunctions[type] = new Function(body);
 	}
 	eventFunction = this.eventFunctions[type];
@@ -398,7 +398,7 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 			post: function (url, obj) {
 				return $http.post(url, obj);
 			}
-		});
+		}, this.$mdMedia);
 	}
 };
 
@@ -598,19 +598,6 @@ WbAbstractWidget.prototype.setScope = function ($scope) {
 WbAbstractWidget.prototype.getScope = function () {
 	return this.$scope;
 };
-
-// WbAbstractWidget.prototype.setUnderCursor = function (widget) {
-// if(!this.isRoot()){
-// this.getParent().setUnderCursor(widget);
-// }
-// if(this._widgetUnderCursor === widget){
-// return;
-// }
-// this._widgetUnderCursor = widget;
-// this.fire('widgetUnderCursor', {
-// widget: this._widgetUnderCursor
-// });
-// };
 
 WbAbstractWidget.prototype.isEditable = function () {
 	return this.editable;
@@ -812,13 +799,14 @@ WbAbstractWidget.prototype.getBoundingClientRect = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
 	this.$wbUtil = $wbUtil;
 	this.$http = $http;
 	this.$widget = $widget;
+	this.$mdMedia = $mdMedia;
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
