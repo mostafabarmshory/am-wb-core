@@ -2056,7 +2056,7 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -2066,6 +2066,7 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$mdTheming = $mdTheming;
 	this.$wbUtil = $wbUtil;
 	this.$http = $http;
+	this.$mdMedia = $mdMedia;
 
 	var ctrl = this;
 	this.on('modelChanged', function () {
@@ -7569,7 +7570,7 @@ angular.module('am-wb-core').service('$wbUi', function($mdDialog, $q, $http) {
 /**
  * Utility class of WB
  */
-angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, $sce, $mdMedia) {
+angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, $sce) {
     'use strict';
     var service = this;
 
@@ -7734,7 +7735,7 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         {
             flexLayout.display = 'flex';
             // row
-            if (layout.direction === 'row' && $mdMedia('gt-sm')) {
+            if (layout.direction === 'row') {
                 flexLayout['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
                 flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
                 flexLayout['overflow-y'] = 'visible';
