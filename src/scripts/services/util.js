@@ -25,7 +25,7 @@
 /**
  * Utility class of WB
  */
-angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, $sce, $mdMedia) {
+angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, $sce) {
     'use strict';
     var service = this;
 
@@ -190,7 +190,7 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         {
             flexLayout.display = 'flex';
             // row
-            if (layout.direction === 'row' && $mdMedia('gt-sm')) {
+            if (layout.direction === 'row') {
                 flexLayout['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
                 flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
                 flexLayout['overflow-y'] = 'visible';
