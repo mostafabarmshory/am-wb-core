@@ -68,4 +68,26 @@ angular.module('am-wb-core')
 		controllerAs: 'ctrl',
 		tags : [ 'data' ]
 	});
+	
+
+    $resource.newPage({
+        type : 'wb-js',
+        icon : 'script',
+        label : 'JS Script',
+        templateUrl : 'views/resources/wb-event-code-editor.html',
+        /*
+         * @ngInject
+         */
+        controller : function($scope) {
+            $scope.$watch('value', function(value) {
+                if (angular.isDefined(value)) {
+                    $scope.$parent.setValue(value);
+                } else {
+                    $scope.$parent.setValue('');
+                }
+            }, true);
+        },
+        controllerAs: 'ctrl',
+        tags : [ 'js' ]
+    });
 });

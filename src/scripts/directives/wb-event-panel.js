@@ -33,31 +33,81 @@ angular.module('am-wb-core')
  * Loads list of settings.
  * 
  */
-.directive('wbEventPanel', function($settings, $widget) {
-	/**
-	 * Init settings
-	 */
-	function postLink($scope, $element, $attrs, $ctrls) {
-		// Load ngModel
-		var ngModelCtrl = $ctrls[0];
+.directive('wbEventPanel', function ($settings, $widget) {
+    /**
+     * Init settings
+     */
+    function postLink($scope, $element, $attrs, $ctrls) {
+        // Load ngModel
+        var ngModelCtrl = $ctrls[0];
+        var widget = null;
+        var keys = [ 'click', 'mouseout', 'mouseover', 'resize' ];
+        var titles = [ 'Click', 'Mouseout', 'Mouseover', 'Resize' ];
 
-		function loadSetting(widget) {
-			
-		}
+        ngModelCtrl.$render = function () {
+            if (ngModelCtrl.$viewValue) {
+                widget = ngModelCtrl.$viewValue;
+                loadEvents();
+            }
+        };
 
-		ngModelCtrl.$render = function() {
-			if(ngModelCtrl.$viewValue) {
-				loadSetting(ngModelCtrl.$viewValue);
-			}
-		};
-	}
-	
-	return {
-		restrict : 'E',
-		replace: true,
-		templateUrl: 'views/directives/wb-event-panel.html',
-		scope : {},
-		link : postLink,
-		require:['ngModel']
-	};
+        function loadEvents() {
+            $scope.events = [];
+            for (var i = 0; i < keys.length; i++) {
+                var event = {};
+                event.key = keys[i];
+                event.title = titles[i];
+                event.code = widget.getModelProperty('event.' + event.key);
+                $scope.events.push(event);
+            }
+        }
+
+        function saveEvents() {
+            for (var i = 0; i < $scope.events.length; i++) {
+                var event = $scope.events[i];
+                if (event.code) {
+                    widget.setModelProperty('event.' + event.key, event.code);
+                } else {
+                    widget.setModelProperty('event.' + event.key, undefined);
+                }
+            }
+        }
+
+        /**
+         * Save events into the model
+         */
+        $scope.saveEvents = saveEvents;
+    }
+
+    return {
+        restrict : 'E',
+        replace : true,
+        templateUrl : 'views/directives/wb-event-panel.html',
+        scope : {},
+        link : postLink,
+        require : [ 'ngModel' ],
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function($scope, $resource){
+            this.editEvent = function(event) {
+                $resource.get('js', {
+                    data: event.code
+                })
+                .then(function(value){
+                    event.code = value;
+                    if(!value){
+                        delete event.code;
+                    }
+                    $scope.saveEvents();
+                });
+            };
+            
+            this.deleteEvent = function(event) {
+                delete event.code;
+                $scope.saveEvents();
+            };
+        }
+    };
 });

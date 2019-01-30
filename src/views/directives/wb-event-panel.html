@@ -1,11 +1,35 @@
-<fieldset>
-	<legend translate>On resize</legend>
-	<textarea 
-		type="text" 
-		aria-label="On click event handler" 
-		rows="2" 
-		ng-model="ctrl.onResize" 
-		ng-model-options="{updateOn : 'change'}"
-		ng-change="ctrl.setEvent('resize', ctrl.onResize)">
-	</textarea>
-</fieldset>
+<div
+	layout="column">
+	<h3 translate>Events</h3>
+	<table
+		class="mb-table">
+		<thead>
+			<tr
+ 				md-colors="{color: 'primary-700'}">
+				<td translate>Name</td>
+				<td translate>Code</td>
+				<td></td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr
+				ng-repeat="event in events track by $index">
+				<td>{{event.title}}</td>
+				<td>{{event.code | limitTo:13 }} ...</td>
+				<td>
+					<md-button
+						ng-if="event.code"
+						ng-click="ctrl.deleteEvent(event, $event)"
+						class="md-icon-button">
+						<wb-icon>delete</wb-icon>
+					</md-button>
+					<md-button
+						ng-click="ctrl.editEvent(event, $event)"
+						class="md-icon-button">
+						<wb-icon>edit</wb-icon>
+					</md-button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
