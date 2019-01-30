@@ -833,7 +833,7 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -843,6 +843,7 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$mdTheming = $mdTheming;
 	this.$wbUtil = $wbUtil;
 	this.$http = $http;
+	this.$mdMedia = $mdMedia;
 
 	var ctrl = this;
 	this.on('modelChanged', function () {
