@@ -37,9 +37,20 @@ angular.module('am-wb-core')
 		restrict: 'E',
 		scope: {
 			title: '@title',
-			value: '=value',
 			icon: '@icon',
 			slider:'@slider'
+		},
+		require: ['ngModel'],
+		link: function (scope, element, attr, ctrls) {
+		    var ngModelCtrl = ctrls[0];
+
+		    ngModelCtrl.$render = function () {
+			scope.value = ngModelCtrl.$modelValue;
+		    };
+
+		    scope.valueChanged = function (value) {
+			ngModelCtrl.$setViewValue(value);
+		    };
 		}
 	};
 });
