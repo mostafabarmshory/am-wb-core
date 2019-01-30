@@ -1,0 +1,11 @@
+<fieldset>
+	<legend translate>On resize</legend>
+	<textarea 
+		type="text" 
+		aria-label="On click event handler" 
+		rows="2" 
+		ng-model="ctrl.onResize" 
+		ng-model-options="{updateOn : 'change'}"
+		ng-change="ctrl.setEvent('resize', ctrl.onResize)">
+	</textarea>
+</fieldset>

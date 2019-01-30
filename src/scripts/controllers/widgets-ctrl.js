@@ -28,7 +28,28 @@
  * @descreption root of the widgets
  * 
  * This is an abstract implementation of the widgets.
- *  # Events
+ * 
+ * ## Models
+ * 
+ * The model of the widget is consist of two main part:
+ * 
+ * <ul>
+ * <li>User data</li>
+ * <li>Runtime data</li>
+ * </ul>
+ * 
+ * User data is set as input data model and the runtime data
+ * is managed by events and user functions. 
+ * 
+ * Finally the combination of user and runtime data is used to
+ * update the view.
+ * 
+ * The setModelProperty changes the user data model.
+ * 
+ * The setProperty changes the runtime properties.
+ * 
+ * 
+ * ## Events
  * 
  * 
  * Here is list of allowed types:
@@ -60,6 +81,10 @@ var WbAbstractWidget = function () {
 	this.childWidgets = [];
 	this.$scope = null;
 	this.$element = null;
+	/*
+	 * This is a cache of customer function
+	 * 
+	 */
 	this.eventFunctions = {};
 	this.computedStyle = {};
 	
@@ -82,15 +107,11 @@ var WbAbstractWidget = function () {
 
 			mouseout: function ($event) {
 				ctrl.fire('mouseout', $event);
-				if (!ctrl.isEditable()) {
-					ctrl.evalWidgetEvent('mouseout', $event);
-				}
+				ctrl.evalWidgetEvent('mouseout', $event);
 			},
 			mouseover: function ($event) {
 				ctrl.fire('mouseover', $event);
-				if (!ctrl.isEditable()) {
-					ctrl.evalWidgetEvent('mouseover', $event);
-				}
+				ctrl.evalWidgetEvent('mouseover', $event);
 			}
 	};
 
@@ -99,6 +120,8 @@ var WbAbstractWidget = function () {
      */
 	this.resizeObserver = new ResizeObserver(function ($event) {
 		ctrl.fireResizeLayout($event);
+		// check if there is a user function
+        ctrl.evalWidgetEvent('resize', $event);
 	});
 
 };
@@ -187,14 +210,32 @@ WbAbstractWidget.prototype.refresh = function() {
 	this.getScope().wbModel = model;
 
 	this.loadStyle();
-	this.loadSeo(model);
+	this.loadSeo();
 };
 
-
-
+/**
+ * Returns model of the widget 
+ * 
+ * The model is managed by other entity and used as read only part
+ * in the widget. 
+ * 
+ *  By the way it is supposed that the model is used just in a widget and
+ * to modify the model, a method of the widget is called. In this case the
+ * widget fire the changes of the model.
+ * 
+ * @see #setModelProperty(key, value)
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getModel = function () {
 	return this.wbModel;
 };
+
+/**
+ * Sets model of the widget
+ * 
+ * @see #getModel()
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setModel = function (model) {
 	if (model === this.wbModel) {
 		return;
@@ -203,6 +244,12 @@ WbAbstractWidget.prototype.setModel = function (model) {
 	this.refresh();
 	this.fire('modelChanged');
 };
+
+/**
+ * Checks if the key exist in the widget model
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.hasModelProperty = function(key){
 	return objectPath.has(this.getModel(), key);
 };
@@ -240,8 +287,16 @@ WbAbstractWidget.prototype.getProperty = function (key){
 	return objectPath.get(this.getRuntimeModel(), key);
 };
 
-// XXX: maso, 2019: check
-WbAbstractWidget.prototype.setProperty = function (key, value){
+/**
+ * Changes property value
+ * 
+ *  If the change cause the view to update then this function will
+ * update and render the view.
+ * 
+ * @memberof WbAbstractWidget
+ * @name setProperty
+ */
+WbAbstractWidget.prototype.setProperty = function (address, value){
 	// create the event
 	var $event = {};
 	$event.source = this;
@@ -250,11 +305,11 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	$event.newValue =  value;
 
 	// Set the address
-	var address = 'style.' + key;
+	var model = this.getRuntimeModel();
 	if(angular.isDefined(value)){
-		objectPath.set(this.getRuntimeModel(), address, value);
+		objectPath.set(model, address, value);
 	} else {
-		objectPath.del(this.getRuntimeModel(), address);
+		objectPath.del(model, address);
 	}
 
 	// refresh the view
@@ -292,28 +347,30 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 WbAbstractWidget.prototype.style = function (style, value) {
 	// there is no argument so act as get
 	if(!angular.isDefined(style)){
-		return angular.copy(this.getProperty('style'));
+	    return angular.copy(this.getProperty('style'));
 	}
 	// style is a key
 	if(angular.isString(style)){
 		if(angular.isDefined(value)){
-			// set style
-			return this.setProperty('style.'+style, value);
+			return this.setStyle(style, value);
 		} else {
-			// get style
-			return this.getProperty('style.' + style);
+			return this.getStyle(style);
 		}
 	}
-	// style is object
-	this.setSilent(true);
-	if(angular.isDefined(style)){
-		// XXX: set styles
-		// _.merge(this.dynamicStyle, style);
-		// this.fire('styleChanged');
-		return;
-	}
-	this.setSilent(false);
-	this.updateView();
+};
+
+/**
+ * Sets style of the widget
+ */
+WbAbstractWidget.prototype.setStyle = function(key, value) {
+    this.setProperty('style.' + key, value);
+};
+
+/**
+ * Get style from widget
+ */
+WbAbstractWidget.prototype.getStyle = function(key) {
+    return this.getProperty('style.' + key);
 };
 
 /**
@@ -324,6 +381,10 @@ WbAbstractWidget.prototype.style = function (style, value) {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
+    if (!this.isEditable()) {
+        // User function will not evaluate in edit mode
+        return;
+    }
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
 		var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2];' + this.getEvent()[type];
