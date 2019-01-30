@@ -1251,7 +1251,28 @@ angular.module('am-wb-core')//
  * @descreption root of the widgets
  * 
  * This is an abstract implementation of the widgets.
- *  # Events
+ * 
+ * ## Models
+ * 
+ * The model of the widget is consist of two main part:
+ * 
+ * <ul>
+ * <li>User data</li>
+ * <li>Runtime data</li>
+ * </ul>
+ * 
+ * User data is set as input data model and the runtime data
+ * is managed by events and user functions. 
+ * 
+ * Finally the combination of user and runtime data is used to
+ * update the view.
+ * 
+ * The setModelProperty changes the user data model.
+ * 
+ * The setProperty changes the runtime properties.
+ * 
+ * 
+ * ## Events
  * 
  * 
  * Here is list of allowed types:
@@ -1283,6 +1304,10 @@ var WbAbstractWidget = function () {
 	this.childWidgets = [];
 	this.$scope = null;
 	this.$element = null;
+	/*
+	 * This is a cache of customer function
+	 * 
+	 */
 	this.eventFunctions = {};
 	this.computedStyle = {};
 	
@@ -1305,15 +1330,11 @@ var WbAbstractWidget = function () {
 
 			mouseout: function ($event) {
 				ctrl.fire('mouseout', $event);
-				if (!ctrl.isEditable()) {
-					ctrl.evalWidgetEvent('mouseout', $event);
-				}
+				ctrl.evalWidgetEvent('mouseout', $event);
 			},
 			mouseover: function ($event) {
 				ctrl.fire('mouseover', $event);
-				if (!ctrl.isEditable()) {
-					ctrl.evalWidgetEvent('mouseover', $event);
-				}
+				ctrl.evalWidgetEvent('mouseover', $event);
 			}
 	};
 
@@ -1322,6 +1343,8 @@ var WbAbstractWidget = function () {
      */
 	this.resizeObserver = new ResizeObserver(function ($event) {
 		ctrl.fireResizeLayout($event);
+		// check if there is a user function
+        ctrl.evalWidgetEvent('resize', $event);
 	});
 
 };
@@ -1410,14 +1433,32 @@ WbAbstractWidget.prototype.refresh = function() {
 	this.getScope().wbModel = model;
 
 	this.loadStyle();
-	this.loadSeo(model);
+	this.loadSeo();
 };
 
-
-
+/**
+ * Returns model of the widget 
+ * 
+ * The model is managed by other entity and used as read only part
+ * in the widget. 
+ * 
+ *  By the way it is supposed that the model is used just in a widget and
+ * to modify the model, a method of the widget is called. In this case the
+ * widget fire the changes of the model.
+ * 
+ * @see #setModelProperty(key, value)
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getModel = function () {
 	return this.wbModel;
 };
+
+/**
+ * Sets model of the widget
+ * 
+ * @see #getModel()
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setModel = function (model) {
 	if (model === this.wbModel) {
 		return;
@@ -1426,6 +1467,12 @@ WbAbstractWidget.prototype.setModel = function (model) {
 	this.refresh();
 	this.fire('modelChanged');
 };
+
+/**
+ * Checks if the key exist in the widget model
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.hasModelProperty = function(key){
 	return objectPath.has(this.getModel(), key);
 };
@@ -1463,21 +1510,29 @@ WbAbstractWidget.prototype.getProperty = function (key){
 	return objectPath.get(this.getRuntimeModel(), key);
 };
 
-// XXX: maso, 2019: check
+/**
+ * Changes property value
+ * 
+ *  If the change cause the view to update then this function will
+ * update and render the view.
+ * 
+ * @memberof WbAbstractWidget
+ * @name setProperty
+ */
 WbAbstractWidget.prototype.setProperty = function (key, value){
 	// create the event
 	var $event = {};
 	$event.source = this;
 	$event.key = key;
-	$event.oldValue = old;
+	$event.oldValue = this.getProperty(key);
 	$event.newValue =  value;
 
 	// Set the address
-	var address = 'style.' + key;
+	var model = this.getRuntimeModel();
 	if(angular.isDefined(value)){
-		objectPath.set(this.getRuntimeModel(), address, value);
+		objectPath.set(model, key, value);
 	} else {
-		objectPath.del(this.getRuntimeModel(), address);
+		objectPath.del(model, key);
 	}
 
 	// refresh the view
@@ -1515,28 +1570,30 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 WbAbstractWidget.prototype.style = function (style, value) {
 	// there is no argument so act as get
 	if(!angular.isDefined(style)){
-		return angular.copy(this.getProperty('style'));
+	    return angular.copy(this.getProperty('style'));
 	}
 	// style is a key
 	if(angular.isString(style)){
 		if(angular.isDefined(value)){
-			// set style
-			return this.setProperty('style.'+style, value);
+			return this.setStyle(style, value);
 		} else {
-			// get style
-			return this.getProperty('style.' + style);
+			return this.getStyle(style);
 		}
 	}
-	// style is object
-	this.setSilent(true);
-	if(angular.isDefined(style)){
-		// XXX: set styles
-		// _.merge(this.dynamicStyle, style);
-		// this.fire('styleChanged');
-		return;
-	}
-	this.setSilent(false);
-	this.updateView();
+};
+
+/**
+ * Sets style of the widget
+ */
+WbAbstractWidget.prototype.setStyle = function(key, value) {
+    this.setProperty('style.' + key, value);
+};
+
+/**
+ * Get style from widget
+ */
+WbAbstractWidget.prototype.getStyle = function(key) {
+    return this.getProperty('style.' + key);
 };
 
 /**
@@ -1547,9 +1604,13 @@ WbAbstractWidget.prototype.style = function (style, value) {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
+    if (this.isEditable()) {
+        // User function will not evaluate in edit mode
+        return;
+    }
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
-		var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2];' + this.getEvent()[type];
+		var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2]; var $media =  arguments[3];' + this.getEvent()[type];
 		this.eventFunctions[type] = new Function(body);
 	}
 	eventFunction = this.eventFunctions[type];
@@ -1560,7 +1621,7 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 			post: function (url, obj) {
 				return $http.post(url, obj);
 			}
-		});
+		}, this.$mdMedia);
 	}
 };
 
@@ -1760,19 +1821,6 @@ WbAbstractWidget.prototype.setScope = function ($scope) {
 WbAbstractWidget.prototype.getScope = function () {
 	return this.$scope;
 };
-
-// WbAbstractWidget.prototype.setUnderCursor = function (widget) {
-// if(!this.isRoot()){
-// this.getParent().setUnderCursor(widget);
-// }
-// if(this._widgetUnderCursor === widget){
-// return;
-// }
-// this._widgetUnderCursor = widget;
-// this.fire('widgetUnderCursor', {
-// widget: this._widgetUnderCursor
-// });
-// };
 
 WbAbstractWidget.prototype.isEditable = function () {
 	return this.editable;
@@ -1974,13 +2022,14 @@ WbAbstractWidget.prototype.getBoundingClientRect = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
 	this.$wbUtil = $wbUtil;
 	this.$http = $http;
 	this.$widget = $widget;
+	this.$mdMedia = $mdMedia;
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
@@ -2335,6 +2384,123 @@ angular.module('am-wb-core')
         }
     }
 });
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wb-setting-panel-group
+ * @description Widgets settings
+ * 
+ * Loads list of settings.
+ * 
+ */
+.directive('wbEventPanel', function ($settings, $widget) {
+    /**
+     * Init settings
+     */
+    function postLink($scope, $element, $attrs, $ctrls) {
+        // Load ngModel
+        var ngModelCtrl = $ctrls[0];
+        var widget = null;
+        var keys = [ 'click', 'mouseout', 'mouseover', 'resize' ];
+        var titles = [ 'Click', 'Mouseout', 'Mouseover', 'Resize' ];
+
+        ngModelCtrl.$render = function () {
+            if (ngModelCtrl.$viewValue) {
+                widget = ngModelCtrl.$viewValue;
+                if(angular.isArray(widget) && widget.length > 0){
+                	widget = widget[0];
+                }
+                loadEvents();
+            }
+        };
+
+        function loadEvents() {
+            $scope.events = [];
+            for (var i = 0; i < keys.length; i++) {
+                var event = {};
+                event.key = keys[i];
+                event.title = titles[i];
+                event.code = widget.getModelProperty('event.' + event.key);
+                $scope.events.push(event);
+            }
+        }
+
+        function saveEvents() {
+            for (var i = 0; i < $scope.events.length; i++) {
+                var event = $scope.events[i];
+                if (event.code) {
+                    widget.setModelProperty('event.' + event.key, event.code);
+                } else {
+                    widget.setModelProperty('event.' + event.key, undefined);
+                }
+            }
+        }
+
+        /**
+         * Save events into the model
+         */
+        $scope.saveEvents = saveEvents;
+    }
+
+    return {
+        restrict : 'E',
+        replace : true,
+        templateUrl : 'views/directives/wb-event-panel.html',
+        scope : {},
+        link : postLink,
+        require : [ 'ngModel' ],
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function($scope, $resource){
+            this.editEvent = function(event) {
+                $resource.get('js', {
+                    data: event.code
+                })
+                .then(function(value){
+                    event.code = value;
+                    if(!value){
+                        delete event.code;
+                    }
+                    $scope.saveEvents();
+                });
+            };
+
+            this.deleteEvent = function(event) {
+                delete event.code;
+                $scope.saveEvents();
+            };
+        }
+    };
+});
+
 /* 
  * The MIT License (MIT)
  * 
@@ -5520,6 +5686,66 @@ angular.module('am-wb-core')
 		controllerAs: 'ctrl',
 		tags : [ 'data' ]
 	});
+	
+
+    $resource.newPage({
+        type : 'wb-js',
+        icon : 'script',
+        label : 'JS Script',
+        templateUrl : 'views/resources/wb-event-code-editor.html',
+        /*
+         * @ngInject
+         */
+        controller : function($scope) {
+            $scope.$watch('value', function(value) {
+                if (angular.isDefined(value)) {
+                    $scope.$parent.setValue(value);
+                } else {
+                    $scope.$parent.setValue('');
+                }
+            }, true);
+            
+            
+
+            // create element
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+
+            // set callback
+            if (script.readyState) {  // IE
+                script.onreadystatechange = function () {
+                    if (script.readyState === 'loaded' || script.readyState === 'complete') {
+                        script.onreadystatechange = null;
+                        $scope.$apply();
+                        callback();
+                    }
+                };
+            } else {  // Others
+                script.onload = function () {
+                    $scope.__youtube_script.__youtube_script_loaded = true;
+                    $scope.__youtube_script.__youtube_script_loading = false;
+                    callback();
+                    $scope.$apply();
+                };
+                script.onerror = function () {
+                    // TODO:
+                    $scope.__youtube_script.__youtube_script_loaded = false;
+                    $scope.__youtube_script.__youtube_script_loading = false;
+                    $scope.__youtube_script.__youtube_script_load_failed = true;
+                    callback();
+                    $scope.$apply();
+                };
+            }
+
+            // append
+            script.src = url;
+            document.getElementsByTagName('head')[0].appendChild(script);
+            
+            
+        },
+        controllerAs: 'ctrl',
+        tags : [ 'js' ]
+    });
 });
 
 /* 
@@ -7081,6 +7307,9 @@ angular.module('am-wb-core')
 	/**
 	 * Get a resource 
 	 * 
+	 * - option.data: current value of the date
+	 * - option.style: style of the dialog (title, descritpion, image, ..)
+	 * 
 	 * @param tags
 	 * @returns
 	 */
@@ -8502,6 +8731,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/directives/wb-event-panel.html',
+    "<div layout=column> <h3 translate>Events</h3> <table class=mb-table> <thead> <tr md-colors=\"{color: 'primary-700'}\"> <td translate>Name</td> <td translate>Code</td> <td></td> </tr> </thead> <tbody> <tr ng-repeat=\"event in events track by $index\"> <td>{{event.title}}</td> <td>{{event.code | limitTo:13 }} ...</td> <td> <md-button ng-if=event.code ng-click=\"ctrl.deleteEvent(event, $event)\" class=md-icon-button> <wb-icon>delete</wb-icon> </md-button> <md-button ng-click=\"ctrl.editEvent(event, $event)\" class=md-icon-button> <wb-icon>edit</wb-icon> </md-button> </td> </tr> </tbody> </table> </div>"
+  );
+
+
   $templateCache.put('views/directives/wb-group.html',
     "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"ctrl.addChild(index, item)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" md-theme-watch=true></div>"
   );
@@ -8634,6 +8868,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/partials/wb-widget-options.html',
     ""
+  );
+
+
+  $templateCache.put('views/resources/wb-event-code-editor.html',
+    "<div> <textarea rows=10 cols=10 ng-model=value></textarea> </div>"
   );
 
 

@@ -47,6 +47,9 @@ angular.module('am-wb-core')
         ngModelCtrl.$render = function () {
             if (ngModelCtrl.$viewValue) {
                 widget = ngModelCtrl.$viewValue;
+                if(angular.isArray(widget) && widget.length > 0){
+                	widget = widget[0];
+                }
                 loadEvents();
             }
         };
