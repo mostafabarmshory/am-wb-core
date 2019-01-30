@@ -1405,7 +1405,7 @@ WbAbstractWidget.prototype.loadStyle = function () {
 	if (!model) {
 		return;
 	}
-	var computedStyle = angular.merge({}, runtimeModel.style, model.style);
+	var computedStyle = angular.merge({}, model.style, runtimeModel.style);
 	if(angular.equals(computedStyle, this.computedStyle)){
 		return;
 	}
@@ -1424,16 +1424,29 @@ WbAbstractWidget.prototype.loadStyle = function () {
 };
 
 
-WbAbstractWidget.prototype.refresh = function() {
+WbAbstractWidget.prototype.refresh = function($event) {
 	if(this.isSilent()) {
 		return;
 	}
 	// to support old widget
 	var model = this.getModel();
 	this.getScope().wbModel = model;
+	
+	if($event){
+		var key = $event.key || 'x';
+		// update event
+		if(key.startsWith('event')){
+			this.eventFunctions = {};
+		} else if(key.startsWith('style')) {
+			this.loadStyle();
+			this.loadSeo();
+		}
+	} else {
+		this.eventFunctions = {};
+		this.loadStyle();
+		this.loadSeo();
+	}
 
-	this.loadStyle();
-	this.loadSeo();
 };
 
 /**
@@ -1536,7 +1549,7 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	}
 
 	// refresh the view
-	this.refresh();
+	this.refresh($event);
 };
 
 /**
@@ -5704,44 +5717,6 @@ angular.module('am-wb-core')
                     $scope.$parent.setValue('');
                 }
             }, true);
-            
-            
-
-            // create element
-            var script = document.createElement('script');
-            script.type = 'text/javascript';
-
-            // set callback
-            if (script.readyState) {  // IE
-                script.onreadystatechange = function () {
-                    if (script.readyState === 'loaded' || script.readyState === 'complete') {
-                        script.onreadystatechange = null;
-                        $scope.$apply();
-                        callback();
-                    }
-                };
-            } else {  // Others
-                script.onload = function () {
-                    $scope.__youtube_script.__youtube_script_loaded = true;
-                    $scope.__youtube_script.__youtube_script_loading = false;
-                    callback();
-                    $scope.$apply();
-                };
-                script.onerror = function () {
-                    // TODO:
-                    $scope.__youtube_script.__youtube_script_loaded = false;
-                    $scope.__youtube_script.__youtube_script_loading = false;
-                    $scope.__youtube_script.__youtube_script_load_failed = true;
-                    callback();
-                    $scope.$apply();
-                };
-            }
-
-            // append
-            script.src = url;
-            document.getElementsByTagName('head')[0].appendChild(script);
-            
-            
         },
         controllerAs: 'ctrl',
         tags : [ 'js' ]
@@ -8872,7 +8847,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/resources/wb-event-code-editor.html',
-    "<div> <textarea rows=10 cols=10 ng-model=value></textarea> </div>"
+    "<textarea rows=10 cols=10 ng-model=value></textarea>"
   );
 
 
