@@ -564,31 +564,33 @@ WbAbstractWidget.prototype.fireResizeLayout = function ($event) {
 /**
  * Gets direction of the widget
  * 
+ * This function get direction from user model and is equals to:
+ * 
+ * widget.getModelProperty('style.layout.direction');
+ * 
+ * NOTE: default layout direction is column.
+ * 
  * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
  */
 WbAbstractWidget.prototype.getDirection = function () {
-	var model = this.getModel();
-	if(!model){
-		return;
-	}
-	return model.style.layout.direction;
+    return this.getModelProperty('style.layout.direction') || 'column';
 };
 
 WbAbstractWidget.prototype.getEvent = function () {
-	return this.wbModel.event || {};
+	return this.getModelProperty('event') || {};
 };
 
 
 WbAbstractWidget.prototype.getTitle = function () {
-	return this.wbModel.label;
+    return this.getModelProperty('label');
 };
 
 WbAbstractWidget.prototype.getType = function () {
-	return this.wbModel.type;
+    return this.getModelProperty('type');
 };
 
 WbAbstractWidget.prototype.getId = function () {
-	return this.wbModel.id;
+    return this.getModelProperty('id');
 };
 
 /**
