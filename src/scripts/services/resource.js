@@ -209,6 +209,9 @@ angular.module('am-wb-core')
 	/**
 	 * Get a resource 
 	 * 
+	 * - option.data: current value of the date
+	 * - option.style: style of the dialog (title, descritpion, image, ..)
+	 * 
 	 * @param tags
 	 * @returns
 	 */

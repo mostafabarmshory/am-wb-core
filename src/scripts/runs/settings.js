@@ -724,7 +724,7 @@ angular.module('am-wb-core')
 			};
 			
 			this.remove = function (index) {
-				this.sahadows.splice(index, 1);
+				this.shadows.splice(index, 1);
 				this.updateShadows();
 			};
 

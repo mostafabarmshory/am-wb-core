@@ -15,7 +15,8 @@
             "event": {
                 "click": "alert('Wow!! Click event');",
                 "mouseover": "$widget.style({\"background\": {\"color\": \"red\"}});",
-                "mouseout": "$widget.style({\"background\": {\"color\": null}});"
+                "mouseout": "$widget.style({\"background\": {\"color\": null}});",
+                "resize": "if($media(\"gt-sm\")){$widget.style(\"background.color\", \"red\");}else{$widget.style(\"background.color\", \"blue\");}"
             }
         }
     ]

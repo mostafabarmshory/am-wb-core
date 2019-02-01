@@ -43,7 +43,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
     this.widgetLocator = widgetLocator;
     
     
-    $http.get('examples/html.json')
+    $http.get('examples/rwd.json')
     .then(function(res) {
         // NOTE: maso, 2018: clean data model
         $scope.model = $wbUtil.clean(res.data);
@@ -140,6 +140,41 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
             watch2();
         });
     }
+    
+    function openEvents(){
+        var watch, watch2;
+        var parent = $scope;
+        $wbFloat.show({
+            title: 'Events',
+            template:'<wb-event-panel ng-model="model"></wb-event-panel>',
+            parent: $scope,
+            controller: function($scope, $wbFloat){
+                watch = parent.$watch('editable', function(value){
+                    if(value === false) {
+                        $wbFloat.hide();
+                    }
+                });
+                watch2 = parent.$watch('selectedWidget', function(value){
+                    $scope.model = value;
+                });
+            },
+            // Extera options
+            headerControls: headerControls,
+            position: {
+                my: 'left-top',
+                at: 'left-top',
+                autoposition: 'down',
+                offsetX: -5,
+                offsetY: 5
+            }
+        })
+        .finally(function(){
+            watch();
+            watch2();
+        });
+    }
+
+    
 
     function openContent(){
         var watch, watch2;
@@ -179,6 +214,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
             openWidgets();
             openSettings();
             openContent();
+            openEvents();
             if(!widgetLocator.isEnable()){
                 widgetLocator.setEnable(true);
             }
