@@ -8861,7 +8861,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/resources/wb-event-code-editor.html',
-    "<textarea rows=10 cols=10 ng-model=value></textarea>"
+    "<textarea dir=ltr rows=10 cols=10 ng-model=value></textarea>"
   );
 
 
