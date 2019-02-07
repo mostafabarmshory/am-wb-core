@@ -1,13 +1,19 @@
-<div 
-    layout="column"
-    style="min-width: 200px;">
+<!-- <div  -->
+<!--     layout="column" -->
+<!--     style="min-width: 200px;"> -->
     <div 
         layout="row"
         layout-align="end center">
         <wb-icon ng-if="icon">{{icon}}</wb-icon>
-        <span flex ng-if="title" translate="">{{::title}}
-            <md-tooltip ng-if="description" md-delay="1500">{{::description}}</md-tooltip>
-        </span>
+        <md-tooltip 
+        	ng-if="description" 
+        	md-delay="1500">
+        	<span translate>{{::description}}</span>
+        </md-tooltip>
+        <span 
+        	flex 
+        	ng-if="title" 
+        	translate>{{::title}}</span>
         <md-input-container 
             ng-show="ctrl.isNumerical()"
             style="margin:0px; padding:0px; width:60px; height:30px;">
@@ -26,22 +32,22 @@
                 <md-option 
                     ng-repeat="type in ::types track by $index"
                     value="{{::type}}">
-                    {{::type}}
+                    <span translate>{{::type}}</span>
                 </md-option>
             </md-select>
         </md-input-container>
     </div>
     
-    <md-slider-container 
-        ng-disabled="!ctrl.isNumerical()"
-       	style="margin:0px; padding:0px; height:30px;"
-       	aria-label="Choosing vlaue with slider" 
-       	id="wb-ui-setting-length-slider">
-        <md-slider 
-            min="0" 
-            max="99" 
-            ng-model="internalValue"
-            ng-change="updateLength(internalUnit, internalValue)">
-        </md-slider>
-    </md-slider-container>
-</div>
+<!--     <md-slider-container  -->
+<!--         ng-disabled="!ctrl.isNumerical()" -->
+<!--        	style="margin:0px; padding:0px; height:30px;" -->
+<!--        	aria-label="Choosing vlaue with slider"  -->
+<!--        	id="wb-ui-setting-length-slider"> -->
+<!--         <md-slider  -->
+<!--             min="0"  -->
+<!--             max="99"  -->
+<!--             ng-model="internalValue" -->
+<!--             ng-change="updateLength(internalUnit, internalValue)"> -->
+<!--         </md-slider> -->
+<!--     </md-slider-container> -->
+<!-- </div> -->
