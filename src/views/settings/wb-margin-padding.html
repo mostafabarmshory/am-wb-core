@@ -1,107 +1,105 @@
 <!-- Margin and Padding setting -->
 
-<!--Margin-->
-<md-subheader 
-	class="md-hue-3">
-	<span translate>Margin</span>
-</md-subheader>
+<fieldset
+	layout="column">
+	<legend translate>Margin</legend>
 
-<!--All equal-->
-<wb-ui-setting-length
-    title="All"
-    icon="select_all"
-    description="Set all margins"
-    ng-model="ctrl.marginAll"
-    ng-change="ctrl.updateAllMargin(ctrl.marginAll)"
-    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
-</wb-ui-setting-length>
+	<!--All equal-->
+	<wb-ui-setting-length
+	    title="All"
+	    icon="select_all"
+	    description="Set all margins"
+	    ng-model="ctrl.marginAll"
+	    ng-change="ctrl.updateAllMargin(ctrl.marginAll)"
+	    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
+	</wb-ui-setting-length>
+	<md-divider></md-divider>
+	<!--top left-->
+	<wb-ui-setting-length
+	    title="Top"
+	    icon="border_top"
+	    ng-model="ctrl.margin.top"
+	    ng-change="ctrl.updateMargin(ctrl.margin)"
+	    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
+	</wb-ui-setting-length>
+	
+	<!--top right-->
+	<wb-ui-setting-length
+	    title="Right"
+	    icon="border_right"
+	    ng-model="ctrl.margin.right"
+	    ng-change="ctrl.updateMargin(ctrl.margin)"
+	    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
+	</wb-ui-setting-length>
+	
+	<!--bottom right-->
+	<wb-ui-setting-length
+	    title="Bottom"
+	    icon="border_bottom"
+	    ng-model="ctrl.margin.bottom"
+	    ng-change="ctrl.updateMargin(ctrl.margin)"
+	    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
+	</wb-ui-setting-length>
+	
+	<!--bottom left-->
+	<wb-ui-setting-length
+	    title="Left"
+	    icon="border_left"
+	    ng-model="ctrl.margin.left"
+	    ng-change="ctrl.updateMargin(ctrl.margin)"
+	    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
+	</wb-ui-setting-length>
+</fieldset>
 
-<!--top left-->
-<wb-ui-setting-length
-    title="Top"
-    icon="border_top"
-    ng-model="ctrl.margin.top"
-    ng-change="ctrl.updateMargin(ctrl.margin)"
-    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
-</wb-ui-setting-length>
 
-<!--top right-->
-<wb-ui-setting-length
-    title="Right"
-    icon="border_right"
-    ng-model="ctrl.margin.right"
-    ng-change="ctrl.updateMargin(ctrl.margin)"
-    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
-</wb-ui-setting-length>
-
-<!--bottom right-->
-<wb-ui-setting-length
-    title="Bottom"
-    icon="border_bottom"
-    ng-model="ctrl.margin.bottom"
-    ng-change="ctrl.updateMargin(ctrl.margin)"
-    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
-</wb-ui-setting-length>
-
-<!--bottom left-->
-<wb-ui-setting-length
-    title="Left"
-    icon="border_left"
-    ng-model="ctrl.margin.left"
-    ng-change="ctrl.updateMargin(ctrl.margin)"
-    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
-</wb-ui-setting-length>
-
-
-<!--Padding section-->
-<md-subheader 
-	class="md-hue-3">
-	<span translate>Padding</span>
-</md-subheader>
-
-<!--All equal-->
-<wb-ui-setting-length
-    title="All"
-    icon="select_all"
-    description="Set all paddings"
-    ng-model="ctrl.paddingAll"
-    ng-change="ctrl.updateAllPadding(ctrl.paddingAll)"
-    extra-values = "['inherit']">
-</wb-ui-setting-length>
-
-<!--top left-->
-<wb-ui-setting-length
-    title="Top"
-    icon="border_top"
-    ng-model="ctrl.padding.top"
-    ng-change="ctrl.updatePadding(ctrl.padding)"
-    extra-values = "['inherit']">
-</wb-ui-setting-length>
-
-<!--top right-->
-<wb-ui-setting-length
-    title="Right"
-    icon="border_right"
-    ng-model="ctrl.padding.right"
-    ng-change="ctrl.updatePadding(ctrl.padding)"
-    extra-values = "['inherit']">
-</wb-ui-setting-length>
-
-<!--bottom right-->
-<wb-ui-setting-length
-    title="Bottom"
-    icon="border_bottom"
-    ng-model="ctrl.padding.bottom"
-    ng-change="ctrl.updatePadding(ctrl.padding)"
-    extra-values = "['inherit']">
-</wb-ui-setting-length>
-
-<!--bottom left-->
-<wb-ui-setting-length
-    title="Left"
-    icon="border_left"
-    ng-model="ctrl.padding.left"
-    ng-change="ctrl.updatePadding(ctrl.padding)"
-    extra-values = "['inherit']">
-</wb-ui-setting-length>
+<fieldset
+	layout="column">
+	<legend translate>Padding</legend>
+	
+	<!--All equal-->
+	<wb-ui-setting-length
+	    title="All"
+	    icon="select_all"
+	    description="Set all paddings"
+	    ng-model="ctrl.paddingAll"
+	    ng-change="ctrl.updateAllPadding(ctrl.paddingAll)"
+	    extra-values = "['inherit']">
+	</wb-ui-setting-length>
+	
+	<!--top left-->
+	<wb-ui-setting-length
+	    title="Top"
+	    icon="border_top"
+	    ng-model="ctrl.padding.top"
+	    ng-change="ctrl.updatePadding(ctrl.padding)"
+	    extra-values = "['inherit']">
+	</wb-ui-setting-length>
+	
+	<!--top right-->
+	<wb-ui-setting-length
+	    title="Right"
+	    icon="border_right"
+	    ng-model="ctrl.padding.right"
+	    ng-change="ctrl.updatePadding(ctrl.padding)"
+	    extra-values = "['inherit']">
+	</wb-ui-setting-length>
+	
+	<!--bottom right-->
+	<wb-ui-setting-length
+	    title="Bottom"
+	    icon="border_bottom"
+	    ng-model="ctrl.padding.bottom"
+	    ng-change="ctrl.updatePadding(ctrl.padding)"
+	    extra-values = "['inherit']">
+	</wb-ui-setting-length>
+	
+	<!--bottom left-->
+	<wb-ui-setting-length
+	    title="Left"
+	    icon="border_left"
+	    ng-model="ctrl.padding.left"
+	    ng-change="ctrl.updatePadding(ctrl.padding)"
+	    extra-values = "['inherit']">
+	</wb-ui-setting-length>
+</fieldset>
 
