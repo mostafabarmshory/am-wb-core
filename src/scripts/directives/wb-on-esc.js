@@ -37,7 +37,7 @@ angular.module('am-wb-core')
     return function(scope, elm, attr) {
         elm.bind('keydown', function(e) {
             if (e.keyCode === 27) {
-                scope.$apply(attr.onEsc);
+                scope.$apply(attr.wbOnEsc);
             }
         });
     };
