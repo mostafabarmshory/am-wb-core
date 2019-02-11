@@ -17,6 +17,9 @@
                 "background": {
                 	"color": "red"
                 }
+            },
+            "event": {
+                "click": "$widget.setProperty(\"style.visibility\", \"hidden\");"
             }
         },{
             "type": "HtmlText",

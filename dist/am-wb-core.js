@@ -2770,10 +2770,8 @@ angular.module('am-wb-core')
 	};
 });
 
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -2799,48 +2797,171 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wb-infinate-scroll
- * @description wbInfinateScroll
+ * @name wb-on-enter
+ * @description Call an action on ENTER
  * 
- * This is deprecated please use mb-infinate-scroll
+ * ```
+ * <input
+ *  wb-on-enter="toast('ESC')">
+ * ```
  */
-.directive('wbInfinateScroll', function($q, $timeout) {
+.directive('wbOnEnter', function() {
+    return function(scope, elm, attr) {
+        elm.bind('keypress', function(e) {
+            if (e.keyCode === 13) {
+                scope.$apply(attr.wbOnEnter);
+            }
+        });
+    };
+});
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
 
-	function postLink(scope, elem) {
-		var raw = elem[0];
+angular.module('am-wb-core')
 
-		function loadNextPage() {
-			var value = scope.loadPage();
-			return $q.when(value)//
-			.then(checkScroll);
-		}
-
-		function checkScroll(value) {
-			if(value){
-				return $timeout(function(){
-					if(raw.scrollHeight <= raw.offsetHeight){
-						return loadNextPage();
-					}
-				}, 100);
-			}
-		}
-
-		function scrollChange() {
-			if (raw.scrollTop + raw.offsetHeight + 5 >= raw.scrollHeight) {
-				loadNextPage();
-			}
-		}
-
-		elem.on('scroll', scrollChange);
-		loadNextPage();
-	}
-
+/**
+ * @ngdoc Directives
+ * @name wb-on-error
+ * @description Call an action on error
+ * 
+ * This directive is used to run an action on error of an element
+ * 
+ * ```
+ * <img
+ * 	wb-on-error="toast('image is not loaded')"
+ * 	href="image/path">
+ * ```
+ */
+.directive('wbOnError', function() {
 	return {
 		restrict : 'A',
-		scope : {
-			loadPage : '=wbInfinateScroll'
-		},
-		link : postLink
+		link : function(scope, element, attrs) {
+			element.bind('error', function() {
+				// call the function that was passed
+				if (attrs.wbOnError) {
+					scope.$apply(attrs.wbOnError);
+				}
+			});
+		}
+	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wb-on-esc
+ * @description Call an action on ESC
+ * 
+ * ```
+ * <input
+ *  wb-on-esc="toast('ESC')">
+ * ```
+ */
+.directive('wbOnEsc', function() {
+    return function(scope, elm, attr) {
+        elm.bind('keydown', function(e) {
+            if (e.keyCode === 27) {
+                scope.$apply(attr.wbOnEsc);
+            }
+        });
+    };
+});
+
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wb-on-load
+ * @description Call an action on load
+ * 
+ * This directive is used to run an action on load of an element. For exmaple
+ * use to show alert on load of image:
+ * 
+ * ```
+ * <img
+ * 	wb-on-load="toast('image is loaded')"
+ * 	href="image/path">
+ * ```
+ */
+.directive('wbOnLoad', function() {
+	return {
+		restrict : 'A',
+		link : function(scope, element, attrs) {
+			element.bind('load', function() {
+				// call the function that was passed
+				if (attrs.wbOnLoad) {
+					scope.$apply(attrs.wbOnLoad);
+				}
+			});
+		}
 	};
 });
 
@@ -5880,7 +6001,7 @@ angular.module('am-wb-core')
 		type: 'general',
 		label: 'General',
 		icon: 'opacity',
-		templateUrl: 'views/settings/wb-color-cursor-opacity.html',
+		templateUrl: 'views/settings/wb-general.html',
 		controllerAs: 'ctrl',
 		/*
 		 * @ngInject
@@ -5923,8 +6044,11 @@ angular.module('am-wb-core')
 			
 			this.init = function(){
 			    this.direction = this.getStyle('direction') || 'ltr';
-				this.color = this.getStyle('color');
+			    this.color = this.getStyle('color');
+
 				this.cursor = this.getStyle('cursor');
+
+				this.visibility = this.getStyle('visibility') || 'visible';
 				this.opacity = this.getStyle('opacity');
 			};
 		}
@@ -7584,525 +7708,529 @@ angular.module('am-wb-core').service('$wbUi', function($mdDialog, $q, $http) {
  * Utility class of WB
  */
 angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, $sce) {
-    'use strict';
-    var service = this;
+	'use strict';
+	var service = this;
 
-    function cleanMap(oldStyle, newStyle, map) {
-        for (var i = 0; i < map.length; i++) {
-            if (oldStyle[map[i][0]]) {
-                newStyle[map[i][1]] = oldStyle[map[i][0]];
-                delete oldStyle[map[i][0]];
-            }
-        }
-    }
+	function cleanMap(oldStyle, newStyle, map) {
+		for (var i = 0; i < map.length; i++) {
+			if (oldStyle[map[i][0]]) {
+				newStyle[map[i][1]] = oldStyle[map[i][0]];
+				delete oldStyle[map[i][0]];
+			}
+		}
+	}
 
-    function getTemplateOf(page)
-    {
-        var template;
-        var templateUrl;
-        if (angular.isDefined(template = page.template)) {
-            if (angular.isFunction(template)) {
-                template = template(page.params);
-            }
-        } else if (angular
-                .isDefined(templateUrl = page.templateUrl)) {
-            if (angular.isFunction(templateUrl)) {
-                templateUrl = templateUrl(page.params);
-            }
-            if (angular.isDefined(templateUrl)) {
-                page.loadedTemplateUrl = $sce.valueOf(templateUrl);
-                template = $templateRequest(templateUrl);
-            }
-        }
-        return template;
-    }
+	function getTemplateOf(page)
+	{
+		var template;
+		var templateUrl;
+		if (angular.isDefined(template = page.template)) {
+			if (angular.isFunction(template)) {
+				template = template(page.params);
+			}
+		} else if (angular
+				.isDefined(templateUrl = page.templateUrl)) {
+			if (angular.isFunction(templateUrl)) {
+				templateUrl = templateUrl(page.params);
+			}
+			if (angular.isDefined(templateUrl)) {
+				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+				template = $templateRequest(templateUrl);
+			}
+		}
+		return template;
+	}
 
-    /**
-     * Loading template of the page
-     * 
-     * @name getTemplateFor
-     * @memberof $wbUtil
-     * @param page
-     *            {object} properties of a page, widget , ..
-     * @return promise to load template on resolve.
-     */
-    function getTemplateFor(page)
-    {
-        return $q.when(getTemplateOf(page));
-    }
+	/**
+	 * Loading template of the page
+	 * 
+	 * @name getTemplateFor
+	 * @memberof $wbUtil
+	 * @param page
+	 *            {object} properties of a page, widget , ..
+	 * @return promise to load template on resolve.
+	 */
+	function getTemplateFor(page)
+	{
+		return $q.when(getTemplateOf(page));
+	}
 
-    /**
-     * Converts data into a valid CSS attributes
-     */
-    function convertToWidgetCss(style) {
-        var style = style || {};
-        var css = {};
-        // size
-        css = _.merge(css, style.size || {});
+	/**
+	 * Converts data into a valid CSS attributes
+	 */
+	function convertToWidgetCss(style) {
+		var style = style || {};
+		var css = {};
+		// size
+		css = _.merge(css, style.size || {});
 
-        // layout
-        css = _.merge(css, convertToWidgetCssLayout(style.layout || {}));
+		// layout
+		if(style.visibility === 'hidden'){
+			css.display = 'none';
+		} else {
+			css = _.merge(css, convertToWidgetCssLayout(style.layout || {}));
+		}
 
-        // background
-        css = _.merge(css, convertToWidgetCssBackground(style.background || {}));
+		// background
+		css = _.merge(css, convertToWidgetCssBackground(style.background || {}));
 
-        // border
-        css = _.merge(css, convertToWidgetCssBoarder(style.border || {}));
+		// border
+		css = _.merge(css, convertToWidgetCssBoarder(style.border || {}));
 
-        // shadows
-        css = _.merge(css, convertToWidgetCssShadows(style.shadows || {}));
-        
-        // color, cursor, opacity, direction
-        css = _.merge(css, {
-            padding: style.padding,
-            margin: style.margin,
-            direction: style.direction || 'ltr',
-            color: style.color || 'initial',
-            cursor: style.cursor || 'auto',
-            opacity: style.opacity || '1'
-        });
-        
-        return css;
-    }
+		// shadows
+		css = _.merge(css, convertToWidgetCssShadows(style.shadows || {}));
 
-    function createShadowStr(shadow) {
-        var hShift = shadow.hShift || '0px';
-        var vShift = shadow.vShift || '0px';
-        var blur = shadow.blur || '0px';
-        var spread = shadow.spread || '0px';
-        var color = shadow.color || 'black';
-        
-        var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
-        
-        if(shadow.inset) {
-            boxShadow = boxShadow.concat(' ' + 'inset');
-        }
-        
-        return boxShadow;
-    }
+		// color, cursor, opacity, direction
+		css = _.merge(css, {
+			padding: style.padding,
+			margin: style.margin,
+			direction: style.direction || 'ltr',
+			color: style.color || 'initial',
+			cursor: style.cursor || 'auto',
+			opacity: style.opacity || '1',
+		});
 
-    function convertToWidgetCssShadows(shadows) {
-        var shadowStr = '';
+		return css;
+	}
 
-        if (!angular.isArray(shadows) || shadows.length === 0) {
-            shadowStr = 'none';
-        } else {
-            angular.forEach(shadows, function (shadow, index) {
-                shadowStr += createShadowStr(shadow);
-                if(index + 1 < shadows.length){
-                    shadowStr += ', ';
-                }
-            });
-        }
+	function createShadowStr(shadow) {
+		var hShift = shadow.hShift || '0px';
+		var vShift = shadow.vShift || '0px';
+		var blur = shadow.blur || '0px';
+		var spread = shadow.spread || '0px';
+		var color = shadow.color || 'black';
 
-        return {
-            'box-shadow': shadowStr
-        };
-    }
-    
-    function convertToWidgetCssBoarder(style) {
-        var conf = {};
-        if (style.style) {
-            conf['border-style'] = style.style;
-        }
-        if (style.width) {
-            conf['border-width'] = style.width;
-        }
-        if (style.color) {
-            conf['border-color'] = style.color;
-        }
-        if (style.radius) {
-            conf['border-radius'] = style.radius;
-        }
-        
-        return conf;
-    }
+		var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
 
-    function convertToWidgetCssBackground(style){
-        var cssValue = {};
-        if(style.background){
-            cssValue.background = style.background;
-        }
-        cssValue['background-image'] = (style.image) ? 'url(\''+style.image+'\')' : 'none';
-        cssValue['background-color'] = style.color || 'initial';
-        cssValue['background-size'] = style.size || 'auto';
-        cssValue['background-repeat'] = style.repeat || 'repeat';
-        cssValue['background-position'] = style.position || '0px 0px';
-        cssValue['background-attachment'] = style.attachment || 'scroll';
-        cssValue['background-origin'] = style.origin || 'padding-box';
-        cssValue['background-clip'] = style.clip || 'border-box';
+		if(shadow.inset) {
+			boxShadow = boxShadow.concat(' ' + 'inset');
+		}
 
-        return cssValue;
-    }
+		return boxShadow;
+	}
 
-    /**
-     * Converts data into a layout CSS3
-     */
-    function convertToWidgetCssLayout(layout){
-        var flexLayout = {};
-        /*
-         * Group
-         * 
-         * check if is group apply flex flow
-         */
-        {
-            flexLayout.display = 'flex';
-            // row
-            if (layout.direction === 'row') {
-                flexLayout['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
-                flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
-                flexLayout['overflow-y'] = 'visible';
-            } else {
-                flexLayout['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
-                flexLayout['overflow-x'] = 'visible';
-                flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
-            }
+	function convertToWidgetCssShadows(shadows) {
+		var shadowStr = '';
 
+		if (!angular.isArray(shadows) || shadows.length === 0) {
+			shadowStr = 'none';
+		} else {
+			angular.forEach(shadows, function (shadow, index) {
+				shadowStr += createShadowStr(shadow);
+				if(index + 1 < shadows.length){
+					shadowStr += ', ';
+				}
+			});
+		}
 
-            // wrap
-            if (layout.wrap) {
-                flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
-                // wrap align
-                var alignContent;
-                switch (layout.wrap_align) {
-                case 'start':
-                    alignContent = 'flex-start';
-                    break;
-                case 'end':
-                    alignContent = 'flex-end';
-                    break;
-                case 'center':
-                    alignContent = 'center';
-                    break;
-                case 'space-between':
-                    alignContent = 'space-between';
-                    break;
-                case 'space-around':
-                    alignContent = 'space-around';
-                    break;
-                case 'stretch':
-                    alignContent = 'stretch';
-                    break;
-                default:
-                    alignContent = 'stretch';
-                }
-                flexLayout['align-content'] = alignContent;
-            } else {
-                flexLayout['flex-wrap'] = 'nowrap';
-            }
+		return {
+			'box-shadow': shadowStr
+		};
+	}
+
+	function convertToWidgetCssBoarder(style) {
+		var conf = {};
+		if (style.style) {
+			conf['border-style'] = style.style;
+		}
+		if (style.width) {
+			conf['border-width'] = style.width;
+		}
+		if (style.color) {
+			conf['border-color'] = style.color;
+		}
+		if (style.radius) {
+			conf['border-radius'] = style.radius;
+		}
+
+		return conf;
+	}
+
+	function convertToWidgetCssBackground(style){
+		var cssValue = {};
+		if(style.background){
+			cssValue.background = style.background;
+		}
+		cssValue['background-image'] = (style.image) ? 'url(\''+style.image+'\')' : 'none';
+		cssValue['background-color'] = style.color || 'initial';
+		cssValue['background-size'] = style.size || 'auto';
+		cssValue['background-repeat'] = style.repeat || 'repeat';
+		cssValue['background-position'] = style.position || '0px 0px';
+		cssValue['background-attachment'] = style.attachment || 'scroll';
+		cssValue['background-origin'] = style.origin || 'padding-box';
+		cssValue['background-clip'] = style.clip || 'border-box';
+
+		return cssValue;
+	}
+
+	/**
+	 * Converts data into a layout CSS3
+	 */
+	function convertToWidgetCssLayout(layout){
+		var flexLayout = {};
+		/*
+		 * Group
+		 * 
+		 * check if is group apply flex flow
+		 */
+		{
+			flexLayout.display = 'flex';
+			// row
+			if (layout.direction === 'row') {
+				flexLayout['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
+				flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
+				flexLayout['overflow-y'] = 'visible';
+			} else {
+				flexLayout['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
+				flexLayout['overflow-x'] = 'visible';
+				flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+			}
 
 
-            // justify
-            var justify;
-            switch (layout.justify) {
-            case 'start':
-                justify = 'flex-start';
-                break;
-            case 'end':
-                justify = 'flex-end';
-                break;
-            case 'center':
-                justify = 'center';
-                break;
-            case 'space-between':
-                justify = 'space-between';
-                break;
-            case 'space-around':
-                justify = 'space-around';
-                break;
-            case 'space-evenly':
-                justify = 'space-evenly';
-                break;
-            default:
-                justify = 'flex-start';
-            }
-            flexLayout['justify-content'] = justify;
+			// wrap
+			if (layout.wrap) {
+				flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
+				// wrap align
+				var alignContent;
+				switch (layout.wrap_align) {
+				case 'start':
+					alignContent = 'flex-start';
+					break;
+				case 'end':
+					alignContent = 'flex-end';
+					break;
+				case 'center':
+					alignContent = 'center';
+					break;
+				case 'space-between':
+					alignContent = 'space-between';
+					break;
+				case 'space-around':
+					alignContent = 'space-around';
+					break;
+				case 'stretch':
+					alignContent = 'stretch';
+					break;
+				default:
+					alignContent = 'stretch';
+				}
+				flexLayout['align-content'] = alignContent;
+			} else {
+				flexLayout['flex-wrap'] = 'nowrap';
+			}
 
-            // align
-            var align;
-            switch (layout.align) {
-            case 'start':
-                align = 'flex-start';
-                break;
-            case 'end':
-                align = 'flex-end';
-                break;
-            case 'center':
-                align = 'center';
-                break;
-            case 'baseline':
-                align = 'baseline';
-                break;
-            case 'stretch':
-                align = 'stretch';
-                break;
-            default:
-                align = 'stretch';
-            }
-            flexLayout['align-items'] = align;
-        }
 
-        /*
-         * Widget
-         */
-        {
-            flexLayout.order = layout.order >= 0 ? layout.order : 0;
-            flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
-            flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
-            // TODO: maso, 2018: compute based on size
-            flexLayout['flex-basis'] = 'auto';
+			// justify
+			var justify;
+			switch (layout.justify) {
+			case 'start':
+				justify = 'flex-start';
+				break;
+			case 'end':
+				justify = 'flex-end';
+				break;
+			case 'center':
+				justify = 'center';
+				break;
+			case 'space-between':
+				justify = 'space-between';
+				break;
+			case 'space-around':
+				justify = 'space-around';
+				break;
+			case 'space-evenly':
+				justify = 'space-evenly';
+				break;
+			default:
+				justify = 'flex-start';
+			}
+			flexLayout['justify-content'] = justify;
 
-            // align-self
-            // auto | flex-start | flex-end | center | baseline | stretch;
-            var alignSelf;
-            switch (layout.align_self) {
-            case 'start':
-                alignSelf = 'flex-start';
-                break;
-            case 'end':
-                alignSelf = 'flex-end';
-                break;
-            case 'center':
-                alignSelf = 'center';
-                break;
-            case 'baseline':
-                alignSelf = 'baseline';
-                break;
-            case 'stretch':
-                alignSelf = 'stretch';
-                break;
-            default:
-                alignSelf = 'auto';
-            }
-            flexLayout['align-self'] = alignSelf;
-        }
+			// align
+			var align;
+			switch (layout.align) {
+			case 'start':
+				align = 'flex-start';
+				break;
+			case 'end':
+				align = 'flex-end';
+				break;
+			case 'center':
+				align = 'center';
+				break;
+			case 'baseline':
+				align = 'baseline';
+				break;
+			case 'stretch':
+				align = 'stretch';
+				break;
+			default:
+				align = 'stretch';
+			}
+			flexLayout['align-items'] = align;
+		}
 
-        return flexLayout;
-    }
+		/*
+		 * Widget
+		 */
+		{
+			flexLayout.order = layout.order >= 0 ? layout.order : 0;
+			flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
+			flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
+			// TODO: maso, 2018: compute based on size
+			flexLayout['flex-basis'] = 'auto';
 
-    function cleanEvetns(model)
-    {
-        // event
-        if (!model.event) {
-            model.event = {};
-        }
-    }
+			// align-self
+			// auto | flex-start | flex-end | center | baseline | stretch;
+			var alignSelf;
+			switch (layout.align_self) {
+			case 'start':
+				alignSelf = 'flex-start';
+				break;
+			case 'end':
+				alignSelf = 'flex-end';
+				break;
+			case 'center':
+				alignSelf = 'center';
+				break;
+			case 'baseline':
+				alignSelf = 'baseline';
+				break;
+			case 'stretch':
+				alignSelf = 'stretch';
+				break;
+			default:
+				alignSelf = 'auto';
+			}
+			flexLayout['align-self'] = alignSelf;
+		}
 
-    function cleanLayout(model)
-    {
-        if (!model.style.layout) {
-            model.style.layout = {};
-        }
-        if (model.type === 'Group' || model.type === 'Page') {
-            // convert
-            var newStyle = model.style.layout;
-            var oldStyle = model.style;
+		return flexLayout;
+	}
 
-            if (oldStyle.flexDirection) {
-                if (oldStyle.flexDirection === 'wb-flex-row') {
-                    newStyle.direction = 'row';
-                } else {
-                    newStyle.direction = 'column';
-                }
-                delete oldStyle.flexDirection;
-            }
-            if (!newStyle.direction) {
-                newStyle.direction = 'column';
-            }
+	function cleanEvetns(model)
+	{
+		// event
+		if (!model.event) {
+			model.event = {};
+		}
+	}
 
-            switch (oldStyle.flexAlignItem) {
-            case 'wb-flex-align-items-center':
-                newStyle.align = 'center';
-                break;
-            case 'wb-flex-align-items-end':
-                newStyle.align = 'end';
-                break;
-            case 'wb-flex-align-items-start':
-                newStyle.align = 'start';
-                break;
-            case 'wb-flex-align-items-stretch':
-                newStyle.align = 'stretch';
-                break;
-            default:
-                newStyle.align = 'stretch';
-            }
-            delete oldStyle.flexAlignItem;
+	function cleanLayout(model)
+	{
+		if (!model.style.layout) {
+			model.style.layout = {};
+		}
+		if (model.type === 'Group' || model.type === 'Page') {
+			// convert
+			var newStyle = model.style.layout;
+			var oldStyle = model.style;
 
-            switch (oldStyle.justifyContent) {
-            case 'wb-flex-justify-content-center':
-                newStyle.justify = 'center';
-                break;
-            case 'wb-flex-justify-content-end':
-                newStyle.justify = 'end';
-                break;
-            case 'wb-flex-justify-content-start':
-                newStyle.justify = 'start';
-                break;
-            case 'wb-flex-justify-content-space-between':
-                newStyle.justify = 'space-between';
-                break;
-            case 'wb-flex-justify-content-space-around':
-                newStyle.justify = 'space-around';
-                break;
-            default:
-                newStyle.justify = 'center';
-            }
-            delete oldStyle.justifyContent;
-        }
-    }
+			if (oldStyle.flexDirection) {
+				if (oldStyle.flexDirection === 'wb-flex-row') {
+					newStyle.direction = 'row';
+				} else {
+					newStyle.direction = 'column';
+				}
+				delete oldStyle.flexDirection;
+			}
+			if (!newStyle.direction) {
+				newStyle.direction = 'column';
+			}
 
-    function cleanSize(model)
-    {
-        if (!model.style.size) {
-            model.style.size = {};
-        }
-        var newStyle = model.style.size;
-        var oldStyle = model.style;
-        var map = [['width', 'width'],
-            ['height', 'height']];
-        cleanMap(oldStyle, newStyle, map);
-    }
+			switch (oldStyle.flexAlignItem) {
+			case 'wb-flex-align-items-center':
+				newStyle.align = 'center';
+				break;
+			case 'wb-flex-align-items-end':
+				newStyle.align = 'end';
+				break;
+			case 'wb-flex-align-items-start':
+				newStyle.align = 'start';
+				break;
+			case 'wb-flex-align-items-stretch':
+				newStyle.align = 'stretch';
+				break;
+			default:
+				newStyle.align = 'stretch';
+			}
+			delete oldStyle.flexAlignItem;
 
-    function cleanBackground(model)
-    {
-        if (!model.style.background) {
-            model.style.background = {};
-        }
-        var newStyle = model.style.background;
-        var oldStyle = model.style;
-        var map = [['backgroundImage', 'image'],
-            ['backgroundColor', 'color'],
-            ['backgroundSize', 'size'],
-            ['backgroundRepeat', 'repeat'],
-            ['backgroundPosition', 'position']];
-        cleanMap(oldStyle, newStyle, map);
-    }
+			switch (oldStyle.justifyContent) {
+			case 'wb-flex-justify-content-center':
+				newStyle.justify = 'center';
+				break;
+			case 'wb-flex-justify-content-end':
+				newStyle.justify = 'end';
+				break;
+			case 'wb-flex-justify-content-start':
+				newStyle.justify = 'start';
+				break;
+			case 'wb-flex-justify-content-space-between':
+				newStyle.justify = 'space-between';
+				break;
+			case 'wb-flex-justify-content-space-around':
+				newStyle.justify = 'space-around';
+				break;
+			default:
+				newStyle.justify = 'center';
+			}
+			delete oldStyle.justifyContent;
+		}
+	}
 
-    function cleanBorder(model)
-    {
-        if (!model.style.border) {
-            model.style.border = {};
-        }
-        var oldStyle = model.style;
-        var newStyle = model.style.border;
+	function cleanSize(model)
+	{
+		if (!model.style.size) {
+			model.style.size = {};
+		}
+		var newStyle = model.style.size;
+		var oldStyle = model.style;
+		var map = [['width', 'width'],
+			['height', 'height']];
+		cleanMap(oldStyle, newStyle, map);
+	}
 
-        if (oldStyle.borderRadius) {
-            if (oldStyle.borderRadius.uniform) {
-                newStyle.radius = oldStyle.borderRadius.all + 'px';
-            }
-            // TODO: maso, 2018: support other models
-        }
-        // delete old values
-        delete model.style.borderColor;
-        delete model.style.borderRadius;
-        delete model.style.borderStyleColorWidth;
-        delete model.style.borderStyle;
-        delete model.style.borderWidth;
-    }
+	function cleanBackground(model)
+	{
+		if (!model.style.background) {
+			model.style.background = {};
+		}
+		var newStyle = model.style.background;
+		var oldStyle = model.style;
+		var map = [['backgroundImage', 'image'],
+			['backgroundColor', 'color'],
+			['backgroundSize', 'size'],
+			['backgroundRepeat', 'repeat'],
+			['backgroundPosition', 'position']];
+		cleanMap(oldStyle, newStyle, map);
+	}
 
-    function cleanSpace(model)
-    {
-        // Margin and padding
-        if (model.style.padding && angular.isObject(model.style.padding)) {
-            var padding = '';
-            if (model.style.padding.isUniform) {
-                padding = model.style.padding.uniform;
-            } else {
-                padding = model.style.padding.top || '0px' + ' ' +
-                model.style.padding.right || '0px' + ' ' +
-                model.style.padding.bottom || '0px' + ' ' +
-                model.style.padding.left || '0px' + ' ';
-            }
-            model.style.padding = padding;
-        }
+	function cleanBorder(model)
+	{
+		if (!model.style.border) {
+			model.style.border = {};
+		}
+		var oldStyle = model.style;
+		var newStyle = model.style.border;
 
-        if (model.style.margin && angular.isObject(model.style.margin)) {
-            var margin = '';
-            if (model.style.margin.isUniform) {
-                margin = model.style.margin.uniform;
-            } else {
-                margin = model.style.margin.top || '0px' + ' ' +
-                model.style.margin.right || '0px' + ' ' +
-                model.style.margin.bottom || '0px' + ' ' +
-                model.style.margin.left || '0px' + ' ';
-            }
-            model.style.margin = margin;
-        }
+		if (oldStyle.borderRadius) {
+			if (oldStyle.borderRadius.uniform) {
+				newStyle.radius = oldStyle.borderRadius.all + 'px';
+			}
+			// TODO: maso, 2018: support other models
+		}
+		// delete old values
+		delete model.style.borderColor;
+		delete model.style.borderRadius;
+		delete model.style.borderStyleColorWidth;
+		delete model.style.borderStyle;
+		delete model.style.borderWidth;
+	}
 
-    }
+	function cleanSpace(model)
+	{
+		// Margin and padding
+		if (model.style.padding && angular.isObject(model.style.padding)) {
+			var padding = '';
+			if (model.style.padding.isUniform) {
+				padding = model.style.padding.uniform;
+			} else {
+				padding = model.style.padding.top || '0px' + ' ' +
+				model.style.padding.right || '0px' + ' ' +
+				model.style.padding.bottom || '0px' + ' ' +
+				model.style.padding.left || '0px' + ' ';
+			}
+			model.style.padding = padding;
+		}
 
-    function cleanAlign(model)
-    {
-        if (!model.style.align) {
-            model.style.align = {};
-        }
-    }
+		if (model.style.margin && angular.isObject(model.style.margin)) {
+			var margin = '';
+			if (model.style.margin.isUniform) {
+				margin = model.style.margin.uniform;
+			} else {
+				margin = model.style.margin.top || '0px' + ' ' +
+				model.style.margin.right || '0px' + ' ' +
+				model.style.margin.bottom || '0px' + ' ' +
+				model.style.margin.left || '0px' + ' ';
+			}
+			model.style.margin = margin;
+		}
 
-    function cleanStyle(model)
-    {
-        if (!model.style) {
-            model.style = {};
-        }
-        cleanLayout(model);
-        cleanSize(model);
-        cleanBackground(model);
-        cleanBorder(model);
-        cleanSpace(model);
-        cleanAlign(model);
-    }
+	}
 
-    function cleanInternal(model)
-    {
-        cleanEvetns(model);
-        cleanStyle(model);
-        if (model.type === 'Group' || model.type === 'Page') {
-            if (!model.contents) {
-                model.contents = [];
-            }
-            if (model.contents.length) {
-                for (var i = 0; i < model.contents.length; i++) {
-                    cleanInternal(model.contents[i]);
-                }
-            }
-        }
-        return model;
-    }
+	function cleanAlign(model)
+	{
+		if (!model.style.align) {
+			model.style.align = {};
+		}
+	}
 
-    /**
-     * Clean data model
-     * @name clean 
-     * @param {object} model 
-     * @param {type} force
-     */
-    function clean(model, force)
-    {
-        if (!model.type || model.type === 'Page') {
-            model.type = 'Group';
-        }
-        if (model.version === 'wb1' && !force) {
-            return model;
-        }
-        var newModel = cleanInternal(model);
-        newModel.version = 'wb1';
-        return newModel;
-    }
+	function cleanStyle(model)
+	{
+		if (!model.style) {
+			model.style = {};
+		}
+		cleanLayout(model);
+		cleanSize(model);
+		cleanBackground(model);
+		cleanBorder(model);
+		cleanSpace(model);
+		cleanAlign(model);
+	}
 
-    service.cleanMap = cleanMap;
-    service.clean = clean;
-    service.cleanInternal = cleanInternal;
-    service.cleanStyle = cleanStyle;
-    service.cleanAlign = cleanAlign;
-    service.cleanSpace = cleanSpace;
-    service.cleanBorder = cleanBorder;
-    service.cleanBackground = cleanBackground;
-    service.cleanSize = cleanSize;
-    service.cleanLayout = cleanLayout;
-    service.cleanEvetns = cleanEvetns;
+	function cleanInternal(model)
+	{
+		cleanEvetns(model);
+		cleanStyle(model);
+		if (model.type === 'Group' || model.type === 'Page') {
+			if (!model.contents) {
+				model.contents = [];
+			}
+			if (model.contents.length) {
+				for (var i = 0; i < model.contents.length; i++) {
+					cleanInternal(model.contents[i]);
+				}
+			}
+		}
+		return model;
+	}
 
-    service.getTemplateFor = getTemplateFor;
-    service.getTemplateOf = getTemplateOf;
-    service.convertToWidgetCss = convertToWidgetCss;
-    service.convertToWidgetCssLayout = convertToWidgetCssLayout;
+	/**
+	 * Clean data model
+	 * @name clean 
+	 * @param {object} model 
+	 * @param {type} force
+	 */
+	function clean(model, force)
+	{
+		if (!model.type || model.type === 'Page') {
+			model.type = 'Group';
+		}
+		if (model.version === 'wb1' && !force) {
+			return model;
+		}
+		var newModel = cleanInternal(model);
+		newModel.version = 'wb1';
+		return newModel;
+	}
+
+	service.cleanMap = cleanMap;
+	service.clean = clean;
+	service.cleanInternal = cleanInternal;
+	service.cleanStyle = cleanStyle;
+	service.cleanAlign = cleanAlign;
+	service.cleanSpace = cleanSpace;
+	service.cleanBorder = cleanBorder;
+	service.cleanBackground = cleanBackground;
+	service.cleanSize = cleanSize;
+	service.cleanLayout = cleanLayout;
+	service.cleanEvetns = cleanEvetns;
+
+	service.getTemplateFor = getTemplateFor;
+	service.getTemplateOf = getTemplateOf;
+	service.convertToWidgetCss = convertToWidgetCss;
+	service.convertToWidgetCssLayout = convertToWidgetCssLayout;
 });
 
 /* 
@@ -8889,8 +9017,8 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/settings/wb-color-cursor-opacity.html',
-    " <div layout=column style=\"min-width: 200px\">  <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setStyle('direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setStyle('color', ctrl.color)\"> </wb-ui-setting-color>  <div layout=row> <wb-icon>mouse</wb-icon> <p translate=\"\">Cursor</p> <span flex></span> <md-input-container layout-align=\"end center\"> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setStyle('cursor', ctrl.cursor)\"> <md-option ng-repeat=\"cursor in ::ctrl.cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </div>  <div layout=row layout-align=\"end center\"> <wb-icon>opacity</wb-icon> <span flex translate=\"\">Opacity</span> <md-input-container style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input ng-model=ctrl.opacity ng-change=\"ctrl.setStyle('opacity', ctrl.opacity)\"> </md-input-container> </div> </div>"
+  $templateCache.put('views/settings/wb-general.html',
+    " <div layout=column style=\"min-width: 200px\">  <fieldset layout=column> <legend translate>Text</legend> <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setStyle('direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setStyle('color', ctrl.color)\"> </wb-ui-setting-color> </fieldset>  <fieldset layout=column> <legend translate>Mouse</legend> <md-input-container> <wb-icon>mouse</wb-icon> <label translate>Cursor</label> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setStyle('cursor', ctrl.cursor)\"> <md-option ng-repeat=\"cursor in ::ctrl.cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Visibility</legend> <md-input-container layout-align=\"end center\"> <label translate>Visibility</label> <md-select ng-model=ctrl.visibility ng-change=\"ctrl.setStyle('visibility', ctrl.visibility)\" style=\"min-width: 200px\" disabled> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> </md-select> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:60px; height:30px\"> <wb-icon>opacity</wb-icon> <label translate>Opacity</label> <input ng-model=ctrl.opacity ng-change=\"ctrl.setStyle('opacity', ctrl.opacity)\"> </md-input-container> </fieldset> </div>"
   );
 
 

@@ -1,7 +1,5 @@
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,47 +25,21 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wb-infinate-scroll
- * @description wbInfinateScroll
+ * @name wb-on-esc
+ * @description Call an action on ESC
  * 
- * This is deprecated please use mb-infinate-scroll
+ * ```
+ * <input
+ *  wb-on-esc="toast('ESC')">
+ * ```
  */
-.directive('wbInfinateScroll', function($q, $timeout) {
-
-	function postLink(scope, elem) {
-		var raw = elem[0];
-
-		function loadNextPage() {
-			var value = scope.loadPage();
-			return $q.when(value)//
-			.then(checkScroll);
-		}
-
-		function checkScroll(value) {
-			if(value){
-				return $timeout(function(){
-					if(raw.scrollHeight <= raw.offsetHeight){
-						return loadNextPage();
-					}
-				}, 100);
-			}
-		}
-
-		function scrollChange() {
-			if (raw.scrollTop + raw.offsetHeight + 5 >= raw.scrollHeight) {
-				loadNextPage();
-			}
-		}
-
-		elem.on('scroll', scrollChange);
-		loadNextPage();
-	}
-
-	return {
-		restrict : 'A',
-		scope : {
-			loadPage : '=wbInfinateScroll'
-		},
-		link : postLink
-	};
+.directive('wbOnEsc', function() {
+    return function(scope, elm, attr) {
+        elm.bind('keydown', function(e) {
+            if (e.keyCode === 27) {
+                scope.$apply(attr.wbOnEsc);
+            }
+        });
+    };
 });
+

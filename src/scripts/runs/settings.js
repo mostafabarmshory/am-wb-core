@@ -141,7 +141,7 @@ angular.module('am-wb-core')
 		type: 'general',
 		label: 'General',
 		icon: 'opacity',
-		templateUrl: 'views/settings/wb-color-cursor-opacity.html',
+		templateUrl: 'views/settings/wb-general.html',
 		controllerAs: 'ctrl',
 		/*
 		 * @ngInject
@@ -184,8 +184,11 @@ angular.module('am-wb-core')
 			
 			this.init = function(){
 			    this.direction = this.getStyle('direction') || 'ltr';
-				this.color = this.getStyle('color');
+			    this.color = this.getStyle('color');
+
 				this.cursor = this.getStyle('cursor');
+
+				this.visibility = this.getStyle('visibility') || 'visible';
 				this.opacity = this.getStyle('opacity');
 			};
 		}
