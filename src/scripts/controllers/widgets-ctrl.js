@@ -76,6 +76,22 @@
  * </ul>
  */
 var WbAbstractWidget = function () {
+    
+    function debounce(func, wait) {
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            var later = function() {
+                timeout = null;
+                func.apply(context, args);
+            };
+            var callNow = !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+    }
+    
 	this.actions = [];
 	this.callbacks = [];
 	this.childWidgets = [];
@@ -118,11 +134,11 @@ var WbAbstractWidget = function () {
 	/*
 	 * Add resize observer to the element
 	 */
-	this.resizeObserver = new ResizeObserver(function ($event) {
+	this.resizeObserver = new ResizeObserver(debounce(function ($event) {
 		ctrl.fireResizeLayout($event);
 		// check if there is a user function
 		ctrl.evalWidgetEvent('resize', $event);
-	});
+	}, 100));
 
 };
 

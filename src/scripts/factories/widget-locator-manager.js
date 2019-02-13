@@ -41,6 +41,7 @@ angular
  */
 .factory('WidgetLocatorManager',function ($widget, BoundWidgetLocator, SelectionWidgetLocator) {
 
+
     /**
      * Get path of a widget to the root
      */
@@ -64,7 +65,7 @@ angular
         // attributes
         this.selectionLocators = [];
         this.boundLocators = [];
-        
+
         this.locatorsMap = new Map();
         this.widgetMap = new Map();
 
@@ -234,7 +235,7 @@ angular
             locator.setVisible(this.visible);
         }
     };
-    
+
     /**
      * Update all locators
      * 
@@ -245,27 +246,27 @@ angular
         var i;
         var locator;
         var widget;
-        
+
         /*
          * Adds new locator for new widget
          */
         var ctrl = this;
         if(!this.newLocatorListener) {
-            this.newLocatorListener = function($event){
+            this.newLocatorListener = $widget.debounce(function($event){
                 ctrl.updateBoundLocators();
                 ctrl.updateSelectionLocators();
-            }
+            }, 100);
         }
         if(!this.styleChangeListener){
-        	this.styleChangeListener = function($event) {
-        		if(angular.equals($event.newValue.layout, $event.oldValue.layout)){
-        			return;
-        		}
+            this.styleChangeListener = $widget.debounce(function($event) {
+                if(angular.equals($event.newValue.layout, $event.oldValue.layout)){
+                    return;
+                }
                 ctrl.updateBoundLocators();
                 ctrl.updateSelectionLocators();
-        	}
+            }, 100);
         }
-        
+
         // list widgets
         var rootWidget = this.getRootWidget();
         if(!rootWidget){
@@ -274,7 +275,7 @@ angular
         widgets = $widget.getChildren(rootWidget);
         widgets.push(rootWidget);
         this.activeBoundLocators = widgets.length;
-        
+
         // disable extra
         angular.forEach(this.boundLocators, function(locator){
             locator.setEnable(i < widgets.length);
@@ -298,7 +299,7 @@ angular
             locator.setWidget(widgets[i]);
             locator.setEnable(true);
             locator.setVisible(this.visible);
-            
+
             // add listener
             widgets[i].on('newchild', ctrl.newLocatorListener);
             widgets[i].on('styleChanged', ctrl.styleChangeListener);

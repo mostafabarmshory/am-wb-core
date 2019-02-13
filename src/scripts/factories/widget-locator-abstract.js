@@ -34,7 +34,7 @@ angular.module('am-wb-core')//
  * example it is used to show widget actions on the fly.
  * 
  */
-.factory('AbstractWidgetLocator', function ($rootElement) {
+.factory('AbstractWidgetLocator', function ($rootElement, $widget) {
 
     /**
      * Creates new instance of the widget locator
@@ -73,9 +73,9 @@ angular.module('am-wb-core')//
                     ctrl.removeClass('mouseover');
                     ctrl.mouseover = false;
                 },
-                'resize-layout' : function ($event) {
+                'resize-layout' : $widget.debounce(function ($event) {
                     ctrl.updateView();
-                }
+                }, 100)
         };
     }
 
