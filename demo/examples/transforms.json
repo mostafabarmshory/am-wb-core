@@ -1,0 +1,54 @@
+{
+    "type": "Group",
+    "name": "Group main",
+    "style": {
+        "margin": "60px"
+    },
+    "event": {
+        "resize": "if($media(\"gt-sm\")){$widget.style(\"layout.direction\", \"row\");}else{$widget.style(\"layout.direction\", \"column\");}"
+    },
+    "contents": [
+        {
+            "type": "HtmlText",
+            "name": "Widget",
+            "text": "<h2>HTML Text 1</h2>",
+            "style": {
+                "margin": "60px",
+                "background": {
+                	"color": "red"
+                },
+                "transform": {
+                    "orgin": "50% 50%",
+                    "perspective": "200px",
+                    "x": {
+                        "translate": "10px",
+                        "scale": 0.5,
+                        "rotate": "180deg",
+                        "skew": "30deg"
+                    },
+                    "y": {
+                        "translate": "10px",
+                        "scale": 0.8,
+                        "rotate": "-45deg",
+                        "skew":  "30deg"
+                    },
+                    "z": {
+                        "translate": "10px",
+                        "scale": 1.0,
+                        "rotate": "40deg"
+                    }
+                }
+            }
+        },{
+            "type": "HtmlText",
+            "name": "Widget",
+            "text": "<h2>HTML Text 2</h2>",
+            "style": {
+                "margin": "60px",
+                "background": {
+                	"color": "blue"
+                }
+            }
+        }
+    ]
+}
