@@ -87,7 +87,7 @@ var WbAbstractWidget = function () {
 	 */
 	this.eventFunctions = {};
 	this.computedStyle = {};
-	
+
 	// models
 	this.runtimeModel = {};
 	this.model = {};
@@ -116,12 +116,12 @@ var WbAbstractWidget = function () {
 	};
 
 	/*
-     * Add resize observer to the element
-     */
+	 * Add resize observer to the element
+	 */
 	this.resizeObserver = new ResizeObserver(function ($event) {
 		ctrl.fireResizeLayout($event);
 		// check if there is a user function
-        ctrl.evalWidgetEvent('resize', $event);
+		ctrl.evalWidgetEvent('resize', $event);
 	});
 
 };
@@ -160,9 +160,9 @@ WbAbstractWidget.prototype.loadSeo = function () {
 	}
 
 	// TODO: support of
-// - {Text} label (https://schema.org/title)
-// - {Text} description (https://schema.org/description)
-// - {Text} keywords (https://schema.org/keywords)
+//	- {Text} label (https://schema.org/title)
+//	- {Text} description (https://schema.org/description)
+//	- {Text} keywords (https://schema.org/keywords)
 };
 
 /**
@@ -208,7 +208,7 @@ WbAbstractWidget.prototype.refresh = function($event) {
 	// to support old widget
 	var model = this.getModel();
 	this.getScope().wbModel = model;
-	
+
 	if($event){
 		var key = $event.key || 'x';
 		// update event
@@ -360,7 +360,7 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 WbAbstractWidget.prototype.style = function (style, value) {
 	// there is no argument so act as get
 	if(!angular.isDefined(style)){
-	    return angular.copy(this.getProperty('style'));
+		return angular.copy(this.getProperty('style'));
 	}
 	// style is a key
 	if(angular.isString(style)){
@@ -376,14 +376,14 @@ WbAbstractWidget.prototype.style = function (style, value) {
  * Sets style of the widget
  */
 WbAbstractWidget.prototype.setStyle = function(key, value) {
-    this.setProperty('style.' + key, value);
+	this.setProperty('style.' + key, value);
 };
 
 /**
  * Get style from widget
  */
 WbAbstractWidget.prototype.getStyle = function(key) {
-    return this.getProperty('style.' + key);
+	return this.getProperty('style.' + key);
 };
 
 /**
@@ -394,10 +394,10 @@ WbAbstractWidget.prototype.getStyle = function(key) {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
-    if (this.isEditable()) {
-        // User function will not evaluate in edit mode
-        return;
-    }
+	if (this.isEditable()) {
+		// User function will not evaluate in edit mode
+		return;
+	}
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
 		var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2]; var $media =  arguments[3];' + this.getEvent()[type];
@@ -573,7 +573,7 @@ WbAbstractWidget.prototype.fireResizeLayout = function ($event) {
  * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
  */
 WbAbstractWidget.prototype.getDirection = function () {
-    return this.getModelProperty('style.layout.direction') || 'column';
+	return this.getModelProperty('style.layout.direction') || 'column';
 };
 
 WbAbstractWidget.prototype.getEvent = function () {
@@ -582,15 +582,15 @@ WbAbstractWidget.prototype.getEvent = function () {
 
 
 WbAbstractWidget.prototype.getTitle = function () {
-    return this.getModelProperty('label');
+	return this.getModelProperty('label');
 };
 
 WbAbstractWidget.prototype.getType = function () {
-    return this.getModelProperty('type');
+	return this.getModelProperty('type');
 };
 
 WbAbstractWidget.prototype.getId = function () {
-    return this.getModelProperty('id');
+	return this.getModelProperty('id');
 };
 
 /**
@@ -806,6 +806,81 @@ WbAbstractWidget.prototype.getBoundingClientRect = function () {
 	};
 };
 
+
+/**
+ * Adds animation to the page
+ */
+WbAbstractWidget.prototype.animate = function (options) {
+	var ctrl = this;
+	var animation = {
+			targets: this.getRuntimeModel(),
+			update: function(/*anim*/) {
+				// XXX: maso, 2019: support multiple key in event
+				ctrl.refresh();
+			}
+	};
+	var keys = [];
+
+	// copy animation properties
+	if(options.duration){
+		animation.duration = options.duration;
+	}
+	if(options.loop){
+		animation.loop = options.loop;
+	}
+	if(options.autoplay){
+		animation.autoplay = options.autoplay;
+	}
+	if(options.delay){
+		animation.delay = options.delay;
+	}
+	if(options.easing){
+		animation.easing = options.easing;
+	}
+
+	// Create list of attributes
+	for(var key in options){
+		// ignore keys
+		if(key === 'duration'|| 
+				key === 'loop'|| 
+				key === 'autoplay'||
+				key === 'delay'||
+				key === 'easing'){
+			continue;
+		}
+		keys.push(key);
+		animation[key] = options[key];
+		
+		// set initial value
+		var val = this.getProperty(key);
+		if(!val) {
+			this.setProperty(key, this.getModelProperty(key));
+		}
+		
+		// NOTE: if the value is empty then you have to set from values
+	}
+
+	return anime(animation);
+};
+
+/**
+ * Remove animations from the widget
+ * 
+ */
+WbAbstractWidget.prototype.removeAnimation = function () {
+	// The animation will not add to element so there is no need to remove
+};
+
+
+
+
+
+/***********************************************************************************************
+ *                                                                                             *
+ *                                                                                             *
+ *                                                                                             *
+ *                                                                                             *
+ ***********************************************************************************************/
 /**
  * @ngdoc Controllers
  * @name wbWidgetCtrl
@@ -826,6 +901,13 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
 
+
+/***********************************************************************************************
+ *                                                                                             *
+ *                                                                                             *
+ *                                                                                             *
+ *                                                                                             *
+ ***********************************************************************************************/
 /**
  * @ngdoc Controllers
  * @name WbWidgetGroupCtrl
@@ -1110,7 +1192,7 @@ WbWidgetGroupCtrl.prototype.setAllowedTypes = function (allowedTypes) {
 };
 
 
-// submit the controller
+//submit the controller
 angular.module('am-wb-core')//
 .controller('WbWidgetCtrl', WbWidgetCtrl)//
 .controller('WbWidgetGroupCtrl', WbWidgetGroupCtrl);
