@@ -17,6 +17,10 @@
     "_": false,
     "tinymce": false,
     "crypto": false,
-    "anime": false
+    "anime": false,
+    "HTMLCollection": false,
+    "objectPath": false,
+    "Map": false,
+    "Promise": false
   }
 }

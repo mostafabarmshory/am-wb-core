@@ -85,7 +85,7 @@ module.exports = function(grunt) {
             },
             js : {
                 files : [
-                	'<%= yeoman.app %>/libs/**/*.js',
+                	'<%= yeoman.app %>/libs/*.js',
                     '<%= yeoman.app %>/scripts/**/*.js',
                     '<%= yeoman.demo %>/scripts/**/*.js'
                     ],
@@ -642,7 +642,7 @@ module.exports = function(grunt) {
             project_files : {
                 files : {
                     '<%= yeoman.demo %>/index.html' : [
-                        '<%= yeoman.app %>/libs/**/*.js',
+                        '<%= yeoman.app %>/libs/*.js',
                         '<%= yeoman.app %>/scripts/**/*.js',
                         '<%= yeoman.app %>/styles/**/*.css',
                         '<%= yeoman.demo %>/scripts/**/*.js',

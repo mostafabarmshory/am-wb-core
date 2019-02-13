@@ -1,939 +1,2638 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-        typeof define === 'function' && define.amd ? define(factory) :
-            (global.ResizeObserver = factory());
-}(this, (function () { 'use strict';
+	'use strict';
+	if(typeof exports === 'object' && typeof module !== 'undefined'){
+		module.exports = factory();
+	} else {
+//		typeof define === 'function' && define.amd ? define(factory) :
+		global.ResizeObserver = factory();
+	}
+}(this, (function () { 
+	'use strict';
 
-/**
- * A collection of shims that provide minimal functionality of the ES6 collections.
- *
- * These implementations are not meant to be used outside of the ResizeObserver
- * modules as they cover only a limited range of use cases.
- */
-/* eslint-disable require-jsdoc, valid-jsdoc */
-var MapShim = (function () {
-    if (typeof Map !== 'undefined') {
-        return Map;
-    }
-    /**
-     * Returns index in provided array that matches the specified key.
-     *
-     * @param {Array<Array>} arr
-     * @param {*} key
-     * @returns {number}
-     */
-    function getIndex(arr, key) {
-        var result = -1;
-        arr.some(function (entry, index) {
-            if (entry[0] === key) {
-                result = index;
-                return true;
-            }
-            return false;
-        });
-        return result;
-    }
-    return /** @class */ (function () {
-        function class_1() {
-            this.__entries__ = [];
-        }
-        Object.defineProperty(class_1.prototype, "size", {
-            /**
-             * @returns {boolean}
-             */
-            get: function () {
-                return this.__entries__.length;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        /**
-         * @param {*} key
-         * @returns {*}
-         */
-        class_1.prototype.get = function (key) {
-            var index = getIndex(this.__entries__, key);
-            var entry = this.__entries__[index];
-            return entry && entry[1];
-        };
-        /**
-         * @param {*} key
-         * @param {*} value
-         * @returns {void}
-         */
-        class_1.prototype.set = function (key, value) {
-            var index = getIndex(this.__entries__, key);
-            if (~index) {
-                this.__entries__[index][1] = value;
-            }
-            else {
-                this.__entries__.push([key, value]);
-            }
-        };
-        /**
-         * @param {*} key
-         * @returns {void}
-         */
-        class_1.prototype.delete = function (key) {
-            var entries = this.__entries__;
-            var index = getIndex(entries, key);
-            if (~index) {
-                entries.splice(index, 1);
-            }
-        };
-        /**
-         * @param {*} key
-         * @returns {void}
-         */
-        class_1.prototype.has = function (key) {
-            return !!~getIndex(this.__entries__, key);
-        };
-        /**
-         * @returns {void}
-         */
-        class_1.prototype.clear = function () {
-            this.__entries__.splice(0);
-        };
-        /**
-         * @param {Function} callback
-         * @param {*} [ctx=null]
-         * @returns {void}
-         */
-        class_1.prototype.forEach = function (callback, ctx) {
-            if (ctx === void 0) { ctx = null; }
-            for (var _i = 0, _a = this.__entries__; _i < _a.length; _i++) {
-                var entry = _a[_i];
-                callback.call(ctx, entry[1], entry[0]);
-            }
-        };
-        return class_1;
-    }());
-})();
+	/**
+	 * A collection of shims that provide minimal functionality of the ES6 collections.
+	 *
+	 * These implementations are not meant to be used outside of the ResizeObserver
+	 * modules as they cover only a limited range of use cases.
+	 */
+	/* eslint-disable require-jsdoc, valid-jsdoc */
+	var MapShim = (function () {
+		if (typeof Map !== 'undefined') {
+			return Map;
+		}
+		/**
+		 * Returns index in provided array that matches the specified key.
+		 *
+		 * @param {Array<Array>} arr
+		 * @param {*} key
+		 * @returns {number}
+		 */
+		function getIndex(arr, key) {
+			var result = -1;
+			arr.some(function (entry, index) {
+				if (entry[0] === key) {
+					result = index;
+					return true;
+				}
+				return false;
+			});
+			return result;
+		}
+		return /** @class */ (function () {
+			function class_1() {
+				this.__entries__ = [];
+			}
+			Object.defineProperty(class_1.prototype, "size", {
+				/**
+				 * @returns {boolean}
+				 */
+				get: function () {
+					return this.__entries__.length;
+				},
+				enumerable: true,
+				configurable: true
+			});
+			/**
+			 * @param {*} key
+			 * @returns {*}
+			 */
+			class_1.prototype.get = function (key) {
+				var index = getIndex(this.__entries__, key);
+				var entry = this.__entries__[index];
+				return entry && entry[1];
+			};
+			/**
+			 * @param {*} key
+			 * @param {*} value
+			 * @returns {void}
+			 */
+			class_1.prototype.set = function (key, value) {
+				var index = getIndex(this.__entries__, key);
+				if (~index) {
+					this.__entries__[index][1] = value;
+				}
+				else {
+					this.__entries__.push([key, value]);
+				}
+			};
+			/**
+			 * @param {*} key
+			 * @returns {void}
+			 */
+			class_1.prototype.delete = function (key) {
+				var entries = this.__entries__;
+				var index = getIndex(entries, key);
+				if (~index) {
+					entries.splice(index, 1);
+				}
+			};
+			/**
+			 * @param {*} key
+			 * @returns {void}
+			 */
+			class_1.prototype.has = function (key) {
+				return !!~getIndex(this.__entries__, key);
+			};
+			/**
+			 * @returns {void}
+			 */
+			class_1.prototype.clear = function () {
+				this.__entries__.splice(0);
+			};
+			/**
+			 * @param {Function} callback
+			 * @param {*} [ctx=null]
+			 * @returns {void}
+			 */
+			class_1.prototype.forEach = function (callback, ctx) {
+				if (ctx === void 0) { ctx = null; }
+				for (var _i = 0, _a = this.__entries__; _i < _a.length; _i++) {
+					var entry = _a[_i];
+					callback.call(ctx, entry[1], entry[0]);
+				}
+			};
+			return class_1;
+		}());
+	})();
 
-/**
- * Detects whether window and document objects are available in current environment.
- */
-var isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined' && window.document === document;
+	/**
+	 * Detects whether window and document objects are available in current environment.
+	 */
+	var isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined' && window.document === document;
 
-// Returns global object of a current environment.
-var global$1 = (function () {
-    if (typeof global !== 'undefined' && global.Math === Math) {
-        return global;
-    }
-    if (typeof self !== 'undefined' && self.Math === Math) {
-        return self;
-    }
-    if (typeof window !== 'undefined' && window.Math === Math) {
-        return window;
-    }
-    // eslint-disable-next-line no-new-func
-    return Function('return this')();
-})();
+	// Returns global object of a current environment.
+	var global$1 = (function () {
+		if (typeof global !== 'undefined' && global.Math === Math) {
+			return global;
+		}
+		if (typeof self !== 'undefined' && self.Math === Math) {
+			return self;
+		}
+		if (typeof window !== 'undefined' && window.Math === Math) {
+			return window;
+		}
+		// eslint-disable-next-line no-new-func
+		return Function('return this')();
+	})();
 
-/**
- * A shim for the requestAnimationFrame which falls back to the setTimeout if
- * first one is not supported.
- *
- * @returns {number} Requests' identifier.
- */
-var requestAnimationFrame$1 = (function () {
-    if (typeof requestAnimationFrame === 'function') {
-        // It's required to use a bounded function because IE sometimes throws
-        // an "Invalid calling object" error if rAF is invoked without the global
-        // object on the left hand side.
-        return requestAnimationFrame.bind(global$1);
-    }
-    return function (callback) { return setTimeout(function () { return callback(Date.now()); }, 1000 / 60); };
-})();
+	/**
+	 * A shim for the requestAnimationFrame which falls back to the setTimeout if
+	 * first one is not supported.
+	 *
+	 * @returns {number} Requests' identifier.
+	 */
+	var requestAnimationFrame$1 = (function () {
+		if (typeof requestAnimationFrame === 'function') {
+			// It's required to use a bounded function because IE sometimes throws
+			// an "Invalid calling object" error if rAF is invoked without the global
+			// object on the left hand side.
+			return requestAnimationFrame.bind(global$1);
+		}
+		return function (callback) { return setTimeout(function () { return callback(Date.now()); }, 1000 / 60); };
+	})();
 
-// Defines minimum timeout before adding a trailing call.
-var trailingTimeout = 2;
-/**
- * Creates a wrapper function which ensures that provided callback will be
- * invoked only once during the specified delay period.
- *
- * @param {Function} callback - Function to be invoked after the delay period.
- * @param {number} delay - Delay after which to invoke callback.
- * @returns {Function}
- */
-function throttle (callback, delay) {
-    var leadingCall = false, trailingCall = false, lastCallTime = 0;
-    /**
-     * Invokes the original callback function and schedules new invocation if
-     * the "proxy" was called during current request.
-     *
-     * @returns {void}
-     */
-    function resolvePending() {
-        if (leadingCall) {
-            leadingCall = false;
-            callback();
-        }
-        if (trailingCall) {
-            proxy();
-        }
-    }
-    /**
-     * Callback invoked after the specified delay. It will further postpone
-     * invocation of the original function delegating it to the
-     * requestAnimationFrame.
-     *
-     * @returns {void}
-     */
-    function timeoutCallback() {
-        requestAnimationFrame$1(resolvePending);
-    }
-    /**
-     * Schedules invocation of the original function.
-     *
-     * @returns {void}
-     */
-    function proxy() {
-        var timeStamp = Date.now();
-        if (leadingCall) {
-            // Reject immediately following calls.
-            if (timeStamp - lastCallTime < trailingTimeout) {
-                return;
-            }
-            // Schedule new call to be in invoked when the pending one is resolved.
-            // This is important for "transitions" which never actually start
-            // immediately so there is a chance that we might miss one if change
-            // happens amids the pending invocation.
-            trailingCall = true;
-        }
-        else {
-            leadingCall = true;
-            trailingCall = false;
-            setTimeout(timeoutCallback, delay);
-        }
-        lastCallTime = timeStamp;
-    }
-    return proxy;
-}
+	// Defines minimum timeout before adding a trailing call.
+	var trailingTimeout = 2;
+	/**
+	 * Creates a wrapper function which ensures that provided callback will be
+	 * invoked only once during the specified delay period.
+	 *
+	 * @param {Function} callback - Function to be invoked after the delay period.
+	 * @param {number} delay - Delay after which to invoke callback.
+	 * @returns {Function}
+	 */
+	function throttle (callback, delay) {
+		var leadingCall = false, trailingCall = false, lastCallTime = 0;
+		/**
+		 * Invokes the original callback function and schedules new invocation if
+		 * the "proxy" was called during current request.
+		 *
+		 * @returns {void}
+		 */
+		function resolvePending() {
+			if (leadingCall) {
+				leadingCall = false;
+				callback();
+			}
+			if (trailingCall) {
+				proxy();
+			}
+		}
+		/**
+		 * Callback invoked after the specified delay. It will further postpone
+		 * invocation of the original function delegating it to the
+		 * requestAnimationFrame.
+		 *
+		 * @returns {void}
+		 */
+		function timeoutCallback() {
+			requestAnimationFrame$1(resolvePending);
+		}
+		/**
+		 * Schedules invocation of the original function.
+		 *
+		 * @returns {void}
+		 */
+		function proxy() {
+			var timeStamp = Date.now();
+			if (leadingCall) {
+				// Reject immediately following calls.
+				if (timeStamp - lastCallTime < trailingTimeout) {
+					return;
+				}
+				// Schedule new call to be in invoked when the pending one is resolved.
+				// This is important for "transitions" which never actually start
+				// immediately so there is a chance that we might miss one if change
+				// happens amids the pending invocation.
+				trailingCall = true;
+			}
+			else {
+				leadingCall = true;
+				trailingCall = false;
+				setTimeout(timeoutCallback, delay);
+			}
+			lastCallTime = timeStamp;
+		}
+		return proxy;
+	}
 
-// Minimum delay before invoking the update of observers.
-var REFRESH_DELAY = 20;
-// A list of substrings of CSS properties used to find transition events that
-// might affect dimensions of observed elements.
-var transitionKeys = ['top', 'right', 'bottom', 'left', 'width', 'height', 'size', 'weight'];
-// Check if MutationObserver is available.
-var mutationObserverSupported = typeof MutationObserver !== 'undefined';
-/**
- * Singleton controller class which handles updates of ResizeObserver instances.
- */
-var ResizeObserverController = /** @class */ (function () {
-    /**
-     * Creates a new instance of ResizeObserverController.
-     *
-     * @private
-     */
-    function ResizeObserverController() {
-        /**
-         * Indicates whether DOM listeners have been added.
-         *
-         * @private {boolean}
-         */
-        this.connected_ = false;
-        /**
-         * Tells that controller has subscribed for Mutation Events.
-         *
-         * @private {boolean}
-         */
-        this.mutationEventsAdded_ = false;
-        /**
-         * Keeps reference to the instance of MutationObserver.
-         *
-         * @private {MutationObserver}
-         */
-        this.mutationsObserver_ = null;
-        /**
-         * A list of connected observers.
-         *
-         * @private {Array<ResizeObserverSPI>}
-         */
-        this.observers_ = [];
-        this.onTransitionEnd_ = this.onTransitionEnd_.bind(this);
-        this.refresh = throttle(this.refresh.bind(this), REFRESH_DELAY);
-    }
-    /**
-     * Adds observer to observers list.
-     *
-     * @param {ResizeObserverSPI} observer - Observer to be added.
-     * @returns {void}
-     */
-    ResizeObserverController.prototype.addObserver = function (observer) {
-        if (!~this.observers_.indexOf(observer)) {
-            this.observers_.push(observer);
-        }
-        // Add listeners if they haven't been added yet.
-        if (!this.connected_) {
-            this.connect_();
-        }
-    };
-    /**
-     * Removes observer from observers list.
-     *
-     * @param {ResizeObserverSPI} observer - Observer to be removed.
-     * @returns {void}
-     */
-    ResizeObserverController.prototype.removeObserver = function (observer) {
-        var observers = this.observers_;
-        var index = observers.indexOf(observer);
-        // Remove observer if it's present in registry.
-        if (~index) {
-            observers.splice(index, 1);
-        }
-        // Remove listeners if controller has no connected observers.
-        if (!observers.length && this.connected_) {
-            this.disconnect_();
-        }
-    };
-    /**
-     * Invokes the update of observers. It will continue running updates insofar
-     * it detects changes.
-     *
-     * @returns {void}
-     */
-    ResizeObserverController.prototype.refresh = function () {
-        var changesDetected = this.updateObservers_();
-        // Continue running updates if changes have been detected as there might
-        // be future ones caused by CSS transitions.
-        if (changesDetected) {
-            this.refresh();
-        }
-    };
-    /**
-     * Updates every observer from observers list and notifies them of queued
-     * entries.
-     *
-     * @private
-     * @returns {boolean} Returns "true" if any observer has detected changes in
-     *      dimensions of it's elements.
-     */
-    ResizeObserverController.prototype.updateObservers_ = function () {
-        // Collect observers that have active observations.
-        var activeObservers = this.observers_.filter(function (observer) {
-            return observer.gatherActive(), observer.hasActive();
-        });
-        // Deliver notifications in a separate cycle in order to avoid any
-        // collisions between observers, e.g. when multiple instances of
-        // ResizeObserver are tracking the same element and the callback of one
-        // of them changes content dimensions of the observed target. Sometimes
-        // this may result in notifications being blocked for the rest of observers.
-        activeObservers.forEach(function (observer) { return observer.broadcastActive(); });
-        return activeObservers.length > 0;
-    };
-    /**
-     * Initializes DOM listeners.
-     *
-     * @private
-     * @returns {void}
-     */
-    ResizeObserverController.prototype.connect_ = function () {
-        // Do nothing if running in a non-browser environment or if listeners
-        // have been already added.
-        if (!isBrowser || this.connected_) {
-            return;
-        }
-        // Subscription to the "Transitionend" event is used as a workaround for
-        // delayed transitions. This way it's possible to capture at least the
-        // final state of an element.
-        document.addEventListener('transitionend', this.onTransitionEnd_);
-        window.addEventListener('resize', this.refresh);
-        if (mutationObserverSupported) {
-            this.mutationsObserver_ = new MutationObserver(this.refresh);
-            this.mutationsObserver_.observe(document, {
-                attributes: true,
-                childList: true,
-                characterData: true,
-                subtree: true
-            });
-        }
-        else {
-            document.addEventListener('DOMSubtreeModified', this.refresh);
-            this.mutationEventsAdded_ = true;
-        }
-        this.connected_ = true;
-    };
-    /**
-     * Removes DOM listeners.
-     *
-     * @private
-     * @returns {void}
-     */
-    ResizeObserverController.prototype.disconnect_ = function () {
-        // Do nothing if running in a non-browser environment or if listeners
-        // have been already removed.
-        if (!isBrowser || !this.connected_) {
-            return;
-        }
-        document.removeEventListener('transitionend', this.onTransitionEnd_);
-        window.removeEventListener('resize', this.refresh);
-        if (this.mutationsObserver_) {
-            this.mutationsObserver_.disconnect();
-        }
-        if (this.mutationEventsAdded_) {
-            document.removeEventListener('DOMSubtreeModified', this.refresh);
-        }
-        this.mutationsObserver_ = null;
-        this.mutationEventsAdded_ = false;
-        this.connected_ = false;
-    };
-    /**
-     * "Transitionend" event handler.
-     *
-     * @private
-     * @param {TransitionEvent} event
-     * @returns {void}
-     */
-    ResizeObserverController.prototype.onTransitionEnd_ = function (_a) {
-        var _b = _a.propertyName, propertyName = _b === void 0 ? '' : _b;
-        // Detect whether transition may affect dimensions of an element.
-        var isReflowProperty = transitionKeys.some(function (key) {
-            return !!~propertyName.indexOf(key);
-        });
-        if (isReflowProperty) {
-            this.refresh();
-        }
-    };
-    /**
-     * Returns instance of the ResizeObserverController.
-     *
-     * @returns {ResizeObserverController}
-     */
-    ResizeObserverController.getInstance = function () {
-        if (!this.instance_) {
-            this.instance_ = new ResizeObserverController();
-        }
-        return this.instance_;
-    };
-    /**
-     * Holds reference to the controller's instance.
-     *
-     * @private {ResizeObserverController}
-     */
-    ResizeObserverController.instance_ = null;
-    return ResizeObserverController;
-}());
+	// Minimum delay before invoking the update of observers.
+	var REFRESH_DELAY = 20;
+	// A list of substrings of CSS properties used to find transition events that
+	// might affect dimensions of observed elements.
+	var transitionKeys = ['top', 'right', 'bottom', 'left', 'width', 'height', 'size', 'weight'];
+	// Check if MutationObserver is available.
+	var mutationObserverSupported = typeof MutationObserver !== 'undefined';
+	/**
+	 * Singleton controller class which handles updates of ResizeObserver instances.
+	 */
+	var ResizeObserverController = /** @class */ (function () {
+		/**
+		 * Creates a new instance of ResizeObserverController.
+		 *
+		 * @private
+		 */
+		function ResizeObserverController() {
+			/**
+			 * Indicates whether DOM listeners have been added.
+			 *
+			 * @private {boolean}
+			 */
+			this.connected_ = false;
+			/**
+			 * Tells that controller has subscribed for Mutation Events.
+			 *
+			 * @private {boolean}
+			 */
+			this.mutationEventsAdded_ = false;
+			/**
+			 * Keeps reference to the instance of MutationObserver.
+			 *
+			 * @private {MutationObserver}
+			 */
+			this.mutationsObserver_ = null;
+			/**
+			 * A list of connected observers.
+			 *
+			 * @private {Array<ResizeObserverSPI>}
+			 */
+			this.observers_ = [];
+			this.onTransitionEnd_ = this.onTransitionEnd_.bind(this);
+			this.refresh = throttle(this.refresh.bind(this), REFRESH_DELAY);
+		}
+		/**
+		 * Adds observer to observers list.
+		 *
+		 * @param {ResizeObserverSPI} observer - Observer to be added.
+		 * @returns {void}
+		 */
+		ResizeObserverController.prototype.addObserver = function (observer) {
+			if (!~this.observers_.indexOf(observer)) {
+				this.observers_.push(observer);
+			}
+			// Add listeners if they haven't been added yet.
+			if (!this.connected_) {
+				this.connect_();
+			}
+		};
+		/**
+		 * Removes observer from observers list.
+		 *
+		 * @param {ResizeObserverSPI} observer - Observer to be removed.
+		 * @returns {void}
+		 */
+		ResizeObserverController.prototype.removeObserver = function (observer) {
+			var observers = this.observers_;
+			var index = observers.indexOf(observer);
+			// Remove observer if it's present in registry.
+			if (~index) {
+				observers.splice(index, 1);
+			}
+			// Remove listeners if controller has no connected observers.
+			if (!observers.length && this.connected_) {
+				this.disconnect_();
+			}
+		};
+		/**
+		 * Invokes the update of observers. It will continue running updates insofar
+		 * it detects changes.
+		 *
+		 * @returns {void}
+		 */
+		ResizeObserverController.prototype.refresh = function () {
+			var changesDetected = this.updateObservers_();
+			// Continue running updates if changes have been detected as there might
+			// be future ones caused by CSS transitions.
+			if (changesDetected) {
+				this.refresh();
+			}
+		};
+		/**
+		 * Updates every observer from observers list and notifies them of queued
+		 * entries.
+		 *
+		 * @private
+		 * @returns {boolean} Returns "true" if any observer has detected changes in
+		 *      dimensions of it's elements.
+		 */
+		ResizeObserverController.prototype.updateObservers_ = function () {
+			// Collect observers that have active observations.
+			var activeObservers = this.observers_.filter(function (observer) {
+				return observer.gatherActive(), observer.hasActive();
+			});
+			// Deliver notifications in a separate cycle in order to avoid any
+			// collisions between observers, e.g. when multiple instances of
+			// ResizeObserver are tracking the same element and the callback of one
+			// of them changes content dimensions of the observed target. Sometimes
+			// this may result in notifications being blocked for the rest of observers.
+			activeObservers.forEach(function (observer) { return observer.broadcastActive(); });
+			return activeObservers.length > 0;
+		};
+		/**
+		 * Initializes DOM listeners.
+		 *
+		 * @private
+		 * @returns {void}
+		 */
+		ResizeObserverController.prototype.connect_ = function () {
+			// Do nothing if running in a non-browser environment or if listeners
+			// have been already added.
+			if (!isBrowser || this.connected_) {
+				return;
+			}
+			// Subscription to the "Transitionend" event is used as a workaround for
+			// delayed transitions. This way it's possible to capture at least the
+			// final state of an element.
+			document.addEventListener('transitionend', this.onTransitionEnd_);
+			window.addEventListener('resize', this.refresh);
+			if (mutationObserverSupported) {
+				this.mutationsObserver_ = new MutationObserver(this.refresh);
+				this.mutationsObserver_.observe(document, {
+					attributes: true,
+					childList: true,
+					characterData: true,
+					subtree: true
+				});
+			}
+			else {
+				document.addEventListener('DOMSubtreeModified', this.refresh);
+				this.mutationEventsAdded_ = true;
+			}
+			this.connected_ = true;
+		};
+		/**
+		 * Removes DOM listeners.
+		 *
+		 * @private
+		 * @returns {void}
+		 */
+		ResizeObserverController.prototype.disconnect_ = function () {
+			// Do nothing if running in a non-browser environment or if listeners
+			// have been already removed.
+			if (!isBrowser || !this.connected_) {
+				return;
+			}
+			document.removeEventListener('transitionend', this.onTransitionEnd_);
+			window.removeEventListener('resize', this.refresh);
+			if (this.mutationsObserver_) {
+				this.mutationsObserver_.disconnect();
+			}
+			if (this.mutationEventsAdded_) {
+				document.removeEventListener('DOMSubtreeModified', this.refresh);
+			}
+			this.mutationsObserver_ = null;
+			this.mutationEventsAdded_ = false;
+			this.connected_ = false;
+		};
+		/**
+		 * "Transitionend" event handler.
+		 *
+		 * @private
+		 * @param {TransitionEvent} event
+		 * @returns {void}
+		 */
+		ResizeObserverController.prototype.onTransitionEnd_ = function (_a) {
+			var _b = _a.propertyName, propertyName = _b === void 0 ? '' : _b;
+			// Detect whether transition may affect dimensions of an element.
+			var isReflowProperty = transitionKeys.some(function (key) {
+				return !!~propertyName.indexOf(key);
+			});
+			if (isReflowProperty) {
+				this.refresh();
+			}
+		};
+		/**
+		 * Returns instance of the ResizeObserverController.
+		 *
+		 * @returns {ResizeObserverController}
+		 */
+		ResizeObserverController.getInstance = function () {
+			if (!this.instance_) {
+				this.instance_ = new ResizeObserverController();
+			}
+			return this.instance_;
+		};
+		/**
+		 * Holds reference to the controller's instance.
+		 *
+		 * @private {ResizeObserverController}
+		 */
+		ResizeObserverController.instance_ = null;
+		return ResizeObserverController;
+	}());
 
-/**
- * Defines non-writable/enumerable properties of the provided target object.
- *
- * @param {Object} target - Object for which to define properties.
- * @param {Object} props - Properties to be defined.
- * @returns {Object} Target object.
- */
-var defineConfigurable = (function (target, props) {
-    for (var _i = 0, _a = Object.keys(props); _i < _a.length; _i++) {
-        var key = _a[_i];
-        Object.defineProperty(target, key, {
-            value: props[key],
-            enumerable: false,
-            writable: false,
-            configurable: true
-        });
-    }
-    return target;
-});
+	/**
+	 * Defines non-writable/enumerable properties of the provided target object.
+	 *
+	 * @param {Object} target - Object for which to define properties.
+	 * @param {Object} props - Properties to be defined.
+	 * @returns {Object} Target object.
+	 */
+	var defineConfigurable = (function (target, props) {
+		for (var _i = 0, _a = Object.keys(props); _i < _a.length; _i++) {
+			var key = _a[_i];
+			Object.defineProperty(target, key, {
+				value: props[key],
+				enumerable: false,
+				writable: false,
+				configurable: true
+			});
+		}
+		return target;
+	});
 
-/**
- * Returns the global object associated with provided element.
- *
- * @param {Object} target
- * @returns {Object}
- */
-var getWindowOf = (function (target) {
-    // Assume that the element is an instance of Node, which means that it
-    // has the "ownerDocument" property from which we can retrieve a
-    // corresponding global object.
-    var ownerGlobal = target && target.ownerDocument && target.ownerDocument.defaultView;
-    // Return the local global object if it's not possible extract one from
-    // provided element.
-    return ownerGlobal || global$1;
-});
+	/**
+	 * Returns the global object associated with provided element.
+	 *
+	 * @param {Object} target
+	 * @returns {Object}
+	 */
+	var getWindowOf = (function (target) {
+		// Assume that the element is an instance of Node, which means that it
+		// has the "ownerDocument" property from which we can retrieve a
+		// corresponding global object.
+		var ownerGlobal = target && target.ownerDocument && target.ownerDocument.defaultView;
+		// Return the local global object if it's not possible extract one from
+		// provided element.
+		return ownerGlobal || global$1;
+	});
 
-// Placeholder of an empty content rectangle.
-var emptyRect = createRectInit(0, 0, 0, 0);
-/**
- * Converts provided string to a number.
- *
- * @param {number|string} value
- * @returns {number}
- */
-function toFloat(value) {
-    return parseFloat(value) || 0;
-}
-/**
- * Extracts borders size from provided styles.
- *
- * @param {CSSStyleDeclaration} styles
- * @param {...string} positions - Borders positions (top, right, ...)
- * @returns {number}
- */
-function getBordersSize(styles) {
-    var positions = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        positions[_i - 1] = arguments[_i];
-    }
-    return positions.reduce(function (size, position) {
-        var value = styles['border-' + position + '-width'];
-        return size + toFloat(value);
-    }, 0);
-}
-/**
- * Extracts paddings sizes from provided styles.
- *
- * @param {CSSStyleDeclaration} styles
- * @returns {Object} Paddings box.
- */
-function getPaddings(styles) {
-    var positions = ['top', 'right', 'bottom', 'left'];
-    var paddings = {};
-    for (var _i = 0, positions_1 = positions; _i < positions_1.length; _i++) {
-        var position = positions_1[_i];
-        var value = styles['padding-' + position];
-        paddings[position] = toFloat(value);
-    }
-    return paddings;
-}
-/**
- * Calculates content rectangle of provided SVG element.
- *
- * @param {SVGGraphicsElement} target - Element content rectangle of which needs
- *      to be calculated.
- * @returns {DOMRectInit}
- */
-function getSVGContentRect(target) {
-    var bbox = target.getBBox();
-    return createRectInit(0, 0, bbox.width, bbox.height);
-}
-/**
- * Calculates content rectangle of provided HTMLElement.
- *
- * @param {HTMLElement} target - Element for which to calculate the content rectangle.
- * @returns {DOMRectInit}
- */
-function getHTMLElementContentRect(target) {
-    // Client width & height properties can't be
-    // used exclusively as they provide rounded values.
-    var clientWidth = target.clientWidth, clientHeight = target.clientHeight;
-    // By this condition we can catch all non-replaced inline, hidden and
-    // detached elements. Though elements with width & height properties less
-    // than 0.5 will be discarded as well.
-    //
-    // Without it we would need to implement separate methods for each of
-    // those cases and it's not possible to perform a precise and performance
-    // effective test for hidden elements. E.g. even jQuery's ':visible' filter
-    // gives wrong results for elements with width & height less than 0.5.
-    if (!clientWidth && !clientHeight) {
-        return emptyRect;
-    }
-    var styles = getWindowOf(target).getComputedStyle(target);
-    var paddings = getPaddings(styles);
-    var horizPad = paddings.left + paddings.right;
-    var vertPad = paddings.top + paddings.bottom;
-    // Computed styles of width & height are being used because they are the
-    // only dimensions available to JS that contain non-rounded values. It could
-    // be possible to utilize the getBoundingClientRect if only it's data wasn't
-    // affected by CSS transformations let alone paddings, borders and scroll bars.
-    var width = toFloat(styles.width), height = toFloat(styles.height);
-    // Width & height include paddings and borders when the 'border-box' box
-    // model is applied (except for IE).
-    if (styles.boxSizing === 'border-box') {
-        // Following conditions are required to handle Internet Explorer which
-        // doesn't include paddings and borders to computed CSS dimensions.
-        //
-        // We can say that if CSS dimensions + paddings are equal to the "client"
-        // properties then it's either IE, and thus we don't need to subtract
-        // anything, or an element merely doesn't have paddings/borders styles.
-        if (Math.round(width + horizPad) !== clientWidth) {
-            width -= getBordersSize(styles, 'left', 'right') + horizPad;
-        }
-        if (Math.round(height + vertPad) !== clientHeight) {
-            height -= getBordersSize(styles, 'top', 'bottom') + vertPad;
-        }
-    }
-    // Following steps can't be applied to the document's root element as its
-    // client[Width/Height] properties represent viewport area of the window.
-    // Besides, it's as well not necessary as the <html> itself neither has
-    // rendered scroll bars nor it can be clipped.
-    if (!isDocumentElement(target)) {
-        // In some browsers (only in Firefox, actually) CSS width & height
-        // include scroll bars size which can be removed at this step as scroll
-        // bars are the only difference between rounded dimensions + paddings
-        // and "client" properties, though that is not always true in Chrome.
-        var vertScrollbar = Math.round(width + horizPad) - clientWidth;
-        var horizScrollbar = Math.round(height + vertPad) - clientHeight;
-        // Chrome has a rather weird rounding of "client" properties.
-        // E.g. for an element with content width of 314.2px it sometimes gives
-        // the client width of 315px and for the width of 314.7px it may give
-        // 314px. And it doesn't happen all the time. So just ignore this delta
-        // as a non-relevant.
-        if (Math.abs(vertScrollbar) !== 1) {
-            width -= vertScrollbar;
-        }
-        if (Math.abs(horizScrollbar) !== 1) {
-            height -= horizScrollbar;
-        }
-    }
-    return createRectInit(paddings.left, paddings.top, width, height);
-}
-/**
- * Checks whether provided element is an instance of the SVGGraphicsElement.
- *
- * @param {Element} target - Element to be checked.
- * @returns {boolean}
- */
-var isSVGGraphicsElement = (function () {
-    // Some browsers, namely IE and Edge, don't have the SVGGraphicsElement
-    // interface.
-    if (typeof SVGGraphicsElement !== 'undefined') {
-        return function (target) { return target instanceof getWindowOf(target).SVGGraphicsElement; };
-    }
-    // If it's so, then check that element is at least an instance of the
-    // SVGElement and that it has the "getBBox" method.
-    // eslint-disable-next-line no-extra-parens
-    return function (target) { return (target instanceof getWindowOf(target).SVGElement &&
-            typeof target.getBBox === 'function'); };
-})();
-/**
- * Checks whether provided element is a document element (<html>).
- *
- * @param {Element} target - Element to be checked.
- * @returns {boolean}
- */
-function isDocumentElement(target) {
-    return target === getWindowOf(target).document.documentElement;
-}
-/**
- * Calculates an appropriate content rectangle for provided html or svg element.
- *
- * @param {Element} target - Element content rectangle of which needs to be calculated.
- * @returns {DOMRectInit}
- */
-function getContentRect(target) {
-    if (!isBrowser) {
-        return emptyRect;
-    }
-    if (isSVGGraphicsElement(target)) {
-        return getSVGContentRect(target);
-    }
-    return getHTMLElementContentRect(target);
-}
-/**
- * Creates rectangle with an interface of the DOMRectReadOnly.
- * Spec: https://drafts.fxtf.org/geometry/#domrectreadonly
- *
- * @param {DOMRectInit} rectInit - Object with rectangle's x/y coordinates and dimensions.
- * @returns {DOMRectReadOnly}
- */
-function createReadOnlyRect(_a) {
-    var x = _a.x, y = _a.y, width = _a.width, height = _a.height;
-    // If DOMRectReadOnly is available use it as a prototype for the rectangle.
-    var Constr = typeof DOMRectReadOnly !== 'undefined' ? DOMRectReadOnly : Object;
-    var rect = Object.create(Constr.prototype);
-    // Rectangle's properties are not writable and non-enumerable.
-    defineConfigurable(rect, {
-        x: x, y: y, width: width, height: height,
-        top: y,
-        right: x + width,
-        bottom: height + y,
-        left: x
-    });
-    return rect;
-}
-/**
- * Creates DOMRectInit object based on the provided dimensions and the x/y coordinates.
- * Spec: https://drafts.fxtf.org/geometry/#dictdef-domrectinit
- *
- * @param {number} x - X coordinate.
- * @param {number} y - Y coordinate.
- * @param {number} width - Rectangle's width.
- * @param {number} height - Rectangle's height.
- * @returns {DOMRectInit}
- */
-function createRectInit(x, y, width, height) {
-    return { x: x, y: y, width: width, height: height };
-}
+	// Placeholder of an empty content rectangle.
+	var emptyRect = createRectInit(0, 0, 0, 0);
+	/**
+	 * Converts provided string to a number.
+	 *
+	 * @param {number|string} value
+	 * @returns {number}
+	 */
+	function toFloat(value) {
+		return parseFloat(value) || 0;
+	}
+	/**
+	 * Extracts borders size from provided styles.
+	 *
+	 * @param {CSSStyleDeclaration} styles
+	 * @param {...string} positions - Borders positions (top, right, ...)
+	 * @returns {number}
+	 */
+	function getBordersSize(styles) {
+		var positions = [];
+		for (var _i = 1; _i < arguments.length; _i++) {
+			positions[_i - 1] = arguments[_i];
+		}
+		return positions.reduce(function (size, position) {
+			var value = styles['border-' + position + '-width'];
+			return size + toFloat(value);
+		}, 0);
+	}
+	/**
+	 * Extracts paddings sizes from provided styles.
+	 *
+	 * @param {CSSStyleDeclaration} styles
+	 * @returns {Object} Paddings box.
+	 */
+	function getPaddings(styles) {
+		var positions = ['top', 'right', 'bottom', 'left'];
+		var paddings = {};
+		for (var _i = 0, positions_1 = positions; _i < positions_1.length; _i++) {
+			var position = positions_1[_i];
+			var value = styles['padding-' + position];
+			paddings[position] = toFloat(value);
+		}
+		return paddings;
+	}
+	/**
+	 * Calculates content rectangle of provided SVG element.
+	 *
+	 * @param {SVGGraphicsElement} target - Element content rectangle of which needs
+	 *      to be calculated.
+	 * @returns {DOMRectInit}
+	 */
+	function getSVGContentRect(target) {
+		var bbox = target.getBBox();
+		return createRectInit(0, 0, bbox.width, bbox.height);
+	}
+	/**
+	 * Calculates content rectangle of provided HTMLElement.
+	 *
+	 * @param {HTMLElement} target - Element for which to calculate the content rectangle.
+	 * @returns {DOMRectInit}
+	 */
+	function getHTMLElementContentRect(target) {
+		// Client width & height properties can't be
+		// used exclusively as they provide rounded values.
+		var clientWidth = target.clientWidth, clientHeight = target.clientHeight;
+		// By this condition we can catch all non-replaced inline, hidden and
+		// detached elements. Though elements with width & height properties less
+		// than 0.5 will be discarded as well.
+		//
+		// Without it we would need to implement separate methods for each of
+		// those cases and it's not possible to perform a precise and performance
+		// effective test for hidden elements. E.g. even jQuery's ':visible' filter
+		// gives wrong results for elements with width & height less than 0.5.
+		if (!clientWidth && !clientHeight) {
+			return emptyRect;
+		}
+		var styles = getWindowOf(target).getComputedStyle(target);
+		var paddings = getPaddings(styles);
+		var horizPad = paddings.left + paddings.right;
+		var vertPad = paddings.top + paddings.bottom;
+		// Computed styles of width & height are being used because they are the
+		// only dimensions available to JS that contain non-rounded values. It could
+		// be possible to utilize the getBoundingClientRect if only it's data wasn't
+		// affected by CSS transformations let alone paddings, borders and scroll bars.
+		var width = toFloat(styles.width), height = toFloat(styles.height);
+		// Width & height include paddings and borders when the 'border-box' box
+		// model is applied (except for IE).
+		if (styles.boxSizing === 'border-box') {
+			// Following conditions are required to handle Internet Explorer which
+			// doesn't include paddings and borders to computed CSS dimensions.
+			//
+			// We can say that if CSS dimensions + paddings are equal to the "client"
+			// properties then it's either IE, and thus we don't need to subtract
+			// anything, or an element merely doesn't have paddings/borders styles.
+			if (Math.round(width + horizPad) !== clientWidth) {
+				width -= getBordersSize(styles, 'left', 'right') + horizPad;
+			}
+			if (Math.round(height + vertPad) !== clientHeight) {
+				height -= getBordersSize(styles, 'top', 'bottom') + vertPad;
+			}
+		}
+		// Following steps can't be applied to the document's root element as its
+		// client[Width/Height] properties represent viewport area of the window.
+		// Besides, it's as well not necessary as the <html> itself neither has
+		// rendered scroll bars nor it can be clipped.
+		if (!isDocumentElement(target)) {
+			// In some browsers (only in Firefox, actually) CSS width & height
+			// include scroll bars size which can be removed at this step as scroll
+			// bars are the only difference between rounded dimensions + paddings
+			// and "client" properties, though that is not always true in Chrome.
+			var vertScrollbar = Math.round(width + horizPad) - clientWidth;
+			var horizScrollbar = Math.round(height + vertPad) - clientHeight;
+			// Chrome has a rather weird rounding of "client" properties.
+			// E.g. for an element with content width of 314.2px it sometimes gives
+			// the client width of 315px and for the width of 314.7px it may give
+			// 314px. And it doesn't happen all the time. So just ignore this delta
+			// as a non-relevant.
+			if (Math.abs(vertScrollbar) !== 1) {
+				width -= vertScrollbar;
+			}
+			if (Math.abs(horizScrollbar) !== 1) {
+				height -= horizScrollbar;
+			}
+		}
+		return createRectInit(paddings.left, paddings.top, width, height);
+	}
+	/**
+	 * Checks whether provided element is an instance of the SVGGraphicsElement.
+	 *
+	 * @param {Element} target - Element to be checked.
+	 * @returns {boolean}
+	 */
+	var isSVGGraphicsElement = (function () {
+		// Some browsers, namely IE and Edge, don't have the SVGGraphicsElement
+		// interface.
+		if (typeof SVGGraphicsElement !== 'undefined') {
+			return function (target) { return target instanceof getWindowOf(target).SVGGraphicsElement; };
+		}
+		// If it's so, then check that element is at least an instance of the
+		// SVGElement and that it has the "getBBox" method.
+		// eslint-disable-next-line no-extra-parens
+		return function (target) { return (target instanceof getWindowOf(target).SVGElement &&
+				typeof target.getBBox === 'function'); };
+	})();
+	/**
+	 * Checks whether provided element is a document element (<html>).
+	 *
+	 * @param {Element} target - Element to be checked.
+	 * @returns {boolean}
+	 */
+	function isDocumentElement(target) {
+		return target === getWindowOf(target).document.documentElement;
+	}
+	/**
+	 * Calculates an appropriate content rectangle for provided html or svg element.
+	 *
+	 * @param {Element} target - Element content rectangle of which needs to be calculated.
+	 * @returns {DOMRectInit}
+	 */
+	function getContentRect(target) {
+		if (!isBrowser) {
+			return emptyRect;
+		}
+		if (isSVGGraphicsElement(target)) {
+			return getSVGContentRect(target);
+		}
+		return getHTMLElementContentRect(target);
+	}
+	/**
+	 * Creates rectangle with an interface of the DOMRectReadOnly.
+	 * Spec: https://drafts.fxtf.org/geometry/#domrectreadonly
+	 *
+	 * @param {DOMRectInit} rectInit - Object with rectangle's x/y coordinates and dimensions.
+	 * @returns {DOMRectReadOnly}
+	 */
+	function createReadOnlyRect(_a) {
+		var x = _a.x, y = _a.y, width = _a.width, height = _a.height;
+		// If DOMRectReadOnly is available use it as a prototype for the rectangle.
+		var Constr = typeof DOMRectReadOnly !== 'undefined' ? DOMRectReadOnly : Object;
+		var rect = Object.create(Constr.prototype);
+		// Rectangle's properties are not writable and non-enumerable.
+		defineConfigurable(rect, {
+			x: x, y: y, width: width, height: height,
+			top: y,
+			right: x + width,
+			bottom: height + y,
+			left: x
+		});
+		return rect;
+	}
+	/**
+	 * Creates DOMRectInit object based on the provided dimensions and the x/y coordinates.
+	 * Spec: https://drafts.fxtf.org/geometry/#dictdef-domrectinit
+	 *
+	 * @param {number} x - X coordinate.
+	 * @param {number} y - Y coordinate.
+	 * @param {number} width - Rectangle's width.
+	 * @param {number} height - Rectangle's height.
+	 * @returns {DOMRectInit}
+	 */
+	function createRectInit(x, y, width, height) {
+		return { x: x, y: y, width: width, height: height };
+	}
 
-/**
- * Class that is responsible for computations of the content rectangle of
- * provided DOM element and for keeping track of it's changes.
- */
-var ResizeObservation = /** @class */ (function () {
-    /**
-     * Creates an instance of ResizeObservation.
-     *
-     * @param {Element} target - Element to be observed.
-     */
-    function ResizeObservation(target) {
-        /**
-         * Broadcasted width of content rectangle.
-         *
-         * @type {number}
-         */
-        this.broadcastWidth = 0;
-        /**
-         * Broadcasted height of content rectangle.
-         *
-         * @type {number}
-         */
-        this.broadcastHeight = 0;
-        /**
-         * Reference to the last observed content rectangle.
-         *
-         * @private {DOMRectInit}
-         */
-        this.contentRect_ = createRectInit(0, 0, 0, 0);
-        this.target = target;
-    }
-    /**
-     * Updates content rectangle and tells whether it's width or height properties
-     * have changed since the last broadcast.
-     *
-     * @returns {boolean}
-     */
-    ResizeObservation.prototype.isActive = function () {
-        var rect = getContentRect(this.target);
-        this.contentRect_ = rect;
-        return (rect.width !== this.broadcastWidth ||
-                rect.height !== this.broadcastHeight);
-    };
-    /**
-     * Updates 'broadcastWidth' and 'broadcastHeight' properties with a data
-     * from the corresponding properties of the last observed content rectangle.
-     *
-     * @returns {DOMRectInit} Last observed content rectangle.
-     */
-    ResizeObservation.prototype.broadcastRect = function () {
-        var rect = this.contentRect_;
-        this.broadcastWidth = rect.width;
-        this.broadcastHeight = rect.height;
-        return rect;
-    };
-    return ResizeObservation;
-}());
+	/**
+	 * Class that is responsible for computations of the content rectangle of
+	 * provided DOM element and for keeping track of it's changes.
+	 */
+	var ResizeObservation = /** @class */ (function () {
+		/**
+		 * Creates an instance of ResizeObservation.
+		 *
+		 * @param {Element} target - Element to be observed.
+		 */
+		function ResizeObservation(target) {
+			/**
+			 * Broadcasted width of content rectangle.
+			 *
+			 * @type {number}
+			 */
+			this.broadcastWidth = 0;
+			/**
+			 * Broadcasted height of content rectangle.
+			 *
+			 * @type {number}
+			 */
+			this.broadcastHeight = 0;
+			/**
+			 * Reference to the last observed content rectangle.
+			 *
+			 * @private {DOMRectInit}
+			 */
+			this.contentRect_ = createRectInit(0, 0, 0, 0);
+			this.target = target;
+		}
+		/**
+		 * Updates content rectangle and tells whether it's width or height properties
+		 * have changed since the last broadcast.
+		 *
+		 * @returns {boolean}
+		 */
+		ResizeObservation.prototype.isActive = function () {
+			var rect = getContentRect(this.target);
+			this.contentRect_ = rect;
+			return (rect.width !== this.broadcastWidth ||
+					rect.height !== this.broadcastHeight);
+		};
+		/**
+		 * Updates 'broadcastWidth' and 'broadcastHeight' properties with a data
+		 * from the corresponding properties of the last observed content rectangle.
+		 *
+		 * @returns {DOMRectInit} Last observed content rectangle.
+		 */
+		ResizeObservation.prototype.broadcastRect = function () {
+			var rect = this.contentRect_;
+			this.broadcastWidth = rect.width;
+			this.broadcastHeight = rect.height;
+			return rect;
+		};
+		return ResizeObservation;
+	}());
 
-var ResizeObserverEntry = /** @class */ (function () {
-    /**
-     * Creates an instance of ResizeObserverEntry.
-     *
-     * @param {Element} target - Element that is being observed.
-     * @param {DOMRectInit} rectInit - Data of the element's content rectangle.
-     */
-    function ResizeObserverEntry(target, rectInit) {
-        var contentRect = createReadOnlyRect(rectInit);
-        // According to the specification following properties are not writable
-        // and are also not enumerable in the native implementation.
-        //
-        // Property accessors are not being used as they'd require to define a
-        // private WeakMap storage which may cause memory leaks in browsers that
-        // don't support this type of collections.
-        defineConfigurable(this, { target: target, contentRect: contentRect });
-    }
-    return ResizeObserverEntry;
-}());
+	var ResizeObserverEntry = /** @class */ (function () {
+		/**
+		 * Creates an instance of ResizeObserverEntry.
+		 *
+		 * @param {Element} target - Element that is being observed.
+		 * @param {DOMRectInit} rectInit - Data of the element's content rectangle.
+		 */
+		function ResizeObserverEntry(target, rectInit) {
+			var contentRect = createReadOnlyRect(rectInit);
+			// According to the specification following properties are not writable
+			// and are also not enumerable in the native implementation.
+			//
+			// Property accessors are not being used as they'd require to define a
+			// private WeakMap storage which may cause memory leaks in browsers that
+			// don't support this type of collections.
+			defineConfigurable(this, { target: target, contentRect: contentRect });
+		}
+		return ResizeObserverEntry;
+	}());
 
-var ResizeObserverSPI = /** @class */ (function () {
-    /**
-     * Creates a new instance of ResizeObserver.
-     *
-     * @param {ResizeObserverCallback} callback - Callback function that is invoked
-     *      when one of the observed elements changes it's content dimensions.
-     * @param {ResizeObserverController} controller - Controller instance which
-     *      is responsible for the updates of observer.
-     * @param {ResizeObserver} callbackCtx - Reference to the public
-     *      ResizeObserver instance which will be passed to callback function.
-     */
-    function ResizeObserverSPI(callback, controller, callbackCtx) {
-        /**
-         * Collection of resize observations that have detected changes in dimensions
-         * of elements.
-         *
-         * @private {Array<ResizeObservation>}
-         */
-        this.activeObservations_ = [];
-        /**
-         * Registry of the ResizeObservation instances.
-         *
-         * @private {Map<Element, ResizeObservation>}
-         */
-        this.observations_ = new MapShim();
-        if (typeof callback !== 'function') {
-            throw new TypeError('The callback provided as parameter 1 is not a function.');
-        }
-        this.callback_ = callback;
-        this.controller_ = controller;
-        this.callbackCtx_ = callbackCtx;
-    }
-    /**
-     * Starts observing provided element.
-     *
-     * @param {Element} target - Element to be observed.
-     * @returns {void}
-     */
-    ResizeObserverSPI.prototype.observe = function (target) {
-        if (!arguments.length) {
-            throw new TypeError('1 argument required, but only 0 present.');
-        }
-        // Do nothing if current environment doesn't have the Element interface.
-        if (typeof Element === 'undefined' || !(Element instanceof Object)) {
-            return;
-        }
-        if (!(target instanceof getWindowOf(target).Element)) {
-            throw new TypeError('parameter 1 is not of type "Element".');
-        }
-        var observations = this.observations_;
-        // Do nothing if element is already being observed.
-        if (observations.has(target)) {
-            return;
-        }
-        observations.set(target, new ResizeObservation(target));
-        this.controller_.addObserver(this);
-        // Force the update of observations.
-        this.controller_.refresh();
-    };
-    /**
-     * Stops observing provided element.
-     *
-     * @param {Element} target - Element to stop observing.
-     * @returns {void}
-     */
-    ResizeObserverSPI.prototype.unobserve = function (target) {
-        if (!arguments.length) {
-            throw new TypeError('1 argument required, but only 0 present.');
-        }
-        // Do nothing if current environment doesn't have the Element interface.
-        if (typeof Element === 'undefined' || !(Element instanceof Object)) {
-            return;
-        }
-        if (!(target instanceof getWindowOf(target).Element)) {
-            throw new TypeError('parameter 1 is not of type "Element".');
-        }
-        var observations = this.observations_;
-        // Do nothing if element is not being observed.
-        if (!observations.has(target)) {
-            return;
-        }
-        observations.delete(target);
-        if (!observations.size) {
-            this.controller_.removeObserver(this);
-        }
-    };
-    /**
-     * Stops observing all elements.
-     *
-     * @returns {void}
-     */
-    ResizeObserverSPI.prototype.disconnect = function () {
-        this.clearActive();
-        this.observations_.clear();
-        this.controller_.removeObserver(this);
-    };
-    /**
-     * Collects observation instances the associated element of which has changed
-     * it's content rectangle.
-     *
-     * @returns {void}
-     */
-    ResizeObserverSPI.prototype.gatherActive = function () {
-        var _this = this;
-        this.clearActive();
-        this.observations_.forEach(function (observation) {
-            if (observation.isActive()) {
-                _this.activeObservations_.push(observation);
-            }
-        });
-    };
-    /**
-     * Invokes initial callback function with a list of ResizeObserverEntry
-     * instances collected from active resize observations.
-     *
-     * @returns {void}
-     */
-    ResizeObserverSPI.prototype.broadcastActive = function () {
-        // Do nothing if observer doesn't have active observations.
-        if (!this.hasActive()) {
-            return;
-        }
-        var ctx = this.callbackCtx_;
-        // Create ResizeObserverEntry instance for every active observation.
-        var entries = this.activeObservations_.map(function (observation) {
-            return new ResizeObserverEntry(observation.target, observation.broadcastRect());
-        });
-        this.callback_.call(ctx, entries, ctx);
-        this.clearActive();
-    };
-    /**
-     * Clears the collection of active observations.
-     *
-     * @returns {void}
-     */
-    ResizeObserverSPI.prototype.clearActive = function () {
-        this.activeObservations_.splice(0);
-    };
-    /**
-     * Tells whether observer has active observations.
-     *
-     * @returns {boolean}
-     */
-    ResizeObserverSPI.prototype.hasActive = function () {
-        return this.activeObservations_.length > 0;
-    };
-    return ResizeObserverSPI;
-}());
+	var ResizeObserverSPI = /** @class */ (function () {
+		/**
+		 * Creates a new instance of ResizeObserver.
+		 *
+		 * @param {ResizeObserverCallback} callback - Callback function that is invoked
+		 *      when one of the observed elements changes it's content dimensions.
+		 * @param {ResizeObserverController} controller - Controller instance which
+		 *      is responsible for the updates of observer.
+		 * @param {ResizeObserver} callbackCtx - Reference to the public
+		 *      ResizeObserver instance which will be passed to callback function.
+		 */
+		function ResizeObserverSPI(callback, controller, callbackCtx) {
+			/**
+			 * Collection of resize observations that have detected changes in dimensions
+			 * of elements.
+			 *
+			 * @private {Array<ResizeObservation>}
+			 */
+			this.activeObservations_ = [];
+			/**
+			 * Registry of the ResizeObservation instances.
+			 *
+			 * @private {Map<Element, ResizeObservation>}
+			 */
+			this.observations_ = new MapShim();
+			if (typeof callback !== 'function') {
+				throw new TypeError('The callback provided as parameter 1 is not a function.');
+			}
+			this.callback_ = callback;
+			this.controller_ = controller;
+			this.callbackCtx_ = callbackCtx;
+		}
+		/**
+		 * Starts observing provided element.
+		 *
+		 * @param {Element} target - Element to be observed.
+		 * @returns {void}
+		 */
+		ResizeObserverSPI.prototype.observe = function (target) {
+			if (!arguments.length) {
+				throw new TypeError('1 argument required, but only 0 present.');
+			}
+			// Do nothing if current environment doesn't have the Element interface.
+			if (typeof Element === 'undefined' || !(Element instanceof Object)) {
+				return;
+			}
+			if (!(target instanceof getWindowOf(target).Element)) {
+				throw new TypeError('parameter 1 is not of type "Element".');
+			}
+			var observations = this.observations_;
+			// Do nothing if element is already being observed.
+			if (observations.has(target)) {
+				return;
+			}
+			observations.set(target, new ResizeObservation(target));
+			this.controller_.addObserver(this);
+			// Force the update of observations.
+			this.controller_.refresh();
+		};
+		/**
+		 * Stops observing provided element.
+		 *
+		 * @param {Element} target - Element to stop observing.
+		 * @returns {void}
+		 */
+		ResizeObserverSPI.prototype.unobserve = function (target) {
+			if (!arguments.length) {
+				throw new TypeError('1 argument required, but only 0 present.');
+			}
+			// Do nothing if current environment doesn't have the Element interface.
+			if (typeof Element === 'undefined' || !(Element instanceof Object)) {
+				return;
+			}
+			if (!(target instanceof getWindowOf(target).Element)) {
+				throw new TypeError('parameter 1 is not of type "Element".');
+			}
+			var observations = this.observations_;
+			// Do nothing if element is not being observed.
+			if (!observations.has(target)) {
+				return;
+			}
+			observations.delete(target);
+			if (!observations.size) {
+				this.controller_.removeObserver(this);
+			}
+		};
+		/**
+		 * Stops observing all elements.
+		 *
+		 * @returns {void}
+		 */
+		ResizeObserverSPI.prototype.disconnect = function () {
+			this.clearActive();
+			this.observations_.clear();
+			this.controller_.removeObserver(this);
+		};
+		/**
+		 * Collects observation instances the associated element of which has changed
+		 * it's content rectangle.
+		 *
+		 * @returns {void}
+		 */
+		ResizeObserverSPI.prototype.gatherActive = function () {
+			var _this = this;
+			this.clearActive();
+			this.observations_.forEach(function (observation) {
+				if (observation.isActive()) {
+					_this.activeObservations_.push(observation);
+				}
+			});
+		};
+		/**
+		 * Invokes initial callback function with a list of ResizeObserverEntry
+		 * instances collected from active resize observations.
+		 *
+		 * @returns {void}
+		 */
+		ResizeObserverSPI.prototype.broadcastActive = function () {
+			// Do nothing if observer doesn't have active observations.
+			if (!this.hasActive()) {
+				return;
+			}
+			var ctx = this.callbackCtx_;
+			// Create ResizeObserverEntry instance for every active observation.
+			var entries = this.activeObservations_.map(function (observation) {
+				return new ResizeObserverEntry(observation.target, observation.broadcastRect());
+			});
+			this.callback_.call(ctx, entries, ctx);
+			this.clearActive();
+		};
+		/**
+		 * Clears the collection of active observations.
+		 *
+		 * @returns {void}
+		 */
+		ResizeObserverSPI.prototype.clearActive = function () {
+			this.activeObservations_.splice(0);
+		};
+		/**
+		 * Tells whether observer has active observations.
+		 *
+		 * @returns {boolean}
+		 */
+		ResizeObserverSPI.prototype.hasActive = function () {
+			return this.activeObservations_.length > 0;
+		};
+		return ResizeObserverSPI;
+	}());
 
-// Registry of internal observers. If WeakMap is not available use current shim
-// for the Map collection as it has all required methods and because WeakMap
-// can't be fully polyfilled anyway.
-var observers = typeof WeakMap !== 'undefined' ? new WeakMap() : new MapShim();
-/**
- * ResizeObserver API. Encapsulates the ResizeObserver SPI implementation
- * exposing only those methods and properties that are defined in the spec.
- */
-var ResizeObserver = /** @class */ (function () {
-    /**
-     * Creates a new instance of ResizeObserver.
-     *
-     * @param {ResizeObserverCallback} callback - Callback that is invoked when
-     *      dimensions of the observed elements change.
-     */
-    function ResizeObserver(callback) {
-        if (!(this instanceof ResizeObserver)) {
-            throw new TypeError('Cannot call a class as a function.');
-        }
-        if (!arguments.length) {
-            throw new TypeError('1 argument required, but only 0 present.');
-        }
-        var controller = ResizeObserverController.getInstance();
-        var observer = new ResizeObserverSPI(callback, controller, this);
-        observers.set(this, observer);
-    }
-    return ResizeObserver;
-}());
-// Expose public methods of ResizeObserver.
-[
-    'observe',
-    'unobserve',
-    'disconnect'
-    ].forEach(function (method) {
-        ResizeObserver.prototype[method] = function () {
-            var _a;
-            return (_a = observers.get(this))[method].apply(_a, arguments);
-        };
-    });
+	// Registry of internal observers. If WeakMap is not available use current shim
+	// for the Map collection as it has all required methods and because WeakMap
+	// can't be fully polyfilled anyway.
+	var observers = typeof WeakMap !== 'undefined' ? new WeakMap() : new MapShim();
+	/**
+	 * ResizeObserver API. Encapsulates the ResizeObserver SPI implementation
+	 * exposing only those methods and properties that are defined in the spec.
+	 */
+	var ResizeObserver = /** @class */ (function () {
+		/**
+		 * Creates a new instance of ResizeObserver.
+		 *
+		 * @param {ResizeObserverCallback} callback - Callback that is invoked when
+		 *      dimensions of the observed elements change.
+		 */
+		function ResizeObserver(callback) {
+			if (!(this instanceof ResizeObserver)) {
+				throw new TypeError('Cannot call a class as a function.');
+			}
+			if (!arguments.length) {
+				throw new TypeError('1 argument required, but only 0 present.');
+			}
+			var controller = ResizeObserverController.getInstance();
+			var observer = new ResizeObserverSPI(callback, controller, this);
+			observers.set(this, observer);
+		}
+		return ResizeObserver;
+	}());
+	// Expose public methods of ResizeObserver.
+	[
+		'observe',
+		'unobserve',
+		'disconnect'
+		].forEach(function (method) {
+			ResizeObserver.prototype[method] = function () {
+				var _a;
+				return (_a = observers.get(this))[method].apply(_a, arguments);
+			};
+		});
 
-var index = (function () {
-    // Export existing implementation if available.
-    if (typeof global$1.ResizeObserver !== 'undefined') {
-        return global$1.ResizeObserver;
-    }
-    return ResizeObserver;
-})();
+	var index = (function () {
+		// Export existing implementation if available.
+		if (typeof global$1.ResizeObserver !== 'undefined') {
+			return global$1.ResizeObserver;
+		}
+		return ResizeObserver;
+	})();
 
-return index;
+	return index;
 
 })));
+/*
+ * anime.js v3.0.1
+ * (c) 2019 Julian Garnier
+ * Released under the MIT license
+ * animejs.com
+ */
+(function (root, factory){
+	'use strict';
+
+	/*istanbul ignore next:cant test*/
+	if (typeof module === 'object' && typeof module.exports === 'object') {
+		module.exports = factory();
+	} else {
+		// Browser globals
+		root.anime = factory();
+	}
+})(this, function(){
+	'use strict';
+
+	// Defaults
+
+	var defaultInstanceSettings = {
+			update: null,
+			begin: null,
+			loopBegin: null,
+			changeBegin: null,
+			change: null,
+			changeComplete: null,
+			loopComplete: null,
+			complete: null,
+			loop: 1,
+			direction: 'normal',
+			autoplay: true,
+			timelineOffset: 0
+	};
+
+	var defaultTweenSettings = {
+			duration: 1000,
+			delay: 0,
+			endDelay: 0,
+			easing: 'easeOutElastic(1, .5)',
+			round: 0
+	};
+
+	var validTransforms = ['translateX', 'translateY', 'translateZ', 'rotate', 'rotateX', 'rotateY', 'rotateZ', 'scale', 'scaleX', 'scaleY', 'scaleZ', 'skew', 'skewX', 'skewY', 'perspective'];
+
+	// Caching
+
+	var cache = {
+			CSS: {},
+			springs: {}
+	};
+
+	// Utils
+
+	function minMax(val, min, max) {
+		return Math.min(Math.max(val, min), max);
+	}
+
+	function stringContains(str, text) {
+		return str.indexOf(text) > -1;
+	}
+
+	function applyArguments(func, args) {
+		return func.apply(null, args);
+	}
+
+	var is = {
+			arr: function (a) { return Array.isArray(a); },
+			obj: function (a) { return stringContains(Object.prototype.toString.call(a), 'Object'); },
+			pth: function (a) { return is.obj(a) && a.hasOwnProperty('totalLength'); },
+			svg: function (a) { return a instanceof SVGElement; },
+			inp: function (a) { return a instanceof HTMLInputElement; },
+			dom: function (a) { return a.nodeType || is.svg(a); },
+			str: function (a) { return typeof a === 'string'; },
+			fnc: function (a) { return typeof a === 'function'; },
+			und: function (a) { return typeof a === 'undefined'; },
+			hex: function (a) { return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(a); },
+			rgb: function (a) { return /^rgb/.test(a); },
+			hsl: function (a) { return /^hsl/.test(a); },
+			col: function (a) { return (is.hex(a) || is.rgb(a) || is.hsl(a)); },
+			key: function (a) { return !defaultInstanceSettings.hasOwnProperty(a) && !defaultTweenSettings.hasOwnProperty(a) && a !== 'targets' && a !== 'keyframes'; }
+	};
+
+	// Easings
+
+	function parseEasingParameters(string) {
+		var match = /\(([^)]+)\)/.exec(string);
+		return match ? match[1].split(',').map(function (p) { return parseFloat(p); }) : [];
+	}
+
+	// Spring solver inspired by Webkit Copyright © 2016 Apple Inc. All rights reserved. https://webkit.org/demos/spring/spring.js
+
+	function spring(string, duration) {
+
+		var params = parseEasingParameters(string);
+		var mass = minMax(is.und(params[0]) ? 1 : params[0], 0.1, 100);
+		var stiffness = minMax(is.und(params[1]) ? 100 : params[1], 0.1, 100);
+		var damping = minMax(is.und(params[2]) ? 10 : params[2], 0.1, 100);
+		var velocity =  minMax(is.und(params[3]) ? 0 : params[3], 0.1, 100);
+		var w0 = Math.sqrt(stiffness / mass);
+		var zeta = damping / (2 * Math.sqrt(stiffness * mass));
+		var wd = zeta < 1 ? w0 * Math.sqrt(1 - zeta * zeta) : 0;
+		var a = 1;
+		var b = zeta < 1 ? (zeta * w0 + -velocity) / wd : -velocity + w0;
+
+		function solver(t) {
+			var progress = duration ? (duration * t) / 1000 : t;
+			if (zeta < 1) {
+				progress = Math.exp(-progress * zeta * w0) * (a * Math.cos(wd * progress) + b * Math.sin(wd * progress));
+			} else {
+				progress = (a + b * progress) * Math.exp(-progress * w0);
+			}
+			if (t === 0 || t === 1) { return t; }
+			return 1 - progress;
+		}
+
+		function getDuration() {
+			var cached = cache.springs[string];
+			if (cached) { return cached; }
+			var frame = 1/6;
+			var elapsed = 0;
+			var rest = 0;
+			while(rest < 16) {
+				elapsed += frame;
+				if (solver(elapsed) === 1) {
+					rest++;
+//					if (rest >= 16) { 
+//						break;
+//					}
+				} else {
+					rest = 0;
+				}
+			}
+			var duration = elapsed * frame * 1000;
+			cache.springs[string] = duration;
+			return duration;
+		}
+
+		return duration ? solver : getDuration;
+
+	}
+
+	// Elastic easing adapted from jQueryUI http://api.jqueryui.com/easings/
+
+	function elastic(amplitude, period) {
+		if ( amplitude === void 0 ) {amplitude = 1;}
+		if ( period === void 0 ) {period = 0.5;}
+
+		var a = minMax(amplitude, 1, 10);
+		var p = minMax(period, 0.1, 2);
+		return function (t) {
+			return (t === 0 || t === 1) ? t : 
+				-a * Math.pow(2, 10 * (t - 1)) * Math.sin((((t - 1) - (p / (Math.PI * 2) * Math.asin(1 / a))) * (Math.PI * 2)) / p);
+		};
+	}
+
+	// Basic steps easing implementation https://developer.mozilla.org/fr/docs/Web/CSS/transition-timing-function
+	function steps(basicSteps) {
+		if ( basicSteps === void 0 ) {
+			basicSteps = 10;
+		}
+
+		return function (t) { 
+			return Math.round(t * basicSteps) * (1 / basicSteps); 
+		};
+	}
+
+	// BezierEasing https://github.com/gre/bezier-easing
+
+	var bezier = (function () {
+
+		var kSplineTableSize = 11;
+		var kSampleStepSize = 1.0 / (kSplineTableSize - 1.0);
+
+		function fA(aA1, aA2) { return 1.0 - 3.0 * aA2 + 3.0 * aA1; }
+		function fB(aA1, aA2) { return 3.0 * aA2 - 6.0 * aA1; }
+		function fC(aA1)      { return 3.0 * aA1; }
+
+		function calcBezier(aT, aA1, aA2) { 
+			return ((fA(aA1, aA2) * aT + fB(aA1, aA2)) * aT + fC(aA1)) * aT; 
+		}
+		function getSlope(aT, aA1, aA2) { 
+			return 3.0 * fA(aA1, aA2) * aT * aT + 2.0 * fB(aA1, aA2) * aT + fC(aA1); 
+		}
+
+		function binarySubdivide(aX, aA, aB, mX1, mX2) {
+			var currentX, currentT, i = 0;
+			do {
+				currentT = aA + (aB - aA) / 2.0;
+				currentX = calcBezier(currentT, mX1, mX2) - aX;
+				if (currentX > 0.0) { 
+					aB = currentT; 
+				} else { 
+					aA = currentT;
+				}
+			} while (Math.abs(currentX) > 0.0000001 && ++i < 10);
+			return currentT;
+		}
+
+		function newtonRaphsonIterate(aX, aGuessT, mX1, mX2) {
+			for (var i = 0; i < 4; ++i) {
+				var currentSlope = getSlope(aGuessT, mX1, mX2);
+				if (currentSlope === 0.0) { return aGuessT; }
+				var currentX = calcBezier(aGuessT, mX1, mX2) - aX;
+				aGuessT -= currentX / currentSlope;
+			}
+			return aGuessT;
+		}
+
+		function bezier(mX1, mY1, mX2, mY2) {
+
+			if (!(0 <= mX1 && mX1 <= 1 && 0 <= mX2 && mX2 <= 1)) { return; }
+			var sampleValues = new Float32Array(kSplineTableSize);
+
+			if (mX1 !== mY1 || mX2 !== mY2) {
+				for (var i = 0; i < kSplineTableSize; ++i) {
+					sampleValues[i] = calcBezier(i * kSampleStepSize, mX1, mX2);
+				}
+			}
+
+			function getTForX(aX) {
+
+				var intervalStart = 0;
+				var currentSample = 1;
+				var lastSample = kSplineTableSize - 1;
+
+				for (; currentSample !== lastSample && sampleValues[currentSample] <= aX; ++currentSample) {
+					intervalStart += kSampleStepSize;
+				}
+
+				--currentSample;
+
+				var dist = (aX - sampleValues[currentSample]) / (sampleValues[currentSample + 1] - sampleValues[currentSample]);
+				var guessForT = intervalStart + dist * kSampleStepSize;
+				var initialSlope = getSlope(guessForT, mX1, mX2);
+
+				if (initialSlope >= 0.001) {
+					return newtonRaphsonIterate(aX, guessForT, mX1, mX2);
+				} else if (initialSlope === 0.0) {
+					return guessForT;
+				} else {
+					return binarySubdivide(aX, intervalStart, intervalStart + kSampleStepSize, mX1, mX2);
+				}
+
+			}
+
+			return function (x) {
+				if (mX1 === mY1 && mX2 === mY2) {
+					return x;
+				}
+				if (x === 0 || x === 1) { 
+					return x; 
+				}
+				return calcBezier(getTForX(x), mY1, mY2);
+			};
+
+		}
+
+		return bezier;
+
+	})();
+
+	var penner = (function () {
+
+		var names = ['Quad', 'Cubic', 'Quart', 'Quint', 'Sine', 'Expo', 'Circ', 'Back', 'Elastic'];
+
+		// Approximated Penner equations http://matthewlein.com/ceaser/
+
+		var curves = {
+				In: [
+					[0.550, 0.085, 0.680, 0.530], /* inQuad */
+					[0.550, 0.055, 0.675, 0.190], /* inCubic */
+					[0.895, 0.030, 0.685, 0.220], /* inQuart */
+					[0.755, 0.050, 0.855, 0.060], /* inQuint */
+					[0.470, 0.000, 0.745, 0.715], /* inSine */
+					[0.950, 0.050, 0.795, 0.035], /* inExpo */
+					[0.600, 0.040, 0.980, 0.335], /* inCirc */
+					[0.600,-0.280, 0.735, 0.045], /* inBack */
+					elastic /* inElastic */
+					],
+					Out: [
+						[0.250, 0.460, 0.450, 0.940], /* outQuad */
+						[0.215, 0.610, 0.355, 1.000], /* outCubic */
+						[0.165, 0.840, 0.440, 1.000], /* outQuart */
+						[0.230, 1.000, 0.320, 1.000], /* outQuint */
+						[0.390, 0.575, 0.565, 1.000], /* outSine */
+						[0.190, 1.000, 0.220, 1.000], /* outExpo */
+						[0.075, 0.820, 0.165, 1.000], /* outCirc */
+						[0.175, 0.885, 0.320, 1.275], /* outBack */
+						function (a, p) { return function (t) { return 1 - elastic(a, p)(1 - t); }; } /* outElastic */
+						],
+						InOut: [
+							[0.455, 0.030, 0.515, 0.955], /* inOutQuad */
+							[0.645, 0.045, 0.355, 1.000], /* inOutCubic */
+							[0.770, 0.000, 0.175, 1.000], /* inOutQuart */
+							[0.860, 0.000, 0.070, 1.000], /* inOutQuint */
+							[0.445, 0.050, 0.550, 0.950], /* inOutSine */
+							[1.000, 0.000, 0.000, 1.000], /* inOutExpo */
+							[0.785, 0.135, 0.150, 0.860], /* inOutCirc */
+							[0.680,-0.550, 0.265, 1.550], /* inOutBack */
+							function (a, p) { 
+								return function (t) { 
+									return t < 0.5 ? elastic(a, p)(t * 2) / 2 : 1 - elastic(a, p)(t * -2 + 2) / 2; 
+								}; 
+							} /* inOutElastic */
+							]
+		};
+
+		var eases = { 
+				linear: [0.250, 0.250, 0.750, 0.750]
+		};
+
+		var loop = function ( coords ) {
+			curves[coords].forEach(function (ease, i) {
+				eases['ease'+coords+names[i]] = ease;
+			});
+		};
+
+		for (var coords in curves){ 
+			loop( coords );
+		}
+
+		return eases;
+
+	})();
+
+	function parseEasings(easing, duration) {
+		if (is.fnc(easing)) { return easing; }
+		var name = easing.split('(')[0];
+		var ease = penner[name];
+		var args = parseEasingParameters(easing);
+		switch (name) {
+		case 'spring' : return spring(easing, duration);
+		case 'cubicBezier' : return applyArguments(bezier, args);
+		case 'steps' : return applyArguments(steps, args);
+		default : return is.fnc(ease) ? applyArguments(ease, args) : applyArguments(bezier, ease);
+		}
+	}
+
+	// Strings
+
+	function selectString(str) {
+		try {
+			var nodes = document.querySelectorAll(str);
+			return nodes;
+		} catch(e) {
+			return;
+		}
+	}
+
+	// Arrays
+
+	function filterArray(arr, callback) {
+		var len = arr.length;
+		var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+		var result = [];
+		for (var i = 0; i < len; i++) {
+			if (i in arr) {
+				var val = arr[i];
+				if (callback.call(thisArg, val, i, arr)) {
+					result.push(val);
+				}
+			}
+		}
+		return result;
+	}
+
+	function flattenArray(arr) {
+		return arr.reduce(function (a, b) { return a.concat(is.arr(b) ? flattenArray(b) : b); }, []);
+	}
+
+	function toArray(o) {
+		if (is.arr(o)) { return o; }
+		if (is.str(o)) { o = selectString(o) || o; }
+		if (o instanceof NodeList || o instanceof HTMLCollection) { return [].slice.call(o); }
+		return [o];
+	}
+
+	function arrayContains(arr, val) {
+		return arr.some(function (a) { return a === val; });
+	}
+
+	// Objects
+
+	function cloneObject(o) {
+		var clone = {};
+		for (var p in o) { clone[p] = o[p]; }
+		return clone;
+	}
+
+	function replaceObjectProps(o1, o2) {
+		var o = cloneObject(o1);
+		for (var p in o1) { o[p] = o2.hasOwnProperty(p) ? o2[p] : o1[p]; }
+		return o;
+	}
+
+	function mergeObjects(o1, o2) {
+		var o = cloneObject(o1);
+		for (var p in o2) { o[p] = is.und(o1[p]) ? o2[p] : o1[p]; }
+		return o;
+	}
+
+	// Colors
+
+	function rgbToRgba(rgbValue) {
+		var rgb = /rgb\((\d+,\s*[\d]+,\s*[\d]+)\)/g.exec(rgbValue);
+		return rgb ? ('rgba(' + (rgb[1]) + ',1)') : rgbValue;
+	}
+
+	function hexToRgba(hexValue) {
+		var rgx = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+		var hex = hexValue.replace(rgx, function (m, r, g, b) { return r + r + g + g + b + b; } );
+		var rgb = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		var r = parseInt(rgb[1], 16);
+		var g = parseInt(rgb[2], 16);
+		var b = parseInt(rgb[3], 16);
+		return ('rgba(' + r + ',' + g + ',' + b + ',1)');
+	}
+
+	function hslToRgba(hslValue) {
+		var hsl = /hsl\((\d+),\s*([\d.]+)%,\s*([\d.]+)%\)/g.exec(hslValue) || /hsla\((\d+),\s*([\d.]+)%,\s*([\d.]+)%,\s*([\d.]+)\)/g.exec(hslValue);
+		var h = parseInt(hsl[1], 10) / 360;
+		var s = parseInt(hsl[2], 10) / 100;
+		var l = parseInt(hsl[3], 10) / 100;
+		var a = hsl[4] || 1;
+		function hue2rgb(p, q, t) {
+			if (t < 0) { t += 1; }
+			if (t > 1) { t -= 1; }
+			if (t < 1/6) { return p + (q - p) * 6 * t; }
+			if (t < 1/2) { return q; }
+			if (t < 2/3) { return p + (q - p) * (2/3 - t) * 6; }
+			return p;
+		}
+		var r, g, b;
+		if (s === 0) {
+			r = g = b = l;
+		} else {
+			var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+			var p = 2 * l - q;
+			r = hue2rgb(p, q, h + 1/3);
+			g = hue2rgb(p, q, h);
+			b = hue2rgb(p, q, h - 1/3);
+		}
+		return ('rgba(' + (r * 255) + ',' + (g * 255) + ',' + (b * 255) + ',' + a + ')');
+	}
+
+	function colorToRgb(val) {
+		if (is.rgb(val)) { return rgbToRgba(val); }
+		if (is.hex(val)) { return hexToRgba(val); }
+		if (is.hsl(val)) { return hslToRgba(val); }
+	}
+
+	// Units
+
+	function getUnit(val) {
+		var split = /([\+\-]?[0-9#\.]+)(%|px|pt|em|rem|in|cm|mm|ex|ch|pc|vw|vh|vmin|vmax|deg|rad|turn)?$/.exec(val);
+		if (split) { return split[2]; }
+	}
+
+	function getTransformUnit(propName) {
+		if (stringContains(propName, 'translate') || propName === 'perspective') { return 'px'; }
+		if (stringContains(propName, 'rotate') || stringContains(propName, 'skew')) { return 'deg'; }
+	}
+
+	// Values
+
+	function getFunctionValue(val, animatable) {
+		if (!is.fnc(val)) { return val; }
+		return val(animatable.target, animatable.id, animatable.total);
+	}
+
+	function getAttribute(el, prop) {
+		return el.getAttribute(prop);
+	}
+
+	function convertPxToUnit(el, value, unit) {
+		var valueUnit = getUnit(value);
+		if (arrayContains([unit, 'deg', 'rad', 'turn'], valueUnit)) { return value; }
+		var cached = cache.CSS[value + unit];
+		if (!is.und(cached)) { return cached; }
+		var baseline = 100;
+		var tempEl = document.createElement(el.tagName);
+		var parentEl = (el.parentNode && (el.parentNode !== document)) ? el.parentNode : document.body;
+		parentEl.appendChild(tempEl);
+		tempEl.style.position = 'absolute';
+		tempEl.style.width = baseline + unit;
+		var factor = baseline / tempEl.offsetWidth;
+		parentEl.removeChild(tempEl);
+		var convertedUnit = factor * parseFloat(value);
+		cache.CSS[value + unit] = convertedUnit;
+		return convertedUnit;
+	}
+
+	function getCSSValue(el, prop, unit) {
+		if (prop in el.style) {
+			var uppercasePropName = prop.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+			var value = el.style[prop] || getComputedStyle(el).getPropertyValue(uppercasePropName) || '0';
+			return unit ? convertPxToUnit(el, value, unit) : value;
+		}
+	}
+
+	function getAnimationType(el, prop) {
+		if (is.dom(el) && !is.inp(el) && (getAttribute(el, prop) || (is.svg(el) && el[prop]))) {
+			return 'attribute'; 
+		}
+		if (is.dom(el) && arrayContains(validTransforms, prop)) { 
+			return 'transform'; 
+		}
+		if (is.dom(el) && (prop !== 'transform' && getCSSValue(el, prop))) {
+			return 'css'; 
+		}
+		// Direct object
+		return 'object';
+	}
+
+	function getElementTransforms(el) {
+		if (!is.dom(el)) { return; }
+		var str = el.style.transform || '';
+		var reg  = /(\w+)\(([^)]*)\)/g;
+		var transforms = new Map();
+		var m = reg.exec(str);
+		while (m) { 
+			transforms.set(m[1], m[2]); 
+			m = reg.exec(str);
+		}
+		return transforms;
+	}
+
+	function getTransformValue(el, propName, animatable, unit) {
+		var defaultVal = stringContains(propName, 'scale') ? 1 : 0 + getTransformUnit(propName);
+		var value = getElementTransforms(el).get(propName) || defaultVal;
+		if (animatable) {
+			animatable.transforms.list.set(propName, value);
+			animatable.transforms.last = propName;
+		}
+		return unit ? convertPxToUnit(el, value, unit) : value;
+	}
+
+	function getOriginalTargetValue(target, propName, unit, animatable) {
+		switch (getAnimationType(target, propName)) {
+		case 'transform': return getTransformValue(target, propName, animatable, unit);
+		case 'css': return getCSSValue(target, propName, unit);
+		case 'attribute': return getAttribute(target, propName);
+		default: {
+			var value = objectPath.get(target, propName);
+			return value || 0;
+		}
+		}
+	}
+
+	function getRelativeValue(to, from) {
+		var operator = /^(\*=|\+=|-=)/.exec(to);
+		if (!operator) { return to; }
+		var u = getUnit(to) || 0;
+		var x = parseFloat(from);
+		var y = parseFloat(to.replace(operator[0], ''));
+		switch (operator[0][0]) {
+		case '+': return x + y + u;
+		case '-': return x - y + u;
+		case '*': return x * y + u;
+		}
+	}
+
+	function validateValue(val, unit) {
+		if (is.col(val)) { return colorToRgb(val); }
+		var originalUnit = getUnit(val);
+		var unitLess = originalUnit ? val.substr(0, val.length - originalUnit.length) : val;
+		return unit && !/\s/g.test(val) ? unitLess + unit : unitLess;
+	}
+
+	// getTotalLength() equivalent for circle, rect, polyline, polygon and line shapes
+	// adapted from https://gist.github.com/SebLambla/3e0550c496c236709744
+
+	function getDistance(p1, p2) {
+		return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+	}
+
+	function getCircleLength(el) {
+		return Math.PI * 2 * getAttribute(el, 'r');
+	}
+
+	function getRectLength(el) {
+		return (getAttribute(el, 'width') * 2) + (getAttribute(el, 'height') * 2);
+	}
+
+	function getLineLength(el) {
+		return getDistance(
+				{x: getAttribute(el, 'x1'), y: getAttribute(el, 'y1')}, 
+				{x: getAttribute(el, 'x2'), y: getAttribute(el, 'y2')}
+		);
+	}
+
+	function getPolylineLength(el) {
+		var points = el.points;
+		var totalLength = 0;
+		var previousPos;
+		for (var i = 0 ; i < points.numberOfItems; i++) {
+			var currentPos = points.getItem(i);
+			if (i > 0) { totalLength += getDistance(previousPos, currentPos); }
+			previousPos = currentPos;
+		}
+		return totalLength;
+	}
+
+	function getPolygonLength(el) {
+		var points = el.points;
+		return getPolylineLength(el) + getDistance(points.getItem(points.numberOfItems - 1), points.getItem(0));
+	}
+
+	// Path animation
+
+	function getTotalLength(el) {
+		if (el.getTotalLength) { return el.getTotalLength(); }
+		switch(el.tagName.toLowerCase()) {
+		case 'circle': return getCircleLength(el);
+		case 'rect': return getRectLength(el);
+		case 'line': return getLineLength(el);
+		case 'polyline': return getPolylineLength(el);
+		case 'polygon': return getPolygonLength(el);
+		}
+	}
+
+	function setDashoffset(el) {
+		var pathLength = getTotalLength(el);
+		el.setAttribute('stroke-dasharray', pathLength);
+		return pathLength;
+	}
+
+	// Motion path
+
+	function getParentSvgEl(el) {
+		var parentEl = el.parentNode;
+		while (is.svg(parentEl)) {
+			parentEl = parentEl.parentNode;
+			if (!is.svg(parentEl.parentNode)) { break; }
+		}
+		return parentEl;
+	}
+
+	function getParentSvg(pathEl, svgData) {
+		var svg = svgData || {};
+		var parentSvgEl = svg.el || getParentSvgEl(pathEl);
+		var rect = parentSvgEl.getBoundingClientRect();
+		var viewBoxAttr = getAttribute(parentSvgEl, 'viewBox');
+		var width = rect.width;
+		var height = rect.height;
+		var viewBox = svg.viewBox || (viewBoxAttr ? viewBoxAttr.split(' ') : [0, 0, width, height]);
+		return {
+			el: parentSvgEl,
+			viewBox: viewBox,
+			x: viewBox[0] / 1,
+			y: viewBox[1] / 1,
+			w: width / viewBox[2],
+			h: height / viewBox[3]
+		};
+	}
+
+	function getPath(path, percent) {
+		var pathEl = is.str(path) ? selectString(path)[0] : path;
+		var p = percent || 100;
+		return function(property) {
+			return {
+				property: property,
+				el: pathEl,
+				svg: getParentSvg(pathEl),
+				totalLength: getTotalLength(pathEl) * (p / 100)
+			};
+		};
+	}
+
+	function getPathProgress(path, progress) {
+		function point(offset) {
+			if ( offset === void 0 ) { 
+				offset = 0;
+			}
+
+			var l = progress + offset >= 1 ? progress + offset : 0;
+			return path.el.getPointAtLength(l);
+		}
+		var svg = getParentSvg(path.el, path.svg);
+		var p = point();
+		var p0 = point(-1);
+		var p1 = point(+1);
+		switch (path.property) {
+		case 'x': return (p.x - svg.x) * svg.w;
+		case 'y': return (p.y - svg.y) * svg.h;
+		case 'angle': return Math.atan2(p1.y - p0.y, p1.x - p0.x) * 180 / Math.PI;
+		}
+	}
+
+	// Decompose value
+
+	function decomposeValue(val, unit) {
+		var rgx = /-?\d*\.?\d+/g;
+		var value = validateValue((is.pth(val) ? val.totalLength : val), unit) + '';
+		return {
+			original: value,
+			numbers: value.match(rgx) ? value.match(rgx).map(Number) : [0],
+					strings: (is.str(val) || unit) ? value.split(rgx) : []
+		};
+	}
+
+	// Animatables
+
+	function parseTargets(targets) {
+		var targetsArray = targets ? (flattenArray(is.arr(targets) ? targets.map(toArray) : toArray(targets))) : [];
+		return filterArray(targetsArray, function (item, pos, self) { return self.indexOf(item) === pos; });
+	}
+
+	function getAnimatables(targets) {
+		var parsed = parseTargets(targets);
+		return parsed.map(function (t, i) {
+			return {
+				target: t, 
+				id: i, 
+				total: parsed.length, 
+				transforms: { 
+					list: getElementTransforms(t) 
+				} 
+			};
+		});
+	}
+
+	// Properties
+
+	function normalizePropertyTweens(prop, tweenSettings) {
+		var settings = cloneObject(tweenSettings);
+		// Override duration if easing is a spring
+		if (/^spring/.test(settings.easing)) { settings.duration = spring(settings.easing); }
+		if (is.arr(prop)) {
+			var l = prop.length;
+			var isFromTo = (l === 2 && !is.obj(prop[0]));
+			if (!isFromTo) {
+				// Duration divided by the number of tweens
+				if (!is.fnc(tweenSettings.duration)) { settings.duration = tweenSettings.duration / l; }
+			} else {
+				// Transform [from, to] values shorthand to a valid tween value
+				prop = {value: prop};
+			}
+		}
+		var propArray = is.arr(prop) ? prop : [prop];
+		return propArray.map(function (v, i) {
+			var obj = (is.obj(v) && !is.pth(v)) ? v : {value: v};
+			// Default delay value should only be applied to the first tween
+			if (is.und(obj.delay)) { obj.delay = !i ? tweenSettings.delay : 0; }
+			// Default endDelay value should only be applied to the last tween
+			if (is.und(obj.endDelay)) { obj.endDelay = i === propArray.length - 1 ? tweenSettings.endDelay : 0; }
+			return obj;
+		}).map(function (k) { return mergeObjects(k, settings); });
+	}
+
+
+	function flattenKeyframes(keyframes) {
+		var propertyNames = filterArray(flattenArray(keyframes.map(function (key) { return Object.keys(key); })), function (p) { return is.key(p); })
+		.reduce(function (a,b) { if (a.indexOf(b) < 0) { a.push(b); } return a; }, []);
+		var properties = {};
+		var loop = function ( i ) {
+			var propName = propertyNames[i];
+			properties[propName] = keyframes.map(function (key) {
+				var newKey = {};
+				for (var p in key) {
+					if (is.key(p)) {
+						if (p === propName) { newKey.value = key[p]; }
+					} else {
+						newKey[p] = key[p];
+					}
+				}
+				return newKey;
+			});
+		};
+
+		for (var i = 0; i < propertyNames.length; i++) {
+			loop( i );
+		}
+		return properties;
+	}
+
+	function getProperties(tweenSettings, params) {
+		var properties = [];
+		var keyframes = params.keyframes;
+		if (keyframes) { params = mergeObjects(flattenKeyframes(keyframes), params); }
+		for (var p in params) {
+			if (is.key(p)) {
+				properties.push({
+					name: p,
+					tweens: normalizePropertyTweens(params[p], tweenSettings)
+				});
+			}
+		}
+		return properties;
+	}
+
+	// Tweens
+
+	function normalizeTweenValues(tween, animatable) {
+		function mapF(v) { 
+			return getFunctionValue(v, animatable); 
+		}
+		var t = {};
+		for (var p in tween) {
+			var value = getFunctionValue(tween[p], animatable);
+			if (is.arr(value)) {
+				value = value.map(mapF);
+				if (value.length === 1) {
+					value = value[0]; 
+				}
+			}
+			t[p] = value;
+		}
+		t.duration = parseFloat(t.duration);
+		t.delay = parseFloat(t.delay);
+		return t;
+	}
+
+	function normalizeTweens(prop, animatable) {
+		var previousTween;
+		return prop.tweens.map(function (t) {
+			var tween = normalizeTweenValues(t, animatable);
+			var tweenValue = tween.value;
+			var to = is.arr(tweenValue) ? tweenValue[1] : tweenValue;
+			var toUnit = getUnit(to);
+			var originalValue = getOriginalTargetValue(animatable.target, prop.name, toUnit, animatable);
+			var previousValue = previousTween ? previousTween.to.original : originalValue;
+			var from = is.arr(tweenValue) ? tweenValue[0] : previousValue;
+			var fromUnit = getUnit(from) || getUnit(originalValue);
+			var unit = toUnit || fromUnit;
+			if (is.und(to)) { to = previousValue; }
+			tween.from = decomposeValue(from, unit);
+			tween.to = decomposeValue(getRelativeValue(to, from), unit);
+			tween.start = previousTween ? previousTween.end : 0;
+			tween.end = tween.start + tween.delay + tween.duration + tween.endDelay;
+			tween.easing = parseEasings(tween.easing, tween.duration);
+			tween.isPath = is.pth(tweenValue);
+			tween.isColor = is.col(tween.from.original);
+			if (tween.isColor) { tween.round = 1; }
+			previousTween = tween;
+			return tween;
+		});
+	}
+
+	// Tween progress
+
+	var setProgressValue = {
+			css: function (t, p, v) { 
+				t.style[p] = v;
+				return v; 
+			},
+			attribute: function (t, p, v) { 
+				return t.setAttribute(p, v);
+			},
+			object: function (target, property, value) { 
+				return objectPath.set(target, property, value);
+			},
+			transform: function (t, p, v, transforms, manual) {
+				transforms.list.set(p, v);
+				if (p === transforms.last || manual) {
+					var str = '';
+					transforms.list.forEach(function (value, prop) { str += prop + '(' + value + ') '; });
+					t.style.transform = str;
+				}
+			}
+	};
+
+	// Set Value helper
+
+	function setTargetsValue(targets, properties) {
+		var animatables = getAnimatables(targets);
+		animatables.forEach(function (animatable) {
+			for (var property in properties) {
+				var value = getFunctionValue(properties[property], animatable);
+				var target = animatable.target;
+				var valueUnit = getUnit(value);
+				var originalValue = getOriginalTargetValue(target, property, valueUnit, animatable);
+				var unit = valueUnit || getUnit(originalValue);
+				var to = getRelativeValue(validateValue(value, unit), originalValue);
+				var animType = getAnimationType(target, property);
+				setProgressValue[animType](target, property, to, animatable.transforms, true);
+			}
+		});
+	}
+
+	// Animations
+
+	function createAnimation(animatable, prop) {
+		var animType = getAnimationType(animatable.target, prop.name);
+		if (animType) {
+			var tweens = normalizeTweens(prop, animatable);
+			var lastTween = tweens[tweens.length - 1];
+			return {
+				type: animType,
+				property: prop.name,
+				animatable: animatable,
+				tweens: tweens,
+				duration: lastTween.end,
+				delay: tweens[0].delay,
+				endDelay: lastTween.endDelay
+			};
+		}
+	}
+
+	function getAnimations(animatables, properties) {
+		return filterArray(flattenArray(animatables.map(function (animatable) {
+			return properties.map(function (prop) {
+				return createAnimation(animatable, prop);
+			});
+		})), function (a) { return !is.und(a); });
+	}
+
+	// Create Instance
+
+	function getInstanceTimings(animations, tweenSettings) {
+		var animLength = animations.length;
+		var getTlOffset = function (anim) { 
+			return anim.timelineOffset ? anim.timelineOffset : 0; 
+		};
+		var timings = {};
+		timings.duration = animLength ? Math.max.apply(Math, animations.map(function (anim) { return getTlOffset(anim) + anim.duration; })) : tweenSettings.duration;
+		timings.delay = animLength ? Math.min.apply(Math, animations.map(function (anim) { return getTlOffset(anim) + anim.delay; })) : tweenSettings.delay;
+		timings.endDelay = animLength ? timings.duration - Math.max.apply(Math, animations.map(function (anim) { return getTlOffset(anim) + anim.duration - anim.endDelay; })) : tweenSettings.endDelay;
+		return timings;
+	}
+
+	var instanceID = 0;
+
+	function createNewInstance(params) {
+		var instanceSettings = replaceObjectProps(defaultInstanceSettings, params);
+		var tweenSettings = replaceObjectProps(defaultTweenSettings, params);
+		var properties = getProperties(tweenSettings, params);
+		var animatables = getAnimatables(params.targets);
+		var animations = getAnimations(animatables, properties);
+		var timings = getInstanceTimings(animations, tweenSettings);
+		var id = instanceID;
+		instanceID++;
+		return mergeObjects(instanceSettings, {
+			id: id,
+			children: [],
+			animatables: animatables,
+			animations: animations,
+			duration: timings.duration,
+			delay: timings.delay,
+			endDelay: timings.endDelay
+		});
+	}
+
+	// Core
+
+	var activeInstances = [];
+	var pausedInstances = [];
+	var raf;
+
+	var engine = (function () {
+		function play() { 
+			raf = requestAnimationFrame(step);
+		}
+		function step(t) {
+			var activeInstancesLength = activeInstances.length;
+			if (activeInstancesLength) {
+				var i = 0;
+				while (i < activeInstancesLength) {
+					var activeInstance = activeInstances[i];
+					if (!activeInstance.paused) {
+						activeInstance.tick(t);
+					} else {
+						var instanceIndex = activeInstances.indexOf(activeInstance);
+						if (instanceIndex > -1) {
+							activeInstances.splice(instanceIndex, 1);
+							activeInstancesLength = activeInstances.length;
+						}
+					}
+					i++;
+				}
+				play();
+			} else {
+				raf = cancelAnimationFrame(raf);
+			}
+		}
+		return play;
+	})();
+
+	function handleVisibilityChange() {
+		if (document.hidden) {
+			activeInstances.forEach(function (ins) { return ins.pause(); });
+			pausedInstances = activeInstances.slice(0);
+			activeInstances = [];
+		} else {
+			pausedInstances.forEach(function (ins) { return ins.play(); });
+		}
+	}
+
+	if (typeof document !== 'undefined') {
+		document.addEventListener('visibilitychange', handleVisibilityChange);
+	}
+
+	// Public Instance
+
+	function anime(params) {
+		if ( params === void 0 ) {
+			params = {};
+		}
+
+
+		var startTime = 0, lastTime = 0, now = 0;
+		var children, childrenLength = 0;
+		var resolve = null;
+
+		function makePromise(instance) {
+			var promise = window.Promise && new Promise(function (_resolve) { 
+				resolve = _resolve; 
+				return resolve;
+			});
+			instance.finished = promise;
+			return promise;
+		}
+
+		var instance = createNewInstance(params);
+		var promise = makePromise(instance);
+
+		function toggleInstanceDirection() {
+			var direction = instance.direction;
+			if (direction !== 'alternate') {
+				instance.direction = direction !== 'normal' ? 'normal' : 'reverse';
+			}
+			instance.reversed = !instance.reversed;
+			children.forEach(function (child) { 
+				child.reversed = instance.reversed; 
+				return child.reversed;
+			});
+		}
+
+		function adjustTime(time) {
+			return instance.reversed ? instance.duration - time : time;
+		}
+
+		function resetTime() {
+			startTime = 0;
+			lastTime = adjustTime(instance.currentTime) * (1 / anime.speed);
+		}
+
+		function seekCild(time, child) {
+			if (child) { 
+				child.seek(time - child.timelineOffset); 
+			}
+		}
+
+		function syncInstanceChildren(time) {
+			if (!instance.reversePlayback) {
+				for (var i = 0; i < childrenLength; i++) {
+					seekCild(time, children[i]);
+				}
+			} else {
+				for (var i$1 = childrenLength; i$1--;) {
+					seekCild(time, children[i$1]); 
+				}
+			}
+		}
+
+		function setAnimationsProgress(insTime) {
+			function filterF(t) {
+				return (insTime < t.end); 
+			}
+			var i = 0;
+			var animations = instance.animations;
+			var animationsLength = animations.length;
+			while (i < animationsLength) {
+				var anim = animations[i];
+				var animatable = anim.animatable;
+				var tweens = anim.tweens;
+				var tweenLength = tweens.length - 1;
+				var tween = tweens[tweenLength];
+				// Only check for keyframes if there is more than one tween
+				if (tweenLength) { 
+					tween = filterArray(tweens, filterF)[0] || tween; 
+				}
+				var elapsed = minMax(insTime - tween.start - tween.delay, 0, tween.duration) / tween.duration;
+				var eased = isNaN(elapsed) ? 1 : tween.easing(elapsed);
+				var strings = tween.to.strings;
+				var round = tween.round;
+				var numbers = [];
+				var toNumbersLength = tween.to.numbers.length;
+				var progress = (void 0);
+				for (var n = 0; n < toNumbersLength; n++) {
+					var value = (void 0);
+					var toNumber = tween.to.numbers[n];
+					var fromNumber = tween.from.numbers[n] || 0;
+					if (!tween.isPath) {
+						value = fromNumber + (eased * (toNumber - fromNumber));
+					} else {
+						value = getPathProgress(tween.value, eased * toNumber);
+					}
+					if (round) {
+						if (!(tween.isColor && n > 2)) {
+							value = Math.round(value * round) / round;
+						}
+					}
+					numbers.push(value);
+				}
+				// Manual Array.reduce for better performances
+				var stringsLength = strings.length;
+				if (!stringsLength) {
+					progress = numbers[0];
+				} else {
+					progress = strings[0];
+					for (var s = 0; s < stringsLength; s++) {
+//						var a = strings[s];
+						var b = strings[s + 1];
+						var n$1 = numbers[s];
+						if (!isNaN(n$1)) {
+							if (!b) {
+								progress += n$1 + ' ';
+							} else {
+								progress += n$1 + b;
+							}
+						}
+					}
+				}
+				setProgressValue[anim.type](animatable.target, anim.property, progress, animatable.transforms);
+				anim.currentValue = progress;
+				i++;
+			}
+		}
+
+		function setCallback(cb) {
+			if (instance[cb] && !instance.passThrough) { instance[cb](instance); }
+		}
+
+		function countIteration() {
+			if (instance.remaining && instance.remaining !== true) {
+				instance.remaining--;
+			}
+		}
+
+		function setInstanceProgress(engineTime) {
+			var insDuration = instance.duration;
+			var insDelay = instance.delay;
+			var insEndDelay = insDuration - instance.endDelay;
+			var insTime = adjustTime(engineTime);
+			instance.progress = minMax((insTime / insDuration) * 100, 0, 100);
+			instance.reversePlayback = insTime < instance.currentTime;
+			if (children) {
+				syncInstanceChildren(insTime);
+			}
+			if (!instance.began && instance.currentTime > 0) {
+				instance.began = true;
+				setCallback('begin');
+				setCallback('loopBegin');
+			}
+			if (insTime <= insDelay && instance.currentTime !== 0) {
+				setAnimationsProgress(0);
+			}
+			if ((insTime >= insEndDelay && instance.currentTime !== insDuration) || !insDuration) {
+				setAnimationsProgress(insDuration);
+			}
+			if (insTime > insDelay && insTime < insEndDelay) {
+				if (!instance.changeBegan) {
+					instance.changeBegan = true;
+					instance.changeCompleted = false;
+					setCallback('changeBegin');
+				}
+				setCallback('change');
+				setAnimationsProgress(insTime);
+			} else {
+				if (instance.changeBegan) {
+					instance.changeCompleted = true;
+					instance.changeBegan = false;
+					setCallback('changeComplete');
+				}
+			}
+			instance.currentTime = minMax(insTime, 0, insDuration);
+			if (instance.began) { 
+				setCallback('update');
+			}
+			if (engineTime >= insDuration) {
+				lastTime = 0;
+				countIteration();
+				if (instance.remaining) {
+					startTime = now;
+					setCallback('loopComplete');
+					setCallback('loopBegin');
+					if (instance.direction === 'alternate') { 
+						toggleInstanceDirection(); 
+					}
+				} else {
+					instance.paused = true;
+					if (!instance.completed) {
+						instance.completed = true;
+						setCallback('loopComplete');
+						setCallback('complete');
+						if (!instance.passThrough && 'Promise' in window) {
+							resolve();
+							promise = makePromise(instance);
+						}
+					}
+				}
+			}
+		}
+
+		instance.reset = function() {
+			var direction = instance.direction;
+			instance.passThrough = false;
+			instance.currentTime = 0;
+			instance.progress = 0;
+			instance.paused = true;
+			instance.began = false;
+			instance.changeBegan = false;
+			instance.completed = false;
+			instance.changeCompleted = false;
+			instance.reversePlayback = false;
+			instance.reversed = direction === 'reverse';
+			instance.remaining = instance.loop;
+			children = instance.children;
+			childrenLength = children.length;
+			for (var i = childrenLength; i--;) { 
+				instance.children[i].reset(); 
+			}
+			if (instance.reversed && instance.loop !== true || (direction === 'alternate' && instance.loop === 1)) { instance.remaining++; }
+			setAnimationsProgress(0);
+		};
+
+		// Set Value helper
+
+		instance.set = function(targets, properties) {
+			setTargetsValue(targets, properties);
+			return instance;
+		};
+
+		instance.tick = function(t) {
+			now = t;
+			if (!startTime) { 
+				startTime = now; 
+			}
+			setInstanceProgress((now + (lastTime - startTime)) * anime.speed);
+		};
+
+		instance.seek = function(time) {
+			setInstanceProgress(adjustTime(time));
+		};
+
+		instance.pause = function() {
+			instance.paused = true;
+			resetTime();
+		};
+
+		instance.play = function() {
+			if (!instance.paused) { 
+				return; 
+			}
+			if (instance.completed) { 
+				instance.reset(); 
+			}
+			instance.paused = false;
+			activeInstances.push(instance);
+			resetTime();
+			if (!raf) { 
+				engine(); 
+			}
+		};
+
+		instance.reverse = function() {
+			toggleInstanceDirection();
+			resetTime();
+		};
+
+		instance.restart = function() {
+			instance.reset();
+			instance.play();
+		};
+
+		instance.reset();
+
+		if (instance.autoplay) { 
+			instance.play(); 
+		}
+
+		return instance;
+
+	}
+
+	// Remove targets from animation
+
+	function removeTargetsFromAnimations(targetsArray, animations) {
+		for (var a = animations.length; a--;) {
+			if (arrayContains(targetsArray, animations[a].animatable.target)) {
+				animations.splice(a, 1);
+			}
+		}
+	}
+
+	function removeTargets(targets) {
+		var targetsArray = parseTargets(targets);
+		for (var i = activeInstances.length; i--;) {
+			var instance = activeInstances[i];
+			var animations = instance.animations;
+			var children = instance.children;
+			removeTargetsFromAnimations(targetsArray, animations);
+			for (var c = children.length; c--;) {
+				var child = children[c];
+				var childAnimations = child.animations;
+				removeTargetsFromAnimations(targetsArray, childAnimations);
+				if (!childAnimations.length && !child.children.length) { 
+					children.splice(c, 1); 
+				}
+			}
+			if (!animations.length && !children.length) { 
+				instance.pause(); 
+			}
+		}
+	}
+
+	// Stagger helpers
+
+	function stagger(val, params) {
+		if ( params === void 0 ) {
+			params = {};
+		}
+
+		var direction = params.direction || 'normal';
+		var easing = params.easing ? parseEasings(params.easing) : null;
+		var grid = params.grid;
+		var axis = params.axis;
+		var fromIndex = params.from || 0;
+		var fromFirst = fromIndex === 'first';
+		var fromCenter = fromIndex === 'center';
+		var fromLast = fromIndex === 'last';
+		var isRange = is.arr(val);
+		var val1 = isRange ? parseFloat(val[0]) : parseFloat(val);
+		var val2 = isRange ? parseFloat(val[1]) : 0;
+		var unit = getUnit(isRange ? val[1] : val) || 0;
+		var start = params.start || 0 + (isRange ? val1 : 0);
+		var values = [];
+		var maxValue = 0;
+		return function (el, i, t) {
+			if (fromFirst) { fromIndex = 0; }
+			if (fromCenter) { fromIndex = (t - 1) / 2; }
+			if (fromLast) { fromIndex = t - 1; }
+			if (!values.length) {
+				for (var index = 0; index < t; index++) {
+					if (!grid) {
+						values.push(Math.abs(fromIndex - index));
+					} else {
+						var fromX = !fromCenter ? fromIndex%grid[0] : (grid[0]-1)/2;
+						var fromY = !fromCenter ? Math.floor(fromIndex/grid[0]) : (grid[1]-1)/2;
+						var toX = index%grid[0];
+						var toY = Math.floor(index/grid[0]);
+						var distanceX = fromX - toX;
+						var distanceY = fromY - toY;
+						var value = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+						if (axis === 'x') { 
+							value = -distanceX; 
+						}
+						if (axis === 'y') { 
+							value = -distanceY; 
+						}
+						values.push(value);
+					}
+					maxValue = Math.max.apply(Math, values);
+				}
+				if (easing) { 
+					values = values.map(function (val) { 
+						return easing(val / maxValue) * maxValue; 
+					}); 
+				}
+				if (direction === 'reverse') { 
+					values = values.map(function (val) { 
+						return axis ? (val < 0) ? val * -1 : -val : Math.abs(maxValue - val); 
+					}); 
+				}
+			}
+			var spacing = isRange ? (val2 - val1) / maxValue : val1;
+			return start + (spacing * (Math.round(values[i] * 100) / 100)) + unit;
+		};
+	}
+
+	// Timeline
+	function timeline(params) {
+		if ( params === void 0 ) {
+			params = {};
+		}
+
+		var tl = anime(params);
+		tl.duration = 0;
+		tl.add = function(instanceParams, timelineOffset) {
+			var tlIndex = activeInstances.indexOf(tl);
+			var children = tl.children;
+			if (tlIndex > -1) { activeInstances.splice(tlIndex, 1); }
+			function passThrough(ins) { ins.passThrough = true; }
+			for (var i = 0; i < children.length; i++) { 
+				passThrough(children[i]); 
+			}
+			var insParams = mergeObjects(instanceParams, replaceObjectProps(defaultTweenSettings, params));
+			insParams.targets = insParams.targets || params.targets;
+			var tlDuration = tl.duration;
+			insParams.autoplay = false;
+			insParams.direction = tl.direction;
+			insParams.timelineOffset = is.und(timelineOffset) ? tlDuration : getRelativeValue(timelineOffset, tlDuration);
+			passThrough(tl);
+			tl.seek(insParams.timelineOffset);
+			var ins = anime(insParams);
+			passThrough(ins);
+			children.push(ins);
+			var timings = getInstanceTimings(children, params);
+			tl.delay = timings.delay;
+			tl.endDelay = timings.endDelay;
+			tl.duration = timings.duration;
+			tl.seek(0);
+			tl.reset();
+			if (tl.autoplay) { 
+				tl.play(); 
+			}
+			return tl;
+		};
+		return tl;
+	}
+
+	anime.version = '3.0.1';
+	anime.speed = 1;
+	anime.running = activeInstances;
+	anime.remove = removeTargets;
+	anime.get = getOriginalTargetValue;
+	anime.set = setTargetsValue;
+	anime.convertPx = convertPxToUnit;
+	anime.path = getPath;
+	anime.setDashoffset = setDashoffset;
+	anime.stagger = stagger;
+	anime.timeline = timeline;
+	anime.easing = parseEasings;
+	anime.penner = penner;
+	anime.random = function (min, max) { 
+		return Math.floor(Math.random() * (max - min + 1)) + min; 
+	};
+
+	return anime;
+});
+
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+/**
+ * Binds a TinyMCE widget to <textarea> elements.
+ */
+angular.module('ui.tinymce', [])
+.value('uiTinymceConfig', {})
+.directive('uiTinymce', function($rootScope, $compile, $timeout, $window, $sce, uiTinymceConfig, uiTinymceService) {
+	uiTinymceConfig = uiTinymceConfig || {};
+
+	if (uiTinymceConfig.baseUrl) {
+		tinymce.baseURL = uiTinymceConfig.baseUrl;
+	}
+
+	return {
+		require: ['ngModel', '^?form'],
+		priority: 599,
+		link: function(scope, element, attrs, ctrls) {
+			if (!$window.tinymce) {
+				return;
+			}
+
+			var ngModel = ctrls[0],
+			form = ctrls[1] || null;
+
+			var expression, options = {
+					debounce: true
+			}, tinyInstance,
+			updateView = function(editor) {
+				var content = editor.getContent({format: options.format}).trim();
+				content = $sce.trustAsHtml(content);
+
+				ngModel.$setViewValue(content);
+				if (!$rootScope.$$phase) {
+					scope.$digest();
+				}
+			};
+
+			function toggleDisable(disabled) {
+				if (disabled) {
+					ensureInstance();
+
+					if (tinyInstance) {
+						tinyInstance.getBody().setAttribute('contenteditable', false);
+					}
+				} else {
+					ensureInstance();
+
+					if (tinyInstance && !tinyInstance.settings.readonly && tinyInstance.getDoc()) {
+						tinyInstance.getBody().setAttribute('contenteditable', true);
+					}
+				}
+			}
+
+			// fetch a unique ID from the service
+			var uniqueId = uiTinymceService.getUniqueId();
+			attrs.$set('id', uniqueId);
+
+			expression = {};
+
+			angular.extend(expression, scope.$eval(attrs.uiTinymce));
+
+			//Debounce update and save action
+			var debouncedUpdate = (function(debouncedUpdateDelay) {
+				var debouncedUpdateTimer;
+				return function(ed) {
+					$timeout.cancel(debouncedUpdateTimer);
+					debouncedUpdateTimer = $timeout(function() {
+						return (function(ed) {
+							if (ed.isDirty()) {
+								ed.save();
+								updateView(ed);
+							}
+						})(ed);
+					}, debouncedUpdateDelay);
+				};
+			})(400);
+
+			var setupOptions = {
+					// Update model when calling setContent
+					// (such as from the source editor popup)
+					setup: function(ed) {
+						ed.on('init', function() {
+							ngModel.$render();
+							ngModel.$setPristine();
+							ngModel.$setUntouched();
+							if (form) {
+								form.$setPristine();
+							}
+						});
+
+						// Update model when:
+						// - a button has been clicked [ExecCommand]
+						// - the editor content has been modified [change]
+						// - the node has changed [NodeChange]
+						// - an object has been resized (table, image) [ObjectResized]
+						ed.on('ExecCommand change NodeChange ObjectResized', function() {
+							if (!options.debounce) {
+								ed.save();
+								updateView(ed);
+								return;
+							}
+							debouncedUpdate(ed);
+						});
+
+						ed.on('blur', function() {
+							element[0].blur();
+							ngModel.$setTouched();
+							if (!$rootScope.$$phase) {
+								scope.$digest();
+							}
+						});
+
+						ed.on('remove', function() {
+							element.remove();
+						});
+
+						if (uiTinymceConfig.setup) {
+							uiTinymceConfig.setup(ed, {
+								updateView: updateView
+							});
+						}
+
+						if (expression.setup) {
+							expression.setup(ed, {
+								updateView: updateView
+							});
+						}
+					},
+					format: expression.format || 'html',
+					selector: '#' + attrs.id
+			};
+			// extend options with initial uiTinymceConfig and
+			// options from directive attribute value
+			angular.extend(options, uiTinymceConfig, expression, setupOptions);
+			// Wrapped in $timeout due to $tinymce:refresh implementation, requires
+			// element to be present in DOM before instantiating editor when
+			// re-rendering directive
+			$timeout(function() {
+				if (options.baseURL){
+					tinymce.baseURL = options.baseURL;
+				}
+				var maybeInitPromise = tinymce.init(options);
+				if(maybeInitPromise && typeof maybeInitPromise.then === 'function') {
+					maybeInitPromise.then(function() {
+						toggleDisable(scope.$eval(attrs.ngDisabled));
+					});
+				} else {
+					toggleDisable(scope.$eval(attrs.ngDisabled));
+				}
+			});
+
+			ngModel.$formatters.unshift(function(modelValue) {
+				return modelValue ? $sce.trustAsHtml(modelValue) : '';
+			});
+
+			ngModel.$parsers.unshift(function(viewValue) {
+				return viewValue ? $sce.getTrustedHtml(viewValue) : '';
+			});
+
+			ngModel.$render = function() {
+				ensureInstance();
+
+				var viewValue = ngModel.$viewValue ?
+						$sce.getTrustedHtml(ngModel.$viewValue) : '';
+
+						// instance.getDoc() check is a guard against null value
+						// when destruction & recreation of instances happen
+						if (tinyInstance &&
+								tinyInstance.getDoc()
+						) {
+							tinyInstance.setContent(viewValue);
+							// Triggering change event due to TinyMCE not firing event &
+							// becoming out of sync for change callbacks
+							tinyInstance.fire('change');
+						}
+			};
+
+			attrs.$observe('disabled', toggleDisable);
+
+			// This block is because of TinyMCE not playing well with removal and
+			// recreation of instances, requiring instances to have different
+			// selectors in order to render new instances properly
+			var unbindEventListener = scope.$on('$tinymce:refresh', function(e, id) {
+				var eid = attrs.id;
+				if (angular.isUndefined(id) || id === eid) {
+					var parentElement = element.parent();
+					var clonedElement = element.clone();
+					clonedElement.removeAttr('id');
+					clonedElement.removeAttr('style');
+					clonedElement.removeAttr('aria-hidden');
+					tinymce.execCommand('mceRemoveEditor', false, eid);
+					parentElement.append($compile(clonedElement)(scope));
+					unbindEventListener();
+				}
+			});
+
+			scope.$on('$destroy', function() {
+				ensureInstance();
+
+				if (tinyInstance) {
+					tinyInstance.remove();
+					tinyInstance = null;
+				}
+			});
+
+			function ensureInstance() {
+				if (!tinyInstance) {
+					tinyInstance = tinymce.get(attrs.id);
+				}
+			}
+		}
+	};
+})
+
+/**
+ * A service is used to create unique ID's, this prevents duplicate ID's if there are multiple editors on screen.
+ */
+.service('uiTinymceService', function() {
+	var UITinymceService = function() {
+		var ID_ATTR = 'ui-tinymce';
+		// uniqueId keeps track of the latest assigned ID
+		var uniqueId = 0;
+		// getUniqueId returns a unique ID
+		var getUniqueId = function() {
+			uniqueId ++;
+			return ID_ATTR + '-' + uniqueId;
+		};
+		// return the function as a public method of the service
+		return {
+			getUniqueId: getUniqueId
+		};
+	};
+	// return a new instance of the service
+	return new UITinymceService();
+});
 /* 
  * The MIT License (MIT)
  * 
@@ -1310,7 +3009,7 @@ var WbAbstractWidget = function () {
 	 */
 	this.eventFunctions = {};
 	this.computedStyle = {};
-	
+
 	// models
 	this.runtimeModel = {};
 	this.model = {};
@@ -1339,12 +3038,12 @@ var WbAbstractWidget = function () {
 	};
 
 	/*
-     * Add resize observer to the element
-     */
+	 * Add resize observer to the element
+	 */
 	this.resizeObserver = new ResizeObserver(function ($event) {
 		ctrl.fireResizeLayout($event);
 		// check if there is a user function
-        ctrl.evalWidgetEvent('resize', $event);
+		ctrl.evalWidgetEvent('resize', $event);
 	});
 
 };
@@ -1383,9 +3082,9 @@ WbAbstractWidget.prototype.loadSeo = function () {
 	}
 
 	// TODO: support of
-// - {Text} label (https://schema.org/title)
-// - {Text} description (https://schema.org/description)
-// - {Text} keywords (https://schema.org/keywords)
+//	- {Text} label (https://schema.org/title)
+//	- {Text} description (https://schema.org/description)
+//	- {Text} keywords (https://schema.org/keywords)
 };
 
 /**
@@ -1431,7 +3130,7 @@ WbAbstractWidget.prototype.refresh = function($event) {
 	// to support old widget
 	var model = this.getModel();
 	this.getScope().wbModel = model;
-	
+
 	if($event){
 		var key = $event.key || 'x';
 		// update event
@@ -1583,7 +3282,7 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 WbAbstractWidget.prototype.style = function (style, value) {
 	// there is no argument so act as get
 	if(!angular.isDefined(style)){
-	    return angular.copy(this.getProperty('style'));
+		return angular.copy(this.getProperty('style'));
 	}
 	// style is a key
 	if(angular.isString(style)){
@@ -1599,14 +3298,14 @@ WbAbstractWidget.prototype.style = function (style, value) {
  * Sets style of the widget
  */
 WbAbstractWidget.prototype.setStyle = function(key, value) {
-    this.setProperty('style.' + key, value);
+	this.setProperty('style.' + key, value);
 };
 
 /**
  * Get style from widget
  */
 WbAbstractWidget.prototype.getStyle = function(key) {
-    return this.getProperty('style.' + key);
+	return this.getProperty('style.' + key);
 };
 
 /**
@@ -1617,10 +3316,10 @@ WbAbstractWidget.prototype.getStyle = function(key) {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
-    if (this.isEditable()) {
-        // User function will not evaluate in edit mode
-        return;
-    }
+	if (this.isEditable()) {
+		// User function will not evaluate in edit mode
+		return;
+	}
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
 		var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2]; var $media =  arguments[3];' + this.getEvent()[type];
@@ -1796,7 +3495,7 @@ WbAbstractWidget.prototype.fireResizeLayout = function ($event) {
  * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
  */
 WbAbstractWidget.prototype.getDirection = function () {
-    return this.getModelProperty('style.layout.direction') || 'column';
+	return this.getModelProperty('style.layout.direction') || 'column';
 };
 
 WbAbstractWidget.prototype.getEvent = function () {
@@ -1805,15 +3504,15 @@ WbAbstractWidget.prototype.getEvent = function () {
 
 
 WbAbstractWidget.prototype.getTitle = function () {
-    return this.getModelProperty('label');
+	return this.getModelProperty('label');
 };
 
 WbAbstractWidget.prototype.getType = function () {
-    return this.getModelProperty('type');
+	return this.getModelProperty('type');
 };
 
 WbAbstractWidget.prototype.getId = function () {
-    return this.getModelProperty('id');
+	return this.getModelProperty('id');
 };
 
 /**
@@ -2029,6 +3728,81 @@ WbAbstractWidget.prototype.getBoundingClientRect = function () {
 	};
 };
 
+
+/**
+ * Adds animation to the page
+ */
+WbAbstractWidget.prototype.animate = function (options) {
+	var ctrl = this;
+	var animation = {
+			targets: this.getRuntimeModel(),
+			update: function(/*anim*/) {
+				// XXX: maso, 2019: support multiple key in event
+				ctrl.refresh();
+			}
+	};
+	var keys = [];
+
+	// copy animation properties
+	if(options.duration){
+		animation.duration = options.duration;
+	}
+	if(options.loop){
+		animation.loop = options.loop;
+	}
+	if(options.autoplay){
+		animation.autoplay = options.autoplay;
+	}
+	if(options.delay){
+		animation.delay = options.delay;
+	}
+	if(options.easing){
+		animation.easing = options.easing;
+	}
+
+	// Create list of attributes
+	for(var key in options){
+		// ignore keys
+		if(key === 'duration'|| 
+				key === 'loop'|| 
+				key === 'autoplay'||
+				key === 'delay'||
+				key === 'easing'){
+			continue;
+		}
+		keys.push(key);
+		animation[key] = options[key];
+		
+		// set initial value
+		var val = this.getProperty(key);
+		if(!val) {
+			this.setProperty(key, this.getModelProperty(key));
+		}
+		
+		// NOTE: if the value is empty then you have to set from values
+	}
+
+	return anime(animation);
+};
+
+/**
+ * Remove animations from the widget
+ * 
+ */
+WbAbstractWidget.prototype.removeAnimation = function () {
+	// The animation will not add to element so there is no need to remove
+};
+
+
+
+
+
+/***********************************************************************************************
+ *                                                                                             *
+ *                                                                                             *
+ *                                                                                             *
+ *                                                                                             *
+ ***********************************************************************************************/
 /**
  * @ngdoc Controllers
  * @name wbWidgetCtrl
@@ -2049,6 +3823,13 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
 
+
+/***********************************************************************************************
+ *                                                                                             *
+ *                                                                                             *
+ *                                                                                             *
+ *                                                                                             *
+ ***********************************************************************************************/
 /**
  * @ngdoc Controllers
  * @name WbWidgetGroupCtrl
@@ -2333,7 +4114,7 @@ WbWidgetGroupCtrl.prototype.setAllowedTypes = function (allowedTypes) {
 };
 
 
-// submit the controller
+//submit the controller
 angular.module('am-wb-core')//
 .controller('WbWidgetCtrl', WbWidgetCtrl)//
 .controller('WbWidgetGroupCtrl', WbWidgetGroupCtrl);
@@ -8576,265 +10357,6 @@ angular.module('am-wb-core')
     };
 });
 
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-/**
- * Binds a TinyMCE widget to <textarea> elements.
- */
-angular.module('ui.tinymce', [])
-.value('uiTinymceConfig', {})
-.directive('uiTinymce', function($rootScope, $compile, $timeout, $window, $sce, uiTinymceConfig, uiTinymceService) {
-	uiTinymceConfig = uiTinymceConfig || {};
-
-	if (uiTinymceConfig.baseUrl) {
-		tinymce.baseURL = uiTinymceConfig.baseUrl;
-	}
-
-	return {
-		require: ['ngModel', '^?form'],
-		priority: 599,
-		link: function(scope, element, attrs, ctrls) {
-			if (!$window.tinymce) {
-				return;
-			}
-
-			var ngModel = ctrls[0],
-			form = ctrls[1] || null;
-
-			var expression, options = {
-					debounce: true
-			}, tinyInstance,
-			updateView = function(editor) {
-				var content = editor.getContent({format: options.format}).trim();
-				content = $sce.trustAsHtml(content);
-
-				ngModel.$setViewValue(content);
-				if (!$rootScope.$$phase) {
-					scope.$digest();
-				}
-			};
-
-			function toggleDisable(disabled) {
-				if (disabled) {
-					ensureInstance();
-
-					if (tinyInstance) {
-						tinyInstance.getBody().setAttribute('contenteditable', false);
-					}
-				} else {
-					ensureInstance();
-
-					if (tinyInstance && !tinyInstance.settings.readonly && tinyInstance.getDoc()) {
-						tinyInstance.getBody().setAttribute('contenteditable', true);
-					}
-				}
-			}
-
-			// fetch a unique ID from the service
-			var uniqueId = uiTinymceService.getUniqueId();
-			attrs.$set('id', uniqueId);
-
-			expression = {};
-
-			angular.extend(expression, scope.$eval(attrs.uiTinymce));
-
-			//Debounce update and save action
-			var debouncedUpdate = (function(debouncedUpdateDelay) {
-				var debouncedUpdateTimer;
-				return function(ed) {
-					$timeout.cancel(debouncedUpdateTimer);
-					debouncedUpdateTimer = $timeout(function() {
-						return (function(ed) {
-							if (ed.isDirty()) {
-								ed.save();
-								updateView(ed);
-							}
-						})(ed);
-					}, debouncedUpdateDelay);
-				};
-			})(400);
-
-			var setupOptions = {
-					// Update model when calling setContent
-					// (such as from the source editor popup)
-					setup: function(ed) {
-						ed.on('init', function() {
-							ngModel.$render();
-							ngModel.$setPristine();
-							ngModel.$setUntouched();
-							if (form) {
-								form.$setPristine();
-							}
-						});
-
-						// Update model when:
-						// - a button has been clicked [ExecCommand]
-						// - the editor content has been modified [change]
-						// - the node has changed [NodeChange]
-						// - an object has been resized (table, image) [ObjectResized]
-						ed.on('ExecCommand change NodeChange ObjectResized', function() {
-							if (!options.debounce) {
-								ed.save();
-								updateView(ed);
-								return;
-							}
-							debouncedUpdate(ed);
-						});
-
-						ed.on('blur', function() {
-							element[0].blur();
-							ngModel.$setTouched();
-							if (!$rootScope.$$phase) {
-								scope.$digest();
-							}
-						});
-
-						ed.on('remove', function() {
-							element.remove();
-						});
-
-						if (uiTinymceConfig.setup) {
-							uiTinymceConfig.setup(ed, {
-								updateView: updateView
-							});
-						}
-
-						if (expression.setup) {
-							expression.setup(ed, {
-								updateView: updateView
-							});
-						}
-					},
-					format: expression.format || 'html',
-					selector: '#' + attrs.id
-			};
-			// extend options with initial uiTinymceConfig and
-			// options from directive attribute value
-			angular.extend(options, uiTinymceConfig, expression, setupOptions);
-			// Wrapped in $timeout due to $tinymce:refresh implementation, requires
-			// element to be present in DOM before instantiating editor when
-			// re-rendering directive
-			$timeout(function() {
-				if (options.baseURL){
-					tinymce.baseURL = options.baseURL;
-				}
-				var maybeInitPromise = tinymce.init(options);
-				if(maybeInitPromise && typeof maybeInitPromise.then === 'function') {
-					maybeInitPromise.then(function() {
-						toggleDisable(scope.$eval(attrs.ngDisabled));
-					});
-				} else {
-					toggleDisable(scope.$eval(attrs.ngDisabled));
-				}
-			});
-
-			ngModel.$formatters.unshift(function(modelValue) {
-				return modelValue ? $sce.trustAsHtml(modelValue) : '';
-			});
-
-			ngModel.$parsers.unshift(function(viewValue) {
-				return viewValue ? $sce.getTrustedHtml(viewValue) : '';
-			});
-
-			ngModel.$render = function() {
-				ensureInstance();
-
-				var viewValue = ngModel.$viewValue ?
-						$sce.getTrustedHtml(ngModel.$viewValue) : '';
-
-						// instance.getDoc() check is a guard against null value
-						// when destruction & recreation of instances happen
-						if (tinyInstance &&
-								tinyInstance.getDoc()
-						) {
-							tinyInstance.setContent(viewValue);
-							// Triggering change event due to TinyMCE not firing event &
-							// becoming out of sync for change callbacks
-							tinyInstance.fire('change');
-						}
-			};
-
-			attrs.$observe('disabled', toggleDisable);
-
-			// This block is because of TinyMCE not playing well with removal and
-			// recreation of instances, requiring instances to have different
-			// selectors in order to render new instances properly
-			var unbindEventListener = scope.$on('$tinymce:refresh', function(e, id) {
-				var eid = attrs.id;
-				if (angular.isUndefined(id) || id === eid) {
-					var parentElement = element.parent();
-					var clonedElement = element.clone();
-					clonedElement.removeAttr('id');
-					clonedElement.removeAttr('style');
-					clonedElement.removeAttr('aria-hidden');
-					tinymce.execCommand('mceRemoveEditor', false, eid);
-					parentElement.append($compile(clonedElement)(scope));
-					unbindEventListener();
-				}
-			});
-
-			scope.$on('$destroy', function() {
-				ensureInstance();
-
-				if (tinyInstance) {
-					tinyInstance.remove();
-					tinyInstance = null;
-				}
-			});
-
-			function ensureInstance() {
-				if (!tinyInstance) {
-					tinyInstance = tinymce.get(attrs.id);
-				}
-			}
-		}
-	};
-})
-
-/**
- * A service is used to create unique ID's, this prevents duplicate ID's if there are multiple editors on screen.
- */
-.service('uiTinymceService', function() {
-	var UITinymceService = function() {
-		var ID_ATTR = 'ui-tinymce';
-		// uniqueId keeps track of the latest assigned ID
-		var uniqueId = 0;
-		// getUniqueId returns a unique ID
-		var getUniqueId = function() {
-			uniqueId ++;
-			return ID_ATTR + '-' + uniqueId;
-		};
-		// return the function as a public method of the service
-		return {
-			getUniqueId: getUniqueId
-		};
-	};
-	// return a new instance of the service
-	return new UITinymceService();
-});
 angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 

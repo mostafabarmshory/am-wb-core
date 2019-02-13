@@ -10,9 +10,6 @@
 	/*istanbul ignore next:cant test*/
 	if (typeof module === 'object' && typeof module.exports === 'object') {
 		module.exports = factory();
-	} else if (typeof define === 'function' && define.amd) {
-		// AMD. Register as an anonymous module.
-		define([], factory);
 	} else {
 		// Browser globals
 		root.anime = factory();
@@ -97,10 +94,10 @@
 	function spring(string, duration) {
 
 		var params = parseEasingParameters(string);
-		var mass = minMax(is.und(params[0]) ? 1 : params[0], .1, 100);
-		var stiffness = minMax(is.und(params[1]) ? 100 : params[1], .1, 100);
-		var damping = minMax(is.und(params[2]) ? 10 : params[2], .1, 100);
-		var velocity =  minMax(is.und(params[3]) ? 0 : params[3], .1, 100);
+		var mass = minMax(is.und(params[0]) ? 1 : params[0], 0.1, 100);
+		var stiffness = minMax(is.und(params[1]) ? 100 : params[1], 0.1, 100);
+		var damping = minMax(is.und(params[2]) ? 10 : params[2], 0.1, 100);
+		var velocity =  minMax(is.und(params[3]) ? 0 : params[3], 0.1, 100);
 		var w0 = Math.sqrt(stiffness / mass);
 		var zeta = damping / (2 * Math.sqrt(stiffness * mass));
 		var wd = zeta < 1 ? w0 * Math.sqrt(1 - zeta * zeta) : 0;
@@ -124,11 +121,13 @@
 			var frame = 1/6;
 			var elapsed = 0;
 			var rest = 0;
-			while(true) {
+			while(rest < 16) {
 				elapsed += frame;
 				if (solver(elapsed) === 1) {
 					rest++;
-					if (rest >= 16) { break; }
+//					if (rest >= 16) { 
+//						break;
+//					}
 				} else {
 					rest = 0;
 				}
@@ -145,23 +144,26 @@
 	// Elastic easing adapted from jQueryUI http://api.jqueryui.com/easings/
 
 	function elastic(amplitude, period) {
-		if ( amplitude === void 0 ) amplitude = 1;
-		if ( period === void 0 ) period = .5;
+		if ( amplitude === void 0 ) {amplitude = 1;}
+		if ( period === void 0 ) {period = 0.5;}
 
 		var a = minMax(amplitude, 1, 10);
-		var p = minMax(period, .1, 2);
+		var p = minMax(period, 0.1, 2);
 		return function (t) {
 			return (t === 0 || t === 1) ? t : 
 				-a * Math.pow(2, 10 * (t - 1)) * Math.sin((((t - 1) - (p / (Math.PI * 2) * Math.asin(1 / a))) * (Math.PI * 2)) / p);
-		}
+		};
 	}
 
 	// Basic steps easing implementation https://developer.mozilla.org/fr/docs/Web/CSS/transition-timing-function
+	function steps(basicSteps) {
+		if ( basicSteps === void 0 ) {
+			basicSteps = 10;
+		}
 
-	function steps(steps) {
-		if ( steps === void 0 ) steps = 10;
-
-		return function (t) { return Math.round(t * steps) * (1 / steps); };
+		return function (t) { 
+			return Math.round(t * basicSteps) * (1 / basicSteps); 
+		};
 	}
 
 	// BezierEasing https://github.com/gre/bezier-easing
@@ -171,19 +173,27 @@
 		var kSplineTableSize = 11;
 		var kSampleStepSize = 1.0 / (kSplineTableSize - 1.0);
 
-		function A(aA1, aA2) { return 1.0 - 3.0 * aA2 + 3.0 * aA1 }
-		function B(aA1, aA2) { return 3.0 * aA2 - 6.0 * aA1 }
-		function C(aA1)      { return 3.0 * aA1 }
+		function fA(aA1, aA2) { return 1.0 - 3.0 * aA2 + 3.0 * aA1; }
+		function fB(aA1, aA2) { return 3.0 * aA2 - 6.0 * aA1; }
+		function fC(aA1)      { return 3.0 * aA1; }
 
-		function calcBezier(aT, aA1, aA2) { return ((A(aA1, aA2) * aT + B(aA1, aA2)) * aT + C(aA1)) * aT }
-		function getSlope(aT, aA1, aA2) { return 3.0 * A(aA1, aA2) * aT * aT + 2.0 * B(aA1, aA2) * aT + C(aA1) }
+		function calcBezier(aT, aA1, aA2) { 
+			return ((fA(aA1, aA2) * aT + fB(aA1, aA2)) * aT + fC(aA1)) * aT; 
+		}
+		function getSlope(aT, aA1, aA2) { 
+			return 3.0 * fA(aA1, aA2) * aT * aT + 2.0 * fB(aA1, aA2) * aT + fC(aA1); 
+		}
 
 		function binarySubdivide(aX, aA, aB, mX1, mX2) {
 			var currentX, currentT, i = 0;
 			do {
 				currentT = aA + (aB - aA) / 2.0;
 				currentX = calcBezier(currentT, mX1, mX2) - aX;
-				if (currentX > 0.0) { aB = currentT; } else { aA = currentT; }
+				if (currentX > 0.0) { 
+					aB = currentT; 
+				} else { 
+					aA = currentT;
+				}
 			} while (Math.abs(currentX) > 0.0000001 && ++i < 10);
 			return currentT;
 		}
@@ -236,10 +246,14 @@
 			}
 
 			return function (x) {
-				if (mX1 === mY1 && mX2 === mY2) { return x; }
-				if (x === 0 || x === 1) { return x; }
+				if (mX1 === mY1 && mX2 === mY2) {
+					return x;
+				}
+				if (x === 0 || x === 1) { 
+					return x; 
+				}
 				return calcBezier(getTForX(x), mY1, mY2);
-			}
+			};
 
 		}
 
@@ -285,7 +299,11 @@
 							[1.000, 0.000, 0.000, 1.000], /* inOutExpo */
 							[0.785, 0.135, 0.150, 0.860], /* inOutCirc */
 							[0.680,-0.550, 0.265, 1.550], /* inOutBack */
-							function (a, p) { return function (t) { return t < .5 ? elastic(a, p)(t * 2) / 2 : 1 - elastic(a, p)(t * -2 + 2) / 2; }; } /* inOutElastic */
+							function (a, p) { 
+								return function (t) { 
+									return t < 0.5 ? elastic(a, p)(t * 2) / 2 : 1 - elastic(a, p)(t * -2 + 2) / 2; 
+								}; 
+							} /* inOutElastic */
 							]
 		};
 
@@ -387,7 +405,7 @@
 
 	function rgbToRgba(rgbValue) {
 		var rgb = /rgb\((\d+,\s*[\d]+,\s*[\d]+)\)/g.exec(rgbValue);
-		return rgb ? ("rgba(" + (rgb[1]) + ",1)") : rgbValue;
+		return rgb ? ('rgba(' + (rgb[1]) + ',1)') : rgbValue;
 	}
 
 	function hexToRgba(hexValue) {
@@ -397,7 +415,7 @@
 		var r = parseInt(rgb[1], 16);
 		var g = parseInt(rgb[2], 16);
 		var b = parseInt(rgb[3], 16);
-		return ("rgba(" + r + "," + g + "," + b + ",1)");
+		return ('rgba(' + r + ',' + g + ',' + b + ',1)');
 	}
 
 	function hslToRgba(hslValue) {
@@ -415,7 +433,7 @@
 			return p;
 		}
 		var r, g, b;
-		if (s == 0) {
+		if (s === 0) {
 			r = g = b = l;
 		} else {
 			var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
@@ -424,7 +442,7 @@
 			g = hue2rgb(p, q, h);
 			b = hue2rgb(p, q, h - 1/3);
 		}
-		return ("rgba(" + (r * 255) + "," + (g * 255) + "," + (b * 255) + "," + a + ")");
+		return ('rgba(' + (r * 255) + ',' + (g * 255) + ',' + (b * 255) + ',' + a + ')');
 	}
 
 	function colorToRgb(val) {
@@ -501,7 +519,11 @@
 		var str = el.style.transform || '';
 		var reg  = /(\w+)\(([^)]*)\)/g;
 		var transforms = new Map();
-		var m; while (m = reg.exec(str)) { transforms.set(m[1], m[2]); }
+		var m = reg.exec(str);
+		while (m) { 
+			transforms.set(m[1], m[2]); 
+			m = reg.exec(str);
+		}
 		return transforms;
 	}
 
@@ -510,7 +532,7 @@
 		var value = getElementTransforms(el).get(propName) || defaultVal;
 		if (animatable) {
 			animatable.transforms.list.set(propName, value);
-			animatable.transforms['last'] = propName;
+			animatable.transforms.last = propName;
 		}
 		return unit ? convertPxToUnit(el, value, unit) : value;
 	}
@@ -631,7 +653,7 @@
 			y: viewBox[1] / 1,
 			w: width / viewBox[2],
 			h: height / viewBox[3]
-		}
+		};
 	}
 
 	function getPath(path, percent) {
@@ -643,13 +665,15 @@
 				el: pathEl,
 				svg: getParentSvg(pathEl),
 				totalLength: getTotalLength(pathEl) * (p / 100)
-			}
-		}
+			};
+		};
 	}
 
 	function getPathProgress(path, progress) {
 		function point(offset) {
-			if ( offset === void 0 ) offset = 0;
+			if ( offset === void 0 ) { 
+				offset = 0;
+			}
 
 			var l = progress + offset >= 1 ? progress + offset : 0;
 			return path.el.getPointAtLength(l);
@@ -674,7 +698,7 @@
 			original: value,
 			numbers: value.match(rgx) ? value.match(rgx).map(Number) : [0],
 					strings: (is.str(val) || unit) ? value.split(rgx) : []
-		}
+		};
 	}
 
 	// Animatables
@@ -687,7 +711,14 @@
 	function getAnimatables(targets) {
 		var parsed = parseTargets(targets);
 		return parsed.map(function (t, i) {
-			return {target: t, id: i, total: parsed.length, transforms: { list: getElementTransforms(t) } };
+			return {
+				target: t, 
+				id: i, 
+				total: parsed.length, 
+				transforms: { 
+					list: getElementTransforms(t) 
+				} 
+			};
 		});
 	}
 
@@ -730,7 +761,7 @@
 				var newKey = {};
 				for (var p in key) {
 					if (is.key(p)) {
-						if (p == propName) { newKey.value = key[p]; }
+						if (p === propName) { newKey.value = key[p]; }
 					} else {
 						newKey[p] = key[p];
 					}
@@ -739,7 +770,9 @@
 			});
 		};
 
-		for (var i = 0; i < propertyNames.length; i++) loop( i );
+		for (var i = 0; i < propertyNames.length; i++) {
+			loop( i );
+		}
 		return properties;
 	}
 
@@ -761,12 +794,17 @@
 	// Tweens
 
 	function normalizeTweenValues(tween, animatable) {
+		function mapF(v) { 
+			return getFunctionValue(v, animatable); 
+		}
 		var t = {};
 		for (var p in tween) {
 			var value = getFunctionValue(tween[p], animatable);
 			if (is.arr(value)) {
-				value = value.map(function (v) { return getFunctionValue(v, animatable); });
-				if (value.length === 1) { value = value[0]; }
+				value = value.map(mapF);
+				if (value.length === 1) {
+					value = value[0]; 
+				}
 			}
 			t[p] = value;
 		}
@@ -804,8 +842,13 @@
 	// Tween progress
 
 	var setProgressValue = {
-			css: function (t, p, v) { return t.style[p] = v; },
-			attribute: function (t, p, v) { return t.setAttribute(p, v); },
+			css: function (t, p, v) { 
+				t.style[p] = v;
+				return v; 
+			},
+			attribute: function (t, p, v) { 
+				return t.setAttribute(p, v);
+			},
 			object: function (target, property, value) { 
 				return objectPath.set(target, property, value);
 			},
@@ -813,7 +856,7 @@
 				transforms.list.set(p, v);
 				if (p === transforms.last || manual) {
 					var str = '';
-					transforms.list.forEach(function (value, prop) { str += prop + "(" + value + ") "; });
+					transforms.list.forEach(function (value, prop) { str += prop + '(' + value + ') '; });
 					t.style.transform = str;
 				}
 			}
@@ -852,7 +895,7 @@
 				duration: lastTween.end,
 				delay: tweens[0].delay,
 				endDelay: lastTween.endDelay
-			}
+			};
 		}
 	}
 
@@ -952,7 +995,9 @@
 	// Public Instance
 
 	function anime(params) {
-		if ( params === void 0 ) params = {};
+		if ( params === void 0 ) {
+			params = {};
+		}
 
 
 		var startTime = 0, lastTime = 0, now = 0;
@@ -960,7 +1005,10 @@
 		var resolve = null;
 
 		function makePromise(instance) {
-			var promise = window.Promise && new Promise(function (_resolve) { return resolve = _resolve; });
+			var promise = window.Promise && new Promise(function (_resolve) { 
+				resolve = _resolve; 
+				return resolve;
+			});
 			instance.finished = promise;
 			return promise;
 		}
@@ -975,7 +1023,8 @@
 			}
 			instance.reversed = !instance.reversed;
 			children.forEach(function (child) { 
-				return child.reversed = instance.reversed; 
+				child.reversed = instance.reversed; 
+				return child.reversed;
 			});
 		}
 
@@ -1007,6 +1056,9 @@
 		}
 
 		function setAnimationsProgress(insTime) {
+			function filterF(t) {
+				return (insTime < t.end); 
+			}
 			var i = 0;
 			var animations = instance.animations;
 			var animationsLength = animations.length;
@@ -1018,7 +1070,8 @@
 				var tween = tweens[tweenLength];
 				// Only check for keyframes if there is more than one tween
 				if (tweenLength) { 
-					tween = filterArray(tweens, function (t) { return (insTime < t.end); })[0] || tween; }
+					tween = filterArray(tweens, filterF)[0] || tween; 
+				}
 				var elapsed = minMax(insTime - tween.start - tween.delay, 0, tween.duration) / tween.duration;
 				var eased = isNaN(elapsed) ? 1 : tween.easing(elapsed);
 				var strings = tween.to.strings;
@@ -1049,7 +1102,7 @@
 				} else {
 					progress = strings[0];
 					for (var s = 0; s < stringsLength; s++) {
-						var a = strings[s];
+//						var a = strings[s];
 						var b = strings[s + 1];
 						var n$1 = numbers[s];
 						if (!isNaN(n$1)) {
@@ -1315,7 +1368,7 @@
 			}
 			var spacing = isRange ? (val2 - val1) / maxValue : val1;
 			return start + (spacing * (Math.round(values[i] * 100) / 100)) + unit;
-		}
+		};
 	}
 
 	// Timeline

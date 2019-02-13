@@ -14,7 +14,11 @@
 		"_": true,
 		"tinymce": true,
     	"crypto": false,
-    	"anime": false
+    	"anime": false,
+    	"HTMLCollection": false,
+    	"objectPath": false,
+    	"Map": false,
+    	"Promise": false
 	},
 	"extends": "eslint:recommended",
 	"parserOptions": {
