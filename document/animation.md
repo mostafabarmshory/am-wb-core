@@ -1,3 +1,5 @@
+SEE: https://animejs.com/documentation/
+
 Animations are added to a widget vi the events and javascript code.
 
 To add an animation to a widget:
