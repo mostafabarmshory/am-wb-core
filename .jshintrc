@@ -16,6 +16,7 @@
     "jsPanel": false,
     "_": false,
     "tinymce": false,
-    "crypto": false
+    "crypto": false,
+    "anime": false
   }
 }

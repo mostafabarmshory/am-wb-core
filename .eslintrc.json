@@ -13,7 +13,8 @@
 		"jsPanel": true,
 		"_": true,
 		"tinymce": true,
-    	"crypto": false
+    	"crypto": false,
+    	"anime": false
 	},
 	"extends": "eslint:recommended",
 	"parserOptions": {
