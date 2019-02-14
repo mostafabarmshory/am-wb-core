@@ -6331,28 +6331,54 @@ angular.module('am-wb-core')
 		restrict: 'E',
 		scope: {
 			title: '@title',
-                        lable: '@lable',
-			value: '=value',
+            lable: '@lable',
 			icon: '@icon'
 		},
         /*
          * @ngInject
          */
 		controller: function($scope, $resource){
-			function selectVideo(){
-				return $resource.get('video', {
+			this.selectValue = function(){
+			    var ctrl = this;
+				return $resource.get('vedio', {
 					style: {
-						title: 'Select audio'
+						title: 'Select video'
 					},
 					data: $scope.value
 				})//
 				.then(function(value){
-					$scope.value = value;
+					ctrl.changeValue(value);
 				});
-			}
-
-			$scope.edit = selectVideo;
-		}
+			};
+			/*
+			 * Set new value
+			 */
+			this.changeValue = function(newValue){
+			    $scope.valueChanged(newValue);
+			};
+			
+			this.clearValue = function() {
+                this.changeValue(null);
+			};
+		},
+		controllerAs: 'ctrl',
+		require: 'ngModel',
+        link: function(scope, element, attr, ngModelCtrl) {
+            /*
+             * Set in scope
+             */
+            ngModelCtrl.$render = function () {
+                scope.value = ngModelCtrl.$modelValue;
+            };
+            
+            /*
+             * Change the model
+             */
+            scope.valueChanged = function (newValue) {
+                scope.value = newValue;
+                ngModelCtrl.$setViewValue(newValue); 
+            };
+        }
 	};
 });
 
@@ -10697,7 +10723,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-video.html',
-    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>wb-object-video</wb-icon> </md-button> <md-input-container> <input ng-model=value> </md-input-container> </md-list-item>"
+    "<md-input-container class=\"md-icon-float md-icon-right md-block\"> <label>{{::title}}</label> <wb-icon ng-click=ctrl.selectValue()>wb-object-video</wb-icon> <input ng-model=value ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.changeValue(value)> <wb-icon ng-click=ctrl.clearValue()>close</wb-icon> </md-input-container>"
   );
 
 
