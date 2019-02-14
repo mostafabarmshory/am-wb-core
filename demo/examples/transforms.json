@@ -14,12 +14,16 @@
             "text": "<h2>HTML Text 1</h2>",
             "style": {
                 "margin": "60px",
+                "size": {
+                    "height": "200px"
+                },
                 "background": {
                 	"color": "red"
                 },
                 "transform": {
                     "origin": "50% 50%",
                     "perspective": "200px",
+                    "style": "preserve-3d",
                     "x": {
                         "translate": "10px",
                         "scale": 0.5,
