@@ -166,7 +166,8 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         
         return {
             transform: transform,
-            'transform-orgin': transformOptions.orgin || '0% 0%'
+            'transform-origin': transformOptions.origin || 'center',
+            'transform-style': transformOptions.style || 'flat'
         };
     };
 
