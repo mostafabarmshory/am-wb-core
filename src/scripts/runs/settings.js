@@ -147,6 +147,7 @@ angular.module('am-wb-core')
          * @ngInject
          */
         controller: function () {
+            // TODO: maso, 2019: move to the view
             this.cursors = [{
                 title: 'Alias',
                 value: 'alias'
@@ -190,6 +191,17 @@ angular.module('am-wb-core')
 
                 this.visibility = this.getStyle('visibility') || 'visible';
                 this.opacity = this.getStyle('opacity');
+                
+                // overflow
+                this.overflowX = this.getStyle('overflow.x') || 'visible';
+                this.overflowY = this.getStyle('overflow.y') || 'visible';
+            };
+            
+            this.updateOverflowX = function(){
+                this.setStyle('overflow.x', this.overflowX);
+            };
+            this.updateOverflowY = function(){
+                this.setStyle('overflow.y', this.overflowY);
             };
         }
     });

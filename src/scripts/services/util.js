@@ -98,6 +98,8 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
                 convertToWidgetCssShadows(style.shadows || {}),
                 // transform
                 convertToWidgetCssTransfrom(style.transform || {}),
+                // Overflow
+                convertToWidgetCssOverflow(style.overflow || {}),
                 // color, cursor, opacity, direction
                 {
                     padding: style.padding,
@@ -111,6 +113,13 @@ angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, 
         return css;
     }
 
+    function convertToWidgetCssOverflow(overflowOption) {
+        return {
+            'overflow-x': overflowOption.x || 'visible',
+            'overflow-y': overflowOption.y || 'visible'
+        };
+    }
+    
     function convertToWidgetCssTransfrom(transformOptions) {
         var transform = '';
 
