@@ -2,4 +2,5 @@ test/*
 demo/*
 dist/*
 Gruntfile.js
-src/scripts/ResizeObserver.js
+src/libs/ResizeObserver.js
+src/libs/anime.js

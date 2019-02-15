@@ -16,6 +16,11 @@
     "jsPanel": false,
     "_": false,
     "tinymce": false,
-    "crypto": false
+    "crypto": false,
+    "anime": false,
+    "HTMLCollection": false,
+    "objectPath": false,
+    "Map": false,
+    "Promise": false
   }
 }

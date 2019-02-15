@@ -39,27 +39,53 @@ angular.module('am-wb-core')
 		restrict: 'E',
 		scope: {
 			title: '@title',
-                        lable: '@lable',
-			value: '=value',
+            lable: '@lable',
 			icon: '@icon'
 		},
         /*
          * @ngInject
          */
 		controller: function($scope, $resource){
-			function selectVideo(){
-				return $resource.get('video', {
+			this.selectValue = function(){
+			    var ctrl = this;
+				return $resource.get('vedio', {
 					style: {
-						title: 'Select audio'
+						title: 'Select video'
 					},
 					data: $scope.value
 				})//
 				.then(function(value){
-					$scope.value = value;
+					ctrl.changeValue(value);
 				});
-			}
-
-			$scope.edit = selectVideo;
-		}
+			};
+			/*
+			 * Set new value
+			 */
+			this.changeValue = function(newValue){
+			    $scope.valueChanged(newValue);
+			};
+			
+			this.clearValue = function() {
+                this.changeValue(null);
+			};
+		},
+		controllerAs: 'ctrl',
+		require: 'ngModel',
+        link: function(scope, element, attr, ngModelCtrl) {
+            /*
+             * Set in scope
+             */
+            ngModelCtrl.$render = function () {
+                scope.value = ngModelCtrl.$modelValue;
+            };
+            
+            /*
+             * Change the model
+             */
+            scope.valueChanged = function (newValue) {
+                scope.value = newValue;
+                ngModelCtrl.$setViewValue(newValue); 
+            };
+        }
 	};
 });

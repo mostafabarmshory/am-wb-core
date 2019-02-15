@@ -13,7 +13,12 @@
 		"jsPanel": true,
 		"_": true,
 		"tinymce": true,
-    	"crypto": false
+    	"crypto": false,
+    	"anime": false,
+    	"HTMLCollection": false,
+    	"objectPath": false,
+    	"Map": false,
+    	"Promise": false
 	},
 	"extends": "eslint:recommended",
 	"parserOptions": {

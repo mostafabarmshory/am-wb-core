@@ -36,9 +36,9 @@ angular.module('am-wb-core')
 	/*
 	 * Default settings
 	 */
-	var WB_SETTINGS_GROUP_DEFAULT = [ 'general'/*, 'description'*/, 'border',
+	var WB_SETTINGS_GROUP_DEFAULT = [ 'general', 'transform', 'border',
 		'background', 'layout', 'layout-self', 'marginPadding', 'size', 'shadow', 'SEO' ];
-	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'border',
+	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'transform', 'border',
 		'background', 'marginPadding', 'layout-self', 'size', 'shadow', 'SEO' ];
 
 	/**
