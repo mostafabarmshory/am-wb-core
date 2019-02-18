@@ -78,7 +78,12 @@ angular.module('am-wb-core')
 
 		ngModelCtrl.$render = function() {
 			if(ngModelCtrl.$viewValue) {
-				loadSetting(ngModelCtrl.$viewValue);
+				var model = ngModelCtrl.$viewValue;
+				if(angular.isArray(model) && model.length){
+					loadSetting(model[0]);
+				} else {
+					loadSetting(model);
+				}
 			}
 		};
 	}

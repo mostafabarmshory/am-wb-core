@@ -4252,13 +4252,19 @@ angular.module('am-wb-core')
                 widget = ngModelCtrl.$viewValue;
                 if(angular.isArray(widget) && widget.length > 0){
                 	widget = widget[0];
+                	loadEvents();
+                } else {
+                	cleanEvents();
                 }
-                loadEvents();
             }
         };
 
+        function cleanEvents(){
+        	$scope.events = [];
+        }
+        
         function loadEvents() {
-            $scope.events = [];
+        	cleanEvents();
             for (var i = 0; i < keys.length; i++) {
                 var event = {};
                 event.key = keys[i];
@@ -4949,7 +4955,12 @@ angular.module('am-wb-core')
 
 		ngModelCtrl.$render = function() {
 			if(ngModelCtrl.$viewValue) {
-				loadSetting(ngModelCtrl.$viewValue);
+				var model = ngModelCtrl.$viewValue;
+				if(angular.isArray(model) && model.length){
+					loadSetting(model[0]);
+				} else {
+					loadSetting(model);
+				}
 			}
 		};
 	}
