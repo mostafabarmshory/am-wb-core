@@ -3855,7 +3855,7 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -3866,6 +3866,7 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$wbUtil = $wbUtil;
 	this.$http = $http;
 	this.$mdMedia = $mdMedia;
+	this.$timeout = $timeout;
 
 	var ctrl = this;
 	this.on('modelChanged', function () {
@@ -4000,7 +4001,9 @@ WbWidgetGroupCtrl.prototype.removeChild = function (widget) {
 	if (index > -1) {
 		// remove selection
 		if (widget.isSelected()) {
-			widget.setSelected(false);
+			this.$timeout(function(){
+				widget.setSelected(false);
+			});
 		}
 		// remove model
 		this.childWidgets.splice(index, 1);
