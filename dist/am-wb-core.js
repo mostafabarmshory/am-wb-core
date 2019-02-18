@@ -3479,15 +3479,17 @@ WbAbstractWidget.prototype.fire = function (type, params) {
 
 	// fire
 	var callbacks = this.callbacks[type];
-	for(var i = 0; i < callbacks.length; i++){
-		// TODO: maso, 2018: check if the event is stopped to propagate
-		try {
-			callbacks[i](event);
-		} catch (error) {
-			// NOTE: remove on release
-			console.log(error);
+	this.$timeout(function(){
+		for(var i = 0; i < callbacks.length; i++){
+			// TODO: maso, 2018: check if the event is stopped to propagate
+			try {
+				callbacks[i](event);
+			} catch (error) {
+				// NOTE: remove on release
+				console.log(error);
+			}
 		}
-	}
+	});
 };
 
 WbAbstractWidget.prototype.fireResizeLayout = function ($event) {
@@ -3827,7 +3829,7 @@ WbAbstractWidget.prototype.removeAnimation = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -3835,6 +3837,7 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia
 	this.$http = $http;
 	this.$widget = $widget;
 	this.$mdMedia = $mdMedia;
+	this.$timeout = $timeout;
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
@@ -4001,9 +4004,7 @@ WbWidgetGroupCtrl.prototype.removeChild = function (widget) {
 	if (index > -1) {
 		// remove selection
 		if (widget.isSelected()) {
-			this.$timeout(function(){
-				widget.setSelected(false);
-			});
+			widget.setSelected(false);
 		}
 		// remove model
 		this.childWidgets.splice(index, 1);
