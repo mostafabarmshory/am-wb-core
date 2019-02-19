@@ -3479,15 +3479,17 @@ WbAbstractWidget.prototype.fire = function (type, params) {
 
 	// fire
 	var callbacks = this.callbacks[type];
-	for(var i = 0; i < callbacks.length; i++){
-		// TODO: maso, 2018: check if the event is stopped to propagate
-		try {
-			callbacks[i](event);
-		} catch (error) {
-			// NOTE: remove on release
-			console.log(error);
+	this.$timeout(function(){
+		for(var i = 0; i < callbacks.length; i++){
+			// TODO: maso, 2018: check if the event is stopped to propagate
+			try {
+				callbacks[i](event);
+			} catch (error) {
+				// NOTE: remove on release
+				console.log(error);
+			}
 		}
-	}
+	});
 };
 
 WbAbstractWidget.prototype.fireResizeLayout = function ($event) {
@@ -3827,7 +3829,7 @@ WbAbstractWidget.prototype.removeAnimation = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -3835,6 +3837,7 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia
 	this.$http = $http;
 	this.$widget = $widget;
 	this.$mdMedia = $mdMedia;
+	this.$timeout = $timeout;
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
@@ -3855,7 +3858,7 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -3866,6 +3869,7 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$wbUtil = $wbUtil;
 	this.$http = $http;
 	this.$mdMedia = $mdMedia;
+	this.$timeout = $timeout;
 
 	var ctrl = this;
 	this.on('modelChanged', function () {
@@ -4248,13 +4252,19 @@ angular.module('am-wb-core')
                 widget = ngModelCtrl.$viewValue;
                 if(angular.isArray(widget) && widget.length > 0){
                 	widget = widget[0];
+                	loadEvents();
+                } else {
+                	cleanEvents();
                 }
-                loadEvents();
             }
         };
 
+        function cleanEvents(){
+        	$scope.events = [];
+        }
+        
         function loadEvents() {
-            $scope.events = [];
+        	cleanEvents();
             for (var i = 0; i < keys.length; i++) {
                 var event = {};
                 event.key = keys[i];
@@ -4945,7 +4955,12 @@ angular.module('am-wb-core')
 
 		ngModelCtrl.$render = function() {
 			if(ngModelCtrl.$viewValue) {
-				loadSetting(ngModelCtrl.$viewValue);
+				var model = ngModelCtrl.$viewValue;
+				if(angular.isArray(model) && model.length){
+					loadSetting(model[0]);
+				} else {
+					loadSetting(model);
+				}
 			}
 		};
 	}
