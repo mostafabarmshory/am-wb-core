@@ -73,6 +73,12 @@ angular.module('am-wb-core')
 			$scope.$eval(function() {
 				onSelectionFuction($scope.$parent, locals);
 			});
+			/*
+			 * Catch angular digest exception
+			 */
+			try{					
+				$scope.$apply();
+			} catch(excetpion){}
 		}
 
 		// Load ngModel

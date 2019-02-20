@@ -2998,22 +2998,21 @@ angular.module('am-wb-core')//
  * </ul>
  */
 var WbAbstractWidget = function () {
-    
-    function debounce(func, wait) {
-        var timeout;
-        return function() {
-            var context = this, args = arguments;
-            var later = function() {
-                timeout = null;
-                func.apply(context, args);
-            };
-            var callNow = !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
-        };
-    }
-    
+
+	function debounce(func, wait) {
+		var timeout;
+		return function() {
+			var context = this;
+			var args = arguments;
+			var later = function() {
+				timeout = null;
+				func.apply(context, args);
+			};
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+		};
+	}
+
 	this.actions = [];
 	this.callbacks = [];
 	this.childWidgets = [];
@@ -3023,7 +3022,7 @@ var WbAbstractWidget = function () {
 	 * This is a cache of customer function
 	 * 
 	 */
-	this.eventFunctions = {};
+	 this.eventFunctions = {};
 	this.computedStyle = {};
 
 	// models
@@ -3057,11 +3056,26 @@ var WbAbstractWidget = function () {
 	 * Add resize observer to the element
 	 */
 	this.resizeObserver = new ResizeObserver(debounce(function ($event) {
-		ctrl.fireResizeLayout($event);
-		// check if there is a user function
+		if(angular.isArray($event)){
+			$event = $event[0];
+		}
+		ctrl.fire('resize-layout', $event);
 		ctrl.evalWidgetEvent('resize', $event);
-	}, 100));
+	}, 300));
 
+	var options = {
+			root: null,
+			rootMargin: "0px",
+//			threshold: buildThresholdList()
+	};
+	this.intersectionObserver = new IntersectionObserver(function ($event) {
+		if(angular.isArray($event)){
+			$event = $event[0];
+		}
+		ctrl.intersecting = $event.isIntersecting;
+		ctrl.fire('intersection', $event);
+		ctrl.evalWidgetEvent('intersection', $event);
+	}, options);
 };
 
 /**
@@ -3388,6 +3402,7 @@ WbAbstractWidget.prototype.disconnect = function () {
 		return;
 	}
 	this.resizeObserver.unobserve($element[0]);
+	this.intersectionObserver.unobserve($element[0]);
 	angular.forEach(this.eventListeners, function (listener, key) {
 		$element.off(key, listener);
 	});
@@ -3399,6 +3414,7 @@ WbAbstractWidget.prototype.connect = function () {
 		return;
 	}
 	this.resizeObserver.observe($element[0]);
+	this.intersectionObserver.observe($element[0]);
 	angular.forEach(this.eventListeners, function (listener, key) {
 		$element.on(key, listener);
 	});
@@ -3433,6 +3449,9 @@ WbAbstractWidget.prototype.on = function (type, callback) {
 	}
 	if (!angular.isArray(this.callbacks[type])) {
 		this.callbacks[type] = [];
+	}
+	if(this.callbacks[type].includes(callback)){
+		return;
 	}
 	this.callbacks[type].push(callback);
 };
@@ -3479,27 +3498,16 @@ WbAbstractWidget.prototype.fire = function (type, params) {
 
 	// fire
 	var callbacks = this.callbacks[type];
-	this.$timeout(function(){
-		for(var i = 0; i < callbacks.length; i++){
-			// TODO: maso, 2018: check if the event is stopped to propagate
-			try {
-				callbacks[i](event);
-			} catch (error) {
-				// NOTE: remove on release
-				console.log(error);
-			}
+	for(var i = 0; i < callbacks.length; i++){
+		// TODO: maso, 2018: check if the event is stopped to propagate
+		try {
+			callbacks[i](event);
+		} catch (error) {
+			// NOTE: remove on release
+			console.log(error);
 		}
-	}, 300);
+	}
 };
-
-WbAbstractWidget.prototype.fireResizeLayout = function ($event) {
-	this.fire('resize', $event);
-	var children = this.$widget.getChildren(this.getRoot());
-	angular.forEach(children, function (widget) {
-		widget.fire('resize-layout', $event);
-	});
-};
-
 
 /**
  * Gets direction of the widget
@@ -3567,32 +3575,23 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
 		delete this.lastSelectedItem;
 		this.setSelected(true);
 	}
-//	if (editable) {
-//		// Lesson on click
-//		var ctrl = this;
-//
-//		// TODO: remove watch for model update and fire in setting
-//		this._modelWatche = this.getScope().$watch('wbModel', function () {
-//			ctrl.fire('modelUpdate');
-//		}, true);
-//	} else {
-//		// remove selection handler
-//		if (this._modelWatche) {
-//			this._modelWatche();
-//			delete this._modelWatche;
-//		}
-//	}
 	// propagate to child
 	angular.forEach(this.childWidgets, function (widget) {
 		widget.setEditable(editable);
 	});
 
+	// TODO: maso, 2019: add event data
 	if (editable) {
 		this.fire('editable');
 	} else {
 		this.fire('noneditable');
 	}
 };
+
+WbAbstractWidget.prototype.isIntersecting = function(){
+	return this.intersecting;
+}
+
 
 /**
  * Delete the widget
@@ -3790,13 +3789,13 @@ WbAbstractWidget.prototype.animate = function (options) {
 		}
 		keys.push(key);
 		animation[key] = options[key];
-		
+
 		// set initial value
 		var val = this.getProperty(key);
 		if(!val) {
 			this.setProperty(key, this.getModelProperty(key));
 		}
-		
+
 		// NOTE: if the value is empty then you have to set from values
 	}
 
@@ -4078,10 +4077,6 @@ WbWidgetGroupCtrl.prototype.moveChild = function (widget, index) {
 
 	// move controller
 	arraymove(this.getChildren(), this.indexOfChild(widget), index);
-
-	this.fireResizeLayout({
-		source: widget
-	});
 };
 
 /**
@@ -4399,14 +4394,12 @@ angular.module('am-wb-core')
 			$scope.$eval(function() {
 				onSelectionFuction($scope.$parent, locals);
 			});
-			if ($scope.wbEditable) {
-				/*
-				 * Catch angular digest exception
-				 */
-				try{					
-					$scope.$apply();
-				} catch(excetpion){}
-			}
+			/*
+			 * Catch angular digest exception
+			 */
+			try{					
+				$scope.$apply();
+			} catch(excetpion){}
 		}
 
 		// Load ngModel
@@ -6706,17 +6699,32 @@ angular.module('am-wb-core')//
                     ctrl.removeClass('mouseover');
                     ctrl.mouseover = false;
                 },
-                'resize-layout' : $widget.debounce(function ($event) {
-                    ctrl.updateView();
-                }, 100)
+                'resize-layout' : function ($event) {
+                    ctrl.internalUpdateView();
+                },
+                'intersection' : function ($event) {
+                	ctrl.internalUpdateView();
+                },
         };
     }
+
+    
+    abstractWidgetLocator.prototype.isIntersecting = function () {
+    	var widget = this.getWidget();
+    	return widget.isIntersecting();
+    };
 
     /**
      * Defines anchor 
      */
     abstractWidgetLocator.prototype.setAnchor = function (anchor) {
         this.anchor = anchor;
+    };
+    /**
+     * Update the view
+     */
+    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
+    	this.anchor = anchor;
     };
 
     abstractWidgetLocator.prototype.getAnchor = function (auncher) {
@@ -6758,8 +6766,11 @@ angular.module('am-wb-core')//
     abstractWidgetLocator.prototype.setWidget = function (widget) {
         this.disconnect();
         this.widget = widget;
+        if(!widget) {
+        	return;
+        }
         this.observe();
-        this.updateView();
+    	this.internalUpdateView();
         this.fire('widgetChanged');
     };
 
@@ -6796,11 +6807,11 @@ angular.module('am-wb-core')//
 
     abstractWidgetLocator.prototype.hide = function () {
         this.setVisible(false);
-    }
+    };
 
     abstractWidgetLocator.prototype.show = function () {
         this.setVisible(true);
-    }
+    };
 
 
     /**
@@ -6816,49 +6827,16 @@ angular.module('am-wb-core')//
     	}
         this.visible = visible;
         if (visible) {
-            this.updateView();
+        	this.observe();
             this.fire('show');
         } else {
+        	this.disconnect();
             this.fire('hide');
         }
-        angular.forEach(this.elements, function (element) {
-            if (visible) {
-                element.show();
-            } else {
-                element.hide();
-            }
-        });
     }
 
     abstractWidgetLocator.prototype.isVisible = function () {
         return this.visible;
-    }
-
-    /**
-     * Enable locator
-     * 
-     * If the locater is enable, then it watch for regular widget event and fire
-     * it to internal listeneres.
-     * 
-     * @param enable
-     *            {boolean} the flag to enable and disable.
-     * @memberof AbstractWidgetLocator
-     */
-    abstractWidgetLocator.prototype.setEnable = function (enable) {
-        if (this.enable == enable) {
-            return;
-        }
-        this.enable = enable;
-        this.setVisible(this.enable && this.visible);
-        if (this.enable) {
-            this.observe();
-        } else {
-            this.disconnect();
-        }
-    }
-
-    abstractWidgetLocator.prototype.isEnable = function () {
-        return this.enable;
     }
 
     /**
@@ -6922,6 +6900,30 @@ angular.module('am-wb-core')//
         var elements = this.getElements();
         angular.forEach(elements, function (element) {
             anchor.append(element);
+        });
+    };
+    
+    abstractWidgetLocator.prototype.internalUpdateView = function(){
+    	var widget = this.getWidget();
+        if(!widget || widget.isRoot()){
+//            this.setVisible(false);
+            return;
+        }
+        
+    	var visible = this.isVisible() && this.isIntersecting();
+    	if(visible) {
+    		this.updateView();
+    	}
+    	if(visible === this._oldVisible) {
+    		return;
+    	}
+    	this._oldVisible = visible;
+        angular.forEach(this.elements, function (element) {
+            if (visible) {
+                element.show();
+            } else {
+                element.hide();
+            }
         });
     };
 
@@ -6996,10 +6998,6 @@ angular.module('am-wb-core')//
 
 	boundWidgetLocator.prototype.updateView = function () {
         var widget = this.getWidget();
-        if(!widget || widget.isRoot()){
-            this.setEnable(false);
-            return;
-        }
 	    var bound = widget.getBoundingClientRect();
 	    var space = 2;
 		this.topElement.css({
@@ -7247,13 +7245,13 @@ angular
         // disable extra
         for (i = 0; i < this.selectionLocators.length; i++) {
             this.selectionLocators[i]
-            .setEnable(i < widgets.length);
+            .setVisible(i < widgets.length);
         }
 
         // add new
         while (this.selectionLocators.length < widgets.length) {
             locator = new this.SelectionLocator(this.SelectionLocatorOption);
-            locator.setEnable(true);
+            locator.setVisible(false);
             this.selectionLocators.push(locator);
         }
 
@@ -7284,7 +7282,7 @@ angular
             this.newLocatorListener = $widget.debounce(function($event){
                 ctrl.updateBoundLocators();
                 ctrl.updateSelectionLocators();
-            }, 100);
+            }, 100, true);
         }
         if(!this.styleChangeListener){
             this.styleChangeListener = $widget.debounce(function($event) {
@@ -7293,7 +7291,7 @@ angular
                 }
                 ctrl.updateBoundLocators();
                 ctrl.updateSelectionLocators();
-            }, 100);
+            }, 100, true);
         }
 
         // list widgets
@@ -7307,7 +7305,7 @@ angular
 
         // disable extra
         angular.forEach(this.boundLocators, function(locator){
-            locator.setEnable(i < widgets.length);
+            locator.setVisible(i < widgets.length);
             // remove listener
             var widget = locator.getWidget();
             if(widget){
@@ -7326,7 +7324,7 @@ angular
         for (i = 0; i < widgets.length; i++) {
             var locator = this.boundLocators[i];
             locator.setWidget(widgets[i]);
-            locator.setEnable(true);
+            
             locator.setVisible(this.visible);
 
             // add listener
@@ -7469,10 +7467,6 @@ angular.module('am-wb-core')//
 
     selectionWidgetLocator.prototype.updateView = function () {
         var widget = this.getWidget();
-        if(!widget || widget.isRoot()){
-            this.setEnable(false);
-            return;
-        }
         var bound = widget.getBoundingClientRect();
         var space = 2;
         this.topElement.css({
@@ -10596,15 +10590,20 @@ angular.module('am-wb-core')
     this.debounce = function (func, wait, immediate) {
         var timeout;
         return function() {
-            var context = this, args = arguments;
+            var context = this;
+            var args = arguments;
             var later = function() {
                 timeout = null;
-                if (!immediate) func.apply(context, args);
+                if (!immediate) {
+                	func.apply(context, args);
+                }
             };
             var callNow = immediate && !timeout;
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
+            if (callNow) {
+            	func.apply(context, args);
+            }
         };
     };
 });
@@ -10881,8 +10880,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
     "            'textcolor',\n" +
     "            'textpattern',\n" +
     "            'toc',\n" +
-    "            'visualblocks',\n" +
-    "            'wordcount'\n" +
+    "            'visualblocks'\n" +
     "        ],\n" +
     "        toolbar: [\n" +
     "            'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',\n" +
