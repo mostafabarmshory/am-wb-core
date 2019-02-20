@@ -3489,7 +3489,7 @@ WbAbstractWidget.prototype.fire = function (type, params) {
 				console.log(error);
 			}
 		}
-	});
+	}, 300);
 };
 
 WbAbstractWidget.prototype.fireResizeLayout = function ($event) {
@@ -3567,21 +3567,21 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
 		delete this.lastSelectedItem;
 		this.setSelected(true);
 	}
-	if (editable) {
-		// Lesson on click
-		var ctrl = this;
-
-		// TODO: remove watch for model update and fire in setting
-		this._modelWatche = this.getScope().$watch('wbModel', function () {
-			ctrl.fire('modelUpdate');
-		}, true);
-	} else {
-		// remove selection handler
-		if (this._modelWatche) {
-			this._modelWatche();
-			delete this._modelWatche;
-		}
-	}
+//	if (editable) {
+//		// Lesson on click
+//		var ctrl = this;
+//
+//		// TODO: remove watch for model update and fire in setting
+//		this._modelWatche = this.getScope().$watch('wbModel', function () {
+//			ctrl.fire('modelUpdate');
+//		}, true);
+//	} else {
+//		// remove selection handler
+//		if (this._modelWatche) {
+//			this._modelWatche();
+//			delete this._modelWatche;
+//		}
+//	}
 	// propagate to child
 	angular.forEach(this.childWidgets, function (widget) {
 		widget.setEditable(editable);

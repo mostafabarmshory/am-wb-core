@@ -76,22 +76,21 @@
  * </ul>
  */
 var WbAbstractWidget = function () {
-    
-    function debounce(func, wait) {
-        var timeout;
-        return function() {
-            var context = this, args = arguments;
-            var later = function() {
-                timeout = null;
-                func.apply(context, args);
-            };
-            var callNow = !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) func.apply(context, args);
-        };
-    }
-    
+
+	function debounce(func, wait) {
+		var timeout;
+		return function() {
+			var context = this;
+			var args = arguments;
+			var later = function() {
+				timeout = null;
+				func.apply(context, args);
+			};
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+		};
+	}
+
 	this.actions = [];
 	this.callbacks = [];
 	this.childWidgets = [];
@@ -101,7 +100,7 @@ var WbAbstractWidget = function () {
 	 * This is a cache of customer function
 	 * 
 	 */
-	this.eventFunctions = {};
+	 this.eventFunctions = {};
 	this.computedStyle = {};
 
 	// models
@@ -135,11 +134,26 @@ var WbAbstractWidget = function () {
 	 * Add resize observer to the element
 	 */
 	this.resizeObserver = new ResizeObserver(debounce(function ($event) {
-		ctrl.fireResizeLayout($event);
-		// check if there is a user function
+		if(angular.isArray($event)){
+			$event = $event[0];
+		}
+		ctrl.fire('resize-layout', $event);
 		ctrl.evalWidgetEvent('resize', $event);
-	}, 100));
+	}, 300));
 
+	var options = {
+			root: null,
+			rootMargin: "0px",
+//			threshold: buildThresholdList()
+	};
+	this.intersectionObserver = new IntersectionObserver(function ($event) {
+		if(angular.isArray($event)){
+			$event = $event[0];
+		}
+		ctrl.intersecting = $event.isIntersecting;
+		ctrl.fire('intersection', $event);
+		ctrl.evalWidgetEvent('intersection', $event);
+	}, options);
 };
 
 /**
@@ -466,6 +480,7 @@ WbAbstractWidget.prototype.disconnect = function () {
 		return;
 	}
 	this.resizeObserver.unobserve($element[0]);
+	this.intersectionObserver.unobserve($element[0]);
 	angular.forEach(this.eventListeners, function (listener, key) {
 		$element.off(key, listener);
 	});
@@ -477,6 +492,7 @@ WbAbstractWidget.prototype.connect = function () {
 		return;
 	}
 	this.resizeObserver.observe($element[0]);
+	this.intersectionObserver.observe($element[0]);
 	angular.forEach(this.eventListeners, function (listener, key) {
 		$element.on(key, listener);
 	});
@@ -511,6 +527,9 @@ WbAbstractWidget.prototype.on = function (type, callback) {
 	}
 	if (!angular.isArray(this.callbacks[type])) {
 		this.callbacks[type] = [];
+	}
+	if(this.callbacks[type].includes(callback)){
+		return;
 	}
 	this.callbacks[type].push(callback);
 };
@@ -557,27 +576,16 @@ WbAbstractWidget.prototype.fire = function (type, params) {
 
 	// fire
 	var callbacks = this.callbacks[type];
-	this.$timeout(function(){
-		for(var i = 0; i < callbacks.length; i++){
-			// TODO: maso, 2018: check if the event is stopped to propagate
-			try {
-				callbacks[i](event);
-			} catch (error) {
-				// NOTE: remove on release
-				console.log(error);
-			}
+	for(var i = 0; i < callbacks.length; i++){
+		// TODO: maso, 2018: check if the event is stopped to propagate
+		try {
+			callbacks[i](event);
+		} catch (error) {
+			// NOTE: remove on release
+			console.log(error);
 		}
-	});
+	}
 };
-
-WbAbstractWidget.prototype.fireResizeLayout = function ($event) {
-	this.fire('resize', $event);
-	var children = this.$widget.getChildren(this.getRoot());
-	angular.forEach(children, function (widget) {
-		widget.fire('resize-layout', $event);
-	});
-};
-
 
 /**
  * Gets direction of the widget
@@ -645,32 +653,23 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
 		delete this.lastSelectedItem;
 		this.setSelected(true);
 	}
-	if (editable) {
-		// Lesson on click
-		var ctrl = this;
-
-		// TODO: remove watch for model update and fire in setting
-		this._modelWatche = this.getScope().$watch('wbModel', function () {
-			ctrl.fire('modelUpdate');
-		}, true);
-	} else {
-		// remove selection handler
-		if (this._modelWatche) {
-			this._modelWatche();
-			delete this._modelWatche;
-		}
-	}
 	// propagate to child
 	angular.forEach(this.childWidgets, function (widget) {
 		widget.setEditable(editable);
 	});
 
+	// TODO: maso, 2019: add event data
 	if (editable) {
 		this.fire('editable');
 	} else {
 		this.fire('noneditable');
 	}
 };
+
+WbAbstractWidget.prototype.isIntersecting = function(){
+	return this.intersecting;
+}
+
 
 /**
  * Delete the widget
@@ -868,13 +867,13 @@ WbAbstractWidget.prototype.animate = function (options) {
 		}
 		keys.push(key);
 		animation[key] = options[key];
-		
+
 		// set initial value
 		var val = this.getProperty(key);
 		if(!val) {
 			this.setProperty(key, this.getModelProperty(key));
 		}
-		
+
 		// NOTE: if the value is empty then you have to set from values
 	}
 
@@ -1156,10 +1155,6 @@ WbWidgetGroupCtrl.prototype.moveChild = function (widget, index) {
 
 	// move controller
 	arraymove(this.getChildren(), this.indexOfChild(widget), index);
-
-	this.fireResizeLayout({
-		source: widget
-	});
 };
 
 /**

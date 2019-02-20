@@ -130,10 +130,6 @@ angular.module('am-wb-core')//
 
     selectionWidgetLocator.prototype.updateView = function () {
         var widget = this.getWidget();
-        if(!widget || widget.isRoot()){
-            this.setEnable(false);
-            return;
-        }
         var bound = widget.getBoundingClientRect();
         var space = 2;
         this.topElement.css({

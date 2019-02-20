@@ -218,13 +218,13 @@ angular
         // disable extra
         for (i = 0; i < this.selectionLocators.length; i++) {
             this.selectionLocators[i]
-            .setEnable(i < widgets.length);
+            .setVisible(i < widgets.length);
         }
 
         // add new
         while (this.selectionLocators.length < widgets.length) {
             locator = new this.SelectionLocator(this.SelectionLocatorOption);
-            locator.setEnable(true);
+            locator.setVisible(false);
             this.selectionLocators.push(locator);
         }
 
@@ -255,7 +255,7 @@ angular
             this.newLocatorListener = $widget.debounce(function($event){
                 ctrl.updateBoundLocators();
                 ctrl.updateSelectionLocators();
-            }, 100);
+            }, 100, true);
         }
         if(!this.styleChangeListener){
             this.styleChangeListener = $widget.debounce(function($event) {
@@ -264,7 +264,7 @@ angular
                 }
                 ctrl.updateBoundLocators();
                 ctrl.updateSelectionLocators();
-            }, 100);
+            }, 100, true);
         }
 
         // list widgets
@@ -278,7 +278,7 @@ angular
 
         // disable extra
         angular.forEach(this.boundLocators, function(locator){
-            locator.setEnable(i < widgets.length);
+            locator.setVisible(i < widgets.length);
             // remove listener
             var widget = locator.getWidget();
             if(widget){
@@ -297,7 +297,7 @@ angular
         for (i = 0; i < widgets.length; i++) {
             var locator = this.boundLocators[i];
             locator.setWidget(widgets[i]);
-            locator.setEnable(true);
+            
             locator.setVisible(this.visible);
 
             // add listener
