@@ -4239,8 +4239,8 @@ angular.module('am-wb-core')
         // Load ngModel
         var ngModelCtrl = $ctrls[0];
         var widget = null;
-        var keys = [ 'click', 'mouseout', 'mouseover', 'resize' ];
-        var titles = [ 'Click', 'Mouseout', 'Mouseover', 'Resize' ];
+        var keys = [ 'click', 'mouseout', 'mouseover', 'resize', 'intersection'];
+        var titles = [ 'Click', 'Mouseout', 'Mouseover', 'Resize', 'Intersection'];
 
         ngModelCtrl.$render = function () {
             if (ngModelCtrl.$viewValue) {
@@ -10622,7 +10622,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-event-panel.html',
-    "<table class=mb-table style=\"font-size: 10px\"> <thead> <tr md-colors=\"{color: 'primary-700'}\"> <td translate>Name</td> <td translate>Code</td> <td></td> </tr> </thead> <tbody> <tr ng-repeat=\"event in events track by $index\"> <td>{{event.title}}</td> <td>{{event.code | limitTo:13 }} ...</td> <td> <md-button ng-if=event.code ng-click=\"ctrl.deleteEvent(event, $event)\" class=md-icon-button> <wb-icon>delete</wb-icon> </md-button> <md-button ng-click=\"ctrl.editEvent(event, $event)\" class=md-icon-button> <wb-icon>edit</wb-icon> </md-button> </td> </tr> </tbody> </table>"
+    "<table class=mb-table style=\"font-size: 10px\"> <thead> <tr md-colors=\"{color: 'primary-700'}\"> <td translate>Name</td> <td translate>Code</td> <td></td> </tr> </thead> <tbody> <tr ng-repeat=\"event in events track by $index\"> <td>{{event.title}}</td> <td>{{event.code | limitTo:13 }} ...</td> <td> <md-button ng-click=\"ctrl.editEvent(event, $event)\" class=md-icon-button> <wb-icon>edit</wb-icon> </md-button> <md-button ng-if=event.code ng-click=\"ctrl.deleteEvent(event, $event)\" class=md-icon-button> <wb-icon>delete</wb-icon> </md-button> </td> </tr> </tbody> </table>"
   );
 
 

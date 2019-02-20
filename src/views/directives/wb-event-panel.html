@@ -16,15 +16,15 @@
 			<td>{{event.code | limitTo:13 }} ...</td>
 			<td>
 				<md-button
+					ng-click="ctrl.editEvent(event, $event)"
+					class="md-icon-button">
+					<wb-icon>edit</wb-icon>
+				</md-button>
+				<md-button
 					ng-if="event.code"
 					ng-click="ctrl.deleteEvent(event, $event)"
 					class="md-icon-button">
 					<wb-icon>delete</wb-icon>
-				</md-button>
-				<md-button
-					ng-click="ctrl.editEvent(event, $event)"
-					class="md-icon-button">
-					<wb-icon>edit</wb-icon>
 				</md-button>
 			</td>
 		</tr>
