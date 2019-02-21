@@ -66,10 +66,6 @@ angular.module('am-wb-core')//
 
 	boundWidgetLocator.prototype.updateView = function () {
         var widget = this.getWidget();
-        if(!widget || widget.isRoot()){
-            this.setEnable(false);
-            return;
-        }
 	    var bound = widget.getBoundingClientRect();
 	    var space = 2;
 		this.topElement.css({

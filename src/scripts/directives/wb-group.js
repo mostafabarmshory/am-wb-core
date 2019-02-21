@@ -73,14 +73,12 @@ angular.module('am-wb-core')
 			$scope.$eval(function() {
 				onSelectionFuction($scope.$parent, locals);
 			});
-			if ($scope.wbEditable) {
-				/*
-				 * Catch angular digest exception
-				 */
-				try{					
-					$scope.$apply();
-				} catch(excetpion){}
-			}
+			/*
+			 * Catch angular digest exception
+			 */
+			try{					
+				$scope.$apply();
+			} catch(excetpion){}
 		}
 
 		// Load ngModel

@@ -73,17 +73,32 @@ angular.module('am-wb-core')//
                     ctrl.removeClass('mouseover');
                     ctrl.mouseover = false;
                 },
-                'resize-layout' : $widget.debounce(function ($event) {
-                    ctrl.updateView();
-                }, 100)
+                'resize-layout' : function ($event) {
+                    ctrl.internalUpdateView();
+                },
+                'intersection' : function ($event) {
+                	ctrl.internalUpdateView();
+                },
         };
     }
+
+    
+    abstractWidgetLocator.prototype.isIntersecting = function () {
+    	var widget = this.getWidget();
+    	return widget.isIntersecting();
+    };
 
     /**
      * Defines anchor 
      */
     abstractWidgetLocator.prototype.setAnchor = function (anchor) {
         this.anchor = anchor;
+    };
+    /**
+     * Update the view
+     */
+    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
+    	this.anchor = anchor;
     };
 
     abstractWidgetLocator.prototype.getAnchor = function (auncher) {
@@ -125,8 +140,11 @@ angular.module('am-wb-core')//
     abstractWidgetLocator.prototype.setWidget = function (widget) {
         this.disconnect();
         this.widget = widget;
+        if(!widget) {
+        	return;
+        }
         this.observe();
-        this.updateView();
+    	this.internalUpdateView();
         this.fire('widgetChanged');
     };
 
@@ -163,11 +181,11 @@ angular.module('am-wb-core')//
 
     abstractWidgetLocator.prototype.hide = function () {
         this.setVisible(false);
-    }
+    };
 
     abstractWidgetLocator.prototype.show = function () {
         this.setVisible(true);
-    }
+    };
 
 
     /**
@@ -183,49 +201,16 @@ angular.module('am-wb-core')//
     	}
         this.visible = visible;
         if (visible) {
-            this.updateView();
+        	this.observe();
             this.fire('show');
         } else {
+        	this.disconnect();
             this.fire('hide');
         }
-        angular.forEach(this.elements, function (element) {
-            if (visible) {
-                element.show();
-            } else {
-                element.hide();
-            }
-        });
     }
 
     abstractWidgetLocator.prototype.isVisible = function () {
         return this.visible;
-    }
-
-    /**
-     * Enable locator
-     * 
-     * If the locater is enable, then it watch for regular widget event and fire
-     * it to internal listeneres.
-     * 
-     * @param enable
-     *            {boolean} the flag to enable and disable.
-     * @memberof AbstractWidgetLocator
-     */
-    abstractWidgetLocator.prototype.setEnable = function (enable) {
-        if (this.enable == enable) {
-            return;
-        }
-        this.enable = enable;
-        this.setVisible(this.enable && this.visible);
-        if (this.enable) {
-            this.observe();
-        } else {
-            this.disconnect();
-        }
-    }
-
-    abstractWidgetLocator.prototype.isEnable = function () {
-        return this.enable;
     }
 
     /**
@@ -289,6 +274,30 @@ angular.module('am-wb-core')//
         var elements = this.getElements();
         angular.forEach(elements, function (element) {
             anchor.append(element);
+        });
+    };
+    
+    abstractWidgetLocator.prototype.internalUpdateView = function(){
+    	var widget = this.getWidget();
+        if(!widget || widget.isRoot()){
+//            this.setVisible(false);
+            return;
+        }
+        
+    	var visible = this.isVisible() && this.isIntersecting();
+    	if(visible) {
+    		this.updateView();
+    	}
+    	if(visible === this._oldVisible) {
+    		return;
+    	}
+    	this._oldVisible = visible;
+        angular.forEach(this.elements, function (element) {
+            if (visible) {
+                element.show();
+            } else {
+                element.hide();
+            }
         });
     };
 
