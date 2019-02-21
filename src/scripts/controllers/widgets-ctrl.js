@@ -1015,6 +1015,7 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
 	.then(function () {
 		var $element = parentWidget.getElement();
 		parentWidget.childWidgets.forEach(function (widget) {
+		    widget.setEditable(ctrl.isEditable());
 			$element.append(widget.getElement());
 		});
 	})

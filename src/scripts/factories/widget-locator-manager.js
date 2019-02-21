@@ -82,9 +82,67 @@ angular
                     var widget = $event.source;
                     ctrl.updateLocators();
                 },
+                'loaded': function($event){
+                    var widget = $event.source;
+                    var children = $widget.getChildren(widget);
+                    for(var i = 0; i < children.length; i++){
+                        ctrl.widgetAdded(children[i]);
+                    }
+                },
+                'newchild': function($event) {
+                    var widget = $event.widget;
+                    ctrl.widgetAdded(widget);
+                },
+                'delete': function($event) {
+                    var widget = $event.source;
+                    ctrl.widgetDeleted(widget);
+                }
         };
     }
 
+    
+    WidgetLocatorManager.prototype.widgetDeleted = function(widget){
+        if(this.isEnable()){
+            // events
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                widget.off(type, callback);
+            });
+            // locator
+            var locator = this.getBoundLocatorOf(widget);
+            locator.disconnect();
+            this.boundLocatorMap.delete(widget);
+            this.boundLocatorTrash.push(locator);
+            // selection
+            var index = this.selectedWidgets.indexOf(widget);
+            if(index>-1){
+                this.selectedWidgets.splice(index, 1);
+                var selectionLocator = this.getSelectionLocatorOf(widget);
+                selectionLocator.disconnect(widget);
+                this.selectionLocatorMap.delete(widget);
+                this.selectionLocatorTrash.push(selectionLocator);
+            }
+            // intersection
+            index = this.intersectingWidget.indexOf(widget);
+            if(index > -1){
+                this.intersectingWidget.splice(index, 1);
+            }
+            // update view
+            this.updateLocators();
+        }
+    };
+    
+    WidgetLocatorManager.prototype.widgetAdded = function(widget){
+        if(this.isEnable()){
+            // events
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                widget.on(type, callback);
+            });
+            
+            // update view
+            this.updateLocators();
+        }
+    };
+    
     /**
      * Sets visibility of locators
      * 
@@ -147,6 +205,18 @@ angular
             }
         }
         // XXX: maso, selection
+        
+        // ROOT
+        var rootWidget = this.getRootWidget();
+        if(enable) {
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                rootWidget.on(type, callback);
+            });
+        } else {
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                rootWidget.off(type, callback);
+            });
+        }
 
     };
 
@@ -212,11 +282,13 @@ angular
             this.destroy();
         }
         this.rootWidget = rootWidget;
-        if(this.rootWidget) {
-            var element = this.rootWidget.getElement();
+        if(this.rootWidget && this.isEnable()) {
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                rootWidget.on(type, callback);
+            });
         }
         if (this.isEnable()) {
-            this.updateBoundLocators();
+            this.updateLocators();
         }
     };
 
@@ -268,14 +340,20 @@ angular
     }
 
     WidgetLocatorManager.prototype.widgetIntersectingChange = function(widget){
+        if(widget.isRoot()){
+            return;
+        }
         var index = this.intersectingWidget.indexOf(widget);
+        var locator = this.getBoundLocatorOf(widget);
         // widget intersects with view
         if(widget.isIntersecting()){
+            locator.connect(widget);
             if(index < 0){
                 this.intersectingWidget.push(widget);
                 this.updateLocators();
             }
         } else {
+            locator.disconnect();
             // widget is out of view
             if(index >= 0){
                 this.intersectingWidget.splice(index, 1);
