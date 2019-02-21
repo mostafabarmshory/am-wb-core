@@ -56,6 +56,9 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
         var widgets = $event.widgets;
         if(widgets.length) {
             var widget =  widgets[0];
+            if(widget.isRoot()){
+                widgetLocator.setRootWidget(widget);
+            }
             $scope.selectedWidget = widget;
             $scope.actions = widget.getActions();
         } else {

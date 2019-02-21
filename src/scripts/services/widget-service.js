@@ -312,7 +312,7 @@ angular.module('am-wb-core')
     this.getChildren = function(widget) {
         // Check if it is group
         var widgets = [];
-        if(widget.getType() !== 'Group') {
+        if(!angular.isDefined(widget) || widget.getType() !== 'Group') {
             return widgets;
         }
         

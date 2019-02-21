@@ -137,7 +137,7 @@ var WbAbstractWidget = function () {
 		if(angular.isArray($event)){
 			$event = $event[0];
 		}
-		ctrl.fire('resize-layout', $event);
+		ctrl.fire('resize', $event);
 		ctrl.evalWidgetEvent('resize', $event);
 	}, 300));
 
