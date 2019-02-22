@@ -10265,7 +10265,7 @@ angular.module('am-wb-core')
         $wbUtil, $rootScope,
         $q, $sce, $templateRequest, $compile, $controller) {
 
-    
+
     this.providers =  {};
     var _group_repo = [];
     var contentElementAsso = [];
@@ -10464,28 +10464,27 @@ angular.module('am-wb-core')
             } else {
                 ctrl = $controller('WbWidgetGroupCtrl', wlocals);
             }
-            // NOTE: can inject widget controller as WidgetCtrl
             ctrl.setParent(parentWidget);
-            ctrl.setModel(model);
-            wlocals.WidgetCtrl = ctrl;
 
+            // NOTE: can inject widget controller as WidgetCtrl
+            wlocals.WidgetCtrl = ctrl;
+            wlocals.$parent = parentWidget;
             // extend element controller
             if (angular.isDefined(widget.controller)) {
                 angular.extend(ctrl, $controller(widget.controller, wlocals));
             }
-            if (widget.controllerAs) {
-                childScope[widget.controllerAs] = ctrl;
-            }
-            childScope['ctrl'] = ctrl;
+
+            ctrl.setModel(model);
+            childScope[widget.controllerAs || 'ctrl'] = ctrl;
 
             // bind ctrl
             element.data('$ngControllerController', ctrl);
             link(childScope);
-            
+
             // return widget
-	    if(angular.isFunction(ctrl.initWidget)){
-		ctrl.initWidget();
-	    }
+            if(angular.isFunction(ctrl.initWidget)){
+                ctrl.initWidget();
+            }
             return ctrl;
         });
     }
@@ -10527,7 +10526,7 @@ angular.module('am-wb-core')
 
     // utils
     service.compile = compile;
-    
+
     /**
      * Gets list of all children from the widget
      * 
@@ -10544,7 +10543,7 @@ angular.module('am-wb-core')
         if(!angular.isDefined(widget) || widget.getType() !== 'Group') {
             return widgets;
         }
-        
+
         // load list of widgets
         var groups = [];
         groups.push(widget);
@@ -10559,17 +10558,17 @@ angular.module('am-wb-core')
                 }
             }
         }
-        
+
         //return the list
         return widgets;
     }
-    
-    
+
+
     this.addProvider = function(key, value) {
         this.providers[key] = value;
     };
-    
-    
+
+
     // Returns a function, that, as long as it continues to be invoked, will not
     // be triggered. The function will be called after it stops being called for
     // N milliseconds. If `immediate` is passed, trigger the function on the
@@ -10582,14 +10581,14 @@ angular.module('am-wb-core')
             var later = function() {
                 timeout = null;
                 if (!immediate) {
-                	func.apply(context, args);
+                    func.apply(context, args);
                 }
             };
             var callNow = immediate && !timeout;
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
             if (callNow) {
-            	func.apply(context, args);
+                func.apply(context, args);
             }
         };
     };
