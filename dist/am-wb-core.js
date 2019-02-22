@@ -7229,7 +7229,7 @@ angular
     };
 
     WidgetLocatorManager.prototype.directUpdateLocator = function(locator, widget) {
-        if(this.isVisible){
+        if(this.isVisible()){
             locator.connect(widget);
         } else {
             locator.disconnect();
