@@ -10263,7 +10263,7 @@ angular.module('am-wb-core')
  */
 .service('$widget', function(
         $wbUtil, $rootScope,
-        $q, $sce, $templateRequest, $compile, $controller) {
+        $q, $sce, $templateRequest, $compile, $controller, $mdTheming) {
 
 
     this.providers =  {};
@@ -10480,6 +10480,7 @@ angular.module('am-wb-core')
             // bind ctrl
             element.data('$ngControllerController', ctrl);
             link(childScope);
+            $mdTheming(element);
 
             // return widget
             if(angular.isFunction(ctrl.initWidget)){
