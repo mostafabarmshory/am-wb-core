@@ -43,7 +43,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
     this.widgetLocator = widgetLocator;
     
     
-    $http.get('examples/load.json')
+    $http.get('examples/event-init.json')
     .then(function(res) {
         // NOTE: maso, 2018: clean data model
         $scope.model = $wbUtil.clean(res.data);
@@ -60,11 +60,10 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
                 widgetLocator.setRootWidget(widget);
             }
             $scope.selectedWidget = widget;
-            $scope.actions = widget.getActions();
         } else {
             $scope.selectedWidget = null;
-            $scope.actions = null;
         }
+        $scope.selectedWidgets = widgets;
     };
 
 
@@ -224,7 +223,38 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
         }
         widgetLocator.setVisible(value);
     });
+    
+
+    
+    
+    $scope.actions = [
+        {
+            icon: 'delete',
+            action: function(){
+                var widgets = $scope.selectedWidgets || [];
+                for(var i = 0; i < widgets.length; i++){
+                    widgets[i].delete();
+                }
+                $scope.selectedWidgts= [];
+            }
+        }
+    ];
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /**
