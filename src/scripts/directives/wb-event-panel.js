@@ -41,8 +41,8 @@ angular.module('am-wb-core')
         // Load ngModel
         var ngModelCtrl = $ctrls[0];
         var widget = null;
-        var keys = [ 'click', 'mouseout', 'mouseover', 'resize', 'intersection'];
-        var titles = [ 'Click', 'Mouseout', 'Mouseover', 'Resize', 'Intersection'];
+        var keys = [ 'init', 'click', 'mouseout', 'mouseover', 'resize', 'intersection'];
+        var titles = [ 'Initialization', 'Click', 'Mouseout', 'Mouseover', 'Resize', 'Intersection'];
 
         ngModelCtrl.$render = function () {
             if (ngModelCtrl.$viewValue) {
