@@ -4383,8 +4383,7 @@ angular.module('am-wb-core')
  * NOTE: The root widget will be passed as first selected item. The function
  * will be evaluated in non edit mode.
  */
-.directive('wbGroup',
-		function($compile, $widget, $wbUtil, $controller, $settings, $parse) {
+.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $parse, $timeout) {
 
 	/*
 	 * Link widget view
@@ -4404,7 +4403,7 @@ angular.module('am-wb-core')
 		 */
 		function fireSelection($event) {
 			if(!onSelectionFuction) {
-			    return;
+				return;
 			}
 			var widgets = $event.widgets;
 			var locals = {
@@ -4417,6 +4416,9 @@ angular.module('am-wb-core')
 			}
 			$scope.$eval(function() {
 				onSelectionFuction($scope.$parent, locals);
+			});
+			$timeout(function(){
+				try{$scope.$digest();} catch(ex){};
 			});
 		}
 
