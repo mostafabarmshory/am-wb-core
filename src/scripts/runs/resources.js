@@ -71,9 +71,9 @@ angular.module('am-wb-core')
 	
 
     $resource.newPage({
-        type : 'wb-js',
+        type : 'script',
         icon : 'script',
-        label : 'JS Script',
+        label : 'Script',
         templateUrl : 'views/resources/wb-event-code-editor.html',
         /*
          * @ngInject
@@ -88,6 +88,6 @@ angular.module('am-wb-core')
             }, true);
         },
         controllerAs: 'ctrl',
-        tags : [ 'js' ]
+        tags : [ 'code', 'script']
     });
 });

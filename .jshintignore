@@ -4,3 +4,4 @@ dist/**
 Gruntfile.js
 src/libs/ResizeObserver.js
 src/libs/anime.js
+src/libs/prism.js

@@ -25,7 +25,8 @@
 /**
  * Utility class of WB
  */
-angular.module('am-wb-core').service('$wbUtil', function ($q, $templateRequest, $sce) {
+angular.module('am-wb-core')
+.service('$wbUtil', function ($q, $templateRequest, $sce) {
     'use strict';
     var service = this;
 

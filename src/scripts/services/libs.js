@@ -23,76 +23,45 @@
  */
 'use strict';
 
+angular.module('am-wb-core')
+
 /**
  * @ngdoc Services
- * @name $wbUi
- * @description UI utilities management
+ * @name $$wbCrypto
+ * @description Crypto services
+ * 
  * 
  */
-angular.module('am-wb-core')
-.service('$wbUi', function($mdDialog, $q, $http) {
-
-	var _templates = [];
-	var service = this;
-
-
-	/**
-	 * Opens dialog
-	 * @returns
-	 */
-	function openDialog(dialogData){
-		return $mdDialog.show(dialogData);
-	}
-
-
-	/**
-	 * Get list of registered templates
-	 * 
-	 * @memberof $wbUi
-	 */
-	function templates(){
-		return $q.when({
-			items: _templates
-		});
-	}
-
-	/**
-	 * Gets list of templates
-	 */
-	function getTemplates(){
-		return _templates;
-	}
-
-	/**
-	 * Adds new template
-	 * 
-	 * @memberof $wbUi
-	 */
-	function newTemplate(template){
-		_templates.push(template);
-		return service;
-	}
-
-
-	/**
-	 * Load a template
-	 * 
-	 * @memberof $wbUi
-	 */
-	function loadTemplate(template){
-		// TODO: maso, 2018: check if template is a function
-		if(angular.isDefined(_templates.template)){
-			return $q.when(JSON.parse(_templates.template));
-		}
-		return $http.get(template.templateUrl)
-		.then(function(res){
-			return res.data;
-		});
-	}
+.service('$wbLibs', function($q) {
+	var libs = {};
 	
-	service.openDialog = openDialog;
-	service.templates = templates;
-	service.getTemplates = getTemplates;
-	service.newTemplate = newTemplate;
-	service.loadTemplate = loadTemplate;
+	this.load = function(path){
+		if(libs[path]){
+			return $q.resolve({
+				message: 'isload'
+			});
+		}
+		var defer = $q.defer();
+		
+		var script = document.createElement('script');
+		script.src = path;
+		script.async=1;
+		script.onload = function(){
+			libs[path] = true;
+			defer.resolve({
+				path: path,
+				message: 'loaded'
+			});
+		};
+		script.onerror = function() {
+			libs[path] = false;
+			defer.reject({
+				path: path,
+				message: 'fail'
+			});
+		};
+		document.getElementsByTagName('head')[0].appendChild(script);
+		return defer.promise;
+	}
+    return this;
 });
