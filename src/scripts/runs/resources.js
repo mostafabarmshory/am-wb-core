@@ -78,14 +78,41 @@ angular.module('am-wb-core')
         /*
          * @ngInject
          */
-        controller : function($scope) {
-            $scope.$watch('value', function(value) {
-                if (angular.isDefined(value)) {
-                    $scope.$parent.setValue(value);
-                } else {
-                    $scope.$parent.setValue('');
-                }
-            }, true);
+        controller : function($scope, $wbLibs, $element) {
+        	var ctrl = this;
+        	this.value = $scope.value || {
+            	code: '',
+            	language: 'javascript'
+            };
+//            $scope.$watch(function(){
+//            	return ctrl.value;
+//            }, function(value) {
+//                $scope.$parent.setValue(value);
+//            }, true);
+            this.setCode = function(code) {
+            	this.value.code = code;
+                $scope.$parent.setValue(this.value);
+            };
+            
+
+            $wbLibs.load('resources/libs/ace.js')
+            .then(function(){
+            	var editor = ace.edit($element.find('div')[0]);
+            	editor.setOptions({
+            	   enableBasicAutocompletion: true, 
+            	   enableLiveAutocompletion: true, 
+            	   showPrintMargin: false, 
+            	   maxLines: Infinity,
+            	   fontSize: '100%'
+            	});
+            	$scope.editor = editor;
+//            	editor.setTheme('resources/libs/ace/theme/chrome');
+//            	editor.session.setMode('resources/libs/ace/mode/javascript');
+            	editor.setValue(ctrl.value.code);
+            	editor.on("change", function(){
+            		ctrl.setCode(editor.getValue());
+            	});
+            })
         },
         controllerAs: 'ctrl',
         tags : [ 'code', 'script']
