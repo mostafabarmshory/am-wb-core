@@ -1,0 +1,10 @@
+{
+    "type": "Group",
+    "name": "Main page",
+    "label": "To test the init event",
+    "description": "On the event a message will be show",
+    "event": {
+        "init": "$widget.setProperty('style.background.color', '#ff00ff'); alert('page is loaded');"
+    },
+    "contents": []
+}

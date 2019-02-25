@@ -45,25 +45,19 @@ angular.module('am-wb-core')//
         this.callbacks = [];
         this.elements = [];
         this.observedWidgets = [];
-        
+
         // Creates listeners
         var ctrl = this;
         this.widgetListeners = {
-                'delete' : function ($event) {
-                    ctrl.setWidget(null);
-                    ctrl.fire('widgetDeleted', $event);
-                },
                 'select' : function ($event) {
                     ctrl.addClass('selected');
                     ctrl.removeClass('mouseover');
-                    ctrl.fire('widgetSelected', $event);
                 },
                 'unselect' : function ($event) {
                     ctrl.removeClass('selected');
                     if (ctrl.mouseover) {
                         ctrl.addClass('mouseover');
                     }
-                    ctrl.fire('widgetUnselected', $event);
                 },
                 'mouseover' : function ($event) {
                     ctrl.addClass('mouseover');
@@ -73,20 +67,8 @@ angular.module('am-wb-core')//
                     ctrl.removeClass('mouseover');
                     ctrl.mouseover = false;
                 },
-                'resize-layout' : function ($event) {
-                    ctrl.internalUpdateView();
-                },
-                'intersection' : function ($event) {
-                	ctrl.internalUpdateView();
-                },
         };
     }
-
-    
-    abstractWidgetLocator.prototype.isIntersecting = function () {
-    	var widget = this.getWidget();
-    	return widget.isIntersecting();
-    };
 
     /**
      * Defines anchor 
@@ -94,11 +76,12 @@ angular.module('am-wb-core')//
     abstractWidgetLocator.prototype.setAnchor = function (anchor) {
         this.anchor = anchor;
     };
+
     /**
      * Update the view
      */
     abstractWidgetLocator.prototype.setAnchor = function (anchor) {
-    	this.anchor = anchor;
+        this.anchor = anchor;
     };
 
     abstractWidgetLocator.prototype.getAnchor = function (auncher) {
@@ -125,27 +108,10 @@ angular.module('am-wb-core')//
 
 
     /**
-     * Checks if the locator is visible
-     * 
-     * @return true if the locator is visible
-     * @memberof AbstractWidgetLocator
-     */
-    abstractWidgetLocator.prototype.isVisible = function () {
-        return this.visible;
-    };
-
-    /**
      * Sets new widget
      */
     abstractWidgetLocator.prototype.setWidget = function (widget) {
-        this.disconnect();
         this.widget = widget;
-        if(!widget) {
-        	return;
-        }
-        this.observe();
-    	this.internalUpdateView();
-        this.fire('widgetChanged');
     };
 
     abstractWidgetLocator.prototype.getWidget = function () {
@@ -159,72 +125,6 @@ angular.module('am-wb-core')//
     abstractWidgetLocator.prototype.getElements = function () {
         return this.elements;
     };
-
-    abstractWidgetLocator.prototype.on = function (type, callback) {
-        if (!angular.isArray(this.callbacks[type])) {
-            this.callbacks[type] = [];
-        }
-        this.callbacks[type].push(callback);
-    };
-
-    abstractWidgetLocator.prototype.fire = function (type) {
-        if (angular.isDefined(this.callbacks[type])) {
-            for (var i = 0; i < this.callbacks[type].length; i++) {
-                try {
-                    this.callbacks[type][i]();
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-        }
-    };
-
-    abstractWidgetLocator.prototype.hide = function () {
-        this.setVisible(false);
-    };
-
-    abstractWidgetLocator.prototype.show = function () {
-        this.setVisible(true);
-    };
-
-
-    /**
-     * Set the locator visible
-     * 
-     * @param visible
-     *            {boolean} the visibility of the page
-     * @memberof AbstractWidgetLocator
-     */
-    abstractWidgetLocator.prototype.setVisible = function (visible) {
-    	if(this.visible === visible) {
-    		return;
-    	}
-        this.visible = visible;
-        if (visible) {
-        	this.observe();
-            this.fire('show');
-        } else {
-        	this.disconnect();
-            this.fire('hide');
-        }
-    }
-
-    abstractWidgetLocator.prototype.isVisible = function () {
-        return this.visible;
-    }
-
-    /**
-     * Removes all resources
-     */
-    abstractWidgetLocator.prototype.destroy = function () {
-        this.fire('destroied');
-        this.disconnect();
-        angular.forEach(this.elements, function (element) {
-            element.remove();
-        });
-        this.elements = [];
-        this.callbacks = [];
-    }
 
     abstractWidgetLocator.prototype.addClass = function (value) {
         var elements = this.getElements();
@@ -244,61 +144,42 @@ angular.module('am-wb-core')//
      * Remove connection the the current widget
      */
     abstractWidgetLocator.prototype.disconnect = function () {
-        if(!this.widget){
-            return;
+        this.connect(null);
+        this.connected = false;
+    };
+
+    abstractWidgetLocator.prototype.connect = function (widget) {
+        this.connected = true;
+        if (this.widget !==  widget) {
+            var elements = this.getElements();
+            if(this.widget){
+                var oldWidget = this.widget;
+                angular.forEach(this.widgetListeners, function (listener, type) {
+                    oldWidget.off(type, listener);
+                });
+                for (var i = 0; i < elements.length; i++) {
+                    elements[i].detach();
+                }
+            }
+            this.setWidget(widget);
+            if(widget){
+                angular.forEach(this.widgetListeners, function (listener, type) {
+                    widget.on(type, listener);
+                });
+                var anchor = this.getAnchor();
+                angular.forEach(elements, function (element) {
+                    anchor.append(element);
+                });
+            }
         }
-        // remove listeners
-        var widget = this.widget;
-        angular.forEach(this.widgetListeners, function (listener, type) {
-            widget.off(type, listener);
-        });
-        // remove elements
-        var elements = this.getElements();
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].detach();
+        if(this.getWidget()){
+            this.updateView();
         }
     };
 
-    abstractWidgetLocator.prototype.observe = function () {
-        if (!this.widget) {
-            return;
-        }
-        // add listener
-        var widget = this.widget;
-        angular.forEach(this.widgetListeners, function (listener, type) {
-            widget.on(type, listener);
-        });
-        
-        // attache element
-        var anchor = this.getAnchor();
-        var elements = this.getElements();
-        angular.forEach(elements, function (element) {
-            anchor.append(element);
-        });
-    };
-    
-    abstractWidgetLocator.prototype.internalUpdateView = function(){
-    	var widget = this.getWidget();
-        if(!widget || widget.isRoot()){
-//            this.setVisible(false);
-            return;
-        }
-        
-    	var visible = this.isVisible() && this.isIntersecting();
-    	if(visible) {
-    		this.updateView();
-    	}
-    	if(visible === this._oldVisible) {
-    		return;
-    	}
-    	this._oldVisible = visible;
-        angular.forEach(this.elements, function (element) {
-            if (visible) {
-                element.show();
-            } else {
-                element.hide();
-            }
-        });
+
+    abstractWidgetLocator.prototype.isConnected = function () {
+        return this.connected;
     };
 
     return abstractWidgetLocator;

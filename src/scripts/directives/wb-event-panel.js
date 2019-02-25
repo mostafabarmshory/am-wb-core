@@ -41,8 +41,8 @@ angular.module('am-wb-core')
         // Load ngModel
         var ngModelCtrl = $ctrls[0];
         var widget = null;
-        var keys = [ 'click', 'mouseout', 'mouseover', 'resize', 'intersection'];
-        var titles = [ 'Click', 'Mouseout', 'Mouseover', 'Resize', 'Intersection'];
+        var keys = [ 'init', 'click', 'mouseout', 'mouseover', 'resize', 'intersection'];
+        var titles = [ 'Initialization', 'Click', 'Mouseout', 'Mouseover', 'Resize', 'Intersection'];
 
         ngModelCtrl.$render = function () {
             if (ngModelCtrl.$viewValue) {
@@ -101,11 +101,14 @@ angular.module('am-wb-core')
          */
         controller: function($scope, $resource){
             this.editEvent = function(event) {
-                $resource.get('js', {
-                    data: event.code
+                $resource.get('script', {
+                    data: {
+                    	language: 'javascript',
+                    	code: event.code
+                    }
                 })
                 .then(function(value){
-                    event.code = value;
+                    event.code = value.code;
                     if(!value){
                         delete event.code;
                     }

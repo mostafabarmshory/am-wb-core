@@ -41,74 +41,108 @@ angular
  */
 .factory('WidgetLocatorManager',function ($widget, BoundWidgetLocator, SelectionWidgetLocator) {
 
-
-    /**
-     * Get path of a widget to the root
-     */
-    function getPathOf(widget) {
-        var widgets = [];
-        while (widget != null) {
-            widgets.push(widget);
-            widget = widget.getParent();
-        }
-        return widgets;
-    }
-
     /**
      * Creates new instance of the manager
      * 
      * @memberof CursorWidgetLocator
      */
     function WidgetLocatorManager(options) {
-        options = options || {};
-        this.setEnable(false);
-        // attributes
-        this.selectionLocators = [];
-        this.boundLocators = [];
+        var ctrl = this;
 
-        this.locatorsMap = new Map();
-        this.widgetMap = new Map();
+        this.intersectingWidget = [];
+        this.selectedWidgets = [];
+
+        this.boundLocatorMap = new Map();
+        this.boundLocatorTrash = [];
+
+        this.selectionLocatorMap = new Map();
+        this.selectionLocatorTrash = [];
+
 
         // selection options
-        this.SelectionLocator = options.selectionLocator || SelectionWidgetLocator;
-        this.SelectionLocatorOption = options.selectionLocatorOption || {};
+        this.selectionLocatorOption = options.selectionLocatorOption || {};
         this.selectionEnable = true;
         if (angular.isDefined(options.selectionEnable)) {
             this.selectionEnable = options.selectionEnable;
         }
 
         // bound options
-        this.BoundLocator = options.boundLocator || BoundWidgetLocator;
-        this.BoundLocatorOption = options.boundLocatorOption || {};
+        this.boundLocatorOption = options.boundLocatorOption || {};
         this.boundEnable = true;
         if (angular.isDefined(options.boundEnable)) {
             this.boundEnable = options.boundEnable;
         }
+
+        this.widgetListeners = {
+                'intersection' : function ($event) {
+                    var widget = $event.source;
+                    ctrl.widgetIntersectingChange(widget);
+                },
+                'resize': function($event){
+                    var widget = $event.source;
+                    ctrl.updateLocators();
+                },
+                'loaded': function($event){
+                    var widget = $event.source;
+                    var children = $widget.getChildren(widget);
+                    for(var i = 0; i < children.length; i++){
+                        ctrl.widgetAdded(children[i]);
+                    }
+                },
+                'newchild': function($event) {
+                    var widget = $event.widget;
+                    ctrl.widgetAdded(widget);
+                },
+                'delete': function($event) {
+                    var widget = $event.source;
+                    ctrl.widgetDeleted(widget);
+                }
+        };
     }
 
-    /**
-     * Distracts all locators and remove from view
-     * 
-     * @memberof CursorWidgetLocator
-     */
-    WidgetLocatorManager.prototype.destroy = function () {
-        angular.forEach(this.selectionLocators, function (
-                locator) {
-            locator.destroy();
-        });
-        angular.forEach(this.boundLocators, function (locator) {
-            locator.destroy();
-        });
-
-        // create locators
-        this.selectionLocators = [];
-        this.boundLocators = [];
-
-        // clean maps
-        this.locatorsMap = new Map();
-        this.widgetMap = new Map();
+    
+    WidgetLocatorManager.prototype.widgetDeleted = function(widget){
+        if(this.isEnable()){
+            // events
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                widget.off(type, callback);
+            });
+            // locator
+            var locator = this.getBoundLocatorOf(widget);
+            locator.disconnect();
+            this.boundLocatorMap.delete(widget);
+            this.boundLocatorTrash.push(locator);
+            // selection
+            var index = this.selectedWidgets.indexOf(widget);
+            if(index>-1){
+                this.selectedWidgets.splice(index, 1);
+                var selectionLocator = this.getSelectionLocatorOf(widget);
+                selectionLocator.disconnect(widget);
+                this.selectionLocatorMap.delete(widget);
+                this.selectionLocatorTrash.push(selectionLocator);
+            }
+            // intersection
+            index = this.intersectingWidget.indexOf(widget);
+            if(index > -1){
+                this.intersectingWidget.splice(index, 1);
+            }
+            // update view
+            this.updateLocators();
+        }
     };
-
+    
+    WidgetLocatorManager.prototype.widgetAdded = function(widget){
+        if(this.isEnable()){
+            // events
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                widget.on(type, callback);
+            });
+            
+            // update view
+            this.updateLocators();
+        }
+    };
+    
     /**
      * Sets visibility of locators
      * 
@@ -122,8 +156,7 @@ angular
             return;
         }
         this.visible = visible;
-        this.updateBoundLocators();
-        this.updateSelectionLocators();
+        this.updateLocators();
     }
 
     /**
@@ -142,10 +175,49 @@ angular
             return;
         }
         this.enable = enable;
-        if(this.enable){
-            this.updateSelectionLocators();
-            this.updateBoundLocators();
+
+        var widgets = $widget.getChildren(this.getRootWidget());
+        var intersectingWidget = [];
+        // listeners
+        for(var i = 0; i < widgets.length; i ++){
+            var widget = widgets[i];
+            if(widget.isIntersecting()){
+                intersectingWidget.push(widget);
+            }
+            if(enable) {
+                angular.forEach(this.widgetListeners, function (callback, type) {
+                    widget.on(type, callback);
+                });
+            } else {
+                angular.forEach(this.widgetListeners, function (callback, type) {
+                    widget.off(type, callback);
+                });
+            }
         }
+        // bound
+        this.intersectingWidget = intersectingWidget;
+        for(var j = 0; j < intersectingWidget.length; j++){
+            var locator = this.getBoundLocatorOf(intersectingWidget[j]);
+            if(enable) {
+                locator.connect(intersectingWidget[j]);
+            } else {
+                locator.disconnect();
+            }
+        }
+        // XXX: maso, selection
+        
+        // ROOT
+        var rootWidget = this.getRootWidget();
+        if(enable) {
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                rootWidget.on(type, callback);
+            });
+        } else {
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                rootWidget.off(type, callback);
+            });
+        }
+
     };
 
     WidgetLocatorManager.prototype.isEnable = function () {
@@ -160,14 +232,27 @@ angular
      * @memberof CursorWidgetLocator
      */
     WidgetLocatorManager.prototype.setSelectedWidgets = function (widgets) {
-        var rootWidget = this.getRootWidget();
-        if(!rootWidget && widgets.length){
-            rootWidget = widgets[0].getRoot();
-            this.setRootWidget(rootWidget);
+        if(!this.isEnable()){
+            return;
         }
+        if(!angular.isArray(widgets)){
+            widgets = [];
+        }
+
+        // remove old
+        for(var i = 0; i < this.selectedWidgets.length; i++){
+            var widget = this.selectedWidgets[i];
+            if(widgets.indexOf(widget) < 0){
+                var locator = this.getSelectionLocatorOf(widget);
+                this.selectionLocatorTrash.push(locator);
+                this.selectionLocatorMap.delete(widget);
+                locator.disconnect();
+            }
+        }
+
         this.selectedWidgets = widgets;
-        if (this.isEnable()) {
-            this.updateSelectionLocators();
+        if(this.isEnable()){
+            this.updateLocators();
         }
     };
 
@@ -178,7 +263,11 @@ angular
      * @memberof CursorWidgetLocator
      */
     WidgetLocatorManager.prototype.getSelectedWidgets = function () {
-        return this.selectedWidgets || [];
+        return this.selectedWidgets;
+    };
+
+    WidgetLocatorManager.prototype.isWidgetSelected = function(widget){
+        return this.selectedWidgets.indexOf(widget) >= 0;
     };
 
     /**
@@ -193,11 +282,13 @@ angular
             this.destroy();
         }
         this.rootWidget = rootWidget;
-        if(this.rootWidget) {
-            var element = this.rootWidget.getElement();
+        if(this.rootWidget && this.isEnable()) {
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                rootWidget.on(type, callback);
+            });
         }
         if (this.isEnable()) {
-            this.updateBoundLocators();
+            this.updateLocators();
         }
     };
 
@@ -211,28 +302,11 @@ angular
         return this.rootWidget;
     };
 
-    WidgetLocatorManager.prototype.updateSelectionLocators = function () {
-        var widgets = this.getSelectedWidgets();
-        var locator;
-        var i;
-        // disable extra
-        for (i = 0; i < this.selectionLocators.length; i++) {
-            this.selectionLocators[i]
-            .setVisible(i < widgets.length);
-        }
-
-        // add new
-        while (this.selectionLocators.length < widgets.length) {
-            locator = new this.SelectionLocator(this.SelectionLocatorOption);
-            locator.setVisible(false);
-            this.selectionLocators.push(locator);
-        }
-
-        // set widgets
-        for (i = 0; i < widgets.length; i++) {
-            locator = this.selectionLocators[i];
-            locator.setWidget(widgets[i]);
-            locator.setVisible(this.visible);
+    WidgetLocatorManager.prototype.directUpdateLocator = function(locator, widget) {
+        if(this.isVisible()){
+            locator.connect(widget);
+        } else {
+            locator.disconnect();
         }
     };
 
@@ -241,70 +315,82 @@ angular
      * 
      * @memberof WidgetLocatorManager
      */
-    WidgetLocatorManager.prototype.updateBoundLocators = function () {
-        var widgets;
-        var i;
-        var locator;
-        var widget;
+    WidgetLocatorManager.prototype.updateLocators = function () {
+        if(!angular.isFunction(this.debounceUpdate)){
+            this.debounceUpdate = $widget.debounce(function(){
+                var widgets = this.getIntersectingWidgets();
+                for(var i = 0; i < widgets.length; i++){
+                    var widget = widgets[i];
+                    // update bound
+                    this.directUpdateLocator(this.getBoundLocatorOf(widget), widget);
 
-        /*
-         * Adds new locator for new widget
-         */
-        var ctrl = this;
-        if(!this.newLocatorListener) {
-            this.newLocatorListener = $widget.debounce(function($event){
-                ctrl.updateBoundLocators();
-                ctrl.updateSelectionLocators();
-            }, 100, true);
-        }
-        if(!this.styleChangeListener){
-            this.styleChangeListener = $widget.debounce(function($event) {
-                if(angular.equals($event.newValue.layout, $event.oldValue.layout)){
-                    return;
+                    // update selection
+                    if(this.isWidgetSelected(widget)){
+                        this.directUpdateLocator(this.getSelectionLocatorOf(widget), widget);
+                    }
                 }
-                ctrl.updateBoundLocators();
-                ctrl.updateSelectionLocators();
-            }, 100, true);
+            }, 300, false);
         }
+        this.debounceUpdate();
+    };
 
-        // list widgets
-        var rootWidget = this.getRootWidget();
-        if(!rootWidget){
+
+    WidgetLocatorManager.prototype.getIntersectingWidgets = function(){
+        return this.intersectingWidget;
+    }
+
+    WidgetLocatorManager.prototype.widgetIntersectingChange = function(widget){
+        if(widget.isRoot()){
             return;
         }
-        widgets = $widget.getChildren(rootWidget);
-        widgets.push(rootWidget);
-        this.activeBoundLocators = widgets.length;
-
-        // disable extra
-        angular.forEach(this.boundLocators, function(locator){
-            locator.setVisible(i < widgets.length);
-            // remove listener
-            var widget = locator.getWidget();
-            if(widget){
-                widget.off('newchild', ctrl.newLocatorListener);
-                widget.off('styleChanged', ctrl.styleChangeListener);
+        var index = this.intersectingWidget.indexOf(widget);
+        var locator = this.getBoundLocatorOf(widget);
+        // widget intersects with view
+        if(widget.isIntersecting()){
+            locator.connect(widget);
+            if(index < 0){
+                this.intersectingWidget.push(widget);
+                this.updateLocators();
             }
-        });
-
-        // add new
-        while (this.boundLocators.length < widgets.length) {
-            locator = new this.BoundLocator(this.BoundLocatorOption);
-            this.boundLocators.push(locator);
+        } else {
+            locator.disconnect();
+            // widget is out of view
+            if(index >= 0){
+                this.intersectingWidget.splice(index, 1);
+                this.updateLocators();
+            }
         }
+    }
 
-        // set widgets
-        for (i = 0; i < widgets.length; i++) {
-            var locator = this.boundLocators[i];
-            locator.setWidget(widgets[i]);
-            
-            locator.setVisible(this.visible);
-
-            // add listener
-            widgets[i].on('newchild', ctrl.newLocatorListener);
-            widgets[i].on('styleChanged', ctrl.styleChangeListener);
+    WidgetLocatorManager.prototype.getBoundLocatorOf = function (widget) {
+        var map = this.boundLocatorMap;
+        if(!map.has(widget)) {
+            var locator;
+            if(this.boundLocatorTrash.length > 0){
+                locator = this.boundLocatorTrash.pop();
+            } else {
+                locator = new BoundWidgetLocator(this.boundLocatorOption);
+            }
+            map.set(widget, locator);
         }
+        return map.get(widget);
     };
+
+    WidgetLocatorManager.prototype.getSelectionLocatorOf = function(widget) {
+        var map = this.selectionLocatorMap;
+        if(!map.has(widget)) {
+            var locator;
+            if(this.selectionLocatorTrash.length > 0){
+                locator = this.selectionLocatorTrash.pop();
+            } else {
+                locator = new SelectionWidgetLocator(this.selectionLocatorOption);
+            }
+            map.set(widget, locator);
+        }
+        return map.get(widget);
+    };
+
+
 
     return WidgetLocatorManager;
 });
