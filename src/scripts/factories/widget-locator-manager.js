@@ -79,7 +79,6 @@ angular
                     ctrl.widgetIntersectingChange(widget);
                 },
                 'resize': function($event){
-                    var widget = $event.source;
                     ctrl.updateLocators();
                 },
                 'loaded': function($event){
@@ -96,53 +95,53 @@ angular
                 'delete': function($event) {
                     var widget = $event.source;
                     ctrl.widgetDeleted(widget);
+                },
+                'modelUpdated': function($event) {
+                    ctrl.updateLocators();
                 }
         };
     }
 
-    
+
     WidgetLocatorManager.prototype.widgetDeleted = function(widget){
-        if(this.isEnable()){
-            // events
-            angular.forEach(this.widgetListeners, function (callback, type) {
-                widget.off(type, callback);
-            });
-            // locator
-            var locator = this.getBoundLocatorOf(widget);
-            locator.disconnect();
-            this.boundLocatorMap.delete(widget);
-            this.boundLocatorTrash.push(locator);
-            // selection
-            var index = this.selectedWidgets.indexOf(widget);
-            if(index>-1){
-                this.selectedWidgets.splice(index, 1);
-                var selectionLocator = this.getSelectionLocatorOf(widget);
-                selectionLocator.disconnect(widget);
-                this.selectionLocatorMap.delete(widget);
-                this.selectionLocatorTrash.push(selectionLocator);
-            }
-            // intersection
-            index = this.intersectingWidget.indexOf(widget);
-            if(index > -1){
-                this.intersectingWidget.splice(index, 1);
-            }
-            // update view
-            this.updateLocators();
+        // events
+        angular.forEach(this.widgetListeners, function (callback, type) {
+            widget.off(type, callback);
+        });
+        // locator
+        var locator = this.getBoundLocatorOf(widget);
+        locator.disconnect();
+        this.boundLocatorMap.delete(widget);
+        this.boundLocatorTrash.push(locator);
+
+        // selection
+        var index = this.selectedWidgets.indexOf(widget);
+        if(index > -1){
+            this.selectedWidgets.splice(index, 1);
+            var selectionLocator = this.getSelectionLocatorOf(widget);
+            selectionLocator.disconnect(widget);
+            this.selectionLocatorMap.delete(widget);
+            this.selectionLocatorTrash.push(selectionLocator);
         }
+        // intersection
+        index = this.intersectingWidget.indexOf(widget);
+        if(index > -1){
+            this.intersectingWidget.splice(index, 1);
+        }
+        // update view
+        this.updateLocators();
     };
-    
+
     WidgetLocatorManager.prototype.widgetAdded = function(widget){
-        if(this.isEnable()){
-            // events
-            angular.forEach(this.widgetListeners, function (callback, type) {
-                widget.on(type, callback);
-            });
-            
-            // update view
-            this.updateLocators();
-        }
+        // add events
+        angular.forEach(this.widgetListeners, function (callback, type) {
+            widget.on(type, callback);
+        });
+
+        // update view
+        this.updateLocators();
     };
-    
+
     /**
      * Sets visibility of locators
      * 
@@ -205,7 +204,7 @@ angular
             }
         }
         // XXX: maso, selection
-        
+
         // ROOT
         var rootWidget = this.getRootWidget();
         if(enable) {
@@ -321,6 +320,7 @@ angular
                 var widgets = this.getIntersectingWidgets();
                 for(var i = 0; i < widgets.length; i++){
                     var widget = widgets[i];
+                    
                     // update bound
                     this.directUpdateLocator(this.getBoundLocatorOf(widget), widget);
 
@@ -340,7 +340,7 @@ angular
     }
 
     WidgetLocatorManager.prototype.widgetIntersectingChange = function(widget){
-        if(widget.isRoot()){
+        if(widget.isRoot() || !this.isVisible()){
             return;
         }
         var index = this.intersectingWidget.indexOf(widget);
