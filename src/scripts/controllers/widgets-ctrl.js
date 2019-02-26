@@ -143,9 +143,7 @@ var WbAbstractWidget = function () {
         if(angular.isArray($event)){
             $event = $event[0];
         }
-        ctrl.intersecting = $event.isIntersecting;
-        ctrl.fire('intersection', $event);
-        ctrl.evalWidgetEvent('intersection', $event);
+        ctrl.setIntersecting($event.isIntersecting, $event);
     }, options);
 };
 
@@ -697,7 +695,13 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
 
 WbAbstractWidget.prototype.isIntersecting = function(){
     return this.intersecting;
-}
+};
+
+WbAbstractWidget.prototype.setIntersecting = function(intersecting, $event){
+    this.intersecting = intersecting;
+    this.fire('intersection', $event);
+    this.evalWidgetEvent('intersection', $event);
+};
 
 
 /**

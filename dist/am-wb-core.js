@@ -3997,9 +3997,7 @@ var WbAbstractWidget = function () {
         if(angular.isArray($event)){
             $event = $event[0];
         }
-        ctrl.intersecting = $event.isIntersecting;
-        ctrl.fire('intersection', $event);
-        ctrl.evalWidgetEvent('intersection', $event);
+        ctrl.setIntersecting($event.isIntersecting, $event);
     }, options);
 };
 
@@ -4551,7 +4549,13 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
 
 WbAbstractWidget.prototype.isIntersecting = function(){
     return this.intersecting;
-}
+};
+
+WbAbstractWidget.prototype.setIntersecting = function(intersecting, $event){
+    this.intersecting = intersecting;
+    this.fire('intersection', $event);
+    this.evalWidgetEvent('intersection', $event);
+};
 
 
 /**
@@ -8002,6 +8006,9 @@ angular
         });
 
         // update view
+        widget.setIntersecting(true,{
+            message: 'Load child in model'
+        });
         this.updateLocators();
     };
 
@@ -8057,7 +8064,11 @@ angular
             }
         }
         // bound
-        this.intersectingWidget = intersectingWidget;
+        if(intersectingWidget.length) {
+            this.intersectingWidget = intersectingWidget;
+        } else {
+            this.intersectingWidget = widgets;
+        }
         for(var j = 0; j < intersectingWidget.length; j++){
             var locator = this.getBoundLocatorOf(intersectingWidget[j]);
             if(enable) {
@@ -8629,7 +8640,7 @@ angular.module('am-wb-core')
             	$scope.editor = editor;
 //            	editor.setTheme('resources/libs/ace/theme/chrome');
 //            	editor.session.setMode('resources/libs/ace/mode/javascript');
-            	editor.setValue(ctrl.value.code);
+            	editor.setValue(ctrl.value.code || '');
             	editor.on("change", function(){
             		ctrl.setCode(editor.getValue());
             	});
@@ -10422,15 +10433,16 @@ angular.module('am-wb-core')
 		var script = document.createElement('script');
 		script.src = path;
 		script.async=1;
+		var ctrl = this;
 		script.onload = function(){
-			this.libs[path] = true;
+			ctrl.libs[path] = true;
 			defer.resolve({
 				path: path,
 				message: 'loaded'
 			});
 		};
 		script.onerror = function() {
-			libs[path] = false;
+			ctrl.libs[path] = false;
 			defer.reject({
 				path: path,
 				message: 'fail'

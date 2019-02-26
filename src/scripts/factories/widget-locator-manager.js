@@ -139,6 +139,9 @@ angular
         });
 
         // update view
+        widget.setIntersecting(true,{
+            message: 'Load child in model'
+        });
         this.updateLocators();
     };
 
@@ -194,7 +197,11 @@ angular
             }
         }
         // bound
-        this.intersectingWidget = intersectingWidget;
+        if(intersectingWidget.length) {
+            this.intersectingWidget = intersectingWidget;
+        } else {
+            this.intersectingWidget = widgets;
+        }
         for(var j = 0; j < intersectingWidget.length; j++){
             var locator = this.getBoundLocatorOf(intersectingWidget[j]);
             if(enable) {
