@@ -33,10 +33,10 @@ angular.module('am-wb-core')
  * 
  */
 .service('$wbLibs', function($q) {
-	var libs = {};
+	this.libs = {};
 	
 	this.load = function(path){
-		if(libs[path]){
+		if(this.libs[path]){
 			return $q.resolve({
 				message: 'isload'
 			});
@@ -46,15 +46,16 @@ angular.module('am-wb-core')
 		var script = document.createElement('script');
 		script.src = path;
 		script.async=1;
+		var ctrl = this;
 		script.onload = function(){
-			libs[path] = true;
+			ctrl.libs[path] = true;
 			defer.resolve({
 				path: path,
 				message: 'loaded'
 			});
 		};
 		script.onerror = function() {
-			libs[path] = false;
+			ctrl.libs[path] = false;
 			defer.reject({
 				path: path,
 				message: 'fail'

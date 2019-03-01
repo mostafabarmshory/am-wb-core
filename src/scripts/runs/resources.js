@@ -108,7 +108,7 @@ angular.module('am-wb-core')
             	$scope.editor = editor;
 //            	editor.setTheme('resources/libs/ace/theme/chrome');
 //            	editor.session.setMode('resources/libs/ace/mode/javascript');
-            	editor.setValue(ctrl.value.code);
+            	editor.setValue(ctrl.value.code || '');
             	editor.on("change", function(){
             		ctrl.setCode(editor.getValue());
             	});
