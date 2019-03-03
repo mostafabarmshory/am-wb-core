@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-angular.module('mblowfish-core') //
+angular.module('am-wb-core') //
 
 /**
  * @ngdoc Services
@@ -47,7 +47,7 @@ angular.module('mblowfish-core') //
 	 */
 	function getDispatcherFor(type) {
 		if (!dispatchers[type]) {
-			dispatchers[type] = new Dispatcher();
+			dispatchers[type] = new Flux.Dispatcher();
 		}
 		return dispatchers[type];
 	}
