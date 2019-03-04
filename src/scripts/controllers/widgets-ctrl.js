@@ -459,7 +459,19 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	}
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
-		eventFunction(event, this, this.$http, this.$mdMedia, this.$window);
+		try{
+			eventFunction(event, this, this.$http, this.$mdMedia, this.$window);
+		} catch(ex){
+			console.log('Fail to run event code');
+			console.log({
+				type: type,
+				event: event
+			});
+			console.log(ex);
+		}
+//		try{
+//			this.getScope().$digest();
+//		} catch(ex){};
 	}
 };
 
@@ -968,7 +980,7 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $window) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -980,6 +992,7 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$http = $http;
 	this.$mdMedia = $mdMedia;
 	this.$timeout = $timeout;
+	this.$window = $window;
 
 	var ctrl = this;
 	this.on('modelChanged', function () {

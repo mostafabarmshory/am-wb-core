@@ -4308,18 +4308,24 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	}
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
-		var body = '\'use strict\'; var $event = arguments[0]; var $widget = arguments[1]; var $http = arguments[2]; var $media =  arguments[3];' + this.getEvent()[type];
+		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4];' + this.getEvent()[type];
 		this.eventFunctions[type] = new Function(body);
 	}
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
-		var $http = this.$http;
-		var ctrl = this;
-		eventFunction(event, ctrl, {
-			post: function (url, obj) {
-				return $http.post(url, obj);
-			}
-		}, this.$mdMedia);
+		try{
+			eventFunction(event, this, this.$http, this.$mdMedia, this.$window);
+		} catch(ex){
+			console.log('Fail to run event code');
+			console.log({
+				type: type,
+				event: event
+			});
+			console.log(ex);
+		}
+//		try{
+//			this.getScope().$digest();
+//		} catch(ex){};
 	}
 };
 
@@ -4801,7 +4807,7 @@ WbAbstractWidget.prototype.removeAnimation = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout, $window) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -4810,6 +4816,7 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia
 	this.$widget = $widget;
 	this.$mdMedia = $mdMedia;
 	this.$timeout = $timeout;
+	this.$window = $window;
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
@@ -4827,7 +4834,7 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $window) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -4839,6 +4846,7 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$http = $http;
 	this.$mdMedia = $mdMedia;
 	this.$timeout = $timeout;
+	this.$window = $window;
 
 	var ctrl = this;
 	this.on('modelChanged', function () {
@@ -9936,7 +9944,23 @@ angular.module('am-wb-core')
         help: 'http://dpq.co.ir',
         helpId: 'wb-widget-html',
         // functional properties
-        templateUrl: 'views/widgets/wb-html.html'
+        templateUrl: 'views/widgets/wb-html.html',
+        controller: function(){
+        	this.text = '';
+        	this.setText = function(text){
+        		this.text = text;
+        	};
+        	this.initWidget = function(){
+        		var ctrl = this;
+        		this.on('modelUpdated', function($event){
+        			if($event.key === 'text'){
+        				ctrl.setText($event.newValue);
+        			}
+        		});
+        		this.setText(this.getModelProperty('text'));
+        	};
+        },
+        controllerAs: 'ctrl'
     });
 });
 
@@ -12269,7 +12293,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/widgets/wb-html.html',
-    " <div ng-if=!ctrl.isEditable() ng-bind-html=\"::wbModel.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
+    " <div ng-if=!ctrl.isEditable() ng-bind-html=\"ctrl.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
     "        selector : 'div.tinymce', \n" +
     "        menubar: true,\n" +
     "        inline: true,\n" +
@@ -12317,7 +12341,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
     "        powerpaste_word_import: 'clean',\n" +
     "        powerpaste_html_import: 'clean',\n" +
     "        format: 'raw',\n" +
-    "    }\" ng-model=wbModel.text class=\"wb-widget-fill tinymce wb-widget-text\" ng-keydown=$event.stopPropagation();> </div>"
+    "    }\" ng-model=ctrl.text ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setModelProperty('text', ctrl.text)\" class=\"wb-widget-fill tinymce wb-widget-text\" ng-keydown=$event.stopPropagation();> </div>"
   );
 
 

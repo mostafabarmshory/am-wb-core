@@ -80,6 +80,22 @@ angular.module('am-wb-core')
         help: 'http://dpq.co.ir',
         helpId: 'wb-widget-html',
         // functional properties
-        templateUrl: 'views/widgets/wb-html.html'
+        templateUrl: 'views/widgets/wb-html.html',
+        controller: function(){
+        	this.text = '';
+        	this.setText = function(text){
+        		this.text = text;
+        	};
+        	this.initWidget = function(){
+        		var ctrl = this;
+        		this.on('modelUpdated', function($event){
+        			if($event.key === 'text'){
+        				ctrl.setText($event.newValue);
+        			}
+        		});
+        		this.setText(this.getModelProperty('text'));
+        	};
+        },
+        controllerAs: 'ctrl'
     });
 });
