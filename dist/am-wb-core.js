@@ -11323,7 +11323,7 @@ angular.module('am-wb-core')
 			if(REGEX_BACKGROUND_IMAGE_SPEC.test(style.image)){
 				image = style.image;
 			} else {
-				iame = 'url(\''+style.image+'\')';
+				image = 'url(\''+style.image+'\')';
 			}
 		}
 
