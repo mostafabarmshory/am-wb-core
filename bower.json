@@ -1,7 +1,7 @@
 {
   "name": "am-wb-core",
   "moduleName": "am-wb-core",
-  "version": "2.4.17",
+  "version": "2.4.18",
   "authors": [
     "Mostafa Barmshory <mostafa.barmshory@dpq.co.ir>",
     "Hadi mansouri <mohammad.hadi.mansouri@dpq.co.ir>",
@@ -36,7 +36,8 @@
     "jspanel4x": "master",
     "lodash": "3.x",
     "tinymce": "4.8.x",
-    "object-path": "^0.11.0"
+    "object-path": "^0.11.0",
+    "flux": "3.1.x"
   },
   "devDependencies": {
     "angular-mocks": "1.7.x",

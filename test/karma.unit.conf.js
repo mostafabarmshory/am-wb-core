@@ -53,6 +53,7 @@ module.exports = function(config) {
 			'bower_components/lodash/lodash.js',
 			'bower_components/tinymce/tinymce.js',
 			'bower_components/object-path/index.js',
+			'bower_components/flux/dist/Flux.js',
 			'bower_components/angular-mocks/angular-mocks.js',
 			'bower_components/json-formatter/dist/json-formatter.js',
 			// endbower

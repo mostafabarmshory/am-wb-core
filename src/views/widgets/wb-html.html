@@ -6,7 +6,7 @@
  -->
 <div
 	ng-if="!ctrl.isEditable()"
-	ng-bind-html="::wbModel.text | wbunsafe"
+	ng-bind-html="ctrl.text | wbunsafe"
 	class="wb-widget-fill wb-widget-text">
 </div>
 <div
@@ -60,7 +60,10 @@
         powerpaste_html_import: 'clean',
         format: 'raw',
     }"
-	ng-model="wbModel.text"
+	ng-model="ctrl.text"
+    ng-model-options="{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}"
+    ng-change="ctrl.setModelProperty('text', ctrl.text)"
+	        
 	class="wb-widget-fill tinymce wb-widget-text"
 	ng-keydown="$event.stopPropagation();">
 </div>
