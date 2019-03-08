@@ -10286,6 +10286,10 @@ angular.module('am-wb-core') //
 
 	/**
 	 * Dispatches a payload to all registered callbacks.
+	 * 
+	 *  Payload contains key and values. You may add extra values to the 
+	 * payload.
+	 * 
 	 */
 	this.dispatch = function(type, payload) {
 		return getDispatcherFor(type).dispatch(payload);
@@ -10298,6 +10302,7 @@ angular.module('am-wb-core') //
 		return getDispatcherFor(type).isDispatching();
 	};
 });
+
 /* 
  * The MIT License (MIT)
  * 
@@ -11098,598 +11103,610 @@ angular.module('am-wb-core')
  */
 angular.module('am-wb-core')
 .service('$wbUtil', function ($q, $templateRequest, $sce) {
-    'use strict';
-    var service = this;
+	'use strict';
+	var REGEX_BACKGROUND_IMAGE_SPEC = RegExp('(repeating\-)?(linear|radial)\-(gradient)');
+	var service = this;
 
-    function cleanMap(oldStyle, newStyle, map) {
-        for (var i = 0; i < map.length; i++) {
-            if (oldStyle[map[i][0]]) {
-                newStyle[map[i][1]] = oldStyle[map[i][0]];
-                delete oldStyle[map[i][0]];
-            }
-        }
-    }
+	function cleanMap(oldStyle, newStyle, map) {
+		for (var i = 0; i < map.length; i++) {
+			if (oldStyle[map[i][0]]) {
+				newStyle[map[i][1]] = oldStyle[map[i][0]];
+				delete oldStyle[map[i][0]];
+			}
+		}
+	}
 
-    function getTemplateOf(page)
-    {
-        var template;
-        var templateUrl;
-        if (angular.isDefined(template = page.template)) {
-            if (angular.isFunction(template)) {
-                template = template(page.params);
-            }
-        } else if (angular
-                .isDefined(templateUrl = page.templateUrl)) {
-            if (angular.isFunction(templateUrl)) {
-                templateUrl = templateUrl(page.params);
-            }
-            if (angular.isDefined(templateUrl)) {
-                page.loadedTemplateUrl = $sce.valueOf(templateUrl);
-                template = $templateRequest(templateUrl);
-            }
-        }
-        return template;
-    }
+	function getTemplateOf(page)
+	{
+		var template;
+		var templateUrl;
+		if (angular.isDefined(template = page.template)) {
+			if (angular.isFunction(template)) {
+				template = template(page.params);
+			}
+		} else if (angular
+				.isDefined(templateUrl = page.templateUrl)) {
+			if (angular.isFunction(templateUrl)) {
+				templateUrl = templateUrl(page.params);
+			}
+			if (angular.isDefined(templateUrl)) {
+				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+				template = $templateRequest(templateUrl);
+			}
+		}
+		return template;
+	}
 
-    /**
-     * Loading template of the page
-     * 
-     * @name getTemplateFor
-     * @memberof $wbUtil
-     * @param page
-     *            {object} properties of a page, widget , ..
-     * @return promise to load template on resolve.
-     */
-    function getTemplateFor(page)
-    {
-        return $q.when(getTemplateOf(page));
-    }
+	/**
+	 * Loading template of the page
+	 * 
+	 * @name getTemplateFor
+	 * @memberof $wbUtil
+	 * @param page
+	 *            {object} properties of a page, widget , ..
+	 * @return promise to load template on resolve.
+	 */
+	function getTemplateFor(page)
+	{
+		return $q.when(getTemplateOf(page));
+	}
 
-    /**
-     * Converts data into a valid CSS attributes
-     */
-    function convertToWidgetCss(style) {
-        var style = style || {};
-        var css = {};
+	/**
+	 * Converts data into a valid CSS attributes
+	 */
+	function convertToWidgetCss(style) {
+		var style = style || {};
+		var css = {};
 
-        // layout
-        if(style.visibility === 'hidden'){
-            css.display = 'none';
-        } else {
-            css = _.merge(css, convertToWidgetCssLayout(style.layout || {}));
-        }
+		// layout
+		if(style.visibility === 'hidden'){
+			css.display = 'none';
+		} else {
+			css = _.merge(css, convertToWidgetCssLayout(style.layout || {}));
+		}
 
-        css = _.merge(css, 
-                // size
-                style.size || {},
-                // background
-                convertToWidgetCssBackground(style.background || {}),
-                // border
-                convertToWidgetCssBoarder(style.border || {}),
-                // shadows
-                convertToWidgetCssShadows(style.shadows || {}),
-                // transform
-                convertToWidgetCssTransfrom(style.transform || {}),
-                // Overflow
-                convertToWidgetCssOverflow(style.overflow || {}),
-                // color, cursor, opacity, direction
-                {
-                    padding: style.padding,
-                    margin: style.margin,
-                    direction: style.direction || 'ltr',
-                    color: style.color || 'initial',
-                    cursor: style.cursor || 'auto',
-                    opacity: style.opacity || '1',
-                });
+		css = _.merge(css, 
+				// size
+				style.size || {},
+				// background
+				convertToWidgetCssBackground(style.background || {}),
+				// border
+				convertToWidgetCssBoarder(style.border || {}),
+				// shadows
+				convertToWidgetCssShadows(style.shadows || {}),
+				// transform
+				convertToWidgetCssTransfrom(style.transform || {}),
+				// Overflow
+				convertToWidgetCssOverflow(style.overflow || {}),
+				// color, cursor, opacity, direction
+				{
+					padding: style.padding,
+					margin: style.margin,
+					direction: style.direction || 'ltr',
+					color: style.color || 'initial',
+					cursor: style.cursor || 'auto',
+					opacity: style.opacity || '1',
+				});
 
-        return css;
-    }
+		return css;
+	}
 
-    function convertToWidgetCssOverflow(overflowOption) {
-        return {
-            'overflow-x': overflowOption.x || 'visible',
-            'overflow-y': overflowOption.y || 'visible'
-        };
-    }
-    
-    function convertToWidgetCssTransfrom(transformOptions) {
-        var transform = '';
+	function convertToWidgetCssOverflow(overflowOption) {
+		return {
+			'overflow-x': overflowOption.x || 'visible',
+			'overflow-y': overflowOption.y || 'visible'
+		};
+	}
 
-        if(transformOptions.x){
-            if(transformOptions.x.rotate){
-                transform += ' rotateX('+transformOptions.x.rotate+')';
-            }
-            if(transformOptions.x.translate){
-                transform += ' translateX('+transformOptions.x.translate+')';
-            }
-            if(transformOptions.x.scale){
-                transform += ' scaleX('+transformOptions.x.scale+')';
-            }
-            if(transformOptions.x.skew){
-                transform += ' skewX('+transformOptions.x.skew+')';
-            }
-        }
-        if(transformOptions.y){
-            if(transformOptions.y.rotate){
-                transform += ' rotateY('+transformOptions.y.rotate+')';
-            }
-            if(transformOptions.y.translate){
-                transform += ' translateY('+transformOptions.y.translate+')';
-            }
-            if(transformOptions.y.scale){
-                transform += ' scaleY('+transformOptions.y.scale+')';
-            }
-            if(transformOptions.y.skew){
-                transform += ' skewY('+transformOptions.y.skew+')';
-            }
-        }
-        if(transformOptions.z){
-            if(transformOptions.y.rotate){
-                transform += ' rotateZ('+transformOptions.z.rotate+')';
-            }
-            if(transformOptions.y.translate){
-                transform += ' translateZ('+transformOptions.z.translate+')';
-            }
-            if(transformOptions.y.scale){
-                transform += ' scaleZ('+transformOptions.z.scale+')';
-            }
-        }
-        
-        if(transformOptions.perspective){
-            transform += ' perspective('+transformOptions.perspective+')';
-        }
-        
-        if(!transform) {
-            return {
-                transform: 'none'
-            };
-        }
-        
-        return {
-            transform: transform,
-            'transform-origin': transformOptions.origin || 'center',
-            'transform-style': transformOptions.style || 'flat'
-        };
-    };
+	function convertToWidgetCssTransfrom(transformOptions) {
+		var transform = '';
 
-    function createShadowStr(shadow) {
-        var hShift = shadow.hShift || '0px';
-        var vShift = shadow.vShift || '0px';
-        var blur = shadow.blur || '0px';
-        var spread = shadow.spread || '0px';
-        var color = shadow.color || 'black';
+		if(transformOptions.x){
+			if(transformOptions.x.rotate){
+				transform += ' rotateX('+transformOptions.x.rotate+')';
+			}
+			if(transformOptions.x.translate){
+				transform += ' translateX('+transformOptions.x.translate+')';
+			}
+			if(transformOptions.x.scale){
+				transform += ' scaleX('+transformOptions.x.scale+')';
+			}
+			if(transformOptions.x.skew){
+				transform += ' skewX('+transformOptions.x.skew+')';
+			}
+		}
+		if(transformOptions.y){
+			if(transformOptions.y.rotate){
+				transform += ' rotateY('+transformOptions.y.rotate+')';
+			}
+			if(transformOptions.y.translate){
+				transform += ' translateY('+transformOptions.y.translate+')';
+			}
+			if(transformOptions.y.scale){
+				transform += ' scaleY('+transformOptions.y.scale+')';
+			}
+			if(transformOptions.y.skew){
+				transform += ' skewY('+transformOptions.y.skew+')';
+			}
+		}
+		if(transformOptions.z){
+			if(transformOptions.y.rotate){
+				transform += ' rotateZ('+transformOptions.z.rotate+')';
+			}
+			if(transformOptions.y.translate){
+				transform += ' translateZ('+transformOptions.z.translate+')';
+			}
+			if(transformOptions.y.scale){
+				transform += ' scaleZ('+transformOptions.z.scale+')';
+			}
+		}
 
-        var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
+		if(transformOptions.perspective){
+			transform += ' perspective('+transformOptions.perspective+')';
+		}
 
-        if(shadow.inset) {
-            boxShadow = boxShadow.concat(' ' + 'inset');
-        }
+		if(!transform) {
+			return {
+				transform: 'none'
+			};
+		}
 
-        return boxShadow;
-    }
+		return {
+			transform: transform,
+			'transform-origin': transformOptions.origin || 'center',
+			'transform-style': transformOptions.style || 'flat'
+		};
+	};
 
-    function convertToWidgetCssShadows(shadows) {
-        var shadowStr = '';
+	function createShadowStr(shadow) {
+		var hShift = shadow.hShift || '0px';
+		var vShift = shadow.vShift || '0px';
+		var blur = shadow.blur || '0px';
+		var spread = shadow.spread || '0px';
+		var color = shadow.color || 'black';
 
-        if (!angular.isArray(shadows) || shadows.length === 0) {
-            shadowStr = 'none';
-        } else {
-            angular.forEach(shadows, function (shadow, index) {
-                shadowStr += createShadowStr(shadow);
-                if(index + 1 < shadows.length){
-                    shadowStr += ', ';
-                }
-            });
-        }
+		var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
 
-        return {
-            'box-shadow': shadowStr
-        };
-    }
+		if(shadow.inset) {
+			boxShadow = boxShadow.concat(' ' + 'inset');
+		}
 
-    function convertToWidgetCssBoarder(style) {
-        var conf = {};
-        if (style.style) {
-            conf['border-style'] = style.style;
-        }
-        if (style.width) {
-            conf['border-width'] = style.width;
-        }
-        if (style.color) {
-            conf['border-color'] = style.color;
-        }
-        if (style.radius) {
-            conf['border-radius'] = style.radius;
-        }
+		return boxShadow;
+	}
 
-        return conf;
-    }
+	function convertToWidgetCssShadows(shadows) {
+		var shadowStr = '';
 
-    function convertToWidgetCssBackground(style){
-        var cssValue = {};
-        if(style.background){
-            cssValue.background = style.background;
-        }
-        cssValue['background-image'] = (style.image) ? 'url(\''+style.image+'\')' : 'none';
-        cssValue['background-color'] = style.color || 'initial';
-        cssValue['background-size'] = style.size || 'auto';
-        cssValue['background-repeat'] = style.repeat || 'repeat';
-        cssValue['background-position'] = style.position || '0px 0px';
-        cssValue['background-attachment'] = style.attachment || 'scroll';
-        cssValue['background-origin'] = style.origin || 'padding-box';
-        cssValue['background-clip'] = style.clip || 'border-box';
+		if (!angular.isArray(shadows) || shadows.length === 0) {
+			shadowStr = 'none';
+		} else {
+			angular.forEach(shadows, function (shadow, index) {
+				shadowStr += createShadowStr(shadow);
+				if(index + 1 < shadows.length){
+					shadowStr += ', ';
+				}
+			});
+		}
 
-        return cssValue;
-    }
+		return {
+			'box-shadow': shadowStr
+		};
+	}
 
-    /**
-     * Converts data into a layout CSS3
-     */
-    function convertToWidgetCssLayout(layout){
-        var flexLayout = {};
-        /*
-         * Group
-         * 
-         * check if is group apply flex flow
-         */
-        {
-            flexLayout.display = 'flex';
-            // row
-            if (layout.direction === 'row') {
-                flexLayout['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
-                flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
-                flexLayout['overflow-y'] = 'visible';
-            } else {
-                flexLayout['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
-                flexLayout['overflow-x'] = 'visible';
-                flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
-            }
+	function convertToWidgetCssBoarder(style) {
+		var conf = {};
+		if (style.style) {
+			conf['border-style'] = style.style;
+		}
+		if (style.width) {
+			conf['border-width'] = style.width;
+		}
+		if (style.color) {
+			conf['border-color'] = style.color;
+		}
+		if (style.radius) {
+			conf['border-radius'] = style.radius;
+		}
 
+		return conf;
+	}
 
-            // wrap
-            if (layout.wrap) {
-                flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
-                // wrap align
-                var alignContent;
-                switch (layout.wrap_align) {
-                case 'start':
-                    alignContent = 'flex-start';
-                    break;
-                case 'end':
-                    alignContent = 'flex-end';
-                    break;
-                case 'center':
-                    alignContent = 'center';
-                    break;
-                case 'space-between':
-                    alignContent = 'space-between';
-                    break;
-                case 'space-around':
-                    alignContent = 'space-around';
-                    break;
-                case 'stretch':
-                    alignContent = 'stretch';
-                    break;
-                default:
-                    alignContent = 'stretch';
-                }
-                flexLayout['align-content'] = alignContent;
-            } else {
-                flexLayout['flex-wrap'] = 'nowrap';
-            }
+	function convertToWidgetCssBackground(style){
+		var cssValue = {};
+		if(style.background){
+			cssValue.background = style.background;
+			return;
+		}
+		// image
+		var image = 'none';
+		if(style.image){
+			if(REGEX_BACKGROUND_IMAGE_SPEC.test(style.image)){
+				image = style.image;
+			} else {
+				iame = 'url(\''+style.image+'\')';
+			}
+		}
+
+		cssValue['background-image'] = image;
+		cssValue['background-color'] = style.color || 'initial';
+		cssValue['background-size'] = style.size || 'auto';
+		cssValue['background-repeat'] = style.repeat || 'repeat';
+		cssValue['background-position'] = style.position || '0px 0px';
+		cssValue['background-attachment'] = style.attachment || 'scroll';
+		cssValue['background-origin'] = style.origin || 'padding-box';
+		cssValue['background-clip'] = style.clip || 'border-box';
+
+		return cssValue;
+	}
+
+	/**
+	 * Converts data into a layout CSS3
+	 */
+	function convertToWidgetCssLayout(layout){
+		var flexLayout = {};
+		/*
+		 * Group
+		 * 
+		 * check if is group apply flex flow
+		 */
+		{
+			flexLayout.display = 'flex';
+			// row
+			if (layout.direction === 'row') {
+				flexLayout['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
+				flexLayout['overflow-x'] = layout.wrap ? 'visible' : 'auto';
+				flexLayout['overflow-y'] = 'visible';
+			} else {
+				flexLayout['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
+				flexLayout['overflow-x'] = 'visible';
+				flexLayout['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+			}
 
 
-            // justify
-            var justify;
-            switch (layout.justify) {
-            case 'start':
-                justify = 'flex-start';
-                break;
-            case 'end':
-                justify = 'flex-end';
-                break;
-            case 'center':
-                justify = 'center';
-                break;
-            case 'space-between':
-                justify = 'space-between';
-                break;
-            case 'space-around':
-                justify = 'space-around';
-                break;
-            case 'space-evenly':
-                justify = 'space-evenly';
-                break;
-            default:
-                justify = 'flex-start';
-            }
-            flexLayout['justify-content'] = justify;
+			// wrap
+			if (layout.wrap) {
+				flexLayout['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
+				// wrap align
+				var alignContent;
+				switch (layout.wrap_align) {
+				case 'start':
+					alignContent = 'flex-start';
+					break;
+				case 'end':
+					alignContent = 'flex-end';
+					break;
+				case 'center':
+					alignContent = 'center';
+					break;
+				case 'space-between':
+					alignContent = 'space-between';
+					break;
+				case 'space-around':
+					alignContent = 'space-around';
+					break;
+				case 'stretch':
+					alignContent = 'stretch';
+					break;
+				default:
+					alignContent = 'stretch';
+				}
+				flexLayout['align-content'] = alignContent;
+			} else {
+				flexLayout['flex-wrap'] = 'nowrap';
+			}
 
-            // align
-            var align;
-            switch (layout.align) {
-            case 'start':
-                align = 'flex-start';
-                break;
-            case 'end':
-                align = 'flex-end';
-                break;
-            case 'center':
-                align = 'center';
-                break;
-            case 'baseline':
-                align = 'baseline';
-                break;
-            case 'stretch':
-                align = 'stretch';
-                break;
-            default:
-                align = 'stretch';
-            }
-            flexLayout['align-items'] = align;
-        }
 
-        /*
-         * Widget
-         */
-        {
-            flexLayout.order = layout.order >= 0 ? layout.order : 0;
-            flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
-            flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
-            // TODO: maso, 2018: compute based on size
-            flexLayout['flex-basis'] = 'auto';
+			// justify
+			var justify;
+			switch (layout.justify) {
+			case 'start':
+				justify = 'flex-start';
+				break;
+			case 'end':
+				justify = 'flex-end';
+				break;
+			case 'center':
+				justify = 'center';
+				break;
+			case 'space-between':
+				justify = 'space-between';
+				break;
+			case 'space-around':
+				justify = 'space-around';
+				break;
+			case 'space-evenly':
+				justify = 'space-evenly';
+				break;
+			default:
+				justify = 'flex-start';
+			}
+			flexLayout['justify-content'] = justify;
 
-            // align-self
-            // auto | flex-start | flex-end | center | baseline | stretch;
-            var alignSelf;
-            switch (layout.align_self) {
-            case 'start':
-                alignSelf = 'flex-start';
-                break;
-            case 'end':
-                alignSelf = 'flex-end';
-                break;
-            case 'center':
-                alignSelf = 'center';
-                break;
-            case 'baseline':
-                alignSelf = 'baseline';
-                break;
-            case 'stretch':
-                alignSelf = 'stretch';
-                break;
-            default:
-                alignSelf = 'auto';
-            }
-            flexLayout['align-self'] = alignSelf;
-        }
+			// align
+			var align;
+			switch (layout.align) {
+			case 'start':
+				align = 'flex-start';
+				break;
+			case 'end':
+				align = 'flex-end';
+				break;
+			case 'center':
+				align = 'center';
+				break;
+			case 'baseline':
+				align = 'baseline';
+				break;
+			case 'stretch':
+				align = 'stretch';
+				break;
+			default:
+				align = 'stretch';
+			}
+			flexLayout['align-items'] = align;
+		}
 
-        return flexLayout;
-    }
+		/*
+		 * Widget
+		 */
+		{
+			flexLayout.order = layout.order >= 0 ? layout.order : 0;
+			flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
+			flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
+			// TODO: maso, 2018: compute based on size
+			flexLayout['flex-basis'] = 'auto';
 
-    function cleanEvetns(model)
-    {
-        // event
-        if (!model.event) {
-            model.event = {};
-        }
-    }
+			// align-self
+			// auto | flex-start | flex-end | center | baseline | stretch;
+			var alignSelf;
+			switch (layout.align_self) {
+			case 'start':
+				alignSelf = 'flex-start';
+				break;
+			case 'end':
+				alignSelf = 'flex-end';
+				break;
+			case 'center':
+				alignSelf = 'center';
+				break;
+			case 'baseline':
+				alignSelf = 'baseline';
+				break;
+			case 'stretch':
+				alignSelf = 'stretch';
+				break;
+			default:
+				alignSelf = 'auto';
+			}
+			flexLayout['align-self'] = alignSelf;
+		}
 
-    function cleanLayout(model)
-    {
-        if (!model.style.layout) {
-            model.style.layout = {};
-        }
-        if (model.type === 'Group' || model.type === 'Page') {
-            // convert
-            var newStyle = model.style.layout;
-            var oldStyle = model.style;
+		return flexLayout;
+	}
 
-            if (oldStyle.flexDirection) {
-                if (oldStyle.flexDirection === 'wb-flex-row') {
-                    newStyle.direction = 'row';
-                } else {
-                    newStyle.direction = 'column';
-                }
-                delete oldStyle.flexDirection;
-            }
-            if (!newStyle.direction) {
-                newStyle.direction = 'column';
-            }
+	function cleanEvetns(model)
+	{
+		// event
+		if (!model.event) {
+			model.event = {};
+		}
+	}
 
-            switch (oldStyle.flexAlignItem) {
-            case 'wb-flex-align-items-center':
-                newStyle.align = 'center';
-                break;
-            case 'wb-flex-align-items-end':
-                newStyle.align = 'end';
-                break;
-            case 'wb-flex-align-items-start':
-                newStyle.align = 'start';
-                break;
-            case 'wb-flex-align-items-stretch':
-                newStyle.align = 'stretch';
-                break;
-            default:
-                newStyle.align = 'stretch';
-            }
-            delete oldStyle.flexAlignItem;
+	function cleanLayout(model)
+	{
+		if (!model.style.layout) {
+			model.style.layout = {};
+		}
+		if (model.type === 'Group' || model.type === 'Page') {
+			// convert
+			var newStyle = model.style.layout;
+			var oldStyle = model.style;
 
-            switch (oldStyle.justifyContent) {
-            case 'wb-flex-justify-content-center':
-                newStyle.justify = 'center';
-                break;
-            case 'wb-flex-justify-content-end':
-                newStyle.justify = 'end';
-                break;
-            case 'wb-flex-justify-content-start':
-                newStyle.justify = 'start';
-                break;
-            case 'wb-flex-justify-content-space-between':
-                newStyle.justify = 'space-between';
-                break;
-            case 'wb-flex-justify-content-space-around':
-                newStyle.justify = 'space-around';
-                break;
-            default:
-                newStyle.justify = 'center';
-            }
-            delete oldStyle.justifyContent;
-        }
-    }
+			if (oldStyle.flexDirection) {
+				if (oldStyle.flexDirection === 'wb-flex-row') {
+					newStyle.direction = 'row';
+				} else {
+					newStyle.direction = 'column';
+				}
+				delete oldStyle.flexDirection;
+			}
+			if (!newStyle.direction) {
+				newStyle.direction = 'column';
+			}
 
-    function cleanSize(model)
-    {
-        if (!model.style.size) {
-            model.style.size = {};
-        }
-        var newStyle = model.style.size;
-        var oldStyle = model.style;
-        var map = [['width', 'width'],
-            ['height', 'height']];
-        cleanMap(oldStyle, newStyle, map);
-    }
+			switch (oldStyle.flexAlignItem) {
+			case 'wb-flex-align-items-center':
+				newStyle.align = 'center';
+				break;
+			case 'wb-flex-align-items-end':
+				newStyle.align = 'end';
+				break;
+			case 'wb-flex-align-items-start':
+				newStyle.align = 'start';
+				break;
+			case 'wb-flex-align-items-stretch':
+				newStyle.align = 'stretch';
+				break;
+			default:
+				newStyle.align = 'stretch';
+			}
+			delete oldStyle.flexAlignItem;
 
-    function cleanBackground(model)
-    {
-        if (!model.style.background) {
-            model.style.background = {};
-        }
-        var newStyle = model.style.background;
-        var oldStyle = model.style;
-        var map = [['backgroundImage', 'image'],
-            ['backgroundColor', 'color'],
-            ['backgroundSize', 'size'],
-            ['backgroundRepeat', 'repeat'],
-            ['backgroundPosition', 'position']];
-        cleanMap(oldStyle, newStyle, map);
-    }
+			switch (oldStyle.justifyContent) {
+			case 'wb-flex-justify-content-center':
+				newStyle.justify = 'center';
+				break;
+			case 'wb-flex-justify-content-end':
+				newStyle.justify = 'end';
+				break;
+			case 'wb-flex-justify-content-start':
+				newStyle.justify = 'start';
+				break;
+			case 'wb-flex-justify-content-space-between':
+				newStyle.justify = 'space-between';
+				break;
+			case 'wb-flex-justify-content-space-around':
+				newStyle.justify = 'space-around';
+				break;
+			default:
+				newStyle.justify = 'center';
+			}
+			delete oldStyle.justifyContent;
+		}
+	}
 
-    function cleanBorder(model)
-    {
-        if (!model.style.border) {
-            model.style.border = {};
-        }
-        var oldStyle = model.style;
-        var newStyle = model.style.border;
+	function cleanSize(model)
+	{
+		if (!model.style.size) {
+			model.style.size = {};
+		}
+		var newStyle = model.style.size;
+		var oldStyle = model.style;
+		var map = [['width', 'width'],
+			['height', 'height']];
+		cleanMap(oldStyle, newStyle, map);
+	}
 
-        if (oldStyle.borderRadius) {
-            if (oldStyle.borderRadius.uniform) {
-                newStyle.radius = oldStyle.borderRadius.all + 'px';
-            }
-            // TODO: maso, 2018: support other models
-        }
-        // delete old values
-        delete model.style.borderColor;
-        delete model.style.borderRadius;
-        delete model.style.borderStyleColorWidth;
-        delete model.style.borderStyle;
-        delete model.style.borderWidth;
-    }
+	function cleanBackground(model)
+	{
+		if (!model.style.background) {
+			model.style.background = {};
+		}
+		var newStyle = model.style.background;
+		var oldStyle = model.style;
+		var map = [['backgroundImage', 'image'],
+			['backgroundColor', 'color'],
+			['backgroundSize', 'size'],
+			['backgroundRepeat', 'repeat'],
+			['backgroundPosition', 'position']];
+		cleanMap(oldStyle, newStyle, map);
+	}
 
-    function cleanSpace(model)
-    {
-        // Margin and padding
-        if (model.style.padding && angular.isObject(model.style.padding)) {
-            var padding = '';
-            if (model.style.padding.isUniform) {
-                padding = model.style.padding.uniform;
-            } else {
-                padding = model.style.padding.top || '0px' + ' ' +
-                model.style.padding.right || '0px' + ' ' +
-                model.style.padding.bottom || '0px' + ' ' +
-                model.style.padding.left || '0px' + ' ';
-            }
-            model.style.padding = padding;
-        }
+	function cleanBorder(model)
+	{
+		if (!model.style.border) {
+			model.style.border = {};
+		}
+		var oldStyle = model.style;
+		var newStyle = model.style.border;
 
-        if (model.style.margin && angular.isObject(model.style.margin)) {
-            var margin = '';
-            if (model.style.margin.isUniform) {
-                margin = model.style.margin.uniform;
-            } else {
-                margin = model.style.margin.top || '0px' + ' ' +
-                model.style.margin.right || '0px' + ' ' +
-                model.style.margin.bottom || '0px' + ' ' +
-                model.style.margin.left || '0px' + ' ';
-            }
-            model.style.margin = margin;
-        }
+		if (oldStyle.borderRadius) {
+			if (oldStyle.borderRadius.uniform) {
+				newStyle.radius = oldStyle.borderRadius.all + 'px';
+			}
+			// TODO: maso, 2018: support other models
+		}
+		// delete old values
+		delete model.style.borderColor;
+		delete model.style.borderRadius;
+		delete model.style.borderStyleColorWidth;
+		delete model.style.borderStyle;
+		delete model.style.borderWidth;
+	}
 
-    }
+	function cleanSpace(model)
+	{
+		// Margin and padding
+		if (model.style.padding && angular.isObject(model.style.padding)) {
+			var padding = '';
+			if (model.style.padding.isUniform) {
+				padding = model.style.padding.uniform;
+			} else {
+				padding = model.style.padding.top || '0px' + ' ' +
+				model.style.padding.right || '0px' + ' ' +
+				model.style.padding.bottom || '0px' + ' ' +
+				model.style.padding.left || '0px' + ' ';
+			}
+			model.style.padding = padding;
+		}
 
-    function cleanAlign(model)
-    {
-        if (!model.style.align) {
-            model.style.align = {};
-        }
-    }
+		if (model.style.margin && angular.isObject(model.style.margin)) {
+			var margin = '';
+			if (model.style.margin.isUniform) {
+				margin = model.style.margin.uniform;
+			} else {
+				margin = model.style.margin.top || '0px' + ' ' +
+				model.style.margin.right || '0px' + ' ' +
+				model.style.margin.bottom || '0px' + ' ' +
+				model.style.margin.left || '0px' + ' ';
+			}
+			model.style.margin = margin;
+		}
 
-    function cleanStyle(model)
-    {
-        if (!model.style) {
-            model.style = {};
-        }
-        cleanLayout(model);
-        cleanSize(model);
-        cleanBackground(model);
-        cleanBorder(model);
-        cleanSpace(model);
-        cleanAlign(model);
-    }
+	}
 
-    function cleanInternal(model)
-    {
-        cleanEvetns(model);
-        cleanStyle(model);
-        if (model.type === 'Group' || model.type === 'Page') {
-            if (!model.contents) {
-                model.contents = [];
-            }
-            if (model.contents.length) {
-                for (var i = 0; i < model.contents.length; i++) {
-                    cleanInternal(model.contents[i]);
-                }
-            }
-        }
-        return model;
-    }
+	function cleanAlign(model)
+	{
+		if (!model.style.align) {
+			model.style.align = {};
+		}
+	}
 
-    /**
-     * Clean data model
-     * @name clean 
-     * @param {object} model 
-     * @param {type} force
-     */
-    function clean(model, force)
-    {
-        if (!model.type || model.type === 'Page') {
-            model.type = 'Group';
-        }
-        if (model.version === 'wb1' && !force) {
-            return model;
-        }
-        var newModel = cleanInternal(model);
-        newModel.version = 'wb1';
-        return newModel;
-    }
+	function cleanStyle(model)
+	{
+		if (!model.style) {
+			model.style = {};
+		}
+		cleanLayout(model);
+		cleanSize(model);
+		cleanBackground(model);
+		cleanBorder(model);
+		cleanSpace(model);
+		cleanAlign(model);
+	}
 
-    service.cleanMap = cleanMap;
-    service.clean = clean;
-    service.cleanInternal = cleanInternal;
-    service.cleanStyle = cleanStyle;
-    service.cleanAlign = cleanAlign;
-    service.cleanSpace = cleanSpace;
-    service.cleanBorder = cleanBorder;
-    service.cleanBackground = cleanBackground;
-    service.cleanSize = cleanSize;
-    service.cleanLayout = cleanLayout;
-    service.cleanEvetns = cleanEvetns;
+	function cleanInternal(model)
+	{
+		cleanEvetns(model);
+		cleanStyle(model);
+		if (model.type === 'Group' || model.type === 'Page') {
+			if (!model.contents) {
+				model.contents = [];
+			}
+			if (model.contents.length) {
+				for (var i = 0; i < model.contents.length; i++) {
+					cleanInternal(model.contents[i]);
+				}
+			}
+		}
+		return model;
+	}
 
-    service.getTemplateFor = getTemplateFor;
-    service.getTemplateOf = getTemplateOf;
-    service.convertToWidgetCss = convertToWidgetCss;
-    service.convertToWidgetCssLayout = convertToWidgetCssLayout;
+	/**
+	 * Clean data model
+	 * @name clean 
+	 * @param {object} model 
+	 * @param {type} force
+	 */
+	function clean(model, force)
+	{
+		if (!model.type || model.type === 'Page') {
+			model.type = 'Group';
+		}
+		if (model.version === 'wb1' && !force) {
+			return model;
+		}
+		var newModel = cleanInternal(model);
+		newModel.version = 'wb1';
+		return newModel;
+	}
+
+	service.cleanMap = cleanMap;
+	service.clean = clean;
+	service.cleanInternal = cleanInternal;
+	service.cleanStyle = cleanStyle;
+	service.cleanAlign = cleanAlign;
+	service.cleanSpace = cleanSpace;
+	service.cleanBorder = cleanBorder;
+	service.cleanBackground = cleanBackground;
+	service.cleanSize = cleanSize;
+	service.cleanLayout = cleanLayout;
+	service.cleanEvetns = cleanEvetns;
+
+	service.getTemplateFor = getTemplateFor;
+	service.getTemplateOf = getTemplateOf;
+	service.convertToWidgetCss = convertToWidgetCss;
+	service.convertToWidgetCssLayout = convertToWidgetCssLayout;
 });
 
 /* 
