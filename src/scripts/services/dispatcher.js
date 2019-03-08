@@ -89,6 +89,10 @@ angular.module('am-wb-core') //
 
 	/**
 	 * Dispatches a payload to all registered callbacks.
+	 * 
+	 *  Payload contains key and values. You may add extra values to the 
+	 * payload.
+	 * 
 	 */
 	this.dispatch = function(type, payload) {
 		return getDispatcherFor(type).dispatch(payload);
