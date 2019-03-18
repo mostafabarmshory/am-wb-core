@@ -4199,6 +4199,11 @@ WbAbstractWidget.prototype.setModelProperty = function (key, value){
 	$event.oldValue = this.getModelProperty(key);
 	$event.newValue =  value;
 
+    // check if value changed
+    if(angular.equals($event.oldValue, $event.newValue)){
+        return;
+    }
+
 	// Set the address
 	if(angular.isDefined(value)){
 		objectPath.set(this.getModel(), key, value);
@@ -4239,6 +4244,11 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	$event.oldValue = this.getProperty(key);
 	$event.newValue =  value;
 
+	// check if value changed
+	if(angular.equals($event.oldValue, $event.newValue)){
+	    return;
+	}
+
 	// Set the address
 	var model = this.getRuntimeModel();
 	if(angular.isDefined(value)){
@@ -4246,9 +4256,11 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	} else {
 		objectPath.del(model, key);
 	}
+	
 
 	// refresh the view
 	this.refresh($event);
+    this.fire('runtimeModelUpdated', $event);
 };
 
 /**
