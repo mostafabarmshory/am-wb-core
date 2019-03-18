@@ -24,9 +24,17 @@ Here, There is an example shows how the events are stored in model:
 
 The following events are supported and available to the user.
 
+- init:
 - click : The event occurs when the user clicks on an element.
+- dbclick:
 - mouseout : The event occurs when a user moves the mouse pointer out of an element, or out of one of its children.
 - mouseover: The event occurs when the pointer is moved onto an element, or onto one of its children.
+- mouseenter:
+- mouseleave:
+- mousedown:
+- mouseup:
+- resize:
+- intersection:
 
 The user also is provided some useful methods he/she could use to define some styles on the widget in these events.
 To see information about these functions, go to api section under $widget. (in programming.md file)
