@@ -114,6 +114,10 @@ var WbAbstractWidget = function () {
 				}
 				ctrl.fire('click', $event);
 			},
+			dblclick: function ($event) {
+			    ctrl.fire('dblclick', $event);
+			    ctrl.evalWidgetEvent('dblclick', $event);
+			},
 			mouseout: function ($event) {
 				ctrl.fire('mouseout', $event);
 				ctrl.evalWidgetEvent('mouseout', $event);
@@ -121,7 +125,23 @@ var WbAbstractWidget = function () {
 			mouseover: function ($event) {
 				ctrl.fire('mouseover', $event);
 				ctrl.evalWidgetEvent('mouseover', $event);
-			}
+			},
+			mousedown: function ($event) {
+                ctrl.fire('mousedown', $event);
+                ctrl.evalWidgetEvent('mousedown', $event);
+            },
+            mouseup: function ($event) {
+                ctrl.fire('mouseup', $event);
+                ctrl.evalWidgetEvent('mouseup', $event);
+            },
+			mouseenter: function ($event) {
+                ctrl.fire('mouseenter', $event);
+                ctrl.evalWidgetEvent('mouseenter', $event);
+            },
+			mouseleave: function ($event) {
+                ctrl.fire('mouseleave', $event);
+                ctrl.evalWidgetEvent('mouseleave', $event);
+            },
 	};
 
 	/*

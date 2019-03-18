@@ -41,32 +41,40 @@ angular.module('am-wb-core')
         // Load ngModel
         var ngModelCtrl = $ctrls[0];
         var widget = null;
-        var keys = [ 'init', 'click', 'mouseout', 'mouseover', 'resize', 'intersection'];
-        var titles = [ 'Initialization', 'Click', 'Mouseout', 'Mouseover', 'Resize', 'Intersection'];
+        var keys = [ 'init', 'click', 'dblclick', 'mouseout',
+            'mouseover', 'mousedown', 'mouseup',
+            'mouseenter', 'mouseleave', 'resize',
+            'intersection' ];
+        var titles = [ 'Initialization', 'Click',
+            'Double click', 'Mouse out', 'Mouse over',
+            'Mouse down', 'Mouse up', 'Mouse enter',
+            'Mouse leave', 'Resize', 'Intersection' ];
 
         ngModelCtrl.$render = function () {
             if (ngModelCtrl.$viewValue) {
                 widget = ngModelCtrl.$viewValue;
-                if(angular.isArray(widget) && widget.length > 0){
-                	widget = widget[0];
-                	loadEvents();
+                if (angular.isArray(widget)
+                        && widget.length > 0) {
+                    widget = widget[0];
+                    loadEvents();
                 } else {
-                	cleanEvents();
+                    cleanEvents();
                 }
             }
         };
 
-        function cleanEvents(){
-        	$scope.events = [];
+        function cleanEvents() {
+            $scope.events = [];
         }
-        
+
         function loadEvents() {
-        	cleanEvents();
+            cleanEvents();
             for (var i = 0; i < keys.length; i++) {
                 var event = {};
                 event.key = keys[i];
                 event.title = titles[i];
-                event.code = widget.getModelProperty('event.' + event.key);
+                event.code = widget.getModelProperty('event.'
+                        + event.key);
                 $scope.events.push(event);
             }
         }
@@ -75,9 +83,11 @@ angular.module('am-wb-core')
             for (var i = 0; i < $scope.events.length; i++) {
                 var event = $scope.events[i];
                 if (event.code) {
-                    widget.setModelProperty('event.' + event.key, event.code);
+                    widget.setModelProperty('event.'
+                            + event.key, event.code);
                 } else {
-                    widget.setModelProperty('event.' + event.key, undefined);
+                    widget.setModelProperty('event.'
+                            + event.key, undefined);
                 }
             }
         }
@@ -95,28 +105,27 @@ angular.module('am-wb-core')
         scope : {},
         link : postLink,
         require : [ 'ngModel' ],
-        controllerAs: 'ctrl',
+        controllerAs : 'ctrl',
         /*
          * @ngInject
          */
-        controller: function($scope, $resource){
-            this.editEvent = function(event) {
+        controller : function ($scope, $resource) {
+            this.editEvent = function (event) {
                 $resource.get('script', {
-                    data: {
-                    	language: 'javascript',
-                    	code: event.code
+                    data : {
+                        language : 'javascript',
+                        code : event.code
                     }
-                })
-                .then(function(value){
+                }).then(function (value) {
                     event.code = value.code;
-                    if(!value){
+                    if (!value) {
                         delete event.code;
                     }
                     $scope.saveEvents();
                 });
             };
 
-            this.deleteEvent = function(event) {
+            this.deleteEvent = function (event) {
                 delete event.code;
                 $scope.saveEvents();
             };
