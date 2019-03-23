@@ -1,15 +1,49 @@
-<!--selfAlign--> 
-<wb-ui-setting-choose
-    ng-if="ctrl.getParentDirection() === 'row'"
-    title="Self Vert."
-    items="ctrl.selfAlign_['row']" 
-    ng-model="ctrl.alignSelf"
-    ng-change="ctrl.alignSelfChanged()"> 
-</wb-ui-setting-choose>
-<wb-ui-setting-choose
-    ng-if="ctrl.getParentDirection() !== 'row'"
-    title="Self Vert."
-    items="ctrl.selfAlign_['column']" 
-    ng-model="ctrl.alignSelf"
-    ng-change="ctrl.alignSelfChanged()"> 
-</wb-ui-setting-choose>
+<!-- self align --> 
+<fieldset
+   	layout="column">
+	<legend translate>Align</legend>
+	<wb-ui-setting-choose
+	    ng-if="ctrl.getParentDirection() === 'row'"
+	    title="Self Vert."
+	    items="ctrl.selfAlign_['row']" 
+	    ng-model="ctrl.alignSelf"
+	    ng-change="ctrl.alignSelfChanged()"> 
+	</wb-ui-setting-choose>
+	<wb-ui-setting-choose
+	    ng-if="ctrl.getParentDirection() !== 'row'"
+	    title="Self Vert."
+	    items="ctrl.selfAlign_['column']" 
+	    ng-model="ctrl.alignSelf"
+	    ng-change="ctrl.alignSelfChanged()"> 
+	</wb-ui-setting-choose>
+</fieldset>
+
+<!-- Flex --> 
+<fieldset
+   	layout="column">
+	<legend translate>Box</legend>
+	<md-input-container class="md-block">
+	    <label translate>Order</label>
+	    <input
+	        ng-model="ctrl.order"
+	        ng-model-options="{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}"
+	        ng-change="ctrl.updateOrder(ctrl.order, $event)"
+	        type="number">
+	</md-input-container>
+	<md-input-container class="md-block">
+	    <label translate>Grow</label>
+	    <input
+	        ng-model="ctrl.grow"
+	        ng-model-options="{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}"
+	        ng-change="ctrl.updateGrow(ctrl.grow, $event)"
+	        type="number">
+	</md-input-container>
+	<md-input-container class="md-block">
+	    <label translate>Shrink</label>
+	    <input
+	        ng-model="ctrl.shrink"
+	        ng-model-options="{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}"
+	        ng-change="ctrl.updateShrink(ctrl.shrink, $event)"
+	        type="number">
+	</md-input-container>
+</fieldset>
