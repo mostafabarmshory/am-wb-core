@@ -9275,6 +9275,10 @@ angular.module('am-wb-core')
                         title: 'Center',
                         icon: 'format_align_center',
                         value: 'center'
+                    }, {
+                    	title: 'Automatic',
+                    	icon: 'brightness_auto',
+                    	value: 'auto'
                     }],
                     'row': [{
                         title: 'Stretch',
@@ -9292,6 +9296,10 @@ angular.module('am-wb-core')
                         title: 'Center',
                         icon: 'align_center_vertical',
                         value: 'center'
+                    }, {
+                    	title: 'Automatic',
+                    	icon: 'brightness_auto',
+                    	value: 'auto'
                     }]
             };
 
@@ -9299,7 +9307,10 @@ angular.module('am-wb-core')
              * watch 'wbModel' and apply the changes in setting panel
              */
             this.init = function () {
-                this.alignSelf = this.getStyleLayout('align_self');
+                this.alignSelf = this.getStyleLayout('align_self') || 'auto';
+                this.order = this.getStyleLayout('order') || 0;
+                this.grow = this.getStyleLayout('grow') || 0;
+                this.shrink = this.getStyleLayout('shrink') || 1;
             };
 
             /**
@@ -9318,6 +9329,15 @@ angular.module('am-wb-core')
              */
             this.alignSelfChanged = function () {
                 this.setStyleLayout('align_self', this.alignSelf);
+            };
+            this.updateOrder = function(order){
+            	this.setStyleLayout('order', order);
+            };
+            this.updateGrow = function(grow){
+            	this.setStyleLayout('grow', grow);
+            };
+            this.updateShrink = function(shrink){
+            	this.setStyleLayout('shrink', shrink);
             };
         }
     });
@@ -12306,7 +12326,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-layout-self.html',
-    " <wb-ui-setting-choose ng-if=\"ctrl.getParentDirection() === 'row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['row']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.getParentDirection() !== 'row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['column']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose>"
+    " <fieldset layout=column> <legend translate>Align</legend> <wb-ui-setting-choose ng-if=\"ctrl.getParentDirection() === 'row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['row']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.getParentDirection() !== 'row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['column']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> </fieldset>  <fieldset layout=column> <legend translate>Box</legend> <md-input-container class=md-block> <label translate>Order</label> <input ng-model=ctrl.order ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateOrder(ctrl.order, $event)\" type=number> </md-input-container> <md-input-container class=md-block> <label translate>Grow</label> <input ng-model=ctrl.grow ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateGrow(ctrl.grow, $event)\" type=number> </md-input-container> <md-input-container class=md-block> <label translate>Shrink</label> <input ng-model=ctrl.shrink ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateShrink(ctrl.shrink, $event)\" type=number> </md-input-container> </fieldset>"
   );
 
 
