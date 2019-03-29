@@ -557,6 +557,10 @@ angular.module('am-wb-core')
                         title: 'Center',
                         icon: 'format_align_center',
                         value: 'center'
+                    }, {
+                    	title: 'Automatic',
+                    	icon: 'brightness_auto',
+                    	value: 'auto'
                     }],
                     'row': [{
                         title: 'Stretch',
@@ -574,6 +578,10 @@ angular.module('am-wb-core')
                         title: 'Center',
                         icon: 'align_center_vertical',
                         value: 'center'
+                    }, {
+                    	title: 'Automatic',
+                    	icon: 'brightness_auto',
+                    	value: 'auto'
                     }]
             };
 
@@ -581,7 +589,10 @@ angular.module('am-wb-core')
              * watch 'wbModel' and apply the changes in setting panel
              */
             this.init = function () {
-                this.alignSelf = this.getStyleLayout('align_self');
+                this.alignSelf = this.getStyleLayout('align_self') || 'auto';
+                this.order = this.getStyleLayout('order') || 0;
+                this.grow = this.getStyleLayout('grow') || 0;
+                this.shrink = this.getStyleLayout('shrink') || 1;
             };
 
             /**
@@ -600,6 +611,15 @@ angular.module('am-wb-core')
              */
             this.alignSelfChanged = function () {
                 this.setStyleLayout('align_self', this.alignSelf);
+            };
+            this.updateOrder = function(order){
+            	this.setStyleLayout('order', order);
+            };
+            this.updateGrow = function(grow){
+            	this.setStyleLayout('grow', grow);
+            };
+            this.updateShrink = function(shrink){
+            	this.setStyleLayout('shrink', shrink);
             };
         }
     });

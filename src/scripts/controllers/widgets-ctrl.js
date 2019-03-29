@@ -114,6 +114,10 @@ var WbAbstractWidget = function () {
 				}
 				ctrl.fire('click', $event);
 			},
+			dblclick: function ($event) {
+			    ctrl.fire('dblclick', $event);
+			    ctrl.evalWidgetEvent('dblclick', $event);
+			},
 			mouseout: function ($event) {
 				ctrl.fire('mouseout', $event);
 				ctrl.evalWidgetEvent('mouseout', $event);
@@ -121,7 +125,23 @@ var WbAbstractWidget = function () {
 			mouseover: function ($event) {
 				ctrl.fire('mouseover', $event);
 				ctrl.evalWidgetEvent('mouseover', $event);
-			}
+			},
+			mousedown: function ($event) {
+                ctrl.fire('mousedown', $event);
+                ctrl.evalWidgetEvent('mousedown', $event);
+            },
+            mouseup: function ($event) {
+                ctrl.fire('mouseup', $event);
+                ctrl.evalWidgetEvent('mouseup', $event);
+            },
+			mouseenter: function ($event) {
+                ctrl.fire('mouseenter', $event);
+                ctrl.evalWidgetEvent('mouseenter', $event);
+            },
+			mouseleave: function ($event) {
+                ctrl.fire('mouseleave', $event);
+                ctrl.evalWidgetEvent('mouseleave', $event);
+            },
 	};
 
 	/*
@@ -325,6 +345,11 @@ WbAbstractWidget.prototype.setModelProperty = function (key, value){
 	$event.oldValue = this.getModelProperty(key);
 	$event.newValue =  value;
 
+    // check if value changed
+    if(angular.equals($event.oldValue, $event.newValue)){
+        return;
+    }
+
 	// Set the address
 	if(angular.isDefined(value)){
 		objectPath.set(this.getModel(), key, value);
@@ -365,6 +390,11 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	$event.oldValue = this.getProperty(key);
 	$event.newValue =  value;
 
+	// check if value changed
+	if(angular.equals($event.oldValue, $event.newValue)){
+	    return;
+	}
+
 	// Set the address
 	var model = this.getRuntimeModel();
 	if(angular.isDefined(value)){
@@ -372,9 +402,11 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	} else {
 		objectPath.del(model, key);
 	}
+	
 
 	// refresh the view
 	this.refresh($event);
+    this.fire('runtimeModelUpdated', $event);
 };
 
 /**
@@ -469,9 +501,6 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 			});
 			console.log(ex);
 		}
-//		try{
-//			this.getScope().$digest();
-//		} catch(ex){};
 	}
 };
 
