@@ -4355,9 +4355,6 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 			});
 			console.log(ex);
 		}
-//		try{
-//			this.getScope().$digest();
-//		} catch(ex){};
 	}
 };
 
