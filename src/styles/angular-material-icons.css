@@ -6,7 +6,7 @@
  */
 /* mixin definition ; sets LTR and RTL within the same style call */
 
-md-autocomplete button ng-md-icon {
+md-autocomplete button wb-icon {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -14,20 +14,20 @@ md-autocomplete button ng-md-icon {
     transform: translate3d(-50%, -50%, 0) scale(0.9);
 }
 
-md-autocomplete button ng-md-icon path {
+md-autocomplete button wb-icon path {
     stroke-width: 0;
 }
 
-.md-button.ng-md-icon {
+.md-button.wb-icon {
     padding: 0;
     background: none;
 }
 
-.md-button.md-fab ng-md-icon {
+.md-button.md-fab wb-icon {
     margin-top: 0;
 }
 
-md-checkbox .ng-md-icon {
+md-checkbox .wb-icon {
     transition: 240ms;
     position: absolute;
     top: 0;
@@ -38,11 +38,11 @@ md-checkbox .ng-md-icon {
     border-radius: 2px;
 }
 
-md-checkbox.md-checked .ng-md-icon {
+md-checkbox.md-checked .wb-icon {
     border: none;
 }
 
-md-checkbox.md-checked .ng-md-icon:after {
+md-checkbox.md-checked .wb-icon:after {
     -webkit-transform: rotate(45deg);
     transform: rotate(45deg);
     position: absolute;
@@ -57,7 +57,7 @@ md-checkbox.md-checked .ng-md-icon:after {
     content: '';
 }
 
-.md-chips .md-chip .md-chip-remove ng-md-icon {
+.md-chips .md-chip .md-chip-remove wb-icon {
     height: 18px;
     width: 18px;
     position: absolute;
@@ -67,7 +67,7 @@ md-checkbox.md-checked .ng-md-icon:after {
     transform: translate3d(-50%, -50%, 0);
 }
 
-ng-md-icon {
+wb-icon {
     margin: auto;
     background-repeat: no-repeat no-repeat;
     display: inline-block;
@@ -77,78 +77,78 @@ ng-md-icon {
     width: 24px;
 }
 
-ng-md-icon svg {
+wb-icon svg {
     pointer-events: none;
     display: block;
 }
 
-ng-md-icon[md-font-icon] {
+wb-icon[md-font-icon] {
     line-height: 1;
     width: auto;
 }
 
-ng-md-icon[disabled] svg {
+wb-icon[disabled] svg {
     fill: rgba(0, 0, 0, 0.26);
 }
 
-md-input-container > ng-md-icon {
+md-input-container > wb-icon {
     position: absolute;
     top: 5px;
     left: 2px;
 }
 
-md-input-container > ng-md-icon + input {
+md-input-container > wb-icon + input {
     margin-left: 36px;
 }
 
-md-input-container.md-icon-float > ng-md-icon {
+md-input-container.md-icon-float > wb-icon {
     top: 26px;
     left: 2px;
 }
 
-md-input-container.md-icon-float > ng-md-icon + input {
+md-input-container.md-icon-float > wb-icon + input {
     margin-left: 36px;
 }
 
 @media screen and (-ms-high-contrast: active) {
-    md-input-container.md-default-theme > ng-md-icon {
+    md-input-container.md-default-theme > wb-icon {
         fill: #fff;
     }
 }
 
-md-list-item > div.md-primary > ng-md-icon,
-md-list-item > div.md-secondary > ng-md-icon,
-md-list-item > ng-md-icon:first-child,
-md-list-item > ng-md-icon.md-secondary,
-md-list-item .md-list-item-inner > div.md-primary > ng-md-icon,
-md-list-item .md-list-item-inner > div.md-secondary > ng-md-icon,
-md-list-item .md-list-item-inner > ng-md-icon:first-child,
-md-list-item .md-list-item-inner > ng-md-icon.md-secondary {
+md-list-item > div.md-primary > wb-icon,
+md-list-item > div.md-secondary > wb-icon,
+md-list-item > wb-icon:first-child,
+md-list-item > wb-icon.md-secondary,
+md-list-item .md-list-item-inner > div.md-primary > wb-icon,
+md-list-item .md-list-item-inner > div.md-secondary > wb-icon,
+md-list-item .md-list-item-inner > wb-icon:first-child,
+md-list-item .md-list-item-inner > wb-icon.md-secondary {
     width: 24px;
     margin-top: 16px;
     margin-bottom: 12px;
     box-sizing: content-box;
 }
 
-md-list-item > ng-md-icon:first-child,
-md-list-item .md-list-item-inner > ng-md-icon:first-child {
+md-list-item > wb-icon:first-child,
+md-list-item .md-list-item-inner > wb-icon:first-child {
     margin-right: 32px;
 }
 
-md-list-item.md-2-line > ng-md-icon:first-child,
-md-list-item.md-2-line > .md-no-style > ng-md-icon:first-child {
+md-list-item.md-2-line > wb-icon:first-child,
+md-list-item.md-2-line > .md-no-style > wb-icon:first-child {
     -webkit-align-self: flex-start;
     -ms-flex-item-align: start;
     align-self: flex-start;
 }
 
-md-list-item.md-3-line > ng-md-icon:first-child,
-md-list-item.md-3-line > .md-no-style > ng-md-icon:first-child {
+md-list-item.md-3-line > wb-icon:first-child,
+md-list-item.md-3-line > .md-no-style > wb-icon:first-child {
     margin-top: 16px;
 }
 
-md-tabs-wrapper md-prev-button ng-md-icon,
-md-tabs-wrapper md-next-button ng-md-icon {
+md-tabs-wrapper md-prev-button wb-icon,
+md-tabs-wrapper md-next-button wb-icon {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -156,7 +156,7 @@ md-tabs-wrapper md-next-button ng-md-icon {
     transform: translate3d(-50%, -50%, 0);
 }
 
-md-tabs-wrapper md-next-button ng-md-icon {
+md-tabs-wrapper md-next-button wb-icon {
     -webkit-transform: translate3d(-50%, -50%, 0) rotate(180deg);
     transform: translate3d(-50%, -50%, 0) rotate(180deg);
 }

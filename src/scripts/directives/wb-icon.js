@@ -95,7 +95,7 @@ angular.module('am-wb-core')
 
 		function render(newIcon) {
 			// check for new changes
-			if(newIcon.name === icon.name 
+			if(renderCount && newIcon.name === icon.name 
 					&& newIcon.size === icon.size
 					&& newIcon.viewbox === icon.viewbox){
 				return;
@@ -143,7 +143,7 @@ angular.module('am-wb-core')
 		restrict: 'AE',
 		transclude : true,
 		link: postLink,
-		replace: true
+		replace: false
 	};
 })
 
