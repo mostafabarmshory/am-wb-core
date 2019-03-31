@@ -27,7 +27,6 @@
     "angular-sanitize": "1.7.x",
     "angular-material": "1.1.x",
     "angular-translate": "2.18.x",
-    "angular-material-icons": "0.7.x",
     "weakmap-polyfill": "2.0.x",
     "ngHandsontable": "0.13.x",
     "angular-material-expansion-panel": "https://github.com/mostafabarmshory/angular-material-expansion-panel.git#0.7.x",
@@ -37,7 +36,8 @@
     "lodash": "3.x",
     "tinymce": "4.8.x",
     "object-path": "^0.11.0",
-    "flux": "3.1.x"
+    "flux": "3.1.x",
+    "mustache.js": "mustache#^3.0.1"
   },
   "devDependencies": {
     "angular-mocks": "1.7.x",
