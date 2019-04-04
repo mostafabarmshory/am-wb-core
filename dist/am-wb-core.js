@@ -8785,6 +8785,385 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name TinymcePluginCodesample
+ * @description Adding code sample to tinymce
+ * 
+ * 
+ * ## options
+ * 
+ * codesample_languages: array of languages
+ * 
+ */
+.factory('TinymcePluginCodesample', function ($resource) {
+	'use strict';
+	var languages;
+	var defaultLanguages = [{
+		text: 'HTML/XML',
+		value: 'markup'
+	},
+	{
+		text: 'JavaScript',
+		value: 'javascript'
+	},
+	{
+		text: 'CSS',
+		value: 'css'
+	},
+	{
+		text: 'PHP',
+		value: 'php'
+	},
+	{
+		text: 'Ruby',
+		value: 'ruby'
+	},
+	{
+		text: 'Python',
+		value: 'python'
+	},
+	{
+		text: 'Java',
+		value: 'java'
+	},
+	{
+		text: 'C',
+		value: 'c'
+	},
+	{
+		text: 'C#',
+		value: 'csharp'
+	},
+	{
+		text: 'C++',
+		value: 'cpp'
+	}];
+
+	/*
+	 * dom utils
+	 */
+	var tinymceDomeUtils = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+
+	function isCodeSample(elm) {
+		return elm && elm.nodeName === 'PRE' && elm.className.indexOf('language-') !== -1;
+	}
+
+	function trimArg(predicateFn) {
+		return function (arg1, arg2) {
+			return predicateFn(arg2);
+		};
+	}
+
+	/*
+	 * Insert new code sample into the cell
+	 */
+	function insertCodeSample(editor, language, code, node) {
+		editor.undoManager.transact(function () {
+//			var node = getSelectedCodeSample(editor);
+			code = tinymceDomeUtils.DOM.encode(code);
+			if (node) {
+				editor.dom.setAttrib(node, 'class', 'language-' + language);
+				node.innerHTML = code;
+				Prism.highlightElement(node);
+				editor.selection.select(node);
+			} else {
+				editor.insertContent('<pre id="__new" class="language-' + language + '">' + code + '</pre>');
+				editor.selection.select(editor.$('#__new').removeAttr('id')[0]);
+			}
+		});
+	}
+
+	/*
+	 * Add to plugin manager
+	 */
+
+	var tinymcePluginCodesample = function (editor, pluginUrl) {
+		this.setEditor(editor, pluginUrl);
+	};
+
+	/**
+	 * Set editor and load the plugin
+	 */
+	tinymcePluginCodesample.prototype.setEditor = function(editor) {
+		this._editor = editor;
+		languages = editor.settings.codesample_languages || defaultLanguages;
+		this.setup();
+		this.register();
+	}
+
+	/**
+	 * Gets current editor
+	 */
+	tinymcePluginCodesample.prototype.getEditor = function(){
+		return this._editor;
+	}
+
+
+
+	/**
+	 * Setups the environments and events
+	 */
+	tinymcePluginCodesample.prototype.setup = function () {
+		var facotry = this;
+		var editor = this.getEditor();
+		var $ = editor.$;
+		editor.on('PreProcess', function (e) {
+			$('pre[contenteditable=false]', e.node).filter(trimArg(isCodeSample)).each(function (idx, elm) {
+				var $elm = $(elm), code = elm.textContent;
+				$elm.attr('class', $.trim($elm.attr('class')));
+				$elm.removeAttr('contentEditable');
+				$elm.empty().append($('<code></code>').each(function () {
+					this.textContent = code;
+				}));
+			});
+		});
+		editor.on('SetContent', function () {
+			var unprocessedCodeSamples = $('pre').filter(trimArg(isCodeSample)).filter(function (idx, elm) {
+				return elm.contentEditable !== 'false';
+			});
+			if (unprocessedCodeSamples.length) {
+				editor.undoManager.transact(function () {
+					unprocessedCodeSamples.each(function (idx, elm) {
+						$(elm).find('br').each(function (idx, elm) {
+							elm.parentNode.replaceChild(editor.getDoc().createTextNode('\n'), elm);
+						});
+						elm.contentEditable = false;
+						elm.innerHTML = editor.dom.encode(elm.textContent);
+						Prism.highlightElement(elm);
+						elm.className = $.trim(elm.className);
+					});
+				});
+			}
+		});
+
+		editor.on('dblclick', function (ev) {
+			if (isCodeSample(ev.target)) {
+				facotry.openEditor();
+			}
+		});
+	};
+
+	/**
+	 * Register the plugin with the editor
+	 * 
+	 */
+	tinymcePluginCodesample.prototype.register = function () {
+		var facotry = this;
+		var editor = this.getEditor();
+		editor.addCommand('codesample', function () {
+			var node = editor.selection.getNode();
+			if (editor.selection.isCollapsed() || isCodeSample(node)) {
+				facotry.openEditor();
+			} else {
+				editor.formatter.toggle('code');
+			}
+		});
+		editor.addButton('codesample', {
+			cmd: 'codesample',
+			title: 'Insert/Edit code sample'
+		});
+		editor.addMenuItem('codesample', {
+			cmd: 'codesample',
+			text: 'Code sample',
+			icon: 'codesample'
+		});
+	};
+
+	/*
+	 * Get selected code sample from the editor
+	 */
+	tinymcePluginCodesample.prototype.getSelectedCodeSample = function () {
+		var editor = this.getEditor();
+		var node = editor.selection.getNode();
+		if (isCodeSample(node)) {
+			return node;
+		}
+		return null;
+	};
+
+	/*
+	 * Get current code.
+	 * 
+	 * If the code sample is empty then an empty text is returned as
+	 * result.
+	 */
+	tinymcePluginCodesample.prototype.getCurrentCode = function () {
+		var node = this.getSelectedCodeSample();
+		if (node) {
+			return node.textContent;
+		}
+		return '';
+	};
+
+
+	/*
+	 * Gets current language of the code sampler
+	 */
+	tinymcePluginCodesample.prototype.getCurrentLanguage = function (editor) {
+		var matches;
+		var node = this.getSelectedCodeSample();
+		if (node) {
+			matches = node.className.match(/language-(\w+)/);
+			return matches ? matches[1] : '';
+		}
+		return '';
+	};
+
+	/*
+	 * Open editor to edit a code sample
+	 */
+	tinymcePluginCodesample.prototype.openEditor = function () { 
+		var editor = this.getEditor();
+		var node = this.getSelectedCodeSample();
+		var factory = this;
+		$resource.get('script', {
+			data : {
+				language: this.getCurrentLanguage(editor),
+				languages: languages,
+				// TODO: maso, 2019: get code
+				code: this.getCurrentCode()
+			}
+		})
+		.then(function(script){
+			insertCodeSample(editor, script.language, script.code, node);
+		});
+	};
+
+
+	return tinymcePluginCodesample;
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name TinymcePluginImageToolxcx
+ * @description Adding image plugin
+ * 
+ */
+.factory('TinymcePluginImageTool', function ($resource) {
+	'use strict';
+
+	var tinymcePluginImageTool = function (editor/*, pluginUrl*/) {
+		var factory = this;
+		this.setEditor(editor);
+		editor.addButton('image', {
+			icon: 'image',
+			tooltip: 'Insert/edit image',
+			onclick: function(url){
+				editor.insertContent('<img src="' + url + '" >');
+			},
+			stateSelector: 'img:not([data-mce-object],[data-mce-placeholder]),figure.image'
+		});
+
+		editor.addMenuItem('image', {
+			icon: 'image',
+			text: 'Image',
+			onclick: function(){
+				factory.insertImage();
+			},
+			context: 'insert',
+			prependToContext: true
+		});
+
+		editor.addCommand('mceImage', function(){
+			factory.insertImage();
+		});
+	}
+
+	tinymcePluginImageTool.prototype.insertImage = function() {
+		var editor = this.getEditor();
+		$resource.get('image')//
+		.then(function(value){
+			editor.insertContent('<img src="' + value + '" >');
+		});
+	};
+	
+	tinymcePluginImageTool.prototype.setEditor = function(editor) {
+		this._editor = editor;
+	};
+	
+	tinymcePluginImageTool.prototype.getEditor = function() {
+		return this._editor;
+	};
+
+	return tinymcePluginImageTool;
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 'use strict';
 
 angular.module('am-wb-core')//
@@ -9891,55 +10270,72 @@ angular.module('am-wb-core')
 		controllerAs: 'ctrl',
 		tags : [ 'data' ]
 	});
-	
 
-    $resource.newPage({
-        type : 'script',
-        icon : 'script',
-        label : 'Script',
-        templateUrl : 'views/resources/wb-event-code-editor.html',
-        /*
-         * @ngInject
-         */
-        controller : function($scope, $wbLibs, $element) {
-        	var ctrl = this;
-        	this.value = $scope.value || {
-            	code: '',
-            	language: 'javascript'
-            };
-//            $scope.$watch(function(){
-//            	return ctrl.value;
-//            }, function(value) {
-//                $scope.$parent.setValue(value);
-//            }, true);
-            this.setCode = function(code) {
-            	this.value.code = code;
-                $scope.$parent.setValue(this.value);
-            };
-            
 
-            $wbLibs.load('resources/libs/ace.js')
-            .then(function(){
-            	var editor = ace.edit($element.find('div')[0]);
-            	editor.setOptions({
-            	   enableBasicAutocompletion: true, 
-            	   enableLiveAutocompletion: true, 
-            	   showPrintMargin: false, 
-            	   maxLines: Infinity,
-            	   fontSize: '100%'
-            	});
-            	$scope.editor = editor;
-//            	editor.setTheme('resources/libs/ace/theme/chrome');
-//            	editor.session.setMode('resources/libs/ace/mode/javascript');
-            	editor.setValue(ctrl.value.code || '');
-            	editor.on("change", function(){
-            		ctrl.setCode(editor.getValue());
-            	});
-            })
-        },
-        controllerAs: 'ctrl',
-        tags : [ 'code', 'script']
-    });
+	$resource.newPage({
+		type : 'script',
+		icon : 'script',
+		label : 'Script',
+		templateUrl : 'views/resources/wb-event-code-editor.html',
+		/*
+		 * @ngInject
+		 */
+		controller : function($scope, $wbLibs, $element) {
+			var ctrl = this;
+			this.value = $scope.value || {
+				code: '',
+				language: 'javascript',
+				languages: [{
+					text: 'HTML/XML',
+					value: 'markup'
+				},
+				{
+					text: 'JavaScript',
+					value: 'javascript'
+				},
+				{
+					text: 'CSS',
+					value: 'css'
+				}]
+			};
+			this.setCode = function(code) {
+				this.value.code = code;
+				$scope.$parent.setValue(this.value);
+			};
+			
+			this.setLanguage = function(language){
+				this.value.code = language;
+				$scope.$parent.setValue(this.value);
+			};
+			
+			this.setEditor = function(editor) {
+				this.editor = editor;
+				editor.setOptions({
+					enableBasicAutocompletion: true, 
+					enableLiveAutocompletion: true, 
+					showPrintMargin: false, 
+					maxLines: Infinity,
+					fontSize: '100%'
+				});
+				$scope.editor = editor;
+//				editor.setTheme('resources/libs/ace/theme/chrome');
+//				editor.session.setMode('resources/libs/ace/mode/javascript');
+				editor.setValue(ctrl.value.code || '');
+				editor.on("change", function(){
+					ctrl.setCode(editor.getValue());
+				});
+			};
+			
+
+			var ctrl = this;
+			$wbLibs.load('resources/libs/ace.js')
+			.then(function(){
+				ctrl.setEditor(ace.edit($element.find('div#am-wb-resources-script-editor')[0]));
+			})
+		},
+		controllerAs: 'ctrl',
+		tags : [ 'code', 'script']
+	});
 });
 
 /* 
@@ -10818,335 +11214,38 @@ angular.module('am-wb-core')
     });
 });
 
-/**
- * plugin.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
-
-/*global tinymce:true */
 angular.module('am-wb-core')
 
-/**
+/*
  * Load default resources
  */
-.run(function($resource) {
-	'use strict';
-
-
-
-	var Cell = function (initial) {
-		var value = initial;
-		var get = function () {
-			return value;
-		};
-		var set = function (v) {
-			value = v;
-		};
-		var clone = function () {
-			return Cell(get());
-		};
-		return {
-			get: get,
-			set: set,
-			clone: clone
-		};
-	};
-
-	var global = tinymce.util.Tools.resolve('tinymce.PluginManager');
-
-	var global$1 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
-
-	var getContentCss = function (editor) {
-		return editor.settings.codesample_content_css;
-	};
-	var getLanguages = function (editor) {
-		return editor.settings.codesample_languages;
-	};
-	var getDialogMinWidth = function (editor) {
-		return Math.min(global$1.DOM.getViewPort().w, editor.getParam('codesample_dialog_width', 800));
-	};
-	var getDialogMinHeight = function (editor) {
-		return Math.min(global$1.DOM.getViewPort().w, editor.getParam('codesample_dialog_height', 650));
-	};
-	var $_g667hraajm0o6auo = {
-			getContentCss: getContentCss,
-			getLanguages: getLanguages,
-			getDialogMinWidth: getDialogMinWidth,
-			getDialogMinHeight: getDialogMinHeight
-	};
-
-	function isCodeSample(elm) {
-		return elm && elm.nodeName === 'PRE' && elm.className.indexOf('language-') !== -1;
-	}
-	function trimArg(predicateFn) {
-		return function (arg1, arg2) {
-			return predicateFn(arg2);
-		};
-	}
-	var $_dcxw1rafjm0o6avx = {
-			isCodeSample: isCodeSample,
-			trimArg: trimArg
-	};
-
-	var getSelectedCodeSample = function (editor) {
-		var node = editor.selection.getNode();
-		if ($_dcxw1rafjm0o6avx.isCodeSample(node)) {
-			return node;
-		}
-		return null;
-	};
-	var insertCodeSample = function (editor, language, code) {
-		editor.undoManager.transact(function () {
-			var node = getSelectedCodeSample(editor);
-			code = global$1.DOM.encode(code);
-			if (node) {
-				editor.dom.setAttrib(node, 'class', 'language-' + language);
-				node.innerHTML = code;
-				Prism.highlightElement(node);
-				editor.selection.select(node);
-			} else {
-				editor.insertContent('<pre id="__new" class="language-' + language + '">' + code + '</pre>');
-				editor.selection.select(editor.$('#__new').removeAttr('id')[0]);
-			}
-		});
-	};
-	var getCurrentCode = function (editor) {
-		var node = getSelectedCodeSample(editor);
-		if (node) {
-			return node.textContent;
-		}
-		return '';
-	};
-	var $_9sg2iacjm0o6auq = {
-			getSelectedCodeSample: getSelectedCodeSample,
-			insertCodeSample: insertCodeSample,
-			getCurrentCode: getCurrentCode
-	};
-
-	var getLanguages$1 = function (editor) {
-		var defaultLanguages = [
-			{
-				text: 'HTML/XML',
-				value: 'markup'
-			},
-			{
-				text: 'JavaScript',
-				value: 'javascript'
-			},
-			{
-				text: 'CSS',
-				value: 'css'
-			},
-			{
-				text: 'PHP',
-				value: 'php'
-			},
-			{
-				text: 'Ruby',
-				value: 'ruby'
-			},
-			{
-				text: 'Python',
-				value: 'python'
-			},
-			{
-				text: 'Java',
-				value: 'java'
-			},
-			{
-				text: 'C',
-				value: 'c'
-			},
-			{
-				text: 'C#',
-				value: 'csharp'
-			},
-			{
-				text: 'C++',
-				value: 'cpp'
-			}
-			];
-		var customLanguages = $_g667hraajm0o6auo.getLanguages(editor);
-		return customLanguages ? customLanguages : defaultLanguages;
-	};
-	var getCurrentLanguage = function (editor) {
-		var matches;
-		var node = $_9sg2iacjm0o6auq.getSelectedCodeSample(editor);
-		if (node) {
-			matches = node.className.match(/language-(\w+)/);
-			return matches ? matches[1] : '';
-		}
-		return '';
-	};
-	var $_760p5vagjm0o6avz = {
-			getLanguages: getLanguages$1,
-			getCurrentLanguage: getCurrentLanguage
-	};
-
-	var $_4c9coja9jm0o6aum = {
-			open: function (editor) {
-				$resource.get('script', {})
-				.then(function(script){
-					$_9sg2iacjm0o6auq.insertCodeSample(editor, script.language, script.code);
-				});
-			}
-	};
-
-	var register = function (editor) {
-		editor.addCommand('codesample', function () {
-			var node = editor.selection.getNode();
-			if (editor.selection.isCollapsed() || $_dcxw1rafjm0o6avx.isCodeSample(node)) {
-				$_4c9coja9jm0o6aum.open(editor);
-			} else {
-				editor.formatter.toggle('code');
-			}
-		});
-	};
-	var $_8fhnxga8jm0o6aul = { register: register };
-
-	var setup = function (editor) {
-		var $ = editor.$;
-		editor.on('PreProcess', function (e) {
-			$('pre[contenteditable=false]', e.node).filter($_dcxw1rafjm0o6avx.trimArg($_dcxw1rafjm0o6avx.isCodeSample)).each(function (idx, elm) {
-				var $elm = $(elm), code = elm.textContent;
-				$elm.attr('class', $.trim($elm.attr('class')));
-				$elm.removeAttr('contentEditable');
-				$elm.empty().append($('<code></code>').each(function () {
-					this.textContent = code;
-				}));
-			});
-		});
-		editor.on('SetContent', function () {
-			var unprocessedCodeSamples = $('pre').filter($_dcxw1rafjm0o6avx.trimArg($_dcxw1rafjm0o6avx.isCodeSample)).filter(function (idx, elm) {
-				return elm.contentEditable !== 'false';
-			});
-			if (unprocessedCodeSamples.length) {
-				editor.undoManager.transact(function () {
-					unprocessedCodeSamples.each(function (idx, elm) {
-						$(elm).find('br').each(function (idx, elm) {
-							elm.parentNode.replaceChild(editor.getDoc().createTextNode('\n'), elm);
-						});
-						elm.contentEditable = false;
-						elm.innerHTML = editor.dom.encode(elm.textContent);
-						Prism.highlightElement(elm);
-						elm.className = $.trim(elm.className);
-					});
-				});
-			}
-		});
-	};
-	var $_4bpd7rahjm0o6aw0 = { setup: setup };
-
-	var loadCss = function (editor, pluginUrl, addedInlineCss, addedCss) {
-		var linkElm;
-		var contentCss = $_g667hraajm0o6auo.getContentCss(editor);
-		if (editor.inline && addedInlineCss.get()) {
-			return;
-		}
-		if (!editor.inline && addedCss.get()) {
-			return;
-		}
-		if (editor.inline) {
-			addedInlineCss.set(true);
-		} else {
-			addedCss.set(true);
-		}
-//		if (contentCss !== false) {
-//			linkElm = editor.dom.create('link', {
-//				rel: 'stylesheet',
-//				href: contentCss ? contentCss : pluginUrl + '/css/prism.css'
-//			});
-//			editor.getDoc().getElementsByTagName('head')[0].appendChild(linkElm);
-//		}
-	};
-	var $_b85lfuaijm0o6aw2 = { loadCss: loadCss };
-
-	var register$1 = function (editor) {
-		editor.addButton('codesample', {
-			cmd: 'codesample',
-			title: 'Insert/Edit code sample'
-		});
-		editor.addMenuItem('codesample', {
-			cmd: 'codesample',
-			text: 'Code sample',
-			icon: 'codesample'
-		});
-	};
-	var $_fuxw3sajjm0o6aw4 = { register: register$1 };
-
-	var addedInlineCss = Cell(false);
-	global.add('codesample', function (editor, pluginUrl) {
-		var addedCss = Cell(false);
-		$_4bpd7rahjm0o6aw0.setup(editor);
-		$_fuxw3sajjm0o6aw4.register(editor);
-		$_8fhnxga8jm0o6aul.register(editor);
-		editor.on('init', function () {
-			$_b85lfuaijm0o6aw2.loadCss(editor, pluginUrl, addedInlineCss, addedCss);
-		});
-		editor.on('dblclick', function (ev) {
-			if ($_dcxw1rafjm0o6avx.isCodeSample(ev.target)) {
-				$_4c9coja9jm0o6aum.open(editor);
-			}
-		});
-	});
-});
-
-/**
- * plugin.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/*global tinymce:true */
-'use strict';
-angular.module('am-wb-core')
-
-/**
- * Load default resources
- */
-.run(function($resource) {
-
-	function imageTool(editor) {
-
-		function insertImage(url){
-			editor.insertContent('<img src="' + url + '" >');
-		}
-
-		function showDialog(){
-			$resource.get('image')//
-			.then(function(value){
-				insertImage(value);
-			});
-		}
-
-		editor.addButton('image', {
-			icon: 'image',
-			tooltip: 'Insert/edit image',
-			onclick: showDialog,
-			stateSelector: 'img:not([data-mce-object],[data-mce-placeholder]),figure.image'
-		});
-
-		editor.addMenuItem('image', {
-			icon: 'image',
-			text: 'Image',
-			onclick: showDialog,
-			context: 'insert',
-			prependToContext: true
-		});
-
-		editor.addCommand('mceImage', showDialog);
-	}
-
-	tinymce.PluginManager.add('image', imageTool);
+.run(function($resource, TinymcePluginImageTool, TinymcePluginCodesample) {
+	var pluginManager = tinymce.PluginManager;
+	pluginManager.add('codesample', TinymcePluginCodesample);
+	pluginManager.add('image', TinymcePluginImageTool);
 });
 
 /* 
@@ -11967,14 +12066,20 @@ angular.module('am-wb-core')
 			});
 		}
 
-		/**
+		/*
 		 * Sets value to the real var
-		 * 
 		 */
-		function setValue(value){
+		this.setValue = function(value){
 			$scope.value = value;
 		}
 
+		/*
+		 * Gets current value
+		 */
+		this.getValue = function(){
+			return $scope.value;
+		};
+		
 		/**
 		 * encapsulate template srce with panel widget template.
 		 * 
@@ -12056,10 +12161,14 @@ angular.module('am-wb-core')
 		$scope.hide = hide;
 		$scope.cancel = cancel;
 		$scope.answer = answer;
-		$scope.setValue = setValue;
 
 		if(pages.length){
 			loadPage(pages[0]);
+		}
+		
+		var ctrl = this;
+		$scope.setValue = function(value){
+			return ctrl.setValue(value);
 		}
 	}
 
@@ -13518,7 +13627,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/resources/wb-event-code-editor.html',
-    "<div layout-fill> <md-toolbar layout=row> <span flex></span> <md-button>{{value.language}}</md-button> </md-toolbar> <md-content> <div id=am-wb-resources-script-editor> </div> </md-content> </div>"
+    "<div layout=column layout-fill> <md-toolbar> <div class=md-toolbar-tools layout=row> <span flex></span> <md-select ng-model=value.language ng-change=ctrl.setLanguage(value.language) class=md-no-underline> <md-option ng-repeat=\"l in value.languages track by $index\" ng-value=l.value> {{l.text}} </md-option> </md-select> </div> </md-toolbar> <md-content flex> <div style=\"min-height: 100%; min-width: 100%\" index=0 id=am-wb-resources-script-editor> </div> </md-content> </div>"
   );
 
 
