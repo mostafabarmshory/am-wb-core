@@ -10611,7 +10611,7 @@ angular.module('am-wb-core')
                 this.property = this.getProperty('property');
                 this.description = this.getProperty('description');
                 this.keywords = this.getProperty('keywords');
-                this.cover = this.getProperty('cover');
+                // NOTE: cover is removed from weburger
             };
         }
     });
@@ -13681,7 +13681,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-seo.html',
-    " <md-input-container> <label translate=\"\">Id</label> <input ng-model=ctrl.id ng-change=\"ctrl.setProperty('id', ctrl.id)\"> </md-input-container> <md-input-container> <label translate=\"\">Label</label> <input ng-model=ctrl.label ng-change=\"ctrl.setProperty('label', ctrl.label)\"> </md-input-container> <md-input-container> <label translate=\"\">Type</label> <input ng-model=ctrl.category ng-change=\"ctrl.setProperty('category', ctrl.category)\"> </md-input-container> <md-input-container> <label translate=\"\">Property</label> <input ng-model=ctrl.property ng-change=\"ctrl.setProperty('property', ctrl.property)\"> </md-input-container> <md-input-container> <label translate=\"\">Description</label> <input ng-model=ctrl.description ng-change=\"ctrl.setProperty('description', ctrl.description)\"> </md-input-container> <md-input-container> <label translate=\"\">Keywords</label> <input ng-model=ctrl.keywords ng-change=\"ctrl.setProperty('keywords', ctrl.keywords)\"> </md-input-container> <wb-ui-setting-image ng-if=ctrl.isRoot() title=Cover wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.cover ng-change=\"ctrl.setProperty('cover', ctrl.cover)\"> </wb-ui-setting-image>"
+    " <md-input-container> <label translate=\"\">Id</label> <input ng-model=ctrl.id ng-change=\"ctrl.setProperty('id', ctrl.id)\"> </md-input-container> <md-input-container> <label translate=\"\">Label</label> <input ng-model=ctrl.label ng-change=\"ctrl.setProperty('label', ctrl.label)\"> </md-input-container> <md-input-container> <label translate=\"\">Type</label> <input ng-model=ctrl.category ng-change=\"ctrl.setProperty('category', ctrl.category)\"> </md-input-container> <md-input-container> <label translate=\"\">Property</label> <input ng-model=ctrl.property ng-change=\"ctrl.setProperty('property', ctrl.property)\"> </md-input-container> <md-input-container> <label translate=\"\">Description</label> <input ng-model=ctrl.description ng-change=\"ctrl.setProperty('description', ctrl.description)\"> </md-input-container> <md-input-container> <label translate=\"\">Keywords</label> <input ng-model=ctrl.keywords ng-change=\"ctrl.setProperty('keywords', ctrl.keywords)\"> </md-input-container> "
   );
 
 
