@@ -76,14 +76,20 @@ angular.module('am-wb-core')
 			});
 		}
 
-		/**
+		/*
 		 * Sets value to the real var
-		 * 
 		 */
-		function setValue(value){
+		this.setValue = function(value){
 			$scope.value = value;
 		}
 
+		/*
+		 * Gets current value
+		 */
+		this.getValue = function(){
+			return $scope.value;
+		};
+		
 		/**
 		 * encapsulate template srce with panel widget template.
 		 * 
@@ -165,10 +171,14 @@ angular.module('am-wb-core')
 		$scope.hide = hide;
 		$scope.cancel = cancel;
 		$scope.answer = answer;
-		$scope.setValue = setValue;
 
 		if(pages.length){
 			loadPage(pages[0]);
+		}
+		
+		var ctrl = this;
+		$scope.setValue = function(value){
+			return ctrl.setValue(value);
 		}
 	}
 
