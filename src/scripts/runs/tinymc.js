@@ -26,8 +26,9 @@ angular.module('am-wb-core')
 /*
  * Load default resources
  */
-.run(function($resource, TinymcePluginImageTool, TinymcePluginCodesample) {
+.run(function($resource, TinymcePluginImageTool, TinymcePluginCodesample, TinymcePluginLink) {
 	var pluginManager = tinymce.PluginManager;
 	pluginManager.add('codesample', TinymcePluginCodesample);
 	pluginManager.add('image', TinymcePluginImageTool);
+	pluginManager.add('link', TinymcePluginLink);
 });
