@@ -19,7 +19,6 @@
         <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
         <!-- bower:css -->
         <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
-        <link rel="stylesheet" href="bower_components/angular-material-icons/angular-material-icons.css" />
         <link rel="stylesheet" href="bower_components/pikaday/css/pikaday.css" />
         <link rel="stylesheet" href="bower_components/handsontable/dist/handsontable.css" />
         <link rel="stylesheet" href="bower_components/angular-material-expansion-panel/dist/md-expansion-panel.css" />
@@ -65,12 +64,22 @@
                 <md-button
                     class="wb-group-button left"
                     ng-click="editable = !editable">
-                    <wb-icon>edit</wb-icon>
+                    <wb-icon wb-icon-name="{{action.icon || 'edit'}}"></wb-icon>
                 </md-button>
                 <md-button
                     ng-repeat="action in actions"
                     ng-click="runAction(action)">
-                    <wb-icon>{{action.icon}}</wb-icon>
+                    <wb-icon icon="{{action.icon}}"></wb-icon>
+                </md-button>
+                <md-button
+                    ng-repeat="action in actions"
+                    ng-click="runAction(action)">
+                    <wb-icon size="48">{{action.icon}}</wb-icon>
+                </md-button>
+                <md-button
+                    ng-repeat="action in actions"
+                    ng-click="runAction(action)">
+                    <wb-icon size="48" style="fill: red;">{{action.icon}}</wb-icon>
                 </md-button>
             </section>
 	        <md-content
@@ -98,7 +107,6 @@
         <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
         <script src="bower_components/angular-material/angular-material.js"></script>
         <script src="bower_components/angular-translate/angular-translate.js"></script>
-        <script src="bower_components/angular-material-icons/angular-material-icons.min.js"></script>
         <script src="bower_components/weakmap-polyfill/weakmap-polyfill.js"></script>
         <script src="bower_components/moment/moment.js"></script>
         <script src="bower_components/numbro/numbro.js"></script>
@@ -115,6 +123,7 @@
         <script src="bower_components/tinymce/tinymce.js"></script>
         <script src="bower_components/object-path/index.js"></script>
         <script src="bower_components/flux/dist/Flux.js"></script>
+        <script src="bower_components/mustache.js/mustache.js"></script>
         <script src="bower_components/angular-mocks/angular-mocks.js"></script>
         <script src="bower_components/json-formatter/dist/json-formatter.js"></script>
         <!-- endbower -->
@@ -162,16 +171,19 @@
         <script src="scripts/directives/wb-widgets-explorer.js"></script>
         <script src="scripts/directives/wb-widgets-list.js"></script>
         <script src="scripts/directives/wb-widgets-module.js"></script>
+        <script src="scripts/factories/tinymce-plugin-codesample.js"></script>
+        <script src="scripts/factories/tinymce-plugin-imagetool.js"></script>
+        <script src="scripts/factories/tinymce-plugin-link.js"></script>
         <script src="scripts/factories/widget-locator-abstract.js"></script>
         <script src="scripts/factories/widget-locator-bound.js"></script>
         <script src="scripts/factories/widget-locator-manager.js"></script>
         <script src="scripts/factories/widget-locator-selection.js"></script>
         <script src="scripts/filters/wb-md5.js"></script>
         <script src="scripts/filters/wb-unsafe.js"></script>
+        <script src="scripts/providers/icon-servic.js"></script>
         <script src="scripts/runs/resources.js"></script>
         <script src="scripts/runs/settings.js"></script>
-        <script src="scripts/runs/tinymc-codesample.js"></script>
-        <script src="scripts/runs/tinymc-image.js"></script>
+        <script src="scripts/runs/tinymc.js"></script>
         <script src="scripts/runs/widgets.js"></script>
         <script src="scripts/services/crypto.js"></script>
         <script src="scripts/services/dispatcher.js"></script>

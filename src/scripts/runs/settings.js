@@ -271,7 +271,7 @@ angular.module('am-wb-core')
                 this.property = this.getProperty('property');
                 this.description = this.getProperty('description');
                 this.keywords = this.getProperty('keywords');
-                this.cover = this.getProperty('cover');
+                // NOTE: cover is removed from weburger
             };
         }
     });

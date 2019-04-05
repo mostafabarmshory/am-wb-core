@@ -68,53 +68,70 @@ angular.module('am-wb-core')
 		controllerAs: 'ctrl',
 		tags : [ 'data' ]
 	});
-	
 
-    $resource.newPage({
-        type : 'script',
-        icon : 'script',
-        label : 'Script',
-        templateUrl : 'views/resources/wb-event-code-editor.html',
-        /*
-         * @ngInject
-         */
-        controller : function($scope, $wbLibs, $element) {
-        	var ctrl = this;
-        	this.value = $scope.value || {
-            	code: '',
-            	language: 'javascript'
-            };
-//            $scope.$watch(function(){
-//            	return ctrl.value;
-//            }, function(value) {
-//                $scope.$parent.setValue(value);
-//            }, true);
-            this.setCode = function(code) {
-            	this.value.code = code;
-                $scope.$parent.setValue(this.value);
-            };
-            
 
-            $wbLibs.load('resources/libs/ace.js')
-            .then(function(){
-            	var editor = ace.edit($element.find('div')[0]);
-            	editor.setOptions({
-            	   enableBasicAutocompletion: true, 
-            	   enableLiveAutocompletion: true, 
-            	   showPrintMargin: false, 
-            	   maxLines: Infinity,
-            	   fontSize: '100%'
-            	});
-            	$scope.editor = editor;
-//            	editor.setTheme('resources/libs/ace/theme/chrome');
-//            	editor.session.setMode('resources/libs/ace/mode/javascript');
-            	editor.setValue(ctrl.value.code || '');
-            	editor.on("change", function(){
-            		ctrl.setCode(editor.getValue());
-            	});
-            })
-        },
-        controllerAs: 'ctrl',
-        tags : [ 'code', 'script']
-    });
+	$resource.newPage({
+		type : 'script',
+		icon : 'script',
+		label : 'Script',
+		templateUrl : 'views/resources/wb-event-code-editor.html',
+		/*
+		 * @ngInject
+		 */
+		controller : function($scope, $wbLibs, $element) {
+			var ctrl = this;
+			this.value = $scope.value || {
+				code: '',
+				language: 'javascript',
+				languages: [{
+					text: 'HTML/XML',
+					value: 'markup'
+				},
+				{
+					text: 'JavaScript',
+					value: 'javascript'
+				},
+				{
+					text: 'CSS',
+					value: 'css'
+				}]
+			};
+			this.setCode = function(code) {
+				this.value.code = code;
+				$scope.$parent.setValue(this.value);
+			};
+			
+			this.setLanguage = function(language){
+				this.value.code = language;
+				$scope.$parent.setValue(this.value);
+			};
+			
+			this.setEditor = function(editor) {
+				this.editor = editor;
+				editor.setOptions({
+					enableBasicAutocompletion: true, 
+					enableLiveAutocompletion: true, 
+					showPrintMargin: false, 
+					maxLines: Infinity,
+					fontSize: '100%'
+				});
+				$scope.editor = editor;
+//				editor.setTheme('resources/libs/ace/theme/chrome');
+//				editor.session.setMode('resources/libs/ace/mode/javascript');
+				editor.setValue(ctrl.value.code || '');
+				editor.on("change", function(){
+					ctrl.setCode(editor.getValue());
+				});
+			};
+			
+
+			var ctrl = this;
+			$wbLibs.load('resources/libs/ace.js')
+			.then(function(){
+				ctrl.setEditor(ace.edit($element.find('div#am-wb-resources-script-editor')[0]));
+			})
+		},
+		controllerAs: 'ctrl',
+		tags : [ 'code', 'script']
+	});
 });
