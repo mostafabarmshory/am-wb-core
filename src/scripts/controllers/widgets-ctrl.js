@@ -492,7 +492,7 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
 		try{
-			eventFunction(event, this, this.$http, this.$mdMedia, this.$window);
+			return eventFunction(event, this, this.$http, this.$mdMedia, this.$window);
 		} catch(ex){
 			console.log('Fail to run event code');
 			console.log({
