@@ -41,15 +41,47 @@ angular.module('am-wb-core')
         // Load ngModel
         var ngModelCtrl = $ctrls[0];
         var widget = null;
-        var keys = [ 'init', 'click', 'dblclick', 'mouseout',
-            'mouseover', 'mousedown', 'mouseup',
-            'mouseenter', 'mouseleave', 'resize',
-            'intersection' ];
-        var titles = [ 'Initialization', 'Click',
-            'Double click', 'Mouse out', 'Mouse over',
-            'Mouse down', 'Mouse up', 'Mouse enter',
-            'Mouse leave', 'Resize', 'Intersection' ];
-
+        var eventTypes = [{
+        	key: 'init',
+        	title: 'Initialization'
+        },{
+        	key: 'click',
+        	title: 'Click'
+        },{
+        	key: 'dblclick',
+        	title: 'Double click'
+        },{
+        	key: 'mouseout',
+        	title: 'Mouse out'
+        },{
+        	key: 'mouseover',
+        	title: 'Mouse over'
+        },{
+        	key: 'mousedown',
+        	title: 'Mouse down'
+        },{
+        	key: 'mouseup',
+        	title: 'Mouse up'
+        },{
+        	key: 'mouseenter',
+        	title: 'Mouse enter'
+        },{
+        	key: 'mouseleave',
+        	title: 'Mouse leave'
+        },{
+        	key: 'resize',
+        	title: 'Resize'
+        },{
+        	key: 'intersection',
+        	title: 'Intersection'
+        },{
+        	key: 'success',
+        	title: 'Success'
+        },{
+        	key: 'failure',
+        	title: 'Failure'
+        }];
+        
         ngModelCtrl.$render = function () {
             if (ngModelCtrl.$viewValue) {
                 widget = ngModelCtrl.$viewValue;
@@ -69,12 +101,9 @@ angular.module('am-wb-core')
 
         function loadEvents() {
             cleanEvents();
-            for (var i = 0; i < keys.length; i++) {
-                var event = {};
-                event.key = keys[i];
-                event.title = titles[i];
-                event.code = widget.getModelProperty('event.'
-                        + event.key);
+            for (var i = 0; i < eventTypes.length; i++) {
+                var event = eventTypes[i];
+                event.code = widget.getModelProperty('event.' + event.key);
                 $scope.events.push(event);
             }
         }
