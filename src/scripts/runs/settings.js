@@ -751,11 +751,14 @@ angular.module('am-wb-core')
              * watch 'wbModel' and apply the changes in setting panel
              */
             this.init = function () {
-                this.shadows = this.getProperty('style.shadows');
+                var shadows = this.getProperty('style.shadows');
+                // this is an object we have to make a clone.
+                this.shadows = _.cloneDeep(shadows);
             };
 
             this.updateShadows = function(){
                 this.setProperty('style.shadows', this.shadows);
+                this.init();
             };
 
             this.remove = function (index) {

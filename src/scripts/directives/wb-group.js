@@ -128,6 +128,7 @@ angular.module('am-wb-core')
 			wbAllowedTypes : '<?'
 		},
 		link : wbGroupLink,
-		require : 'ngModel'
+		require : 'ngModel',
+		replace: true
 	};
 });
