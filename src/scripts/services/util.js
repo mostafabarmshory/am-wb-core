@@ -377,8 +377,7 @@ angular.module('am-wb-core')
 			flexLayout.order = layout.order >= 0 ? layout.order : 0;
 			flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
 			flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
-			// TODO: maso, 2018: compute based on size
-			flexLayout['flex-basis'] = 'auto';
+			flexLayout['flex-basis'] = layout.basis || 'auto';
 
 			// align-self
 			// auto | flex-start | flex-end | center | baseline | stretch;
