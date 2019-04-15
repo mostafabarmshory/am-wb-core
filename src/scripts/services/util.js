@@ -91,7 +91,7 @@ angular.module('am-wb-core')
 
 		css = _.merge(css, 
 				// size
-				style.size || {},
+				convertToWidgetCssSize(style.size || {}),
 				// background
 				convertToWidgetCssBackground(style.background || {}),
 				// border
@@ -405,6 +405,21 @@ angular.module('am-wb-core')
 		}
 
 		return flexLayout;
+	}
+	
+	/*
+	 * Convert size object to valid CSS size
+	 */
+	function convertToWidgetCssSize(size) {
+	    return {
+	        'width': size.width || 'auto',
+	        'min-width': size.minWidth || '0',
+	        'max-width': size.maxWidth || 'none',
+	        
+	        'height': size.height || 'auto',
+	        'min-height': size.minHeight || '0',
+	        'max-height': size.maxHeight || 'none',
+	    };
 	}
 
 	function cleanEvetns(model)

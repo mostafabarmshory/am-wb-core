@@ -46,4 +46,123 @@ describe('Service $wbUtil', function () {
         var css = $wbUtil.convertToWidgetCss(style);
         expect(css['flex-basis']).toBe(style.layout.basis);
     });
+
+
+    // -------------------------------
+    // width
+    // -------------------------------
+    it('should support size.width for style', function () {
+        var style = {
+                size: {
+                    width: '10px'
+                }
+        };
+
+        var css = $wbUtil.convertToWidgetCss(style);
+        expect(css['width']).toBe(style.size.width);
+    });
+    it('should support default value of size.width for style', function () {
+        var style = {};
+        var css = $wbUtil.convertToWidgetCss(style);
+        expect(css['width']).toBe('auto');
+    });
+
+    // -------------------------------
+    // minWidth
+    // -------------------------------
+    it('should support size.minWidth for style', function () {
+        var style = {
+                size: {
+                    minWidth: '134px'
+                }
+        };
+        var css = $wbUtil.convertToWidgetCss(style);
+        expect(css['min-width']).toBe(style.size.minWidth);
+    });
+    it('should support default value of size.minWidth for style', function () {
+        var style = {};
+        var css = $wbUtil.convertToWidgetCss(style);
+        expect(css['min-width']).toBe('0');
+    });
+
+    // -------------------------------
+    // maxWidth
+    // -------------------------------
+    it('should support size.maxWidth for style', function () {
+        var style = {
+                size: {
+                    maxWidth: '134px'
+                }
+        };
+        var css = $wbUtil.convertToWidgetCss(style);
+        expect(css['max-width']).toBe(style.size.maxWidth);
+    });
+    it('should support default value of size.maxWidth for style', function () {
+        var style = {};
+        var css = $wbUtil.convertToWidgetCss(style);
+        expect(css['max-width']).toBe('none');
+    });
+
+
+
+
+
+
+
+
+
+    // -------------------------------
+    // height
+    // -------------------------------
+    it('should support size.height for style', function () {
+        var style = {
+                size: {
+                    height: '10px'
+                }
+        };
+
+        var css = $wbUtil.convertToWidgetCss(style);
+        expect(css['height']).toBe(style.size.height);
+    });
+    it('should support default value of size.height for style', function () {
+        var style = {};
+        var css = $wbUtil.convertToWidgetCss(style);
+        expect(css['height']).toBe('auto');
+    });
+
+    // -------------------------------
+    // minHeight
+    // -------------------------------
+    it('should support size.minHeight for style', function () {
+        var style = {
+                size: {
+                    minHeight: '134px'
+                }
+        };
+        var css = $wbUtil.convertToWidgetCss(style);
+        expect(css['min-height']).toBe(style.size.minHeight);
+    });
+    it('should support default value of size.minHeight for style', function () {
+        var style = {};
+        var css = $wbUtil.convertToWidgetCss(style);
+        expect(css['min-height']).toBe('0');
+    });
+
+    // -------------------------------
+    // maxWidth
+    // -------------------------------
+    it('should support size.maxHeight for style', function () {
+        var style = {
+                size: {
+                    maxHeight: '134px'
+                }
+        };
+        var css = $wbUtil.convertToWidgetCss(style);
+        expect(css['max-height']).toBe(style.size.maxHeight);
+    });
+    it('should support default value of size.maxHeight for style', function () {
+        var style = {};
+        var css = $wbUtil.convertToWidgetCss(style);
+        expect(css['max-height']).toBe('none');
+    });
 });
