@@ -51,15 +51,21 @@ angular.module('am-wb-core')
 		 * @returns
 		 */
 		function loadSetting(wbWidget) {
-			// load pages
-			var widget = $widget.getWidget(wbWidget.getModel());
-			var settingKeys = $settings.getSettingsFor(widget);
 
 			// hide all settings
 			var i;
 			for(i = 0; i < $scope.settings.length; i++){
 				$scope.settings[i].visible = false;
 			}
+			
+			if(!wbWidget || (angular.isArray(wbWidget) && wbWidget.length < 1)){
+			    $scope.wbModel = null;
+			    return;
+			}
+
+			// load pages
+			var widget = $widget.getWidget(wbWidget.getModel());
+			var settingKeys = $settings.getSettingsFor(widget);
 
 			// visible new ones
 			for(i = 0; i < settingKeys.length; i++){
