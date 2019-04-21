@@ -28,6 +28,7 @@ describe('WbWidgetCtrl ', function () {
 	var $rootScope;
 	var $widget;
 	var $httpBackend;
+	var widgetType = 'TestWidget-' + Math.random();
 
 	function MockRootWidget() {
 		// TODO;
@@ -38,21 +39,35 @@ describe('WbWidgetCtrl ', function () {
 		return this.scope;
 	}
 
-
-
 	// load the service's module
 	beforeEach(module('am-wb-core'));
 	beforeEach(inject(function (_$rootScope_, _$widget_, _$httpBackend_) {
 		$rootScope = _$rootScope_;
 		$widget = _$widget_;
 		$httpBackend = _$httpBackend_;
+		/*
+		 * Register a test widget
+		 */
+		$widget.newWidget({
+		    type: widgetType,
+		    controller: function(){
+		        this.testFunction = function(){
+		            return true;
+		        };
+		        this.initWidget = function() {
+		            // TODO;
+		        };
+		    },
+		    controllerAs: 'ctrl',
+		    template: '<h1>{{ctrl.text}}</h1>'
+		})
 	}));
 
 	it('should support add and remove callback on events', function (done) {
 		var root = new MockRootWidget();
 		// Create new instance
 		$widget.compile({
-			type: 'HtmlText',
+			type: widgetType,
 			id: 'test',
 			name: 'Widget',
 			text: '<h2>HTML Text In 4th group0</h2>',
@@ -77,14 +92,50 @@ describe('WbWidgetCtrl ', function () {
 			
 			done();
 		});
-		$httpBackend//
-			.when('GET', 'views/widgets/wb-html.html')//
-			.respond(200, "<div></div>");
-		try{
-		    $httpBackend.flush();
-		} catch (e) {
-            // TODO: handle exception
-        }
 		$rootScope.$apply();
 	});
+	
+
+    it('should update css and element if any part of style.size changed', function (done) {
+        var root = new MockRootWidget();
+        // Create new instance
+        $widget.compile({
+            type: widgetType,
+            id: 'test',
+            name: 'Widget',
+            text: '<h2>HTML Text In 4th group0</h2>',
+        }, root)
+        .then(function(widget){
+            expect(widget).not.toBe(null);
+            expect(widget.getId()).toBe('test');
+            
+            var randomValue = Math.floor(Math.random() * 1000) + 'px';
+            widget.setProperty('style.size.width', randomValue);
+            expect(widget.getElement().css('width')).toBe(randomValue);
+            
+            randomValue = Math.floor(Math.random() * 1000) + 'px';
+            widget.setProperty('style.size.minWidth', randomValue);
+            expect(widget.getElement().css('min-width')).toBe(randomValue);
+            
+            randomValue = Math.floor(Math.random() * 1000) + 'px';
+            widget.setProperty('style.size.maxWidth', randomValue);
+            expect(widget.getElement().css('max-width')).toBe(randomValue);
+            
+            
+            var randomValue = Math.floor(Math.random() * 1000) + 'px';
+            widget.setProperty('style.size.height', randomValue);
+            expect(widget.getElement().css('height')).toBe(randomValue);
+            
+            randomValue = Math.floor(Math.random() * 1000) + 'px';
+            widget.setProperty('style.size.minHeight', randomValue);
+            expect(widget.getElement().css('min-height')).toBe(randomValue);
+            
+            randomValue = Math.floor(Math.random() * 1000) + 'px';
+            widget.setProperty('style.size.maxHeight', randomValue);
+            expect(widget.getElement().css('max-height')).toBe(randomValue);
+            
+            done();
+        });
+        $rootScope.$apply();
+    });
 });

@@ -591,11 +591,13 @@ angular.module('am-wb-core')
             this.init = function () {
                 this.alignSelf = this.getStyleLayout('align_self') || 'auto';
                 this.order = this.getStyleLayout('order') || 0;
+                // SEE: https://www.w3schools.com/cssreF/css3_pr_flex-basis.asp
+                this.basis = this.getStyleLayout('basis') || 'auto';
                 this.grow = this.getStyleLayout('grow') || 0;
                 this.shrink = this.getStyleLayout('shrink') || 1;
             };
 
-            /**
+            /*
              * Fetchs parent direction
              */
             this.getParentDirection = function(){
@@ -614,6 +616,9 @@ angular.module('am-wb-core')
             };
             this.updateOrder = function(order){
             	this.setStyleLayout('order', order);
+            };
+            this.updateBasis = function(basis){
+                this.setStyleLayout('basis', basis);
             };
             this.updateGrow = function(grow){
             	this.setStyleLayout('grow', grow);

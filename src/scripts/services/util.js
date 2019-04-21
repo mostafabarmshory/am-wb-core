@@ -91,7 +91,7 @@ angular.module('am-wb-core')
 
 		css = _.merge(css, 
 				// size
-				style.size || {},
+				convertToWidgetCssSize(style.size || {}),
 				// background
 				convertToWidgetCssBackground(style.background || {}),
 				// border
@@ -377,8 +377,7 @@ angular.module('am-wb-core')
 			flexLayout.order = layout.order >= 0 ? layout.order : 0;
 			flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
 			flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
-			// TODO: maso, 2018: compute based on size
-			flexLayout['flex-basis'] = 'auto';
+			flexLayout['flex-basis'] = layout.basis || 'auto';
 
 			// align-self
 			// auto | flex-start | flex-end | center | baseline | stretch;
@@ -406,6 +405,21 @@ angular.module('am-wb-core')
 		}
 
 		return flexLayout;
+	}
+	
+	/*
+	 * Convert size object to valid CSS size
+	 */
+	function convertToWidgetCssSize(size) {
+	    return {
+	        'width': size.width || 'auto',
+	        'min-width': size.minWidth || '0',
+	        'max-width': size.maxWidth || 'none',
+	        
+	        'height': size.height || 'auto',
+	        'min-height': size.minHeight || '0',
+	        'max-height': size.maxHeight || 'none',
+	    };
 	}
 
 	function cleanEvetns(model)
