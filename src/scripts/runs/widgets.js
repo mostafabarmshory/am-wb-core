@@ -47,7 +47,15 @@ angular.module('am-wb-core')
         groups: ['basic'],
         model: {
             style: {
-                margin: '1px'
+                margin: '1px',
+                padding: '1px',
+                layout: {
+                    direction: 'column'
+                },
+                size: {
+                    minHeight: '16px',
+                    minWidth: '16px'
+                }
             }
         },
         // functional properties
