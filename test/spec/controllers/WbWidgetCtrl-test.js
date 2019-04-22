@@ -32,7 +32,7 @@ describe('WbWidgetCtrl ', function () {
 
 	function MockRootWidget() {
 		// TODO;
-		this.scope = $rootScope.$new()
+		this.scope = $rootScope.$new();
 	};
 
 	MockRootWidget.prototype.getScope = function(){
@@ -60,7 +60,7 @@ describe('WbWidgetCtrl ', function () {
 		    },
 		    controllerAs: 'ctrl',
 		    template: '<h1>{{ctrl.text}}</h1>'
-		})
+		});
 	}));
 
 	it('should support add and remove callback on events', function (done) {
