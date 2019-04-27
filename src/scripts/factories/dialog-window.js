@@ -38,6 +38,8 @@ angular.module('am-wb-core')
     
     /**
      * Gets parent of the window
+     * 
+     * @memberof WbDialogWindow
      */
     wbWindow.prototype.getParent = function(){
         return this.parent;
@@ -46,23 +48,56 @@ angular.module('am-wb-core')
     /**
      * Sets title of the window
      * 
-     * @memberof wbWindow
+     * @memberof WbDialogWindow
      * @params title {string} the window title
      */
     wbWindow.prototype.setTitle = function(title){
-        $document.title = title;
+        this.title = title;
+        if(this.isVisible()){
+            // TODO: maso, 2019: set title of the current dialog
+        }
     };
 
     /**
      * Sets title of the window
      * 
-     * @memberof wbWindow
+     * @memberof WbDialogWindow
      * @return {string} the window title
      */
     wbWindow.prototype.getTitle = function(){
-        return $document.title;
+        return this.title;
     };
 
+
+    /**
+     * Sets language of the window
+     * 
+     * @memberof WbDialogWindow
+     * @params language {string} the window language
+     */
+    wbWindow.prototype.setLanguage = function(language){
+        this.language = language;
+        if(this.isVisible()){
+            // TODO: maso, 2019: set title of the current dialog
+        }
+    };
+
+    /**
+     * Sets title of the window
+     * 
+     * @memberof WbDialogWindow
+     * @return {string} the window language
+     */
+    wbWindow.prototype.getLanguage = function(){
+        return this.language;
+    };
+
+    
+    
+    // Utils
+    wbWindow.prototype.isVisible = function(){
+        return false;
+    };
 
     return wbWindow;
 });

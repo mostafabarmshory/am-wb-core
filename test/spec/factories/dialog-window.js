@@ -44,15 +44,23 @@ describe('Service $wbWindow', function () {
         var window = new WbDialogWindow();
         expect(window.getParent()).toBe($wbWindow);
     });
-    
-    it('should set title of the page', function () {
+
+    it(' must set title of the page', function () {
         // create default window
         var window = new WbDialogWindow();
-        
+
         var title = 'new title:' + Math.random();
         window.setTitle(title);
         expect(window.getTitle()).toBe(title);
-        expect($document.title).toBe(title);
+    });
+
+    it(' must set language of the window', function () {
+        // create default window
+        var window = new WbDialogWindow();
+
+        var language = 'lang' + Math.random();
+        window.setLanguage(language);
+        expect(window.getLanguage()).toBe(language);
     });
 
 });
