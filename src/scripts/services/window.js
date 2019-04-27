@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')
 /**
@@ -30,11 +29,58 @@ angular.module('am-wb-core')
  * @description The main window manager
  * 
  */
-.service('$wbWindow', function($window, $document, $rootElement) {
-
+.service('$wbWindow', function($window, $document, $rootElement, $injector) {
+    'use strict';
+    
+    
+    /********************************************************************
+     * Utilitiey
+     ********************************************************************/
     var headElement = $rootElement.find('head');
     var bodyElement = $rootElement.find('body');
+    var WbDialogWindow;
 
+    
+    /*
+     * Open a float based on options
+     */
+    function openFloatPanel(window, options) {
+        if(!WbDialogWindow){
+            WbDialogWindow = $injector.get('WbDialogWindow');
+        }
+        
+        var window = new WbDialogWindow(window);
+        window.setTitle(options.name);
+        window.setLanguage(options.language);
+        if(options.position){
+            window.setPosition(options.position.x, options.position.y);
+        }
+        window.setCloseOnEscape(options.closeOnEscape);
+        window.setVisible(true);
+        return window;
+    }
+    
+    /*
+     * Convert to window option
+     */
+    function convertToWindowOption(options) {
+        return '';
+    }
+    
+    /*
+     * Open window based on options
+     */
+    function openWindow(window, options) {
+        return $window.open(
+                options.url, 
+                options.name, 
+                convertToWindowOption(options), 
+                option.replace);
+    }
+
+    /********************************************************************
+     * 
+     ********************************************************************/
     /**
      * Gets parent of the window
      */
@@ -55,7 +101,7 @@ angular.module('am-wb-core')
     /**
      * Sets title of the window
      * 
-     * @memberof wbWindow
+     * @memberof $wbWindow
      * @return {string} the window title
      */
     this.getTitle = function(){
@@ -79,5 +125,32 @@ angular.module('am-wb-core')
     this.getLanguage = function(){
         return bodyElement.attr('lang');
     };
-
+    
+    
+    /**
+     * 
+     * The open() method opens a new browser window, or a new tab, depending 
+     * on your browser settings.
+     * 
+     * Tip: Use the close() method to close the window.
+     * 
+     * @memberof $wbWindow
+     * @return window object
+     */
+    this.open = function(url, name, options, replace){
+        // check options
+        options = options || {
+            internal: false
+        };
+        options.url = url;
+        options.name = name;
+        options.replace = replace;
+        //open
+        if(options.internal){
+            return openFloatPanel(this, options);
+        }
+        return openWindow(this, options);
+    };
+    
+    
 });

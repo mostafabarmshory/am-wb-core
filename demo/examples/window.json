@@ -1,0 +1,19 @@
+{
+    "type": "Group",
+    "name": "Main page",
+    "label": "To test the init event",
+    "description": "On the event a message will be show",
+    "style": {
+        "size": {
+            "width": "100%",
+            "minHeight": "512px"
+        },
+        "background": {
+            "color": "#123456"
+        }
+    },
+    "event": {
+        "click": " var offset = $widget.getElement().offset();$window.open('', 'titl', { internal: true, closeOnEscape: true, position:{x: $event.pageX, y: $event.pageY}}, false);"
+    },
+    "contents": []
+}

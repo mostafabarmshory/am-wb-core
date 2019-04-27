@@ -167,11 +167,16 @@ angular.module('am-wb-core')
 
 		var panel = jsPanel.create({
 			theme: 'primary',
-			headerTitle : optionsOrPreset.title || 'my panel #1',
+			
+			closeOnEscape:  optionsOrPreset.closeOnEscape,
+			
+			header : optionsOrPreset.header,
+			headerTitle : optionsOrPreset.headerTitle || 'my panel #1',
+			headerControls: optionsOrPreset.headerControls || 'all',
+			
 			position : optionsOrPreset.position || 'center-top 0 58',
 			panelSize : optionsOrPreset.panelSize || '400 400',
 			contentSize : optionsOrPreset.contentSize || '450 250',
-			headerControls: optionsOrPreset.headerControls || 'all',
 			content : '<div style="border-top: 1px solid;width: 100%;height: 250px;padding: 0px;pointer-events: inherit;"></div>',
 			callback : function() {
 				var parentElement = angular.element(this.content);
@@ -212,16 +217,16 @@ angular.module('am-wb-core')
 		});
 
 		var rootElement = angular.element(panel);
-		panel.setVisible = function(flag){
+		rootElement.setVisible = function(flag){
 			this._isVisible = flag;
-			rootElement.css('visibility', this._isVisible ? 'visible' : 'hidden');
+			this.css('visibility', this._isVisible ? 'visible' : 'hidden');
 		};
 
-		panel.isVisible = function(){
+		rootElement.isVisible = function(){
 			return this._isVisible;
 		};
 
-		return panel;
+		return rootElement;
 	};
 
 

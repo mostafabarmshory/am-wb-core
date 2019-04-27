@@ -58,5 +58,25 @@ describe('Service $wbWindow', function () {
         // Not works in test mode
 //        expect($wbWindow.getLanguage()).toBe(language);
     });
+    
+    it(' must open internal window', function () {
+        // create default window
+        var window = $wbWindow.open('', 'name', {
+            internal: true,
+        }, false);
+        expect(angular.isDefined(window)).toBe(true);
+        
+        // window is common window manager
+        expect(angular.isFunction(window.setTitle)).toBe(true);
+        expect(angular.isFunction(window.getTitle)).toBe(true);
+        
+        expect(angular.isFunction(window.setLanguage)).toBe(true);
+        expect(angular.isFunction(window.getLanguage)).toBe(true);
+        
+        expect(angular.isFunction(window.open)).toBe(true);
+//        expect(angular.isFunction(window.close)).toBe(true);
+        expect(angular.isFunction(window.setVisible)).toBe(true);
+        expect(angular.isFunction(window.isVisible)).toBe(true);
+    });
 
 });

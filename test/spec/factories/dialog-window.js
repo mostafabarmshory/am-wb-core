@@ -62,5 +62,27 @@ describe('Service $wbWindow', function () {
         window.setLanguage(language);
         expect(window.getLanguage()).toBe(language);
     });
+    
+    it(' must set visible and hidden', function () {
+        // create default window
+        var window = new WbDialogWindow();
+        
+        window.setVisible(true);
+        expect(window.isVisible()).toBe(true);
+        
+        window.setVisible(false);
+        expect(window.isVisible()).toBe(false);
+    });
+    
+    it(' must set visible and hidden (vice versa)', function () {
+        // create default window
+        var window = new WbDialogWindow();
+        
+        window.setVisible(false);
+        expect(window.isVisible()).toBe(false);
+
+        window.setVisible(true);
+        expect(window.isVisible()).toBe(true);
+    });
 
 });

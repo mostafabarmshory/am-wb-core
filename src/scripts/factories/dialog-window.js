@@ -21,11 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')
-.factory('WbDialogWindow', function($wbWindow, $document) {
-    
+.factory('WbDialogWindow', function($wbWindow, $document, $wbFloat) {
+    'use strict';
+
+
+    // Utils
+    function covertToFloadConfig(dialogWindow) {
+        var options = {
+                closeOnEscape: dialogWindow.closeOnEscape,
+                header: true,
+                headerTitle: dialogWindow.title,
+                headerLogo: '',
+                headerControls: {
+//                    close: 'remove',
+//                    maximize: 'remove',
+//                    normalize: 'remove',
+//                    minimize: 'remove',
+//                    smallify: 'remove',
+//                    smallifyrev: 'remove',
+                }
+        };
+
+        if(angular.isDefined(dialogWindow.x)){
+            options.position = {
+                    type: 'fixed',
+                    my: 'left-top',
+                    at: 'left-top',
+                    of: 'body',
+                    container: 'body',
+                    offsetX: dialogWindow.x,
+                    offsetY: dialogWindow.y
+            }
+        }
+
+        return options;
+    }
+
     /**
      * @ngdoc Factory
      * @name WbDialogWindow
@@ -34,8 +67,9 @@ angular.module('am-wb-core')
      */
     var wbWindow = function(parent){
         this.parent = parent || $wbWindow;
+        this.floatDialogElement = null;
     };
-    
+
     /**
      * Gets parent of the window
      * 
@@ -92,12 +126,71 @@ angular.module('am-wb-core')
         return this.language;
     };
 
-    
-    
-    // Utils
+    /**
+     * 
+     * The open() method opens a new browser window, or a new tab, depending 
+     * on your browser settings.
+     * 
+     * Tip: Use the close() method to close the window.
+     * 
+     * @memberof WbDialogWindow
+     * @return window object
+     */
+    wbWindow.prototype.open = function(url, name, options, replace){
+        return $wbWindow.open(url, name, options, replace);
+    }
+
+    /**
+     * Sets visible of the window
+     * 
+     * 
+     * @memberof WbDialogWindow
+     * @params visible {boolean} of the window
+     */
+    wbWindow.prototype.setVisible = function(visible){
+        if(!this.floatDialogElement) {
+            this.floatDialogElement = $wbFloat.create(covertToFloadConfig(this));
+        } else if(this.floatDialogElement.isVisible() === visible) {
+            return;
+        }
+
+        this.floatDialogElement.setVisible(visible);
+    }
+
+    /**
+     * Gets visible of the window
+     * 
+     * 
+     * @memberof WbDialogWindow
+     * @returns true if the window is visible
+     */
     wbWindow.prototype.isVisible = function(){
-        return false;
+        if(! this.floatDialogElement){
+            return false;
+        }
+        return this.floatDialogElement.isVisible();
     };
+
+
+    wbWindow.prototype.setPosition = function(x, y) {
+        this.x = x;
+        this.y = y;
+        if(this.floatDialogElement){
+            // TODO: reload the window position
+        }
+    };
+
+    wbWindow.prototype.setCloseOnEscape = function(closeOnEscape) {
+        this.closeOnEscape = closeOnEscape;
+        if(this.floatDialogElement){
+            // TODO: reload the window close
+        }
+    }
+
+
+//  wbWindow.prototype.setSize = function(w, h) {
+
+//  };
 
     return wbWindow;
 });
