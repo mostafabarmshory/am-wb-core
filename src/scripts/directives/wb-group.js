@@ -38,7 +38,7 @@ angular.module('am-wb-core')
  * NOTE: The root widget will be passed as first selected item. The function
  * will be evaluated in non edit mode.
  */
-.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $parse, $timeout) {
+.directive('wbGroup', function($widget, $parse, $timeout) {
 
 	/*
 	 * Link widget view
@@ -92,10 +92,11 @@ angular.module('am-wb-core')
 			if (rootWidget) {
 				rootWidget.setModel(model);
 			} else {
-				$widget.compile(model).then(function(widget) {
-					$element.append(widget.getElement());
+				$widget.compile(model, null, $element)
+				.then(function(widget) {
 					rootWidget = widget;
-					widget.on('select', fireSelection);
+					// load
+					rootWidget.on('select', fireSelection);
 					fireSelection({
 						widgets : [ widget ]
 					});

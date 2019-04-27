@@ -59,7 +59,7 @@ angular.module('am-wb-core')
             }
         },
         // functional properties
-        templateUrl: 'views/directives/wb-group.html',
+        templateUrl: 'views/widgets/wb-group.html',
         help: 'http://dpq.co.ir/more-information-link',
         helpId: 'wb-widget-group'
     });

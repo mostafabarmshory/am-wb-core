@@ -967,9 +967,25 @@ WbAbstractWidget.prototype.removeAnimation = function () {
 	// The animation will not add to element so there is no need to remove
 };
 
+/**
+ * Sets window of the widget
+ * 
+ * @memberof WbAbstractWidget
+ * @params window {WbWindow} of the current widget
+ */
+WbAbstractWidget.prototype.setWindow = function (window) {
+    this.window = window;
+};
 
-
-
+/**
+ * Gets window of the widget
+ * 
+ * @memberof WbAbstractWidget
+ * @return window of the current widget or from the root
+ */
+WbAbstractWidget.prototype.getWindow = function () {
+    return this.window || this.getRoot().getWindow() || this.$wbWindow;
+};
 
 /*******************************************************************************
  * * * * *
@@ -1009,7 +1025,7 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $window) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $window, $wbWindow) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -1022,6 +1038,7 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$mdMedia = $mdMedia;
 	this.$timeout = $timeout;
 	this.$window = $window;
+    this.$wbWindow = $wbWindow;
 
 	var ctrl = this;
 	this.on('modelChanged', function () {
