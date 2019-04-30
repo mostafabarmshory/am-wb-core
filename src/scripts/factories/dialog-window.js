@@ -35,12 +35,12 @@ angular.module('am-wb-core')
                 headerTitle: dialogWindow.title,
                 headerLogo: '',
                 headerControls: {
-//                    close: 'remove',
-//                    maximize: 'remove',
-//                    normalize: 'remove',
-//                    minimize: 'remove',
-//                    smallify: 'remove',
-//                    smallifyrev: 'remove',
+//                  close: 'remove',
+//                  maximize: 'remove',
+//                  normalize: 'remove',
+//                  minimize: 'remove',
+//                  smallify: 'remove',
+//                  smallifyrev: 'remove',
                 }
         };
 
@@ -171,7 +171,14 @@ angular.module('am-wb-core')
         return this.floatDialogElement.isVisible();
     };
 
-
+    /**
+     * Sets position of the window
+     * 
+     * 
+     * @memberof WbDialogWindow
+     * @params x {string|int} absolute position
+     * @params y {string|int} absolute position
+     */
     wbWindow.prototype.setPosition = function(x, y) {
         this.x = x;
         this.y = y;
@@ -180,6 +187,13 @@ angular.module('am-wb-core')
         }
     };
 
+    /**
+     * Close window on Escape
+     * 
+     * @memberof WbDialogWindow
+     * @params x {string|int} absolute position
+     * @params y {string|int} absolute position
+     */
     wbWindow.prototype.setCloseOnEscape = function(closeOnEscape) {
         this.closeOnEscape = closeOnEscape;
         if(this.floatDialogElement){
@@ -187,10 +201,70 @@ angular.module('am-wb-core')
         }
     }
 
+    /**
+     * Sets size of the window
+     * 
+     * @memberof WbDialogWindow
+     * @params width {string|int} absolute position
+     * @params height {string|int} absolute position
+     */
+    wbWindow.prototype.setSize = function(width, height) {
+        this.width = width;
+        this.height = height;
+        if(this.floatDialogElement){
+            // TODO: reload the window size
+        }
+    };
 
-//  wbWindow.prototype.setSize = function(w, h) {
+    /**
+     * Loads a library
+     * 
+     * @memberof WbDialogWindow
+     * @path path of library
+     * @return promise to load the library
+     */
+    wbWindow.prototype.loadLibrary = function(path){
+        return $wbLibs.load(path);
+    };
 
-//  };
+    /**
+     * Check if the library is loaded
+     * 
+     * @memberof WbDialogWindow
+     * @return true if the library is loaded
+     */
+    wbWindow.prototype.isLibraryLoaded = function(path){
+        return $wbLibs.isLoaded(path);
+    };
+
+
+    /**
+     * Set meta
+     * 
+     * @memberof WbDialogWindow
+     * @params key {string} the key of meta
+     * @params value {string} the value of meta
+     */
+    wbWindow.prototype.setMeta = function (key, value){
+        var parent = this.getParent();
+        if(parent) {
+            parent.setMeta(key, value);
+        }
+    };
+
+    /**
+     * Set link
+     * 
+     * @memberof WbDialogWindow
+     * @params key {string} the key of link
+     * @params data {string} the value of link
+     */
+    wbWindow.prototype.setLink = function (key, data){
+        var parent = this.getParent();
+        if(parent) {
+            parent.setLink(key, data);
+        }
+    };
 
     return wbWindow;
 });

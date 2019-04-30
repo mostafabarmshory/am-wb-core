@@ -23,7 +23,7 @@
  */
 'use strict';
 
-describe('Service $wbWindow', function () {
+describe('Directive WbDialogWindow ', function () {
     var WbDialogWindow;
     var $document;
     var $wbWindow; 
@@ -62,27 +62,80 @@ describe('Service $wbWindow', function () {
         window.setLanguage(language);
         expect(window.getLanguage()).toBe(language);
     });
-    
+
     it(' must set visible and hidden', function () {
         // create default window
         var window = new WbDialogWindow();
-        
+
         window.setVisible(true);
         expect(window.isVisible()).toBe(true);
-        
+
         window.setVisible(false);
         expect(window.isVisible()).toBe(false);
     });
-    
+
     it(' must set visible and hidden (vice versa)', function () {
         // create default window
         var window = new WbDialogWindow();
-        
+
         window.setVisible(false);
         expect(window.isVisible()).toBe(false);
 
         window.setVisible(true);
         expect(window.isVisible()).toBe(true);
+    });
+
+    it('must set meta', function () {
+        // create default window
+        var window = new WbDialogWindow();
+
+        var key = 'keym';
+        var value = 'value:' + Math.random();
+
+        window.setMeta(key, value);
+        window.setMeta(key, value);
+
+        // open with $window
+        window = $wbWindow.open('','Title', {
+            internal: true
+        }, false);
+        window.setMeta(key, value);
+        window.setMeta(key, value);
+
+        // open with $window
+        window = $wbWindow.open('','Title', {
+            internal: false
+        }, false);
+        window.setMeta(key, value);
+        window.setMeta(key, value);
+
+    });
+    
+    it('must set link', function () {
+        // create default window
+        var window = new WbDialogWindow();
+        
+        var key = 'keym';
+        var data = {
+                value: 'value'
+         }
+        
+        window.setLink(key, data);
+        window.setLink(key, data);
+        
+        // open with $window
+        window = $wbWindow.open('','Title', {
+            internal: true
+        }, false);
+        window.setLink(key, data);
+        window.setLink(key, data);
+        
+        // open with $window
+        window = $wbWindow.open('','Title', {
+            internal: false
+        }, false);
+        window.setLink(key, data);
+        window.setLink(key, data);
     });
 
 });

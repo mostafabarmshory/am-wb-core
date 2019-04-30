@@ -23,20 +23,22 @@
  */
 'use strict';
 
-describe('Service $wbWindow', function () {
+describe('Service $wbWindow ', function () {
     var $wbWindow;
     var $document;
     var $window;
+    var $rootScope;
 
 
     // load the service's module
     beforeEach(module('am-wb-core'));
 
     // instantiate service
-    beforeEach(inject(function (_$wbWindow_, _$window_, _$document_) {
+    beforeEach(inject(function (_$wbWindow_, _$window_, _$document_, _$rootScope_) {
         $wbWindow = _$wbWindow_;
         $document = _$document_;
         $window = _$window_;
+        $rootScope = _$rootScope_;
     }));
 
     it(' parent is the $window parent', function () {
@@ -48,7 +50,7 @@ describe('Service $wbWindow', function () {
         var title = 'new title:' + Math.random();
         $wbWindow.setTitle(title);
         expect($wbWindow.getTitle()).toBe(title);
-        expect($document.title).toBe(title);
+        expect($window.document.title).toBe(title);
     });
 
     it(' must be able to change language of the page', function () {
@@ -77,6 +79,38 @@ describe('Service $wbWindow', function () {
 //        expect(angular.isFunction(window.close)).toBe(true);
         expect(angular.isFunction(window.setVisible)).toBe(true);
         expect(angular.isFunction(window.isVisible)).toBe(true);
+        
+        expect(angular.isFunction(window.loadLibrary)).toBe(true);
+        expect(angular.isFunction(window.isLibraryLoaded)).toBe(true);
+    });
+    
+    it('must load library', function(done){
+        var path = 'path/to/library';
+        $wbWindow.loadLibrary(path)
+        .then(function(){
+            done();
+        }, function(){
+            done();
+        });
+        $rootScope.$digest();
+    });
+    
+    it('must set meat', function(){
+        var key = 'key';
+        var value = 'value:' + Math.random();
+        
+        $wbWindow.setMeta(key, value);
+        $wbWindow.setMeta(key, value);
+    });
+    
+    it('must set link', function(){
+        var key = 'key';
+        var data = {
+               value: 'value'
+        }
+        
+        $wbWindow.setLink(key, data);
+        $wbWindow.setLink(key, data);
     });
 
 });

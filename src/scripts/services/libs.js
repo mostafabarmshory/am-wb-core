@@ -30,39 +30,11 @@ angular.module('am-wb-core')
  * @name $$wbCrypto
  * @description Crypto services
  * 
- * 
+ * Deprecated : use $wbWindow
  */
-.service('$wbLibs', function($q) {
-	this.libs = {};
-	
+.service('$wbLibs', function($wbWindow) {
 	this.load = function(path){
-		if(this.libs[path]){
-			return $q.resolve({
-				message: 'isload'
-			});
-		}
-		var defer = $q.defer();
-		
-		var script = document.createElement('script');
-		script.src = path;
-		script.async=1;
-		var ctrl = this;
-		script.onload = function(){
-			ctrl.libs[path] = true;
-			defer.resolve({
-				path: path,
-				message: 'loaded'
-			});
-		};
-		script.onerror = function() {
-			ctrl.libs[path] = false;
-			defer.reject({
-				path: path,
-				message: 'fail'
-			});
-		};
-		document.getElementsByTagName('head')[0].appendChild(script);
-		return defer.promise;
+		return $wbWindow.loadLibrary(path);
 	}
     return this;
 });

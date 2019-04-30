@@ -5390,7 +5390,7 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
 		try{
-			return eventFunction(event, this, this.$http, this.$mdMedia, this.$window);
+			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow);
 		} catch(ex){
 			console.log('Fail to run event code');
 			console.log({
@@ -5865,9 +5865,25 @@ WbAbstractWidget.prototype.removeAnimation = function () {
 	// The animation will not add to element so there is no need to remove
 };
 
+/**
+ * Sets window of the widget
+ * 
+ * @memberof WbAbstractWidget
+ * @params window {WbWindow} of the current widget
+ */
+WbAbstractWidget.prototype.setWindow = function (window) {
+    this.window = window;
+};
 
-
-
+/**
+ * Gets window of the widget
+ * 
+ * @memberof WbAbstractWidget
+ * @return window of the current widget or from the root
+ */
+WbAbstractWidget.prototype.getWindow = function () {
+    return this.window || this.getRoot().getWindow() || this.$wbWindow;
+};
 
 /*******************************************************************************
  * * * * *
@@ -5880,7 +5896,7 @@ WbAbstractWidget.prototype.removeAnimation = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout, $window) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout, $wbWindow) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -5889,7 +5905,7 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia
 	this.$widget = $widget;
 	this.$mdMedia = $mdMedia;
 	this.$timeout = $timeout;
-	this.$window = $window;
+	this.$wbWindow = $wbWindow;
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
@@ -5907,7 +5923,7 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $window) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $wbWindow) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -5919,7 +5935,7 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$http = $http;
 	this.$mdMedia = $mdMedia;
 	this.$timeout = $timeout;
-	this.$window = $window;
+    this.$wbWindow = $wbWindow;
 
 	var ctrl = this;
 	this.on('modelChanged', function () {
@@ -6452,7 +6468,7 @@ angular.module('am-wb-core')
  * NOTE: The root widget will be passed as first selected item. The function
  * will be evaluated in non edit mode.
  */
-.directive('wbGroup', function($compile, $widget, $wbUtil, $controller, $settings, $parse, $timeout) {
+.directive('wbGroup', function($widget, $parse, $timeout) {
 
 	/*
 	 * Link widget view
@@ -6506,10 +6522,11 @@ angular.module('am-wb-core')
 			if (rootWidget) {
 				rootWidget.setModel(model);
 			} else {
-				$widget.compile(model).then(function(widget) {
-					$element.append(widget.getElement());
+				$widget.compile(model, null, $element)
+				.then(function(widget) {
 					rootWidget = widget;
-					widget.on('select', fireSelection);
+					// load
+					rootWidget.on('select', fireSelection);
 					fireSelection({
 						widgets : [ widget ]
 					});
@@ -8798,6 +8815,573 @@ angular.module('am-wb-core')
 		}
 	};
 });
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')
+.factory('WbDialogWindow', function($wbWindow, $document, $wbFloat) {
+    'use strict';
+
+
+    // Utils
+    function covertToFloadConfig(dialogWindow) {
+        var options = {
+                closeOnEscape: dialogWindow.closeOnEscape,
+                header: true,
+                headerTitle: dialogWindow.title,
+                headerLogo: '',
+                headerControls: {
+//                  close: 'remove',
+//                  maximize: 'remove',
+//                  normalize: 'remove',
+//                  minimize: 'remove',
+//                  smallify: 'remove',
+//                  smallifyrev: 'remove',
+                }
+        };
+
+        if(angular.isDefined(dialogWindow.x)){
+            options.position = {
+                    type: 'fixed',
+                    my: 'left-top',
+                    at: 'left-top',
+                    of: 'body',
+                    container: 'body',
+                    offsetX: dialogWindow.x,
+                    offsetY: dialogWindow.y
+            }
+        }
+
+        return options;
+    }
+
+    /**
+     * @ngdoc Factory
+     * @name WbDialogWindow
+     * @description WbDialogWindow a dialog manager
+     * 
+     */
+    var wbWindow = function(parent){
+        this.parent = parent || $wbWindow;
+        this.floatDialogElement = null;
+    };
+
+    /**
+     * Gets parent of the window
+     * 
+     * @memberof WbDialogWindow
+     */
+    wbWindow.prototype.getParent = function(){
+        return this.parent;
+    }
+
+    /**
+     * Sets title of the window
+     * 
+     * @memberof WbDialogWindow
+     * @params title {string} the window title
+     */
+    wbWindow.prototype.setTitle = function(title){
+        this.title = title;
+        if(this.isVisible()){
+            // TODO: maso, 2019: set title of the current dialog
+        }
+    };
+
+    /**
+     * Sets title of the window
+     * 
+     * @memberof WbDialogWindow
+     * @return {string} the window title
+     */
+    wbWindow.prototype.getTitle = function(){
+        return this.title;
+    };
+
+
+    /**
+     * Sets language of the window
+     * 
+     * @memberof WbDialogWindow
+     * @params language {string} the window language
+     */
+    wbWindow.prototype.setLanguage = function(language){
+        this.language = language;
+        if(this.isVisible()){
+            // TODO: maso, 2019: set title of the current dialog
+        }
+    };
+
+    /**
+     * Sets title of the window
+     * 
+     * @memberof WbDialogWindow
+     * @return {string} the window language
+     */
+    wbWindow.prototype.getLanguage = function(){
+        return this.language;
+    };
+
+    /**
+     * 
+     * The open() method opens a new browser window, or a new tab, depending 
+     * on your browser settings.
+     * 
+     * Tip: Use the close() method to close the window.
+     * 
+     * @memberof WbDialogWindow
+     * @return window object
+     */
+    wbWindow.prototype.open = function(url, name, options, replace){
+        return $wbWindow.open(url, name, options, replace);
+    }
+
+    /**
+     * Sets visible of the window
+     * 
+     * 
+     * @memberof WbDialogWindow
+     * @params visible {boolean} of the window
+     */
+    wbWindow.prototype.setVisible = function(visible){
+        if(!this.floatDialogElement) {
+            this.floatDialogElement = $wbFloat.create(covertToFloadConfig(this));
+        } else if(this.floatDialogElement.isVisible() === visible) {
+            return;
+        }
+
+        this.floatDialogElement.setVisible(visible);
+    }
+
+    /**
+     * Gets visible of the window
+     * 
+     * 
+     * @memberof WbDialogWindow
+     * @returns true if the window is visible
+     */
+    wbWindow.prototype.isVisible = function(){
+        if(! this.floatDialogElement){
+            return false;
+        }
+        return this.floatDialogElement.isVisible();
+    };
+
+    /**
+     * Sets position of the window
+     * 
+     * 
+     * @memberof WbDialogWindow
+     * @params x {string|int} absolute position
+     * @params y {string|int} absolute position
+     */
+    wbWindow.prototype.setPosition = function(x, y) {
+        this.x = x;
+        this.y = y;
+        if(this.floatDialogElement){
+            // TODO: reload the window position
+        }
+    };
+
+    /**
+     * Close window on Escape
+     * 
+     * @memberof WbDialogWindow
+     * @params x {string|int} absolute position
+     * @params y {string|int} absolute position
+     */
+    wbWindow.prototype.setCloseOnEscape = function(closeOnEscape) {
+        this.closeOnEscape = closeOnEscape;
+        if(this.floatDialogElement){
+            // TODO: reload the window close
+        }
+    }
+
+    /**
+     * Sets size of the window
+     * 
+     * @memberof WbDialogWindow
+     * @params width {string|int} absolute position
+     * @params height {string|int} absolute position
+     */
+    wbWindow.prototype.setSize = function(width, height) {
+        this.width = width;
+        this.height = height;
+        if(this.floatDialogElement){
+            // TODO: reload the window size
+        }
+    };
+
+    /**
+     * Loads a library
+     * 
+     * @memberof WbDialogWindow
+     * @path path of library
+     * @return promise to load the library
+     */
+    wbWindow.prototype.loadLibrary = function(path){
+        return $wbLibs.load(path);
+    };
+
+    /**
+     * Check if the library is loaded
+     * 
+     * @memberof WbDialogWindow
+     * @return true if the library is loaded
+     */
+    wbWindow.prototype.isLibraryLoaded = function(path){
+        return $wbLibs.isLoaded(path);
+    };
+
+
+    /**
+     * Set meta
+     * 
+     * @memberof WbDialogWindow
+     * @params key {string} the key of meta
+     * @params value {string} the value of meta
+     */
+    wbWindow.prototype.setMeta = function (key, value){
+        var parent = this.getParent();
+        if(parent) {
+            parent.setMeta(key, value);
+        }
+    };
+
+    /**
+     * Set link
+     * 
+     * @memberof WbDialogWindow
+     * @params key {string} the key of link
+     * @params data {string} the value of link
+     */
+    wbWindow.prototype.setLink = function (key, data){
+        var parent = this.getParent();
+        if(parent) {
+            parent.setLink(key, data);
+        }
+    };
+
+    return wbWindow;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')
+.factory('NativeWindowWrapper', function($q, $injector, $window, $wbFloat, $rootScope) {
+    'use strict';
+
+    /**
+     * @ngdoc Factory
+     * @name WbDialogWindow
+     * @description WbDialogWindow a dialog manager
+     * 
+     */
+    var nativeWindowWrapper = function(nativeWindow){
+        this.nw = nativeWindow;
+        this.location = nativeWindow.location;
+        this.libs = {};
+    };
+
+
+    /********************************************************************
+     * Utilitiey
+     ********************************************************************/
+    var WbDialogWindow;
+
+
+    /*
+     * Open a float based on options
+     */
+    function openFloatPanel(window, options) {
+        if(!WbDialogWindow){
+            WbDialogWindow = $injector.get('WbDialogWindow');
+        }
+
+        var window = new WbDialogWindow(window);
+        window.setTitle(options.name);
+        window.setLanguage(options.language);
+        if(options.position){
+            window.setPosition(options.position.x, options.position.y);
+        }
+        window.setCloseOnEscape(options.closeOnEscape);
+        window.setVisible(true);
+        return window;
+    }
+
+    /*
+     * Convert to window option
+     */
+    function convertToWindowOption(options) {
+        return '';
+    }
+
+    /*
+     * Open window based on options
+     */
+    function openWindow(window, options) {
+        var windowNative = window.open(
+                options.url, 
+                options.name, 
+                convertToWindowOption(options), 
+                options.replace);
+        return new nativeWindowWrapper(windowNative);
+    }
+
+    /********************************************************************
+     * 
+     ********************************************************************/
+    /**
+     * Gets parent of the window
+     * 
+     * @memberof
+     * @return parent
+     */
+    nativeWindowWrapper.prototype.getParent = function(){
+        return this.nw.parent;
+    }
+
+    nativeWindowWrapper.prototype.getDocument = function(){
+        return this.nw.document;
+    }
+
+    nativeWindowWrapper.prototype.getHeadElement = function(){
+        if(this._he) {
+            return this._he;
+        }
+        var document = this.getDocument();
+        this._he = angular.element(document.getElementsByTagName('head')[0]);
+        return this._he;
+    };
+
+    nativeWindowWrapper.prototype.getBodyElement = function(){
+        if(this._be) {
+            return this._be;
+        }
+        var document = this.getDocument();
+        this._be = angular.element(document.getElementsByTagName('body')[0]);
+        return this._be;
+    };
+
+    nativeWindowWrapper.prototype.getLocation = function(){
+        return this.nw.location;
+    };
+    
+    /**
+     * Sets title of the window
+     * 
+     * @memberof wbWindow
+     * @params title {string} the window title
+     */
+    nativeWindowWrapper.prototype.setTitle = function(title){
+        var document = this.getDocument();
+        document.title = title;
+    };
+
+    /**
+     * Sets title of the window
+     * 
+     * @memberof $wbWindow
+     * @return {string} the window title
+     */
+    nativeWindowWrapper.prototype.getTitle = function(){
+        var document = this.getDocument();
+        return document.title;
+    };
+
+
+    /**
+     * Sets language of the window
+     * 
+     */
+    nativeWindowWrapper.prototype.setLanguage = function(language){
+        var bodyElement = this.getBodyElement();
+        bodyElement.attr('lang', language);
+    };
+
+    /**
+     * Gets language of the window
+     * 
+     */
+    nativeWindowWrapper.prototype.getLanguage = function(){
+        var bodyElement = this.getBodyElement();
+        return bodyElement.attr('lang');
+    };
+
+
+    /**
+     * 
+     * The open() method opens a new browser window, or a new tab, depending 
+     * on your browser settings.
+     * 
+     * Tip: Use the close() method to close the window.
+     * 
+     * @memberof $wbWindow
+     * @return window object
+     */
+    nativeWindowWrapper.prototype.open = function(url, name, options, replace){
+        // check options
+        options = options || {
+            internal: false
+        };
+        options.url = url;
+        options.name = name;
+        options.replace = replace;
+        //open
+        if(options.internal){
+            return openFloatPanel(this, options);
+        }
+        return openWindow(this.nw, options);
+    };
+
+
+    /**
+     * Loads a library
+     * 
+     * @memberof $wbWindow
+     * @path path of library
+     * @return promise to load the library
+     */
+    nativeWindowWrapper.prototype.loadLibrary = function(path){
+        if(this.libs[path]){
+            return $q.resolve({
+                message: 'isload'
+            });
+        }
+        var defer = $q.defer();
+
+        var document = this.getDocument();
+        var script = document.createElement('script');
+        script.src = path;
+        script.async=1;
+        var ctrl = this;
+        script.onload = function(){
+            ctrl.libs[path] = true;
+            defer.resolve({
+                path: path,
+                message: 'loaded'
+            });
+            $rootScope.$digest();
+        };
+        script.onerror = function() {
+            ctrl.libs[path] = false;
+            defer.reject({
+                path: path,
+                message: 'fail'
+            });
+            $rootScope.$digest();
+        };
+        document.getElementsByTagName('head')[0].appendChild(script);
+        return defer.promise;
+    };
+
+    /**
+     * Check if the library is loaded
+     * 
+     * @memberof $wbWindow
+     * @return true if the library is loaded
+     */
+    nativeWindowWrapper.prototype.isLibraryLoaded = function(path){
+        if(this.libs[path]){
+            return true;
+        }
+        return false;
+    };
+
+
+    /**
+     * Set meta
+     * 
+     * @memberof $wbWindow
+     * @params key {string} the key of meta
+     * @params value {string} the value of meta
+     */
+    nativeWindowWrapper.prototype.setMeta = function (key, value){
+        var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
+        var headElement = this.getHeadElement();
+        var elements = headElement.find('meta[name='+searchkey+']');
+        var metaElement;
+        if(elements.length === 0){
+            // title element not found
+            metaElement = angular.element('<meta name=\''+key+'\' content=\'\' />');
+            headElement.append(metaElement);
+        } else {
+            metaElement = angular.element(elements[0]);
+        }
+        metaElement.attr('content', value);
+    };
+
+    /**
+     * Set link
+     * 
+     * @memberof $wbWindow
+     * @params key {string} the key of meta
+     * @params data {string} the value of meta
+     */
+    nativeWindowWrapper.prototype.setLink = function(key, data){
+        var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
+        var headElement = this.getHeadElement();
+        var elements = headElement.find('link[key='+searchkey+']');
+        var metaElement;
+        if(elements.length === 0){
+            // title element not found
+            metaElement = angular.element('<link key=\''+key+'\' />');
+            headElement.append(metaElement);
+        } else {
+            metaElement = angular.element(elements[0]);
+        }
+        for (var property in data) {
+            metaElement.attr(property, data[property]);
+        }
+    };
+
+
+    return nativeWindowWrapper;
+});
+
 /* 
  * The MIT License (MIT)
  * 
@@ -12154,7 +12738,7 @@ angular.module('am-wb-core')
             }
         },
         // functional properties
-        templateUrl: 'views/directives/wb-group.html',
+        templateUrl: 'views/widgets/wb-group.html',
         help: 'http://dpq.co.ir/more-information-link',
         helpId: 'wb-widget-group'
     });
@@ -12711,11 +13295,16 @@ angular.module('am-wb-core')
 
 		var panel = jsPanel.create({
 			theme: 'primary',
-			headerTitle : optionsOrPreset.title || 'my panel #1',
+			
+			closeOnEscape:  optionsOrPreset.closeOnEscape,
+			
+			header : optionsOrPreset.header,
+			headerTitle : optionsOrPreset.headerTitle || 'my panel #1',
+			headerControls: optionsOrPreset.headerControls || 'all',
+			
 			position : optionsOrPreset.position || 'center-top 0 58',
 			panelSize : optionsOrPreset.panelSize || '400 400',
 			contentSize : optionsOrPreset.contentSize || '450 250',
-			headerControls: optionsOrPreset.headerControls || 'all',
 			content : '<div style="border-top: 1px solid;width: 100%;height: 250px;padding: 0px;pointer-events: inherit;"></div>',
 			callback : function() {
 				var parentElement = angular.element(this.content);
@@ -12756,16 +13345,16 @@ angular.module('am-wb-core')
 		});
 
 		var rootElement = angular.element(panel);
-		panel.setVisible = function(flag){
+		rootElement.setVisible = function(flag){
 			this._isVisible = flag;
-			rootElement.css('visibility', this._isVisible ? 'visible' : 'hidden');
+			this.css('visibility', this._isVisible ? 'visible' : 'hidden');
 		};
 
-		panel.isVisible = function(){
+		rootElement.isVisible = function(){
 			return this._isVisible;
 		};
 
-		return panel;
+		return rootElement;
 	};
 
 
@@ -12804,39 +13393,11 @@ angular.module('am-wb-core')
  * @name $$wbCrypto
  * @description Crypto services
  * 
- * 
+ * Deprecated : use $wbWindow
  */
-.service('$wbLibs', function($q) {
-	this.libs = {};
-	
+.service('$wbLibs', function($wbWindow) {
 	this.load = function(path){
-		if(this.libs[path]){
-			return $q.resolve({
-				message: 'isload'
-			});
-		}
-		var defer = $q.defer();
-		
-		var script = document.createElement('script');
-		script.src = path;
-		script.async=1;
-		var ctrl = this;
-		script.onload = function(){
-			ctrl.libs[path] = true;
-			defer.resolve({
-				path: path,
-				message: 'loaded'
-			});
-		};
-		script.onerror = function() {
-			ctrl.libs[path] = false;
-			defer.reject({
-				path: path,
-				message: 'fail'
-			});
-		};
-		document.getElementsByTagName('head')[0].appendChild(script);
-		return defer.promise;
+		return $wbWindow.loadLibrary(path);
 	}
     return this;
 });
@@ -14160,12 +14721,12 @@ angular.module('am-wb-core')
      *            </ul>
      * @param parentWidget
      *     {WbWidget} the parent
+     * @param preElement {Element} pre build element
      * @return promise A promise that resolve created element
      */
-    function compile(model, parentWidget){
+    function compile(model, parentWidget, preElement){
         var widget = _widget(model);
         var childScope = null;
-        var element = null;
 
         // 1- create scope
         var parentScope;
@@ -14179,31 +14740,38 @@ angular.module('am-wb-core')
 
         // 2- create element
         var service = this;
-        return $wbUtil.getTemplateFor(widget)//
-        .then(function(template) {
-            if (model.type !== 'Group') {
-                template = '<div class="wb-widget" name="{{wbModel.name}}" '+
 
-                'dnd-disable-if="!ctrl.isEditable()" '+
-                'dnd-draggable="wbModel" '+
-                'dnd-type="wbModel.type" '+
-                'dnd-effect-allowed="copyMove" '+
-                'dnd-callback="1" '+
+        var gettingTemplatePromisse;
+        if(preElement){
+            gettingTemplatePromisse = $q.resolve(preElement);
+        } else {
+            gettingTemplatePromisse = $wbUtil.getTemplateFor(widget)
+            .then(function(template) {
+                if (model.type !== 'Group') {
+                    template = '<div class="wb-widget" name="{{wbModel.name}}" '+
 
-                'dnd-moved="ctrl.delete()" '+
+                    'dnd-disable-if="!ctrl.isEditable()" '+
+                    'dnd-draggable="wbModel" '+
+                    'dnd-type="wbModel.type" '+
+                    'dnd-effect-allowed="copyMove" '+
+                    'dnd-callback="1" '+
 
-                'md-theme-watch="true">' + template + '</div>';
-            }
+                    'dnd-moved="ctrl.delete()" '+
 
-            var ctrl;
+                    'md-theme-watch="true">' + template + '</div>';
+                }
 
-            // 3- bind controller
-            element = angular.element(template);
+                // 3- bind controller
+                return angular.element(template);
+            });
+        }
+        return gettingTemplatePromisse.then(function(element){
             var link = $compile(element);
             var wlocals = _.merge({
                 $scope : childScope,
                 $element : element,
             }, service.providers);
+            var ctrl;
             if (model.type !== 'Group') {
                 ctrl = $controller('WbWidgetCtrl', wlocals);
             } else {
@@ -14340,6 +14908,43 @@ angular.module('am-wb-core')
     };
 });
 
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc Services
+ * @name $wbWindow
+ * @description The main window manager
+ * 
+ */
+.service('$wbWindow', function($window, NativeWindowWrapper) {
+    'use strict';
+    var currentWindow = new NativeWindowWrapper($window);
+    return currentWindow;
+});
+
 angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
@@ -14355,11 +14960,6 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/directives/wb-event-panel.html',
     "<table class=mb-table style=\"font-size: 10px\"> <thead> <tr md-colors=\"{color: 'primary-700'}\"> <td translate>Name</td> <td translate>Code</td> <td></td> </tr> </thead> <tbody> <tr ng-repeat=\"event in events track by $index\"> <td>{{event.title}}</td> <td>{{event.code | limitTo:13 }} ...</td> <td> <md-button ng-click=\"ctrl.editEvent(event, $event)\" class=md-icon-button> <wb-icon>edit</wb-icon> </md-button> <md-button ng-if=event.code ng-click=\"ctrl.deleteEvent(event, $event)\" class=md-icon-button> <wb-icon>delete</wb-icon> </md-button> </td> </tr> </tbody> </table>"
-  );
-
-
-  $templateCache.put('views/directives/wb-group.html',
-    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"ctrl.addChild(index, item)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" md-theme-watch=true></div>"
   );
 
 
@@ -14569,6 +15169,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/sheets/wb-themplates.html',
     "<md-bottom-sheet class=\"md-list md-has-header\" md-colors=\"{backgroundColor: 'background-900'}\"> <div style=\"padding: 16px\">  <div layout=row layout-align=\"start center\" style=\"padding: 0px 8px; margin: 0px\"> <span translate>Start a new page</span> <span flex></span> <span translate>Template gallery</span> <md-divider></md-divider> <md-button aria-label=\"Hide template sheet\" class=md-icon-button ng-click=hideTemplates($event)> <wb-icon>keyboard_arrow_down </wb-icon></md-button> <md-menu> <md-button aria-label=\"Open the interactions menu\" class=md-icon-button ng-click=$mdMenu.open($event)> <wb-icon>more_vert </wb-icon></md-button> <md-menu-content width=4 md-colors=\"{backgroundColor: 'background'}\"> <md-menu-item> <md-button ng-click=hideTemplates($event)> <span translate>Hide templates</span> </md-button> </md-menu-item> </md-menu-content> </md-menu> </div>  <md-content layout=row md-colors=\"{backgroundColor: 'background-900'}\"> <div layout=column ng-repeat=\"template in templates\" ng-click=loadTemplate(template) layout-padding style=\"cursor: pointer\"> <img width=215px height=152px ng-src={{template.thumbnail}} style=\"border-bottom-width: 1px; border: solid\"> {{template.name}} </div> </md-content> </div> </md-bottom-sheet>"
+  );
+
+
+  $templateCache.put('views/widgets/wb-group.html',
+    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"ctrl.addChild(index, item)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" md-theme-watch=true></div>"
   );
 
 
