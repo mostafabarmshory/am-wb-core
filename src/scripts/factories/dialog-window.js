@@ -265,6 +265,33 @@ angular.module('am-wb-core')
             parent.setLink(key, data);
         }
     };
+    
+
+    /**
+     * Write the body
+     * 
+     * @memberof WbDialogWindow
+     * @params data {string} the value
+     */
+    wbWindow.prototype.write = function (data){
+    	this.floatDialogElement.getElement()
+    	.then(function(parentElement){
+    		// string
+    		var element = angular.element(data);
+    		parentElement.empty();
+    		parentElement.append(element);
+    	});
+    };
+    
+    /**
+     * Set view the body
+     * 
+     * @memberof WbDialogWindow
+     * @params data {Object} the view
+     */
+    wbWindow.prototype.setView = function (view){
+    	return this.floatDialogElement.setView(view);
+    };
 
     return wbWindow;
 });

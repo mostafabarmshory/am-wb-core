@@ -1,19 +1,43 @@
 {
     "type": "Group",
-    "name": "Main page",
-    "label": "To test the init event",
-    "description": "On the event a message will be show",
-    "style": {
-        "size": {
-            "width": "100%",
-            "minHeight": "512px"
-        },
-        "background": {
-            "color": "#123456"
-        }
-    },
-    "event": {
-        "click": " var offset = $widget.getElement().offset();$window.open('', 'titl', { internal: true, closeOnEscape: true, position:{x: $event.pageX, y: $event.pageY}}, false);"
-    },
-    "contents": []
+    "contents": [{
+    	"type": "HtmlText",
+    	"text": "Click to open a dialog",
+    	"style": {
+    	    "padding": "16px",
+    	    "margin": "16px",
+        	"background": {
+            	"color": "#123456"
+        	}
+    	},
+    	"event": {
+        	"click": " var offset = $widget.getElement().offset();$window.open('', 'titl', { internal: true, closeOnEscape: true, position:{x: $event.pageX, y: $event.pageY}}, false);"
+    	}
+	},{
+    	"type": "HtmlText",
+    	"text": "Click to open ViraWeb123 in dialgo",
+    	"style": {
+    	    "padding": "16px",
+    	    "margin": "16px",
+        	"background": {
+            	"color": "#123456"
+        	}
+    	},
+    	"event": {
+        	"click": " var offset = $widget.getElement().offset();$window.open('http://www.viraweb123.ir', 'titl', { internal: true, closeOnEscape: true, position:{x: $event.pageX, y: $event.pageY}}, false);"
+    	}
+	},{
+    	"type": "HtmlText",
+    	"text": "Click to open google in new tab",
+    	"style": {
+    	    "padding": "16px",
+    	    "margin": "16px",
+        	"background": {
+            	"color": "#123456"
+        	}
+    	},
+    	"event": {
+        	"click": " var offset = $widget.getElement().offset();$window.open('http://www.viraweb123.ir', 'titl', { internal: false, closeOnEscape: true, position:{x: $event.pageX, y: $event.pageY}}, false);"
+    	}
+	}]
 }

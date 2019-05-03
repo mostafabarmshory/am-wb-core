@@ -61,6 +61,23 @@ angular.module('am-wb-core')
         }
         window.setCloseOnEscape(options.closeOnEscape);
         window.setVisible(true);
+        
+        if(angular.isString(options.url)){
+        	// Open URL
+        	window.write('<iframe style="width:100%; height: 100%;" src="'+options.url+'"></iframe>');
+        } else if(angular.isObject(options.url)){
+        	var view = options.url;
+        	if(view.type === 'view'){
+        		window.setView(view);
+        	}
+        } else {
+        	throw {
+        		message: 'Not supported type of URL',
+        		url: options.url
+        	}
+        }
+        
+        
         return window;
     }
 
@@ -75,6 +92,12 @@ angular.module('am-wb-core')
      * Open window based on options
      */
     function openWindow(window, options) {
+    	// check input url
+        if(!angular.isString(options.url)){
+        	throw {
+        		message: 'Impossible to open window with weburger'
+        	};
+        }
         var windowNative = window.open(
                 options.url, 
                 options.name, 
