@@ -9082,6 +9082,33 @@ angular.module('am-wb-core')
             parent.setLink(key, data);
         }
     };
+    
+
+    /**
+     * Write the body
+     * 
+     * @memberof WbDialogWindow
+     * @params data {string} the value
+     */
+    wbWindow.prototype.write = function (data){
+    	this.floatDialogElement.getElement()
+    	.then(function(parentElement){
+    		// string
+    		var element = angular.element(data);
+    		parentElement.empty();
+    		parentElement.append(element);
+    	});
+    };
+    
+    /**
+     * Set view the body
+     * 
+     * @memberof WbDialogWindow
+     * @params data {Object} the view
+     */
+    wbWindow.prototype.setView = function (view){
+    	return this.floatDialogElement.setView(view);
+    };
 
     return wbWindow;
 });
@@ -9149,6 +9176,23 @@ angular.module('am-wb-core')
         }
         window.setCloseOnEscape(options.closeOnEscape);
         window.setVisible(true);
+        
+        if(angular.isString(options.url)){
+        	// Open URL
+        	window.write('<iframe style="width:100%; height: 100%;" src="'+options.url+'"></iframe>');
+        } else if(angular.isObject(options.url)){
+        	var view = options.url;
+        	if(view.type === 'view'){
+        		window.setView(view);
+        	}
+        } else {
+        	throw {
+        		message: 'Not supported type of URL',
+        		url: options.url
+        	}
+        }
+        
+        
         return window;
     }
 
@@ -9163,6 +9207,12 @@ angular.module('am-wb-core')
      * Open window based on options
      */
     function openWindow(window, options) {
+    	// check input url
+        if(!angular.isString(options.url)){
+        	throw {
+        		message: 'Impossible to open window with weburger'
+        	};
+        }
         var windowNative = window.open(
                 options.url, 
                 options.name, 
@@ -13165,58 +13215,23 @@ angular.module('am-wb-core')
 
 	function InternalDialog(optionsOrPreset){
 		this.setUserOptions(optionsOrPreset);
-	}
-
-	InternalDialog.prototype.callback = function() {
-		this.setElement(angular.element(this.content));
 		var dialog = this;
-
-		/*
-		 * Create view
-		 */
-		function createView(template) {
-			var element = angular.element(template);
-			var optionsOrPreset = dialog.getUserOptions(option);
-
-			var parenScope = optionsOrPreset.parent || $rootScope;
-			var childScope = optionsOrPreset.scope || parenScope.$new(false, parenScope);
-
-			// 3- bind controller
-			var link = $compile(element);
-			if (angular.isDefined(optionsOrPreset.controller)) {
-				var controller = $controller(optionsOrPreset.controller, {
-					$scope: childScope,
-					$element: element,
-					$wbFloat: dialog
-				});
-				if (optionsOrPreset.controllerAs) {
-					childScope[optionsOrPreset.controllerAs] = controller;
-				}
-				element.data('$ngControllerController', controller);
+		this.callback = function() {
+			var element = angular.element(this.content);
+			dialog.setElement(element);
+		};
+		this.onclosed = function(){
+			/*
+			 * Remove scope
+			 * 
+			 * NOTE: if there is a $watch, then this return an error
+			 */
+			if(dialog.scope){
+				dialog.scope.$destroy();
+				delete dialog.scope;
 			}
-			link(childScope);
-			var parentElement = dialog.getElement();
-			parentElement.children('div').append(element);
-		}
-
-		// 2- create element
-		$wbUtil.getTemplateFor(optionsOrPreset)//
-		.then(function(template){
-			return createView(template);
-		});
-	};
-
-	InternalDialog.prototype.onclosed = function(){
-		/*
-		 * Remove scope
-		 * 
-		 * NOTE: if there is a $watch, then this return an error
-		 */
-		if(this.scope){
-			this.scope.$destroy();
-			delete this.scope;
-		}
-	};
+		};
+	}
 
 	InternalDialog.prototype.setUserOptions = function(optionsOrPreset) {
 		this._userOptions = optionsOrPreset;
@@ -13231,19 +13246,39 @@ angular.module('am-wb-core')
 		this.position = optionsOrPreset.position || 'center-top 0 58';
 		this.panelSize = optionsOrPreset.panelSize || '400 400';
 		this.contentSize = optionsOrPreset.contentSize || '450 250';
-		this.content = '<div style="border-top: 1px solid;width: 100%;height: 250px;padding: 0px;pointer-events: inherit;"></div>';
+//		this.content = '<div style="border-top: 1px solid; padding: 0px; pointer-events: inherit; overflow: hidden;"></div>';
 	};
 
 	InternalDialog.prototype.getUserOptions = function() {
 		return this._userOptions;
 	};
 
+	InternalDialog.prototype.setRootElement = function(element){
+		this._rootElement = element;
+		element.css('visibility', this._isVisible ? 'visible' : 'hidden');
+	};
+
+	InternalDialog.prototype.getRootElement = function(){
+		return this._rootElement;
+	};
+
 	InternalDialog.prototype.setElement = function(element){
 		this._element = element;
+		if(this._element){
+			if(this._elementPromise){
+				this._elementPromise.resolve(element);
+			}
+		}
 	};
 
 	InternalDialog.prototype.getElement = function(){
-		return this._element;
+		if(!this._element){
+			if(!this._elementPromise){
+				this._elementPromise = $q.defer();
+			}
+			this._elementPromise.promise;
+		}
+		return $q.when(this._element);
 	};
 
 	InternalDialog.prototype.setScope = function(scope){
@@ -13256,16 +13291,66 @@ angular.module('am-wb-core')
 
 	InternalDialog.prototype.setVisible = function(flag){
 		this._isVisible = flag;
-		var element = this.getElement();
-		element.css('visibility', this._isVisible ? 'visible' : 'hidden');
+		var element = this.getRootElement();
+		if(element){
+			element.css('visibility', this._isVisible ? 'visible' : 'hidden');
+		}
+	};
+	
+	InternalDialog.prototype.hide = function(){
+		this.setVisible(false);
 	};
 
 	InternalDialog.prototype.isVisible = function(){
 		return this._isVisible;
 	};
+	
+	InternalDialog.prototype.setView = function(optionsOrPreset){
+		var dialog = this;
+		var contentElement = null;
+		var template = null;
+		/*
+		 * Create view
+		 */
+		function createView() {
+			// TODO: maso, 2018: check contentElement
+			// TODO: maso, 2019: check template
+			var parenScope = optionsOrPreset.parent || $rootScope;
+			var childScope = optionsOrPreset.scope || parenScope.$new(false, parenScope);
 
+			// 3- bind controller
+			var element = angular.element(template);
+			var link = $compile(element);
+			if (angular.isDefined(optionsOrPreset.controller)) {
+				var controller = $controller(optionsOrPreset.controller, {
+					$scope: childScope,
+					$element: element,
+					$wbFloat: dialog
+				});
+				if (optionsOrPreset.controllerAs) {
+					childScope[optionsOrPreset.controllerAs] = controller;
+				}
+				element.data('$ngControllerController', controller);
+			}
+			link(childScope);
 
+			contentElement.empty();
+			contentElement.append(element);
+		}
 
+		// 2- create element
+		return this.getElement()
+		.then(function(element){
+			contentElement = element;
+			return $wbUtil.getTemplateFor(optionsOrPreset)//
+		})
+		.then(function(templateL){
+			template = templateL;
+			return createView();
+		});
+	};
+	
+	
 
 	/**
 	 * Hide an existing float and resolve the promise returned from
@@ -13326,7 +13411,11 @@ angular.module('am-wb-core')
 	 *         rejected with $mdFloat.cancel().
 	 */
 	this.show = function(optionsOrPreset) {
-		return $q.resolve(this.create(optionsOrPreset));
+		return $q.resolve(this.create(optionsOrPreset))
+		.then(function(dialog){
+			dialog.setView(optionsOrPreset);
+			return dialog;
+		});
 	};
 
 	/**
@@ -13337,7 +13426,7 @@ angular.module('am-wb-core')
 	this.create = function(optionsOrPreset) {
 		var dialog = new InternalDialog(optionsOrPreset);
 		var panel = jsPanel.create(dialog);
-		dialog.setElement(angular.element(panel));
+		dialog.setRootElement(angular.element(panel));
 		return dialog;
 	};
 });
@@ -15055,7 +15144,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widgets-explorer.html',
-    "<div> <div layout=column>  <md-toolbar ng-show=!(showSearch||showSort||showState)> <div class=md-toolbar-tools> <h3 flex translate>Widgets</h3> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=\"wbWidgetExplorer._view_list=!wbWidgetExplorer._view_list\" class=md-icon-button aria-label=\"View mode\"> <wb-icon>{{wbWidgetExplorer._view_list ? 'view_module' : 'view_list'}}</wb-icon> </md-button> <md-button ng-click=\"wbWidgetExplorer._tree_mode=!wbWidgetExplorer._tree_mode\" class=md-icon-button aria-label=\"Tree mode\"> <wb-icon>{{wbWidgetExplorer._tree_mode? 'list' : 'list_tree'}}</wb-icon> </md-button> </div> </md-toolbar>  <md-toolbar class=md-hue-1 ng-show=showSearch> <div class=md-toolbar-tools> <md-button class=md-icon-button ng-click=\"showSearch = !showSearch\" aria-label=Back> <wb-icon>arrow_back</wb-icon> </md-button> <md-input-container md-theme=input flex> <label>&nbsp;</label> <input ng-model=query ng-keyup=\"runQuery(query, $event)\"> </md-input-container> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> </div> </md-toolbar> <md-expansion-panel-group ng-if=wbWidgetExplorer._tree_mode> <md-expansion-panel ng-repeat=\"group in groups\"> <md-expansion-panel-collapsed> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-header> <md-expansion-panel-content style=\"padding: 0px; margin: 0px\"> <wb-widgets-list ng-if=wbWidgetExplorer._view_list widgets=group.widgets> </wb-widgets-list> <wb-widgets-module ng-if=!wbWidgetExplorer._view_list widgets=group.widgets> </wb-widgets-module> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </md-expansion-panel-group> <wb-widgets-list ng-if=\"!wbWidgetExplorer._tree_mode &amp;&amp; wbWidgetExplorer._view_list\" widgets=widgets> </wb-widgets-list> <wb-widgets-module ng-if=\"!wbWidgetExplorer._tree_mode &amp;&amp; !wbWidgetExplorer._view_list\" widgets=widgets> </wb-widgets-module> </div> </div>"
+    "<div layout=column>  <md-toolbar ng-show=!(showSearch||showSort||showState)> <div class=md-toolbar-tools> <h3 flex translate>Widgets</h3> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> <md-divider></md-divider> <md-button ng-click=\"wbWidgetExplorer._view_list=!wbWidgetExplorer._view_list\" class=md-icon-button aria-label=\"View mode\"> <wb-icon>{{wbWidgetExplorer._view_list ? 'view_module' : 'view_list'}}</wb-icon> </md-button> <md-button ng-click=\"wbWidgetExplorer._tree_mode=!wbWidgetExplorer._tree_mode\" class=md-icon-button aria-label=\"Tree mode\"> <wb-icon>{{wbWidgetExplorer._tree_mode? 'list' : 'list_tree'}}</wb-icon> </md-button> </div> </md-toolbar>  <md-toolbar class=md-hue-1 ng-show=showSearch> <div class=md-toolbar-tools> <md-button class=md-icon-button ng-click=\"showSearch = !showSearch\" aria-label=Back> <wb-icon>arrow_back</wb-icon> </md-button> <md-input-container md-theme=input flex> <label>&nbsp;</label> <input ng-model=query ng-keyup=\"runQuery(query, $event)\"> </md-input-container> <md-button class=md-icon-button aria-label=Search ng-click=\"showSearch = !showSearch\"> <wb-icon>search</wb-icon> </md-button> </div> </md-toolbar> <md-content> <md-expansion-panel-group ng-if=wbWidgetExplorer._tree_mode> <md-expansion-panel ng-repeat=\"group in groups\"> <md-expansion-panel-collapsed> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header> <span translate>{{group.title || group.id}}</span> </md-expansion-panel-header> <md-expansion-panel-content style=\"padding: 0px; margin: 0px\"> <wb-widgets-list ng-if=wbWidgetExplorer._view_list widgets=group.widgets> </wb-widgets-list> <wb-widgets-module ng-if=!wbWidgetExplorer._view_list widgets=group.widgets> </wb-widgets-module> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </md-expansion-panel-group> <wb-widgets-list ng-if=\"!wbWidgetExplorer._tree_mode &amp;&amp; wbWidgetExplorer._view_list\" widgets=widgets> </wb-widgets-list> <wb-widgets-module ng-if=\"!wbWidgetExplorer._tree_mode &amp;&amp; !wbWidgetExplorer._view_list\" widgets=widgets> </wb-widgets-module> </md-content> </div>"
   );
 
 

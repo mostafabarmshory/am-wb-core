@@ -154,7 +154,17 @@ Tip: Use the close() method to close the window.
 
 Syntax
 
-	window.open(URL, name, specs, replace)
+	$window.open(URL, name, specs, replace)
+
+For example suppose you are about to open a page in internal window:
+
+	$window.open('http://localhost', 'internal view', {
+		internal: true,
+		width: 200,
+		height: 300,
+		x: 0,
+		y: 0
+	});
 
 #### URL	
 

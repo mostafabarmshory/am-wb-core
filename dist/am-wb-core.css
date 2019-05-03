@@ -65,6 +65,18 @@ Rules for sizing the icon.
 }
 
 /*
+ * Hidde overflow on content
+ */
+.jsPanel-content {
+	overflow: hidden;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    
+    display: flex;
+    flex-direction: row;
+}
+
+/*
  * Set position ot the panel
  */
 .jsPanel {
