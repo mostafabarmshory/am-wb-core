@@ -35,6 +35,13 @@ angular.module('am-wb-core')
 .service('$wbFloat', function($q, $wbUtil, $rootScope, $compile, $controller) {
 	'use strict';
 
+	/**
+	 * @ngdoc Factory
+	 * @name InternalDialog
+	 * @description The internal dialog
+	 * 
+	 * Manage an internal dialog
+	 */
 	function InternalDialog(optionsOrPreset){
 		this.setUserOptions(optionsOrPreset);
 		var dialog = this;
@@ -65,10 +72,9 @@ angular.module('am-wb-core')
 		this.headerTitle = optionsOrPreset.headerTitle || 'my panel #1';
 		this.headerControls = optionsOrPreset.headerControls || 'all';
 
-		this.position = optionsOrPreset.position || 'center-top 0 58';
+		this.position = optionsOrPreset.position || 'center-top 0 0';
 		this.panelSize = optionsOrPreset.panelSize || '400 400';
 		this.contentSize = optionsOrPreset.contentSize || '450 250';
-//		this.content = '<div style="border-top: 1px solid; padding: 0px; pointer-events: inherit; overflow: hidden;"></div>';
 	};
 
 	InternalDialog.prototype.getUserOptions = function() {
@@ -125,6 +131,29 @@ angular.module('am-wb-core')
 
 	InternalDialog.prototype.isVisible = function(){
 		return this._isVisible;
+	};
+	
+	InternalDialog.prototype.setPanel = function(panel){
+		this._panel = panel;
+	};
+	
+	InternalDialog.prototype.getPanel = function(){
+		return this._panel;
+	};
+	
+	/**
+	 * Changes size of the panel
+	 * 
+	 * @memberof InternalDialog
+	 * @params w {String|Integer} the width of the panel
+	 * @params h {String|Integer} the height of the panel
+	 */
+	InternalDialog.prototype.resize = function(w, h){
+		var panel = this.getPanel();
+		panel.resize({
+			width: w,
+			height: h
+		});
 	};
 	
 	InternalDialog.prototype.setView = function(optionsOrPreset){
@@ -248,6 +277,7 @@ angular.module('am-wb-core')
 	this.create = function(optionsOrPreset) {
 		var dialog = new InternalDialog(optionsOrPreset);
 		var panel = jsPanel.create(dialog);
+		dialog.setPanel(panel);
 		dialog.setRootElement(angular.element(panel));
 		return dialog;
 	};

@@ -60,6 +60,14 @@ angular.module('am-wb-core')
             window.setPosition(options.position.x, options.position.y);
         }
         window.setCloseOnEscape(options.closeOnEscape);
+        if(angular.isDefined(options.showTitle)) {
+        	window.setTitleVisible(options.showTitle);
+        }
+        if(angular.isDefined(options.size)) {
+        	var size = options.size;
+        	window.setWidth(size.width);
+        	window.setHeight(size.height);
+        }
         window.setVisible(true);
         
         if(angular.isString(options.url)){
@@ -112,7 +120,7 @@ angular.module('am-wb-core')
     /**
      * Gets parent of the window
      * 
-     * @memberof
+     * @memberof NativeWindowWrapper
      * @return parent
      */
     nativeWindowWrapper.prototype.getParent = function(){
@@ -148,7 +156,7 @@ angular.module('am-wb-core')
     /**
      * Sets title of the window
      * 
-     * @memberof wbWindow
+     * @memberof NativeWindowWrapper
      * @params title {string} the window title
      */
     nativeWindowWrapper.prototype.setTitle = function(title){
@@ -159,7 +167,7 @@ angular.module('am-wb-core')
     /**
      * Sets title of the window
      * 
-     * @memberof $wbWindow
+     * @memberof NativeWindowWrapper
      * @return {string} the window title
      */
     nativeWindowWrapper.prototype.getTitle = function(){
@@ -194,7 +202,7 @@ angular.module('am-wb-core')
      * 
      * Tip: Use the close() method to close the window.
      * 
-     * @memberof $wbWindow
+     * @memberof NativeWindowWrapper
      * @return window object
      */
     nativeWindowWrapper.prototype.open = function(url, name, options, replace){
@@ -212,11 +220,21 @@ angular.module('am-wb-core')
         return openWindow(this.nw, options);
     };
 
+    /**
+     * Close current window
+     * 
+     * @memberof NativeWindowWrapper
+     */
+    nativeWindowWrapper.prototype.close = function(){
+    	this.nw.close();
+    	// TODO: maso, 2019: remove all resources
+    };
+
 
     /**
      * Loads a library
      * 
-     * @memberof $wbWindow
+     * @memberof NativeWindowWrapper
      * @path path of library
      * @return promise to load the library
      */
@@ -256,7 +274,7 @@ angular.module('am-wb-core')
     /**
      * Check if the library is loaded
      * 
-     * @memberof $wbWindow
+     * @memberof NativeWindowWrapper
      * @return true if the library is loaded
      */
     nativeWindowWrapper.prototype.isLibraryLoaded = function(path){
@@ -270,7 +288,7 @@ angular.module('am-wb-core')
     /**
      * Set meta
      * 
-     * @memberof $wbWindow
+     * @memberof NativeWindowWrapper
      * @params key {string} the key of meta
      * @params value {string} the value of meta
      */
@@ -292,7 +310,7 @@ angular.module('am-wb-core')
     /**
      * Set link
      * 
-     * @memberof $wbWindow
+     * @memberof NativeWindowWrapper
      * @params key {string} the key of meta
      * @params data {string} the value of meta
      */
@@ -313,6 +331,46 @@ angular.module('am-wb-core')
         }
     };
 
+    
+    nativeWindowWrapper.prototype.setWidth = function(width){
+    	this.resizeTo(width, this.getHeight());
+    };
+    
+    nativeWindowWrapper.prototype.getWidth = function(){
+    	return this.nw.innerWidth;
+    };
+    
+    nativeWindowWrapper.prototype.setHeight = function(){
+    	this.resizeTo(this.getWidth(), height);
+    };
+    
+    nativeWindowWrapper.prototype.getHeight = function(){
+    	return this.nw.innerHeight;
+    };
+    
+    nativeWindowWrapper.prototype.resizeTo = function(width, height) {
+    	this.nw.resizeTo(width, height);
+    };
+
+    /**
+     * Sets position of the window
+     */
+    nativeWindowWrapper.prototype.setPosition = function(x, y) {
+    	this.x = x;
+    	this.y = y;
+    	// TODO: maso, 2019: set position of the window
+    };
+    
+    /**
+     * Gets current position of the window
+     */
+    nativeWindowWrapper.prototype.getPosition = function() {
+    	return {
+    		x: this.x,
+    		y: this.y
+    	};
+    	// TODO: maso, 2019: set position of the window
+    };
 
     return nativeWindowWrapper;
 });

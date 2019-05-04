@@ -160,11 +160,27 @@ For example suppose you are about to open a page in internal window:
 
 	$window.open('http://localhost', 'internal view', {
 		internal: true,
-		width: 200,
-		height: 300,
-		x: 0,
-		y: 0
+		size: {
+			width: 200,
+			height: 300
+		},
+		position: {
+			x: 0,
+			y: 0
+		}
 	});
+
+Following properties are used for internal window:
+
+- position.x
+- position.y
+- size.width
+- size.height
+- closeOnEscape
+- language
+- showTitle
+
+
 
 #### URL	
 

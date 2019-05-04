@@ -76,12 +76,24 @@ describe('Service $wbWindow ', function () {
         expect(angular.isFunction(window.getLanguage)).toBe(true);
         
         expect(angular.isFunction(window.open)).toBe(true);
-//        expect(angular.isFunction(window.close)).toBe(true);
+        expect(angular.isFunction(window.close)).toBe(true);
         expect(angular.isFunction(window.setVisible)).toBe(true);
         expect(angular.isFunction(window.isVisible)).toBe(true);
         
         expect(angular.isFunction(window.loadLibrary)).toBe(true);
         expect(angular.isFunction(window.isLibraryLoaded)).toBe(true);
+        
+        expect(angular.isFunction(window.setLink)).toBe(true);
+        expect(angular.isFunction(window.setMeta)).toBe(true);
+        
+        expect(angular.isFunction(window.setWidth)).toBe(true);
+        expect(angular.isFunction(window.getWidth)).toBe(true);
+        
+        expect(angular.isFunction(window.setHeight)).toBe(true);
+        expect(angular.isFunction(window.getHeight)).toBe(true);
+        
+//        expect(angular.isFunction(window.setTitleVisible)).toBe(true);
+//        expect(angular.isFunction(window.isTitleVisible)).toBe(true);
     });
     
     it('must load library', function(done){

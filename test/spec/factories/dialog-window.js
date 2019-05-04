@@ -137,5 +137,54 @@ describe('Directive WbDialogWindow ', function () {
         window.setLink(key, data);
         window.setLink(key, data);
     });
+    
+    it('must change position of the window', function () {
+        // create default window
+        var window = new WbDialogWindow();
+        var x = Math.floor(Math.random() * 1000);
+        var y = Math.floor(Math.random() * 1000);
+        
+        window.setPosition(x, y);
+        
+        var position = window.getPosition();
+        expect(position.x).toBe(x);
+        expect(position.y).toBe(y);
+
+        // open with $window
+        window = $wbWindow.open('','Title', {
+            internal: true,
+            position: {
+            	x: x,
+            	y: y
+            }
+        }, false);
+        position = window.getPosition();
+        expect(position.x).toBe(x);
+        expect(position.y).toBe(y);
+    });
+    
+    it('must change size of the window', function () {
+        // create default window
+        var window = new WbDialogWindow();
+        var w = Math.floor(Math.random() * 1000);
+        var h = Math.floor(Math.random() * 1000);
+        
+        window.setWidth(w);
+        expect(window.getWidth()).toBe(w);
+        
+        window.setHeight(h);
+        expect(window.getHeight()).toBe(h);
+        
+        // open with $window
+        window = $wbWindow.open('','Title', {
+            internal: true,
+            size: {
+            	width: w,
+            	height: h
+            }
+        }, false);
+        expect(window.getWidth()).toBe(w);
+        expect(window.getHeight()).toBe(h);
+    });
 
 });

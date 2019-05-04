@@ -39,5 +39,18 @@
     	"event": {
         	"click": " var offset = $widget.getElement().offset();$window.open('http://www.viraweb123.ir', 'titl', { internal: false, closeOnEscape: true, position:{x: $event.pageX, y: $event.pageY}}, false);"
     	}
+	},{
+    	"type": "HtmlText",
+    	"text": "Click to open 100*100 internal window",
+    	"style": {
+    	    "padding": "16px",
+    	    "margin": "16px",
+        	"background": {
+            	"color": "#123456"
+        	}
+    	},
+    	"event": {
+        	"click": " var offset = $widget.getElement().offset();$window.open('http://www.viraweb123.ir', 'titl', { internal: true, closeOnEscape: true, position:{x: $event.pageX, y: $event.pageY}, size:{width: 100, height: 100}}, false);"
+    	}
 	}]
 }
