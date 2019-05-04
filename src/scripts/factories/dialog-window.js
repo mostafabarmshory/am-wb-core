@@ -31,8 +31,8 @@ angular.module('am-wb-core')
 	function covertToFloadConfig(dialogWindow) {
 		var options = {
 				closeOnEscape: dialogWindow.closeOnEscape,
-				header: true,
-				headerTitle: dialogWindow.showTitle,
+				header: dialogWindow.isTitleVisible(),
+				headerTitle: dialogWindow.getTitle(),
 				headerLogo: '',
 				headerControls: {
 //					close: 'remove',
@@ -74,6 +74,7 @@ angular.module('am-wb-core')
 	var wbWindow = function(parent){
 		this.parent = parent || $wbWindow;
 		this.floatDialogElement = null;
+		this.setTitleVisible(true);
 	};
 
 	/**
@@ -348,6 +349,18 @@ angular.module('am-wb-core')
 		if(this.floatDialogElement){
 			this.floatDialogElement.resize(width, height);
 		}
+	};
+	
+	
+	wbWindow.prototype.setTitleVisible = function(visible){
+		this._titleVisible = visible;
+		if(this.floatDialogElement){
+			// TODO: maso, 2019: Check if the JPanel supports title visibility online.
+		}
+	};
+	
+	wbWindow.prototype.isTitleVisible = function(){
+		return this._titleVisible;
 	};
 
 	return wbWindow;

@@ -186,5 +186,30 @@ describe('Directive WbDialogWindow ', function () {
         expect(window.getWidth()).toBe(w);
         expect(window.getHeight()).toBe(h);
     });
+    
+
+    
+    it('must set title visibility of the window', function () {
+        // create default window
+        var window = new WbDialogWindow();
+        window.setTitleVisible(false);
+        expect(window.isTitleVisible()).toBe(false);
+
+        window.setTitleVisible(true);
+        expect(window.isTitleVisible()).toBe(true);
+        
+        // open with $window
+        window = $wbWindow.open('','Title', {
+            internal: true,
+            showTitle: false
+        }, false);
+        expect(window.isTitleVisible()).toBe(false);
+        
+        window = $wbWindow.open('','Title', {
+        	internal: true,
+        	showTitle: true
+        }, false);
+        expect(window.isTitleVisible()).toBe(true);
+    });
 
 });

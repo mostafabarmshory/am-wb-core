@@ -8841,276 +8841,346 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 .factory('WbDialogWindow', function($wbWindow, $document, $wbFloat) {
-    'use strict';
+	'use strict';
 
 
-    // Utils
-    function covertToFloadConfig(dialogWindow) {
-        var options = {
-                closeOnEscape: dialogWindow.closeOnEscape,
-                header: true,
-                headerTitle: dialogWindow.title,
-                headerLogo: '',
-                headerControls: {
-//                  close: 'remove',
-//                  maximize: 'remove',
-//                  normalize: 'remove',
-//                  minimize: 'remove',
-//                  smallify: 'remove',
-//                  smallifyrev: 'remove',
-                }
-        };
+	// Utils
+	function covertToFloadConfig(dialogWindow) {
+		var options = {
+				closeOnEscape: dialogWindow.closeOnEscape,
+				header: dialogWindow.isTitleVisible(),
+				headerTitle: dialogWindow.getTitle(),
+				headerLogo: '',
+				headerControls: {
+//					close: 'remove',
+//					maximize: 'remove',
+//					normalize: 'remove',
+//					minimize: 'remove',
+//					smallify: 'remove',
+//					smallifyrev: 'remove',
+				}
+		};
 
-        if(angular.isDefined(dialogWindow.x)){
-            options.position = {
-                    type: 'fixed',
-                    my: 'left-top',
-                    at: 'left-top',
-                    of: 'body',
-                    container: 'body',
-                    offsetX: dialogWindow.x,
-                    offsetY: dialogWindow.y
-            }
-        }
+		if(angular.isDefined(dialogWindow.x)){
+			options.position = {
+					type: 'fixed',
+					my: 'left-top',
+					at: 'left-top',
+					of: 'body',
+					container: 'body',
+					offsetX: dialogWindow.x,
+					offsetY: dialogWindow.y
+			}
+		}
+		if(angular.isDefined(dialogWindow.width)){
+			options.panelSize = {
+					width: dialogWindow.width, 
+					height: dialogWindow.width
+			};
+		}
 
-        return options;
-    }
+		return options;
+	}
 
-    /**
-     * @ngdoc Factory
-     * @name WbDialogWindow
-     * @description WbDialogWindow a dialog manager
-     * 
-     */
-    var wbWindow = function(parent){
-        this.parent = parent || $wbWindow;
-        this.floatDialogElement = null;
-    };
+	/**
+	 * @ngdoc Factory
+	 * @name WbDialogWindow
+	 * @description WbDialogWindow a dialog manager
+	 * 
+	 */
+	var wbWindow = function(parent){
+		this.parent = parent || $wbWindow;
+		this.floatDialogElement = null;
+		this.setTitleVisible(true);
+	};
 
-    /**
-     * Gets parent of the window
-     * 
-     * @memberof WbDialogWindow
-     */
-    wbWindow.prototype.getParent = function(){
-        return this.parent;
-    }
+	/**
+	 * Gets parent of the window
+	 * 
+	 * @memberof WbDialogWindow
+	 */
+	wbWindow.prototype.getParent = function(){
+		return this.parent;
+	}
 
-    /**
-     * Sets title of the window
-     * 
-     * @memberof WbDialogWindow
-     * @params title {string} the window title
-     */
-    wbWindow.prototype.setTitle = function(title){
-        this.title = title;
-        if(this.isVisible()){
-            // TODO: maso, 2019: set title of the current dialog
-        }
-    };
+	/**
+	 * Sets title of the window
+	 * 
+	 * @memberof WbDialogWindow
+	 * @params title {string} the window title
+	 */
+	wbWindow.prototype.setTitle = function(title){
+		this.title = title;
+		if(this.isVisible()){
+			// TODO: maso, 2019: set title of the current dialog
+		}
+	};
 
-    /**
-     * Sets title of the window
-     * 
-     * @memberof WbDialogWindow
-     * @return {string} the window title
-     */
-    wbWindow.prototype.getTitle = function(){
-        return this.title;
-    };
-
-
-    /**
-     * Sets language of the window
-     * 
-     * @memberof WbDialogWindow
-     * @params language {string} the window language
-     */
-    wbWindow.prototype.setLanguage = function(language){
-        this.language = language;
-        if(this.isVisible()){
-            // TODO: maso, 2019: set title of the current dialog
-        }
-    };
-
-    /**
-     * Sets title of the window
-     * 
-     * @memberof WbDialogWindow
-     * @return {string} the window language
-     */
-    wbWindow.prototype.getLanguage = function(){
-        return this.language;
-    };
-
-    /**
-     * 
-     * The open() method opens a new browser window, or a new tab, depending 
-     * on your browser settings.
-     * 
-     * Tip: Use the close() method to close the window.
-     * 
-     * @memberof WbDialogWindow
-     * @return window object
-     */
-    wbWindow.prototype.open = function(url, name, options, replace){
-        return $wbWindow.open(url, name, options, replace);
-    }
-
-    /**
-     * Sets visible of the window
-     * 
-     * 
-     * @memberof WbDialogWindow
-     * @params visible {boolean} of the window
-     */
-    wbWindow.prototype.setVisible = function(visible){
-        if(!this.floatDialogElement) {
-            this.floatDialogElement = $wbFloat.create(covertToFloadConfig(this));
-        } else if(this.floatDialogElement.isVisible() === visible) {
-            return;
-        }
-
-        this.floatDialogElement.setVisible(visible);
-    }
-
-    /**
-     * Gets visible of the window
-     * 
-     * 
-     * @memberof WbDialogWindow
-     * @returns true if the window is visible
-     */
-    wbWindow.prototype.isVisible = function(){
-        if(! this.floatDialogElement){
-            return false;
-        }
-        return this.floatDialogElement.isVisible();
-    };
-
-    /**
-     * Sets position of the window
-     * 
-     * 
-     * @memberof WbDialogWindow
-     * @params x {string|int} absolute position
-     * @params y {string|int} absolute position
-     */
-    wbWindow.prototype.setPosition = function(x, y) {
-        this.x = x;
-        this.y = y;
-        if(this.floatDialogElement){
-            // TODO: reload the window position
-        }
-    };
-
-    /**
-     * Close window on Escape
-     * 
-     * @memberof WbDialogWindow
-     * @params x {string|int} absolute position
-     * @params y {string|int} absolute position
-     */
-    wbWindow.prototype.setCloseOnEscape = function(closeOnEscape) {
-        this.closeOnEscape = closeOnEscape;
-        if(this.floatDialogElement){
-            // TODO: reload the window close
-        }
-    }
-
-    /**
-     * Sets size of the window
-     * 
-     * @memberof WbDialogWindow
-     * @params width {string|int} absolute position
-     * @params height {string|int} absolute position
-     */
-    wbWindow.prototype.setSize = function(width, height) {
-        this.width = width;
-        this.height = height;
-        if(this.floatDialogElement){
-            // TODO: reload the window size
-        }
-    };
-
-    /**
-     * Loads a library
-     * 
-     * @memberof WbDialogWindow
-     * @path path of library
-     * @return promise to load the library
-     */
-    wbWindow.prototype.loadLibrary = function(path){
-        return $wbLibs.load(path);
-    };
-
-    /**
-     * Check if the library is loaded
-     * 
-     * @memberof WbDialogWindow
-     * @return true if the library is loaded
-     */
-    wbWindow.prototype.isLibraryLoaded = function(path){
-        return $wbLibs.isLoaded(path);
-    };
+	/**
+	 * Sets title of the window
+	 * 
+	 * @memberof WbDialogWindow
+	 * @return {string} the window title
+	 */
+	wbWindow.prototype.getTitle = function(){
+		return this.title;
+	};
 
 
-    /**
-     * Set meta
-     * 
-     * @memberof WbDialogWindow
-     * @params key {string} the key of meta
-     * @params value {string} the value of meta
-     */
-    wbWindow.prototype.setMeta = function (key, value){
-        var parent = this.getParent();
-        if(parent) {
-            parent.setMeta(key, value);
-        }
-    };
+	/**
+	 * Sets language of the window
+	 * 
+	 * @memberof WbDialogWindow
+	 * @params language {string} the window language
+	 */
+	wbWindow.prototype.setLanguage = function(language){
+		this.language = language;
+		if(this.isVisible()){
+			// TODO: maso, 2019: set title of the current dialog
+		}
+	};
 
-    /**
-     * Set link
-     * 
-     * @memberof WbDialogWindow
-     * @params key {string} the key of link
-     * @params data {string} the value of link
-     */
-    wbWindow.prototype.setLink = function (key, data){
-        var parent = this.getParent();
-        if(parent) {
-            parent.setLink(key, data);
-        }
-    };
-    
+	/**
+	 * Sets title of the window
+	 * 
+	 * @memberof WbDialogWindow
+	 * @return {string} the window language
+	 */
+	wbWindow.prototype.getLanguage = function(){
+		return this.language;
+	};
 
-    /**
-     * Write the body
-     * 
-     * @memberof WbDialogWindow
-     * @params data {string} the value
-     */
-    wbWindow.prototype.write = function (data){
-    	this.floatDialogElement.getElement()
-    	.then(function(parentElement){
-    		// string
-    		var element = angular.element(data);
-    		parentElement.empty();
-    		parentElement.append(element);
-    	});
-    };
-    
-    /**
-     * Set view the body
-     * 
-     * @memberof WbDialogWindow
-     * @params data {Object} the view
-     */
-    wbWindow.prototype.setView = function (view){
-    	return this.floatDialogElement.setView(view);
-    };
+	/**
+	 * 
+	 * The open() method opens a new browser window, or a new tab, depending 
+	 * on your browser settings.
+	 * 
+	 * Tip: Use the close() method to close the window.
+	 * 
+	 * @memberof WbDialogWindow
+	 * @return window object
+	 */
+	wbWindow.prototype.open = function(url, name, options, replace){
+		return $wbWindow.open(url, name, options, replace);
+	};
 
-    return wbWindow;
+	/**
+	 * Close current window
+	 * 
+	 * 
+	 * @memberof WbDialogWindow
+	 * @params visible {boolean} of the window
+	 */
+	wbWindow.prototype.close = function(){
+		this.setVisible(false);
+		// TODO: maso, 2019: remove dome and destroy scope.
+	};
+
+	/**
+	 * Sets visible of the window
+	 * 
+	 * 
+	 * @memberof WbDialogWindow
+	 * @params visible {boolean} of the window
+	 */
+	wbWindow.prototype.setVisible = function(visible){
+		if(!this.floatDialogElement) {
+			this.floatDialogElement = $wbFloat.create(covertToFloadConfig(this));
+		} else if(this.floatDialogElement.isVisible() === visible) {
+			return;
+		}
+
+		this.floatDialogElement.setVisible(visible);
+	};
+
+	/**
+	 * Gets visible of the window
+	 * 
+	 * 
+	 * @memberof WbDialogWindow
+	 * @returns true if the window is visible
+	 */
+	wbWindow.prototype.isVisible = function(){
+		if(! this.floatDialogElement){
+			return false;
+		}
+		return this.floatDialogElement.isVisible();
+	};
+
+	/**
+	 * Sets position of the window
+	 * 
+	 * 
+	 * @memberof WbDialogWindow
+	 * @params x {string|int} absolute position
+	 * @params y {string|int} absolute position
+	 */
+	wbWindow.prototype.setPosition = function(x, y) {
+		this.x = x;
+		this.y = y;
+		if(this.floatDialogElement){
+			// TODO: reload the window position
+		}
+	};
+
+	/**
+	 * Gets current position of the window
+	 * 
+	 * @memberof WbDialogWindow
+	 * @return position
+	 */
+	wbWindow.prototype.getPosition = function() {
+		return {
+			x: this.x,
+			y:this.y,
+		};
+	};
+
+
+
+	/**
+	 * Close window on Escape
+	 * 
+	 * @memberof WbDialogWindow
+	 * @params x {string|int} absolute position
+	 * @params y {string|int} absolute position
+	 */
+	wbWindow.prototype.setCloseOnEscape = function(closeOnEscape) {
+		this.closeOnEscape = closeOnEscape;
+		if(this.floatDialogElement){
+			// TODO: reload the window close
+		}
+	};
+
+	/**
+	 * Sets size of the window
+	 * 
+	 * @memberof WbDialogWindow
+	 * @params width {string|int} absolute position
+	 * @params height {string|int} absolute position
+	 */
+	wbWindow.prototype.setSize = function(width, height) {
+		this.width = width;
+		this.height = height;
+		if(this.floatDialogElement){
+			// TODO: reload the window size
+		}
+	};
+
+	/**
+	 * Loads a library
+	 * 
+	 * @memberof WbDialogWindow
+	 * @path path of library
+	 * @return promise to load the library
+	 */
+	wbWindow.prototype.loadLibrary = function(path){
+		return $wbLibs.load(path);
+	};
+
+	/**
+	 * Check if the library is loaded
+	 * 
+	 * @memberof WbDialogWindow
+	 * @return true if the library is loaded
+	 */
+	wbWindow.prototype.isLibraryLoaded = function(path){
+		return $wbLibs.isLoaded(path);
+	};
+
+
+	/**
+	 * Set meta
+	 * 
+	 * @memberof WbDialogWindow
+	 * @params key {string} the key of meta
+	 * @params value {string} the value of meta
+	 */
+	wbWindow.prototype.setMeta = function (key, value){
+		var parent = this.getParent();
+		if(parent) {
+			parent.setMeta(key, value);
+		}
+	};
+
+	/**
+	 * Set link
+	 * 
+	 * @memberof WbDialogWindow
+	 * @params key {string} the key of link
+	 * @params data {string} the value of link
+	 */
+	wbWindow.prototype.setLink = function (key, data){
+		var parent = this.getParent();
+		if(parent) {
+			parent.setLink(key, data);
+		}
+	};
+
+
+	/**
+	 * Write the body
+	 * 
+	 * @memberof WbDialogWindow
+	 * @params data {string} the value
+	 */
+	wbWindow.prototype.write = function (data){
+		this.floatDialogElement.getElement()
+		.then(function(parentElement){
+			// string
+			var element = angular.element(data);
+			parentElement.empty();
+			parentElement.append(element);
+		});
+	};
+
+	/**
+	 * Set view the body
+	 * 
+	 * @memberof WbDialogWindow
+	 * @params data {Object} the view
+	 */
+	wbWindow.prototype.setView = function (view){
+		return this.floatDialogElement.setView(view);
+	};
+
+	wbWindow.prototype.setWidth = function(width){
+		this.resizeTo(width, this.getHeight());
+	};
+
+	wbWindow.prototype.getWidth = function(){
+		return this.width;
+	};
+
+	wbWindow.prototype.setHeight = function(height){
+		this.resizeTo(this.getWidth(), height);
+	};
+
+	wbWindow.prototype.getHeight = function(){
+		return this.height;
+	};
+
+	wbWindow.prototype.resizeTo = function(width, height) {
+		this.width = width;
+		this.height = height;
+		if(this.floatDialogElement){
+			this.floatDialogElement.resize(width, height);
+		}
+	};
+	
+	
+	wbWindow.prototype.setTitleVisible = function(visible){
+		this._titleVisible = visible;
+		if(this.floatDialogElement){
+			// TODO: maso, 2019: Check if the JPanel supports title visibility online.
+		}
+	};
+	
+	wbWindow.prototype.isTitleVisible = function(){
+		return this._titleVisible;
+	};
+
+	return wbWindow;
 });
 
 /* 
@@ -9175,6 +9245,17 @@ angular.module('am-wb-core')
             window.setPosition(options.position.x, options.position.y);
         }
         window.setCloseOnEscape(options.closeOnEscape);
+        if(angular.isDefined(options.showTitle)) {
+        	window.setTitleVisible(options.showTitle);
+        }
+        if(angular.isDefined(options.size)) {
+        	var size = options.size;
+        	window.setWidth(size.width);
+        	window.setHeight(size.height);
+        }
+        if(angular.isDefined(options.showTitle)){
+        	window.setTitleVisible(options.showTitle);
+        }
         window.setVisible(true);
         
         if(angular.isString(options.url)){
@@ -9227,7 +9308,7 @@ angular.module('am-wb-core')
     /**
      * Gets parent of the window
      * 
-     * @memberof
+     * @memberof NativeWindowWrapper
      * @return parent
      */
     nativeWindowWrapper.prototype.getParent = function(){
@@ -9263,7 +9344,7 @@ angular.module('am-wb-core')
     /**
      * Sets title of the window
      * 
-     * @memberof wbWindow
+     * @memberof NativeWindowWrapper
      * @params title {string} the window title
      */
     nativeWindowWrapper.prototype.setTitle = function(title){
@@ -9274,7 +9355,7 @@ angular.module('am-wb-core')
     /**
      * Sets title of the window
      * 
-     * @memberof $wbWindow
+     * @memberof NativeWindowWrapper
      * @return {string} the window title
      */
     nativeWindowWrapper.prototype.getTitle = function(){
@@ -9309,7 +9390,7 @@ angular.module('am-wb-core')
      * 
      * Tip: Use the close() method to close the window.
      * 
-     * @memberof $wbWindow
+     * @memberof NativeWindowWrapper
      * @return window object
      */
     nativeWindowWrapper.prototype.open = function(url, name, options, replace){
@@ -9327,11 +9408,21 @@ angular.module('am-wb-core')
         return openWindow(this.nw, options);
     };
 
+    /**
+     * Close current window
+     * 
+     * @memberof NativeWindowWrapper
+     */
+    nativeWindowWrapper.prototype.close = function(){
+    	this.nw.close();
+    	// TODO: maso, 2019: remove all resources
+    };
+
 
     /**
      * Loads a library
      * 
-     * @memberof $wbWindow
+     * @memberof NativeWindowWrapper
      * @path path of library
      * @return promise to load the library
      */
@@ -9371,7 +9462,7 @@ angular.module('am-wb-core')
     /**
      * Check if the library is loaded
      * 
-     * @memberof $wbWindow
+     * @memberof NativeWindowWrapper
      * @return true if the library is loaded
      */
     nativeWindowWrapper.prototype.isLibraryLoaded = function(path){
@@ -9385,7 +9476,7 @@ angular.module('am-wb-core')
     /**
      * Set meta
      * 
-     * @memberof $wbWindow
+     * @memberof NativeWindowWrapper
      * @params key {string} the key of meta
      * @params value {string} the value of meta
      */
@@ -9407,7 +9498,7 @@ angular.module('am-wb-core')
     /**
      * Set link
      * 
-     * @memberof $wbWindow
+     * @memberof NativeWindowWrapper
      * @params key {string} the key of meta
      * @params data {string} the value of meta
      */
@@ -9428,6 +9519,46 @@ angular.module('am-wb-core')
         }
     };
 
+    
+    nativeWindowWrapper.prototype.setWidth = function(width){
+    	this.resizeTo(width, this.getHeight());
+    };
+    
+    nativeWindowWrapper.prototype.getWidth = function(){
+    	return this.nw.innerWidth;
+    };
+    
+    nativeWindowWrapper.prototype.setHeight = function(){
+    	this.resizeTo(this.getWidth(), height);
+    };
+    
+    nativeWindowWrapper.prototype.getHeight = function(){
+    	return this.nw.innerHeight;
+    };
+    
+    nativeWindowWrapper.prototype.resizeTo = function(width, height) {
+    	this.nw.resizeTo(width, height);
+    };
+
+    /**
+     * Sets position of the window
+     */
+    nativeWindowWrapper.prototype.setPosition = function(x, y) {
+    	this.x = x;
+    	this.y = y;
+    	// TODO: maso, 2019: set position of the window
+    };
+    
+    /**
+     * Gets current position of the window
+     */
+    nativeWindowWrapper.prototype.getPosition = function() {
+    	return {
+    		x: this.x,
+    		y: this.y
+    	};
+    	// TODO: maso, 2019: set position of the window
+    };
 
     return nativeWindowWrapper;
 });
@@ -13213,6 +13344,13 @@ angular.module('am-wb-core')
 .service('$wbFloat', function($q, $wbUtil, $rootScope, $compile, $controller) {
 	'use strict';
 
+	/**
+	 * @ngdoc Factory
+	 * @name InternalDialog
+	 * @description The internal dialog
+	 * 
+	 * Manage an internal dialog
+	 */
 	function InternalDialog(optionsOrPreset){
 		this.setUserOptions(optionsOrPreset);
 		var dialog = this;
@@ -13243,10 +13381,9 @@ angular.module('am-wb-core')
 		this.headerTitle = optionsOrPreset.headerTitle || 'my panel #1';
 		this.headerControls = optionsOrPreset.headerControls || 'all';
 
-		this.position = optionsOrPreset.position || 'center-top 0 58';
+		this.position = optionsOrPreset.position || 'center-top 0 0';
 		this.panelSize = optionsOrPreset.panelSize || '400 400';
 		this.contentSize = optionsOrPreset.contentSize || '450 250';
-//		this.content = '<div style="border-top: 1px solid; padding: 0px; pointer-events: inherit; overflow: hidden;"></div>';
 	};
 
 	InternalDialog.prototype.getUserOptions = function() {
@@ -13303,6 +13440,29 @@ angular.module('am-wb-core')
 
 	InternalDialog.prototype.isVisible = function(){
 		return this._isVisible;
+	};
+	
+	InternalDialog.prototype.setPanel = function(panel){
+		this._panel = panel;
+	};
+	
+	InternalDialog.prototype.getPanel = function(){
+		return this._panel;
+	};
+	
+	/**
+	 * Changes size of the panel
+	 * 
+	 * @memberof InternalDialog
+	 * @params w {String|Integer} the width of the panel
+	 * @params h {String|Integer} the height of the panel
+	 */
+	InternalDialog.prototype.resize = function(w, h){
+		var panel = this.getPanel();
+		panel.resize({
+			width: w,
+			height: h
+		});
 	};
 	
 	InternalDialog.prototype.setView = function(optionsOrPreset){
@@ -13426,6 +13586,7 @@ angular.module('am-wb-core')
 	this.create = function(optionsOrPreset) {
 		var dialog = new InternalDialog(optionsOrPreset);
 		var panel = jsPanel.create(dialog);
+		dialog.setPanel(panel);
 		dialog.setRootElement(angular.element(panel));
 		return dialog;
 	};

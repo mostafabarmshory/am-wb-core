@@ -68,6 +68,9 @@ angular.module('am-wb-core')
         	window.setWidth(size.width);
         	window.setHeight(size.height);
         }
+        if(angular.isDefined(options.showTitle)){
+        	window.setTitleVisible(options.showTitle);
+        }
         window.setVisible(true);
         
         if(angular.isString(options.url)){
