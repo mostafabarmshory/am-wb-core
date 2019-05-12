@@ -29,7 +29,7 @@
  * @description
  * 
  */
-angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter' ])//
+angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 .controller('MyTestCtrl', function($scope, $http, $mdDialog, $widget, $wbUtil, $wbWindow, WidgetLocatorManager) {
 
 	var ctrl = this;
