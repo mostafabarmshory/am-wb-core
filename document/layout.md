@@ -278,7 +278,7 @@ Please see the align-items explanation to understand the available values.
 	{
 		style:{
 			layout: {
-				align-self: auto | start | end | center | baseline | stretch
+				align_self: auto | start | end | center | baseline | stretch
 			}
 		}
 	}

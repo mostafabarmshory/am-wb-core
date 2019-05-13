@@ -95,7 +95,7 @@ var WbAbstractWidget = function () {
 	 * This is a cache of customer function
 	 * 
 	 */
-	 this.eventFunctions = {};
+	this.eventFunctions = {};
 	this.computedStyle = {};
 
 	// models
@@ -115,8 +115,8 @@ var WbAbstractWidget = function () {
 				ctrl.fire('click', $event);
 			},
 			dblclick: function ($event) {
-			    ctrl.fire('dblclick', $event);
-			    ctrl.evalWidgetEvent('dblclick', $event);
+				ctrl.fire('dblclick', $event);
+				ctrl.evalWidgetEvent('dblclick', $event);
 			},
 			mouseout: function ($event) {
 				ctrl.fire('mouseout', $event);
@@ -127,21 +127,21 @@ var WbAbstractWidget = function () {
 				ctrl.evalWidgetEvent('mouseover', $event);
 			},
 			mousedown: function ($event) {
-                ctrl.fire('mousedown', $event);
-                ctrl.evalWidgetEvent('mousedown', $event);
-            },
-            mouseup: function ($event) {
-                ctrl.fire('mouseup', $event);
-                ctrl.evalWidgetEvent('mouseup', $event);
-            },
+				ctrl.fire('mousedown', $event);
+				ctrl.evalWidgetEvent('mousedown', $event);
+			},
+			mouseup: function ($event) {
+				ctrl.fire('mouseup', $event);
+				ctrl.evalWidgetEvent('mouseup', $event);
+			},
 			mouseenter: function ($event) {
-                ctrl.fire('mouseenter', $event);
-                ctrl.evalWidgetEvent('mouseenter', $event);
-            },
+				ctrl.fire('mouseenter', $event);
+				ctrl.evalWidgetEvent('mouseenter', $event);
+			},
 			mouseleave: function ($event) {
-                ctrl.fire('mouseleave', $event);
-                ctrl.evalWidgetEvent('mouseleave', $event);
-            },
+				ctrl.fire('mouseleave', $event);
+				ctrl.evalWidgetEvent('mouseleave', $event);
+			},
 	};
 
 	/*
@@ -345,10 +345,10 @@ WbAbstractWidget.prototype.setModelProperty = function (key, value){
 	$event.oldValue = this.getModelProperty(key);
 	$event.newValue =  value;
 
-    // check if value changed
-    if(angular.equals($event.oldValue, $event.newValue)){
-        return;
-    }
+	// check if value changed
+	if(angular.equals($event.oldValue, $event.newValue)){
+		return;
+	}
 
 	// Set the address
 	if(angular.isDefined(value)){
@@ -392,7 +392,7 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 
 	// check if value changed
 	if(angular.equals($event.oldValue, $event.newValue)){
-	    return;
+		return;
 	}
 
 	// Set the address
@@ -402,11 +402,11 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	} else {
 		objectPath.del(model, key);
 	}
-	
+
 
 	// refresh the view
 	this.refresh($event);
-    this.fire('runtimeModelUpdated', $event);
+	this.fire('runtimeModelUpdated', $event);
 };
 
 /**
@@ -486,13 +486,13 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	}
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
-		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4];' + this.getEvent()[type];
+		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5];' + this.getEvent()[type];
 		this.eventFunctions[type] = new Function(body);
 	}
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
 		try{
-			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow);
+			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow, this.$wbLocal);
 		} catch(ex){
 			console.log('Fail to run event code');
 			console.log({
@@ -553,11 +553,11 @@ WbAbstractWidget.prototype.connect = function () {
 	if (!$element) {
 		return;
 	}
-	this.resizeObserver.observe($element[0]);
-	this.intersectionObserver.observe($element[0]);
 	angular.forEach(this.eventListeners, function (listener, key) {
 		$element.on(key, listener);
 	});
+	this.resizeObserver.observe($element[0]);
+	this.intersectionObserver.observe($element[0]);
 };
 
 WbAbstractWidget.prototype.getElement = function () {
@@ -974,7 +974,7 @@ WbAbstractWidget.prototype.removeAnimation = function () {
  * @params window {WbWindow} of the current widget
  */
 WbAbstractWidget.prototype.setWindow = function (window) {
-    this.window = window;
+	this.window = window;
 };
 
 /**
@@ -984,7 +984,7 @@ WbAbstractWidget.prototype.setWindow = function (window) {
  * @return window of the current widget or from the root
  */
 WbAbstractWidget.prototype.getWindow = function () {
-    return this.window || this.getRoot().getWindow() || this.$wbWindow;
+	return this.window || this.getRoot().getWindow() || this.$wbWindow;
 };
 
 /*******************************************************************************
@@ -998,7 +998,7 @@ WbAbstractWidget.prototype.getWindow = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout, $wbWindow) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout, $wbWindow, $wbLocal) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -1008,6 +1008,7 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia
 	this.$mdMedia = $mdMedia;
 	this.$timeout = $timeout;
 	this.$wbWindow = $wbWindow;
+	this.$wbLocal = $wbLocal;
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
@@ -1025,7 +1026,7 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $wbWindow) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $wbWindow, $wbLocal) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -1037,7 +1038,8 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$http = $http;
 	this.$mdMedia = $mdMedia;
 	this.$timeout = $timeout;
-    this.$wbWindow = $wbWindow;
+	this.$wbWindow = $wbWindow;
+	this.$wbLocal = $wbLocal;
 
 	var ctrl = this;
 	this.on('modelChanged', function () {
