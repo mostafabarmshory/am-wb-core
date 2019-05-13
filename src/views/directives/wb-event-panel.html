@@ -4,8 +4,8 @@
     <thead>
         <tr
             md-colors="{color: 'primary-700'}">
-            <td translate>Name</td>
-            <td translate>Code</td>
+            <td translate="">Name</td>
+            <td translate="">Code</td>
             <td></td>
         </tr>
     </thead>
@@ -14,16 +14,12 @@
             ng-repeat="event in events track by $index">
             <td 
                 ng-click="ctrl.editEvent(event, $event)"
-                style="cursor: pointer">{{event.title}}
+                style="cursor: pointer;">{{event.title}}
             </td>
-            <td>{{event.code| limitTo:13 }} ...</td>
-            <td>
-<!--                <md-button
-                    ng-click="ctrl.editEvent(event, $event)"
-                    class="md-icon-button">
-                    <wb-icon>edit</wb-icon>
-                </md-button>-->
+            <td style="cursor: pointer;">{{event.code| limitTo:13 }} ...</td>
+            <td align="center" style="cursor: pointer;min-height: 22px;">
                 <md-button
+                    style="min-height: 20px;height: 20px;margin: 0px;line-height: 20px;padding: 0px;"
                     ng-if="event.code"
                     ng-click="ctrl.deleteEvent(event, $event)"
                     class="md-icon-button">
