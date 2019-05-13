@@ -43,57 +43,42 @@ These attributes are useful in SEO.
     layout="column"
     style="padding: 0px">
     <legend translate="">Schema</legend>
-    <md-subheader 
-        class="md-primary">
-        <span translate="">Type</span>
-    </md-subheader>
-    <div layout="row">
-        <md-input-container flex="100" style="padding-left: 8px;padding-right: 8px">
-            <label translate="">Type</label>
-            <md-select 
-                ng-model="ctrl.category"
-                ng-change="ctrl.setProperty('category', ctrl.category)">
-                <md-option 
-                    ng-repeat="type in ctrl.schemaTypes" 
-                    value="{{type.value}}">
-                    {{type.key}}
-                </md-option>
-            </md-select>
-        </md-input-container>
+    <md-input-container 
+        flex="100" 
+        style="padding-left: 8px;padding-right: 8px">
+        <label translate="">Type</label>
+        <md-select 
+            ng-model="ctrl.category"
+            ng-change="ctrl.setProperty('category', ctrl.category)">
+            <md-option 
+                ng-repeat="type in ctrl.schemaTypes" 
+                value="{{type.value}}">
+                {{type.key}}
+            </md-option>
+        </md-select>
+    </md-input-container>
+    <div
+        layout="row"
+        layout-align="center center"
+        ng-if="ctrl.alert"
+        style="padding-left: 8px; padding-right: 8px">
+        <p style="color: red">! <span translate="">{{ctrl.alert}}</span></p>
     </div>
-    <md-subheader 
-        class="md-primary">
-        <span translate="">Property</span>
-    </md-subheader>
-    <div layout="row">
-        <md-input-container flex="40" style="padding-left: 8px;padding-right: 8px">
-            <label translate="">Type</label>
-            <md-select 
-                ng-model="ctrl.type"
-                ng-change="ctrl.setType(ctrl.type);ctrl.setProperty('type', ctrl.type)">
-                <md-option 
-                    ng-repeat="type in ctrl.schemaTypes" 
-                    value="{{type.key}}">
-                    {{type.key}}
-                </md-option>
-            </md-select>
-        </md-input-container>
-        <span flex="5"></span>
-        <md-input-container 
-            flex="55"
-            ng-if="ctrl.type"
-            style="padding-left: 8px;padding-right: 8px">
-            <label translate="">Property</label>
-            <md-select 
-                ng-model="ctrl.property"
-                ng-change="ctrl.setProperty('property', ctrl.property)">
-                <md-option 
-                    ng-repeat="property in ctrl.properties" 
-                    value="property">
-                    {{property}}
-                </md-option>
-            </md-select>
-        </md-input-container>
-    </div>
+    <md-input-container 
+        ng-if="!ctrl.alert"
+        flex="100"
+        style="padding-left: 8px;padding-right: 8px">
+        <label translate="">Property</label>
+        <md-select 
+            md-on-open="ctrl.setProperties()"
+            ng-model="ctrl.property"
+            ng-change="ctrl.setProperty('property', ctrl.property)">
+            <md-option 
+                ng-repeat="property in ctrl.properties" 
+                value="property">
+                {{property}}
+            </md-option>
+        </md-select>
+    </md-input-container>
 </fieldset>
 

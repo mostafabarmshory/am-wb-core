@@ -262,7 +262,7 @@ angular.module('am-wb-core')
 		/*
 		 * @ngInject
 		 */
-		controller: function () {
+		controller: function ($translate) {
 		    /*
 		     * Supported Schema Types:
 		     * Article, Book, Image, Person, Product, Service, Text, Thing, WebPage
@@ -314,13 +314,30 @@ angular.module('am-wb-core')
 			this.category = this.getProperty('category');
 			this.type = this.getProperty('type');
 			this.property = this.getProperty('property');
+			this.alert = null;
+			this.getParentCategory();
 			// NOTE: cover is removed from weburger
 		    };
 
+		    this.getParentCategory = function () {
+			var widget = this.getWidget();
+			while (!widget.isRoot() && !widget.getModelProperty('category')) {
+			    widget = widget.getParent();
+			}
+			this.parentCategory = widget.getModelProperty('category');
+		    };
+
+		    this.setProperties = function () {
+			if (!this.parentCategory) {
+			    this.alert = 'No parent type is defined.';
+			} else {
+			    this.setType(this.parentCategory);
+			}
+		    };
+
 		    this.setType = function (type) {
-			this.property = '';
 			switch (type) {
-			    case 'Article':
+			    case 'http://schema.org/Article':
 				this.properties =
 					[
 					    'articleBody', 'articleSection', 'about', 'author', 'comment',
@@ -329,7 +346,8 @@ angular.module('am-wb-core')
 					    'video'
 					];
 				break;
-			    case 'Book':
+
+			    case 'http://schema.org/Book':
 				this.properties =
 					[
 					    'about', 'author', 'bookFormat', 'comment', 'creator', 'genre',
@@ -337,24 +355,27 @@ angular.module('am-wb-core')
 					    'translator', 'video'
 					];
 				break;
-			    case 'Image':
+
+			    case 'http://schema.org/Image':
 				this.properties =
 					[
 					    'about', 'description', 'caption', 'comment', 'thumbnail',
 					    'keywords', 'image', 'name', 'url'
 					];
 				break;
-			    case 'Movie':
+
+			    case 'http://schema.org/Movie':
 				this.properties =
 					[
 					    'about', 'actor', 'comment', 'commentCount', 'copyrightYear',
-					    'countryOfOrigin', 'creator', 'dateCreated', 'description', 
-					    'director', 'duration', 'genre', 'headline', 'isBasedOn', 
-					    'image', 'keywords','musicBy', 'name', 'provider', 'productionCompany',
+					    'countryOfOrigin', 'creator', 'dateCreated', 'description',
+					    'director', 'duration', 'genre', 'headline', 'isBasedOn',
+					    'image', 'keywords', 'musicBy', 'name', 'provider', 'productionCompany',
 					    'sponsor', 'subtitleLanguage', 'text', 'thumbnailUrl', 'trailer'
 					];
 				break;
-			    case 'Person':
+
+			    case 'http://schema.org/Person':
 				this.properties =
 					[
 					    'additionalName', 'address', 'birthDate', 'birthPlace',
@@ -363,27 +384,32 @@ angular.module('am-wb-core')
 					    'image', 'spouse'
 					];
 				break;
-			    case 'Product':
+
+			    case 'http://schema.org/Product':
 				this.properties =
 					[
 					    'brand', 'category', 'color', 'description', 'height',
 					    'isConsumableFor', 'genre', 'headline', 'image', 'name'
 					];
 				break;
-			    case 'Service':
+
+			    case 'http://schema.org/Service':
 				this.properties =
 					[
 					    'areaServed', 'brand', 'category', 'logo', 'serviceType',
 					    'description', 'image', 'name'
 					];
 				break;
-			    case 'Thing':
+
+			    case 'http://schema.org/Thing':
 				this.properties = ['description', 'image', 'name'];
 				break;
-			    case 'Text':
-				this.properties = ['keywords'];
+
+			    case 'http://schema.org/Text':
+				this.properties = ['description', 'image', 'keywords', 'name'];
 				break;
-			    case 'WebPage':
+
+			    case 'http://schema.org/WebPage':
 				this.properties =
 					[
 					    'about', 'author', 'comment', 'description', 'image', 'headline',
