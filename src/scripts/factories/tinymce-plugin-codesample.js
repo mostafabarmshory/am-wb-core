@@ -129,14 +129,14 @@ angular.module('am-wb-core')//
 		languages = editor.settings.codesample_languages || defaultLanguages;
 		this.setup();
 		this.register();
-	}
+	};
 
 	/**
 	 * Gets current editor
 	 */
 	tinymcePluginCodesample.prototype.getEditor = function(){
 		return this._editor;
-	}
+	};
 
 
 

@@ -129,7 +129,7 @@ angular.module('am-wb-core')
 			$wbLibs.load('resources/libs/ace.js')
 			.then(function(){
 				ctrl.setEditor(ace.edit($element.find('div#am-wb-resources-script-editor')[0]));
-			})
+			});
 		},
 		controllerAs: 'ctrl',
 		tags : [ 'code', 'script']
