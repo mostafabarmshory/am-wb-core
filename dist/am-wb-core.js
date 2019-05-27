@@ -13922,8 +13922,10 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Services
- * @name $widget
- * @description Resource managment
+ * @name $resource
+ * @description Resource management system
+ * 
+ * This is a service to get resources. 
  * 
  */
 .service('$resource', function($wbUi, $rootScope) {
