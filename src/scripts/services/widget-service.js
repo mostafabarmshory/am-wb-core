@@ -186,12 +186,12 @@ angular.module('am-wb-core')
      *            </ul>
      * @param parentWidget
      *     {WbWidget} the parent
+     * @param preElement {Element} pre build element
      * @return promise A promise that resolve created element
      */
-    function compile(model, parentWidget){
+    function compile(model, parentWidget, preElement){
         var widget = _widget(model);
         var childScope = null;
-        var element = null;
 
         // 1- create scope
         var parentScope;
@@ -205,31 +205,38 @@ angular.module('am-wb-core')
 
         // 2- create element
         var service = this;
-        return $wbUtil.getTemplateFor(widget)//
-        .then(function(template) {
-            if (model.type !== 'Group') {
-                template = '<div class="wb-widget" name="{{wbModel.name}}" '+
 
-                'dnd-disable-if="!ctrl.isEditable()" '+
-                'dnd-draggable="wbModel" '+
-                'dnd-type="wbModel.type" '+
-                'dnd-effect-allowed="copyMove" '+
-                'dnd-callback="1" '+
+        var gettingTemplatePromisse;
+        if(preElement){
+            gettingTemplatePromisse = $q.resolve(preElement);
+        } else {
+            gettingTemplatePromisse = $wbUtil.getTemplateFor(widget)
+            .then(function(template) {
+                if (model.type !== 'Group') {
+                    template = '<div class="wb-widget" name="{{wbModel.name}}" '+
 
-                'dnd-moved="ctrl.delete()" '+
+                    'dnd-disable-if="!ctrl.isEditable()" '+
+                    'dnd-draggable="wbModel" '+
+                    'dnd-type="wbModel.type" '+
+                    'dnd-effect-allowed="copyMove" '+
+                    'dnd-callback="1" '+
 
-                'md-theme-watch="true">' + template + '</div>';
-            }
+                    'dnd-moved="ctrl.delete()" '+
 
-            var ctrl;
+                    'md-theme-watch="true">' + template + '</div>';
+                }
 
-            // 3- bind controller
-            element = angular.element(template);
+                // 3- bind controller
+                return angular.element(template);
+            });
+        }
+        return gettingTemplatePromisse.then(function(element){
             var link = $compile(element);
             var wlocals = _.merge({
                 $scope : childScope,
                 $element : element,
             }, service.providers);
+            var ctrl;
             if (model.type !== 'Group') {
                 ctrl = $controller('WbWidgetCtrl', wlocals);
             } else {

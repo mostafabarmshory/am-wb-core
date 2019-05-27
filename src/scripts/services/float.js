@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')
 
@@ -34,6 +33,175 @@ angular.module('am-wb-core')
  * The base of this implementation is https://jspanel.de/api.html
  */
 .service('$wbFloat', function($q, $wbUtil, $rootScope, $compile, $controller) {
+	'use strict';
+
+	/**
+	 * @ngdoc Factory
+	 * @name InternalDialog
+	 * @description The internal dialog
+	 * 
+	 * Manage an internal dialog
+	 */
+	function InternalDialog(optionsOrPreset){
+		this.setUserOptions(optionsOrPreset);
+		var dialog = this;
+		this.callback = function() {
+			var element = angular.element(this.content);
+			dialog.setElement(element);
+		};
+		this.onclosed = function(){
+			/*
+			 * Remove scope
+			 * 
+			 * NOTE: if there is a $watch, then this return an error
+			 */
+			if(dialog.scope){
+				dialog.scope.$destroy();
+				delete dialog.scope;
+			}
+		};
+	}
+
+	InternalDialog.prototype.setUserOptions = function(optionsOrPreset) {
+		this._userOptions = optionsOrPreset;
+		this.theme = 'primary';
+
+		this.closeOnEscape =  optionsOrPreset.closeOnEscape;
+
+		this.header = optionsOrPreset.header;
+		this.headerTitle = optionsOrPreset.headerTitle || 'my panel #1';
+		this.headerControls = optionsOrPreset.headerControls || 'all';
+
+		this.position = optionsOrPreset.position || 'center-top 0 0';
+		this.panelSize = optionsOrPreset.panelSize || '400 400';
+		this.contentSize = optionsOrPreset.contentSize || '450 250';
+	};
+
+	InternalDialog.prototype.getUserOptions = function() {
+		return this._userOptions;
+	};
+
+	InternalDialog.prototype.setRootElement = function(element){
+		this._rootElement = element;
+		element.css('visibility', this._isVisible ? 'visible' : 'hidden');
+	};
+
+	InternalDialog.prototype.getRootElement = function(){
+		return this._rootElement;
+	};
+
+	InternalDialog.prototype.setElement = function(element){
+		this._element = element;
+		if(this._element){
+			if(this._elementPromise){
+				this._elementPromise.resolve(element);
+			}
+		}
+	};
+
+	InternalDialog.prototype.getElement = function(){
+		if(!this._element){
+			if(!this._elementPromise){
+				this._elementPromise = $q.defer();
+			}
+			this._elementPromise.promise;
+		}
+		return $q.when(this._element);
+	};
+
+	InternalDialog.prototype.setScope = function(scope){
+		this._scope = scope;
+	};
+
+	InternalDialog.prototype.getScope = function(){
+		return this._scope;
+	};
+
+	InternalDialog.prototype.setVisible = function(flag){
+		this._isVisible = flag;
+		var element = this.getRootElement();
+		if(element){
+			element.css('visibility', this._isVisible ? 'visible' : 'hidden');
+		}
+	};
+	
+	InternalDialog.prototype.hide = function(){
+		this.setVisible(false);
+	};
+
+	InternalDialog.prototype.isVisible = function(){
+		return this._isVisible;
+	};
+	
+	InternalDialog.prototype.setPanel = function(panel){
+		this._panel = panel;
+	};
+	
+	InternalDialog.prototype.getPanel = function(){
+		return this._panel;
+	};
+	
+	/**
+	 * Changes size of the panel
+	 * 
+	 * @memberof InternalDialog
+	 * @params w {String|Integer} the width of the panel
+	 * @params h {String|Integer} the height of the panel
+	 */
+	InternalDialog.prototype.resize = function(w, h){
+		var panel = this.getPanel();
+		panel.resize({
+			width: w,
+			height: h
+		});
+	};
+	
+	InternalDialog.prototype.setView = function(optionsOrPreset){
+		var dialog = this;
+		var contentElement = null;
+		var template = null;
+		/*
+		 * Create view
+		 */
+		function createView() {
+			// TODO: maso, 2018: check contentElement
+			// TODO: maso, 2019: check template
+			var parenScope = optionsOrPreset.parent || $rootScope;
+			var childScope = optionsOrPreset.scope || parenScope.$new(false, parenScope);
+
+			// 3- bind controller
+			var element = angular.element(template);
+			var link = $compile(element);
+			if (angular.isDefined(optionsOrPreset.controller)) {
+				var controller = $controller(optionsOrPreset.controller, {
+					$scope: childScope,
+					$element: element,
+					$wbFloat: dialog
+				});
+				if (optionsOrPreset.controllerAs) {
+					childScope[optionsOrPreset.controllerAs] = controller;
+				}
+				element.data('$ngControllerController', controller);
+			}
+			link(childScope);
+
+			contentElement.empty();
+			contentElement.append(element);
+		}
+
+		// 2- create element
+		return this.getElement()
+		.then(function(element){
+			contentElement = element;
+			return $wbUtil.getTemplateFor(optionsOrPreset)//
+		})
+		.then(function(templateL){
+			template = templateL;
+			return createView();
+		});
+	};
+	
+	
 
 	/**
 	 * Hide an existing float and resolve the promise returned from
@@ -94,136 +262,23 @@ angular.module('am-wb-core')
 	 *         rejected with $mdFloat.cancel().
 	 */
 	this.show = function(optionsOrPreset) {
-		var deferred = $q.defer();
-		// create scopse
-		var parenScope = optionsOrPreset.parent || $rootScope;
-		var childScope = optionsOrPreset.scope || parenScope.$new(false, parenScope);
-
-		var panel = jsPanel.create({
-			theme: 'primary',
-			headerTitle : optionsOrPreset.title || 'my panel #1',
-			position : optionsOrPreset.position || 'center-top 0 58',
-			panelSize : optionsOrPreset.panelSize || '400 400',
-			contentSize : optionsOrPreset.contentSize || '450 250',
-			headerControls: optionsOrPreset.headerControls || 'all',
-			content : '<div style="border-top: 1px solid;width: 100%;height: 250px;padding: 0px;pointer-events: inherit;"></div>',
-			callback : function() {
-				var parentElement = angular.element(this.content);
-
-				// 2- create element
-				return $wbUtil.getTemplateFor(optionsOrPreset)//
-				.then(function(template) {
-					var element = angular.element(template);
-
-					// 3- bind controller
-					var link = $compile(element);
-					if (angular.isDefined(optionsOrPreset.controller)) {
-						var wbFloat = {
-								hide: function(response) {
-									panel.close();
-									deferred.resolve(response);
-								},
-								cancel: function(response) {
-									panel.close();
-									deferred.reject(response);
-								}
-						};
-						var locals = {
-								$scope : childScope,
-								$element : element,
-								$wbFloat : wbFloat
-						};
-						var controller = $controller(optionsOrPreset.controller, locals);
-						if (optionsOrPreset.controllerAs) {
-							childScope[optionsOrPreset.controllerAs] = controller;
-						}
-						element.data('$ngControllerController', controller);
-					}
-					link(childScope);
-					parentElement.children('div').append(element);
-					return element;
-				});
-			},			
-			onclosed: function(){
-				/*
-				 * Remove scope
-				 * 
-				 * NOTE: if there is a $watch, then this return an error
-				 */
-				if(!optionsOrPreset.scope){
-					childScope.$destroy();
-				}
-			}
+		return $q.resolve(this.create(optionsOrPreset))
+		.then(function(dialog){
+			dialog.setView(optionsOrPreset);
+			return dialog;
 		});
-		return deferred.promise;
 	};
 
-
+	/**
+	 * Creates and return a dialog
+	 * 
+	 * @memberof $wbFloat
+	 */
 	this.create = function(optionsOrPreset) {
-		// create scopse
-		var parenScope = optionsOrPreset.parent || $rootScope;
-		var childScope = optionsOrPreset.scope || parenScope.$new(false, parenScope);
-		
-
-		var panel = jsPanel.create({
-			theme: 'primary',
-			headerTitle : optionsOrPreset.title || 'my panel #1',
-			position : optionsOrPreset.position || 'center-top 0 58',
-			panelSize : optionsOrPreset.panelSize || '400 400',
-			contentSize : optionsOrPreset.contentSize || '450 250',
-			headerControls: optionsOrPreset.headerControls || 'all',
-			content : '<div style="border-top: 1px solid;width: 100%;height: 250px;padding: 0px;pointer-events: inherit;"></div>',
-			callback : function() {
-				var parentElement = angular.element(this.content);
-
-				// 2- create element
-				return $wbUtil.getTemplateFor(optionsOrPreset)//
-				.then(function(template) {
-					var element = angular.element(template);
-
-					// 3- bind controller
-					var link = $compile(element);
-					if (angular.isDefined(optionsOrPreset.controller)) {
-						var locals = {
-								$scope : childScope,
-								$element : element
-						};
-						var controller = $controller(optionsOrPreset.controller, locals);
-						if (optionsOrPreset.controllerAs) {
-							childScope[optionsOrPreset.controllerAs] = controller;
-						}
-						element.data('$ngControllerController', controller);
-					}
-					link(childScope);
-					parentElement.children('div').append(element);
-					return element;
-				});
-			},
-			onclosed: function(){
-				/*
-				 * Remove scope
-				 * 
-				 * NOTE: if there is a $watch, then this return an error
-				 */
-				if(!optionsOrPreset.scope){
-					childScope.$destroy();
-				}
-			}
-		});
-
-		var rootElement = angular.element(panel);
-		panel.setVisible = function(flag){
-			this._isVisible = flag;
-			rootElement.css('visibility', this._isVisible ? 'visible' : 'hidden');
-		};
-
-		panel.isVisible = function(){
-			return this._isVisible;
-		};
-
-		return panel;
+		var dialog = new InternalDialog(optionsOrPreset);
+		var panel = jsPanel.create(dialog);
+		dialog.setPanel(panel);
+		dialog.setRootElement(angular.element(panel));
+		return dialog;
 	};
-
-
-
 });

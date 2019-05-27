@@ -13,54 +13,72 @@ these attributes. Here is list of attributes:
 
 These attributes are useful in SEO.
 -->
+<fieldset
+    layout="column">
+    <md-input-container style="margin: 0px;margin-top: 10px">
+        <label translate="">Id</label>
+        <input 
+            type="text" 
+            ng-model="ctrl.id"
+            ng-change="ctrl.setProperty('id', ctrl.id)">
+    </md-input-container>
+    <md-input-container style="margin: 0px">
+        <label translate="">Label</label>
+        <input 
+            type="text" 
+            ng-model="ctrl.label"
+            ng-change="ctrl.setProperty('label', ctrl.label)">
+    </md-input-container>
+    <md-input-container style="margin: 0px">
+        <label translate="">Description</label>
+        <textarea 
+            name="description" 
+            ng-model="ctrl.description"
+            ng-change="ctrl.setProperty('description', ctrl.description)">
+        </textarea>
+    </md-input-container>
+</fieldset>
 
-<md-input-container>
-    <label translate="">Id</label>
-    <input 
-        type="text" 
-        ng-model="ctrl.id"
-    	ng-change="ctrl.setProperty('id', ctrl.id)">
-</md-input-container>
-
-<md-input-container>
-    <label translate="">Label</label>
-    <input 
-        type="text" 
-        ng-model="ctrl.label"
-    	ng-change="ctrl.setProperty('label', ctrl.label)">
-</md-input-container>
-
-<md-input-container>
-    <label translate="">Type</label>
-    <input 
-        type="text" 
-        ng-model="ctrl.category"
-    	ng-change="ctrl.setProperty('category', ctrl.category)">
-</md-input-container>
-
-<md-input-container>
-    <label translate="">Property</label>
-    <input 
-        type="text" 
-        ng-model="ctrl.property"
-    	ng-change="ctrl.setProperty('property', ctrl.property)">
-</md-input-container>
-
-<md-input-container>
-    <label translate="">Description</label>
-    <input 
-        type="text" 
-        ng-model="ctrl.description"
-    	ng-change="ctrl.setProperty('description', ctrl.description)">
-</md-input-container>
-
-<md-input-container>
-    <label translate="">Keywords</label>
-    <input 
-        type="text" 
-        ng-model="ctrl.keywords"
-    	ng-change="ctrl.setProperty('keywords', ctrl.keywords)">
-</md-input-container>
-
-<!-- NOTE: Cover is removed from SEO -->
+<fieldset
+    layout="column"
+    style="padding: 0px">
+    <legend translate="">Schema</legend>
+    <md-input-container 
+        flex="100" 
+        style="padding-left: 8px;padding-right: 8px">
+        <label translate="">Type</label>
+        <md-select 
+            ng-model="ctrl.category"
+            ng-change="ctrl.setProperty('category', ctrl.category)">
+            <md-option 
+                ng-repeat="type in ctrl.schemaTypes" 
+                value="{{type.value}}">
+                {{type.key}}
+            </md-option>
+        </md-select>
+    </md-input-container>
+    <div
+        layout="row"
+        layout-align="center center"
+        ng-if="ctrl.alert"
+        style="padding-left: 8px; padding-right: 8px">
+        <p style="color: red">! <span translate="">{{ctrl.alert}}</span></p>
+    </div>
+    <md-input-container 
+        ng-if="!ctrl.alert"
+        flex="100"
+        style="padding-left: 8px;padding-right: 8px">
+        <label translate="">Property</label>
+        <md-select 
+            md-on-open="ctrl.setProperties()"
+            ng-model="ctrl.property"
+            ng-change="ctrl.setProperty('property', ctrl.property)">
+            <md-option 
+                ng-repeat="property in ctrl.properties" 
+                value="property">
+                {{property}}
+            </md-option>
+        </md-select>
+    </md-input-container>
+</fieldset>
 

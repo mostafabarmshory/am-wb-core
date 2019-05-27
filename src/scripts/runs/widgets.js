@@ -47,11 +47,19 @@ angular.module('am-wb-core')
         groups: ['basic'],
         model: {
             style: {
-                margin: '1px'
+                margin: '1px',
+                padding: '1px',
+                layout: {
+                    direction: 'column'
+                },
+                size: {
+                    minHeight: '16px',
+                    minWidth: '16px'
+                }
             }
         },
         // functional properties
-        templateUrl: 'views/directives/wb-group.html',
+        templateUrl: 'views/widgets/wb-group.html',
         help: 'http://dpq.co.ir/more-information-link',
         helpId: 'wb-widget-group'
     });

@@ -1,5 +1,4 @@
-
-## background
+# Flexbox
 
 The Flexbox Layout (Flexible Box) module (currently a W3C Last Call Working Draft) aims at providing a more efficient way to lay out, align and distribute space among items in a container, even when their size is unknown and/or dynamic (thus the word "flex").
 
@@ -31,20 +30,24 @@ Basically, items will be laid out following either the main axis (from main-star
 
 ![](layout-images/flex-container.svg)
 
-### display
+### type
 
 This defines a flex container; inline or block depending on the given value. It enables a flex context for all its direct children.
 
-	.container {
-	  display: flex; /* or inline-flex */
-	}
+	type: flex | inline-flex
+
+example:
 	
 	{
-		type: 'Group'
+		type: 'Group',
+		style: {
+			layout: {
+				type: flex
+			}
+		}
 	}
 
 Note that CSS columns have no effect on a flex container.
-
 
 ### flex-direction
 
@@ -56,9 +59,9 @@ This establishes the main-axis, thus defining the direction flex items are place
 - row 
 - column
 
-	.container {
-	  flex-direction: row | row-reverse | column | column-reverse;
-	}
+	flex-direction: row | row-reverse | column | column-reverse;
+
+Here is an example:
 	
 	{
 		type: 'Group'
@@ -69,10 +72,10 @@ This establishes the main-axis, thus defining the direction flex items are place
 		}
 	}
 	
-row (default): left to right in ltr; right to left in rtl
-row-reverse: right to left in ltr; left to right in rtl
-column: same as row but top to bottom
-column-reverse: same as row-reverse but bottom to top
+- row (default): left to right in ltr; right to left in rtl
+- row-reverse: right to left in ltr; left to right in rtl
+- column: same as row but top to bottom
+- column-reverse: same as row-reverse but bottom to top
 
 
 ### flex-wrap
@@ -81,10 +84,9 @@ column-reverse: same as row-reverse but bottom to top
 
 By default, flex items will all try to fit onto one line. You can change that and allow the items to wrap as needed with this property.
 	
-	.container{
-	  flex-wrap: nowrap | wrap | wrap-reverse;
-	}
-	
+	wrap: nowrap | wrap | wrap-reverse;
+
+Here is and example
 	
 	{
 		type: 'Group'
@@ -97,9 +99,10 @@ By default, flex items will all try to fit onto one line. You can change that an
 	}
 	
 
-nowrap (default): all flex items will be on one line
-wrap: flex items will wrap onto multiple lines, from top to bottom.
-wrap-reverse: flex items will wrap onto multiple lines from bottom to top.
+- nowrap (default): all flex items will be on one line
+- wrap: flex items will wrap onto multiple lines, from top to bottom.
+- wrap-reverse: flex items will wrap onto multiple lines from bottom to top.
+
 There are some visual demos of flex-wrap here.
 
 
@@ -109,9 +112,9 @@ There are some visual demos of flex-wrap here.
 
 This defines the alignment along the main axis. It helps distribute extra free space left over when either all the flex items on a line are inflexible, or are flexible but have reached their maximum size. It also exerts some control over the alignment of items when they overflow the line.
 
-	.container {
-	  justify-content: flex-start | flex-end | center | space-between | space-around | space-evenly;
-	}
+	justify-content: start | end | center | space-between | space-around | space-evenly;
+
+Here is an example:
 	
 	{
 		type: 'Group'
@@ -124,12 +127,12 @@ This defines the alignment along the main axis. It helps distribute extra free s
 		}
 	}
 
-flex-start (default): items are packed toward the start line
-flex-end: items are packed toward to end line
-center: items are centered along the line
-space-between: items are evenly distributed in the line; first item is on the start line, last item on the end line
-space-around: items are evenly distributed in the line with equal space around them. Note that visually the spaces aren't equal, since all the items have equal space on both sides. The first item will have one unit of space against the container edge, but two units of space between the next item because that next item has its own spacing that applies.
-space-evenly: items are distributed so that the spacing between any two items (and the space to the edges) is equal.
+- start (default): items are packed toward the start line
+- end: items are packed toward to end line
+- center: items are centered along the line
+- space-between: items are evenly distributed in the line; first item is on the start line, last item on the end line
+- space-around: items are evenly distributed in the line with equal space around them. Note that visually the spaces aren't equal, since all the items have equal space on both sides. The first item will have one unit of space against the container edge, but two units of space between the next item because that next item has its own spacing that applies.
+- space-evenly: items are distributed so that the spacing between any two items (and the space to the edges) is equal.
 
 
 ### align-items
@@ -138,9 +141,9 @@ space-evenly: items are distributed so that the spacing between any two items (a
 
 This defines the default behaviour for how flex items are laid out along the cross axis on the current line. Think of it as the justify-content version for the cross-axis (perpendicular to the main-axis).
 
-	.container {
-	  align-items: flex-start | flex-end | center | baseline | stretch;
-	}
+	align-items: flex-start | flex-end | center | baseline | stretch;
+
+Her is an example
 	
 	{
 		type: 'Group'
@@ -153,11 +156,12 @@ This defines the default behaviour for how flex items are laid out along the cro
 			}
 		}
 	}
-flex-start: cross-start margin edge of the items is placed on the cross-start line
-flex-end: cross-end margin edge of the items is placed on the cross-end line
-center: items are centered in the cross-axis
-baseline: items are aligned such as their baselines align
-stretch (default): stretch to fill the container (still respect min-width/max-width)
+
+- start: cross-start margin edge of the items is placed on the cross-start line
+- end: cross-end margin edge of the items is placed on the cross-end line
+- center: items are centered in the cross-axis
+- baseline: items are aligned such as their baselines align
+- stretch (default): stretch to fill the container (still respect min-width/max-width)
 
 
 ### align-content
@@ -168,10 +172,9 @@ This aligns a flex container's lines within when there is extra space in the cro
 
 Note: this property has no effect when there is only one line of flex items.
 
-	.container {
-	  align-content: flex-start | flex-end | center | space-between | space-around | stretch;
-	}
+	align-content: start | end | center | space-between | space-around | stretch
 	
+Here is an example
 	
 	{
 		type: 'Group'
@@ -185,12 +188,12 @@ Note: this property has no effect when there is only one line of flex items.
 		}
 	}
 
-flex-start: lines packed to the start of the container
-flex-end: lines packed to the end of the container
-center: lines packed to the center of the container
-space-between: lines evenly distributed; the first line is at the start of the container while the last one is at the end
-space-around: lines evenly distributed with equal space around each line
-stretch (default): lines stretch to take up the remaining space
+- start: lines packed to the start of the container
+- end: lines packed to the end of the container
+- center: lines packed to the center of the container
+- space-between: lines evenly distributed; the first line is at the start of the container while the last one is at the end
+- space-around: lines evenly distributed with equal space around each line
+- stretch (default): lines stretch to take up the remaining space
 
 ## Item
 
@@ -205,10 +208,12 @@ By default, widgets are laid out in the source order. However, the order propert
 	{
 		style: {
 			layout: {
-				order: <integer>; /* default is 0 */
+				order: <integer>;
 			}
 		}
 	}
+
+/* default is 0 */
 
 ### grow
 
@@ -221,13 +226,15 @@ If all widgets have grow set to 1, the remaining space in the group will be dist
 	{
 		style: {
 			layout:{
-				grow: <number>; /* default 0 */
+				grow: <number>
 			}
 		}
 	}
 
 Negative numbers are invalid.
 
+ /* default 0 */
+ 
 ### shrink
 
 This defines the ability for a widget item to shrink if necessary.
@@ -235,12 +242,14 @@ This defines the ability for a widget item to shrink if necessary.
 	{
 		style:{
 			layout:{
-				shrink: <number>; /* default 1 */
+				shrink: <number>
 			}
 		}
 	}
 
 Negative numbers are invalid.
+
+/* default 1 */
 
 ### basis
 
@@ -249,12 +258,14 @@ This defines the default size of an widget before the remaining space is distrib
 	{
 		style: {
 			layout: {
-				basis: <length> | auto; /* default auto */
+				basis: <length> | auto
 			}
 		}
 	}
 
 If set to 0, the extra space around content isn't factored in. If set to auto, the extra space is distributed based on its grow value. See this graphic.
+
+/* default auto */
 
 ### align-self
 
@@ -264,8 +275,12 @@ This allows the default alignment (or the one specified by align-items) to be ov
 
 Please see the align-items explanation to understand the available values.
 
-	.item {
-	  align-self: auto | flex-start | flex-end | center | baseline | stretch;
+	{
+		style:{
+			layout: {
+				align_self: auto | start | end | center | baseline | stretch
+			}
+		}
 	}
 
 Note that float, clear and vertical-align have no effect on a flex item.
@@ -289,17 +304,3 @@ Blackberry browser 10+ supports the new syntax.
 
 For more informations about how to mix syntaxes in order to get the best browser support, please refer to this article (CSS-Tricks) or this article (DevOpera).	
 
-
-## Java Swing support
-
-See: https://www.google.com/search?q=java+float+layout&oq=java+float+layout&aqs=chrome..69i57j0j69i61l2j0l2.8651j0j7&sourceid=chrome&ie=UTF-8
-
-## Java SWT support
-
-See: https://www.eclipse.org/articles/Article-Understanding-Layouts/Understanding-Layouts.htm
-
-https://help.eclipse.org/mars/index.jsp?topic=%2Forg.eclipse.wb.rcp.doc.user%2Fhtml%2Flayoutmanagers%2Fswt%2Frowlayout.html
-
-## Qt support
-
-See: http://doc.qt.io/qt-5/qtwidgets-layouts-flowlayout-example.html

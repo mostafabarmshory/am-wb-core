@@ -21,20 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')
-
 /**
  * @ngdoc Services
- * @name $$wbCrypto
- * @description Crypto services
+ * @name $wbWindow
+ * @description The main window manager
  * 
- * Deprecated : use $wbWindow
  */
-.service('$wbLibs', function($wbWindow) {
-	this.load = function(path){
-		return $wbWindow.loadLibrary(path);
-	}
-    return this;
+.service('$wbWindow', function($window, NativeWindowWrapper) {
+    'use strict';
+    var currentWindow = new NativeWindowWrapper($window);
+    return currentWindow;
 });
