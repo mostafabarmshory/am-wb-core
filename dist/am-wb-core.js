@@ -14505,42 +14505,45 @@ angular.module('am-wb-core')
 		var transform = '';
 
 		if(transformOptions.x){
-			if(transformOptions.x.rotate){
-				transform += ' rotateX('+transformOptions.x.rotate+')';
+			var x = transformOptions.x;
+			if(x.rotate){
+				transform += ' rotateX('+x.rotate+')';
 			}
-			if(transformOptions.x.translate){
-				transform += ' translateX('+transformOptions.x.translate+')';
+			if(x.translate){
+				transform  += ' translateX('+x.translate+')';
 			}
-			if(transformOptions.x.scale){
-				transform += ' scaleX('+transformOptions.x.scale+')';
+			if(x.scale){
+				transform += ' scaleX('+ x.scale+')';
 			}
-			if(transformOptions.x.skew){
-				transform += ' skewX('+transformOptions.x.skew+')';
+			if(x.skew){
+				transform += ' skewX('+ x.skew+')';
 			}
 		}
 		if(transformOptions.y){
-			if(transformOptions.y.rotate){
-				transform += ' rotateY('+transformOptions.y.rotate+')';
+			var y = transformOptions.y;
+			if(y.rotate){
+				transform += ' rotateY('+y.rotate+')';
 			}
-			if(transformOptions.y.translate){
-				transform += ' translateY('+transformOptions.y.translate+')';
+			if(y.translate){
+				transform += ' translateY('+y.translate+')';
 			}
-			if(transformOptions.y.scale){
-				transform += ' scaleY('+transformOptions.y.scale+')';
+			if(y.scale){
+				transform += ' scaleY('+y.scale+')';
 			}
-			if(transformOptions.y.skew){
-				transform += ' skewY('+transformOptions.y.skew+')';
+			if(y.skew){
+				transform += ' skewY('+y.skew+')';
 			}
 		}
 		if(transformOptions.z){
-			if(transformOptions.y.rotate){
-				transform += ' rotateZ('+transformOptions.z.rotate+')';
+			var z = transformOptions.z;
+			if(z.rotate){
+				transform += ' rotateZ('+z.rotate+')';
 			}
-			if(transformOptions.y.translate){
-				transform += ' translateZ('+transformOptions.z.translate+')';
+			if(z.translate){
+				transform += ' translateZ('+z.translate+')';
 			}
-			if(transformOptions.y.scale){
-				transform += ' scaleZ('+transformOptions.z.scale+')';
+			if(z.scale){
+				transform += ' scaleZ('+z.scale+')';
 			}
 		}
 
