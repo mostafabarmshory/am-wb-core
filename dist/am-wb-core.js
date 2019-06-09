@@ -4856,11 +4856,15 @@ angular.module('am-wb-core')//
         this.widget.setModelProperty('style.layout.' + key, value);
     };
 
-    this.getStyleLayout = function (key) {
+    this.getStyleLayout = function (key, defaultValue) {
         if (!this.widget) {
             return;
         }
-        return this.widget.getModelProperty('style.layout.' + key);
+        var rkey = 'style.layout.' + key;
+        if(!this.widget.hasModelProperty(rkey)){
+        	return defaultValue;
+        }
+        return this.widget.getModelProperty(rkey);
     };
 
     this.setStyle = function (key, value) {
@@ -11969,109 +11973,109 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-	/**
-	 * Load widgets
-	 */
-	.run(function ($settings) {
-	    // utilities
-	    function setAllDim(dim, val) {
+/**
+ * Load widgets
+ */
+.run(function ($settings) {
+	// utilities
+	function setAllDim(dim, val) {
 		dim.top = val;
 		dim.right = val;
 		dim.bottom = val;
 		dim.left = val;
-	    }
+	}
 
-	    function createDimeStr(dim) {
+	function createDimeStr(dim) {
 		var output =
 			dim.top + ' ' +
 			dim.right + ' ' +
 			dim.bottom + ' ' +
 			dim.left;
 		return output;
-	    }
+	}
 
 
-	    /*
-	     * splite margin/padding to its components
-	     * check different state Based on CSS rules. see for example:
-	     * https://www.w3schools.com/cssref/pr_margin.asp
-	     * https://www.w3schools.com/cssref/pr_padding.asp
-	     */
-	    function fillDimFromString(dim, str) {
+	/*
+	 * splite margin/padding to its components
+	 * check different state Based on CSS rules. see for example:
+	 * https://www.w3schools.com/cssref/pr_margin.asp
+	 * https://www.w3schools.com/cssref/pr_padding.asp
+	 */
+	function fillDimFromString(dim, str) {
 		str = str || '';
 		var dimAll;
 		var dimsArray = str.split(' ');
 
 		// 0px is selected
 		if (dimsArray.length === 1) {
-		    dimAll = str;
+			dimAll = str;
 		}
 
 		//All 4 items is equal
 		else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
-		    dimAll = dimsArray[0];
+			dimAll = dimsArray[0];
 		}
 
 		//Items are 4 and different
 		else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
-		    dim.top = dimsArray[0];
-		    dim.right = dimsArray[1];
-		    dim.bottom = dimsArray[2];
-		    dim.left = dimsArray[3];
+			dim.top = dimsArray[0];
+			dim.right = dimsArray[1];
+			dim.bottom = dimsArray[2];
+			dim.left = dimsArray[3];
 		}
 
 		//Items are 3
 		else if (dimsArray.length === 3) {
-		    dim.top = dimsArray[0];
-		    dim.right = dimsArray[1];
-		    dim.left = dimsArray[1];
-		    dim.bottom = dimsArray[2];
+			dim.top = dimsArray[0];
+			dim.right = dimsArray[1];
+			dim.left = dimsArray[1];
+			dim.bottom = dimsArray[2];
 		}
 
 		//Items are 2
 		else if (dimsArray.length === 2) {
-		    dim.top = dimsArray[0];
-		    dim.bottom = dimsArray[0];
-		    dim.right = dimsArray[1];
-		    dim.left = dimsArray[1];
+			dim.top = dimsArray[0];
+			dim.bottom = dimsArray[0];
+			dim.right = dimsArray[1];
+			dim.left = dimsArray[1];
 		}
 
 		//Items are 1
 		else if (dimsArray.length === 1) {
-		    dim.top = dimsArray[0];
-		    dim.right = dimsArray[0];
-		    dim.bottom = dimsArray[0];
-		    dim.left = dimsArray[0];
+			dim.top = dimsArray[0];
+			dim.right = dimsArray[0];
+			dim.bottom = dimsArray[0];
+			dim.left = dimsArray[0];
 		}
 
 		//All items are undefined. In this case default value is 0px.
 		else if (!dimsArray.length) {
-		    dimAll = '0px';
+			dimAll = '0px';
 		}
 
 		// check dimAll
 		if (dimAll) {
-		    setAllDim(dim, dimAll);
+			setAllDim(dim, dimAll);
 		}
-	    }
+	}
 
-	    function setAllCorner(dim, val) {
+	function setAllCorner(dim, val) {
 		dim.topLeft = val;
 		dim.topRight = val;
 		dim.bottomRight = val;
 		dim.bottomLeft = val;
-	    }
+	}
 
-	    function createCornerStr(dim) {
+	function createCornerStr(dim) {
 		return dim.topLeft + ' ' + dim.topRight + ' ' + dim.bottomRight + ' ' + dim.bottomLeft;
-	    }
+	}
 
-	    /*
-	     * splite 'radius' to its components
-	     * check different state Based on CSS rules. see for example:
-	     * https://www.w3schools.com/CSSref/css3_pr_border-radius.asp
-	     */
-	    function fillCornerFromString(dim, str) {
+	/*
+	 * splite 'radius' to its components
+	 * check different state Based on CSS rules. see for example:
+	 * https://www.w3schools.com/CSSref/css3_pr_border-radius.asp
+	 */
+	function fillCornerFromString(dim, str) {
 		var newDom = {};
 		fillDimFromString(newDom, str);
 
@@ -12079,9 +12083,9 @@ angular.module('am-wb-core')
 		dim.topRight = newDom.topRight;
 		dim.bottomRight = newDom.bottomRight;
 		dim.bottomLeft = newDom.bottomLeft;
-	    }
+	}
 
-	    $settings.newPage({
+	$settings.newPage({
 		type: 'general',
 		label: 'General',
 		icon: 'opacity',
@@ -12091,66 +12095,66 @@ angular.module('am-wb-core')
 		 * @ngInject
 		 */
 		controller: function () {
-		    // TODO: maso, 2019: move to the view
-		    this.cursors = [{
-			    title: 'Alias',
-			    value: 'alias'
+			// TODO: maso, 2019: move to the view
+			this.cursors = [{
+				title: 'Alias',
+				value: 'alias'
 			}, {
-			    title: 'All scroll',
-			    value: 'all-scroll'
+				title: 'All scroll',
+				value: 'all-scroll'
 			}, {
-			    title: 'Auto',
-			    value: 'auto'
+				title: 'Auto',
+				value: 'auto'
 			}, {
-			    title: 'Cell',
-			    value: 'cell'
+				title: 'Cell',
+				value: 'cell'
 			}, {
-			    title: 'Context menu',
-			    value: 'context-menu'
+				title: 'Context menu',
+				value: 'context-menu'
 			}, {
-			    title: 'Col resize',
-			    value: 'col-resize'
+				title: 'Col resize',
+				value: 'col-resize'
 			}, {
-			    title: 'Copy',
-			    value: 'copy'
+				title: 'Copy',
+				value: 'copy'
 			}, {
-			    title: 'Default',
-			    value: 'default'
+				title: 'Default',
+				value: 'default'
 			}, {
-			    title: 'Grab',
-			    value: 'grab'
+				title: 'Grab',
+				value: 'grab'
 			}, {
-			    title: 'Pointer',
-			    value: 'pointer'
+				title: 'Pointer',
+				value: 'pointer'
 			}, {
-			    title: 'Move',
-			    value: 'move'
+				title: 'Move',
+				value: 'move'
 			}];
 
-		    this.init = function () {
-			this.direction = this.getStyle('direction') || 'ltr';
-			this.color = this.getStyle('color');
+			this.init = function () {
+				this.direction = this.getStyle('direction') || 'ltr';
+				this.color = this.getStyle('color');
 
-			this.cursor = this.getStyle('cursor');
+				this.cursor = this.getStyle('cursor');
 
-			this.visibility = this.getStyle('visibility') || 'visible';
-			this.opacity = this.getStyle('opacity');
+				this.visibility = this.getStyle('visibility') || 'visible';
+				this.opacity = this.getStyle('opacity');
 
-			// overflow
-			this.overflowX = this.getStyle('overflow.x') || 'visible';
-			this.overflowY = this.getStyle('overflow.y') || 'visible';
-		    };
+				// overflow
+				this.overflowX = this.getStyle('overflow.x') || 'visible';
+				this.overflowY = this.getStyle('overflow.y') || 'visible';
+			};
 
-		    this.updateOverflowX = function () {
-			this.setStyle('overflow.x', this.overflowX);
-		    };
-		    this.updateOverflowY = function () {
-			this.setStyle('overflow.y', this.overflowY);
-		    };
+			this.updateOverflowX = function () {
+				this.setStyle('overflow.x', this.overflowX);
+			};
+			this.updateOverflowY = function () {
+				this.setStyle('overflow.y', this.overflowY);
+			};
 		}
-	    });
+	});
 
-	    $settings.newPage({
+	$settings.newPage({
 		type: 'background',
 		label: 'Background',
 		icon: 'image',
@@ -12166,39 +12170,39 @@ angular.module('am-wb-core')
 		 * from the background.
 		 */
 		controller: function () {
-		    this.init = function (newWidget, oldWidget) {
-			this.image = this.getStyleBackground('image');
-			this.color = this.getStyleBackground('color');
-			this.size = this.getStyleBackground('size');
-			this.repeat = this.getStyleBackground('repeat');
-			this.position = this.getStyleBackground('position');
-		    };
+			this.init = function (newWidget, oldWidget) {
+				this.image = this.getStyleBackground('image');
+				this.color = this.getStyleBackground('color');
+				this.size = this.getStyleBackground('size');
+				this.repeat = this.getStyleBackground('repeat');
+				this.position = this.getStyleBackground('position');
+			};
 
-		    this.setBackgroundImage = function (image) {
-			this.image = image;
-			if (!this.size) {
-			    this.size = 'cover';
-			}
-			if (!this.repeat) {
-			    this.repeat = 'no-repeat';
-			}
-			if (!this.position) {
-			    this.position = 'center center';
-			}
-			this.updateBackground();
-		    };
+			this.setBackgroundImage = function (image) {
+				this.image = image;
+				if (!this.size) {
+					this.size = 'cover';
+				}
+				if (!this.repeat) {
+					this.repeat = 'no-repeat';
+				}
+				if (!this.position) {
+					this.position = 'center center';
+				}
+				this.updateBackground();
+			};
 
-		    this.updateBackground = function () {
-			this.setStyleBackground('image', this.image);
-			this.setStyleBackground('color', this.color);
-			this.setStyleBackground('size', this.size);
-			this.setStyleBackground('repeat', this.image);
-			this.setStyleBackground('position', this.position);
-		    };
+			this.updateBackground = function () {
+				this.setStyleBackground('image', this.image);
+				this.setStyleBackground('color', this.color);
+				this.setStyleBackground('size', this.size);
+				this.setStyleBackground('repeat', this.image);
+				this.setStyleBackground('position', this.position);
+			};
 		}
-	    });
+	});
 
-	    $settings.newPage({
+	$settings.newPage({
 		type: 'SEO',
 		label: 'SEO',
 		templateUrl: 'views/settings/wb-seo.html',
@@ -12207,166 +12211,166 @@ angular.module('am-wb-core')
 		 * @ngInject
 		 */
 		controller: function ($translate) {
-		    /*
-		     * Supported Schema Types:
-		     * Article, Book, Image, Person, Product, Service, Text, Thing, WebPage
-		     */
-		    this.schemaTypes = [
-			{
-			    key: 'Article',
-			    value: 'http://schema.org/Article'
+			/*
+			 * Supported Schema Types:
+			 * Article, Book, Image, Person, Product, Service, Text, Thing, WebPage
+			 */
+			this.schemaTypes = [
+				{
+					key: 'Article',
+					value: 'http://schema.org/Article'
 
-			}, {
-			    key: 'Book',
-			    value: 'http://schema.org/Book'
+				}, {
+					key: 'Book',
+					value: 'http://schema.org/Book'
 
-			}, {
-			    key: 'Image',
-			    value: 'http://schema.org/ImageObject'
+				}, {
+					key: 'Image',
+					value: 'http://schema.org/ImageObject'
 
-			}, {
-			    key: 'Movie',
-			    value: 'http://schema.org/Movie'
-			}, {
-			    key: 'Person',
-			    value: 'http://schema.org/Person'
-			}, {
-			    key: 'Product',
-			    value: 'http://schema.org/Product'
+				}, {
+					key: 'Movie',
+					value: 'http://schema.org/Movie'
+				}, {
+					key: 'Person',
+					value: 'http://schema.org/Person'
+				}, {
+					key: 'Product',
+					value: 'http://schema.org/Product'
 
-			}, {
-			    key: 'Service',
-			    value: 'http://schema.org/Service'
+				}, {
+					key: 'Service',
+					value: 'http://schema.org/Service'
 
-			}, {
-			    key: 'Text',
-			    value: 'http://schema.org/Text'
-			}, {
-			    key: 'Thing',
-			    value: 'http://schema.org/Thing'
-			}, {
-			    key: 'WebPage',
-			    value: 'http://schema.org/WebPage'
+				}, {
+					key: 'Text',
+					value: 'http://schema.org/Text'
+				}, {
+					key: 'Thing',
+					value: 'http://schema.org/Thing'
+				}, {
+					key: 'WebPage',
+					value: 'http://schema.org/WebPage'
 
-			}
-		    ];
-		    this.init = function () {
-			// load data from model
-			this.id = this.getProperty('id');
-			this.label = this.getProperty('label');
-			this.description = this.getProperty('description');
-			this.category = this.getProperty('category');
-			this.type = this.getProperty('type');
-			this.property = this.getProperty('property');
-			this.alert = null;
-			this.getParentCategory();
-			// NOTE: cover is removed from weburger
-		    };
+				}
+				];
+			this.init = function () {
+				// load data from model
+				this.id = this.getProperty('id');
+				this.label = this.getProperty('label');
+				this.description = this.getProperty('description');
+				this.category = this.getProperty('category');
+				this.type = this.getProperty('type');
+				this.property = this.getProperty('property');
+				this.alert = null;
+				this.getParentCategory();
+				// NOTE: cover is removed from weburger
+			};
 
-		    this.getParentCategory = function () {
-			var widget = this.getWidget();
-			while (!widget.isRoot() && !widget.getModelProperty('category')) {
-			    widget = widget.getParent();
-			}
-			this.parentCategory = widget.getModelProperty('category');
-		    };
+			this.getParentCategory = function () {
+				var widget = this.getWidget();
+				while (!widget.isRoot() && !widget.getModelProperty('category')) {
+					widget = widget.getParent();
+				}
+				this.parentCategory = widget.getModelProperty('category');
+			};
 
-		    this.setProperties = function () {
-			if (!this.parentCategory) {
-			    this.alert = 'No parent type is defined.';
-			} else {
-			    this.setType(this.parentCategory);
-			}
-		    };
+			this.setProperties = function () {
+				if (!this.parentCategory) {
+					this.alert = 'No parent type is defined.';
+				} else {
+					this.setType(this.parentCategory);
+				}
+			};
 
-		    this.setType = function (type) {
-			switch (type) {
-			    case 'http://schema.org/Article':
-				this.properties =
-					[
-					    'articleBody', 'articleSection', 'about', 'author', 'comment',
-					    'commentCount', 'contributor', 'creator', 'description', 'editor',
-					    'genre', 'headline', 'keywords', 'publisher', 'text', 'translator',
-					    'video'
-					];
-				break;
+			this.setType = function (type) {
+				switch (type) {
+				case 'http://schema.org/Article':
+					this.properties =
+						[
+							'articleBody', 'articleSection', 'about', 'author', 'comment',
+							'commentCount', 'contributor', 'creator', 'description', 'editor',
+							'genre', 'headline', 'keywords', 'publisher', 'text', 'translator',
+							'video'
+							];
+					break;
 
-			    case 'http://schema.org/Book':
-				this.properties =
-					[
-					    'about', 'author', 'bookFormat', 'comment', 'creator', 'genre',
-					    'headline', 'image', 'keywords', 'name', 'publisher', 'text',
-					    'translator', 'video'
-					];
-				break;
+				case 'http://schema.org/Book':
+					this.properties =
+						[
+							'about', 'author', 'bookFormat', 'comment', 'creator', 'genre',
+							'headline', 'image', 'keywords', 'name', 'publisher', 'text',
+							'translator', 'video'
+							];
+					break;
 
-			    case 'http://schema.org/Image':
-				this.properties =
-					[
-					    'about', 'description', 'caption', 'comment', 'thumbnail',
-					    'keywords', 'image', 'name', 'url'
-					];
-				break;
+				case 'http://schema.org/Image':
+					this.properties =
+						[
+							'about', 'description', 'caption', 'comment', 'thumbnail',
+							'keywords', 'image', 'name', 'url'
+							];
+					break;
 
-			    case 'http://schema.org/Movie':
-				this.properties =
-					[
-					    'about', 'actor', 'comment', 'commentCount', 'copyrightYear',
-					    'countryOfOrigin', 'creator', 'dateCreated', 'description',
-					    'director', 'duration', 'genre', 'headline', 'isBasedOn',
-					    'image', 'keywords', 'musicBy', 'name', 'provider', 'productionCompany',
-					    'sponsor', 'subtitleLanguage', 'text', 'thumbnailUrl', 'trailer'
-					];
-				break;
+				case 'http://schema.org/Movie':
+					this.properties =
+						[
+							'about', 'actor', 'comment', 'commentCount', 'copyrightYear',
+							'countryOfOrigin', 'creator', 'dateCreated', 'description',
+							'director', 'duration', 'genre', 'headline', 'isBasedOn',
+							'image', 'keywords', 'musicBy', 'name', 'provider', 'productionCompany',
+							'sponsor', 'subtitleLanguage', 'text', 'thumbnailUrl', 'trailer'
+							];
+					break;
 
-			    case 'http://schema.org/Person':
-				this.properties =
-					[
-					    'additionalName', 'address', 'birthDate', 'birthPlace',
-					    'children', 'deathDate', 'daethPlace', 'email', 'familyName',
-					    'gender', 'homeLocation', 'parent', 'telephone', 'description',
-					    'image', 'spouse'
-					];
-				break;
+				case 'http://schema.org/Person':
+					this.properties =
+						[
+							'additionalName', 'address', 'birthDate', 'birthPlace',
+							'children', 'deathDate', 'daethPlace', 'email', 'familyName',
+							'gender', 'homeLocation', 'parent', 'telephone', 'description',
+							'image', 'spouse'
+							];
+					break;
 
-			    case 'http://schema.org/Product':
-				this.properties =
-					[
-					    'brand', 'category', 'color', 'description', 'height',
-					    'isConsumableFor', 'genre', 'headline', 'image', 'name'
-					];
-				break;
+				case 'http://schema.org/Product':
+					this.properties =
+						[
+							'brand', 'category', 'color', 'description', 'height',
+							'isConsumableFor', 'genre', 'headline', 'image', 'name'
+							];
+					break;
 
-			    case 'http://schema.org/Service':
-				this.properties =
-					[
-					    'areaServed', 'brand', 'category', 'logo', 'serviceType',
-					    'description', 'image', 'name'
-					];
-				break;
+				case 'http://schema.org/Service':
+					this.properties =
+						[
+							'areaServed', 'brand', 'category', 'logo', 'serviceType',
+							'description', 'image', 'name'
+							];
+					break;
 
-			    case 'http://schema.org/Thing':
-				this.properties = ['description', 'image', 'name'];
-				break;
+				case 'http://schema.org/Thing':
+					this.properties = ['description', 'image', 'name'];
+					break;
 
-			    case 'http://schema.org/Text':
-				this.properties = ['description', 'image', 'keywords', 'name'];
-				break;
+				case 'http://schema.org/Text':
+					this.properties = ['description', 'image', 'keywords', 'name'];
+					break;
 
-			    case 'http://schema.org/WebPage':
-				this.properties =
-					[
-					    'about', 'author', 'comment', 'description', 'image', 'headline',
-					    'keywords', 'commentCount', 'mainContentOfPage', 'primaryImageOfPage',
-					    'video'
-					];
-				break;
-			}
-		    };
+				case 'http://schema.org/WebPage':
+					this.properties =
+						[
+							'about', 'author', 'comment', 'description', 'image', 'headline',
+							'keywords', 'commentCount', 'mainContentOfPage', 'primaryImageOfPage',
+							'video'
+							];
+					break;
+				}
+			};
 		}
-	    });
+	});
 
-	    $settings.newPage({
+	$settings.newPage({
 		type: 'border',
 		label: 'Border',
 		icon: 'border_all',
@@ -12376,113 +12380,113 @@ angular.module('am-wb-core')
 		 * @ngInject
 		 */
 		controller: function () {
-		    this.width = {};
-		    this.radius = {};
+			this.width = {};
+			this.radius = {};
 
-		    this.styles = [{
-			    title: 'None',
-			    value: 'none'
+			this.styles = [{
+				title: 'None',
+				value: 'none'
 			}, {
-			    title: 'Solid',
-			    value: 'solid'
+				title: 'Solid',
+				value: 'solid'
 			}, {
-			    title: 'Dotted',
-			    value: 'dotted'
+				title: 'Dotted',
+				value: 'dotted'
 			}, {
-			    title: 'Dashed',
-			    value: 'dashed'
+				title: 'Dashed',
+				value: 'dashed'
 			}, {
-			    title: 'Double',
-			    value: 'double'
+				title: 'Double',
+				value: 'double'
 			}, {
-			    title: 'Groove',
-			    value: 'groove'
+				title: 'Groove',
+				value: 'groove'
 			}, {
-			    title: 'Ridge',
-			    value: 'ridge'
+				title: 'Ridge',
+				value: 'ridge'
 			}, {
-			    title: 'Inset',
-			    value: 'inset'
+				title: 'Inset',
+				value: 'inset'
 			}, {
-			    title: 'Outset',
-			    value: 'outset'
+				title: 'Outset',
+				value: 'outset'
 			}];
 
-		    /*
-		     * watch 'wbModel' and apply the changes into setting panel
-		     */
-		    this.init = function () {
-			this.style = this.getStyleBorder('style');
-			this.color = this.getStyleBorder('color');
 			/*
-			 * Set width
-			 * width is a string such as '10px 25% 2vh 4px'
+			 * watch 'wbModel' and apply the changes into setting panel
 			 */
-			fillDimFromString(this.width, this.getStyleBorder('width') || 'medium');
+			this.init = function () {
+				this.style = this.getStyleBorder('style');
+				this.color = this.getStyleBorder('color');
+				/*
+				 * Set width
+				 * width is a string such as '10px 25% 2vh 4px'
+				 */
+				fillDimFromString(this.width, this.getStyleBorder('width') || 'medium');
+				/*
+				 * Set radius
+				 * radius is a string such as '10px 25% 2vh 4px'
+				 */
+				fillCornerFromString(this.radius, this.getStyleBorder('radius') || '0px');
+			};
+
 			/*
-			 * Set radius
-			 * radius is a string such as '10px 25% 2vh 4px'
+			 * Settings about border width
 			 */
-			fillCornerFromString(this.radius, this.getStyleBorder('radius') || '0px');
-		    };
+			this.widthAllChanged = function (val) {
+				//medium is default value of width
+				setAllDim(this.width, val || 'medium');
+				this.widthChanged();
+			};
 
-		    /*
-		     * Settings about border width
-		     */
-		    this.widthAllChanged = function (val) {
-			//medium is default value of width
-			setAllDim(this.width, val || 'medium');
-			this.widthChanged();
-		    };
+			this.widthChanged = function () {
+				this.setStyleBorder('width', createDimeStr(this.width));
+			};
 
-		    this.widthChanged = function () {
-			this.setStyleBorder('width', createDimeStr(this.width));
-		    };
+			/*
+			 * Settings about border radius
+			 */
+			this.radiusAllChanged = function (val) {
+				//0px is default value of radius
+				setAllCorner(this.radius, val || '0px');
+				this.radiusChanged();
+			};
 
-		    /*
-		     * Settings about border radius
-		     */
-		    this.radiusAllChanged = function (val) {
-			//0px is default value of radius
-			setAllCorner(this.radius, val || '0px');
-			this.radiusChanged();
-		    };
-
-		    this.radiusChanged = function () {
-			this.setStyleBorder('radius', createCornerStr(this.radius))
-		    };
+			this.radiusChanged = function () {
+				this.setStyleBorder('radius', createCornerStr(this.radius))
+			};
 		}
-	    });
+	});
 
-	    /**
-	     * @ngdoc Widget Settings
-	     * @name layout
-	     * @description Manages element layout
-	     * 
-	     * Layout is consists of the following attributes for a group:
-	     * 
-	     * <ul>
-	     *     <li>direction</li>
-	     *     <li>direction-inverse</li>
-	     *     <li>wrap</li>
-	     *     <li>wrap-inverse</li>
-	     *     <li>align</li>
-	     *     <li>justify</li>
-	     * </ul>
-	     * 
-	     * and following ones for a widget (or group):
-	     * 
-	     * <ul>
-	     *     <li>grow</li>
-	     *     <li>shrink</li>
-	     *     <li>order</li>
-	     * </ul>
-	     * 
-	     * See the layout documents for more details.
-	     * 
-	     * @see wb-layout
-	     */
-	    $settings.newPage({
+	/**
+	 * @ngdoc Widget Settings
+	 * @name layout
+	 * @description Manages element layout
+	 * 
+	 * Layout is consists of the following attributes for a group:
+	 * 
+	 * <ul>
+	 *     <li>direction</li>
+	 *     <li>direction-inverse</li>
+	 *     <li>wrap</li>
+	 *     <li>wrap-inverse</li>
+	 *     <li>align</li>
+	 *     <li>justify</li>
+	 * </ul>
+	 * 
+	 * and following ones for a widget (or group):
+	 * 
+	 * <ul>
+	 *     <li>grow</li>
+	 *     <li>shrink</li>
+	 *     <li>order</li>
+	 * </ul>
+	 * 
+	 * See the layout documents for more details.
+	 * 
+	 * @see wb-layout
+	 */
+	$settings.newPage({
 		type: 'layout',
 		label: 'Layout',
 		icon: 'dashboard',
@@ -12495,129 +12499,129 @@ angular.module('am-wb-core')
 		 * @ngInject
 		 */
 		controller: function () {
-		    this.direction_ = [{
-			    title: 'column',
-			    icon: 'wb-horizontal-boxes',
-			    value: 'column'
+			this.direction_ = [{
+				title: 'column',
+				icon: 'wb-horizontal-boxes',
+				value: 'column'
 			}, {
-			    title: 'row',
-			    icon: 'wb-vertical-boxes',
-			    value: 'row'
+				title: 'row',
+				icon: 'wb-vertical-boxes',
+				value: 'row'
 			}];
 
-		    this.justify_ = {
-			'row': [{
-				title: 'Start',
-				icon: 'sort_start_horiz',
-				value: 'start'
-			    }, {
-				title: 'End',
-				icon: 'sort_end_horiz',
-				value: 'end'
-			    }, {
-				title: 'Center',
-				icon: 'sort_center_horiz',
-				value: 'center'
-			    }, {
-				title: 'Space Around',
-				icon: 'sort_space_around_horiz',
-				value: 'space-around'
-			    }, {
-				title: 'Space Between',
-				icon: 'sort_space_between_horiz',
-				value: 'space-between'
-			    }],
-			'column': [{
-				title: 'Start',
-				icon: 'sort_start_vert',
-				value: 'start'
-			    }, {
-				title: 'End',
-				icon: 'sort_end_vert',
-				value: 'end'
-			    }, {
-				title: 'Center',
-				icon: 'sort_center_vert',
-				value: 'center'
-			    }, {
-				title: 'Space Around',
-				icon: 'sort_space_around_vert',
-				value: 'space-around'
-			    }, {
-				title: 'Space Between',
-				icon: 'sort_space_between_vert',
-				value: 'space-between'
-			    }]
-		    };
+			this.justify_ = {
+					'row': [{
+						title: 'Start',
+						icon: 'sort_start_horiz',
+						value: 'start'
+					}, {
+						title: 'End',
+						icon: 'sort_end_horiz',
+						value: 'end'
+					}, {
+						title: 'Center',
+						icon: 'sort_center_horiz',
+						value: 'center'
+					}, {
+						title: 'Space Around',
+						icon: 'sort_space_around_horiz',
+						value: 'space-around'
+					}, {
+						title: 'Space Between',
+						icon: 'sort_space_between_horiz',
+						value: 'space-between'
+					}],
+					'column': [{
+						title: 'Start',
+						icon: 'sort_start_vert',
+						value: 'start'
+					}, {
+						title: 'End',
+						icon: 'sort_end_vert',
+						value: 'end'
+					}, {
+						title: 'Center',
+						icon: 'sort_center_vert',
+						value: 'center'
+					}, {
+						title: 'Space Around',
+						icon: 'sort_space_around_vert',
+						value: 'space-around'
+					}, {
+						title: 'Space Between',
+						icon: 'sort_space_between_vert',
+						value: 'space-between'
+					}]
+			};
 
-		    this.align_ = {
-			'column': [{
-				title: 'Stretch',
-				icon: 'format_align_justify',
-				value: 'stretch'
-			    }, {
-				title: 'Start',
-				icon: 'format_align_left',
-				value: 'start'
-			    }, {
-				title: 'End',
-				icon: 'format_align_right',
-				value: 'end'
-			    }, {
-				title: 'Center',
-				icon: 'format_align_center',
-				value: 'center'
-			    }],
-			'row': [{
-				title: 'Stretch',
-				icon: 'align_justify_vertical',
-				value: 'stretch'
-			    }, {
-				title: 'Start',
-				icon: 'align_start_vertical',
-				value: 'start'
-			    }, {
-				title: 'End',
-				icon: 'align_end_vertical',
-				value: 'end'
-			    }, {
-				title: 'Center',
-				icon: 'align_center_vertical',
-				value: 'center'
-			    }]
-		    };
-		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-		    this.init = function () {
-			this.direction = this.getStyleLayout('direction') || 'column';
-			this.align = this.getStyleLayout('align');
-			this.wrap = this.getStyleLayout('wrap');
-			this.justify = this.getStyleLayout('justify');
-		    };
+			this.align_ = {
+					'column': [{
+						title: 'Stretch',
+						icon: 'format_align_justify',
+						value: 'stretch'
+					}, {
+						title: 'Start',
+						icon: 'format_align_left',
+						value: 'start'
+					}, {
+						title: 'End',
+						icon: 'format_align_right',
+						value: 'end'
+					}, {
+						title: 'Center',
+						icon: 'format_align_center',
+						value: 'center'
+					}],
+					'row': [{
+						title: 'Stretch',
+						icon: 'align_justify_vertical',
+						value: 'stretch'
+					}, {
+						title: 'Start',
+						icon: 'align_start_vertical',
+						value: 'start'
+					}, {
+						title: 'End',
+						icon: 'align_end_vertical',
+						value: 'end'
+					}, {
+						title: 'Center',
+						icon: 'align_center_vertical',
+						value: 'center'
+					}]
+			};
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				this.direction = this.getStyleLayout('direction') || 'column';
+				this.align = this.getStyleLayout('align');
+				this.wrap = this.getStyleLayout('wrap');
+				this.justify = this.getStyleLayout('justify');
+			};
 
-		    /*
-		     * This part updates the wbModel whenever the layout properties are changed in view
-		     */
-		    this.directionChanged = function () {
-			this.setStyleLayout('direction', this.direction);
-		    };
+			/*
+			 * This part updates the wbModel whenever the layout properties are changed in view
+			 */
+			this.directionChanged = function () {
+				this.setStyleLayout('direction', this.direction);
+			};
 
-		    this.wrapChanged = function () {
-			this.setStyleLayout('wrap', this.wrap);
-		    };
+			this.wrapChanged = function () {
+				this.setStyleLayout('wrap', this.wrap);
+			};
 
-		    this.alignChanged = function () {
-			this.setStyleLayout('align', this.align);
-		    };
+			this.alignChanged = function () {
+				this.setStyleLayout('align', this.align);
+			};
 
-		    this.justifyChanged = function () {
-			this.setStyleLayout('justify', this.justify);
-		    };
+			this.justifyChanged = function () {
+				this.setStyleLayout('justify', this.justify);
+			};
 		}
-	    });
+	});
 
-	    $settings.newPage({
+	$settings.newPage({
 		type: 'layout-self',
 		label: 'Self Layout',
 		icon: 'dashboard',
@@ -12630,97 +12634,97 @@ angular.module('am-wb-core')
 		 * @ngInject
 		 */
 		controller: function () {
-		    this.selfAlign_ = {
-			'column': [{
-				title: 'Stretch',
-				icon: 'format_align_justify',
-				value: 'stretch'
-			    }, {
-				title: 'Start',
-				icon: 'format_align_left',
-				value: 'start'
-			    }, {
-				title: 'End',
-				icon: 'format_align_right',
-				value: 'end'
-			    }, {
-				title: 'Center',
-				icon: 'format_align_center',
-				value: 'center'
-			    }, {
-				title: 'Automatic',
-				icon: 'brightness_auto',
-				value: 'auto'
-			    }],
-			'row': [{
-				title: 'Stretch',
-				icon: 'align_justify_vertical',
-				value: 'stretch'
-			    }, {
-				title: 'Start',
-				icon: 'align_start_vertical',
-				value: 'start'
-			    }, {
-				title: 'End',
-				icon: 'align_end_vertical',
-				value: 'end'
-			    }, {
-				title: 'Center',
-				icon: 'align_center_vertical',
-				value: 'center'
-			    }, {
-				title: 'Automatic',
-				icon: 'brightness_auto',
-				value: 'auto'
-			    }]
-		    };
+			this.selfAlign_ = {
+					'column': [{
+						title: 'Stretch',
+						icon: 'format_align_justify',
+						value: 'stretch'
+					}, {
+						title: 'Start',
+						icon: 'format_align_left',
+						value: 'start'
+					}, {
+						title: 'End',
+						icon: 'format_align_right',
+						value: 'end'
+					}, {
+						title: 'Center',
+						icon: 'format_align_center',
+						value: 'center'
+					}, {
+						title: 'Automatic',
+						icon: 'brightness_auto',
+						value: 'auto'
+					}],
+					'row': [{
+						title: 'Stretch',
+						icon: 'align_justify_vertical',
+						value: 'stretch'
+					}, {
+						title: 'Start',
+						icon: 'align_start_vertical',
+						value: 'start'
+					}, {
+						title: 'End',
+						icon: 'align_end_vertical',
+						value: 'end'
+					}, {
+						title: 'Center',
+						icon: 'align_center_vertical',
+						value: 'center'
+					}, {
+						title: 'Automatic',
+						icon: 'brightness_auto',
+						value: 'auto'
+					}]
+			};
 
-		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-		    this.init = function () {
-			this.alignSelf = this.getStyleLayout('align_self') || 'auto';
-			this.order = this.getStyleLayout('order') || 0;
-			// SEE: https://www.w3schools.com/cssreF/css3_pr_flex-basis.asp
-			this.basis = this.getStyleLayout('basis') || 'auto';
-			this.grow = this.getStyleLayout('grow') || 0;
-			this.shrink = this.getStyleLayout('shrink') || 1;
-		    };
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				this.alignSelf = this.getStyleLayout('align_self', 'auto');
+				this.order = this.getStyleLayout('order', 0);
+				// SEE: https://www.w3schools.com/cssreF/css3_pr_flex-basis.asp
+				this.basis = this.getStyleLayout('basis', 'auto');
+				this.grow = this.getStyleLayout('grow', 0);
+				this.shrink = this.getStyleLayout('shrink', 1);
+			};
 
-		    /*
-		     * Fetchs parent direction
-		     */
-		    this.getParentDirection = function () {
-			var widget = this.getWidget();
-			if (!widget || !widget.getParent()) {
-			    return;
-			}
-			return widget.getParent().getDirection();
-		    };
+			/*
+			 * Fetchs parent direction
+			 */
+			this.getParentDirection = function () {
+				var widget = this.getWidget();
+				if (!widget || !widget.getParent()) {
+					return;
+				}
+				return widget.getParent().getDirection();
+			};
 
-		    /*
-		     * This part updates the wbModel whenever the layout-self property is changed in view
-		     */
-		    this.alignSelfChanged = function () {
-			this.setStyleLayout('align_self', this.alignSelf);
-		    };
-		    this.updateOrder = function (order) {
-			this.setStyleLayout('order', order);
-		    };
-		    this.updateBasis = function (basis) {
-			this.setStyleLayout('basis', basis);
-		    };
-		    this.updateGrow = function (grow) {
-			this.setStyleLayout('grow', grow);
-		    };
-		    this.updateShrink = function (shrink) {
-			this.setStyleLayout('shrink', shrink);
-		    };
+			/*
+			 * This part updates the wbModel whenever the layout-self property is changed in view
+			 */
+			this.alignSelfChanged = function () {
+				this.setStyleLayout('align_self', this.alignSelf);
+			};
+			this.updateOrder = function (order) {
+				this.setStyleLayout('order', order);
+			};
+			this.updateBasis = function (basis) {
+				this.setStyleLayout('basis', basis);
+			};
+			this.updateGrow = function (grow) {
+				this.setStyleLayout('grow', grow);
+			};
+			this.updateShrink = function (shrink) {
+				this.setStyleLayout('shrink', shrink);
+			};
 		}
-	    });
+	});
 
-	    //TODO: Masood, 2018: Move this controller to a separated controller.
-	    $settings.newPage({
+	//TODO: Masood, 2018: Move this controller to a separated controller.
+	$settings.newPage({
 		type: 'marginPadding',
 		label: 'Margin/Padding',
 		icon: 'border_clear',
@@ -12735,50 +12739,50 @@ angular.module('am-wb-core')
 		 * Manage view with multiple editor of margin elements.
 		 */
 		controller: function () {
-		    this.margin = {};
-		    this.padding = {};
+			this.margin = {};
+			this.padding = {};
 
-		    /**
-		     * All settings about margin and padding
-		     * 
-		     * Note: we normally add JSDoc to the global functions.
-		     * 
-		     * @memberof marginPaddingCtrl
-		     */
-		    this.updateAllMargin = function (val) {
-			// default value of margin is 0px
-			setAllDim(this.margin, val || '0px');
-			this.updateMargin(this.margin);
-		    };
+			/**
+			 * All settings about margin and padding
+			 * 
+			 * Note: we normally add JSDoc to the global functions.
+			 * 
+			 * @memberof marginPaddingCtrl
+			 */
+			this.updateAllMargin = function (val) {
+				// default value of margin is 0px
+				setAllDim(this.margin, val || '0px');
+				this.updateMargin(this.margin);
+			};
 
-		    /**
-		     * Sets all padding to the equal value
-		     * 
-		     * @memberof marginPaddingCtrl
-		     */
-		    this.updateAllPadding = function (val) {
-			//default value of padding is 0px
-			setAllDim(this.padding, val);
-			this.updatePadding(this.padding)
-		    };
+			/**
+			 * Sets all padding to the equal value
+			 * 
+			 * @memberof marginPaddingCtrl
+			 */
+			this.updateAllPadding = function (val) {
+				//default value of padding is 0px
+				setAllDim(this.padding, val);
+				this.updatePadding(this.padding)
+			};
 
-		    this.updateMargin = function (newMargin) {
-			this.setStyle('margin', createDimeStr(newMargin));
-		    };
+			this.updateMargin = function (newMargin) {
+				this.setStyle('margin', createDimeStr(newMargin));
+			};
 
-		    this.updatePadding = function (newPadding) {
-			this.setStyle('padding', createDimeStr(newPadding));
-		    };
+			this.updatePadding = function (newPadding) {
+				this.setStyle('padding', createDimeStr(newPadding));
+			};
 
-		    this.init = function () {
-			//margin is a string such as '10px 25% 2vh 4px'
-			fillDimFromString(this.margin, this.getStyle('margin'));
-			fillDimFromString(this.padding, this.getStyle('padding'));
-		    };
+			this.init = function () {
+				//margin is a string such as '10px 25% 2vh 4px'
+				fillDimFromString(this.margin, this.getStyle('margin'));
+				fillDimFromString(this.padding, this.getStyle('padding'));
+			};
 		}
-	    });
+	});
 
-	    $settings.newPage({
+	$settings.newPage({
 		type: 'size',
 		label: 'Size',
 		icon: 'photo_size_select_large',
@@ -12789,48 +12793,48 @@ angular.module('am-wb-core')
 		 * @ngInject
 		 */
 		controller: function () {
-		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-		    this.init = function () {
-			this.width = this.getStyleSize('width');
-			this.height = this.getStyleSize('height');
-			this.minWidth = this.getStyleSize('minWidth');
-			this.minHeight = this.getStyleSize('minHeight');
-			this.maxWidth = this.getStyleSize('maxWidth');
-			this.maxHeight = this.getStyleSize('maxHeight');
-		    };
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				this.width = this.getStyleSize('width');
+				this.height = this.getStyleSize('height');
+				this.minWidth = this.getStyleSize('minWidth');
+				this.minHeight = this.getStyleSize('minHeight');
+				this.maxWidth = this.getStyleSize('maxWidth');
+				this.maxHeight = this.getStyleSize('maxHeight');
+			};
 
-		    /*
-		     * This part updates the wbModel whenever the size properties are changed in view
-		     */
-		    this.widthChanged = function () {
-			this.setStyleSize('width', this.width);
-		    };
+			/*
+			 * This part updates the wbModel whenever the size properties are changed in view
+			 */
+			this.widthChanged = function () {
+				this.setStyleSize('width', this.width);
+			};
 
-		    this.heightChanged = function () {
-			this.setStyleSize('height', this.height);
-		    };
+			this.heightChanged = function () {
+				this.setStyleSize('height', this.height);
+			};
 
-		    this.minWidthChanged = function () {
-			this.setStyleSize('minWidth', this.minWidth);
-		    };
+			this.minWidthChanged = function () {
+				this.setStyleSize('minWidth', this.minWidth);
+			};
 
-		    this.minHeightChanged = function () {
-			this.setStyleSize('minHeight', this.minHeight);
-		    };
+			this.minHeightChanged = function () {
+				this.setStyleSize('minHeight', this.minHeight);
+			};
 
-		    this.maxWidthChanged = function () {
-			this.setStyleSize('maxWidth', this.maxWidth);
-		    };
+			this.maxWidthChanged = function () {
+				this.setStyleSize('maxWidth', this.maxWidth);
+			};
 
-		    this.maxHeightChanged = function () {
-			this.setStyleSize('maxHeight', this.maxHeight);
-		    };
+			this.maxHeightChanged = function () {
+				this.setStyleSize('maxHeight', this.maxHeight);
+			};
 		}
-	    });
+	});
 
-	    $settings.newPage({
+	$settings.newPage({
 		type: 'shadow',
 		label: 'Shadow',
 		icon: 'brightness_low',
@@ -12842,42 +12846,42 @@ angular.module('am-wb-core')
 		 */
 		controller: function () {
 
-		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-		    this.init = function () {
-			var shadows = this.getProperty('style.shadows');
-			// this is an object we have to make a clone.
-			this.shadows = _.cloneDeep(shadows);
-		    };
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				var shadows = this.getProperty('style.shadows');
+				// this is an object we have to make a clone.
+				this.shadows = _.cloneDeep(shadows);
+			};
 
-		    this.updateShadows = function () {
-			this.setProperty('style.shadows', this.shadows);
-			this.init();
-		    };
+			this.updateShadows = function () {
+				this.setProperty('style.shadows', this.shadows);
+				this.init();
+			};
 
-		    this.remove = function (index) {
-			this.shadows.splice(index, 1);
-			this.updateShadows();
-		    };
+			this.remove = function (index) {
+				this.shadows.splice(index, 1);
+				this.updateShadows();
+			};
 
-		    this.addShadow = function () {
-			if (!this.shadows) {
-			    this.shadows = [];
-			}
-			this.shadows.push({
-			    hShift: '0px',
-			    vShift: '0px',
-			    blur: '0px',
-			    spread: '0px',
-			    color: 'rgb(0,0,0)'
-			});
-			this.updateShadows();
-		    };
+			this.addShadow = function () {
+				if (!this.shadows) {
+					this.shadows = [];
+				}
+				this.shadows.push({
+					hShift: '0px',
+					vShift: '0px',
+					blur: '0px',
+					spread: '0px',
+					color: 'rgb(0,0,0)'
+				});
+				this.updateShadows();
+			};
 
 		}
-	    });
-	    $settings.newPage({
+	});
+	$settings.newPage({
 		type: 'transform',
 		label: 'Transform',
 		icon: 'brightness_low',
@@ -12889,88 +12893,88 @@ angular.module('am-wb-core')
 		 */
 		controller: function () {
 
-		    /*
-		     * watch 'wbModel' and apply the changes in setting panel
-		     */
-		    this.init = function () {
-			this.origin = this.getProperty('style.transform.origin');
-			this.style = this.getProperty('style.transform.style');
-			this.perspective = this.getProperty('style.transform.perspective');
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				this.origin = this.getProperty('style.transform.origin');
+				this.style = this.getProperty('style.transform.style');
+				this.perspective = this.getProperty('style.transform.perspective');
 
-			// X:2D
-			this.translateX = this.getProperty('style.transform.x.translate');
-			this.scaleX = this.getProperty('style.transform.x.scale');
-			this.rotateX = this.getProperty('style.transform.x.rotate');
-			this.skewX = this.getProperty('style.transform.x.skew');
+				// X:2D
+				this.translateX = this.getProperty('style.transform.x.translate');
+				this.scaleX = this.getProperty('style.transform.x.scale');
+				this.rotateX = this.getProperty('style.transform.x.rotate');
+				this.skewX = this.getProperty('style.transform.x.skew');
 
-			// Y:2D
-			this.translateY = this.getProperty('style.transform.y.translate');
-			this.scaleY = this.getProperty('style.transform.y.scale');
-			this.rotateY = this.getProperty('style.transform.y.rotate');
-			this.skewY = this.getProperty('style.transform.y.skew');
+				// Y:2D
+				this.translateY = this.getProperty('style.transform.y.translate');
+				this.scaleY = this.getProperty('style.transform.y.scale');
+				this.rotateY = this.getProperty('style.transform.y.rotate');
+				this.skewY = this.getProperty('style.transform.y.skew');
 
-			// Z:3D
-			this.translateZ = this.getProperty('style.transform.z.translate');
-			this.scaleZ = this.getProperty('style.transform.z.scale');
-			this.rotateZ = this.getProperty('style.transform.z.rotate');
-		    };
+				// Z:3D
+				this.translateZ = this.getProperty('style.transform.z.translate');
+				this.scaleZ = this.getProperty('style.transform.z.scale');
+				this.rotateZ = this.getProperty('style.transform.z.rotate');
+			};
 
-		    this.updateOrigin = function () {
-			this.setProperty('style.transform.origin', this.origin);
-		    };
+			this.updateOrigin = function () {
+				this.setProperty('style.transform.origin', this.origin);
+			};
 
-//          flat: Specifies that child elements will NOT preserve its 3D position. This is default
-//          preserve-3d: Specifies that child elements will preserve its 3D position
-//          initial: Sets this property to its default value. Read about initial
-//          inherit: Inherits this property from its parent element. Read about inherit
-		    this.updateStyle = function () {
-			this.setProperty('style.transform.style', this.style);
-		    };
-		    this.updatePerspective = function () {
-			this.setProperty('style.transform.perspective', this.perspective);
-		    };
+//			flat: Specifies that child elements will NOT preserve its 3D position. This is default
+//			preserve-3d: Specifies that child elements will preserve its 3D position
+//			initial: Sets this property to its default value. Read about initial
+//			inherit: Inherits this property from its parent element. Read about inherit
+			this.updateStyle = function () {
+				this.setProperty('style.transform.style', this.style);
+			};
+			this.updatePerspective = function () {
+				this.setProperty('style.transform.perspective', this.perspective);
+			};
 
-		    // X
-		    this.updateTranslateX = function () {
-			this.setProperty('style.transform.x.translate', this.translateX);
-		    };
-		    this.updateScaleX = function () {
-			this.setProperty('style.transform.x.scale', this.scaleX);
-		    };
-		    this.updateRotateX = function () {
-			this.setProperty('style.transform.x.rotate', this.rotateX);
-		    };
-		    this.updateSkewX = function () {
-			this.setProperty('style.transform.x.skew', this.skewX);
-		    };
+			// X
+			this.updateTranslateX = function () {
+				this.setProperty('style.transform.x.translate', this.translateX);
+			};
+			this.updateScaleX = function () {
+				this.setProperty('style.transform.x.scale', this.scaleX);
+			};
+			this.updateRotateX = function () {
+				this.setProperty('style.transform.x.rotate', this.rotateX);
+			};
+			this.updateSkewX = function () {
+				this.setProperty('style.transform.x.skew', this.skewX);
+			};
 
-		    // Y
-		    this.updateTranslateY = function () {
-			this.setProperty('style.transform.y.translate', this.translateY);
-		    };
-		    this.updateScaleY = function () {
-			this.setProperty('style.transform.y.scale', this.scaleY);
-		    };
-		    this.updateRotateY = function () {
-			this.setProperty('style.transform.y.rotate', this.rotateY);
-		    };
-		    this.updateSkewY = function () {
-			this.setProperty('style.transform.y.skew', this.skewY);
-		    };
+			// Y
+			this.updateTranslateY = function () {
+				this.setProperty('style.transform.y.translate', this.translateY);
+			};
+			this.updateScaleY = function () {
+				this.setProperty('style.transform.y.scale', this.scaleY);
+			};
+			this.updateRotateY = function () {
+				this.setProperty('style.transform.y.rotate', this.rotateY);
+			};
+			this.updateSkewY = function () {
+				this.setProperty('style.transform.y.skew', this.skewY);
+			};
 
-		    // Z
-		    this.updateTranslateZ = function () {
-			this.setProperty('style.transform.z.translate', this.translateZ);
-		    };
-		    this.updateScaleZ = function () {
-			this.setProperty('style.transform.z.scale', this.scaleZ);
-		    };
-		    this.updateRotateZ = function () {
-			this.setProperty('style.transform.z.rotate', this.rotateZ);
-		    };
+			// Z
+			this.updateTranslateZ = function () {
+				this.setProperty('style.transform.z.translate', this.translateZ);
+			};
+			this.updateScaleZ = function () {
+				this.setProperty('style.transform.z.scale', this.scaleZ);
+			};
+			this.updateRotateZ = function () {
+				this.setProperty('style.transform.z.rotate', this.rotateZ);
+			};
 		}
-	    });
 	});
+});
 
 /* 
  * The MIT License (MIT)

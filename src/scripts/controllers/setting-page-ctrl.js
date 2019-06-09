@@ -119,11 +119,15 @@ angular.module('am-wb-core')//
         this.widget.setModelProperty('style.layout.' + key, value);
     };
 
-    this.getStyleLayout = function (key) {
+    this.getStyleLayout = function (key, defaultValue) {
         if (!this.widget) {
             return;
         }
-        return this.widget.getModelProperty('style.layout.' + key);
+        var rkey = 'style.layout.' + key;
+        if(!this.widget.hasModelProperty(rkey)){
+        	return defaultValue;
+        }
+        return this.widget.getModelProperty(rkey);
     };
 
     this.setStyle = function (key, value) {
