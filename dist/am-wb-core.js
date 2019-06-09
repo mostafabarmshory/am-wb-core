@@ -6399,13 +6399,46 @@ angular.module('am-wb-core')
 		$scope.saveEvents = saveEvents;
 	    }
 
-            this.deleteEvent = function (event) {
-                delete event.code;
-                $scope.saveEvents();
-            };
-        }
-    };
-});
+	    return {
+		restrict: 'E',
+		replace: true,
+		templateUrl: 'views/directives/wb-event-panel.html',
+		scope: {},
+		link: postLink,
+		require: ['ngModel'],
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope, $resource) {
+
+		    var defaultLanguages = [{
+			    text: 'JavaScript',
+			    value: 'javascript'
+			}];
+		    this.editEvent = function (event) {
+			$resource.get('script', {
+			    data: {
+				language: 'javascript',
+				languages: defaultLanguages,
+				code: event.code
+			    }
+			}).then(function (value) {
+			    event.code = value.code;
+			    if (!value) {
+				delete event.code;
+			    }
+			    $scope.saveEvents();
+			});
+		    };
+
+		    this.deleteEvent = function (event) {
+			delete event.code;
+			$scope.saveEvents();
+		    };
+		}
+	    };
+	});
 
 /* 
  * The MIT License (MIT)
