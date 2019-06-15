@@ -23,3 +23,40 @@ Define a timeout:
 To cancel timeout:
 
   $timeout.cancel(pull);
+
+## Where $timeout is written?
+
+Now, $timeout should be written through initialization of a widget. When a widget is loaded at first, it's init 
+function is called. During this function all timeout functions are defined. 
+Also, on this init function it is needing to set destroy for each timeout function. 
+When a widget is destroyed it fires a 'destroy' event. On init function it is a listener on 'destroy' event and 
+destroys all timeouts are set on widget.
+timeouts also can define over each of events. List of supported events are as follow:
+    - init:
+    - click 
+    - dbclick
+    - mouseout
+    - mouseover
+    - mouseenter
+    - mouseleave
+    - mousedown
+    - mouseup
+    - resize
+    - intersection
+
+###Example: 
+
+Define and destroy timeout on a widget:
+
+    var to1, to2;
+    to1 = $timeout(f1(), 1000);
+
+    $widget.on('click', function () {
+        to2 = $timeout(f2(), 1000);
+    });
+
+    $widget.on('destroy', function () {
+        $timeout.cancel(to1);
+        $timeout.cancel(to2);
+    });
+
