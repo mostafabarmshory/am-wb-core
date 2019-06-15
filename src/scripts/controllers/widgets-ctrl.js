@@ -141,7 +141,7 @@ var WbAbstractWidget = function () {
 			mouseleave: function ($event) {
 				ctrl.fire('mouseleave', $event);
 				ctrl.evalWidgetEvent('mouseleave', $event);
-			},
+			}
 	};
 
 	/*
@@ -291,7 +291,7 @@ WbAbstractWidget.prototype.reload = function(){
 			type: 'init'
 	};
 	this.evalWidgetEvent('init', $event);
-}
+};
 
 
 /**
@@ -486,13 +486,13 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	}
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
-		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5];' + this.getEvent()[type];
+		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5]; $timeout = arguments[6]' + this.getEvent()[type];
 		this.eventFunctions[type] = new Function(body);
 	}
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
 		try{
-			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow, this.$wbLocal);
+			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow, this.$wbLocal, this.$timeout);
 		} catch(ex){
 			console.log('Fail to run event code');
 			console.log({
