@@ -486,7 +486,7 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	}
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
-		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5]; $timeout = arguments[6]' + this.getEvent()[type];
+		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5], $timeout = arguments[6];' + this.getEvent()[type];
 		this.eventFunctions[type] = new Function(body);
 	}
 	eventFunction = this.eventFunctions[type];
@@ -507,7 +507,7 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 /**
  * Remove the widgets
  */
-WbAbstractWidget.prototype.destroy = function () {
+WbAbstractWidget.prototype.destroy = function ($event) {
 	// remove callbacks
 	this.callbacks = [];
 	this.actions = [];
@@ -525,6 +525,7 @@ WbAbstractWidget.prototype.destroy = function () {
 	// remove scope
 	this.$scope.$destroy();
 	this.$scope = null;
+	this.fire('destroy', $event);
 };
 
 WbAbstractWidget.prototype.setElement = function ($element) {
