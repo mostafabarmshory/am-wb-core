@@ -59,6 +59,7 @@ module.exports = function(config) {
 			'bower_components/object-path/index.js',
 			'bower_components/flux/dist/Flux.js',
 			'bower_components/mustache.js/mustache.js',
+			'bower_components/ngstorage/ngStorage.js',
 			'bower_components/angular-mocks/angular-mocks.js',
 			'bower_components/json-formatter/dist/json-formatter.js',
 			// endbower
