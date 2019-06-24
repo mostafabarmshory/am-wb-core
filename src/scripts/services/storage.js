@@ -23,19 +23,47 @@
  */
 'use strict';
 
-angular.module('am-wb-core', [
-	'ngMessages',
-	'ngAnimate',
-	'ngAria',
-	'ngMaterial',
-	'ngSanitize',
+angular.module('am-wb-core')
 
-	'pascalprecht.translate',
-	'mdColorPicker',
-	'ui.tinymce',
-	'dndLists',
-	'material.components.expansionPanels',
-	'ngMdIcons',
-	'ngHandsontable',
-	'ngStorage' // https://github.com/gsklee/ngStorage
-]);
+	/**
+	 * @ngdoc Services
+	 * @name $storage
+	 * @description A service to work with storage of browser
+	 * 
+	 */
+	.service('$storage', function ($localStorage) {
+	    /*
+	     * @param 
+	     * @returns
+	     */
+	    function get(key) {
+		return $localStorage.get(key);
+	    }
+	    /*
+	     * @param 
+	     * @returns
+	     */
+	    function put (key,value) {
+		$localStorage.set(key,value);
+	    }
+	    /*
+	     * @param 
+	     * @returns
+	     */
+	    function remove(key) {
+		$localStorage.remove(key);
+	    }
+	    /*
+	     * @param 
+	     * @returns
+	     */
+	    function has(key) {
+		return ($localStorage.get(key)? true : false);
+	    }
+	    
+	    this.get = get;
+	    this.put = put;
+	    this.remove = remove;
+	    this.has = has;
+	    
+	});

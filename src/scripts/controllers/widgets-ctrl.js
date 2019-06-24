@@ -486,13 +486,13 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	}
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
-		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5], $timeout = arguments[6];' + this.getEvent()[type];
+		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5], $timeout = arguments[6], $dispatcher = arguments[7], $storage = arguments[8];' + this.getEvent()[type];
 		this.eventFunctions[type] = new Function(body);
 	}
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
 		try{
-			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow, this.$wbLocal, this.$timeout);
+			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow, this.$wbLocal, this.$timeout, this.$dispatcher, this.$storage);
 		} catch(ex){
 			console.log('Fail to run event code');
 			console.log({
@@ -999,7 +999,7 @@ WbAbstractWidget.prototype.getWindow = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout, $wbWindow, $wbLocal) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout, $dispatcher, $storage, $wbWindow, $wbLocal) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -1010,6 +1010,8 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia
 	this.$timeout = $timeout;
 	this.$wbWindow = $wbWindow;
 	this.$wbLocal = $wbLocal;
+	this.$dispatcher = $dispatcher;
+	this.$storage = $storage;
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
@@ -1027,7 +1029,7 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $wbWindow, $wbLocal) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $storage, $dispatcher, $wbWindow, $wbLocal) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -1041,6 +1043,8 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$timeout = $timeout;
 	this.$wbWindow = $wbWindow;
 	this.$wbLocal = $wbLocal;
+	this.$dispatcher = $dispatcher;
+	this.$storage = $storage;
 
 	var ctrl = this;
 	this.on('modelChanged', function () {
