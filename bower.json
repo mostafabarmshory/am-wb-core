@@ -37,7 +37,8 @@
     "tinymce": "4.8.x",
     "object-path": "^0.11.0",
     "flux": "3.1.x",
-    "mustache.js": "2.3.x"
+    "mustache.js": "2.3.x",
+    "ngstorage": "0.3.x"
   },
   "devDependencies": {
     "angular-mocks": "1.7.x",

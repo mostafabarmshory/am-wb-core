@@ -42,14 +42,14 @@ angular.module('am-wb-core')
 
 	function getTemplateOf(page)
 	{
-		var template;
-		var templateUrl;
-		if (angular.isDefined(template = page.template)) {
+		var template = page.template;
+		var templateUrl = page.templateUrl;
+		if (angular.isDefined(template)) {
 			if (angular.isFunction(template)) {
 				template = template(page.params);
 			}
 		} else if (angular
-				.isDefined(templateUrl = page.templateUrl)) {
+				.isDefined(templateUrl)) {
 			if (angular.isFunction(templateUrl)) {
 				templateUrl = templateUrl(page.params);
 			}

@@ -1,1 +1,22 @@
-{"contents":[{"text":"<h2>HTML Text</h2>\n<p>این یک نمونه هست که لود شده</p>","type":"HtmlText","name":"HTML text","style":{"borderColor":{"bottom":"none"},"margin":{},"borderRadius":{},"borderStyleColorWidth":{},"borderStyle":{},"borderWidth":{},"flexAlignItem":"wb-flex-item-auto"}}],"type":"Page","direction":"rtl"}
+{
+    "contents": [
+        {
+            "text": "<h2>HTML Text</h2>\n<p>این یک نمونه هست که لود شده</p>",
+            "type": "HtmlText",
+            "name": "HTML text",
+            "style": {
+                "borderColor": {
+                    "bottom": "none"
+                },
+                "margin": {},
+                "borderRadius": {},
+                "borderStyleColorWidth": {},
+                "borderStyle": {},
+                "borderWidth": {},
+                "flexAlignItem": "wb-flex-item-auto"
+            }
+        }
+    ],
+    "type": "Page",
+    "direction": "rtl"
+}
