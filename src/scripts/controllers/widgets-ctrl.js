@@ -407,6 +407,12 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	// refresh the view
 	this.refresh($event);
 	this.fire('runtimeModelUpdated', $event);
+	//To change the view in runtime
+	var ctrl = this;
+	this.$timeout( function() {
+            ctrl.getScope().$digest();
+        });
+	
 };
 
 /**
