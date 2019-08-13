@@ -141,7 +141,7 @@ var WbAbstractWidget = function () {
 			mouseleave: function ($event) {
 				ctrl.fire('mouseleave', $event);
 				ctrl.evalWidgetEvent('mouseleave', $event);
-			},
+			}
 	};
 
 	/*
@@ -291,7 +291,7 @@ WbAbstractWidget.prototype.reload = function(){
 			type: 'init'
 	};
 	this.evalWidgetEvent('init', $event);
-}
+};
 
 
 /**
@@ -407,6 +407,12 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	// refresh the view
 	this.refresh($event);
 	this.fire('runtimeModelUpdated', $event);
+	//To change the view in runtime
+	var ctrl = this;
+	this.$timeout( function() {
+            ctrl.getScope().$digest();
+        });
+	
 };
 
 /**
@@ -486,13 +492,13 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	}
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
-		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5];' + this.getEvent()[type];
+		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5], $timeout = arguments[6], $dispatcher = arguments[7], $storage = arguments[8], $routeParams = arguments[9];' + this.getEvent()[type];
 		this.eventFunctions[type] = new Function(body);
 	}
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
 		try{
-			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow, this.$wbLocal);
+			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow, this.$wbLocal, this.$timeout, this.$dispatcher, this.$storage, this.$routeParams);
 		} catch(ex){
 			console.log('Fail to run event code');
 			console.log({
@@ -507,7 +513,7 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 /**
  * Remove the widgets
  */
-WbAbstractWidget.prototype.destroy = function () {
+WbAbstractWidget.prototype.destroy = function ($event) {
 	// remove callbacks
 	this.callbacks = [];
 	this.actions = [];
@@ -525,6 +531,7 @@ WbAbstractWidget.prototype.destroy = function () {
 	// remove scope
 	this.$scope.$destroy();
 	this.$scope = null;
+	this.fire('destroy', $event);
 };
 
 WbAbstractWidget.prototype.setElement = function ($element) {
@@ -998,7 +1005,7 @@ WbAbstractWidget.prototype.getWindow = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout, $wbWindow, $wbLocal) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout, $routeParams, $dispatcher, $storage, $wbWindow, $wbLocal) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -1008,7 +1015,10 @@ var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia
 	this.$mdMedia = $mdMedia;
 	this.$timeout = $timeout;
 	this.$wbWindow = $wbWindow;
+	this.$routeParams = $routeParams;
 	this.$wbLocal = $wbLocal;
+	this.$dispatcher = $dispatcher;
+	this.$storage = $storage;
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
@@ -1026,7 +1036,7 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $wbWindow, $wbLocal) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $storage, $dispatcher, $routeParams, $wbWindow, $wbLocal) {
 	WbAbstractWidget.call(this);
 	this.setElement($element);
 	this.setScope($scope);
@@ -1039,7 +1049,10 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$mdMedia = $mdMedia;
 	this.$timeout = $timeout;
 	this.$wbWindow = $wbWindow;
+	this.$routeParams = $routeParams;
 	this.$wbLocal = $wbLocal;
+	this.$dispatcher = $dispatcher;
+	this.$storage = $storage;
 
 	var ctrl = this;
 	this.on('modelChanged', function () {

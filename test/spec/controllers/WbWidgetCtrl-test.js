@@ -76,18 +76,18 @@ describe('WbWidgetCtrl ', function () {
 			expect(widget).not.toBe(null);
 			expect(widget.getId()).toBe('test');
 			
-			var flag = true;
+			var flag = false;
 			var callback = function() {
 				flag = true;
 			};
 			
 			widget.on('something', callback);
-			widget.fire('simething');
+			widget.fire('something');
 			expect(flag).toBe(true);
 			
 			flag = false;
 			widget.off('something', callback);
-			widget.fire('simething');
+			widget.fire('something');
 			expect(flag).toBe(false);
 			
 			done();

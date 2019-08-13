@@ -23,20 +23,40 @@
  */
 'use strict';
 
-angular.module('am-wb-core', [
-	'ngMessages',
-	'ngAnimate',
-	'ngAria',
-	'ngMaterial',
-	'ngSanitize',
-	'ngRoute', 
+describe('Service $storage', function () {
+    var $storage;
 
-	'pascalprecht.translate',
-	'mdColorPicker',
-	'ui.tinymce',
-	'dndLists',
-	'material.components.expansionPanels',
-	'ngMdIcons',
-	'ngHandsontable',
-	'ngStorage' // https://github.com/gsklee/ngStorage
-]);
+    // load the service's module
+    beforeEach(module('am-wb-core'));
+
+    // instantiate service
+    beforeEach(inject(function (_$storage_) {
+    	$storage = _$storage_;
+    }));
+
+    it('must implements WB $storage API', function () {
+        expect(angular.isFunction($storage.get)).toBe(true);
+        expect(angular.isFunction($storage.put)).toBe(true);
+        expect(angular.isFunction($storage.remove)).toBe(true);
+        expect(angular.isFunction($storage.has)).toBe(true);
+    });
+
+    it('should be same the pushed and poped data in storage', function () {
+    	$storage.put('number' , 10);
+	var data = $storage.get('number');
+    	expect(data).toBe(10);
+    });
+
+    it('should remove data with a spacial key', function () {
+    	$storage.put('number' , 10);
+    	$storage.remove('number');
+	var data = $storage.get('number');
+    	expect(data).toBe(undefined);
+    });
+    
+    it('should check the existense of a spacial item in storage', function () {
+    	$storage.put('number' , 10);
+	var flag = $storage.has('number');
+    	expect(flag).toBe(true);
+    });
+});

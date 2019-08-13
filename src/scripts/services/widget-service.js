@@ -34,7 +34,7 @@ angular.module('am-wb-core')
  */
 .service('$widget', function(
         $wbUtil, $rootScope,
-        $q, $sce, $templateRequest, $compile, $controller, $mdTheming) {
+        $q, $compile, $controller, $mdTheming) {
 
 
     this.providers =  {};
@@ -196,7 +196,7 @@ angular.module('am-wb-core')
         // 1- create scope
         var parentScope;
         if(parentWidget){
-            parentScope = parentWidget.getScope()
+            parentScope = parentWidget.getScope();
         } else {
             // this is a root widget
             parentScope = $rootScope;
@@ -223,7 +223,7 @@ angular.module('am-wb-core')
 
                     'dnd-moved="ctrl.delete()" '+
 
-                    'md-theme-watch="true">' + template + '</div>';
+                    'md-theme-watch="true">' + (template || '') + '</div>';
                 }
 
                 // 3- bind controller
@@ -234,7 +234,7 @@ angular.module('am-wb-core')
             var link = $compile(element);
             var wlocals = _.merge({
                 $scope : childScope,
-                $element : element,
+                $element : element
             }, service.providers);
             var ctrl;
             if (model.type !== 'Group') {
@@ -340,7 +340,7 @@ angular.module('am-wb-core')
 
         //return the list
         return widgets;
-    }
+    };
 
 
     this.addProvider = function(key, value) {
