@@ -3596,6 +3596,7 @@ angular.module('am-wb-core', [
 	'ngAria',
 	'ngMaterial',
 	'ngSanitize',
+	'ngRoute', 
 
 	'pascalprecht.translate',
 	'mdColorPicker',
@@ -15158,7 +15159,7 @@ angular.module('am-wb-core')
  */
 .service('$widget', function(
         $wbUtil, $rootScope,
-        $q, $sce, $templateRequest, $compile, $controller, $mdTheming) {
+        $q, $compile, $controller, $mdTheming) {
 
 
     this.providers =  {};

@@ -29,6 +29,7 @@ angular.module('am-wb-core', [
 	'ngAria',
 	'ngMaterial',
 	'ngSanitize',
+	'ngRoute', 
 
 	'pascalprecht.translate',
 	'mdColorPicker',
