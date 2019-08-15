@@ -13123,6 +13123,9 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-html',
         // functional properties
         templateUrl: 'views/widgets/wb-html.html',
+	/*
+	 * @ngInject
+	 */
         controller: function(){
         	this.text = '';
         	this.setText = function(text){
