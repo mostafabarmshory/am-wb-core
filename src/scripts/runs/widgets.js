@@ -30,83 +30,83 @@ angular.module('am-wb-core')
  */
 .run(function ($widget) {
 
-    /**
-     * @ngdoc Widgets
-     * @name Group
-     * @description Parent widget of other widgets
-     * 
-     * default setting:
-     * - margin: '1px'
-     */
-    $widget.newWidget({
-        // widget description
-        type: 'Group',
-        title: 'Group',
-        description: 'Panel contains list of widgets.',
-        icon: 'wb-widget-group',
-        groups: ['basic'],
-        model: {
-            style: {
-                margin: '1px',
-                padding: '1px',
-                layout: {
-                    direction: 'column'
-                },
-                size: {
-                    minHeight: '16px',
-                    minWidth: '16px'
-                }
-            }
-        },
-        // functional properties
-        templateUrl: 'views/widgets/wb-group.html',
-        help: 'http://dpq.co.ir/more-information-link',
-        helpId: 'wb-widget-group'
-    });
-    /**
-     * @ngdoc Widgets
-     * @name Text
-     * @description Add rich text to page
-     * 
-     * This is a RTF to add to a page.
-     * 
-     */
-    $widget.newWidget({
-        // widget description
-        type: 'HtmlText',
-        title: 'Text',
-        description: 'An text block.',
-        icon: 'wb-widget-html',
-        groups: ['basic'],
-        model: {
-            text: '<h2>Text element</h2><p>Click on the text box to edit.</p>',
-            style: {
-            	padding: '8px'
-            }
-        },
-        // help id
-        help: 'http://dpq.co.ir',
-        helpId: 'wb-widget-html',
-        // functional properties
-        templateUrl: 'views/widgets/wb-html.html',
-	/*
-	 * @ngInject
+	/**
+	 * @ngdoc Widgets
+	 * @name Group
+	 * @description Parent widget of other widgets
+	 * 
+	 * default setting:
+	 * - margin: '1px'
 	 */
-        controller: function(){
-        	this.text = '';
-        	this.setText = function(text){
-        		this.text = text;
-        	};
-        	this.initWidget = function(){
-        		var ctrl = this;
-        		this.on('modelUpdated', function($event){
-        			if($event.key === 'text'){
-        				ctrl.setText($event.newValue);
-        			}
-        		});
-        		this.setText(this.getModelProperty('text'));
-        	};
-        },
-        controllerAs: 'ctrl'
-    });
+	$widget.newWidget({
+		// widget description
+		type: 'Group',
+		title: 'Group',
+		description: 'Panel contains list of widgets.',
+		icon: 'wb-widget-group',
+		groups: ['basic'],
+		model: {
+			style: {
+				margin: '1px',
+				padding: '1px',
+				layout: {
+					direction: 'column'
+				},
+				size: {
+					minHeight: '16px',
+					minWidth: '16px'
+				}
+			}
+		},
+		// functional properties
+		templateUrl: 'views/widgets/wb-group.html',
+		help: 'http://dpq.co.ir/more-information-link',
+		helpId: 'wb-widget-group'
+	});
+	/**
+	 * @ngdoc Widgets
+	 * @name Text
+	 * @description Add rich text to page
+	 * 
+	 * This is a RTF to add to a page.
+	 * 
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'HtmlText',
+		title: 'Text',
+		description: 'An text block.',
+		icon: 'wb-widget-html',
+		groups: ['basic'],
+		model: {
+			text: '<h2>Text element</h2><p>Click on the text box to edit.</p>',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-html',
+		// functional properties
+		templateUrl: 'views/widgets/wb-html.html',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			this.text = '';
+			this.setText = function(text){
+				this.text = text;
+			};
+			this.initWidget = function(){
+				var ctrl = this;
+				this.on('modelUpdated', function($event){
+					if($event.key === 'text'){
+						ctrl.setText($event.newValue);
+					}
+				});
+				this.setText(this.getModelProperty('text'));
+			};
+		},
+		controllerAs: 'ctrl'
+	});
 });
