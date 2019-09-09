@@ -46,10 +46,9 @@ angular.module('am-wb-core')
 		var templateUrl = page.templateUrl;
 		if (angular.isDefined(template)) {
 			if (angular.isFunction(template)) {
-				template = template(page.params);
+				template = template(page.params | page);
 			}
-		} else if (angular
-				.isDefined(templateUrl)) {
+		} else if (angular.isDefined(templateUrl)) {
 			if (angular.isFunction(templateUrl)) {
 				templateUrl = templateUrl(page.params);
 			}

@@ -59,7 +59,16 @@ angular.module('am-wb-core')
 			}
 		},
 		// functional properties
-		templateUrl: 'views/widgets/wb-group.html',
+		template: function(model){
+			var groupType = model.groupType | 'div';
+			if(groupType === 'form'){
+				return '<form></form>';
+			}
+			if(groupType === 'section'){
+				return '<section></section>';
+			}
+			return '<div></div>';
+		},
 		help: 'http://dpq.co.ir/more-information-link',
 		helpId: 'wb-widget-group'
 	});
@@ -108,5 +117,60 @@ angular.module('am-wb-core')
 			};
 		},
 		controllerAs: 'ctrl'
+	});
+	/**
+	 * @ngdoc Widgets
+	 * @name iframe
+	 * @description Add inline frame to show another document within current one.
+	 * 
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'iframe',
+		title: 'Inline Frame',
+		description: 'Add inline frame to show another document within current one.',
+		icon: 'wb-widget-iframe',
+		groups: ['basic'],
+		model: {
+			name: 'iframe',
+			sandbox: 'allow-same-origin allow-scripts',
+			src: 'https://www.google.com',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-iframe',
+		// functional properties
+		template: '<iframe>Frame Not Supported?!</iframe>',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			// list of element attributes
+			this.iframeElementAttribute = [
+				'name', 'src', 'srcdoc', 'sandbox', 
+				// FIXME: maso, 2019: use style insted
+				'width', 'height'];
+			
+			this.initWidget = function(){
+				var ctrl = this;
+				function eventHandler(event){
+					if(this.iframeElementAttribute.includes(event.key)){
+						this.setElementAttribute(event.key, event.newValue | ctrl.getModelProperty());
+					}
+				}
+				// listen on change
+				this.on('modelUpdated', eventHandler);
+				this.on('runtimeModelUpdated', eventHandler);
+				// load initial data
+				for(var i =0; i < this.iframeElementAttribute.length;i++){
+					var key = this.iframeElementAttribute[i];
+					this.setElementAttribute(key, ctrl.getModelProperty(key));
+				}
+			};
+		},
 	});
 });

@@ -5276,6 +5276,10 @@ WbAbstractWidget.prototype.hasProperty = function (key){
 WbAbstractWidget.prototype.getProperty = function (key){
 	return objectPath.get(this.getRuntimeModel(), key);
 };
+WbAbstractWidget.prototype.removeProperty = function (key){
+	var model = this.getRuntimeModel();
+	objectPath.del(model, key);
+};
 
 /**
  * Changes property value
@@ -5314,9 +5318,9 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	//To change the view in runtime
 	var ctrl = this;
 	this.$timeout( function() {
-            ctrl.getScope().$digest();
-        });
-	
+		ctrl.getScope().$digest();
+	});
+
 };
 
 /**
@@ -5402,7 +5406,20 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
 		try{
-			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow, this.$wbLocal, this.$timeout, this.$dispatcher, this.$storage, this.$routeParams);
+			return eventFunction(
+					event, // -> $event
+					this, // -> $widget
+					this.$http, // -> $http
+					this.$mdMedia, // -> $mdMedia
+					this.$wbWindow, // -> $wbWindow
+					this.$wbLocal, // -> $wbLocal
+					// FIXME: wratp timeout and remove timers on edit mode (or distroy)
+					this.$timeout,// -> $timeout
+					// FIXME: wratp dispatcher and remove listeners
+					this.$dispatcher, // -> $dispatcher
+					this.$storage, // -> $storage
+					this.$routeParams// -> $routeParams
+			);
 		} catch(ex){
 			console.log('Fail to run event code');
 			console.log({
@@ -5473,6 +5490,28 @@ WbAbstractWidget.prototype.connect = function () {
 
 WbAbstractWidget.prototype.getElement = function () {
 	return this.$element;
+};
+
+WbAbstractWidget.prototype.setElementAttribute = function(key, value){
+	var element = this.getElement()[0];
+	if(value){
+		element.setAttribute(key, value);
+	} else {
+		element.removeAttribute(key);
+	}
+};
+
+WbAbstractWidget.prototype.getElementAttribute = function(key){
+	var element = this.getElement()[0];
+	if(!element.hasAttribute(key)){
+		return;
+	}
+	return element.getAttribute(key);
+};
+
+WbAbstractWidget.prototype.removeElementAttribute = function(key){
+	var element = this.getElement()[0];
+	element.removeAttribute(key);
 };
 
 WbAbstractWidget.prototype.setSilent = function(silent) {
@@ -6580,7 +6619,7 @@ angular.module('am-wb-core')
 
 	return {
 		restrict : 'E',
-		templateUrl: 'views/widgets/wb-group.html',
+		template: '<div></div>',
 		scope : {
 			wbEditable : '=?',
 			wbOnModelSelect : '@?',
@@ -13064,85 +13103,149 @@ angular.module('am-wb-core')
  */
 .run(function ($widget) {
 
-    /**
-     * @ngdoc Widgets
-     * @name Group
-     * @description Parent widget of other widgets
-     * 
-     * default setting:
-     * - margin: '1px'
-     */
-    $widget.newWidget({
-        // widget description
-        type: 'Group',
-        title: 'Group',
-        description: 'Panel contains list of widgets.',
-        icon: 'wb-widget-group',
-        groups: ['basic'],
-        model: {
-            style: {
-                margin: '1px',
-                padding: '1px',
-                layout: {
-                    direction: 'column'
-                },
-                size: {
-                    minHeight: '16px',
-                    minWidth: '16px'
-                }
-            }
-        },
-        // functional properties
-        templateUrl: 'views/widgets/wb-group.html',
-        help: 'http://dpq.co.ir/more-information-link',
-        helpId: 'wb-widget-group'
-    });
-    /**
-     * @ngdoc Widgets
-     * @name Text
-     * @description Add rich text to page
-     * 
-     * This is a RTF to add to a page.
-     * 
-     */
-    $widget.newWidget({
-        // widget description
-        type: 'HtmlText',
-        title: 'Text',
-        description: 'An text block.',
-        icon: 'wb-widget-html',
-        groups: ['basic'],
-        model: {
-            text: '<h2>Text element</h2><p>Click on the text box to edit.</p>',
-            style: {
-            	padding: '8px'
-            }
-        },
-        // help id
-        help: 'http://dpq.co.ir',
-        helpId: 'wb-widget-html',
-        // functional properties
-        templateUrl: 'views/widgets/wb-html.html',
-	/*
-	 * @ngInject
+	/**
+	 * @ngdoc Widgets
+	 * @name Group
+	 * @description Parent widget of other widgets
+	 * 
+	 * default setting:
+	 * - margin: '1px'
 	 */
-        controller: function(){
-        	this.text = '';
-        	this.setText = function(text){
-        		this.text = text;
-        	};
-        	this.initWidget = function(){
-        		var ctrl = this;
-        		this.on('modelUpdated', function($event){
-        			if($event.key === 'text'){
-        				ctrl.setText($event.newValue);
-        			}
-        		});
-        		this.setText(this.getModelProperty('text'));
-        	};
-        },
-        controllerAs: 'ctrl'
-    });
+	$widget.newWidget({
+		// widget description
+		type: 'Group',
+		title: 'Group',
+		description: 'Panel contains list of widgets.',
+		icon: 'wb-widget-group',
+		groups: ['basic'],
+		model: {
+			style: {
+				margin: '1px',
+				padding: '1px',
+				layout: {
+					direction: 'column'
+				},
+				size: {
+					minHeight: '16px',
+					minWidth: '16px'
+				}
+			}
+		},
+		// functional properties
+		template: function(model){
+			var groupType = model.groupType | 'div';
+			if(groupType === 'form'){
+				return '<form></form>';
+			}
+			if(groupType === 'section'){
+				return '<section></section>';
+			}
+			return '<div></div>';
+		},
+		help: 'http://dpq.co.ir/more-information-link',
+		helpId: 'wb-widget-group'
+	});
+	/**
+	 * @ngdoc Widgets
+	 * @name Text
+	 * @description Add rich text to page
+	 * 
+	 * This is a RTF to add to a page.
+	 * 
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'HtmlText',
+		title: 'Text',
+		description: 'An text block.',
+		icon: 'wb-widget-html',
+		groups: ['basic'],
+		model: {
+			text: '<h2>Text element</h2><p>Click on the text box to edit.</p>',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-html',
+		// functional properties
+		templateUrl: 'views/widgets/wb-html.html',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			this.text = '';
+			this.setText = function(text){
+				this.text = text;
+			};
+			this.initWidget = function(){
+				var ctrl = this;
+				this.on('modelUpdated', function($event){
+					if($event.key === 'text'){
+						ctrl.setText($event.newValue);
+					}
+				});
+				this.setText(this.getModelProperty('text'));
+			};
+		},
+		controllerAs: 'ctrl'
+	});
+	/**
+	 * @ngdoc Widgets
+	 * @name iframe
+	 * @description Add inline frame to show another document within current one.
+	 * 
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'iframe',
+		title: 'Inline Frame',
+		description: 'Add inline frame to show another document within current one.',
+		icon: 'wb-widget-iframe',
+		groups: ['basic'],
+		model: {
+			name: 'iframe',
+			sandbox: 'allow-same-origin allow-scripts',
+			src: 'https://www.google.com',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-iframe',
+		// functional properties
+		template: '<iframe>Frame Not Supported?!</iframe>',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			// list of element attributes
+			this.iframeElementAttribute = [
+				'name', 'src', 'srcdoc', 'sandbox', 
+				// FIXME: maso, 2019: use style insted
+				'width', 'height'];
+			
+			this.initWidget = function(){
+				var ctrl = this;
+				function eventHandler(event){
+					if(this.iframeElementAttribute.includes(event.key)){
+						this.setElementAttribute(event.key, event.newValue | ctrl.getModelProperty());
+					}
+				}
+				// listen on change
+				this.on('modelUpdated', eventHandler);
+				this.on('runtimeModelUpdated', eventHandler);
+				// load initial data
+				for(var i =0; i < this.iframeElementAttribute.length;i++){
+					var key = this.iframeElementAttribute[i];
+					this.setElementAttribute(key, ctrl.getModelProperty(key));
+				}
+			};
+		},
+	});
 });
 
 /* 
@@ -14522,10 +14625,9 @@ angular.module('am-wb-core')
 		var templateUrl = page.templateUrl;
 		if (angular.isDefined(template)) {
 			if (angular.isFunction(template)) {
-				template = template(page.params);
+				template = template(page.params | page);
 			}
-		} else if (angular
-				.isDefined(templateUrl)) {
+		} else if (angular.isDefined(templateUrl)) {
 			if (angular.isFunction(templateUrl)) {
 				templateUrl = templateUrl(page.params);
 			}
@@ -15172,7 +15274,7 @@ angular.module('am-wb-core')
     var service = this;
 
     var notFoundWidget = {
-            templateUrl : 'views/widgets/wb-notfound.html',
+            template : '<div ng-show="wbEditable">Unsuported widget?!</div>',
             label : 'Not found',
             description : 'Element not found'
     };
@@ -15340,26 +15442,32 @@ angular.module('am-wb-core')
         } else {
             gettingTemplatePromisse = $wbUtil.getTemplateFor(widget)
             .then(function(template) {
-                if (model.type !== 'Group') {
-                    template = '<div class="wb-widget" name="{{wbModel.name}}" '+
-
-                    'dnd-disable-if="!ctrl.isEditable()" '+
-                    'dnd-draggable="wbModel" '+
-                    'dnd-type="wbModel.type" '+
-                    'dnd-effect-allowed="copyMove" '+
-                    'dnd-callback="1" '+
-
-                    'dnd-moved="ctrl.delete()" '+
-
-                    'md-theme-watch="true">' + (template || '') + '</div>';
-                }
-
                 // 3- bind controller
                 return angular.element(template);
             });
         }
         return gettingTemplatePromisse.then(function(element){
-            var link = $compile(element);
+        	// init widget
+        	var widgetRootElement = element[0];
+        	widgetRootElement.setAttribute('dnd-disable-if','!ctrl.isEditable()');
+        	widgetRootElement.setAttribute('dnd-draggable','wbModel');
+        	widgetRootElement.setAttribute('dnd-type','wbModel.type');
+        	widgetRootElement.setAttribute('dnd-effect-allowed','copyMove');
+        	widgetRootElement.setAttribute('dnd-moved','ctrl.delete()');
+        	widgetRootElement.setAttribute('md-theme-watch','true');
+        	if (model.type == 'Group'){
+        		widgetRootElement.className += " wb-group";
+        		widgetRootElement.setAttribute('dnd-list','wbModel.contents');
+        		widgetRootElement.setAttribute('dnd-allowed-types','ctrl.getAllowedTypes()');
+        		widgetRootElement.setAttribute('dnd-allowed-types','ctrl.getAllowedTypes()');
+        		widgetRootElement.setAttribute('dnd-external-sources','true');
+        		widgetRootElement.setAttribute('dnd-drop','ctrl.addChild(index, item)');
+        		widgetRootElement.setAttribute('dnd-horizontal-list','wbModel.style.layout.direction==="row"');
+        	}else {
+        		widgetRootElement.className += " wb-widget";
+        		widgetRootElement.setAttribute('dnd-callback','1');
+        	}
+        	var link = $compile(element);
             var wlocals = _.merge({
                 $scope : childScope,
                 $element : element
@@ -15766,68 +15874,58 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/widgets/wb-group.html',
-    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"ctrl.addChild(index, item)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" md-theme-watch=true></div>"
-  );
-
-
   $templateCache.put('views/widgets/wb-html.html',
-    " <div ng-if=!ctrl.isEditable() ng-bind-html=\"ctrl.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
-    "        selector : 'div.tinymce', \n" +
-    "        menubar: true,\n" +
-    "        inline: true,\n" +
-    "        theme: 'modern',\n" +
-    "        plugins : [\n" +
-    "            'advlist',\n" +
-    "            'autolink',\n" +
-    "            'autoresize',\n" +
-    "            'autosave',\n" +
-    "            'bbcode',\n" +
-    "            'charmap',\n" +
-    "            'code',\n" +
-    "            'codesample',\n" +
-    "            'colorpicker',\n" +
-    "            'contextmenu',\n" +
-    "            'directionality',\n" +
-    "            'emoticons',\n" +
-    "            'hr',\n" +
-    "            'image',\n" +
-    "            'imagetools',\n" +
-    "            'importcss',\n" +
-    "            'insertdatetime',\n" +
-    "            'legacyoutput',\n" +
-    "            'link',\n" +
-    "            'lists',\n" +
-    "            'media',\n" +
-    "            'nonbreaking',\n" +
-    "            'noneditable',\n" +
-    "            'paste',\n" +
-    "            'save',\n" +
-    "            'searchreplace',\n" +
-    "            'spellchecker',\n" +
-    "            'tabfocus',\n" +
-    "            'table',\n" +
-    "            'template',\n" +
-    "            'textcolor',\n" +
-    "            'textpattern',\n" +
-    "            'toc',\n" +
-    "            'visualblocks'\n" +
-    "        ],\n" +
-    "        toolbar: [\n" +
-    "            'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',\n" +
-    "            'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'\n" +
-    "        ],\n" +
-    "        powerpaste_word_import: 'clean',\n" +
-    "        powerpaste_html_import: 'clean',\n" +
-    "        link_assume_external_targets: false,\n" +
-    "        convert_urls: false,\n" +
-    "        format: 'raw',\n" +
-    "    }\" ng-model=ctrl.text ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setModelProperty('text', ctrl.text)\" class=\"wb-widget-fill tinymce wb-widget-text\" ng-keydown=$event.stopPropagation();> </div>"
-  );
-
-
-  $templateCache.put('views/widgets/wb-notfound.html',
-    "<div ng-show=wbEditable> Unsuported widget?! </div>"
+    "<div>  <div ng-if=!ctrl.isEditable() ng-bind-html=\"ctrl.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
+    "\t        selector : 'div.tinymce', \n" +
+    "\t        menubar: true,\n" +
+    "\t        inline: true,\n" +
+    "\t        theme: 'modern',\n" +
+    "\t        plugins : [\n" +
+    "\t            'advlist',\n" +
+    "\t            'autolink',\n" +
+    "\t            'autoresize',\n" +
+    "\t            'autosave',\n" +
+    "\t            'bbcode',\n" +
+    "\t            'charmap',\n" +
+    "\t            'code',\n" +
+    "\t            'codesample',\n" +
+    "\t            'colorpicker',\n" +
+    "\t            'contextmenu',\n" +
+    "\t            'directionality',\n" +
+    "\t            'emoticons',\n" +
+    "\t            'hr',\n" +
+    "\t            'image',\n" +
+    "\t            'imagetools',\n" +
+    "\t            'importcss',\n" +
+    "\t            'insertdatetime',\n" +
+    "\t            'legacyoutput',\n" +
+    "\t            'link',\n" +
+    "\t            'lists',\n" +
+    "\t            'media',\n" +
+    "\t            'nonbreaking',\n" +
+    "\t            'noneditable',\n" +
+    "\t            'paste',\n" +
+    "\t            'save',\n" +
+    "\t            'searchreplace',\n" +
+    "\t            'spellchecker',\n" +
+    "\t            'tabfocus',\n" +
+    "\t            'table',\n" +
+    "\t            'template',\n" +
+    "\t            'textcolor',\n" +
+    "\t            'textpattern',\n" +
+    "\t            'toc',\n" +
+    "\t            'visualblocks'\n" +
+    "\t        ],\n" +
+    "\t        toolbar: [\n" +
+    "\t            'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',\n" +
+    "\t            'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'\n" +
+    "\t        ],\n" +
+    "\t        powerpaste_word_import: 'clean',\n" +
+    "\t        powerpaste_html_import: 'clean',\n" +
+    "\t        link_assume_external_targets: false,\n" +
+    "\t        convert_urls: false,\n" +
+    "\t        format: 'raw',\n" +
+    "\t    }\" ng-model=ctrl.text ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setModelProperty('text', ctrl.text)\" class=\"wb-widget-fill tinymce wb-widget-text\" ng-keydown=$event.stopPropagation();> </div> </div>"
   );
 
 }]);

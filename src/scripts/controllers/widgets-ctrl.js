@@ -372,6 +372,10 @@ WbAbstractWidget.prototype.hasProperty = function (key){
 WbAbstractWidget.prototype.getProperty = function (key){
 	return objectPath.get(this.getRuntimeModel(), key);
 };
+WbAbstractWidget.prototype.removeProperty = function (key){
+	var model = this.getRuntimeModel();
+	objectPath.del(model, key);
+};
 
 /**
  * Changes property value
@@ -410,9 +414,9 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	//To change the view in runtime
 	var ctrl = this;
 	this.$timeout( function() {
-            ctrl.getScope().$digest();
-        });
-	
+		ctrl.getScope().$digest();
+	});
+
 };
 
 /**
@@ -498,7 +502,20 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
 		try{
-			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow, this.$wbLocal, this.$timeout, this.$dispatcher, this.$storage, this.$routeParams);
+			return eventFunction(
+					event, // -> $event
+					this, // -> $widget
+					this.$http, // -> $http
+					this.$mdMedia, // -> $mdMedia
+					this.$wbWindow, // -> $wbWindow
+					this.$wbLocal, // -> $wbLocal
+					// FIXME: wratp timeout and remove timers on edit mode (or distroy)
+					this.$timeout,// -> $timeout
+					// FIXME: wratp dispatcher and remove listeners
+					this.$dispatcher, // -> $dispatcher
+					this.$storage, // -> $storage
+					this.$routeParams// -> $routeParams
+			);
 		} catch(ex){
 			console.log('Fail to run event code');
 			console.log({
@@ -569,6 +586,28 @@ WbAbstractWidget.prototype.connect = function () {
 
 WbAbstractWidget.prototype.getElement = function () {
 	return this.$element;
+};
+
+WbAbstractWidget.prototype.setElementAttribute = function(key, value){
+	var element = this.getElement()[0];
+	if(value){
+		element.setAttribute(key, value);
+	} else {
+		element.removeAttribute(key);
+	}
+};
+
+WbAbstractWidget.prototype.getElementAttribute = function(key){
+	var element = this.getElement()[0];
+	if(!element.hasAttribute(key)){
+		return;
+	}
+	return element.getAttribute(key);
+};
+
+WbAbstractWidget.prototype.removeElementAttribute = function(key){
+	var element = this.getElement()[0];
+	element.removeAttribute(key);
 };
 
 WbAbstractWidget.prototype.setSilent = function(silent) {

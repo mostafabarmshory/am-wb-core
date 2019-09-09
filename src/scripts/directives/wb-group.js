@@ -123,7 +123,7 @@ angular.module('am-wb-core')
 
 	return {
 		restrict : 'E',
-		templateUrl: 'views/widgets/wb-group.html',
+		template: '<div></div>',
 		scope : {
 			wbEditable : '=?',
 			wbOnModelSelect : '@?',

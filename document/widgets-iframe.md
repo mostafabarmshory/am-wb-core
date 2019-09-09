@@ -22,7 +22,21 @@ Specifies the name of an iframe
 
 ### sandbox
 
-Enables an extra set of restrictions for the content in an iframe
+The sandbox attribute enables an extra set of restrictions for the content in the iframe.
+
+When the sandbox attribute is present, and it will:
+
+- treat the content as being from a unique origin
+- block form submission
+- block script execution
+- disable APIs
+- prevent links from targeting other browsing contexts
+- prevent content from using plugins (through <embed>, <object>, <applet>, or other)
+- prevent the content to navigate its top-level browsing context
+- block automatically triggered features (such as automatically playing a video or automatically focusing a form control)
+- The value of the sandbox attribute can either be just sandbox (then all restrictions are applied), or a space-separated list of pre-defined values that will REMOVE the particular restrictions.
+
+values:
 
 - allow-forms
 - allow-pointer-lock

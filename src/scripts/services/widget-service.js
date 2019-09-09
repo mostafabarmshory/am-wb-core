@@ -44,7 +44,7 @@ angular.module('am-wb-core')
     var service = this;
 
     var notFoundWidget = {
-            templateUrl : 'views/widgets/wb-notfound.html',
+            template : '<div ng-show="wbEditable">Unsuported widget?!</div>',
             label : 'Not found',
             description : 'Element not found'
     };
@@ -212,26 +212,32 @@ angular.module('am-wb-core')
         } else {
             gettingTemplatePromisse = $wbUtil.getTemplateFor(widget)
             .then(function(template) {
-                if (model.type !== 'Group') {
-                    template = '<div class="wb-widget" name="{{wbModel.name}}" '+
-
-                    'dnd-disable-if="!ctrl.isEditable()" '+
-                    'dnd-draggable="wbModel" '+
-                    'dnd-type="wbModel.type" '+
-                    'dnd-effect-allowed="copyMove" '+
-                    'dnd-callback="1" '+
-
-                    'dnd-moved="ctrl.delete()" '+
-
-                    'md-theme-watch="true">' + (template || '') + '</div>';
-                }
-
                 // 3- bind controller
                 return angular.element(template);
             });
         }
         return gettingTemplatePromisse.then(function(element){
-            var link = $compile(element);
+        	// init widget
+        	var widgetRootElement = element[0];
+        	widgetRootElement.setAttribute('dnd-disable-if','!ctrl.isEditable()');
+        	widgetRootElement.setAttribute('dnd-draggable','wbModel');
+        	widgetRootElement.setAttribute('dnd-type','wbModel.type');
+        	widgetRootElement.setAttribute('dnd-effect-allowed','copyMove');
+        	widgetRootElement.setAttribute('dnd-moved','ctrl.delete()');
+        	widgetRootElement.setAttribute('md-theme-watch','true');
+        	if (model.type == 'Group'){
+        		widgetRootElement.className += " wb-group";
+        		widgetRootElement.setAttribute('dnd-list','wbModel.contents');
+        		widgetRootElement.setAttribute('dnd-allowed-types','ctrl.getAllowedTypes()');
+        		widgetRootElement.setAttribute('dnd-allowed-types','ctrl.getAllowedTypes()');
+        		widgetRootElement.setAttribute('dnd-external-sources','true');
+        		widgetRootElement.setAttribute('dnd-drop','ctrl.addChild(index, item)');
+        		widgetRootElement.setAttribute('dnd-horizontal-list','wbModel.style.layout.direction==="row"');
+        	}else {
+        		widgetRootElement.className += " wb-widget";
+        		widgetRootElement.setAttribute('dnd-callback','1');
+        	}
+        	var link = $compile(element);
             var wlocals = _.merge({
                 $scope : childScope,
                 $element : element
