@@ -144,6 +144,7 @@ angular.module('am-wb-core')
 		helpId: 'wb-widget-iframe',
 		// functional properties
 		template: '<iframe>Frame Not Supported?!</iframe>',
+		setting: ['iframe'],
 		controllerAs: 'ctrl',
 		/*
 		 * @ngInject
@@ -154,7 +155,7 @@ angular.module('am-wb-core')
 			// the style section.
 			//
 			// 'width', 'height'
-			this.iframeElementAttribute = [
+			var iframeElementAttribute = [
 				'name',
 				'src', 
 				'srcdoc', 
@@ -167,7 +168,7 @@ angular.module('am-wb-core')
 					ctrl.setElementAttribute(key, value);
 				}
 				function eventHandler(event){
-					if(this.iframeElementAttribute.includes(event.key)){
+					if(iframeElementAttribute.includes(event.key)){
 						var key = event.key;
 						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
 						elementAttribute(key, value);
@@ -177,8 +178,8 @@ angular.module('am-wb-core')
 				this.on('modelUpdated', eventHandler);
 				this.on('runtimeModelUpdated', eventHandler);
 				// load initial data
-				for(var i =0; i < this.iframeElementAttribute.length;i++){
-					var key = this.iframeElementAttribute[i];
+				for(var i =0; i < iframeElementAttribute.length;i++){
+					var key = iframeElementAttribute[i];
 					elementAttribute(key, ctrl.getModelProperty(key));
 				}
 			};
@@ -212,6 +213,7 @@ angular.module('am-wb-core')
 		helpId: 'wb-widget-input',
 		// functional properties
 		template: '<input></input>',
+		setting: ['input'],
 		controllerAs: 'ctrl',
 		/*
 		 * @ngInject
@@ -226,6 +228,7 @@ angular.module('am-wb-core')
 				'checked', 
 				'dirname', 
 				'disabled', 
+				'form',
 				'max', 
 				'maxlength', 
 				'min', 
@@ -248,6 +251,92 @@ angular.module('am-wb-core')
 					ctrl.setElementAttribute(key, value);
 					if(key === 'inputType'){
 						ctrl.setElementAttribute('type', value);
+					}
+				}
+				function eventHandler(event){
+					if(elementAttributes.includes(event.key)){
+						var key = event.key;
+						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+						elementAttribute(key, value);
+					}
+				}
+				// listen on change
+				this.on('modelUpdated', eventHandler);
+				this.on('runtimeModelUpdated', eventHandler);
+				// load initial data
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					elementAttribute(key, ctrl.getModelProperty(key));
+				}
+			};
+			
+			/**
+			 * Gets value of the input
+			 */
+			this.val = function(data){
+				if(data){
+					this.setElementAttribute('value', data);
+					return this.getElement().val(data);
+				}
+				return this.getElement().val();
+			};
+		},
+	});
+	
+	/**
+	 * @ngdoc Widgets
+	 * @name textarea
+	 * @description Add textarea to get user value
+	 * 
+	 * It is used to create textarea
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'textarea',
+		title: 'Text Area field',
+		description: 'A widget to get data from users.',
+		icon: 'wb-widget-textarea',
+		groups: ['basic'],
+		model: {
+			name: 'textarea',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-textarea',
+		// functional properties
+		template: '<textarea></textarea>',
+		setting: ['textarea'],
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			// list of element attributes
+			var elementAttributes = [
+				'autofocus',
+				'cols',
+				'dirname',
+				'disabled',
+				'form',
+				'maxlength',
+				'name',
+				'placeholder',
+				'readonly',
+				'required',
+				'rows',
+				'wrap',
+				'value'
+				];
+			
+			this.initWidget = function(){
+				var ctrl = this;
+				function elementAttribute(key, value){
+					ctrl.setElementAttribute(key, value);
+					if(key === 'value'){
+						ctrl.val(value);
 					}
 				}
 				function eventHandler(event){

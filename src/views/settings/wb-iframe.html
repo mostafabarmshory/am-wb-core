@@ -1,0 +1,39 @@
+<fieldset
+    layout="column">
+    <md-input-container style="margin: 0px;margin-top: 10px">
+        <label translate="">Name</label>
+        <input 
+            type="text" 
+            ng-model="name"
+            ng-change="ctrl.setProperty('name', name)">
+    </md-input-container>
+    <md-input-container style="margin: 0px">
+        <label translate="">Sandbox</label>
+        <input 
+            type="text" 
+            ng-model="sandbox"
+            ng-change="ctrl.setProperty('sandbox', sandbox)">
+    </md-input-container>
+</fieldset>
+
+
+<fieldset
+    layout="column">
+    <legend translate>Source</legend>
+    <md-input-container style="margin: 0px">
+        <label translate="">Source</label>
+        <input 
+            type="text" 
+            ng-model="src"
+            ng-change="ctrl.setProperty('src', src)">
+    </md-input-container>
+    <md-input-container style="margin: 0px">
+        <label translate="">Source Document</label>
+        <textarea 
+            name="srcdoc" 
+            ng-model="srcdoc"
+            ng-change="ctrl.setProperty('srcdoc', srcdoc)">
+        </textarea>
+    </md-input-container>
+</fieldset>
+

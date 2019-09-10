@@ -4700,7 +4700,13 @@ angular.module('am-wb-core')
 
 		'wb-widget-group': wbIconServiceProvider.getShape('pages'),
 		'wb-widget-html': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-widget-input': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-widget-textarea': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-widget-iframe': wbIconServiceProvider.getShape('settings_ethernet'),
 
+		'wb-setting-iframe': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-setting-input': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-setting-textarea': wbIconServiceProvider.getShape('settings_ethernet'),
 		/*
 		 * Wifi
 		 */
@@ -13074,6 +13080,126 @@ angular.module('am-wb-core')
 			};
 		}
 	});
+	
+	
+
+	$settings.newPage({
+		type: 'iframe',
+		label: 'Inline Frame',
+		icon: 'wb-setting-iframe',
+		description: 'Inline Frame settings',
+		templateUrl: 'views/settings/wb-iframe.html',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+			var iframeElementAttribute = [
+				'name',
+				'src', 
+				'srcdoc', 
+				'sandbox', 
+			];
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				for(var i =0; i < iframeElementAttribute.length;i++){
+					var key = iframeElementAttribute[i];
+					$scope[key] =  this.getProperty(key);
+				}
+				// TODO: whatch changes of the model
+			};
+		}
+	});
+	$settings.newPage({
+		type: 'input',
+		label: 'Input',
+		icon: 'wb-setting-input',
+		description: 'Input settings',
+		templateUrl: 'views/settings/wb-input.html',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+			// list of element attributes
+			var elementAttributes = [
+				'accept',
+				'alt', 
+				'autocomplete', 
+				'autofocus', 
+				'checked', 
+				'dirname', 
+				'disabled', 
+				'form',
+				'max', 
+				'maxlength', 
+				'min', 
+				'multiple', 
+				'name', 
+				'pattern', 
+				'placeholder', 
+				'readonly', 
+				'required', 
+				'size', 
+				'src', 
+				'step',
+				'inputType',
+				'value',
+				];
+			
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					this[key] =  this.getProperty(key);
+				}
+				// TODO:
+			};
+		}
+	});
+	$settings.newPage({
+		type: 'textarea',
+		label: 'Text Area',
+		icon: 'wb-setting-textarea',
+		description: 'Text Area Settings',
+		templateUrl: 'views/settings/wb-textarea.html',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function () {
+			var elementAttributes = [
+				'autofocus',
+				'cols',
+				'dirname',
+				'disabled',
+				'form',
+				'maxlength',
+				'name',
+				'placeholder',
+				'readonly',
+				'required',
+				'rows',
+				'wrap',
+				'value',
+				];
+			
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					this[key] =  this.getProperty(key);
+				}
+				// TODO:
+			};
+		}
+	});
 });
 
 /* 
@@ -13257,6 +13383,7 @@ angular.module('am-wb-core')
 		helpId: 'wb-widget-iframe',
 		// functional properties
 		template: '<iframe>Frame Not Supported?!</iframe>',
+		setting: ['iframe'],
 		controllerAs: 'ctrl',
 		/*
 		 * @ngInject
@@ -13267,7 +13394,7 @@ angular.module('am-wb-core')
 			// the style section.
 			//
 			// 'width', 'height'
-			this.iframeElementAttribute = [
+			var iframeElementAttribute = [
 				'name',
 				'src', 
 				'srcdoc', 
@@ -13280,7 +13407,7 @@ angular.module('am-wb-core')
 					ctrl.setElementAttribute(key, value);
 				}
 				function eventHandler(event){
-					if(this.iframeElementAttribute.includes(event.key)){
+					if(iframeElementAttribute.includes(event.key)){
 						var key = event.key;
 						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
 						elementAttribute(key, value);
@@ -13290,8 +13417,8 @@ angular.module('am-wb-core')
 				this.on('modelUpdated', eventHandler);
 				this.on('runtimeModelUpdated', eventHandler);
 				// load initial data
-				for(var i =0; i < this.iframeElementAttribute.length;i++){
-					var key = this.iframeElementAttribute[i];
+				for(var i =0; i < iframeElementAttribute.length;i++){
+					var key = iframeElementAttribute[i];
 					elementAttribute(key, ctrl.getModelProperty(key));
 				}
 			};
@@ -13325,6 +13452,7 @@ angular.module('am-wb-core')
 		helpId: 'wb-widget-input',
 		// functional properties
 		template: '<input></input>',
+		setting: ['input'],
 		controllerAs: 'ctrl',
 		/*
 		 * @ngInject
@@ -13339,6 +13467,7 @@ angular.module('am-wb-core')
 				'checked', 
 				'dirname', 
 				'disabled', 
+				'form',
 				'max', 
 				'maxlength', 
 				'min', 
@@ -13361,6 +13490,92 @@ angular.module('am-wb-core')
 					ctrl.setElementAttribute(key, value);
 					if(key === 'inputType'){
 						ctrl.setElementAttribute('type', value);
+					}
+				}
+				function eventHandler(event){
+					if(elementAttributes.includes(event.key)){
+						var key = event.key;
+						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+						elementAttribute(key, value);
+					}
+				}
+				// listen on change
+				this.on('modelUpdated', eventHandler);
+				this.on('runtimeModelUpdated', eventHandler);
+				// load initial data
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					elementAttribute(key, ctrl.getModelProperty(key));
+				}
+			};
+			
+			/**
+			 * Gets value of the input
+			 */
+			this.val = function(data){
+				if(data){
+					this.setElementAttribute('value', data);
+					return this.getElement().val(data);
+				}
+				return this.getElement().val();
+			};
+		},
+	});
+	
+	/**
+	 * @ngdoc Widgets
+	 * @name textarea
+	 * @description Add textarea to get user value
+	 * 
+	 * It is used to create textarea
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'textarea',
+		title: 'Text Area field',
+		description: 'A widget to get data from users.',
+		icon: 'wb-widget-textarea',
+		groups: ['basic'],
+		model: {
+			name: 'textarea',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-textarea',
+		// functional properties
+		template: '<textarea></textarea>',
+		setting: ['textarea'],
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			// list of element attributes
+			var elementAttributes = [
+				'autofocus',
+				'cols',
+				'dirname',
+				'disabled',
+				'form',
+				'maxlength',
+				'name',
+				'placeholder',
+				'readonly',
+				'required',
+				'rows',
+				'wrap',
+				'value'
+				];
+			
+			this.initWidget = function(){
+				var ctrl = this;
+				function elementAttribute(key, value){
+					ctrl.setElementAttribute(key, value);
+					if(key === 'value'){
+						ctrl.val(value);
 					}
 				}
 				function eventHandler(event){
@@ -15974,6 +16189,40 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/settings/wb-iframe.html',
+    "<fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Name</label> <input ng-model=name ng-change=\"ctrl.setProperty('name', name)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Sandbox</label> <input ng-model=sandbox ng-change=\"ctrl.setProperty('sandbox', sandbox)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Source</legend> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Source</label> <input ng-model=src ng-change=\"ctrl.setProperty('src', src)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Source Document</label> <textarea name=srcdoc ng-model=srcdoc ng-change=\"ctrl.setProperty('srcdoc', srcdoc)\">\n" +
+    "        </textarea> </md-input-container> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-input.html',
+    "<fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\" ng-repeat=\"name in [\n" +
+    "\t\t\t\t'accept',\n" +
+    "\t\t\t\t'alt', \n" +
+    "\t\t\t\t'autocomplete', \n" +
+    "\t\t\t\t'autofocus', \n" +
+    "\t\t\t\t'checked', \n" +
+    "\t\t\t\t'dirname', \n" +
+    "\t\t\t\t'disabled', \n" +
+    "\t\t\t\t'form',\n" +
+    "\t\t\t\t'max', \n" +
+    "\t\t\t\t'maxlength', \n" +
+    "\t\t\t\t'min', \n" +
+    "\t\t\t\t'multiple',\n" +
+    "\t\t\t\t'name', \n" +
+    "\t\t\t\t'pattern', \n" +
+    "\t\t\t\t'placeholder', \n" +
+    "\t\t\t\t'readonly', \n" +
+    "\t\t\t\t'required', \n" +
+    "\t\t\t\t'size', \n" +
+    "\t\t\t\t'src', \n" +
+    "\t\t\t\t'step',\n" +
+    "\t\t\t\t'inputType',\n" +
+    "\t\t\t\t'value',\n" +
+    "\t\t\t\t]\"> <label translate=\"\">{{name}}</label> <input ng-model=ctrl[name] ng-change=\"ctrl.setProperty(name, ctrl[name])\"> </md-input-container> </fieldset>"
+  );
+
+
   $templateCache.put('views/settings/wb-layout-self.html',
     " <fieldset layout=column> <legend translate>Align</legend> <wb-ui-setting-choose ng-if=\"ctrl.getParentDirection() === 'row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['row']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.getParentDirection() !== 'row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['column']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> </fieldset>  <fieldset layout=column> <legend translate>Box</legend> <md-input-container class=md-block> <label translate>Order</label> <input ng-model=ctrl.order ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateOrder(ctrl.order, $event)\" type=number> </md-input-container> <md-input-container class=md-block> <label translate>Basis</label> <input ng-model=ctrl.basis ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateBasis(ctrl.basis, $event)\"> </md-input-container> <md-input-container class=md-block> <label translate>Grow</label> <input ng-model=ctrl.grow ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateGrow(ctrl.grow, $event)\" type=number> </md-input-container> <md-input-container class=md-block> <label translate>Shrink</label> <input ng-model=ctrl.shrink ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateShrink(ctrl.shrink, $event)\" type=number> </md-input-container> </fieldset>"
   );
@@ -16007,6 +16256,25 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/settings/wb-size.html',
     " <fieldset> <legend translate>Width</legend> <wb-ui-setting-length title=Width description=\"Set the width\" ng-model=ctrl.width ng-change=ctrl.widthChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min width\" description=\"Set the minimum width\" ng-model=ctrl.minWidth ng-change=ctrl.minWidthChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max width\" description=\"Set the maximum width\" ng-model=ctrl.maxWidth ng-change=ctrl.maxWidthChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset> <fieldset> <legend translate>Height</legend> <wb-ui-setting-length title=Height description=\"Set the height\" ng-model=ctrl.height ng-change=ctrl.heightChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" description=\"Set the minimum height\" ng-model=ctrl.minHeight ng-change=ctrl.minHeightChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" description=\"Set the maximum height\" ng-model=ctrl.maxHeight ng-change=ctrl.maxHeightChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-textarea.html',
+    "<fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\" ng-repeat=\"name in [\n" +
+    "\t\t\t\t'autofocus',\n" +
+    "\t\t\t\t'cols',\n" +
+    "\t\t\t\t'dirname',\n" +
+    "\t\t\t\t'disabled',\n" +
+    "\t\t\t\t'form',\n" +
+    "\t\t\t\t'maxlength',\n" +
+    "\t\t\t\t'name',\n" +
+    "\t\t\t\t'placeholder',\n" +
+    "\t\t\t\t'readonly',\n" +
+    "\t\t\t\t'required',\n" +
+    "\t\t\t\t'rows',\n" +
+    "\t\t\t\t'wrap',\n" +
+    "\t\t\t\t'value',\n" +
+    "\t\t\t\t]\"> <label translate=\"\">{{name}}</label> <input ng-model=ctrl[name] ng-change=\"ctrl.setProperty(name, ctrl[name])\"> </md-input-container> </fieldset>"
   );
 
 

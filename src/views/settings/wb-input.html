@@ -1,0 +1,35 @@
+<fieldset
+    layout="column">
+    <md-input-container style="margin: 0px;margin-top: 10px"
+    	ng-repeat="name in [
+				'accept',
+				'alt', 
+				'autocomplete', 
+				'autofocus', 
+				'checked', 
+				'dirname', 
+				'disabled', 
+				'form',
+				'max', 
+				'maxlength', 
+				'min', 
+				'multiple',
+				'name', 
+				'pattern', 
+				'placeholder', 
+				'readonly', 
+				'required', 
+				'size', 
+				'src', 
+				'step',
+				'inputType',
+				'value',
+				]">
+        <label translate="">{{name}}</label>
+        <input 
+            type="text" 
+            ng-model="ctrl[name]"
+            ng-change="ctrl.setProperty(name, ctrl[name])">
+    </md-input-container>
+</fieldset>
+

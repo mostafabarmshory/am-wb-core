@@ -41,7 +41,7 @@ Specifies that an input widget should automatically get focus when the page load
 
 ### checked	
 
-Specifies that an <input> element should be pre-selected when the page loads (for type="checkbox" or type="radio")
+Specifies that an input widget should be pre-selected when the page loads (for type="checkbox" or type="radio")
 
 ### dirname	
 
@@ -49,35 +49,39 @@ Specifies that the text direction will be submitted
 
 ### disabled	
 
-Specifies that an <input> element should be disabled
+Specifies that an input widget should be disabled
+
+### form
+
+Specifies the form the input widget belongs to
 
 ### max	
 
-Specifies the maximum value for an <input> element
+Specifies the maximum value for an input widget
 
 ### maxlength
 
-Specifies the maximum number of characters allowed in an <input> element
+Specifies the maximum number of characters allowed in an input widget
 
 ### min
 
-Specifies a minimum value for an <input> element
+Specifies a minimum value for an input widget
 
 ### multiple
 
-Specifies that a user can enter more than one value in an <input> element
+Specifies that a user can enter more than one value in an input widget
 
 ### name
 
-Specifies the name of an <input> element
+Specifies the name of an input widget
 
 ### pattern
 
-Specifies a regular expression that an <input> element's value is checked against
+Specifies a regular expression that an input widget's value is checked against
 
 ### placeholder
 
-Specifies a short hint that describes the expected value of an <input> element
+Specifies a short hint that describes the expected value of an input widget
 
 ### readonly
 
@@ -89,7 +93,7 @@ Specifies that an input field must be filled out before submitting the form
 
 ### size
 
-Specifies the width, in characters, of an <input> element
+Specifies the width, in characters, of an input widget
 
 ### src	
 
@@ -101,7 +105,7 @@ any	Specifies the interval between legal numbers in an input field
 
 ### inputType
 
-Specifies the type <input> element to display
+Specifies the type input widget to display
 
 - button
 - checkbox
@@ -128,5 +132,5 @@ Specifies the type <input> element to display
 
 ### value	
 
-Specifies the value of an <input> element
+Specifies the value of an input widget
 

@@ -1090,7 +1090,13 @@ angular.module('am-wb-core')
 
 		'wb-widget-group': wbIconServiceProvider.getShape('pages'),
 		'wb-widget-html': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-widget-input': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-widget-textarea': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-widget-iframe': wbIconServiceProvider.getShape('settings_ethernet'),
 
+		'wb-setting-iframe': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-setting-input': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-setting-textarea': wbIconServiceProvider.getShape('settings_ethernet'),
 		/*
 		 * Wifi
 		 */
