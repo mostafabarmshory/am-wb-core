@@ -4974,7 +4974,23 @@ angular.module('am-wb-core')//
  * <li>widgetSelected</li>
  * </ul>
  */
+var widgetBasicWidgetAttributes = [
+	'accesskey',
+	'contenteditable',
+	'dir',
+	'draggable',
+	'dropzone',
+	'hidden',
+	'id',
+	'lang',
+	'spellcheck',
+	'tabindex',
+	'title',
+	'translate',
+	];
+
 var WbAbstractWidget = function () {
+	'use strict';
 
 	function debounce(func, wait) {
 		var timeout;
@@ -5086,7 +5102,6 @@ WbAbstractWidget.prototype.loadSeo = function () {
 		return;
 	}
 	var $element = this.getElement();
-	$element.attr('id', model.id);
 
 	// Add item scope
 	if (model.category) {
@@ -5108,6 +5123,26 @@ WbAbstractWidget.prototype.loadSeo = function () {
 //	- {Text} label (https://schema.org/title)
 //	- {Text} description (https://schema.org/description)
 //	- {Text} keywords (https://schema.org/keywords)
+};
+
+/**
+ * Loads all basic elements attributes.
+ */
+WbAbstractWidget.prototype.loadBasicProperties = function () {
+	var model = this.getModel();
+	if (!model) {
+		return;
+	}
+	var $element = this.getElement();
+	for(var i =0; i < widgetBasicWidgetAttributes.length; i++){
+		var key = widgetBasicWidgetAttributes[i];
+		var value = this.getProperty(key) || this.getModelProperty(key);
+		if(value){
+			$element.attr(key, value);
+		} else {
+			$element.removeAttr(key);
+		}
+	}
 };
 
 /**
@@ -5159,19 +5194,26 @@ WbAbstractWidget.prototype.refresh = function($event) {
 	this.getScope().wbModel = model;
 
 	if($event){
-		var key = $event.key || 'x';
+		var key = $event.key || 'xxx';
 		// update event
 		if(key.startsWith('event')){
 			this.eventFunctions = {};
 		} else if(key.startsWith('style')) {
 			this.loadStyle();
-			this.loadSeo();
+		} else if(widgetBasicWidgetAttributes.inclouds(key)){
+			var value = this.getProperty(key) || this.getModelProperty(key);;
+			if(value){
+				$element.atter(key, value);
+			} else {
+				$element.removeAttr(key);
+			}
 		}
-	} else {
-		this.eventFunctions = {};
-		this.loadStyle();
-		this.loadSeo();
-	}
+		return;
+	} 
+	this.eventFunctions = {};
+	this.loadStyle();
+	this.loadSeo();
+	this.loadBasicProperties();
 };
 
 /**
@@ -5297,9 +5339,10 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	$event.key = key;
 	$event.oldValue = this.getProperty(key);
 	$event.newValue =  value;
+	$event.value =  value;
 
 	// check if value changed
-	if(angular.equals($event.oldValue, $event.newValue)){
+	if(angular.equals($event.oldValue, $event.value)){
 		return;
 	}
 
@@ -5493,25 +5536,22 @@ WbAbstractWidget.prototype.getElement = function () {
 };
 
 WbAbstractWidget.prototype.setElementAttribute = function(key, value){
-	var element = this.getElement()[0];
+	var $element = this.getElement();
 	if(value){
-		element.setAttribute(key, value);
+		$element.attr(key, value);
 	} else {
-		element.removeAttribute(key);
+		$element.removeAttr(key);
 	}
 };
 
 WbAbstractWidget.prototype.getElementAttribute = function(key){
-	var element = this.getElement()[0];
-	if(!element.hasAttribute(key)){
-		return;
-	}
-	return element.getAttribute(key);
+	var $element = this.getElement();
+	return $element.attr(key);
 };
 
 WbAbstractWidget.prototype.removeElementAttribute = function(key){
-	var element = this.getElement()[0];
-	element.removeAttribute(key);
+	var $element = this.getElement();
+	$element.removeAttr(key);
 };
 
 WbAbstractWidget.prototype.setSilent = function(silent) {
@@ -5858,6 +5898,7 @@ WbAbstractWidget.prototype.getBoundingClientRect = function () {
  */
 WbAbstractWidget.prototype.animate = function (options) {
 	var ctrl = this;
+	var keys = [];
 	var animation = {
 			targets: this.getRuntimeModel(),
 			update: function(/* anim */) {
@@ -5865,7 +5906,6 @@ WbAbstractWidget.prototype.animate = function (options) {
 				ctrl.refresh();
 			}
 	};
-	var keys = [];
 
 	// copy animation properties
 	if(options.duration){
@@ -13223,16 +13263,22 @@ angular.module('am-wb-core')
 		 */
 		controller: function(){
 			// list of element attributes
+			// NOTE: maso, 2019: the width and height of the iframe is set from 
+			// the style section.
+			//
+			// 'width', 'height'
 			this.iframeElementAttribute = [
-				'name', 'src', 'srcdoc', 'sandbox', 
-				// FIXME: maso, 2019: use style insted
-				'width', 'height'];
+				'name',
+				'src', 
+				'srcdoc', 
+				'sandbox', 
+			];
 			
 			this.initWidget = function(){
 				var ctrl = this;
 				function eventHandler(event){
 					if(this.iframeElementAttribute.includes(event.key)){
-						this.setElementAttribute(event.key, event.newValue | ctrl.getModelProperty());
+						this.setElementAttribute(event.key, event.newValue || ctrl.getModelProperty());
 					}
 				}
 				// listen on change

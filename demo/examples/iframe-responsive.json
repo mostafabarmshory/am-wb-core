@@ -1,0 +1,24 @@
+{
+	"type": "Group",
+	"name": "Parent",
+	"style": {
+	    "padding": "80px",
+	    "background":{
+	        "color": "green"
+	    },
+		"layout": {
+			"direction": "row"
+		}
+	},
+	"contents": [{
+		"type": "iframe",
+		"name": "Responsive inline frame",
+		"src": "http://www.viraweb123.ir",
+		"style": {
+			"layout":{
+				"grow": "1",
+				"shrink": "1"
+			}
+		}
+	}]
+}

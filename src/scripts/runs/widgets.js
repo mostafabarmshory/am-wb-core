@@ -150,16 +150,22 @@ angular.module('am-wb-core')
 		 */
 		controller: function(){
 			// list of element attributes
+			// NOTE: maso, 2019: the width and height of the iframe is set from 
+			// the style section.
+			//
+			// 'width', 'height'
 			this.iframeElementAttribute = [
-				'name', 'src', 'srcdoc', 'sandbox', 
-				// FIXME: maso, 2019: use style insted
-				'width', 'height'];
+				'name',
+				'src', 
+				'srcdoc', 
+				'sandbox', 
+			];
 			
 			this.initWidget = function(){
 				var ctrl = this;
 				function eventHandler(event){
 					if(this.iframeElementAttribute.includes(event.key)){
-						this.setElementAttribute(event.key, event.newValue | ctrl.getModelProperty());
+						this.setElementAttribute(event.key, event.newValue || ctrl.getModelProperty());
 					}
 				}
 				// listen on change

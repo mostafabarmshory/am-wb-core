@@ -44,7 +44,8 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 	this.widgetLocator = widgetLocator;
 
 
-	$http.get('examples/window.json')
+//	$http.get('examples/window.json')
+	$http.get('examples/iframe-responsive.json')
 	.then(function(res) {
 		// NOTE: maso, 2018: clean data model
 		$scope.model = $wbUtil.clean(res.data);
