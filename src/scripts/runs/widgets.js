@@ -163,9 +163,14 @@ angular.module('am-wb-core')
 			
 			this.initWidget = function(){
 				var ctrl = this;
+				function elementAttribute(key, value){
+					ctrl.setElementAttribute(key, value);
+				}
 				function eventHandler(event){
 					if(this.iframeElementAttribute.includes(event.key)){
-						this.setElementAttribute(event.key, event.newValue || ctrl.getModelProperty());
+						var key = event.key;
+						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+						elementAttribute(key, value);
 					}
 				}
 				// listen on change
@@ -174,8 +179,103 @@ angular.module('am-wb-core')
 				// load initial data
 				for(var i =0; i < this.iframeElementAttribute.length;i++){
 					var key = this.iframeElementAttribute[i];
-					this.setElementAttribute(key, ctrl.getModelProperty(key));
+					elementAttribute(key, ctrl.getModelProperty(key));
 				}
+			};
+		},
+	});
+	
+	/**
+	 * @ngdoc Widgets
+	 * @name input
+	 * @description Add input to get user value
+	 * 
+	 * It is used to create intractive page with users
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'input',
+		title: 'Input field',
+		description: 'A widget to get data from users.',
+		icon: 'wb-widget-input',
+		groups: ['basic'],
+		model: {
+			name: 'input',
+			sandbox: 'allow-same-origin allow-scripts',
+			src: 'https://www.google.com',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-input',
+		// functional properties
+		template: '<input></input>',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			// list of element attributes
+			var elementAttributes = [
+				'accept',
+				'alt', 
+				'autocomplete', 
+				'autofocus', 
+				'checked', 
+				'dirname', 
+				'disabled', 
+				'max', 
+				'maxlength', 
+				'min', 
+				'multiple', 
+				'name', 
+				'pattern', 
+				'placeholder', 
+				'readonly', 
+				'required', 
+				'size', 
+				'src', 
+				'step',
+				'inputType',
+				'value',
+				];
+			
+			this.initWidget = function(){
+				var ctrl = this;
+				function elementAttribute(key, value){
+					ctrl.setElementAttribute(key, value);
+					if(key === 'inputType'){
+						ctrl.setElementAttribute('type', value);
+					}
+				}
+				function eventHandler(event){
+					if(elementAttributes.includes(event.key)){
+						var key = event.key;
+						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+						elementAttribute(key, value);
+					}
+				}
+				// listen on change
+				this.on('modelUpdated', eventHandler);
+				this.on('runtimeModelUpdated', eventHandler);
+				// load initial data
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					elementAttribute(key, ctrl.getModelProperty(key));
+				}
+			};
+			
+			/**
+			 * Gets value of the input
+			 */
+			this.val = function(data){
+				if(data){
+					this.setElementAttribute('value', data);
+					return this.getElement().val(data);
+				}
+				return this.getElement().val();
 			};
 		},
 	});

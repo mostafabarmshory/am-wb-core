@@ -51,10 +51,6 @@ Specifies that the text direction will be submitted
 
 Specifies that an <input> element should be disabled
 
-### height	
-
-Specifies the height of an <input> element (only for type="image")
-
 ### max	
 
 Specifies the maximum value for an <input> element
@@ -103,7 +99,7 @@ Specifies the URL of the image to use as a submit button (only for type="image")
 
 any	Specifies the interval between legal numbers in an input field
 
-### type
+### inputType
 
 Specifies the type <input> element to display
 
@@ -133,7 +129,4 @@ Specifies the type <input> element to display
 ### value	
 
 Specifies the value of an <input> element
- 
-### width	
 
-Specifies the width of an <input> element (only for type="image")
