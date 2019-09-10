@@ -70,7 +70,23 @@
  * <li>widgetSelected</li>
  * </ul>
  */
+var widgetBasicWidgetAttributes = [
+	'accesskey',
+	'contenteditable',
+	'dir',
+	'draggable',
+	'dropzone',
+	'hidden',
+	'id',
+	'lang',
+	'spellcheck',
+	'tabindex',
+	'title',
+	'translate',
+	];
+
 var WbAbstractWidget = function () {
+	'use strict';
 
 	function debounce(func, wait) {
 		var timeout;
@@ -182,7 +198,6 @@ WbAbstractWidget.prototype.loadSeo = function () {
 		return;
 	}
 	var $element = this.getElement();
-	$element.attr('id', model.id);
 
 	// Add item scope
 	if (model.category) {
@@ -204,6 +219,26 @@ WbAbstractWidget.prototype.loadSeo = function () {
 //	- {Text} label (https://schema.org/title)
 //	- {Text} description (https://schema.org/description)
 //	- {Text} keywords (https://schema.org/keywords)
+};
+
+/**
+ * Loads all basic elements attributes.
+ */
+WbAbstractWidget.prototype.loadBasicProperties = function () {
+	var model = this.getModel();
+	if (!model) {
+		return;
+	}
+	var $element = this.getElement();
+	for(var i =0; i < widgetBasicWidgetAttributes.length; i++){
+		var key = widgetBasicWidgetAttributes[i];
+		var value = this.getProperty(key) || this.getModelProperty(key);
+		if(value){
+			$element.attr(key, value);
+		} else {
+			$element.removeAttr(key);
+		}
+	}
 };
 
 /**
@@ -255,19 +290,26 @@ WbAbstractWidget.prototype.refresh = function($event) {
 	this.getScope().wbModel = model;
 
 	if($event){
-		var key = $event.key || 'x';
+		var key = $event.key || 'xxx';
 		// update event
 		if(key.startsWith('event')){
 			this.eventFunctions = {};
 		} else if(key.startsWith('style')) {
 			this.loadStyle();
-			this.loadSeo();
+		} else if(widgetBasicWidgetAttributes.inclouds(key)){
+			var value = this.getProperty(key) || this.getModelProperty(key);;
+			if(value){
+				$element.atter(key, value);
+			} else {
+				$element.removeAttr(key);
+			}
 		}
-	} else {
-		this.eventFunctions = {};
-		this.loadStyle();
-		this.loadSeo();
-	}
+		return;
+	} 
+	this.eventFunctions = {};
+	this.loadStyle();
+	this.loadSeo();
+	this.loadBasicProperties();
 };
 
 /**
@@ -372,6 +414,10 @@ WbAbstractWidget.prototype.hasProperty = function (key){
 WbAbstractWidget.prototype.getProperty = function (key){
 	return objectPath.get(this.getRuntimeModel(), key);
 };
+WbAbstractWidget.prototype.removeProperty = function (key){
+	var model = this.getRuntimeModel();
+	objectPath.del(model, key);
+};
 
 /**
  * Changes property value
@@ -389,9 +435,10 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	$event.key = key;
 	$event.oldValue = this.getProperty(key);
 	$event.newValue =  value;
+	$event.value =  value;
 
 	// check if value changed
-	if(angular.equals($event.oldValue, $event.newValue)){
+	if(angular.equals($event.oldValue, $event.value)){
 		return;
 	}
 
@@ -410,9 +457,9 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	//To change the view in runtime
 	var ctrl = this;
 	this.$timeout( function() {
-            ctrl.getScope().$digest();
-        });
-	
+		ctrl.getScope().$digest();
+	});
+
 };
 
 /**
@@ -498,7 +545,20 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
 		try{
-			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow, this.$wbLocal, this.$timeout, this.$dispatcher, this.$storage, this.$routeParams);
+			return eventFunction(
+					event, // -> $event
+					this, // -> $widget
+					this.$http, // -> $http
+					this.$mdMedia, // -> $mdMedia
+					this.$wbWindow, // -> $wbWindow
+					this.$wbLocal, // -> $wbLocal
+					// FIXME: wratp timeout and remove timers on edit mode (or distroy)
+					this.$timeout,// -> $timeout
+					// FIXME: wratp dispatcher and remove listeners
+					this.$dispatcher, // -> $dispatcher
+					this.$storage, // -> $storage
+					this.$routeParams// -> $routeParams
+			);
 		} catch(ex){
 			console.log('Fail to run event code');
 			console.log({
@@ -569,6 +629,25 @@ WbAbstractWidget.prototype.connect = function () {
 
 WbAbstractWidget.prototype.getElement = function () {
 	return this.$element;
+};
+
+WbAbstractWidget.prototype.setElementAttribute = function(key, value){
+	var $element = this.getElement();
+	if(value){
+		$element.attr(key, value);
+	} else {
+		$element.removeAttr(key);
+	}
+};
+
+WbAbstractWidget.prototype.getElementAttribute = function(key){
+	var $element = this.getElement();
+	return $element.attr(key);
+};
+
+WbAbstractWidget.prototype.removeElementAttribute = function(key){
+	var $element = this.getElement();
+	$element.removeAttr(key);
 };
 
 WbAbstractWidget.prototype.setSilent = function(silent) {
@@ -915,6 +994,7 @@ WbAbstractWidget.prototype.getBoundingClientRect = function () {
  */
 WbAbstractWidget.prototype.animate = function (options) {
 	var ctrl = this;
+	var keys = [];
 	var animation = {
 			targets: this.getRuntimeModel(),
 			update: function(/* anim */) {
@@ -922,7 +1002,6 @@ WbAbstractWidget.prototype.animate = function (options) {
 				ctrl.refresh();
 			}
 	};
-	var keys = [];
 
 	// copy animation properties
 	if(options.duration){

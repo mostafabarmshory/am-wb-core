@@ -4700,7 +4700,13 @@ angular.module('am-wb-core')
 
 		'wb-widget-group': wbIconServiceProvider.getShape('pages'),
 		'wb-widget-html': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-widget-input': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-widget-textarea': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-widget-iframe': wbIconServiceProvider.getShape('settings_ethernet'),
 
+		'wb-setting-iframe': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-setting-input': wbIconServiceProvider.getShape('settings_ethernet'),
+		'wb-setting-textarea': wbIconServiceProvider.getShape('settings_ethernet'),
 		/*
 		 * Wifi
 		 */
@@ -4974,7 +4980,23 @@ angular.module('am-wb-core')//
  * <li>widgetSelected</li>
  * </ul>
  */
+var widgetBasicWidgetAttributes = [
+	'accesskey',
+	'contenteditable',
+	'dir',
+	'draggable',
+	'dropzone',
+	'hidden',
+	'id',
+	'lang',
+	'spellcheck',
+	'tabindex',
+	'title',
+	'translate',
+	];
+
 var WbAbstractWidget = function () {
+	'use strict';
 
 	function debounce(func, wait) {
 		var timeout;
@@ -5086,7 +5108,6 @@ WbAbstractWidget.prototype.loadSeo = function () {
 		return;
 	}
 	var $element = this.getElement();
-	$element.attr('id', model.id);
 
 	// Add item scope
 	if (model.category) {
@@ -5108,6 +5129,26 @@ WbAbstractWidget.prototype.loadSeo = function () {
 //	- {Text} label (https://schema.org/title)
 //	- {Text} description (https://schema.org/description)
 //	- {Text} keywords (https://schema.org/keywords)
+};
+
+/**
+ * Loads all basic elements attributes.
+ */
+WbAbstractWidget.prototype.loadBasicProperties = function () {
+	var model = this.getModel();
+	if (!model) {
+		return;
+	}
+	var $element = this.getElement();
+	for(var i =0; i < widgetBasicWidgetAttributes.length; i++){
+		var key = widgetBasicWidgetAttributes[i];
+		var value = this.getProperty(key) || this.getModelProperty(key);
+		if(value){
+			$element.attr(key, value);
+		} else {
+			$element.removeAttr(key);
+		}
+	}
 };
 
 /**
@@ -5159,19 +5200,26 @@ WbAbstractWidget.prototype.refresh = function($event) {
 	this.getScope().wbModel = model;
 
 	if($event){
-		var key = $event.key || 'x';
+		var key = $event.key || 'xxx';
 		// update event
 		if(key.startsWith('event')){
 			this.eventFunctions = {};
 		} else if(key.startsWith('style')) {
 			this.loadStyle();
-			this.loadSeo();
+		} else if(widgetBasicWidgetAttributes.inclouds(key)){
+			var value = this.getProperty(key) || this.getModelProperty(key);;
+			if(value){
+				$element.atter(key, value);
+			} else {
+				$element.removeAttr(key);
+			}
 		}
-	} else {
-		this.eventFunctions = {};
-		this.loadStyle();
-		this.loadSeo();
-	}
+		return;
+	} 
+	this.eventFunctions = {};
+	this.loadStyle();
+	this.loadSeo();
+	this.loadBasicProperties();
 };
 
 /**
@@ -5276,6 +5324,10 @@ WbAbstractWidget.prototype.hasProperty = function (key){
 WbAbstractWidget.prototype.getProperty = function (key){
 	return objectPath.get(this.getRuntimeModel(), key);
 };
+WbAbstractWidget.prototype.removeProperty = function (key){
+	var model = this.getRuntimeModel();
+	objectPath.del(model, key);
+};
 
 /**
  * Changes property value
@@ -5293,9 +5345,10 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	$event.key = key;
 	$event.oldValue = this.getProperty(key);
 	$event.newValue =  value;
+	$event.value =  value;
 
 	// check if value changed
-	if(angular.equals($event.oldValue, $event.newValue)){
+	if(angular.equals($event.oldValue, $event.value)){
 		return;
 	}
 
@@ -5314,9 +5367,9 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
 	//To change the view in runtime
 	var ctrl = this;
 	this.$timeout( function() {
-            ctrl.getScope().$digest();
-        });
-	
+		ctrl.getScope().$digest();
+	});
+
 };
 
 /**
@@ -5402,7 +5455,20 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
 		try{
-			return eventFunction(event, this, this.$http, this.$mdMedia, this.$wbWindow, this.$wbLocal, this.$timeout, this.$dispatcher, this.$storage, this.$routeParams);
+			return eventFunction(
+					event, // -> $event
+					this, // -> $widget
+					this.$http, // -> $http
+					this.$mdMedia, // -> $mdMedia
+					this.$wbWindow, // -> $wbWindow
+					this.$wbLocal, // -> $wbLocal
+					// FIXME: wratp timeout and remove timers on edit mode (or distroy)
+					this.$timeout,// -> $timeout
+					// FIXME: wratp dispatcher and remove listeners
+					this.$dispatcher, // -> $dispatcher
+					this.$storage, // -> $storage
+					this.$routeParams// -> $routeParams
+			);
 		} catch(ex){
 			console.log('Fail to run event code');
 			console.log({
@@ -5473,6 +5539,25 @@ WbAbstractWidget.prototype.connect = function () {
 
 WbAbstractWidget.prototype.getElement = function () {
 	return this.$element;
+};
+
+WbAbstractWidget.prototype.setElementAttribute = function(key, value){
+	var $element = this.getElement();
+	if(value){
+		$element.attr(key, value);
+	} else {
+		$element.removeAttr(key);
+	}
+};
+
+WbAbstractWidget.prototype.getElementAttribute = function(key){
+	var $element = this.getElement();
+	return $element.attr(key);
+};
+
+WbAbstractWidget.prototype.removeElementAttribute = function(key){
+	var $element = this.getElement();
+	$element.removeAttr(key);
 };
 
 WbAbstractWidget.prototype.setSilent = function(silent) {
@@ -5819,6 +5904,7 @@ WbAbstractWidget.prototype.getBoundingClientRect = function () {
  */
 WbAbstractWidget.prototype.animate = function (options) {
 	var ctrl = this;
+	var keys = [];
 	var animation = {
 			targets: this.getRuntimeModel(),
 			update: function(/* anim */) {
@@ -5826,7 +5912,6 @@ WbAbstractWidget.prototype.animate = function (options) {
 				ctrl.refresh();
 			}
 	};
-	var keys = [];
 
 	// copy animation properties
 	if(options.duration){
@@ -6580,7 +6665,7 @@ angular.module('am-wb-core')
 
 	return {
 		restrict : 'E',
-		templateUrl: 'views/widgets/wb-group.html',
+		template: '<div></div>',
 		scope : {
 			wbEditable : '=?',
 			wbOnModelSelect : '@?',
@@ -12995,6 +13080,126 @@ angular.module('am-wb-core')
 			};
 		}
 	});
+	
+	
+
+	$settings.newPage({
+		type: 'iframe',
+		label: 'Inline Frame',
+		icon: 'wb-setting-iframe',
+		description: 'Inline Frame settings',
+		templateUrl: 'views/settings/wb-iframe.html',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+			var iframeElementAttribute = [
+				'name',
+				'src', 
+				'srcdoc', 
+				'sandbox', 
+			];
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				for(var i =0; i < iframeElementAttribute.length;i++){
+					var key = iframeElementAttribute[i];
+					$scope[key] =  this.getProperty(key);
+				}
+				// TODO: whatch changes of the model
+			};
+		}
+	});
+	$settings.newPage({
+		type: 'input',
+		label: 'Input',
+		icon: 'wb-setting-input',
+		description: 'Input settings',
+		templateUrl: 'views/settings/wb-input.html',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+			// list of element attributes
+			var elementAttributes = [
+				'accept',
+				'alt', 
+				'autocomplete', 
+				'autofocus', 
+				'checked', 
+				'dirname', 
+				'disabled', 
+				'form',
+				'max', 
+				'maxlength', 
+				'min', 
+				'multiple', 
+				'name', 
+				'pattern', 
+				'placeholder', 
+				'readonly', 
+				'required', 
+				'size', 
+				'src', 
+				'step',
+				'inputType',
+				'value',
+				];
+			
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					this[key] =  this.getProperty(key);
+				}
+				// TODO:
+			};
+		}
+	});
+	$settings.newPage({
+		type: 'textarea',
+		label: 'Text Area',
+		icon: 'wb-setting-textarea',
+		description: 'Text Area Settings',
+		templateUrl: 'views/settings/wb-textarea.html',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function () {
+			var elementAttributes = [
+				'autofocus',
+				'cols',
+				'dirname',
+				'disabled',
+				'form',
+				'maxlength',
+				'name',
+				'placeholder',
+				'readonly',
+				'required',
+				'rows',
+				'wrap',
+				'value',
+				];
+			
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					this[key] =  this.getProperty(key);
+				}
+				// TODO:
+			};
+		}
+	});
 });
 
 /* 
@@ -13064,85 +13269,344 @@ angular.module('am-wb-core')
  */
 .run(function ($widget) {
 
-    /**
-     * @ngdoc Widgets
-     * @name Group
-     * @description Parent widget of other widgets
-     * 
-     * default setting:
-     * - margin: '1px'
-     */
-    $widget.newWidget({
-        // widget description
-        type: 'Group',
-        title: 'Group',
-        description: 'Panel contains list of widgets.',
-        icon: 'wb-widget-group',
-        groups: ['basic'],
-        model: {
-            style: {
-                margin: '1px',
-                padding: '1px',
-                layout: {
-                    direction: 'column'
-                },
-                size: {
-                    minHeight: '16px',
-                    minWidth: '16px'
-                }
-            }
-        },
-        // functional properties
-        templateUrl: 'views/widgets/wb-group.html',
-        help: 'http://dpq.co.ir/more-information-link',
-        helpId: 'wb-widget-group'
-    });
-    /**
-     * @ngdoc Widgets
-     * @name Text
-     * @description Add rich text to page
-     * 
-     * This is a RTF to add to a page.
-     * 
-     */
-    $widget.newWidget({
-        // widget description
-        type: 'HtmlText',
-        title: 'Text',
-        description: 'An text block.',
-        icon: 'wb-widget-html',
-        groups: ['basic'],
-        model: {
-            text: '<h2>Text element</h2><p>Click on the text box to edit.</p>',
-            style: {
-            	padding: '8px'
-            }
-        },
-        // help id
-        help: 'http://dpq.co.ir',
-        helpId: 'wb-widget-html',
-        // functional properties
-        templateUrl: 'views/widgets/wb-html.html',
-	/*
-	 * @ngInject
+	/**
+	 * @ngdoc Widgets
+	 * @name Group
+	 * @description Parent widget of other widgets
+	 * 
+	 * default setting:
+	 * - margin: '1px'
 	 */
-        controller: function(){
-        	this.text = '';
-        	this.setText = function(text){
-        		this.text = text;
-        	};
-        	this.initWidget = function(){
-        		var ctrl = this;
-        		this.on('modelUpdated', function($event){
-        			if($event.key === 'text'){
-        				ctrl.setText($event.newValue);
-        			}
-        		});
-        		this.setText(this.getModelProperty('text'));
-        	};
-        },
-        controllerAs: 'ctrl'
-    });
+	$widget.newWidget({
+		// widget description
+		type: 'Group',
+		title: 'Group',
+		description: 'Panel contains list of widgets.',
+		icon: 'wb-widget-group',
+		groups: ['basic'],
+		model: {
+			style: {
+				margin: '1px',
+				padding: '1px',
+				layout: {
+					direction: 'column'
+				},
+				size: {
+					minHeight: '16px',
+					minWidth: '16px'
+				}
+			}
+		},
+		// functional properties
+		template: function(model){
+			var groupType = model.groupType | 'div';
+			if(groupType === 'form'){
+				return '<form></form>';
+			}
+			if(groupType === 'section'){
+				return '<section></section>';
+			}
+			return '<div></div>';
+		},
+		help: 'http://dpq.co.ir/more-information-link',
+		helpId: 'wb-widget-group'
+	});
+	/**
+	 * @ngdoc Widgets
+	 * @name Text
+	 * @description Add rich text to page
+	 * 
+	 * This is a RTF to add to a page.
+	 * 
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'HtmlText',
+		title: 'Text',
+		description: 'An text block.',
+		icon: 'wb-widget-html',
+		groups: ['basic'],
+		model: {
+			text: '<h2>Text element</h2><p>Click on the text box to edit.</p>',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-html',
+		// functional properties
+		templateUrl: 'views/widgets/wb-html.html',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			this.text = '';
+			this.setText = function(text){
+				this.text = text;
+			};
+			this.initWidget = function(){
+				var ctrl = this;
+				this.on('modelUpdated', function($event){
+					if($event.key === 'text'){
+						ctrl.setText($event.newValue);
+					}
+				});
+				this.setText(this.getModelProperty('text'));
+			};
+		},
+		controllerAs: 'ctrl'
+	});
+	/**
+	 * @ngdoc Widgets
+	 * @name iframe
+	 * @description Add inline frame to show another document within current one.
+	 * 
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'iframe',
+		title: 'Inline Frame',
+		description: 'Add inline frame to show another document within current one.',
+		icon: 'wb-widget-iframe',
+		groups: ['basic'],
+		model: {
+			name: 'iframe',
+			sandbox: 'allow-same-origin allow-scripts',
+			src: 'https://www.google.com',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-iframe',
+		// functional properties
+		template: '<iframe>Frame Not Supported?!</iframe>',
+		setting: ['iframe'],
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			// list of element attributes
+			// NOTE: maso, 2019: the width and height of the iframe is set from 
+			// the style section.
+			//
+			// 'width', 'height'
+			var iframeElementAttribute = [
+				'name',
+				'src', 
+				'srcdoc', 
+				'sandbox', 
+			];
+			
+			this.initWidget = function(){
+				var ctrl = this;
+				function elementAttribute(key, value){
+					ctrl.setElementAttribute(key, value);
+				}
+				function eventHandler(event){
+					if(iframeElementAttribute.includes(event.key)){
+						var key = event.key;
+						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+						elementAttribute(key, value);
+					}
+				}
+				// listen on change
+				this.on('modelUpdated', eventHandler);
+				this.on('runtimeModelUpdated', eventHandler);
+				// load initial data
+				for(var i =0; i < iframeElementAttribute.length;i++){
+					var key = iframeElementAttribute[i];
+					elementAttribute(key, ctrl.getModelProperty(key));
+				}
+			};
+		},
+	});
+	
+	/**
+	 * @ngdoc Widgets
+	 * @name input
+	 * @description Add input to get user value
+	 * 
+	 * It is used to create intractive page with users
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'input',
+		title: 'Input field',
+		description: 'A widget to get data from users.',
+		icon: 'wb-widget-input',
+		groups: ['basic'],
+		model: {
+			name: 'input',
+			sandbox: 'allow-same-origin allow-scripts',
+			src: 'https://www.google.com',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-input',
+		// functional properties
+		template: '<input></input>',
+		setting: ['input'],
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			// list of element attributes
+			var elementAttributes = [
+				'accept',
+				'alt', 
+				'autocomplete', 
+				'autofocus', 
+				'checked', 
+				'dirname', 
+				'disabled', 
+				'form',
+				'max', 
+				'maxlength', 
+				'min', 
+				'multiple', 
+				'name', 
+				'pattern', 
+				'placeholder', 
+				'readonly', 
+				'required', 
+				'size', 
+				'src', 
+				'step',
+				'inputType',
+				'value',
+				];
+			
+			this.initWidget = function(){
+				var ctrl = this;
+				function elementAttribute(key, value){
+					ctrl.setElementAttribute(key, value);
+					if(key === 'inputType'){
+						ctrl.setElementAttribute('type', value);
+					}
+				}
+				function eventHandler(event){
+					if(elementAttributes.includes(event.key)){
+						var key = event.key;
+						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+						elementAttribute(key, value);
+					}
+				}
+				// listen on change
+				this.on('modelUpdated', eventHandler);
+				this.on('runtimeModelUpdated', eventHandler);
+				// load initial data
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					elementAttribute(key, ctrl.getModelProperty(key));
+				}
+			};
+			
+			/**
+			 * Gets value of the input
+			 */
+			this.val = function(data){
+				if(data){
+					this.setElementAttribute('value', data);
+					return this.getElement().val(data);
+				}
+				return this.getElement().val();
+			};
+		},
+	});
+	
+	/**
+	 * @ngdoc Widgets
+	 * @name textarea
+	 * @description Add textarea to get user value
+	 * 
+	 * It is used to create textarea
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'textarea',
+		title: 'Text Area field',
+		description: 'A widget to get data from users.',
+		icon: 'wb-widget-textarea',
+		groups: ['basic'],
+		model: {
+			name: 'textarea',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-textarea',
+		// functional properties
+		template: '<textarea></textarea>',
+		setting: ['textarea'],
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			// list of element attributes
+			var elementAttributes = [
+				'autofocus',
+				'cols',
+				'dirname',
+				'disabled',
+				'form',
+				'maxlength',
+				'name',
+				'placeholder',
+				'readonly',
+				'required',
+				'rows',
+				'wrap',
+				'value'
+				];
+			
+			this.initWidget = function(){
+				var ctrl = this;
+				function elementAttribute(key, value){
+					ctrl.setElementAttribute(key, value);
+					if(key === 'value'){
+						ctrl.val(value);
+					}
+				}
+				function eventHandler(event){
+					if(elementAttributes.includes(event.key)){
+						var key = event.key;
+						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+						elementAttribute(key, value);
+					}
+				}
+				// listen on change
+				this.on('modelUpdated', eventHandler);
+				this.on('runtimeModelUpdated', eventHandler);
+				// load initial data
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					elementAttribute(key, ctrl.getModelProperty(key));
+				}
+			};
+			
+			/**
+			 * Gets value of the input
+			 */
+			this.val = function(data){
+				if(data){
+					this.setElementAttribute('value', data);
+					return this.getElement().val(data);
+				}
+				return this.getElement().val();
+			};
+		},
+	});
 });
 
 /* 
@@ -14522,10 +14986,9 @@ angular.module('am-wb-core')
 		var templateUrl = page.templateUrl;
 		if (angular.isDefined(template)) {
 			if (angular.isFunction(template)) {
-				template = template(page.params);
+				template = template(page.params | page);
 			}
-		} else if (angular
-				.isDefined(templateUrl)) {
+		} else if (angular.isDefined(templateUrl)) {
 			if (angular.isFunction(templateUrl)) {
 				templateUrl = templateUrl(page.params);
 			}
@@ -15172,7 +15635,7 @@ angular.module('am-wb-core')
     var service = this;
 
     var notFoundWidget = {
-            templateUrl : 'views/widgets/wb-notfound.html',
+            template : '<div ng-show="wbEditable">Unsuported widget?!</div>',
             label : 'Not found',
             description : 'Element not found'
     };
@@ -15340,26 +15803,31 @@ angular.module('am-wb-core')
         } else {
             gettingTemplatePromisse = $wbUtil.getTemplateFor(widget)
             .then(function(template) {
-                if (model.type !== 'Group') {
-                    template = '<div class="wb-widget" name="{{wbModel.name}}" '+
-
-                    'dnd-disable-if="!ctrl.isEditable()" '+
-                    'dnd-draggable="wbModel" '+
-                    'dnd-type="wbModel.type" '+
-                    'dnd-effect-allowed="copyMove" '+
-                    'dnd-callback="1" '+
-
-                    'dnd-moved="ctrl.delete()" '+
-
-                    'md-theme-watch="true">' + (template || '') + '</div>';
-                }
-
                 // 3- bind controller
                 return angular.element(template);
             });
         }
         return gettingTemplatePromisse.then(function(element){
-            var link = $compile(element);
+        	// init widget
+        	element.attr('dnd-disable-if','!ctrl.isEditable()');
+        	element.attr('dnd-draggable','wbModel');
+        	element.attr('dnd-type','wbModel.type');
+        	element.attr('dnd-effect-allowed','copyMove');
+        	element.attr('dnd-moved','ctrl.delete()');
+        	element.attr('md-theme-watch','true');
+        	if (model.type == 'Group'){
+        	    element.addClass('wb-group');
+        	    element.attr('dnd-list','wbModel.contents');
+        	    element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
+        	    element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
+        	    element.attr('dnd-external-sources','true');
+        	    element.attr('dnd-drop','ctrl.addChild(index, item)');
+        	    element.attr('dnd-horizontal-list','wbModel.style.layout.direction==="row"');
+        	}else {
+                element.addClass('wb-widget');
+        	    element.attr('dnd-callback','1');
+        	}
+        	var link = $compile(element);
             var wlocals = _.merge({
                 $scope : childScope,
                 $element : element
@@ -15720,6 +16188,40 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/settings/wb-iframe.html',
+    "<fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Name</label> <input ng-model=name ng-change=\"ctrl.setProperty('name', name)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Sandbox</label> <input ng-model=sandbox ng-change=\"ctrl.setProperty('sandbox', sandbox)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Source</legend> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Source</label> <input ng-model=src ng-change=\"ctrl.setProperty('src', src)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Source Document</label> <textarea name=srcdoc ng-model=srcdoc ng-change=\"ctrl.setProperty('srcdoc', srcdoc)\">\n" +
+    "        </textarea> </md-input-container> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-input.html',
+    "<fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\" ng-repeat=\"name in [\n" +
+    "\t\t\t\t'accept',\n" +
+    "\t\t\t\t'alt', \n" +
+    "\t\t\t\t'autocomplete', \n" +
+    "\t\t\t\t'autofocus', \n" +
+    "\t\t\t\t'checked', \n" +
+    "\t\t\t\t'dirname', \n" +
+    "\t\t\t\t'disabled', \n" +
+    "\t\t\t\t'form',\n" +
+    "\t\t\t\t'max', \n" +
+    "\t\t\t\t'maxlength', \n" +
+    "\t\t\t\t'min', \n" +
+    "\t\t\t\t'multiple',\n" +
+    "\t\t\t\t'name', \n" +
+    "\t\t\t\t'pattern', \n" +
+    "\t\t\t\t'placeholder', \n" +
+    "\t\t\t\t'readonly', \n" +
+    "\t\t\t\t'required', \n" +
+    "\t\t\t\t'size', \n" +
+    "\t\t\t\t'src', \n" +
+    "\t\t\t\t'step',\n" +
+    "\t\t\t\t'inputType',\n" +
+    "\t\t\t\t'value',\n" +
+    "\t\t\t\t]\"> <label translate=\"\">{{name}}</label> <input ng-model=ctrl[name] ng-change=\"ctrl.setProperty(name, ctrl[name])\"> </md-input-container> </fieldset>"
+  );
+
+
   $templateCache.put('views/settings/wb-layout-self.html',
     " <fieldset layout=column> <legend translate>Align</legend> <wb-ui-setting-choose ng-if=\"ctrl.getParentDirection() === 'row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['row']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.getParentDirection() !== 'row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['column']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> </fieldset>  <fieldset layout=column> <legend translate>Box</legend> <md-input-container class=md-block> <label translate>Order</label> <input ng-model=ctrl.order ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateOrder(ctrl.order, $event)\" type=number> </md-input-container> <md-input-container class=md-block> <label translate>Basis</label> <input ng-model=ctrl.basis ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateBasis(ctrl.basis, $event)\"> </md-input-container> <md-input-container class=md-block> <label translate>Grow</label> <input ng-model=ctrl.grow ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateGrow(ctrl.grow, $event)\" type=number> </md-input-container> <md-input-container class=md-block> <label translate>Shrink</label> <input ng-model=ctrl.shrink ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateShrink(ctrl.shrink, $event)\" type=number> </md-input-container> </fieldset>"
   );
@@ -15756,6 +16258,25 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/settings/wb-textarea.html',
+    "<fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\" ng-repeat=\"name in [\n" +
+    "\t\t\t\t'autofocus',\n" +
+    "\t\t\t\t'cols',\n" +
+    "\t\t\t\t'dirname',\n" +
+    "\t\t\t\t'disabled',\n" +
+    "\t\t\t\t'form',\n" +
+    "\t\t\t\t'maxlength',\n" +
+    "\t\t\t\t'name',\n" +
+    "\t\t\t\t'placeholder',\n" +
+    "\t\t\t\t'readonly',\n" +
+    "\t\t\t\t'required',\n" +
+    "\t\t\t\t'rows',\n" +
+    "\t\t\t\t'wrap',\n" +
+    "\t\t\t\t'value',\n" +
+    "\t\t\t\t]\"> <label translate=\"\">{{name}}</label> <input ng-model=ctrl[name] ng-change=\"ctrl.setProperty(name, ctrl[name])\"> </md-input-container> </fieldset>"
+  );
+
+
   $templateCache.put('views/settings/wb-transform.html',
     "<fieldset layout=column> <legend translate>General</legend> <md-input-container class=md-block> <label translate>Origin</label> <input ng-model=ctrl.origin ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOrigin()> </md-input-container> <md-input-container class=md-block> <label translate>style</label> <input ng-model=ctrl.style ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateStyle()> </md-input-container> <md-input-container class=md-block> <label translate>Perspective</label> <input ng-model=ctrl.perspective ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updatePerspective()> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>X</legend> <md-input-container class=md-block> <label translate>translate</label> <input ng-model=ctrl.translateX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateTranslateX()> </md-input-container> <md-input-container class=md-block> <label translate>scale</label> <input ng-model=ctrl.scaleX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateScaleX()> </md-input-container> <md-input-container class=md-block> <label translate>rotate</label> <input ng-model=ctrl.rotateX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateRotateX()> </md-input-container> <md-input-container class=md-block> <label translate>skew</label> <input ng-model=ctrl.skewX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateSkewX()> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Y</legend> <md-input-container class=md-block> <label translate>translate</label> <input ng-model=ctrl.translateY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateTranslateY()> </md-input-container> <md-input-container class=md-block> <label translate>scale</label> <input ng-model=ctrl.scaleY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateScaleY()> </md-input-container> <md-input-container class=md-block> <label translate>rotate</label> <input ng-model=ctrl.rotateY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateRotateY()> </md-input-container> <md-input-container class=md-block> <label translate>skew</label> <input ng-model=ctrl.skewY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateSkewY()> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Z</legend> <md-input-container class=md-block> <label translate>translate</label> <input ng-model=ctrl.translateZ ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateTranslatez()> </md-input-container> <md-input-container class=md-block> <label translate>scale</label> <input ng-model=ctrl.scaleZ ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateScaleZ()> </md-input-container> <md-input-container class=md-block> <label translate>rotate</label> <input ng-model=ctrl.rotateZ ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateRotateZ()> </md-input-container> </fieldset>"
   );
@@ -15766,68 +16287,58 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/widgets/wb-group.html',
-    "<div class=wb-group dir=\"{{wbModel.direction || wbModel.style.dir}}\" name={{wbModel.name}} id={{wbModel.id}} dnd-disable-if=!ctrl.isEditable() dnd-draggable=wbModel dnd-effect-allowed=copyMove dnd-type=\"'Group'\" dnd-moved=ctrl.delete() dnd-list=wbModel.contents dnd-allowed-types=ctrl.getAllowedTypes() dnd-external-sources=true dnd-drop=\"ctrl.addChild(index, item)\" dnd-horizontal-list=\"wbModel.style.layout.direction==='row'\" md-theme-watch=true></div>"
-  );
-
-
   $templateCache.put('views/widgets/wb-html.html',
-    " <div ng-if=!ctrl.isEditable() ng-bind-html=\"ctrl.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
-    "        selector : 'div.tinymce', \n" +
-    "        menubar: true,\n" +
-    "        inline: true,\n" +
-    "        theme: 'modern',\n" +
-    "        plugins : [\n" +
-    "            'advlist',\n" +
-    "            'autolink',\n" +
-    "            'autoresize',\n" +
-    "            'autosave',\n" +
-    "            'bbcode',\n" +
-    "            'charmap',\n" +
-    "            'code',\n" +
-    "            'codesample',\n" +
-    "            'colorpicker',\n" +
-    "            'contextmenu',\n" +
-    "            'directionality',\n" +
-    "            'emoticons',\n" +
-    "            'hr',\n" +
-    "            'image',\n" +
-    "            'imagetools',\n" +
-    "            'importcss',\n" +
-    "            'insertdatetime',\n" +
-    "            'legacyoutput',\n" +
-    "            'link',\n" +
-    "            'lists',\n" +
-    "            'media',\n" +
-    "            'nonbreaking',\n" +
-    "            'noneditable',\n" +
-    "            'paste',\n" +
-    "            'save',\n" +
-    "            'searchreplace',\n" +
-    "            'spellchecker',\n" +
-    "            'tabfocus',\n" +
-    "            'table',\n" +
-    "            'template',\n" +
-    "            'textcolor',\n" +
-    "            'textpattern',\n" +
-    "            'toc',\n" +
-    "            'visualblocks'\n" +
-    "        ],\n" +
-    "        toolbar: [\n" +
-    "            'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',\n" +
-    "            'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'\n" +
-    "        ],\n" +
-    "        powerpaste_word_import: 'clean',\n" +
-    "        powerpaste_html_import: 'clean',\n" +
-    "        link_assume_external_targets: false,\n" +
-    "        convert_urls: false,\n" +
-    "        format: 'raw',\n" +
-    "    }\" ng-model=ctrl.text ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setModelProperty('text', ctrl.text)\" class=\"wb-widget-fill tinymce wb-widget-text\" ng-keydown=$event.stopPropagation();> </div>"
-  );
-
-
-  $templateCache.put('views/widgets/wb-notfound.html',
-    "<div ng-show=wbEditable> Unsuported widget?! </div>"
+    "<div>  <div ng-if=!ctrl.isEditable() ng-bind-html=\"ctrl.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
+    "\t        selector : 'div.tinymce', \n" +
+    "\t        menubar: true,\n" +
+    "\t        inline: true,\n" +
+    "\t        theme: 'modern',\n" +
+    "\t        plugins : [\n" +
+    "\t            'advlist',\n" +
+    "\t            'autolink',\n" +
+    "\t            'autoresize',\n" +
+    "\t            'autosave',\n" +
+    "\t            'bbcode',\n" +
+    "\t            'charmap',\n" +
+    "\t            'code',\n" +
+    "\t            'codesample',\n" +
+    "\t            'colorpicker',\n" +
+    "\t            'contextmenu',\n" +
+    "\t            'directionality',\n" +
+    "\t            'emoticons',\n" +
+    "\t            'hr',\n" +
+    "\t            'image',\n" +
+    "\t            'imagetools',\n" +
+    "\t            'importcss',\n" +
+    "\t            'insertdatetime',\n" +
+    "\t            'legacyoutput',\n" +
+    "\t            'link',\n" +
+    "\t            'lists',\n" +
+    "\t            'media',\n" +
+    "\t            'nonbreaking',\n" +
+    "\t            'noneditable',\n" +
+    "\t            'paste',\n" +
+    "\t            'save',\n" +
+    "\t            'searchreplace',\n" +
+    "\t            'spellchecker',\n" +
+    "\t            'tabfocus',\n" +
+    "\t            'table',\n" +
+    "\t            'template',\n" +
+    "\t            'textcolor',\n" +
+    "\t            'textpattern',\n" +
+    "\t            'toc',\n" +
+    "\t            'visualblocks'\n" +
+    "\t        ],\n" +
+    "\t        toolbar: [\n" +
+    "\t            'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',\n" +
+    "\t            'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'\n" +
+    "\t        ],\n" +
+    "\t        powerpaste_word_import: 'clean',\n" +
+    "\t        powerpaste_html_import: 'clean',\n" +
+    "\t        link_assume_external_targets: false,\n" +
+    "\t        convert_urls: false,\n" +
+    "\t        format: 'raw',\n" +
+    "\t    }\" ng-model=ctrl.text ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setModelProperty('text', ctrl.text)\" class=\"wb-widget-fill tinymce wb-widget-text\" ng-keydown=$event.stopPropagation();> </div> </div>"
   );
 
 }]);

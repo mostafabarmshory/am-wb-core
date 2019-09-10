@@ -1,71 +1,73 @@
-<!-- 
-
-- wbModel: Data model related to the current view
-- wbEditable: If edit mode is enabled
-
- -->
-<div
-	ng-if="!ctrl.isEditable()"
-	ng-bind-html="ctrl.text | wbunsafe"
-	class="wb-widget-fill wb-widget-text">
-</div>
-<div
-	ng-if="ctrl.isEditable()"
-	ui-tinymce="{
-        selector : 'div.tinymce', 
-        menubar: true,
-        inline: true,
-        theme: 'modern',
-        plugins : [
-            'advlist',
-            'autolink',
-            'autoresize',
-            'autosave',
-            'bbcode',
-            'charmap',
-            'code',
-            'codesample',
-            'colorpicker',
-            'contextmenu',
-            'directionality',
-            'emoticons',
-            'hr',
-            'image',
-            'imagetools',
-            'importcss',
-            'insertdatetime',
-            'legacyoutput',
-            'link',
-            'lists',
-            'media',
-            'nonbreaking',
-            'noneditable',
-            'paste',
-            'save',
-            'searchreplace',
-            'spellchecker',
-            'tabfocus',
-            'table',
-            'template',
-            'textcolor',
-            'textpattern',
-            'toc',
-            'visualblocks'
-        ],
-        toolbar: [
-            'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',
-            'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'
-        ],
-        powerpaste_word_import: 'clean',
-        powerpaste_html_import: 'clean',
-        link_assume_external_targets: false,
-        convert_urls: false,
-        format: 'raw',
-    }"
-	ng-model="ctrl.text"
-    ng-model-options="{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}"
-    ng-change="ctrl.setModelProperty('text', ctrl.text)"
-	        
-	class="wb-widget-fill tinymce wb-widget-text"
-	ng-keydown="$event.stopPropagation();">
+<div>
+	<!-- 
+	
+	- wbModel: Data model related to the current view
+	- wbEditable: If edit mode is enabled
+	
+	 -->
+	<div
+		ng-if="!ctrl.isEditable()"
+		ng-bind-html="ctrl.text | wbunsafe"
+		class="wb-widget-fill wb-widget-text">
+	</div>
+	<div
+		ng-if="ctrl.isEditable()"
+		ui-tinymce="{
+	        selector : 'div.tinymce', 
+	        menubar: true,
+	        inline: true,
+	        theme: 'modern',
+	        plugins : [
+	            'advlist',
+	            'autolink',
+	            'autoresize',
+	            'autosave',
+	            'bbcode',
+	            'charmap',
+	            'code',
+	            'codesample',
+	            'colorpicker',
+	            'contextmenu',
+	            'directionality',
+	            'emoticons',
+	            'hr',
+	            'image',
+	            'imagetools',
+	            'importcss',
+	            'insertdatetime',
+	            'legacyoutput',
+	            'link',
+	            'lists',
+	            'media',
+	            'nonbreaking',
+	            'noneditable',
+	            'paste',
+	            'save',
+	            'searchreplace',
+	            'spellchecker',
+	            'tabfocus',
+	            'table',
+	            'template',
+	            'textcolor',
+	            'textpattern',
+	            'toc',
+	            'visualblocks'
+	        ],
+	        toolbar: [
+	            'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',
+	            'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'
+	        ],
+	        powerpaste_word_import: 'clean',
+	        powerpaste_html_import: 'clean',
+	        link_assume_external_targets: false,
+	        convert_urls: false,
+	        format: 'raw',
+	    }"
+		ng-model="ctrl.text"
+	    ng-model-options="{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}"
+	    ng-change="ctrl.setModelProperty('text', ctrl.text)"
+		        
+		class="wb-widget-fill tinymce wb-widget-text"
+		ng-keydown="$event.stopPropagation();">
+	</div>
 </div>

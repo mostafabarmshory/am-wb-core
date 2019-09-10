@@ -44,7 +44,7 @@ angular.module('am-wb-core')
     var service = this;
 
     var notFoundWidget = {
-            templateUrl : 'views/widgets/wb-notfound.html',
+            template : '<div ng-show="wbEditable">Unsuported widget?!</div>',
             label : 'Not found',
             description : 'Element not found'
     };
@@ -212,26 +212,31 @@ angular.module('am-wb-core')
         } else {
             gettingTemplatePromisse = $wbUtil.getTemplateFor(widget)
             .then(function(template) {
-                if (model.type !== 'Group') {
-                    template = '<div class="wb-widget" name="{{wbModel.name}}" '+
-
-                    'dnd-disable-if="!ctrl.isEditable()" '+
-                    'dnd-draggable="wbModel" '+
-                    'dnd-type="wbModel.type" '+
-                    'dnd-effect-allowed="copyMove" '+
-                    'dnd-callback="1" '+
-
-                    'dnd-moved="ctrl.delete()" '+
-
-                    'md-theme-watch="true">' + (template || '') + '</div>';
-                }
-
                 // 3- bind controller
                 return angular.element(template);
             });
         }
         return gettingTemplatePromisse.then(function(element){
-            var link = $compile(element);
+        	// init widget
+        	element.attr('dnd-disable-if','!ctrl.isEditable()');
+        	element.attr('dnd-draggable','wbModel');
+        	element.attr('dnd-type','wbModel.type');
+        	element.attr('dnd-effect-allowed','copyMove');
+        	element.attr('dnd-moved','ctrl.delete()');
+        	element.attr('md-theme-watch','true');
+        	if (model.type == 'Group'){
+        	    element.addClass('wb-group');
+        	    element.attr('dnd-list','wbModel.contents');
+        	    element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
+        	    element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
+        	    element.attr('dnd-external-sources','true');
+        	    element.attr('dnd-drop','ctrl.addChild(index, item)');
+        	    element.attr('dnd-horizontal-list','wbModel.style.layout.direction==="row"');
+        	}else {
+                element.addClass('wb-widget');
+        	    element.attr('dnd-callback','1');
+        	}
+        	var link = $compile(element);
             var wlocals = _.merge({
                 $scope : childScope,
                 $element : element

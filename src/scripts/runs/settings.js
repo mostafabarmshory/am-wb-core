@@ -1026,4 +1026,124 @@ angular.module('am-wb-core')
 			};
 		}
 	});
+	
+	
+
+	$settings.newPage({
+		type: 'iframe',
+		label: 'Inline Frame',
+		icon: 'wb-setting-iframe',
+		description: 'Inline Frame settings',
+		templateUrl: 'views/settings/wb-iframe.html',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+			var iframeElementAttribute = [
+				'name',
+				'src', 
+				'srcdoc', 
+				'sandbox', 
+			];
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				for(var i =0; i < iframeElementAttribute.length;i++){
+					var key = iframeElementAttribute[i];
+					$scope[key] =  this.getProperty(key);
+				}
+				// TODO: whatch changes of the model
+			};
+		}
+	});
+	$settings.newPage({
+		type: 'input',
+		label: 'Input',
+		icon: 'wb-setting-input',
+		description: 'Input settings',
+		templateUrl: 'views/settings/wb-input.html',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function ($scope) {
+			// list of element attributes
+			var elementAttributes = [
+				'accept',
+				'alt', 
+				'autocomplete', 
+				'autofocus', 
+				'checked', 
+				'dirname', 
+				'disabled', 
+				'form',
+				'max', 
+				'maxlength', 
+				'min', 
+				'multiple', 
+				'name', 
+				'pattern', 
+				'placeholder', 
+				'readonly', 
+				'required', 
+				'size', 
+				'src', 
+				'step',
+				'inputType',
+				'value',
+				];
+			
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					this[key] =  this.getProperty(key);
+				}
+				// TODO:
+			};
+		}
+	});
+	$settings.newPage({
+		type: 'textarea',
+		label: 'Text Area',
+		icon: 'wb-setting-textarea',
+		description: 'Text Area Settings',
+		templateUrl: 'views/settings/wb-textarea.html',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function () {
+			var elementAttributes = [
+				'autofocus',
+				'cols',
+				'dirname',
+				'disabled',
+				'form',
+				'maxlength',
+				'name',
+				'placeholder',
+				'readonly',
+				'required',
+				'rows',
+				'wrap',
+				'value',
+				];
+			
+			/*
+			 * watch 'wbModel' and apply the changes in setting panel
+			 */
+			this.init = function () {
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					this[key] =  this.getProperty(key);
+				}
+				// TODO:
+			};
+		}
+	});
 });
