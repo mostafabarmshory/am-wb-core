@@ -218,24 +218,23 @@ angular.module('am-wb-core')
         }
         return gettingTemplatePromisse.then(function(element){
         	// init widget
-        	var widgetRootElement = element[0];
-        	widgetRootElement.setAttribute('dnd-disable-if','!ctrl.isEditable()');
-        	widgetRootElement.setAttribute('dnd-draggable','wbModel');
-        	widgetRootElement.setAttribute('dnd-type','wbModel.type');
-        	widgetRootElement.setAttribute('dnd-effect-allowed','copyMove');
-        	widgetRootElement.setAttribute('dnd-moved','ctrl.delete()');
-        	widgetRootElement.setAttribute('md-theme-watch','true');
+        	element.attr('dnd-disable-if','!ctrl.isEditable()');
+        	element.attr('dnd-draggable','wbModel');
+        	element.attr('dnd-type','wbModel.type');
+        	element.attr('dnd-effect-allowed','copyMove');
+        	element.attr('dnd-moved','ctrl.delete()');
+        	element.attr('md-theme-watch','true');
         	if (model.type == 'Group'){
-        		widgetRootElement.className += " wb-group";
-        		widgetRootElement.setAttribute('dnd-list','wbModel.contents');
-        		widgetRootElement.setAttribute('dnd-allowed-types','ctrl.getAllowedTypes()');
-        		widgetRootElement.setAttribute('dnd-allowed-types','ctrl.getAllowedTypes()');
-        		widgetRootElement.setAttribute('dnd-external-sources','true');
-        		widgetRootElement.setAttribute('dnd-drop','ctrl.addChild(index, item)');
-        		widgetRootElement.setAttribute('dnd-horizontal-list','wbModel.style.layout.direction==="row"');
+        	    element.addClass('wb-group');
+        	    element.attr('dnd-list','wbModel.contents');
+        	    element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
+        	    element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
+        	    element.attr('dnd-external-sources','true');
+        	    element.attr('dnd-drop','ctrl.addChild(index, item)');
+        	    element.attr('dnd-horizontal-list','wbModel.style.layout.direction==="row"');
         	}else {
-        		widgetRootElement.className += " wb-widget";
-        		widgetRootElement.setAttribute('dnd-callback','1');
+                element.addClass('wb-widget');
+        	    element.attr('dnd-callback','1');
         	}
         	var link = $compile(element);
             var wlocals = _.merge({
