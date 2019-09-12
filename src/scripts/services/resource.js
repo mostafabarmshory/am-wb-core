@@ -254,7 +254,7 @@ angular.module('am-wb-core')
 				'style' : option.style || {
 					title: tag
 				},
-				'data' : option.data
+				'data' : option.data || {}
 			}
 		});
 	}
