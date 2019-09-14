@@ -14527,7 +14527,9 @@ angular.module('am-wb-core')
 					if (angular.isDefined(page.controller)) {
 						var controller = $controller(page.controller, {
 							$scope : scope,
-							$element : element
+							$element : element,
+							style: style,
+							data: data
 						});
 						if (page.controllerAs) {
 							scope[page.controllerAs] = controller;
@@ -14641,7 +14643,7 @@ angular.module('am-wb-core')
 				'style' : option.style || {
 					title: tag
 				},
-				'data' : option.data
+				'data' : option.data || {}
 			}
 		});
 	}
