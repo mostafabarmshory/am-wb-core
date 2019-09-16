@@ -5449,8 +5449,23 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	}
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
-		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5], $timeout = arguments[6], $dispatcher = arguments[7], $storage = arguments[8], $routeParams = arguments[9];' + this.getEvent()[type];
-		this.eventFunctions[type] = new Function(body);
+	    try{
+    		var body = '\'use strict\';'+
+    		'var $event = arguments[0],' + 
+    		'$widget = arguments[1],' + 
+            '$http = arguments[2],' + 
+            '$media =  arguments[3],' + 
+            '$window =  arguments[4],' + 
+            '$local =  arguments[5],' + 
+            '$timeout = arguments[6],' + 
+            '$dispatcher = arguments[7],' + 
+            '$storage = arguments[8],' + 
+            '$routeParams = arguments[9];' + 
+            this.getEvent()[type];
+    		this.eventFunctions[type] = new Function(body);
+	    }catch(ex){
+	        console.log(ex);
+	    }
 	}
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
@@ -6044,11 +6059,27 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$storage = $storage;
 
 	var ctrl = this;
-	this.on('modelChanged', function () {
-		ctrl.loadWidgets(ctrl.getModel());
-	});
 };
 WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
+
+/**
+ * Set model to a group
+ * 
+ * Setting model to a group is differs from setting in widget. In group 
+ * we try to load children and finally loading the group itself.
+ * 
+ * @memberof WbWidgetGroupCtrl
+ * @param model Object to set into the group
+ */
+WbWidgetGroupCtrl.prototype.setModel = function (model) {
+    if (model === this.wbModel) {
+        return;
+    }
+    this.wbModel = model;
+    this.loadWidgets(model);
+    this.fire('modelChanged');
+    this.reload();
+};
 
 /**
  * Check if the widget is selected
@@ -9188,7 +9219,7 @@ angular.module('am-wb-core')
 	 * @return promise to load the library
 	 */
 	wbWindow.prototype.loadLibrary = function(path){
-		return $wbLibs.load(path);
+		return $wbWindow.loadLibrary(path);
 	};
 
 	/**
@@ -9198,7 +9229,28 @@ angular.module('am-wb-core')
 	 * @return true if the library is loaded
 	 */
 	wbWindow.prototype.isLibraryLoaded = function(path){
-		return $wbLibs.isLoaded(path);
+		return $wbWindow.isLibraryLoaded(path);
+	};
+	
+	/**
+	 * Loads a library
+	 * 
+	 * @memberof WbDialogWindow
+	 * @path path of library
+	 * @return promise to load the library
+	 */
+	wbWindow.prototype.loadStyle = function(path){
+	    return $wbWindow.loadStyle(path);
+	};
+	
+	/**
+	 * Check if the library is loaded
+	 * 
+	 * @memberof WbDialogWindow
+	 * @return true if the library is loaded
+	 */
+	wbWindow.prototype.isStyleLoaded = function(path){
+	    return $wbWindow.isStyleLoaded(path);
 	};
 
 
@@ -9281,7 +9333,6 @@ angular.module('am-wb-core')
 		}
 	};
 	
-	
 	wbWindow.prototype.setTitleVisible = function(visible){
 		this._titleVisible = visible;
 		if(this.floatDialogElement){
@@ -9334,6 +9385,7 @@ angular.module('am-wb-core')
         this.nw = nativeWindow;
         this.location = nativeWindow.location;
         this.libs = {};
+        this.styles = {};
     };
 
 
@@ -9580,6 +9632,62 @@ angular.module('am-wb-core')
      */
     nativeWindowWrapper.prototype.isLibraryLoaded = function(path){
         if(this.libs[path]){
+            return true;
+        }
+        return false;
+    };
+    
+    /**
+     * Loads a style
+     * 
+     * loads css 
+     * 
+     * @memberof NativeWindowWrapper
+     * @path path of library
+     * @return promise to load the library
+     */
+    nativeWindowWrapper.prototype.loadStyle = function(path){
+        if(this.styles[path]){
+            return $q.resolve({
+                message: 'isload'
+            });
+        }
+        var defer = $q.defer();
+        
+        var document = this.getDocument();
+        var style = document.createElement('link');
+        style.setAttribute("rel", "stylesheet")
+        style.setAttribute("type", "text/css")
+        style.setAttribute("href", path)
+        var ctrl = this;
+        style.onload = function(){
+            ctrl.styles[path] = true;
+            defer.resolve({
+                path: path,
+                message: 'loaded'
+            });
+            $rootScope.$digest();
+        };
+        style.onerror = function() {
+            ctrl.styles[path] = false;
+            defer.reject({
+                path: path,
+                message: 'fail'
+            });
+            $rootScope.$digest();
+        };
+        document.getElementsByTagName('head')[0].appendChild(style);
+        return defer.promise;
+    };
+    
+    /**
+     * Check if the library is loaded
+     * 
+     * @memberof NativeWindowWrapper
+     * @return true if the library is loaded
+     */
+    nativeWindowWrapper.prototype.isLibraryLoaded = function(path){
+        if(this.styles[path]){
             return true;
         }
         return false;
