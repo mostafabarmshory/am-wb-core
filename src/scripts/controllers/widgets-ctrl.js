@@ -539,8 +539,12 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	}
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
-		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5], $timeout = arguments[6], $dispatcher = arguments[7], $storage = arguments[8], $routeParams = arguments[9];' + this.getEvent()[type];
-		this.eventFunctions[type] = new Function(body);
+	    try{
+    		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5], $timeout = arguments[6], $dispatcher = arguments[7], $storage = arguments[8], $routeParams = arguments[9];' + this.getEvent()[type];
+    		this.eventFunctions[type] = new Function(body);
+	    }catch(ex){
+	        console.log(ex);
+	    }
 	}
 	eventFunction = this.eventFunctions[type];
 	if (eventFunction) {
