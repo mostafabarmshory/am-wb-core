@@ -540,7 +540,18 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 	var eventFunction;
 	if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
 	    try{
-    		var body = '\'use strict\'; var $event = arguments[0], $widget = arguments[1], $http = arguments[2], $media =  arguments[3], $window =  arguments[4], $local =  arguments[5], $timeout = arguments[6], $dispatcher = arguments[7], $storage = arguments[8], $routeParams = arguments[9];' + this.getEvent()[type];
+    		var body = '\'use strict\';'+
+    		'var $event = arguments[0],' + 
+    		'$widget = arguments[1],' + 
+            '$http = arguments[2],' + 
+            '$media =  arguments[3],' + 
+            '$window =  arguments[4],' + 
+            '$local =  arguments[5],' + 
+            '$timeout = arguments[6],' + 
+            '$dispatcher = arguments[7],' + 
+            '$storage = arguments[8],' + 
+            '$routeParams = arguments[9];' + 
+            this.getEvent()[type];
     		this.eventFunctions[type] = new Function(body);
 	    }catch(ex){
 	        console.log(ex);
@@ -1138,11 +1149,27 @@ var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming
 	this.$storage = $storage;
 
 	var ctrl = this;
-	this.on('modelChanged', function () {
-		ctrl.loadWidgets(ctrl.getModel());
-	});
 };
 WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
+
+/**
+ * Set model to a group
+ * 
+ * Setting model to a group is differs from setting in widget. In group 
+ * we try to load children and finally loading the group itself.
+ * 
+ * @memberof WbWidgetGroupCtrl
+ * @param model Object to set into the group
+ */
+WbWidgetGroupCtrl.prototype.setModel = function (model) {
+    if (model === this.wbModel) {
+        return;
+    }
+    this.wbModel = model;
+    this.loadWidgets(model);
+    this.fire('modelChanged');
+    this.reload();
+};
 
 /**
  * Check if the widget is selected

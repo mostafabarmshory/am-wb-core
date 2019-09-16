@@ -258,7 +258,7 @@ angular.module('am-wb-core')
 	 * @return promise to load the library
 	 */
 	wbWindow.prototype.loadLibrary = function(path){
-		return $wbLibs.load(path);
+		return $wbWindow.loadLibrary(path);
 	};
 
 	/**
@@ -268,7 +268,28 @@ angular.module('am-wb-core')
 	 * @return true if the library is loaded
 	 */
 	wbWindow.prototype.isLibraryLoaded = function(path){
-		return $wbLibs.isLoaded(path);
+		return $wbWindow.isLibraryLoaded(path);
+	};
+	
+	/**
+	 * Loads a library
+	 * 
+	 * @memberof WbDialogWindow
+	 * @path path of library
+	 * @return promise to load the library
+	 */
+	wbWindow.prototype.loadStyle = function(path){
+	    return $wbWindow.loadStyle(path);
+	};
+	
+	/**
+	 * Check if the library is loaded
+	 * 
+	 * @memberof WbDialogWindow
+	 * @return true if the library is loaded
+	 */
+	wbWindow.prototype.isStyleLoaded = function(path){
+	    return $wbWindow.isStyleLoaded(path);
 	};
 
 
@@ -350,7 +371,6 @@ angular.module('am-wb-core')
 			this.floatDialogElement.resize(width, height);
 		}
 	};
-	
 	
 	wbWindow.prototype.setTitleVisible = function(visible){
 		this._titleVisible = visible;

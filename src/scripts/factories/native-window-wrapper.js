@@ -36,6 +36,7 @@ angular.module('am-wb-core')
         this.nw = nativeWindow;
         this.location = nativeWindow.location;
         this.libs = {};
+        this.styles = {};
     };
 
 
@@ -282,6 +283,62 @@ angular.module('am-wb-core')
      */
     nativeWindowWrapper.prototype.isLibraryLoaded = function(path){
         if(this.libs[path]){
+            return true;
+        }
+        return false;
+    };
+    
+    /**
+     * Loads a style
+     * 
+     * loads css 
+     * 
+     * @memberof NativeWindowWrapper
+     * @path path of library
+     * @return promise to load the library
+     */
+    nativeWindowWrapper.prototype.loadStyle = function(path){
+        if(this.styles[path]){
+            return $q.resolve({
+                message: 'isload'
+            });
+        }
+        var defer = $q.defer();
+        
+        var document = this.getDocument();
+        var style = document.createElement('link');
+        style.setAttribute("rel", "stylesheet")
+        style.setAttribute("type", "text/css")
+        style.setAttribute("href", path)
+        var ctrl = this;
+        style.onload = function(){
+            ctrl.styles[path] = true;
+            defer.resolve({
+                path: path,
+                message: 'loaded'
+            });
+            $rootScope.$digest();
+        };
+        style.onerror = function() {
+            ctrl.styles[path] = false;
+            defer.reject({
+                path: path,
+                message: 'fail'
+            });
+            $rootScope.$digest();
+        };
+        document.getElementsByTagName('head')[0].appendChild(style);
+        return defer.promise;
+    };
+    
+    /**
+     * Check if the library is loaded
+     * 
+     * @memberof NativeWindowWrapper
+     * @return true if the library is loaded
+     */
+    nativeWindowWrapper.prototype.isLibraryLoaded = function(path){
+        if(this.styles[path]){
             return true;
         }
         return false;
