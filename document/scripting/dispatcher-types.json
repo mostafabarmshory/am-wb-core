@@ -1,0 +1,37 @@
+{
+	"path": "/",
+	"is_store": true,
+	"description": "All application data",
+	"app": {
+		"path": "/app",
+		"is_store": true,
+		"description": "Current application configurations",
+		"settings":{},
+		"configs":{}
+	},
+	"account": {
+		"path": "/account",
+		"is_store": true,
+		"description": "Current account data",
+		"roles":{},
+		"groups":{},
+		"messages":{
+			"path": "/account",
+			"is_store": true,
+			"description": "Current account data"
+		},
+		"permissions":{}
+	},
+	"tenant": {
+		"path": "/tenant",
+		"is_store": true,
+		"description": "Current tenant data",
+		"settings":{},
+		"configs":{},
+		"domains":{
+			"path": "/account",
+			"is_store": true,
+			"description": "Current account data"
+		}
+	}
+}
