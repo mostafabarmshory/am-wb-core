@@ -23,7 +23,7 @@
  */
 'use strict';
 
-describe('WbWidget input ', function () {
+describe('WbWidget a ', function () {
 	// instantiate service
 	var $rootScope;
 	var $widget;
@@ -46,75 +46,35 @@ describe('WbWidget input ', function () {
 		$httpBackend = _$httpBackend_;
 	}));
 
-	it('should set input type from model', function (done) {
+	it('should set name from model', function (done) {
 		var root = new MockRootWidget();
 		// Create new instance
 		var model = {
-				type: 'input',
-				inputType: 'text',
-				id: 'test',
-				name: 'input-test',
+				type: 'p',
+				id: 'p',
+				href: 'http://www.viraweb123.ir',
 		};
 		$widget.compile(model, root)
 		.then(function(widget){
-			expect(widget.getElementAttribute('inputType')).toBe(model.inputType);
-			expect(widget.getElementAttribute('type')).toBe(model.inputType);
+			expect(widget.getElementAttribute('id')).toBe(model.id);
 			done();
 		});
 		$rootScope.$apply();
 	});
 	
-	it('should set value from model', function (done) {
+	it('should set html from model', function (done) {
 		var root = new MockRootWidget();
 		// Create new instance
 		var model = {
-				type: 'input',
-				inputType: 'text',
-				value: 'inpt-test-value',
+				type: 'p',
+				id: 'p',
+				name: 'a-test',
+				html: '<h2>HTML Text In 4th group0</h2>',
 		};
 		$widget.compile(model, root)
 		.then(function(widget){
-			expect(widget.val()).toBe(model.value);
-			expect(widget.getElementAttribute('value')).toBe(model.value);
-			done();
-		});
-		$rootScope.$apply();
-	});
-	it('should set value from code model', function (done) {
-		var root = new MockRootWidget();
-		// Create new instance
-		var model = {
-				type: 'input',
-				inputType: 'text',
-				value: 'inpt-test-value',
-		};
-		$widget.compile(model, root)
-		.then(function(widget){
-			// loaded values
-			expect(widget.val()).toBe(model.value);
-			expect(widget.getElementAttribute('value')).toBe(model.value);
-			// set value
-			widget.val('text-00');
-			expect(widget.val()).toBe('text-00');
-			expect(widget.getElementAttribute('value')).toBe('text-00');
-			done();
-		});
-		$rootScope.$apply();
-	});
-	
-	it('should set value null from model', function (done) {
-		var root = new MockRootWidget();
-		// Create new instance
-		var model = {
-				type: 'input',
-				inputType: 'text',
-				value: 'inpt-test-value',
-		};
-		$widget.compile(model, root)
-		.then(function(widget){
-			expect(widget.getElementAttribute('value')).toBe(model.value);
-			widget.val('');
-			expect(widget.val()).toBe('');
+			expect(widget.getElementAttribute('html')).toBe(model.html);
+			expect(widget.html()).toBe(model.html);
 			done();
 		});
 		$rootScope.$apply();

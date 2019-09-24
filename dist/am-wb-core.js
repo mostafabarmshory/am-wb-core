@@ -13507,8 +13507,8 @@ angular.module('am-wb-core')
 				'src', 
 				'srcdoc', 
 				'sandbox', 
-			];
-			
+				];
+
 			this.initWidget = function(){
 				var ctrl = this;
 				function elementAttribute(key, value){
@@ -13532,7 +13532,7 @@ angular.module('am-wb-core')
 			};
 		},
 	});
-	
+
 	/**
 	 * @ngdoc Widgets
 	 * @name input
@@ -13591,7 +13591,7 @@ angular.module('am-wb-core')
 				'inputType',
 				'value',
 				];
-			
+
 			this.initWidget = function(){
 				var ctrl = this;
 				function elementAttribute(key, value){
@@ -13616,20 +13616,21 @@ angular.module('am-wb-core')
 					elementAttribute(key, ctrl.getModelProperty(key));
 				}
 			};
-			
+
 			/**
 			 * Gets value of the input
 			 */
-			this.val = function(data){
-				if(data){
-					this.setElementAttribute('value', data);
-					return this.getElement().val(data);
+			this.val = function(){
+				var value = arguments[0];
+				if(value){
+					this.setElementAttribute('value', value);
 				}
-				return this.getElement().val();
+				var element = this.getElement();
+				return element.val.apply(element, arguments);
 			};
 		},
 	});
-	
+
 	/**
 	 * @ngdoc Widgets
 	 * @name textarea
@@ -13677,7 +13678,7 @@ angular.module('am-wb-core')
 				'wrap',
 				'value'
 				];
-			
+
 			this.initWidget = function(){
 				var ctrl = this;
 				function elementAttribute(key, value){
@@ -13702,16 +13703,177 @@ angular.module('am-wb-core')
 					elementAttribute(key, ctrl.getModelProperty(key));
 				}
 			};
-			
+
 			/**
 			 * Gets value of the input
 			 */
-			this.val = function(data){
-				if(data){
-					this.setElementAttribute('value', data);
-					return this.getElement().val(data);
+			this.val = function(){
+				var value = arguments[0];
+				if(value){
+					this.setElementAttribute('value', value);
 				}
-				return this.getElement().val();
+				var element = this.getElement();
+				return element.val.apply(element, arguments);
+			};
+		},
+	});
+
+	/**
+	 * @ngdoc Widgets
+	 * @name a
+	 * @description Add a to get user value
+	 * 
+	 * It is used to create textarea
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'a',
+		title: 'A link',
+		description: 'A widget to add external link. It is used as block item.',
+		icon: 'wb-widget-a',
+		groups: ['basic'],
+		model: {
+			name: 'Link',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-a',
+		// functional properties
+		template: '<a></a>',
+		setting: ['a'],
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			// list of element attributes
+			var elementAttributes = [
+				'download',
+				'href',
+				'hreflang',
+				'media',
+				'ping',
+				'referrerpolicy',
+				'rel',
+				'target',
+				'type',
+				'html'
+				];
+
+			this.initWidget = function(){
+				var ctrl = this;
+				function elementAttribute(key, value){
+					if(key === 'html'){
+						ctrl.getElement().html(value) || '..';
+					}
+					ctrl.setElementAttribute(key, value);
+				}
+				function eventHandler(event){
+					if(elementAttributes.includes(event.key)){
+						var key = event.key;
+						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+						elementAttribute(key, value);
+					}
+				}
+				// listen on change
+				this.on('modelUpdated', eventHandler);
+				this.on('runtimeModelUpdated', eventHandler);
+				// load initial data
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					elementAttribute(key, ctrl.getModelProperty(key));
+				}
+			};
+
+			/**
+			 * Gets value of the input
+			 */
+			this.html = function(){
+				var value = arguments[0];
+				if(value){
+					this.setElementAttribute('html', value);
+				}
+				var element = this.getElement();
+				return element.html.apply(element, arguments);
+			};
+		},
+	});
+	
+	
+
+	/**
+	 * @ngdoc Widgets
+	 * @name p
+	 * @description Add p to get user value
+	 * 
+	 * It is used to create p
+	 */
+	$widget.newWidget({
+		// widget description
+		type: 'p',
+		title: 'Paragraph',
+		description: 'A widget to add paragraph.',
+		icon: 'wb-widget-p',
+		groups: ['basic'],
+		model: {
+			name: 'Pragraph',
+			style: {
+				padding: '8px'
+			}
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-p',
+		// functional properties
+		template: '<p></p>',
+		controllerAs: 'ctrl',
+		/*
+		 * @ngInject
+		 */
+		controller: function(){
+			// list of element attributes
+			var elementAttributes = [
+				'html'
+				];
+
+			this.initWidget = function(){
+				var ctrl = this;
+				function elementAttribute(key, value){
+					if(key === 'html'){
+						ctrl.getElement().html(value);
+					}
+					ctrl.setElementAttribute(key, value);
+				}
+				function eventHandler(event){
+					if(elementAttributes.includes(event.key)){
+						var key = event.key;
+						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+						elementAttribute(key, value);
+					}
+				}
+				// listen on change
+				this.on('modelUpdated', eventHandler);
+				this.on('runtimeModelUpdated', eventHandler);
+				// load initial data
+				for(var i =0; i < elementAttributes.length;i++){
+					var key = elementAttributes[i];
+					elementAttribute(key, ctrl.getModelProperty(key));
+				}
+			};
+
+			/**
+			 * Gets value of the input
+			 */
+			this.html = function(){
+				var value = arguments[0];
+				if(value){
+					this.setElementAttribute('html', value);
+				}
+				var element = this.getElement();
+				return element.html.apply(element, arguments);
 			};
 		},
 	});
