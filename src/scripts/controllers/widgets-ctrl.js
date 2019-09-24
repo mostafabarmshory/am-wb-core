@@ -272,7 +272,13 @@ WbAbstractWidget.prototype.loadStyle = function () {
 	this.computedStyle = computedStyle;
 
 	// load style
-	this.$element.css(this.$wbUtil.convertToWidgetCss(this.computedStyle || {}));
+	var css;
+	if(model.type == 'Group'){
+		css = this.$wbUtil.convertToGroupCss(this.computedStyle || {});
+	} else {
+		css = this.$wbUtil.convertToWidgetCss(this.computedStyle || {});
+	}
+	this.$element.css(css);
 	this.fire('styleChanged', $event);
 };
 

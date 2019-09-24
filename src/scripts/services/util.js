@@ -73,6 +73,21 @@ angular.module('am-wb-core')
 	{
 		return $q.when(getTemplateOf(page));
 	}
+	
+	/**
+	 * Converts data into a valid CSS attributes
+	 */
+	function convertToGroupCss(style) {
+		var style = style || {};
+		var css = convertToWidgetCss(style);
+
+		if(style.visibility === 'hidden'){
+			css.display = 'none';
+		} else {
+			css = _.merge(css, convertToWidgetCssLayout(style.layout || {}));
+		}
+		return css;
+	}
 
 	/**
 	 * Converts data into a valid CSS attributes
@@ -84,8 +99,6 @@ angular.module('am-wb-core')
 		// layout
 		if(style.visibility === 'hidden'){
 			css.display = 'none';
-		} else {
-			css = _.merge(css, convertToWidgetCssLayout(style.layout || {}));
 		}
 
 		css = _.merge(css, 
@@ -645,6 +658,7 @@ angular.module('am-wb-core')
 
 	service.getTemplateFor = getTemplateFor;
 	service.getTemplateOf = getTemplateOf;
+	service.convertToGroupCss = convertToGroupCss;
 	service.convertToWidgetCss = convertToWidgetCss;
 	service.convertToWidgetCssLayout = convertToWidgetCssLayout;
 });

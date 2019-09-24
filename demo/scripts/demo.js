@@ -46,7 +46,8 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 
 //	$http.get('examples/window.json')
 //	$http.get('examples/widgets.json')
-	$http.get('examples/map.json')
+	$http.get('examples/html.json')
+//	$http.get('examples/map.json')
 //	$http.get('examples/iframe-responsive.json')
 	.then(function(res) {
 		// NOTE: maso, 2018: clean data model
