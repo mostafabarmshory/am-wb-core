@@ -23,6 +23,13 @@
  */
 'use strict';
 
+class A{
+    x(){
+        //
+    }
+}
+
+
 angular.module('am-wb-core')
 
 /*
@@ -97,7 +104,7 @@ angular.module('am-wb-core')
 		help: 'http://dpq.co.ir',
 		helpId: 'wb-widget-html',
 		// functional properties
-		templateUrl: 'views/widgets/wb-html.html',
+		template: '<div ng-bind-html="ctrl.text | wbunsafe" class="wb-widget-fill wb-widget-text"></div>',
 		/*
 		 * @ngInject
 		 */

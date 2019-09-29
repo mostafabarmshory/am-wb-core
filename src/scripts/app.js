@@ -23,6 +23,50 @@
  */
 'use strict';
 
+class Wb{
+    
+    /**
+     * Create a new root item
+     */
+    init(selector){
+        // toto
+    }
+    
+    /**
+     * Get root Item
+     */
+    getItems(){
+        
+    }
+    
+    getItem(){}
+}
+class WbWidgetModel{}
+class WbWidgetEventHandler{}
+class WbWidgetContext{}
+class WbWdiget{
+    constructor()
+    {
+        this.state = 'init';
+    }
+    
+    state(stateValue){
+        if(typeof(stateValue === 'undefined')){
+            return this.state;
+        }
+        var oldState = this.state;
+        this.state = stateValue;
+        fire('state', this.state, oldState);
+    }
+    
+    fire(eventKey, value, oldValue){
+        // TODO:
+    }
+}
+class WbGroup extends WbWdiget{}
+class WbEditor{}
+
+
 angular.module('am-wb-core', [
 	'ngMessages',
 	'ngAnimate',

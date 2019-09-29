@@ -74,8 +74,11 @@ var widgetBasicWidgetAttributes = [
 	'accesskey',
 	'contenteditable',
 	'dir',
-	'draggable',
-	'dropzone',
+	/*
+	 * NOTE: We must manage D&D internally to mange user D&D codes
+	 */
+//	'draggable',
+//	'dropzone',
 	'hidden',
 	'id',
 	'lang',
@@ -302,13 +305,9 @@ WbAbstractWidget.prototype.refresh = function($event) {
 			this.eventFunctions = {};
 		} else if(key.startsWith('style')) {
 			this.loadStyle();
-		} else if(widgetBasicWidgetAttributes.inclouds(key)){
-			var value = this.getProperty(key) || this.getModelProperty(key);;
-			if(value){
-				$element.atter(key, value);
-			} else {
-				$element.removeAttr(key);
-			}
+		} else if(_.includes(widgetBasicWidgetAttributes, key)){
+			var value = this.getProperty(key) || this.getModelProperty(key);
+			this.setElementAttribute(key, value);
 		}
 		return;
 	} 
@@ -653,22 +652,19 @@ WbAbstractWidget.prototype.getElement = function () {
 };
 
 WbAbstractWidget.prototype.setElementAttribute = function(key, value){
-	var $element = this.getElement();
 	if(value){
-		$element.attr(key, value);
+		this.$element.attr(key, value);
 	} else {
-		$element.removeAttr(key);
+		this.$element.removeAttr(key);
 	}
 };
 
 WbAbstractWidget.prototype.getElementAttribute = function(key){
-	var $element = this.getElement();
-	return $element.attr(key);
+	return this.$element.attr(key);
 };
 
 WbAbstractWidget.prototype.removeElementAttribute = function(key){
-	var $element = this.getElement();
-	$element.removeAttr(key);
+	this.$element.removeAttr(key);
 };
 
 WbAbstractWidget.prototype.setSilent = function(silent) {
