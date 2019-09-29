@@ -23,47 +23,40 @@
  */
 'use strict';
 
-jQuery.fn.extend({
-    getPath: function () {
-        var path, node = this;
-        while (node.length) {
-            var realNode = node[0], name = realNode.localName;
-            if (!name) break;
-            name = name.toLowerCase();
+angular.module('am-wb-core')//
 
-            var parent = node.parent();
+/**
+ * @ngdoc Factories
+ * @name WidgetEditorFake
+ * @description Editor of a widget
+ * 
+ */
 
-            var sameTagSiblings = parent.children(name);
-            if (sameTagSiblings.length > 1) { 
-                var allSiblings = parent.children();
-                var index = allSiblings.index(realNode) + 1;
-                if (index > 1) {
-                    name += ':nth-child(' + index + ')';
-                }
-            }
 
-            path = name + (path ? '>' + path : '');
-            node = parent;
-        }
 
-        return path;
-    }
+.factory('WidgetEditorFake', function () {
+
+    /**
+     * TODO: maso, 2019: extends WidgetEditorFake
+     * 
+     * Creates new instace of an editor
+     */
+    function editor() {}
+    
+    editor.prototype.destroy = function(){};
+    editor.prototype.fire = function(){}; // internal
+    editor.prototype.setActive = function(){}; // focus|skipFocuse
+    editor.prototype.isActive = function(){};
+    editor.prototype.getWidget = function(){};
+    editor.prototype.setDirty = function(){};
+    editor.prototype.isDirty = function(){};
+    editor.prototype.save = function(){};
+    editor.prototype.hide = function(){};
+    editor.prototype.show = function(){};
+    editor.prototype.isHidden = function(){};
+    editor.prototype.Off = function(){};
+    editor.prototype.On = function(){};
+
+    // the editor type
+    return editor;
 });
-
-angular.module('am-wb-core', [
-	'ngMessages',
-	'ngAnimate',
-	'ngAria',
-	'ngMaterial',
-	'ngSanitize',
-	'ngRoute', 
-
-	'pascalprecht.translate',
-	'mdColorPicker',
-	'ui.tinymce',
-	'dndLists',
-	'material.components.expansionPanels',
-	'ngMdIcons',
-	'ngHandsontable',
-	'ngStorage' // https://github.com/gsklee/ngStorage
-]);

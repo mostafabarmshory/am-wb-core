@@ -11,21 +11,24 @@
 			"type": "Group",
 			"name": "group#1",
 			"style": {
-				"margin": "8px"
+				"margin": "8px",
+				"padding": "80px"
 			},
 			"contents": [
 				{
 					"type": "Group",
 					"name": "group#2",
 					"style": {
-						"margin": "8px"
+						"margin": "8px",
+						"padding": "80px"
 					},
 					"contents": [
 						{
 							"type": "Group",
 							"name": "group#3",
 							"style": {
-								"margin": "8px"
+								"margin": "8px",
+								"padding": "80px"
 							},
 							"contents": [
 								{

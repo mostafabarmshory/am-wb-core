@@ -34,7 +34,8 @@ angular.module('am-wb-core')
  */
 .service('$widget', function(
         $wbUtil, $rootScope,
-        $q, $compile, $controller, $mdTheming) {
+        $q, $compile, $controller, $mdTheming, $injector,
+        WidgetEditorFake) {
 
 
     this.providers =  {};
@@ -379,7 +380,45 @@ angular.module('am-wb-core')
 
 
     /***********************************************Editors***************************************/
-    this.getEditor = function(widget){};
+    var editors = {
+            'a': {
+                type: 'WidgetEditorTinymce',
+                options:{
+                    property: 'html',
+                    inline: true
+                }
+            },
+            'p': {
+                type: 'WidgetEditorTinymce',
+                options:{
+                    property: 'html',
+                    inline: true
+                }
+            },
+            'h1': {
+                type: 'WidgetEditorTinymce',
+                options:{
+                    property: 'html',
+                    inline: true
+                }
+            }
+    }
+    var fakeEditor = new WidgetEditorFake();
+    this.getEditor = function(widget){
+        if(widget.$$wbEditor){
+            // return old editor
+            return widget.$$wbEditor;
+        }
+        if(editors[widget.getType()] == undefined){
+            return fakeEditor;
+        }
+        var register = editors[widget.getType()];
+        // create editor
+        var Editor = $injector.get(register.type);
+        var editor = new Editor(widget, register.options || {});
+        widget.$$wbEditor = editor;
+        return widget.$$wbEditor;
+    };
     this.getEditors = function(){};
     this.getActiveEditor = function(){};
 
