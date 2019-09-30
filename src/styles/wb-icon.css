@@ -130,8 +130,13 @@ md-list-item .md-list-item-inner > wb-icon.md-secondary {
     box-sizing: content-box;
 }
 
-md-list-item > wb-icon:first-child,
-md-list-item .md-list-item-inner > wb-icon:first-child {
+[dir=rtl] md-list-item > wb-icon:first-child,
+[dir=rtl] md-list-item .md-list-item-inner > wb-icon:first-child {
+    margin-left: 32px;
+}
+
+[dir=ltr] md-list-item > wb-icon:first-child,
+[dir=ltr] md-list-item .md-list-item-inner > wb-icon:first-child {
     margin-right: 32px;
 }
 
