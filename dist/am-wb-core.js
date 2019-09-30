@@ -12510,1123 +12510,1239 @@ angular.module('am-wb-core')
  * Load widgets
  */
 .run(function ($settings) {
-	// utilities
-	function setAllDim(dim, val) {
-		dim.top = val;
-		dim.right = val;
-		dim.bottom = val;
-		dim.left = val;
-	}
-
-	function createDimeStr(dim) {
-		var output =
-			dim.top + ' ' +
-			dim.right + ' ' +
-			dim.bottom + ' ' +
-			dim.left;
-		return output;
-	}
-
-
-	/*
-	 * splite margin/padding to its components
-	 * check different state Based on CSS rules. see for example:
-	 * https://www.w3schools.com/cssref/pr_margin.asp
-	 * https://www.w3schools.com/cssref/pr_padding.asp
-	 */
-	function fillDimFromString(dim, str) {
-		str = str || '';
-		var dimAll;
-		var dimsArray = str.split(' ');
-
-		// 0px is selected
-		if (dimsArray.length === 1) {
-			dimAll = str;
-		}
-
-		//All 4 items is equal
-		else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
-			dimAll = dimsArray[0];
-		}
-
-		//Items are 4 and different
-		else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
-			dim.top = dimsArray[0];
-			dim.right = dimsArray[1];
-			dim.bottom = dimsArray[2];
-			dim.left = dimsArray[3];
-		}
-
-		//Items are 3
-		else if (dimsArray.length === 3) {
-			dim.top = dimsArray[0];
-			dim.right = dimsArray[1];
-			dim.left = dimsArray[1];
-			dim.bottom = dimsArray[2];
-		}
-
-		//Items are 2
-		else if (dimsArray.length === 2) {
-			dim.top = dimsArray[0];
-			dim.bottom = dimsArray[0];
-			dim.right = dimsArray[1];
-			dim.left = dimsArray[1];
-		}
-
-		//Items are 1
-		else if (dimsArray.length === 1) {
-			dim.top = dimsArray[0];
-			dim.right = dimsArray[0];
-			dim.bottom = dimsArray[0];
-			dim.left = dimsArray[0];
-		}
-
-		//All items are undefined. In this case default value is 0px.
-		else if (!dimsArray.length) {
-			dimAll = '0px';
-		}
-
-		// check dimAll
-		if (dimAll) {
-			setAllDim(dim, dimAll);
-		}
-	}
-
-	function setAllCorner(dim, val) {
-		dim.topLeft = val;
-		dim.topRight = val;
-		dim.bottomRight = val;
-		dim.bottomLeft = val;
-	}
-
-	function createCornerStr(dim) {
-		return dim.topLeft + ' ' + dim.topRight + ' ' + dim.bottomRight + ' ' + dim.bottomLeft;
-	}
-
-	/*
-	 * splite 'radius' to its components
-	 * check different state Based on CSS rules. see for example:
-	 * https://www.w3schools.com/CSSref/css3_pr_border-radius.asp
-	 */
-	function fillCornerFromString(dim, str) {
-		var newDom = {};
-		fillDimFromString(newDom, str);
-
-		dim.topLeft = newDom.topLeft;
-		dim.topRight = newDom.topRight;
-		dim.bottomRight = newDom.bottomRight;
-		dim.bottomLeft = newDom.bottomLeft;
-	}
-
-	$settings.newPage({
-		type: 'general',
-		label: 'General',
-		icon: 'opacity',
-		templateUrl: 'views/settings/wb-general.html',
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function () {
-			// TODO: maso, 2019: move to the view
-			this.cursors = [{
-				title: 'Alias',
-				value: 'alias'
-			}, {
-				title: 'All scroll',
-				value: 'all-scroll'
-			}, {
-				title: 'Auto',
-				value: 'auto'
-			}, {
-				title: 'Cell',
-				value: 'cell'
-			}, {
-				title: 'Context menu',
-				value: 'context-menu'
-			}, {
-				title: 'Col resize',
-				value: 'col-resize'
-			}, {
-				title: 'Copy',
-				value: 'copy'
-			}, {
-				title: 'Default',
-				value: 'default'
-			}, {
-				title: 'Grab',
-				value: 'grab'
-			}, {
-				title: 'Pointer',
-				value: 'pointer'
-			}, {
-				title: 'Move',
-				value: 'move'
-			}];
-
-			this.init = function () {
-				this.direction = this.getStyle('direction') || 'ltr';
-				this.color = this.getStyle('color');
-
-				this.cursor = this.getStyle('cursor');
-
-				this.visibility = this.getStyle('visibility') || 'visible';
-				this.opacity = this.getStyle('opacity');
-
-				// overflow
-				this.overflowX = this.getStyle('overflow.x') || 'visible';
-				this.overflowY = this.getStyle('overflow.y') || 'visible';
-			};
-
-			this.updateOverflowX = function () {
-				this.setStyle('overflow.x', this.overflowX);
-			};
-			this.updateOverflowY = function () {
-				this.setStyle('overflow.y', this.overflowY);
-			};
-		}
-	});
-
-	$settings.newPage({
-		type: 'background',
-		label: 'Background',
-		icon: 'image',
-		description: '',
-		templateUrl: 'views/settings/wb-background.html',
-		controllerAs: 'ctrl',
-
-		/*
-		 * @ngInject
-		 * @description This controller controls the background attribute. If the user choose an image for 
-		 * the background then sets a default values to the background property. These values are used to show 
-		 * the image in a suitable form; and if the user remove the background image then remove those values 
-		 * from the background.
-		 */
-		controller: function () {
-			this.init = function (newWidget, oldWidget) {
-				this.image = this.getStyleBackground('image');
-				this.color = this.getStyleBackground('color');
-				this.size = this.getStyleBackground('size');
-				this.repeat = this.getStyleBackground('repeat');
-				this.position = this.getStyleBackground('position');
-			};
-
-			this.setBackgroundImage = function (image) {
-				this.image = image;
-				if (!this.size) {
-					this.size = 'cover';
-				}
-				if (!this.repeat) {
-					this.repeat = 'no-repeat';
-				}
-				if (!this.position) {
-					this.position = 'center center';
-				}
-				this.updateBackground();
-			};
-
-			this.updateBackground = function () {
-				this.setStyleBackground('image', this.image);
-				this.setStyleBackground('color', this.color);
-				this.setStyleBackground('size', this.size);
-				this.setStyleBackground('repeat', this.image);
-				this.setStyleBackground('position', this.position);
-			};
-		}
-	});
-
-	$settings.newPage({
-		type: 'SEO',
-		label: 'SEO',
-		templateUrl: 'views/settings/wb-seo.html',
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function ($translate) {
-			/*
-			 * Supported Schema Types:
-			 * Article, Book, Image, Person, Product, Service, Text, Thing, WebPage
-			 */
-			this.schemaTypes = [
-				{
-					key: 'Article',
-					value: 'http://schema.org/Article'
-
-				}, {
-					key: 'Book',
-					value: 'http://schema.org/Book'
-
-				}, {
-					key: 'Image',
-					value: 'http://schema.org/ImageObject'
-
-				}, {
-					key: 'Movie',
-					value: 'http://schema.org/Movie'
-				}, {
-					key: 'Person',
-					value: 'http://schema.org/Person'
-				}, {
-					key: 'Product',
-					value: 'http://schema.org/Product'
-
-				}, {
-					key: 'Service',
-					value: 'http://schema.org/Service'
-
-				}, {
-					key: 'Text',
-					value: 'http://schema.org/Text'
-				}, {
-					key: 'Thing',
-					value: 'http://schema.org/Thing'
-				}, {
-					key: 'WebPage',
-					value: 'http://schema.org/WebPage'
-
-				}
-				];
-			this.init = function () {
-				// load data from model
-				this.id = this.getProperty('id');
-				this.label = this.getProperty('label');
-				this.description = this.getProperty('description');
-				this.category = this.getProperty('category');
-				this.type = this.getProperty('type');
-				this.property = this.getProperty('property');
-				this.alert = null;
-				this.getParentCategory();
-				// NOTE: cover is removed from weburger
-			};
-
-			this.getParentCategory = function () {
-				var widget = this.getWidget();
-				while (!widget.isRoot() && !widget.getModelProperty('category')) {
-					widget = widget.getParent();
-				}
-				this.parentCategory = widget.getModelProperty('category');
-			};
-
-			this.setProperties = function () {
-				if (!this.parentCategory) {
-					this.alert = 'No parent type is defined.';
-				} else {
-					this.setType(this.parentCategory);
-				}
-			};
-
-			this.setType = function (type) {
-				switch (type) {
-				case 'http://schema.org/Article':
-					this.properties =
-						[
-							'articleBody', 'articleSection', 'about', 'author', 'comment',
-							'commentCount', 'contributor', 'creator', 'description', 'editor',
-							'genre', 'headline', 'keywords', 'publisher', 'text', 'translator',
-							'video'
-							];
-					break;
-
-				case 'http://schema.org/Book':
-					this.properties =
-						[
-							'about', 'author', 'bookFormat', 'comment', 'creator', 'genre',
-							'headline', 'image', 'keywords', 'name', 'publisher', 'text',
-							'translator', 'video'
-							];
-					break;
-
-				case 'http://schema.org/Image':
-					this.properties =
-						[
-							'about', 'description', 'caption', 'comment', 'thumbnail',
-							'keywords', 'image', 'name', 'url'
-							];
-					break;
-
-				case 'http://schema.org/Movie':
-					this.properties =
-						[
-							'about', 'actor', 'comment', 'commentCount', 'copyrightYear',
-							'countryOfOrigin', 'creator', 'dateCreated', 'description',
-							'director', 'duration', 'genre', 'headline', 'isBasedOn',
-							'image', 'keywords', 'musicBy', 'name', 'provider', 'productionCompany',
-							'sponsor', 'subtitleLanguage', 'text', 'thumbnailUrl', 'trailer'
-							];
-					break;
-
-				case 'http://schema.org/Person':
-					this.properties =
-						[
-							'additionalName', 'address', 'birthDate', 'birthPlace',
-							'children', 'deathDate', 'daethPlace', 'email', 'familyName',
-							'gender', 'homeLocation', 'parent', 'telephone', 'description',
-							'image', 'spouse'
-							];
-					break;
-
-				case 'http://schema.org/Product':
-					this.properties =
-						[
-							'brand', 'category', 'color', 'description', 'height',
-							'isConsumableFor', 'genre', 'headline', 'image', 'name'
-							];
-					break;
-
-				case 'http://schema.org/Service':
-					this.properties =
-						[
-							'areaServed', 'brand', 'category', 'logo', 'serviceType',
-							'description', 'image', 'name'
-							];
-					break;
-
-				case 'http://schema.org/Thing':
-					this.properties = ['description', 'image', 'name'];
-					break;
-
-				case 'http://schema.org/Text':
-					this.properties = ['description', 'image', 'keywords', 'name'];
-					break;
-
-				case 'http://schema.org/WebPage':
-					this.properties =
-						[
-							'about', 'author', 'comment', 'description', 'image', 'headline',
-							'keywords', 'commentCount', 'mainContentOfPage', 'primaryImageOfPage',
-							'video'
-							];
-					break;
-				}
-			};
-		}
-	});
-
-	$settings.newPage({
-		type: 'border',
-		label: 'Border',
-		icon: 'border_all',
-		templateUrl: 'views/settings/wb-border.html',
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function () {
-			this.width = {};
-			this.radius = {};
-
-			this.styles = [{
-				title: 'None',
-				value: 'none'
-			}, {
-				title: 'Solid',
-				value: 'solid'
-			}, {
-				title: 'Dotted',
-				value: 'dotted'
-			}, {
-				title: 'Dashed',
-				value: 'dashed'
-			}, {
-				title: 'Double',
-				value: 'double'
-			}, {
-				title: 'Groove',
-				value: 'groove'
-			}, {
-				title: 'Ridge',
-				value: 'ridge'
-			}, {
-				title: 'Inset',
-				value: 'inset'
-			}, {
-				title: 'Outset',
-				value: 'outset'
-			}];
-
-			/*
-			 * watch 'wbModel' and apply the changes into setting panel
-			 */
-			this.init = function () {
-				this.style = this.getStyleBorder('style');
-				this.color = this.getStyleBorder('color');
-				/*
-				 * Set width
-				 * width is a string such as '10px 25% 2vh 4px'
-				 */
-				fillDimFromString(this.width, this.getStyleBorder('width') || 'medium');
-				/*
-				 * Set radius
-				 * radius is a string such as '10px 25% 2vh 4px'
-				 */
-				fillCornerFromString(this.radius, this.getStyleBorder('radius') || '0px');
-			};
-
-			/*
-			 * Settings about border width
-			 */
-			this.widthAllChanged = function (val) {
-				//medium is default value of width
-				setAllDim(this.width, val || 'medium');
-				this.widthChanged();
-			};
-
-			this.widthChanged = function () {
-				this.setStyleBorder('width', createDimeStr(this.width));
-			};
-
-			/*
-			 * Settings about border radius
-			 */
-			this.radiusAllChanged = function (val) {
-				//0px is default value of radius
-				setAllCorner(this.radius, val || '0px');
-				this.radiusChanged();
-			};
-
-			this.radiusChanged = function () {
-				this.setStyleBorder('radius', createCornerStr(this.radius))
-			};
-		}
-	});
-
-	/**
-	 * @ngdoc Widget Settings
-	 * @name layout
-	 * @description Manages element layout
-	 * 
-	 * Layout is consists of the following attributes for a group:
-	 * 
-	 * <ul>
-	 *     <li>direction</li>
-	 *     <li>direction-inverse</li>
-	 *     <li>wrap</li>
-	 *     <li>wrap-inverse</li>
-	 *     <li>align</li>
-	 *     <li>justify</li>
-	 * </ul>
-	 * 
-	 * and following ones for a widget (or group):
-	 * 
-	 * <ul>
-	 *     <li>grow</li>
-	 *     <li>shrink</li>
-	 *     <li>order</li>
-	 * </ul>
-	 * 
-	 * See the layout documents for more details.
-	 * 
-	 * @see wb-layout
-	 */
-	$settings.newPage({
-		type: 'layout',
-		label: 'Layout',
-		icon: 'dashboard',
-		description: 'Manages layout of the current item.',
-		templateUrl: 'views/settings/wb-layout.html',
-		controllerAs: 'ctrl',
-		/*
-		 * Manages setting page 
-		 * 
-		 * @ngInject
-		 */
-		controller: function () {
-			this.direction_ = [{
-				title: 'column',
-				icon: 'wb-horizontal-boxes',
-				value: 'column'
-			}, {
-				title: 'row',
-				icon: 'wb-vertical-boxes',
-				value: 'row'
-			}];
-
-			this.justify_ = {
-					'row': [{
-						title: 'Start',
-						icon: 'sort_start_horiz',
-						value: 'start'
-					}, {
-						title: 'End',
-						icon: 'sort_end_horiz',
-						value: 'end'
-					}, {
-						title: 'Center',
-						icon: 'sort_center_horiz',
-						value: 'center'
-					}, {
-						title: 'Space Around',
-						icon: 'sort_space_around_horiz',
-						value: 'space-around'
-					}, {
-						title: 'Space Between',
-						icon: 'sort_space_between_horiz',
-						value: 'space-between'
-					}],
-					'column': [{
-						title: 'Start',
-						icon: 'sort_start_vert',
-						value: 'start'
-					}, {
-						title: 'End',
-						icon: 'sort_end_vert',
-						value: 'end'
-					}, {
-						title: 'Center',
-						icon: 'sort_center_vert',
-						value: 'center'
-					}, {
-						title: 'Space Around',
-						icon: 'sort_space_around_vert',
-						value: 'space-around'
-					}, {
-						title: 'Space Between',
-						icon: 'sort_space_between_vert',
-						value: 'space-between'
-					}]
-			};
-
-			this.align_ = {
-					'column': [{
-						title: 'Stretch',
-						icon: 'format_align_justify',
-						value: 'stretch'
-					}, {
-						title: 'Start',
-						icon: 'format_align_left',
-						value: 'start'
-					}, {
-						title: 'End',
-						icon: 'format_align_right',
-						value: 'end'
-					}, {
-						title: 'Center',
-						icon: 'format_align_center',
-						value: 'center'
-					}],
-					'row': [{
-						title: 'Stretch',
-						icon: 'align_justify_vertical',
-						value: 'stretch'
-					}, {
-						title: 'Start',
-						icon: 'align_start_vertical',
-						value: 'start'
-					}, {
-						title: 'End',
-						icon: 'align_end_vertical',
-						value: 'end'
-					}, {
-						title: 'Center',
-						icon: 'align_center_vertical',
-						value: 'center'
-					}]
-			};
-			/*
-			 * watch 'wbModel' and apply the changes in setting panel
-			 */
-			this.init = function () {
-				this.direction = this.getStyleLayout('direction') || 'column';
-				this.align = this.getStyleLayout('align');
-				this.wrap = this.getStyleLayout('wrap');
-				this.justify = this.getStyleLayout('justify');
-			};
-
-			/*
-			 * This part updates the wbModel whenever the layout properties are changed in view
-			 */
-			this.directionChanged = function () {
-				this.setStyleLayout('direction', this.direction);
-			};
-
-			this.wrapChanged = function () {
-				this.setStyleLayout('wrap', this.wrap);
-			};
-
-			this.alignChanged = function () {
-				this.setStyleLayout('align', this.align);
-			};
-
-			this.justifyChanged = function () {
-				this.setStyleLayout('justify', this.justify);
-			};
-		}
-	});
-
-	$settings.newPage({
-		type: 'layout-self',
-		label: 'Self Layout',
-		icon: 'dashboard',
-		description: 'Manages layout of the current item.',
-		templateUrl: 'views/settings/wb-layout-self.html',
-		controllerAs: 'ctrl',
-		/*
-		 * Manages setting page 
-		 * 
-		 * @ngInject
-		 */
-		controller: function () {
-			this.selfAlign_ = {
-					'column': [{
-						title: 'Stretch',
-						icon: 'format_align_justify',
-						value: 'stretch'
-					}, {
-						title: 'Start',
-						icon: 'format_align_left',
-						value: 'start'
-					}, {
-						title: 'End',
-						icon: 'format_align_right',
-						value: 'end'
-					}, {
-						title: 'Center',
-						icon: 'format_align_center',
-						value: 'center'
-					}, {
-						title: 'Automatic',
-						icon: 'brightness_auto',
-						value: 'auto'
-					}],
-					'row': [{
-						title: 'Stretch',
-						icon: 'align_justify_vertical',
-						value: 'stretch'
-					}, {
-						title: 'Start',
-						icon: 'align_start_vertical',
-						value: 'start'
-					}, {
-						title: 'End',
-						icon: 'align_end_vertical',
-						value: 'end'
-					}, {
-						title: 'Center',
-						icon: 'align_center_vertical',
-						value: 'center'
-					}, {
-						title: 'Automatic',
-						icon: 'brightness_auto',
-						value: 'auto'
-					}]
-			};
-
-			/*
-			 * watch 'wbModel' and apply the changes in setting panel
-			 */
-			this.init = function () {
-				this.alignSelf = this.getStyleLayout('align_self', 'auto');
-				this.order = this.getStyleLayout('order', 0);
-				// SEE: https://www.w3schools.com/cssreF/css3_pr_flex-basis.asp
-				this.basis = this.getStyleLayout('basis', 'auto');
-				this.grow = this.getStyleLayout('grow', 0);
-				this.shrink = this.getStyleLayout('shrink', 1);
-			};
-
-			/*
-			 * Fetchs parent direction
-			 */
-			this.getParentDirection = function () {
-				var widget = this.getWidget();
-				if (!widget || !widget.getParent()) {
-					return;
-				}
-				return widget.getParent().getDirection();
-			};
-
-			/*
-			 * This part updates the wbModel whenever the layout-self property is changed in view
-			 */
-			this.alignSelfChanged = function () {
-				this.setStyleLayout('align_self', this.alignSelf);
-			};
-			this.updateOrder = function (order) {
-				this.setStyleLayout('order', order);
-			};
-			this.updateBasis = function (basis) {
-				this.setStyleLayout('basis', basis);
-			};
-			this.updateGrow = function (grow) {
-				this.setStyleLayout('grow', grow);
-			};
-			this.updateShrink = function (shrink) {
-				this.setStyleLayout('shrink', shrink);
-			};
-		}
-	});
-
-	//TODO: Masood, 2018: Move this controller to a separated controller.
-	$settings.newPage({
-		type: 'marginPadding',
-		label: 'Margin/Padding',
-		icon: 'border_clear',
-		templateUrl: 'views/settings/wb-margin-padding.html',
-		controllerAs: 'ctrl',
-		/** 
-		 * @ngInject
-		 * @ngDoc Controllers
-		 * @name marginPaddingCtrl
-		 * @description manages settings view of margin and padding
-		 * 
-		 * Manage view with multiple editor of margin elements.
-		 */
-		controller: function () {
-			this.margin = {};
-			this.padding = {};
-
-			/**
-			 * All settings about margin and padding
-			 * 
-			 * Note: we normally add JSDoc to the global functions.
-			 * 
-			 * @memberof marginPaddingCtrl
-			 */
-			this.updateAllMargin = function (val) {
-				// default value of margin is 0px
-				setAllDim(this.margin, val || '0px');
-				this.updateMargin(this.margin);
-			};
-
-			/**
-			 * Sets all padding to the equal value
-			 * 
-			 * @memberof marginPaddingCtrl
-			 */
-			this.updateAllPadding = function (val) {
-				//default value of padding is 0px
-				setAllDim(this.padding, val);
-				this.updatePadding(this.padding)
-			};
-
-			this.updateMargin = function (newMargin) {
-				this.setStyle('margin', createDimeStr(newMargin));
-			};
-
-			this.updatePadding = function (newPadding) {
-				this.setStyle('padding', createDimeStr(newPadding));
-			};
-
-			this.init = function () {
-				//margin is a string such as '10px 25% 2vh 4px'
-				fillDimFromString(this.margin, this.getStyle('margin'));
-				fillDimFromString(this.padding, this.getStyle('padding'));
-			};
-		}
-	});
-
-	$settings.newPage({
-		type: 'size',
-		label: 'Size',
-		icon: 'photo_size_select_large',
-		templateUrl: 'views/settings/wb-size.html',
-		controllerAs: 'ctrl',
-
-		/*
-		 * @ngInject
-		 */
-		controller: function () {
-			/*
-			 * watch 'wbModel' and apply the changes in setting panel
-			 */
-			this.init = function () {
-				this.width = this.getStyleSize('width');
-				this.height = this.getStyleSize('height');
-				this.minWidth = this.getStyleSize('minWidth');
-				this.minHeight = this.getStyleSize('minHeight');
-				this.maxWidth = this.getStyleSize('maxWidth');
-				this.maxHeight = this.getStyleSize('maxHeight');
-			};
-
-			/*
-			 * This part updates the wbModel whenever the size properties are changed in view
-			 */
-			this.widthChanged = function () {
-				this.setStyleSize('width', this.width);
-			};
-
-			this.heightChanged = function () {
-				this.setStyleSize('height', this.height);
-			};
-
-			this.minWidthChanged = function () {
-				this.setStyleSize('minWidth', this.minWidth);
-			};
-
-			this.minHeightChanged = function () {
-				this.setStyleSize('minHeight', this.minHeight);
-			};
-
-			this.maxWidthChanged = function () {
-				this.setStyleSize('maxWidth', this.maxWidth);
-			};
-
-			this.maxHeightChanged = function () {
-				this.setStyleSize('maxHeight', this.maxHeight);
-			};
-		}
-	});
-
-	$settings.newPage({
-		type: 'shadow',
-		label: 'Shadow',
-		icon: 'brightness_low',
-		description: 'Show different shadows (zero or more) around the widget',
-		templateUrl: 'views/settings/wb-shadow.html',
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function () {
-
-			/*
-			 * watch 'wbModel' and apply the changes in setting panel
-			 */
-			this.init = function () {
-				var shadows = this.getProperty('style.shadows');
-				// this is an object we have to make a clone.
-				this.shadows = _.cloneDeep(shadows);
-			};
-
-			this.updateShadows = function () {
-				this.setProperty('style.shadows', this.shadows);
-				this.init();
-			};
-
-			this.remove = function (index) {
-				this.shadows.splice(index, 1);
-				this.updateShadows();
-			};
-
-			this.addShadow = function () {
-				if (!this.shadows) {
-					this.shadows = [];
-				}
-				this.shadows.push({
-					hShift: '0px',
-					vShift: '0px',
-					blur: '0px',
-					spread: '0px',
-					color: 'rgb(0,0,0)'
-				});
-				this.updateShadows();
-			};
-
-		}
-	});
-	$settings.newPage({
-		type: 'transform',
-		label: 'Transform',
-		icon: 'brightness_low',
-		description: 'Transform widget shape',
-		templateUrl: 'views/settings/wb-transform.html',
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function () {
-
-			/*
-			 * watch 'wbModel' and apply the changes in setting panel
-			 */
-			this.init = function () {
-				this.origin = this.getProperty('style.transform.origin');
-				this.style = this.getProperty('style.transform.style');
-				this.perspective = this.getProperty('style.transform.perspective');
-
-				// X:2D
-				this.translateX = this.getProperty('style.transform.x.translate');
-				this.scaleX = this.getProperty('style.transform.x.scale');
-				this.rotateX = this.getProperty('style.transform.x.rotate');
-				this.skewX = this.getProperty('style.transform.x.skew');
-
-				// Y:2D
-				this.translateY = this.getProperty('style.transform.y.translate');
-				this.scaleY = this.getProperty('style.transform.y.scale');
-				this.rotateY = this.getProperty('style.transform.y.rotate');
-				this.skewY = this.getProperty('style.transform.y.skew');
-
-				// Z:3D
-				this.translateZ = this.getProperty('style.transform.z.translate');
-				this.scaleZ = this.getProperty('style.transform.z.scale');
-				this.rotateZ = this.getProperty('style.transform.z.rotate');
-			};
-
-			this.updateOrigin = function () {
-				this.setProperty('style.transform.origin', this.origin);
-			};
-
-//			flat: Specifies that child elements will NOT preserve its 3D position. This is default
-//			preserve-3d: Specifies that child elements will preserve its 3D position
-//			initial: Sets this property to its default value. Read about initial
-//			inherit: Inherits this property from its parent element. Read about inherit
-			this.updateStyle = function () {
-				this.setProperty('style.transform.style', this.style);
-			};
-			this.updatePerspective = function () {
-				this.setProperty('style.transform.perspective', this.perspective);
-			};
-
-			// X
-			this.updateTranslateX = function () {
-				this.setProperty('style.transform.x.translate', this.translateX);
-			};
-			this.updateScaleX = function () {
-				this.setProperty('style.transform.x.scale', this.scaleX);
-			};
-			this.updateRotateX = function () {
-				this.setProperty('style.transform.x.rotate', this.rotateX);
-			};
-			this.updateSkewX = function () {
-				this.setProperty('style.transform.x.skew', this.skewX);
-			};
-
-			// Y
-			this.updateTranslateY = function () {
-				this.setProperty('style.transform.y.translate', this.translateY);
-			};
-			this.updateScaleY = function () {
-				this.setProperty('style.transform.y.scale', this.scaleY);
-			};
-			this.updateRotateY = function () {
-				this.setProperty('style.transform.y.rotate', this.rotateY);
-			};
-			this.updateSkewY = function () {
-				this.setProperty('style.transform.y.skew', this.skewY);
-			};
-
-			// Z
-			this.updateTranslateZ = function () {
-				this.setProperty('style.transform.z.translate', this.translateZ);
-			};
-			this.updateScaleZ = function () {
-				this.setProperty('style.transform.z.scale', this.scaleZ);
-			};
-			this.updateRotateZ = function () {
-				this.setProperty('style.transform.z.rotate', this.rotateZ);
-			};
-		}
-	});
-	
-	
-
-	$settings.newPage({
-		type: 'iframe',
-		label: 'Inline Frame',
-		icon: 'wb-setting-iframe',
-		description: 'Inline Frame settings',
-		templateUrl: 'views/settings/wb-iframe.html',
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function ($scope) {
-			var iframeElementAttribute = [
-				'name',
-				'src', 
-				'srcdoc', 
-				'sandbox', 
-			];
-			/*
-			 * watch 'wbModel' and apply the changes in setting panel
-			 */
-			this.init = function () {
-				for(var i =0; i < iframeElementAttribute.length;i++){
-					var key = iframeElementAttribute[i];
-					$scope[key] =  this.getProperty(key);
-				}
-				// TODO: whatch changes of the model
-			};
-		}
-	});
-	$settings.newPage({
-		type: 'input',
-		label: 'Input',
-		icon: 'wb-setting-input',
-		description: 'Input settings',
-		templateUrl: 'views/settings/wb-input.html',
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function ($scope) {
-			// list of element attributes
-			var elementAttributes = [
-				'accept',
-				'alt', 
-				'autocomplete', 
-				'autofocus', 
-				'checked', 
-				'dirname', 
-				'disabled', 
-				'form',
-				'max', 
-				'maxlength', 
-				'min', 
-				'multiple', 
-				'name', 
-				'pattern', 
-				'placeholder', 
-				'readonly', 
-				'required', 
-				'size', 
-				'src', 
-				'step',
-				'inputType',
-				'value',
-				];
-			
-			/*
-			 * watch 'wbModel' and apply the changes in setting panel
-			 */
-			this.init = function () {
-				for(var i =0; i < elementAttributes.length;i++){
-					var key = elementAttributes[i];
-					this[key] =  this.getProperty(key);
-				}
-				// TODO:
-			};
-		}
-	});
-	$settings.newPage({
-		type: 'textarea',
-		label: 'Text Area',
-		icon: 'wb-setting-textarea',
-		description: 'Text Area Settings',
-		templateUrl: 'views/settings/wb-textarea.html',
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function () {
-			var elementAttributes = [
-				'autofocus',
-				'cols',
-				'dirname',
-				'disabled',
-				'form',
-				'maxlength',
-				'name',
-				'placeholder',
-				'readonly',
-				'required',
-				'rows',
-				'wrap',
-				'value',
-				];
-			
-			/*
-			 * watch 'wbModel' and apply the changes in setting panel
-			 */
-			this.init = function () {
-				for(var i =0; i < elementAttributes.length;i++){
-					var key = elementAttributes[i];
-					this[key] =  this.getProperty(key);
-				}
-				// TODO:
-			};
-		}
-	});
+    // utilities
+    function setAllDim(dim, val) {
+        dim.top = val;
+        dim.right = val;
+        dim.bottom = val;
+        dim.left = val;
+    }
+
+    function createDimeStr(dim) {
+        var output =
+            dim.top + ' ' +
+            dim.right + ' ' +
+            dim.bottom + ' ' +
+            dim.left;
+        return output;
+    }
+
+
+    /*
+     * splite margin/padding to its components
+     * check different state Based on CSS rules. see for example:
+     * https://www.w3schools.com/cssref/pr_margin.asp
+     * https://www.w3schools.com/cssref/pr_padding.asp
+     */
+    function fillDimFromString(dim, str) {
+        str = str || '';
+        var dimAll;
+        var dimsArray = str.split(' ');
+
+        // 0px is selected
+        if (dimsArray.length === 1) {
+            dimAll = str;
+        }
+
+        //All 4 items is equal
+        else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
+            dimAll = dimsArray[0];
+        }
+
+        //Items are 4 and different
+        else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
+            dim.top = dimsArray[0];
+            dim.right = dimsArray[1];
+            dim.bottom = dimsArray[2];
+            dim.left = dimsArray[3];
+        }
+
+        //Items are 3
+        else if (dimsArray.length === 3) {
+            dim.top = dimsArray[0];
+            dim.right = dimsArray[1];
+            dim.left = dimsArray[1];
+            dim.bottom = dimsArray[2];
+        }
+
+        //Items are 2
+        else if (dimsArray.length === 2) {
+            dim.top = dimsArray[0];
+            dim.bottom = dimsArray[0];
+            dim.right = dimsArray[1];
+            dim.left = dimsArray[1];
+        }
+
+        //Items are 1
+        else if (dimsArray.length === 1) {
+            dim.top = dimsArray[0];
+            dim.right = dimsArray[0];
+            dim.bottom = dimsArray[0];
+            dim.left = dimsArray[0];
+        }
+
+        //All items are undefined. In this case default value is 0px.
+        else if (!dimsArray.length) {
+            dimAll = '0px';
+        }
+
+        // check dimAll
+        if (dimAll) {
+            setAllDim(dim, dimAll);
+        }
+    }
+
+    function setAllCorner(dim, val) {
+        dim.topLeft = val;
+        dim.topRight = val;
+        dim.bottomRight = val;
+        dim.bottomLeft = val;
+    }
+
+    function createCornerStr(dim) {
+        return dim.topLeft + ' ' + dim.topRight + ' ' + dim.bottomRight + ' ' + dim.bottomLeft;
+    }
+
+    /*
+     * splite 'radius' to its components
+     * check different state Based on CSS rules. see for example:
+     * https://www.w3schools.com/CSSref/css3_pr_border-radius.asp
+     */
+    function fillCornerFromString(dim, str) {
+        var newDom = {};
+        fillDimFromString(newDom, str);
+
+        dim.topLeft = newDom.topLeft;
+        dim.topRight = newDom.topRight;
+        dim.bottomRight = newDom.bottomRight;
+        dim.bottomLeft = newDom.bottomLeft;
+    }
+
+    $settings.newPage({
+        type: 'general',
+        label: 'General',
+        icon: 'opacity',
+        templateUrl: 'views/settings/wb-general.html',
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function () {
+            // TODO: maso, 2019: move to the view
+            this.cursors = [{
+                title: 'alias',
+                value: 'alias',  
+                description: 'The cursor indicates an alias of something is to be created'
+            },{
+                title: 'All Scroll',
+                value: 'all-scroll',
+                description: 'The cursor indicates that something can be scrolled in any direction'
+            },{
+                title: 'Auto',
+                value: 'auto  ',
+                description: 'Default. The browser sets a cursor'
+            },{
+                title: 'Cell',
+                value: 'cell', 
+                description: 'The cursor indicates that a cell (or set of cells) may be selected'
+            },{
+                title: 'Context Menu',
+                value: 'context-menu',
+                description: 'The cursor indicates that a context-menu is available'
+            },{
+                title: 'Columne resize',
+                value: 'col-resize',  
+                description: 'The cursor indicates that the column can be resized horizontally'
+            },{
+                title: 'Copy',
+                value: 'copy',
+                description: 'The cursor indicates something is to be copied'
+            },{
+                title: 'Crosshair',
+                value: 'crosshair',
+                description: 'The cursor render as a crosshair'
+            },{
+                title: 'Default',
+                value: 'default',
+                description: 'The default cursor'
+            },{
+                title: 'Edge Resize',
+                value: 'e-resize',
+                description: 'The cursor indicates that an edge of a box is to be moved right (east)'
+            },{
+                title: 'Bidirectional Resize',
+                value: 'ew-resize',
+                description: 'Indicates a bidirectional resize cursor'
+            },{
+                title: 'Grab',
+                value: 'grab',
+                description: 'The cursor indicates that something can be grabbed '
+            },{
+                title: 'Grabbing',
+                value: 'grabbing',
+                description: 'The cursor indicates that something can be grabbed'
+            },{
+                title: 'Help',
+                value: 'help',
+                description: 'The cursor indicates that help is available '
+            },{
+                title: 'Move',
+                value: 'move',
+                description: 'The cursor indicates something is to be moved'
+            },{
+                title: 'North Resize',
+                value: 'n-resize',
+                description: 'The cursor indicates that an edge of a box is to be moved up (north)'
+            },{
+                title: 'North/East Resize',
+                value: 'ne-resize',
+                description: 'The cursor indicates that an edge of a box is to be moved up and right (north/east)'
+            },{
+                title: 'NS Bidirectional Resize',
+                value: 'ns-resize',
+                description: 'Indicates a bidirectional resize cursor'
+            },{
+                title: 'North/West Resize',
+                value: 'nw-resize',
+                description: 'The cursor indicates that an edge of a box is to be moved up and left (north/west)'
+            },{
+                title: 'Bidirectional Resize',
+                value: 'nwse-resize',
+                description: 'Indicates a bidirectional resize cursor'
+            },{
+                title: 'No Drop',
+                value: 'no-drop',
+                description: 'The cursor indicates that the dragged item cannot be dropped here '
+            },{
+                title: 'None',
+                value: 'none',
+                description: 'No cursor is rendered for the element  '
+            },{
+                title: 'Not Allowed',
+                value: 'not-allowed',
+                description: 'The cursor indicates that the requested action will not be executed'
+            },{
+                title: 'Pointer',
+                value: 'pointer',
+                description: 'The cursor is a pointer and indicates a link'
+            },{
+                title: 'Progress',
+                value: 'progress',
+                description: 'The cursor indicates that the program is busy (in progress)'
+            },{
+                title: 'Row Resize',
+                value: 'row-resize',
+                description: 'The cursor indicates that the row can be resized vertically'
+            },{
+                title: 'South Resize',
+                value: 's-resize',
+                description: 'The cursor indicates that an edge of a box is to be moved down (south)'
+            },{
+                title: 'South/East Resize',
+                value: 'se-resize',
+                description: 'The cursor indicates that an edge of a box is to be moved down and right (south/east)'
+            },{
+                title: 'South/West Resize',
+                value: 'sw-resize',
+                description: 'The cursor indicates that an edge of a box is to be moved down and left (south/west)'
+            },{
+                title: 'Text',
+                value: 'text',
+                description: 'The cursor indicates text that may be selected'
+            },{
+                title: 'Vertical text',
+                value: 'vertical-text',
+                description: 'The cursor indicates vertical-text that may be selected'
+            },{
+                title: 'West Resize',
+                value: 'w-resize',
+                description: 'The cursor indicates that an edge of a box is to be moved left (west)'
+            },{
+                title: 'Wait',
+                value: 'wait',
+                description: 'The cursor indicates that the program is busy'
+            },{
+                title: 'Zoom In',
+                value: 'zoom-in',
+                description: 'The cursor indicates that something can be zoomed in'
+            },{
+                title: 'Zoom Out',
+                value: 'zoom-out',
+                description: 'The cursor indicates that something can be zoomed out'
+            },{
+                title: 'Initial',
+                value: 'Sets this property to its default value. Read about initial',
+                description: 'Sets this property to its default value. Read about initial'
+            },{
+                title: 'Inherit',
+                value: 'inherit',
+                description: 'Inherits this property from its parent element. Read about inherit'
+            }];
+//          TODO: maso, 2019: URL A comma separated list of URLs to custom cursors. Note: Always specify a generic cursor at the end of the list, in case none of the URL-defined cursors can be used 
+
+            this.init = function () {
+                this.direction = this.getStyle('direction') || 'ltr';
+                this.color = this.getStyle('color');
+
+                this.cursor = this.getStyle('cursor');
+
+                this.visibility = this.getStyle('visibility') || 'visible';
+                this.opacity = this.getStyle('opacity');
+
+                // overflow
+                this.overflowX = this.getStyle('overflow.x') || 'visible';
+                this.overflowY = this.getStyle('overflow.y') || 'visible';
+            };
+
+            this.updateOverflowX = function () {
+                this.setStyle('overflow.x', this.overflowX);
+            };
+            this.updateOverflowY = function () {
+                this.setStyle('overflow.y', this.overflowY);
+            };
+        }
+    });
+
+    $settings.newPage({
+        type: 'background',
+        label: 'Background',
+        icon: 'image',
+        description: '',
+        templateUrl: 'views/settings/wb-background.html',
+        controllerAs: 'ctrl',
+
+        /*
+         * @ngInject
+         * @description This controller controls the background attribute. If the user choose an image for 
+         * the background then sets a default values to the background property. These values are used to show 
+         * the image in a suitable form; and if the user remove the background image then remove those values 
+         * from the background.
+         */
+        controller: function () {
+            this.init = function (newWidget, oldWidget) {
+                this.image = this.getStyleBackground('image');
+                this.color = this.getStyleBackground('color');
+                this.size = this.getStyleBackground('size');
+                this.repeat = this.getStyleBackground('repeat');
+                this.position = this.getStyleBackground('position');
+            };
+
+            this.setBackgroundImage = function (image) {
+                this.image = image;
+                if (!this.size) {
+                    this.size = 'cover';
+                }
+                if (!this.repeat) {
+                    this.repeat = 'no-repeat';
+                }
+                if (!this.position) {
+                    this.position = 'center center';
+                }
+                this.updateBackground();
+            };
+
+            this.updateBackground = function () {
+                this.setStyleBackground('image', this.image);
+                this.setStyleBackground('color', this.color);
+                this.setStyleBackground('size', this.size);
+                this.setStyleBackground('repeat', this.image);
+                this.setStyleBackground('position', this.position);
+            };
+        }
+    });
+
+    $settings.newPage({
+        type: 'SEO',
+        label: 'SEO',
+        templateUrl: 'views/settings/wb-seo.html',
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function ($translate) {
+            /*
+             * Supported Schema Types:
+             * Article, Book, Image, Person, Product, Service, Text, Thing, WebPage
+             */
+            this.schemaTypes = [
+                {
+                    key: 'Article',
+                    value: 'http://schema.org/Article'
+
+                }, {
+                    key: 'Book',
+                    value: 'http://schema.org/Book'
+
+                }, {
+                    key: 'Image',
+                    value: 'http://schema.org/ImageObject'
+
+                }, {
+                    key: 'Movie',
+                    value: 'http://schema.org/Movie'
+                }, {
+                    key: 'Person',
+                    value: 'http://schema.org/Person'
+                }, {
+                    key: 'Product',
+                    value: 'http://schema.org/Product'
+
+                }, {
+                    key: 'Service',
+                    value: 'http://schema.org/Service'
+
+                }, {
+                    key: 'Text',
+                    value: 'http://schema.org/Text'
+                }, {
+                    key: 'Thing',
+                    value: 'http://schema.org/Thing'
+                }, {
+                    key: 'WebPage',
+                    value: 'http://schema.org/WebPage'
+
+                }
+                ];
+            this.init = function () {
+                // load data from model
+                this.id = this.getProperty('id');
+                this.label = this.getProperty('label');
+                this.description = this.getProperty('description');
+                this.category = this.getProperty('category');
+                this.type = this.getProperty('type');
+                this.property = this.getProperty('property');
+                this.alert = null;
+                this.getParentCategory();
+                // NOTE: cover is removed from weburger
+            };
+
+            this.getParentCategory = function () {
+                var widget = this.getWidget();
+                while (!widget.isRoot() && !widget.getModelProperty('category')) {
+                    widget = widget.getParent();
+                }
+                this.parentCategory = widget.getModelProperty('category');
+            };
+
+            this.setProperties = function () {
+                if (!this.parentCategory) {
+                    this.alert = 'No parent type is defined.';
+                } else {
+                    this.setType(this.parentCategory);
+                }
+            };
+
+            this.setType = function (type) {
+                switch (type) {
+                case 'http://schema.org/Article':
+                    this.properties =
+                        [
+                            'articleBody', 'articleSection', 'about', 'author', 'comment',
+                            'commentCount', 'contributor', 'creator', 'description', 'editor',
+                            'genre', 'headline', 'keywords', 'publisher', 'text', 'translator',
+                            'video'
+                            ];
+                    break;
+
+                case 'http://schema.org/Book':
+                    this.properties =
+                        [
+                            'about', 'author', 'bookFormat', 'comment', 'creator', 'genre',
+                            'headline', 'image', 'keywords', 'name', 'publisher', 'text',
+                            'translator', 'video'
+                            ];
+                    break;
+
+                case 'http://schema.org/Image':
+                    this.properties =
+                        [
+                            'about', 'description', 'caption', 'comment', 'thumbnail',
+                            'keywords', 'image', 'name', 'url'
+                            ];
+                    break;
+
+                case 'http://schema.org/Movie':
+                    this.properties =
+                        [
+                            'about', 'actor', 'comment', 'commentCount', 'copyrightYear',
+                            'countryOfOrigin', 'creator', 'dateCreated', 'description',
+                            'director', 'duration', 'genre', 'headline', 'isBasedOn',
+                            'image', 'keywords', 'musicBy', 'name', 'provider', 'productionCompany',
+                            'sponsor', 'subtitleLanguage', 'text', 'thumbnailUrl', 'trailer'
+                            ];
+                    break;
+
+                case 'http://schema.org/Person':
+                    this.properties =
+                        [
+                            'additionalName', 'address', 'birthDate', 'birthPlace',
+                            'children', 'deathDate', 'daethPlace', 'email', 'familyName',
+                            'gender', 'homeLocation', 'parent', 'telephone', 'description',
+                            'image', 'spouse'
+                            ];
+                    break;
+
+                case 'http://schema.org/Product':
+                    this.properties =
+                        [
+                            'brand', 'category', 'color', 'description', 'height',
+                            'isConsumableFor', 'genre', 'headline', 'image', 'name'
+                            ];
+                    break;
+
+                case 'http://schema.org/Service':
+                    this.properties =
+                        [
+                            'areaServed', 'brand', 'category', 'logo', 'serviceType',
+                            'description', 'image', 'name'
+                            ];
+                    break;
+
+                case 'http://schema.org/Thing':
+                    this.properties = ['description', 'image', 'name'];
+                    break;
+
+                case 'http://schema.org/Text':
+                    this.properties = ['description', 'image', 'keywords', 'name'];
+                    break;
+
+                case 'http://schema.org/WebPage':
+                    this.properties =
+                        [
+                            'about', 'author', 'comment', 'description', 'image', 'headline',
+                            'keywords', 'commentCount', 'mainContentOfPage', 'primaryImageOfPage',
+                            'video'
+                            ];
+                    break;
+                }
+            };
+        }
+    });
+
+    $settings.newPage({
+        type: 'border',
+        label: 'Border',
+        icon: 'border_all',
+        templateUrl: 'views/settings/wb-border.html',
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function () {
+            this.width = {};
+            this.radius = {};
+
+            this.styles = [{
+                title: 'None',
+                value: 'none'
+            }, {
+                title: 'Solid',
+                value: 'solid'
+            }, {
+                title: 'Dotted',
+                value: 'dotted'
+            }, {
+                title: 'Dashed',
+                value: 'dashed'
+            }, {
+                title: 'Double',
+                value: 'double'
+            }, {
+                title: 'Groove',
+                value: 'groove'
+            }, {
+                title: 'Ridge',
+                value: 'ridge'
+            }, {
+                title: 'Inset',
+                value: 'inset'
+            }, {
+                title: 'Outset',
+                value: 'outset'
+            }];
+
+            /*
+             * watch 'wbModel' and apply the changes into setting panel
+             */
+            this.init = function () {
+                this.style = this.getStyleBorder('style');
+                this.color = this.getStyleBorder('color');
+                /*
+                 * Set width
+                 * width is a string such as '10px 25% 2vh 4px'
+                 */
+                fillDimFromString(this.width, this.getStyleBorder('width') || 'medium');
+                /*
+                 * Set radius
+                 * radius is a string such as '10px 25% 2vh 4px'
+                 */
+                fillCornerFromString(this.radius, this.getStyleBorder('radius') || '0px');
+            };
+
+            /*
+             * Settings about border width
+             */
+            this.widthAllChanged = function (val) {
+                //medium is default value of width
+                setAllDim(this.width, val || 'medium');
+                this.widthChanged();
+            };
+
+            this.widthChanged = function () {
+                this.setStyleBorder('width', createDimeStr(this.width));
+            };
+
+            /*
+             * Settings about border radius
+             */
+            this.radiusAllChanged = function (val) {
+                //0px is default value of radius
+                setAllCorner(this.radius, val || '0px');
+                this.radiusChanged();
+            };
+
+            this.radiusChanged = function () {
+                this.setStyleBorder('radius', createCornerStr(this.radius))
+            };
+        }
+    });
+
+    /**
+     * @ngdoc Widget Settings
+     * @name layout
+     * @description Manages element layout
+     * 
+     * Layout is consists of the following attributes for a group:
+     * 
+     * <ul>
+     *     <li>direction</li>
+     *     <li>direction-inverse</li>
+     *     <li>wrap</li>
+     *     <li>wrap-inverse</li>
+     *     <li>align</li>
+     *     <li>justify</li>
+     * </ul>
+     * 
+     * and following ones for a widget (or group):
+     * 
+     * <ul>
+     *     <li>grow</li>
+     *     <li>shrink</li>
+     *     <li>order</li>
+     * </ul>
+     * 
+     * See the layout documents for more details.
+     * 
+     * @see wb-layout
+     */
+    $settings.newPage({
+        type: 'layout',
+        label: 'Layout',
+        icon: 'dashboard',
+        description: 'Manages layout of the current item.',
+        templateUrl: 'views/settings/wb-layout.html',
+        controllerAs: 'ctrl',
+        /*
+         * Manages setting page 
+         * 
+         * @ngInject
+         */
+        controller: function () {
+            this.direction_ = [{
+                title: 'column',
+                icon: 'wb-horizontal-boxes',
+                value: 'column'
+            }, {
+                title: 'row',
+                icon: 'wb-vertical-boxes',
+                value: 'row'
+            }];
+
+            this.justify_ = {
+                    'row': [{
+                        title: 'Start',
+                        icon: 'sort_start_horiz',
+                        value: 'start'
+                    }, {
+                        title: 'End',
+                        icon: 'sort_end_horiz',
+                        value: 'end'
+                    }, {
+                        title: 'Center',
+                        icon: 'sort_center_horiz',
+                        value: 'center'
+                    }, {
+                        title: 'Space Around',
+                        icon: 'sort_space_around_horiz',
+                        value: 'space-around'
+                    }, {
+                        title: 'Space Between',
+                        icon: 'sort_space_between_horiz',
+                        value: 'space-between'
+                    }],
+                    'column': [{
+                        title: 'Start',
+                        icon: 'sort_start_vert',
+                        value: 'start'
+                    }, {
+                        title: 'End',
+                        icon: 'sort_end_vert',
+                        value: 'end'
+                    }, {
+                        title: 'Center',
+                        icon: 'sort_center_vert',
+                        value: 'center'
+                    }, {
+                        title: 'Space Around',
+                        icon: 'sort_space_around_vert',
+                        value: 'space-around'
+                    }, {
+                        title: 'Space Between',
+                        icon: 'sort_space_between_vert',
+                        value: 'space-between'
+                    }]
+            };
+
+            this.align_ = {
+                    'column': [{
+                        title: 'Stretch',
+                        icon: 'format_align_justify',
+                        value: 'stretch'
+                    }, {
+                        title: 'Start',
+                        icon: 'format_align_left',
+                        value: 'start'
+                    }, {
+                        title: 'End',
+                        icon: 'format_align_right',
+                        value: 'end'
+                    }, {
+                        title: 'Center',
+                        icon: 'format_align_center',
+                        value: 'center'
+                    }],
+                    'row': [{
+                        title: 'Stretch',
+                        icon: 'align_justify_vertical',
+                        value: 'stretch'
+                    }, {
+                        title: 'Start',
+                        icon: 'align_start_vertical',
+                        value: 'start'
+                    }, {
+                        title: 'End',
+                        icon: 'align_end_vertical',
+                        value: 'end'
+                    }, {
+                        title: 'Center',
+                        icon: 'align_center_vertical',
+                        value: 'center'
+                    }]
+            };
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
+            this.init = function () {
+                this.direction = this.getStyleLayout('direction') || 'column';
+                this.align = this.getStyleLayout('align');
+                this.wrap = this.getStyleLayout('wrap');
+                this.justify = this.getStyleLayout('justify');
+            };
+
+            /*
+             * This part updates the wbModel whenever the layout properties are changed in view
+             */
+            this.directionChanged = function () {
+                this.setStyleLayout('direction', this.direction);
+            };
+
+            this.wrapChanged = function () {
+                this.setStyleLayout('wrap', this.wrap);
+            };
+
+            this.alignChanged = function () {
+                this.setStyleLayout('align', this.align);
+            };
+
+            this.justifyChanged = function () {
+                this.setStyleLayout('justify', this.justify);
+            };
+        }
+    });
+
+    $settings.newPage({
+        type: 'layout-self',
+        label: 'Self Layout',
+        icon: 'dashboard',
+        description: 'Manages layout of the current item.',
+        templateUrl: 'views/settings/wb-layout-self.html',
+        controllerAs: 'ctrl',
+        /*
+         * Manages setting page 
+         * 
+         * @ngInject
+         */
+        controller: function () {
+            this.selfAlign_ = {
+                    'column': [{
+                        title: 'Stretch',
+                        icon: 'format_align_justify',
+                        value: 'stretch'
+                    }, {
+                        title: 'Start',
+                        icon: 'format_align_left',
+                        value: 'start'
+                    }, {
+                        title: 'End',
+                        icon: 'format_align_right',
+                        value: 'end'
+                    }, {
+                        title: 'Center',
+                        icon: 'format_align_center',
+                        value: 'center'
+                    }, {
+                        title: 'Automatic',
+                        icon: 'brightness_auto',
+                        value: 'auto'
+                    }],
+                    'row': [{
+                        title: 'Stretch',
+                        icon: 'align_justify_vertical',
+                        value: 'stretch'
+                    }, {
+                        title: 'Start',
+                        icon: 'align_start_vertical',
+                        value: 'start'
+                    }, {
+                        title: 'End',
+                        icon: 'align_end_vertical',
+                        value: 'end'
+                    }, {
+                        title: 'Center',
+                        icon: 'align_center_vertical',
+                        value: 'center'
+                    }, {
+                        title: 'Automatic',
+                        icon: 'brightness_auto',
+                        value: 'auto'
+                    }]
+            };
+
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
+            this.init = function () {
+                this.alignSelf = this.getStyleLayout('align_self', 'auto');
+                this.order = this.getStyleLayout('order', 0);
+                // SEE: https://www.w3schools.com/cssreF/css3_pr_flex-basis.asp
+                this.basis = this.getStyleLayout('basis', 'auto');
+                this.grow = this.getStyleLayout('grow', 0);
+                this.shrink = this.getStyleLayout('shrink', 1);
+            };
+
+            /*
+             * Fetchs parent direction
+             */
+            this.getParentDirection = function () {
+                var widget = this.getWidget();
+                if (!widget || !widget.getParent()) {
+                    return;
+                }
+                return widget.getParent().getDirection();
+            };
+
+            /*
+             * This part updates the wbModel whenever the layout-self property is changed in view
+             */
+            this.alignSelfChanged = function () {
+                this.setStyleLayout('align_self', this.alignSelf);
+            };
+            this.updateOrder = function (order) {
+                this.setStyleLayout('order', order);
+            };
+            this.updateBasis = function (basis) {
+                this.setStyleLayout('basis', basis);
+            };
+            this.updateGrow = function (grow) {
+                this.setStyleLayout('grow', grow);
+            };
+            this.updateShrink = function (shrink) {
+                this.setStyleLayout('shrink', shrink);
+            };
+        }
+    });
+
+    //TODO: Masood, 2018: Move this controller to a separated controller.
+    $settings.newPage({
+        type: 'marginPadding',
+        label: 'Margin/Padding',
+        icon: 'border_clear',
+        templateUrl: 'views/settings/wb-margin-padding.html',
+        controllerAs: 'ctrl',
+        /** 
+         * @ngInject
+         * @ngDoc Controllers
+         * @name marginPaddingCtrl
+         * @description manages settings view of margin and padding
+         * 
+         * Manage view with multiple editor of margin elements.
+         */
+        controller: function () {
+            this.margin = {};
+            this.padding = {};
+
+            /**
+             * All settings about margin and padding
+             * 
+             * Note: we normally add JSDoc to the global functions.
+             * 
+             * @memberof marginPaddingCtrl
+             */
+            this.updateAllMargin = function (val) {
+                // default value of margin is 0px
+                setAllDim(this.margin, val || '0px');
+                this.updateMargin(this.margin);
+            };
+
+            /**
+             * Sets all padding to the equal value
+             * 
+             * @memberof marginPaddingCtrl
+             */
+            this.updateAllPadding = function (val) {
+                //default value of padding is 0px
+                setAllDim(this.padding, val);
+                this.updatePadding(this.padding)
+            };
+
+            this.updateMargin = function (newMargin) {
+                this.setStyle('margin', createDimeStr(newMargin));
+            };
+
+            this.updatePadding = function (newPadding) {
+                this.setStyle('padding', createDimeStr(newPadding));
+            };
+
+            this.init = function () {
+                //margin is a string such as '10px 25% 2vh 4px'
+                fillDimFromString(this.margin, this.getStyle('margin'));
+                fillDimFromString(this.padding, this.getStyle('padding'));
+            };
+        }
+    });
+
+    $settings.newPage({
+        type: 'size',
+        label: 'Size',
+        icon: 'photo_size_select_large',
+        templateUrl: 'views/settings/wb-size.html',
+        controllerAs: 'ctrl',
+
+        /*
+         * @ngInject
+         */
+        controller: function () {
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
+            this.init = function () {
+                this.width = this.getStyleSize('width');
+                this.height = this.getStyleSize('height');
+                this.minWidth = this.getStyleSize('minWidth');
+                this.minHeight = this.getStyleSize('minHeight');
+                this.maxWidth = this.getStyleSize('maxWidth');
+                this.maxHeight = this.getStyleSize('maxHeight');
+            };
+
+            /*
+             * This part updates the wbModel whenever the size properties are changed in view
+             */
+            this.widthChanged = function () {
+                this.setStyleSize('width', this.width);
+            };
+
+            this.heightChanged = function () {
+                this.setStyleSize('height', this.height);
+            };
+
+            this.minWidthChanged = function () {
+                this.setStyleSize('minWidth', this.minWidth);
+            };
+
+            this.minHeightChanged = function () {
+                this.setStyleSize('minHeight', this.minHeight);
+            };
+
+            this.maxWidthChanged = function () {
+                this.setStyleSize('maxWidth', this.maxWidth);
+            };
+
+            this.maxHeightChanged = function () {
+                this.setStyleSize('maxHeight', this.maxHeight);
+            };
+        }
+    });
+
+    $settings.newPage({
+        type: 'shadow',
+        label: 'Shadow',
+        icon: 'brightness_low',
+        description: 'Show different shadows (zero or more) around the widget',
+        templateUrl: 'views/settings/wb-shadow.html',
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function () {
+
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
+            this.init = function () {
+                var shadows = this.getProperty('style.shadows');
+                // this is an object we have to make a clone.
+                this.shadows = _.cloneDeep(shadows);
+            };
+
+            this.updateShadows = function () {
+                this.setProperty('style.shadows', this.shadows);
+                this.init();
+            };
+
+            this.remove = function (index) {
+                this.shadows.splice(index, 1);
+                this.updateShadows();
+            };
+
+            this.addShadow = function () {
+                if (!this.shadows) {
+                    this.shadows = [];
+                }
+                this.shadows.push({
+                    hShift: '0px',
+                    vShift: '0px',
+                    blur: '0px',
+                    spread: '0px',
+                    color: 'rgb(0,0,0)'
+                });
+                this.updateShadows();
+            };
+
+        }
+    });
+    $settings.newPage({
+        type: 'transform',
+        label: 'Transform',
+        icon: 'brightness_low',
+        description: 'Transform widget shape',
+        templateUrl: 'views/settings/wb-transform.html',
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function () {
+
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
+            this.init = function () {
+                this.origin = this.getProperty('style.transform.origin');
+                this.style = this.getProperty('style.transform.style');
+                this.perspective = this.getProperty('style.transform.perspective');
+
+                // X:2D
+                this.translateX = this.getProperty('style.transform.x.translate');
+                this.scaleX = this.getProperty('style.transform.x.scale');
+                this.rotateX = this.getProperty('style.transform.x.rotate');
+                this.skewX = this.getProperty('style.transform.x.skew');
+
+                // Y:2D
+                this.translateY = this.getProperty('style.transform.y.translate');
+                this.scaleY = this.getProperty('style.transform.y.scale');
+                this.rotateY = this.getProperty('style.transform.y.rotate');
+                this.skewY = this.getProperty('style.transform.y.skew');
+
+                // Z:3D
+                this.translateZ = this.getProperty('style.transform.z.translate');
+                this.scaleZ = this.getProperty('style.transform.z.scale');
+                this.rotateZ = this.getProperty('style.transform.z.rotate');
+            };
+
+            this.updateOrigin = function () {
+                this.setProperty('style.transform.origin', this.origin);
+            };
+
+//          flat: Specifies that child elements will NOT preserve its 3D position. This is default
+//          preserve-3d: Specifies that child elements will preserve its 3D position
+//          initial: Sets this property to its default value. Read about initial
+//          inherit: Inherits this property from its parent element. Read about inherit
+            this.updateStyle = function () {
+                this.setProperty('style.transform.style', this.style);
+            };
+            this.updatePerspective = function () {
+                this.setProperty('style.transform.perspective', this.perspective);
+            };
+
+            // X
+            this.updateTranslateX = function () {
+                this.setProperty('style.transform.x.translate', this.translateX);
+            };
+            this.updateScaleX = function () {
+                this.setProperty('style.transform.x.scale', this.scaleX);
+            };
+            this.updateRotateX = function () {
+                this.setProperty('style.transform.x.rotate', this.rotateX);
+            };
+            this.updateSkewX = function () {
+                this.setProperty('style.transform.x.skew', this.skewX);
+            };
+
+            // Y
+            this.updateTranslateY = function () {
+                this.setProperty('style.transform.y.translate', this.translateY);
+            };
+            this.updateScaleY = function () {
+                this.setProperty('style.transform.y.scale', this.scaleY);
+            };
+            this.updateRotateY = function () {
+                this.setProperty('style.transform.y.rotate', this.rotateY);
+            };
+            this.updateSkewY = function () {
+                this.setProperty('style.transform.y.skew', this.skewY);
+            };
+
+            // Z
+            this.updateTranslateZ = function () {
+                this.setProperty('style.transform.z.translate', this.translateZ);
+            };
+            this.updateScaleZ = function () {
+                this.setProperty('style.transform.z.scale', this.scaleZ);
+            };
+            this.updateRotateZ = function () {
+                this.setProperty('style.transform.z.rotate', this.rotateZ);
+            };
+        }
+    });
+
+
+
+    $settings.newPage({
+        type: 'iframe',
+        label: 'Inline Frame',
+        icon: 'wb-setting-iframe',
+        description: 'Inline Frame settings',
+        templateUrl: 'views/settings/wb-iframe.html',
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function ($scope) {
+            var iframeElementAttribute = [
+                'name',
+                'src', 
+                'srcdoc', 
+                'sandbox', 
+                ];
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
+            this.init = function () {
+                for(var i =0; i < iframeElementAttribute.length;i++){
+                    var key = iframeElementAttribute[i];
+                    $scope[key] =  this.getProperty(key);
+                }
+                // TODO: whatch changes of the model
+            };
+        }
+    });
+    $settings.newPage({
+        type: 'input',
+        label: 'Input',
+        icon: 'wb-setting-input',
+        description: 'Input settings',
+        templateUrl: 'views/settings/wb-input.html',
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function ($scope) {
+            // list of element attributes
+            var elementAttributes = [
+                'accept',
+                'alt', 
+                'autocomplete', 
+                'autofocus', 
+                'checked', 
+                'dirname', 
+                'disabled', 
+                'form',
+                'max', 
+                'maxlength', 
+                'min', 
+                'multiple', 
+                'name', 
+                'pattern', 
+                'placeholder', 
+                'readonly', 
+                'required', 
+                'size', 
+                'src', 
+                'step',
+                'inputType',
+                'value',
+                ];
+
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
+            this.init = function () {
+                for(var i =0; i < elementAttributes.length;i++){
+                    var key = elementAttributes[i];
+                    this[key] =  this.getProperty(key);
+                }
+                // TODO:
+            };
+        }
+    });
+    $settings.newPage({
+        type: 'textarea',
+        label: 'Text Area',
+        icon: 'wb-setting-textarea',
+        description: 'Text Area Settings',
+        templateUrl: 'views/settings/wb-textarea.html',
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function () {
+            var elementAttributes = [
+                'autofocus',
+                'cols',
+                'dirname',
+                'disabled',
+                'form',
+                'maxlength',
+                'name',
+                'placeholder',
+                'readonly',
+                'required',
+                'rows',
+                'wrap',
+                'value',
+                ];
+
+            /*
+             * watch 'wbModel' and apply the changes in setting panel
+             */
+            this.init = function () {
+                for(var i =0; i < elementAttributes.length;i++){
+                    var key = elementAttributes[i];
+                    this[key] =  this.getProperty(key);
+                }
+                // TODO:
+            };
+        }
+    });
 });
 
 /* 
@@ -16841,7 +16957,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-general.html',
-    " <fieldset layout=column> <legend translate>Text</legend> <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setStyle('direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setStyle('color', ctrl.color)\"> </wb-ui-setting-color> </fieldset>  <fieldset layout=column> <legend translate>Mouse</legend> <md-input-container> <wb-icon>mouse</wb-icon> <label translate>Cursor</label> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setStyle('cursor', ctrl.cursor)\"> <md-option ng-repeat=\"cursor in ::ctrl.cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Visibility</legend> <md-input-container layout-align=\"end center\"> <label translate>Visibility</label> <md-select ng-model=ctrl.visibility ng-change=\"ctrl.setStyle('visibility', ctrl.visibility)\" style=\"min-width: 200px\" disabled> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> </md-select> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:60px; height:30px\"> <wb-icon>opacity</wb-icon> <label translate>Opacity</label> <input ng-model=ctrl.opacity ng-change=\"ctrl.setStyle('opacity', ctrl.opacity)\"> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Overflow</legend> <md-input-container layout-align=\"end center\"> <label translate>X</label> <md-select ng-model=ctrl.overflowX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOverflowX() style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> <md-input-container layout-align=\"end center\"> <label translate>Y</label> <md-select ng-model=ctrl.overflowY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOverflowY() style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> </fieldset>"
+    " <fieldset layout=column> <legend translate>Text</legend> <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setStyle('direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setStyle('color', ctrl.color)\"> </wb-ui-setting-color> </fieldset>  <fieldset layout=column> <legend translate>Mouse</legend> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>mouse</wb-icon> <label translate>Cursor</label> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setStyle('cursor', ctrl.cursor)\"> <md-option ng-repeat=\"cursor in ::ctrl.cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Visibility</legend> <md-input-container layout-align=\"end center\"> <label translate>Visibility</label> <md-select ng-model=ctrl.visibility ng-change=\"ctrl.setStyle('visibility', ctrl.visibility)\" style=\"min-width: 200px\" disabled> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> </md-select> </md-input-container> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>opacity</wb-icon> <label translate>Opacity</label> <input ng-model=ctrl.opacity ng-change=\"ctrl.setStyle('opacity', ctrl.opacity)\"> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Overflow</legend> <md-input-container layout-align=\"end center\"> <label translate>X</label> <md-select ng-model=ctrl.overflowX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOverflowX() style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> <md-input-container layout-align=\"end center\"> <label translate>Y</label> <md-select ng-model=ctrl.overflowY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOverflowY() style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> </fieldset>"
   );
 
 
