@@ -1,4 +1,51 @@
 
+## Styles
+
+The style is an specific widget attribute which controll the display of the widget.
+
+### cursor
+
+The cursor property specifies the mouse cursor to be displayed when pointing over an element.
+
+- alias:	The cursor indicates an alias of something is to be created	
+- all-scroll:	The cursor indicates that something can be scrolled in any direction	
+- auto:	Default. The browser sets a cursor	
+- cell:	The cursor indicates that a cell (or set of cells) may be selected	
+- context-menu:	The cursor indicates that a context-menu is available	
+- col-resize:	The cursor indicates that the column can be resized horizontally	
+- copy:	The cursor indicates something is to be copied	
+- crosshair:	The cursor render as a crosshair	
+- default:	The default cursor	
+- e-resize:	The cursor indicates that an edge of a box is to be moved right (east)	
+- ew-resize:	Indicates a bidirectional resize cursor	
+- grab:	The cursor indicates that something can be grabbed	
+- grabbing:	The cursor indicates that something can be grabbed	
+- help:	The cursor indicates that help is available	
+- move:	The cursor indicates something is to be moved	
+- n-resize:	The cursor indicates that an edge of a box is to be moved up (north)	
+- ne-resize:	The cursor indicates that an edge of a box is to be moved up and right (north/east)	
+- nesw-resize:	Indicates a bidirectional resize cursor	
+- ns-resize:	Indicates a bidirectional resize cursor	
+- nw-resize:	The cursor indicates that an edge of a box is to be moved up and left (north/west)	
+- nwse-resize:	Indicates a bidirectional resize cursor	
+- no-drop:	The cursor indicates that the dragged item cannot be dropped here	
+- none:	No cursor is rendered for the element	
+- not-allowed:	The cursor indicates that the requested action will not be executed	
+- pointer:	The cursor is a pointer and indicates a link	
+- progress:	The cursor indicates that the program is busy (in progress)	
+- row-resize:	The cursor indicates that the row can be resized vertically	
+- s-resize:	The cursor indicates that an edge of a box is to be moved down (south)	
+- se-resize:	The cursor indicates that an edge of a box is to be moved down and right (south/east)	
+- sw-resize:	The cursor indicates that an edge of a box is to be moved down and left (south/west)	
+- text:	The cursor indicates text that may be selected	
+- URL:	A comma separated list of URLs to custom cursors. Note: Always specify a generic cursor at the end of the list, in case none of the URL-defined cursors can be used	
+- vertical-text:	The cursor indicates vertical-text that may be selected	
+- w-resize:	The cursor indicates that an edge of a box is to be moved left (west)	
+- wait:	The cursor indicates that the program is busy	
+- zoom-in:	The cursor indicates that something can be zoomed in	
+- zoom-out:	The cursor indicates that something can be zoomed out	
+- initial:	Sets this property to its default value. Read about initial	
+- inherit:	Inherits this property from its parent element. Read about inherit
 
 ## Global Attributes
 
