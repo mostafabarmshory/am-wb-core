@@ -34,7 +34,8 @@ angular.module('am-wb-core')
  */
 .service('$widget', function(
         $wbUtil, $rootScope,
-        $q, $compile, $controller, $mdTheming) {
+        $q, $compile, $controller, $mdTheming, $injector,
+        WidgetEditorFake) {
 
 
     this.providers =  {};
@@ -217,26 +218,26 @@ angular.module('am-wb-core')
             });
         }
         return gettingTemplatePromisse.then(function(element){
-        	// init widget
-        	element.attr('dnd-disable-if','!ctrl.isEditable()');
-        	element.attr('dnd-draggable','wbModel');
-        	element.attr('dnd-type','wbModel.type');
-        	element.attr('dnd-effect-allowed','copyMove');
-        	element.attr('dnd-moved','ctrl.delete()');
-        	element.attr('md-theme-watch','true');
-        	if (model.type == 'Group'){
-        	    element.addClass('wb-group');
-        	    element.attr('dnd-list','wbModel.contents');
-        	    element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
-        	    element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
-        	    element.attr('dnd-external-sources','true');
-        	    element.attr('dnd-drop','ctrl.addChild(index, item)');
-        	    element.attr('dnd-horizontal-list','wbModel.style.layout.direction==="row"');
-        	}else {
+            // init widget
+            element.attr('dnd-disable-if','!ctrl.isEditable()');
+            element.attr('dnd-draggable','wbModel');
+            element.attr('dnd-type','wbModel.type');
+            element.attr('dnd-effect-allowed','copyMove');
+            element.attr('dnd-moved','ctrl.delete()');
+            element.attr('md-theme-watch','true');
+            if (model.type == 'Group'){
+                element.addClass('wb-group');
+                element.attr('dnd-list','wbModel.contents');
+                element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
+                element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
+                element.attr('dnd-external-sources','true');
+                element.attr('dnd-drop','ctrl.addChild(index, item)');
+                element.attr('dnd-horizontal-list','wbModel.style.layout.direction==="row"');
+            }else {
                 element.addClass('wb-widget');
-        	    element.attr('dnd-callback','1');
-        	}
-        	var link = $compile(element);
+                element.attr('dnd-callback','1');
+            }
+            var link = $compile(element);
             var wlocals = _.merge({
                 $scope : childScope,
                 $element : element
@@ -376,4 +377,50 @@ angular.module('am-wb-core')
             }
         };
     };
+
+
+    /***********************************************Editors***************************************/
+    var editors = {
+            'a': {
+                type: 'WidgetEditorTinymce',
+                options:{
+                    property: 'html',
+                    inline: true
+                }
+            },
+            'p': {
+                type: 'WidgetEditorTinymce',
+                options:{
+                    property: 'html',
+                    inline: true
+                }
+            },
+            'h1': {
+                type: 'WidgetEditorTinymce',
+                options:{
+                    property: 'html',
+                    inline: true
+                }
+            }
+    }
+    var fakeEditor = new WidgetEditorFake();
+    this.getEditor = function(widget){
+        if(widget.$$wbEditor){
+            // return old editor
+            return widget.$$wbEditor;
+        }
+        if(editors[widget.getType()] == undefined){
+            return fakeEditor;
+        }
+        var register = editors[widget.getType()];
+        // create editor
+        var Editor = $injector.get(register.type);
+        var editor = new Editor(widget, register.options || {});
+        widget.$$wbEditor = editor;
+        return widget.$$wbEditor;
+    };
+    this.getEditors = function(){};
+    this.getActiveEditor = function(){};
+
+
 });

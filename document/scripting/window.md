@@ -237,4 +237,13 @@ Here is an example
 ### Close
 
 
+### loadLibrary
 
+Load library
+
+	$window.loadLibrary('')
+	.then(function(){
+		// TOOD:
+	}, function(){
+		// error
+	});

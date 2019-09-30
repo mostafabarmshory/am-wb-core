@@ -23,7 +23,7 @@
  */
 'use strict';
 
-describe('WbWidget ', function () {
+describe('WbWidget a ', function () {
 	// instantiate service
 	var $rootScope;
 	var $widget;
@@ -46,80 +46,37 @@ describe('WbWidget ', function () {
 		$httpBackend = _$httpBackend_;
 	}));
 
-	var basicAttributes = [{
-		key: 'accesskey',
-		value: 'c'
-	},{
-		key: 'contenteditable',
-		value: 'false',
-	},{
-		key: 'dir',
-		value: 'rtl',
-	},{
-		key: 'draggable',
-		value: 'true',
-	},{
-//		key: 'dropzone',
-//		value: 'false',
-//	},{
-//		key: 'hidden',
-//		value: 'hidden',
-//	},{
-		key: 'id',
-		value: 'my-id',
-	},{
-		key: 'lang',
-		value: 'fa',
-	},{
-		key: 'spellcheck',
-		value: 'true',
-//	},{
-//		key: 'tabindex',
-//		value: '10',
-	},{
-		key: 'title',
-		value: 'title-test',
-	},{
-		key: 'translate',
-		value: 'true',
-	}];
-	angular.forEach(basicAttributes, function(keyval){
-		it('should set ' + keyval.key + ' from model', function (done) {
-			var root = new MockRootWidget();
-			// Create new instance
-			var model = {
-					type: 'Group',
-			};
-			model[keyval.key] = keyval.value;
-			$widget.compile(model, root)
-			.then(function(widget){
-				expect(widget.getElementAttribute(keyval.key)).toBe(model[keyval.key]);
-				done();
-			});
-			$rootScope.$apply();
+	it('should set name from model', function (done) {
+		var root = new MockRootWidget();
+		// Create new instance
+		var model = {
+				type: 'p',
+				id: 'p',
+				href: 'http://www.viraweb123.ir',
+		};
+		$widget.compile(model, root)
+		.then(function(widget){
+			expect(widget.getElementAttribute('id')).toBe(model.id);
+			done();
 		});
+		$rootScope.$apply();
 	});
 	
-	var basicAttributesWrong = [
-		'1accesskey',
-		'xx',
-		'aa aa '
-		];
-	angular.forEach(basicAttributesWrong, function(key){
-		it('should not set invalid key:' + key + ' from model', function (done) {
-			var root = new MockRootWidget();
-			// Create new instance
-			var model = {
-					type: 'Group',
-					id: 'test'
-			};
-			model[key] = 'test-value';
-			$widget.compile(model, root)
-			.then(function(widget){
-				expect(widget.getElementAttribute(key)).toBe(undefined);
-				done();
-			});
-			$rootScope.$apply();
+	it('should set html from model', function (done) {
+		var root = new MockRootWidget();
+		// Create new instance
+		var model = {
+				type: 'p',
+				id: 'p',
+				name: 'a-test',
+				html: '<h2>HTML Text In 4th group0</h2>',
+		};
+		$widget.compile(model, root)
+		.then(function(widget){
+			expect(widget.getElementAttribute('html')).toBe(model.html);
+			expect(widget.html()).toBe(model.html);
+			done();
 		});
+		$rootScope.$apply();
 	});
 });

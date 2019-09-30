@@ -18,7 +18,8 @@
     	"HTMLCollection": false,
     	"objectPath": false,
     	"Map": false,
-    	"Promise": false
+    	"Promise": false,
+    	"jQuery": false
 	},
 	"extends": "eslint:recommended",
 	"parserOptions": {

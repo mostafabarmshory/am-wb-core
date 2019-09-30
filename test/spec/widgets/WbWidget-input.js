@@ -102,20 +102,21 @@ describe('WbWidget input ', function () {
 		$rootScope.$apply();
 	});
 	
-//	it('should set src from model', function (done) {
-//		var root = new MockRootWidget();
-//		// Create new instance
-//		var model = {
-//				type: 'iframe',
-//				id: 'test',
-//				name: 'iframe-test',
-//				src: 'http://localhost'
-//		};
-//		$widget.compile(model, root)
-//		.then(function(widget){
-//			expect(widget.getElementAttribute('src')).toBe(model.src);
-//			done();
-//		});
-//		$rootScope.$apply();
-//	});
+	it('should set value null from model', function (done) {
+		var root = new MockRootWidget();
+		// Create new instance
+		var model = {
+				type: 'input',
+				inputType: 'text',
+				value: 'inpt-test-value',
+		};
+		$widget.compile(model, root)
+		.then(function(widget){
+			expect(widget.getElementAttribute('value')).toBe(model.value);
+			widget.val('');
+			expect(widget.val()).toBe('');
+			done();
+		});
+		$rootScope.$apply();
+	});
 });

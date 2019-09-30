@@ -11,21 +11,24 @@
 			"type": "Group",
 			"name": "group#1",
 			"style": {
-				"margin": "8px"
+				"margin": "8px",
+				"padding": "80px"
 			},
 			"contents": [
 				{
 					"type": "Group",
 					"name": "group#2",
 					"style": {
-						"margin": "8px"
+						"margin": "8px",
+						"padding": "80px"
 					},
 					"contents": [
 						{
 							"type": "Group",
 							"name": "group#3",
 							"style": {
-								"margin": "8px"
+								"margin": "8px",
+								"padding": "80px"
 							},
 							"contents": [
 								{
@@ -39,6 +42,19 @@
 									"type": "HtmlText",
 									"name": "text2",
 									"text": "<h2>HTML Text #2</h2>",
+									"style": {
+										"margin": "8px"
+									}
+								},{
+									"type": "p",
+									"html": "this is <a href=\"http://localhost\">Link</a> in p ",
+									"style": {
+										"margin": "8px"
+									}
+								},{
+									"type": "a",
+									"src": "http://localhost",
+									"html": "this is a link",
 									"style": {
 										"margin": "8px"
 									}
