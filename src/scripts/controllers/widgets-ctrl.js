@@ -104,6 +104,17 @@ var WbAbstractWidget = function () {
             timeout = setTimeout(later, wait);
         };
     }
+    
+    /**
+     * State of the widget
+     * 
+     * - init
+     * - edit
+     * - ready
+     * - deleted
+     * 
+     */
+    this.state = 'init';
 
     this.actions = [];
     this.callbacks = [];
