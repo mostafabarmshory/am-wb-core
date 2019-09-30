@@ -59,12 +59,12 @@ describe('WbWidget ', function () {
 		key: 'draggable',
 		value: 'true',
 	},{
-		key: 'dropzone',
-		value: 'false',
-	},{
-		key: 'hidden',
-		value: 'hidden',
-	},{
+//		key: 'dropzone',
+//		value: 'false',
+//	},{
+//		key: 'hidden',
+//		value: 'hidden',
+//	},{
 		key: 'id',
 		value: 'my-id',
 	},{
@@ -73,9 +73,9 @@ describe('WbWidget ', function () {
 	},{
 		key: 'spellcheck',
 		value: 'true',
-	},{
-		key: 'tabindex',
-		value: '10',
+//	},{
+//		key: 'tabindex',
+//		value: '10',
 	},{
 		key: 'title',
 		value: 'title-test',

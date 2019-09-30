@@ -82,6 +82,9 @@ Rules for sizing the icon.
 .jsPanel {
 	z-index: 70 !important;
 }
+.tox-tinymce-inline.tox-toolbar-dock-transition.tox-toolbar-dock-fadein {
+	z-index: 60 !important;
+}
 /* PrismJS 1.15.0
 https://prismjs.com/download.html#themes=prism&languages=markup+css+clike+javascript&plugins=line-numbers */
 /**
