@@ -73,21 +73,121 @@ angular.module('am-wb-core')//
     /**
      * Creates new instace of an editor
      */
-    function widgetEditor() {}
+    function widgetEditor(widget, options) {
+        this.callbacks = [];
+        this.widget = widget;
+        this.options = options;
+    }
+
+    /**
+     * Remove all resources
+     * 
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.destroy = function(){
+        this.callbacks = [];
+        delete this.widget;
+        delete this.options;
+    };
+
+    /**
+     * Get the widget of the editor
+     * 
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.getWidget = function(){
+        return this.widget;
+    };
+
+    /**
+     * Set the widget as dirty widget
+     * 
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.setDirty = function(){
+        this.dirty = true;
+    };
+
+    /**
+     * Check if the widget is dirty
+     * 
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.isDirty = function(){
+        return this.dirty;
+    };
+
+    /**
+     * Remove callbak from specific type
+     * 
+     * @param type {string} the event name
+     * @param callback {function} the function
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.Off = function(type, callback){
+        if (!angular.isArray(this.callbacks[type])) {
+            return;
+        }
+        var callbacks = this.callbacks[type];
+        var index = callbacks.indexOf(callback);
+        if (index > -1) {
+            callbacks.splice(index, 1);
+        }
+    };
+
+    /**
+     * Add a callback function to the editor
+     * 
+     * @param type {string} the event name
+     * @param callback {function} the function
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.On = function(type, callback){
+        if (!angular.isArray(this.callbacks[type])) {
+            this.callbacks[type] = [];
+        }
+        if(!_.includes(this.callbacks[type], callback)){
+            this.callbacks[type].push(callback);
+        }
+    };
+
+    /**
+     * Fire the event
+     * 
+     * @param type {string} the event name
+     * @param param {object} event params
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.fire = function(type, params){
+        // TODO: maso, 2018: create event object
+        var event = _.merge({
+            source: this,
+            type: type
+        }, params || {});
+
+        // fire
+        var callbacks = this.callbacks[type] || [];
+        for(var i = 0; i < callbacks.length; i++){
+            // TODO: maso, 2018: check if the event is stopped to propagate
+            try {
+                callbacks[i](event);
+            } catch (error) {
+                // NOTE: remove on release
+                console.log(error);
+            }
+        }
+    }; // internal
     
-    widgetEditor.prototype.destroy = function(){};
-    widgetEditor.prototype.fire = function(){}; // internal
+    
+    
+
+
     widgetEditor.prototype.setActive = function(){}; // focus|skipFocuse
     widgetEditor.prototype.isActive = function(){};
-    widgetEditor.prototype.getWidget = function(){};
-    widgetEditor.prototype.setDirty = function(){};
-    widgetEditor.prototype.isDirty = function(){};
     widgetEditor.prototype.save = function(){};
     widgetEditor.prototype.hide = function(){};
     widgetEditor.prototype.show = function(){};
     widgetEditor.prototype.isHidden = function(){};
-    widgetEditor.prototype.Off = function(){};
-    widgetEditor.prototype.On = function(){};
 
     // the editor type
     return widgetEditor;

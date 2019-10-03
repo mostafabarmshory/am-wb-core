@@ -22,9 +22,27 @@
  * SOFTWARE.
  */
 'use strict';
+var widgetBasicWidgetAttributes = [
+    'accesskey',
+    'contenteditable',
+    'dir',
+    /*
+     * NOTE: We must manage D&D internally to mange user D&D codes
+     */
+//  'draggable',
+//  'dropzone',
+    'hidden',
+    'id',
+    'lang',
+    'spellcheck',
+    'tabindex',
+    'title',
+    'translate',
+    ];
 /**
  * @ngdoc Controllers
  * @name WbAbstractWidget
+ * @class
  * @descreption root of the widgets
  * 
  * This is an abstract implementation of the widgets. ## Models
@@ -70,23 +88,6 @@
  * <li>widgetSelected</li>
  * </ul>
  */
-var widgetBasicWidgetAttributes = [
-    'accesskey',
-    'contenteditable',
-    'dir',
-    /*
-     * NOTE: We must manage D&D internally to mange user D&D codes
-     */
-//  'draggable',
-//  'dropzone',
-    'hidden',
-    'id',
-    'lang',
-    'spellcheck',
-    'tabindex',
-    'title',
-    'translate',
-    ];
 
 var WbAbstractWidget = function () {
     'use strict';
@@ -113,14 +114,32 @@ var WbAbstractWidget = function () {
      * - ready
      * - deleted
      * 
+     * @memberof WbAbstractWidget
      */
     this.state = 'init';
 
     this.actions = [];
     this.callbacks = [];
     this.childWidgets = [];
+
+    /**
+     * AngularJS scope of the widget. This field is used in our old pattern and
+     * will be removed in our next major version.
+     * 
+     * @deprecated This will be removed in the next major version.
+     * @memberof WbAbstractWidget
+     */
     this.$scope = null;
+
+    /**
+     * View element of the widget
+     * 
+     * This element is used to draw and managed view widget.
+     * 
+     * @memberof WbAbstractWidget
+     */
     this.$element = null;
+    
     /*
      * This is a cache of customer function
      * 
@@ -210,7 +229,7 @@ var WbAbstractWidget = function () {
  * 
  * @param model
  *            {object} to load from
- * @memberof WbAbstractWidget
+ * @member WbAbstractWidget
  */
 WbAbstractWidget.prototype.loadSeo = function () {
     var model = this.getModel();
@@ -243,6 +262,9 @@ WbAbstractWidget.prototype.loadSeo = function () {
 
 /**
  * Loads all basic elements attributes.
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.loadBasicProperties = function () {
     var model = this.getModel();
@@ -306,6 +328,9 @@ WbAbstractWidget.prototype.loadStyle = function () {
  * Refreshes the view based on the current data
  * 
  * It used runtime and model data to update the view.
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.refresh = function($event) {
     if(this.isSilent()) {
@@ -398,9 +423,22 @@ WbAbstractWidget.prototype.setModel = function (model) {
 WbAbstractWidget.prototype.hasModelProperty = function(key){
     return objectPath.has(this.getModel(), key);
 };
+
+/**
+ * Get model property
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getModelProperty = function(key){
     return objectPath.get(this.getModel(), key);
 };
+
+/**
+ * Sets new model property value
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setModelProperty = function (key, value){
     // create the event
     var $event = {};
@@ -426,16 +464,41 @@ WbAbstractWidget.prototype.setModelProperty = function (key, value){
     this.fire('modelUpdated', $event);
 };
 
-
+/**
+ * Gets runtime model
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getRuntimeModel = function () {
     return this.runtimeModel;
 };
+
+/**
+ * Checks if property exist
+ * 
+ * NOTE: just look for runtime property
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.hasProperty = function (key){
     return objectPath.has(this.getRuntimeModel(), key);
 };
+
+/**
+ * Gets property of the model
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getProperty = function (key){
     return objectPath.get(this.getRuntimeModel(), key);
 };
+
+/**
+ * Remove property
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.removeProperty = function (key){
     var model = this.getRuntimeModel();
     objectPath.del(model, key);
@@ -516,6 +579,9 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
  * The style object is read only and you can get it as follow:
  * 
  * var style = widget.style();
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.style = function (style, value) {
     // there is no argument so act as get
@@ -534,6 +600,9 @@ WbAbstractWidget.prototype.style = function (style, value) {
 
 /**
  * Sets style of the widget
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.setStyle = function(key, value) {
     this.setProperty('style.' + key, value);
@@ -541,6 +610,9 @@ WbAbstractWidget.prototype.setStyle = function(key, value) {
 
 /**
  * Get style from widget
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.getStyle = function(key) {
     return this.getProperty('style.' + key);
@@ -613,6 +685,9 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 
 /**
  * Remove the widgets
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.destroy = function ($event) {
     // remove callbacks
@@ -635,6 +710,12 @@ WbAbstractWidget.prototype.destroy = function ($event) {
     this.fire('destroy', $event);
 };
 
+/**
+ * Set widget element
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setElement = function ($element) {
     try{
         this.disconnect();
@@ -644,6 +725,11 @@ WbAbstractWidget.prototype.setElement = function ($element) {
     }
 };
 
+/**
+ * Disconnect view with the widget
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.disconnect = function () {
     var $element = this.getElement();
     if (!$element) {
@@ -656,6 +742,12 @@ WbAbstractWidget.prototype.disconnect = function () {
     });
 };
 
+/**
+ * Connects view with widget
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.connect = function () {
     var $element = this.getElement();
     if (!$element) {
@@ -668,10 +760,20 @@ WbAbstractWidget.prototype.connect = function () {
     this.intersectionObserver.observe($element[0]);
 };
 
+/**
+ * Get elements of the widget
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getElement = function () {
     return this.$element;
 };
 
+/**
+ * Sets element attributes
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setElementAttribute = function(key, value){
     if(value){
         this.$element.attr(key, value);
@@ -680,18 +782,42 @@ WbAbstractWidget.prototype.setElementAttribute = function(key, value){
     }
 };
 
+/**
+ * Get element attribute
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getElementAttribute = function(key){
     return this.$element.attr(key);
 };
 
+/**
+ * Remove element attribute
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.removeElementAttribute = function(key){
     this.$element.removeAttr(key);
 };
 
+/**
+ * Set widget silent
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setSilent = function(silent) {
     this.silent = silent;
 };
 
+/**
+ * Checks if the element is silent
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.isSilent = function() {
     return this.silent;
 };
@@ -783,23 +909,48 @@ WbAbstractWidget.prototype.fire = function (type, params) {
  * NOTE: default layout direction is column.
  * 
  * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.getDirection = function () {
     return this.getModelProperty('style.layout.direction') || 'column';
 };
 
+/**
+ * Get events of the widget
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getEvent = function () {
     return this.getModelProperty('event') || {};
 };
 
+/**
+ * Get title of the widget
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getTitle = function () {
     return this.getModelProperty('label');
 };
 
+/**
+ * Gets type
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getType = function () {
     return this.getModelProperty('type');
 };
 
+/**
+ * Gets Id of the model
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getId = function () {
     return this.getModelProperty('id');
 };
@@ -809,26 +960,59 @@ WbAbstractWidget.prototype.getId = function () {
  * 
  * Parent widget is called container in this model. It is attached dynamically
  * on the render phease.
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.getParent = function () {
     return this.parent;
 };
 
+/**
+ * Sets parent
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setParent = function (widget) {
     return this.parent = widget;
 };
 
+/**
+ * Set scope data
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setScope = function ($scope) {
     this.$scope = $scope;
 };
+
+/**
+ * Gets Scope data
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getScope = function () {
     return this.$scope;
 };
 
+/**
+ * Checks if the editable mode is enable
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.isEditable = function () {
     return this.editable;
 };
 
+/**
+ * Set edit mode
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setEditable = function (editable) {
     if (this.editable === editable) {
         return;
@@ -855,10 +1039,22 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
     }, 100);
 };
 
+/**
+ * Check if intersecting
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.isIntersecting = function(){
     return this.intersecting;
 };
 
+/**
+ * Set intersecting true
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setIntersecting = function(intersecting, $event){
     this.intersecting = intersecting;
     this.fire('intersection', $event);
@@ -870,6 +1066,8 @@ WbAbstractWidget.prototype.setIntersecting = function(intersecting, $event){
  * Delete the widget
  * 
  * This function just used in edit mode
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.delete = function () {
     // remove itself
@@ -880,6 +1078,8 @@ WbAbstractWidget.prototype.delete = function () {
 
 /**
  * Clone current widget This method works in edit mode only.
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.clone = function () {
     var index = this.getParent().indexOfChild(this);
@@ -889,15 +1089,17 @@ WbAbstractWidget.prototype.clone = function () {
 
 /**
  * This method moves widget one to next.
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.moveNext = function () {
     this.getParent().moveChild(this, this.getParent().indexOfChild(this) + 1);
 };
 
-
-
 /**
  * This method moves widget one to before
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.moveBefore = function () {
     this.getParent().moveChild(this, this.getParent().indexOfChild(this) - 1);
@@ -905,6 +1107,8 @@ WbAbstractWidget.prototype.moveBefore = function () {
 
 /**
  * This method moves widget to the first of it's parent
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.moveFirst = function () {
     this.getParent().moveChild(this, 0);
@@ -912,6 +1116,8 @@ WbAbstractWidget.prototype.moveFirst = function () {
 
 /**
  * This method moves widget to the last of it's parent
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.moveLast = function () {
     this.getParent().moveChild(this, this.getParent().getChildren().length - 1);
@@ -921,6 +1127,9 @@ WbAbstractWidget.prototype.moveLast = function () {
  * Checks if the widget is root
  * 
  * If there is no parent controller then this is a root one.
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.isRoot = function () {
     var parent = this.getParent();
@@ -992,6 +1201,8 @@ WbAbstractWidget.prototype.addAction = function (action) {
 
 /**
  * Gets widget actions
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.getActions = function () {
     return this.actions;
@@ -1032,6 +1243,8 @@ WbAbstractWidget.prototype.getBoundingClientRect = function () {
 
 /**
  * Adds animation to the page
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.animate = function (options) {
     var ctrl = this;
@@ -1089,6 +1302,7 @@ WbAbstractWidget.prototype.animate = function (options) {
 /**
  * Remove animations from the widget
  * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.removeAnimation = function () {
     // The animation will not add to element so there is no need to remove

@@ -32,7 +32,7 @@ angular.module('am-wb-core')//
  * 
  */
 
-.factory('WidgetEditorTinymce', function ($q) {
+.factory('WidgetEditorTinymce', function ($q, WidgetEditor) {
 
     /**
      * TODO: maso, 2019: extends WidgetEditorFake
@@ -40,27 +40,20 @@ angular.module('am-wb-core')//
      * Creates new instace of an editor
      */
     function editor(widget, options) {
-        this.widget = widget;
-        this.options = options;
+        options = options || {};
+        WidgetEditor.apply(this, widget, options);
     }
 
+    /**
+     * remove all resources
+     * 
+     * @memberof WidgetEditorTinymce
+     */
     editor.prototype.destroy = function () {
+        this.hide();
+        WidgetEditor.prototype.destroy.call(this);
     };
-    editor.prototype.fire = function () {
-    }; // internal
-    editor.prototype.setActive = function () {
-    }; // focus|skipFocuse
-    editor.prototype.isActive = function () {
-    };
-    editor.prototype.getWidget = function () {
-    };
-    editor.prototype.setDirty = function () {
-    };
-    editor.prototype.isDirty = function () {
-    };
-    editor.prototype.save = function () {
-    };
-
+    
     /**
      * Remove editor
      */
@@ -91,17 +84,13 @@ angular.module('am-wb-core')//
                 })
             }
         }))
-        .then(function (editor) {
+        .then(function () {
             ctrl.widget.getElement().focus();
         });
     };
 
     editor.prototype.isHidden = function () {
         return this._hide;
-    };
-    editor.prototype.Off = function () {
-    };
-    editor.prototype.On = function () {
     };
 
     /**

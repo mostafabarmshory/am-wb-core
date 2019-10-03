@@ -206,7 +206,6 @@ angular.module('am-wb-core')
 
         // 2- create element
         var service = this;
-
         var gettingTemplatePromisse;
         if(preElement){
             gettingTemplatePromisse = $q.resolve(preElement);
@@ -238,25 +237,7 @@ angular.module('am-wb-core')
                 element.attr('dnd-callback','1');
             }
             var link = $compile(element);
-            var wlocals = _.merge({
-                $scope : childScope,
-                $element : element
-            }, service.providers);
-            var ctrl;
-            if (model.type !== 'Group') {
-                ctrl = $controller('WbWidgetCtrl', wlocals);
-            } else {
-                ctrl = $controller('WbWidgetGroupCtrl', wlocals);
-            }
-            ctrl.setParent(parentWidget);
-
-            // NOTE: can inject widget controller as WidgetCtrl
-            wlocals.WidgetCtrl = ctrl;
-            wlocals.$parent = parentWidget;
-            // extend element controller
-            if (angular.isDefined(widget.controller)) {
-                angular.extend(ctrl, $controller(widget.controller, wlocals));
-            }
+            var ctrl = createWidgetController(widget, model, parentWidget, childScope, element, service.providers);
 
             ctrl.setModel(model);
             childScope[widget.controllerAs || 'ctrl'] = ctrl;
@@ -272,6 +253,31 @@ angular.module('am-wb-core')
             }
             return ctrl;
         });
+    }
+    
+    function createWidgetController(widget, model, parentWidget, childScope, element, providers){
+        var wlocals = _.merge({
+            $scope : childScope,
+            $element : element
+        }, providers);
+        var ctrl;
+        if (model.type !== 'Group') {
+            ctrl = $controller('WbWidgetCtrl', wlocals);
+        } else {
+            ctrl = $controller('WbWidgetGroupCtrl', wlocals);
+        }
+        ctrl.setParent(parentWidget);
+
+        // NOTE: can inject widget controller as WidgetCtrl
+        wlocals.WidgetCtrl = ctrl;
+        wlocals.$parent = parentWidget;
+        // extend element controller
+        if (angular.isDefined(widget.controller)) {
+            var wctrl = $controller(widget.controller, wlocals);
+            // extend the controller
+            angular.extend(ctrl, wctrl);
+        }
+        return ctrl;
     }
 
     /**
@@ -380,30 +386,31 @@ angular.module('am-wb-core')
 
 
     /***********************************************Editors***************************************/
-    var editors = {
-            'a': {
-                type: 'WidgetEditorTinymce',
-                options:{
-                    property: 'html',
-                    inline: true
-                }
-            },
-            'p': {
-                type: 'WidgetEditorTinymce',
-                options:{
-                    property: 'html',
-                    inline: true
-                }
-            },
-            'h1': {
-                type: 'WidgetEditorTinymce',
-                options:{
-                    property: 'html',
-                    inline: true
-                }
-            }
-    }
+    var editors = {};
     var fakeEditor = new WidgetEditorFake();
+    
+    
+
+    /**
+     * Set editor of a widgets
+     * 
+     * on double click editors are used to edit the widget.
+     * 
+     * @params type {string} type of the widget
+     * @params editor {Editor} editor
+     * @memberof $widget
+     */
+    this.setEditor = function(type, editor){
+        editors[type] = editor;
+    };
+
+    /**
+     * Find editor for the given widget
+     * 
+     * @params widget {WbWidget} the widget
+     * @return the editor or fake editor
+     * @memberof $widget
+     */
     this.getEditor = function(widget){
         if(widget.$$wbEditor){
             // return old editor
@@ -416,11 +423,16 @@ angular.module('am-wb-core')
         // create editor
         var Editor = $injector.get(register.type);
         var editor = new Editor(widget, register.options || {});
+        var ctrl = this;
         widget.$$wbEditor = editor;
-        return widget.$$wbEditor;
+        editor.on('destroy', function(){
+            ctrl.removeEditorFromList(editor);
+        });
+        return editor;
     };
-    this.getEditors = function(){};
-    this.getActiveEditor = function(){};
+    
+//    this.getEditors = function(){};
+//    this.getActiveEditor = function(){};
 
 
 });

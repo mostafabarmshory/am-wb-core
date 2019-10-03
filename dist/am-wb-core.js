@@ -4933,6 +4933,81 @@ angular.module('am-wb-core')//
     this.setScope($scope);
 });
 
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name MbWidgetHeaderCtrl
+ * @description Manage a header
+ * 
+ */
+.controller('MbWidgetHeaderCtrl', function () {
+    // list of element attributes
+    var elementAttributes = [
+        'html'
+        ];
+
+    this.initWidget = function(){
+        var ctrl = this;
+        function elementAttribute(key, value){
+            if(key === 'html'){
+                ctrl.getElement().html(value);
+            }
+            ctrl.setElementAttribute(key, value);
+        }
+        function eventHandler(event){
+            if(elementAttributes.includes(event.key)){
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                elementAttribute(key, value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data
+        for(var i =0; i < elementAttributes.length;i++){
+            var key = elementAttributes[i];
+            elementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+
+    /**
+     * Gets value of the input
+     */
+    this.html = function(){
+        var value = arguments[0];
+        if(value){
+            this.setElementAttribute('html', value);
+        }
+        var element = this.getElement();
+        return element.html.apply(element, arguments);
+    };
+});
+
 /* 
  * The MIT License (MIT)
  * 
@@ -4957,9 +5032,27 @@ angular.module('am-wb-core')//
  * SOFTWARE.
  */
 'use strict';
+var widgetBasicWidgetAttributes = [
+    'accesskey',
+    'contenteditable',
+    'dir',
+    /*
+     * NOTE: We must manage D&D internally to mange user D&D codes
+     */
+//  'draggable',
+//  'dropzone',
+    'hidden',
+    'id',
+    'lang',
+    'spellcheck',
+    'tabindex',
+    'title',
+    'translate',
+    ];
 /**
  * @ngdoc Controllers
  * @name WbAbstractWidget
+ * @class
  * @descreption root of the widgets
  * 
  * This is an abstract implementation of the widgets. ## Models
@@ -5005,23 +5098,6 @@ angular.module('am-wb-core')//
  * <li>widgetSelected</li>
  * </ul>
  */
-var widgetBasicWidgetAttributes = [
-    'accesskey',
-    'contenteditable',
-    'dir',
-    /*
-     * NOTE: We must manage D&D internally to mange user D&D codes
-     */
-//  'draggable',
-//  'dropzone',
-    'hidden',
-    'id',
-    'lang',
-    'spellcheck',
-    'tabindex',
-    'title',
-    'translate',
-    ];
 
 var WbAbstractWidget = function () {
     'use strict';
@@ -5039,12 +5115,41 @@ var WbAbstractWidget = function () {
             timeout = setTimeout(later, wait);
         };
     }
+    
+    /**
+     * State of the widget
+     * 
+     * - init
+     * - edit
+     * - ready
+     * - deleted
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.state = 'init';
 
     this.actions = [];
     this.callbacks = [];
     this.childWidgets = [];
+
+    /**
+     * AngularJS scope of the widget. This field is used in our old pattern and
+     * will be removed in our next major version.
+     * 
+     * @deprecated This will be removed in the next major version.
+     * @memberof WbAbstractWidget
+     */
     this.$scope = null;
+
+    /**
+     * View element of the widget
+     * 
+     * This element is used to draw and managed view widget.
+     * 
+     * @memberof WbAbstractWidget
+     */
     this.$element = null;
+    
     /*
      * This is a cache of customer function
      * 
@@ -5134,7 +5239,7 @@ var WbAbstractWidget = function () {
  * 
  * @param model
  *            {object} to load from
- * @memberof WbAbstractWidget
+ * @member WbAbstractWidget
  */
 WbAbstractWidget.prototype.loadSeo = function () {
     var model = this.getModel();
@@ -5167,6 +5272,9 @@ WbAbstractWidget.prototype.loadSeo = function () {
 
 /**
  * Loads all basic elements attributes.
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.loadBasicProperties = function () {
     var model = this.getModel();
@@ -5230,6 +5338,9 @@ WbAbstractWidget.prototype.loadStyle = function () {
  * Refreshes the view based on the current data
  * 
  * It used runtime and model data to update the view.
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.refresh = function($event) {
     if(this.isSilent()) {
@@ -5322,9 +5433,22 @@ WbAbstractWidget.prototype.setModel = function (model) {
 WbAbstractWidget.prototype.hasModelProperty = function(key){
     return objectPath.has(this.getModel(), key);
 };
+
+/**
+ * Get model property
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getModelProperty = function(key){
     return objectPath.get(this.getModel(), key);
 };
+
+/**
+ * Sets new model property value
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setModelProperty = function (key, value){
     // create the event
     var $event = {};
@@ -5350,16 +5474,41 @@ WbAbstractWidget.prototype.setModelProperty = function (key, value){
     this.fire('modelUpdated', $event);
 };
 
-
+/**
+ * Gets runtime model
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getRuntimeModel = function () {
     return this.runtimeModel;
 };
+
+/**
+ * Checks if property exist
+ * 
+ * NOTE: just look for runtime property
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.hasProperty = function (key){
     return objectPath.has(this.getRuntimeModel(), key);
 };
+
+/**
+ * Gets property of the model
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getProperty = function (key){
     return objectPath.get(this.getRuntimeModel(), key);
 };
+
+/**
+ * Remove property
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.removeProperty = function (key){
     var model = this.getRuntimeModel();
     objectPath.del(model, key);
@@ -5440,6 +5589,9 @@ WbAbstractWidget.prototype.setProperty = function (key, value){
  * The style object is read only and you can get it as follow:
  * 
  * var style = widget.style();
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.style = function (style, value) {
     // there is no argument so act as get
@@ -5458,6 +5610,9 @@ WbAbstractWidget.prototype.style = function (style, value) {
 
 /**
  * Sets style of the widget
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.setStyle = function(key, value) {
     this.setProperty('style.' + key, value);
@@ -5465,6 +5620,9 @@ WbAbstractWidget.prototype.setStyle = function(key, value) {
 
 /**
  * Get style from widget
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.getStyle = function(key) {
     return this.getProperty('style.' + key);
@@ -5537,6 +5695,9 @@ WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
 
 /**
  * Remove the widgets
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.destroy = function ($event) {
     // remove callbacks
@@ -5559,6 +5720,12 @@ WbAbstractWidget.prototype.destroy = function ($event) {
     this.fire('destroy', $event);
 };
 
+/**
+ * Set widget element
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setElement = function ($element) {
     try{
         this.disconnect();
@@ -5568,6 +5735,11 @@ WbAbstractWidget.prototype.setElement = function ($element) {
     }
 };
 
+/**
+ * Disconnect view with the widget
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.disconnect = function () {
     var $element = this.getElement();
     if (!$element) {
@@ -5580,6 +5752,12 @@ WbAbstractWidget.prototype.disconnect = function () {
     });
 };
 
+/**
+ * Connects view with widget
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.connect = function () {
     var $element = this.getElement();
     if (!$element) {
@@ -5592,10 +5770,20 @@ WbAbstractWidget.prototype.connect = function () {
     this.intersectionObserver.observe($element[0]);
 };
 
+/**
+ * Get elements of the widget
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getElement = function () {
     return this.$element;
 };
 
+/**
+ * Sets element attributes
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setElementAttribute = function(key, value){
     if(value){
         this.$element.attr(key, value);
@@ -5604,18 +5792,42 @@ WbAbstractWidget.prototype.setElementAttribute = function(key, value){
     }
 };
 
+/**
+ * Get element attribute
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getElementAttribute = function(key){
     return this.$element.attr(key);
 };
 
+/**
+ * Remove element attribute
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.removeElementAttribute = function(key){
     this.$element.removeAttr(key);
 };
 
+/**
+ * Set widget silent
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setSilent = function(silent) {
     this.silent = silent;
 };
 
+/**
+ * Checks if the element is silent
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.isSilent = function() {
     return this.silent;
 };
@@ -5707,23 +5919,48 @@ WbAbstractWidget.prototype.fire = function (type, params) {
  * NOTE: default layout direction is column.
  * 
  * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.getDirection = function () {
     return this.getModelProperty('style.layout.direction') || 'column';
 };
 
+/**
+ * Get events of the widget
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getEvent = function () {
     return this.getModelProperty('event') || {};
 };
 
+/**
+ * Get title of the widget
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getTitle = function () {
     return this.getModelProperty('label');
 };
 
+/**
+ * Gets type
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getType = function () {
     return this.getModelProperty('type');
 };
 
+/**
+ * Gets Id of the model
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getId = function () {
     return this.getModelProperty('id');
 };
@@ -5733,26 +5970,59 @@ WbAbstractWidget.prototype.getId = function () {
  * 
  * Parent widget is called container in this model. It is attached dynamically
  * on the render phease.
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.getParent = function () {
     return this.parent;
 };
 
+/**
+ * Sets parent
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setParent = function (widget) {
     return this.parent = widget;
 };
 
+/**
+ * Set scope data
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setScope = function ($scope) {
     this.$scope = $scope;
 };
+
+/**
+ * Gets Scope data
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.getScope = function () {
     return this.$scope;
 };
 
+/**
+ * Checks if the editable mode is enable
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.isEditable = function () {
     return this.editable;
 };
 
+/**
+ * Set edit mode
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setEditable = function (editable) {
     if (this.editable === editable) {
         return;
@@ -5779,10 +6049,22 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
     }, 100);
 };
 
+/**
+ * Check if intersecting
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.isIntersecting = function(){
     return this.intersecting;
 };
 
+/**
+ * Set intersecting true
+ * 
+ * 
+ * @memberof WbAbstractWidget
+ */
 WbAbstractWidget.prototype.setIntersecting = function(intersecting, $event){
     this.intersecting = intersecting;
     this.fire('intersection', $event);
@@ -5794,6 +6076,8 @@ WbAbstractWidget.prototype.setIntersecting = function(intersecting, $event){
  * Delete the widget
  * 
  * This function just used in edit mode
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.delete = function () {
     // remove itself
@@ -5804,6 +6088,8 @@ WbAbstractWidget.prototype.delete = function () {
 
 /**
  * Clone current widget This method works in edit mode only.
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.clone = function () {
     var index = this.getParent().indexOfChild(this);
@@ -5813,15 +6099,17 @@ WbAbstractWidget.prototype.clone = function () {
 
 /**
  * This method moves widget one to next.
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.moveNext = function () {
     this.getParent().moveChild(this, this.getParent().indexOfChild(this) + 1);
 };
 
-
-
 /**
  * This method moves widget one to before
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.moveBefore = function () {
     this.getParent().moveChild(this, this.getParent().indexOfChild(this) - 1);
@@ -5829,6 +6117,8 @@ WbAbstractWidget.prototype.moveBefore = function () {
 
 /**
  * This method moves widget to the first of it's parent
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.moveFirst = function () {
     this.getParent().moveChild(this, 0);
@@ -5836,6 +6126,8 @@ WbAbstractWidget.prototype.moveFirst = function () {
 
 /**
  * This method moves widget to the last of it's parent
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.moveLast = function () {
     this.getParent().moveChild(this, this.getParent().getChildren().length - 1);
@@ -5845,6 +6137,9 @@ WbAbstractWidget.prototype.moveLast = function () {
  * Checks if the widget is root
  * 
  * If there is no parent controller then this is a root one.
+ * 
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.isRoot = function () {
     var parent = this.getParent();
@@ -5916,6 +6211,8 @@ WbAbstractWidget.prototype.addAction = function (action) {
 
 /**
  * Gets widget actions
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.getActions = function () {
     return this.actions;
@@ -5956,6 +6253,8 @@ WbAbstractWidget.prototype.getBoundingClientRect = function () {
 
 /**
  * Adds animation to the page
+ * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.animate = function (options) {
     var ctrl = this;
@@ -6013,6 +6312,7 @@ WbAbstractWidget.prototype.animate = function (options) {
 /**
  * Remove animations from the widget
  * 
+ * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.removeAnimation = function () {
     // The animation will not add to element so there is no need to remove
@@ -11100,7 +11400,7 @@ angular.module('am-wb-core')//
  * 
  */
 
-.factory('WidgetEditorTinymce', function ($q) {
+.factory('WidgetEditorTinymce', function ($q, WidgetEditor) {
 
     /**
      * TODO: maso, 2019: extends WidgetEditorFake
@@ -11108,27 +11408,20 @@ angular.module('am-wb-core')//
      * Creates new instace of an editor
      */
     function editor(widget, options) {
-        this.widget = widget;
-        this.options = options;
+        options = options || {};
+        WidgetEditor.apply(this, widget, options);
     }
 
+    /**
+     * remove all resources
+     * 
+     * @memberof WidgetEditorTinymce
+     */
     editor.prototype.destroy = function () {
+        this.hide();
+        WidgetEditor.prototype.destroy.call(this);
     };
-    editor.prototype.fire = function () {
-    }; // internal
-    editor.prototype.setActive = function () {
-    }; // focus|skipFocuse
-    editor.prototype.isActive = function () {
-    };
-    editor.prototype.getWidget = function () {
-    };
-    editor.prototype.setDirty = function () {
-    };
-    editor.prototype.isDirty = function () {
-    };
-    editor.prototype.save = function () {
-    };
-
+    
     /**
      * Remove editor
      */
@@ -11159,17 +11452,13 @@ angular.module('am-wb-core')//
                 })
             }
         }))
-        .then(function (editor) {
+        .then(function () {
             ctrl.widget.getElement().focus();
         });
     };
 
     editor.prototype.isHidden = function () {
         return this._hide;
-    };
-    editor.prototype.Off = function () {
-    };
-    editor.prototype.On = function () {
     };
 
     /**
@@ -11262,21 +11551,121 @@ angular.module('am-wb-core')//
     /**
      * Creates new instace of an editor
      */
-    function widgetEditor() {}
+    function widgetEditor(widget, options) {
+        this.callbacks = [];
+        this.widget = widget;
+        this.options = options;
+    }
+
+    /**
+     * Remove all resources
+     * 
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.destroy = function(){
+        this.callbacks = [];
+        delete this.widget;
+        delete this.options;
+    };
+
+    /**
+     * Get the widget of the editor
+     * 
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.getWidget = function(){
+        return this.widget;
+    };
+
+    /**
+     * Set the widget as dirty widget
+     * 
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.setDirty = function(){
+        this.dirty = true;
+    };
+
+    /**
+     * Check if the widget is dirty
+     * 
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.isDirty = function(){
+        return this.dirty;
+    };
+
+    /**
+     * Remove callbak from specific type
+     * 
+     * @param type {string} the event name
+     * @param callback {function} the function
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.Off = function(type, callback){
+        if (!angular.isArray(this.callbacks[type])) {
+            return;
+        }
+        var callbacks = this.callbacks[type];
+        var index = callbacks.indexOf(callback);
+        if (index > -1) {
+            callbacks.splice(index, 1);
+        }
+    };
+
+    /**
+     * Add a callback function to the editor
+     * 
+     * @param type {string} the event name
+     * @param callback {function} the function
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.On = function(type, callback){
+        if (!angular.isArray(this.callbacks[type])) {
+            this.callbacks[type] = [];
+        }
+        if(!_.includes(this.callbacks[type], callback)){
+            this.callbacks[type].push(callback);
+        }
+    };
+
+    /**
+     * Fire the event
+     * 
+     * @param type {string} the event name
+     * @param param {object} event params
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.fire = function(type, params){
+        // TODO: maso, 2018: create event object
+        var event = _.merge({
+            source: this,
+            type: type
+        }, params || {});
+
+        // fire
+        var callbacks = this.callbacks[type] || [];
+        for(var i = 0; i < callbacks.length; i++){
+            // TODO: maso, 2018: check if the event is stopped to propagate
+            try {
+                callbacks[i](event);
+            } catch (error) {
+                // NOTE: remove on release
+                console.log(error);
+            }
+        }
+    }; // internal
     
-    widgetEditor.prototype.destroy = function(){};
-    widgetEditor.prototype.fire = function(){}; // internal
+    
+    
+
+
     widgetEditor.prototype.setActive = function(){}; // focus|skipFocuse
     widgetEditor.prototype.isActive = function(){};
-    widgetEditor.prototype.getWidget = function(){};
-    widgetEditor.prototype.setDirty = function(){};
-    widgetEditor.prototype.isDirty = function(){};
     widgetEditor.prototype.save = function(){};
     widgetEditor.prototype.hide = function(){};
     widgetEditor.prototype.show = function(){};
     widgetEditor.prototype.isHidden = function(){};
-    widgetEditor.prototype.Off = function(){};
-    widgetEditor.prototype.On = function(){};
 
     // the editor type
     return widgetEditor;
@@ -13819,506 +14208,565 @@ angular.module('am-wb-core')
  */
 .run(function ($widget) {
 
-	/**
-	 * @ngdoc Widgets
-	 * @name Group
-	 * @description Parent widget of other widgets
-	 * 
-	 * default setting:
-	 * - margin: '1px'
-	 */
-	$widget.newWidget({
-		// widget description
-		type: 'Group',
-		title: 'Group',
-		description: 'Panel contains list of widgets.',
-		icon: 'wb-widget-group',
-		groups: ['basic'],
-		model: {
-			style: {
-				margin: '1px',
-				padding: '1px',
-				layout: {
-					direction: 'column'
-				},
-				size: {
-					minHeight: '16px',
-					minWidth: '16px'
-				}
-			}
-		},
-		// functional properties
-		template: function(model){
-			var groupType = model.groupType | 'div';
-			if(groupType === 'form'){
-				return '<form></form>';
-			}
-			if(groupType === 'section'){
-				return '<section></section>';
-			}
-			return '<div></div>';
-		},
-		help: 'http://dpq.co.ir/more-information-link',
-		helpId: 'wb-widget-group'
-	});
-	/**
-	 * @ngdoc Widgets
-	 * @name Text
-	 * @description Add rich text to page
-	 * 
-	 * This is a RTF to add to a page.
-	 * 
-	 */
-	$widget.newWidget({
-		// widget description
-		type: 'HtmlText',
-		title: 'Text',
-		description: 'An text block.',
-		icon: 'wb-widget-html',
-		groups: ['basic'],
-		model: {
-			text: '<h2>Text element</h2><p>Click on the text box to edit.</p>',
-			style: {
-				padding: '8px'
-			}
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-html',
-		// functional properties
-		template: '<div ng-bind-html="ctrl.text | wbunsafe" class="wb-widget-fill wb-widget-text"></div>',
-		/*
-		 * @ngInject
-		 */
-		controller: function(){
-			this.text = '';
-			this.setText = function(text){
-				this.text = text;
-			};
-			this.initWidget = function(){
-				var ctrl = this;
-				this.on('modelUpdated', function($event){
-					if($event.key === 'text'){
-						ctrl.setText($event.newValue);
-					}
-				});
-				this.setText(this.getModelProperty('text'));
-			};
-		},
-		controllerAs: 'ctrl'
-	});
-	/**
-	 * @ngdoc Widgets
-	 * @name iframe
-	 * @description Add inline frame to show another document within current one.
-	 * 
-	 */
-	$widget.newWidget({
-		// widget description
-		type: 'iframe',
-		title: 'Inline Frame',
-		description: 'Add inline frame to show another document within current one.',
-		icon: 'wb-widget-iframe',
-		groups: ['basic'],
-		model: {
-			name: 'iframe',
-			sandbox: 'allow-same-origin allow-scripts',
-			src: 'https://www.google.com',
-			style: {
-				padding: '8px'
-			}
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-iframe',
-		// functional properties
-		template: '<iframe>Frame Not Supported?!</iframe>',
-		setting: ['iframe'],
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function(){
-			// list of element attributes
-			// NOTE: maso, 2019: the width and height of the iframe is set from 
-			// the style section.
-			//
-			// 'width', 'height'
-			var iframeElementAttribute = [
-				'name',
-				'src', 
-				'srcdoc', 
-				'sandbox', 
-				];
+    $widget.setEditor('a', {
+        type: 'WidgetEditorTinymce',
+        options:{
+            property: 'html',
+            inline: true
+        }
+    });
+    $widget.setEditor('p', {
+        type: 'WidgetEditorTinymce',
+        options:{
+            property: 'html',
+            inline: true
+        }
+    });
 
-			this.initWidget = function(){
-				var ctrl = this;
-				function elementAttribute(key, value){
-					ctrl.setElementAttribute(key, value);
-				}
-				function eventHandler(event){
-					if(iframeElementAttribute.includes(event.key)){
-						var key = event.key;
-						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-						elementAttribute(key, value);
-					}
-				}
-				// listen on change
-				this.on('modelUpdated', eventHandler);
-				this.on('runtimeModelUpdated', eventHandler);
-				// load initial data
-				for(var i =0; i < iframeElementAttribute.length;i++){
-					var key = iframeElementAttribute[i];
-					elementAttribute(key, ctrl.getModelProperty(key));
-				}
-			};
-		},
-	});
 
-	/**
-	 * @ngdoc Widgets
-	 * @name input
-	 * @description Add input to get user value
-	 * 
-	 * It is used to create intractive page with users
-	 */
-	$widget.newWidget({
-		// widget description
-		type: 'input',
-		title: 'Input field',
-		description: 'A widget to get data from users.',
-		icon: 'wb-widget-input',
-		groups: ['basic'],
-		model: {
-			name: 'input',
-			sandbox: 'allow-same-origin allow-scripts',
-			src: 'https://www.google.com',
-			style: {
-				padding: '8px'
-			}
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-input',
-		// functional properties
-		template: '<input></input>',
-		setting: ['input'],
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function(){
-			// list of element attributes
-			var elementAttributes = [
-				'accept',
-				'alt', 
-				'autocomplete', 
-				'autofocus', 
-				'checked', 
-				'dirname', 
-				'disabled', 
-				'form',
-				'max', 
-				'maxlength', 
-				'min', 
-				'multiple', 
-				'name', 
-				'pattern', 
-				'placeholder', 
-				'readonly', 
-				'required', 
-				'size', 
-				'src', 
-				'step',
-				'inputType',
-				'value',
-				];
+    /**
+     * @ngdoc Widgets
+     * @name Group
+     * @description Parent widget of other widgets
+     * 
+     * default setting:
+     * - margin: '1px'
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'Group',
+        title: 'Group',
+        description: 'Panel contains list of widgets.',
+        icon: 'wb-widget-group',
+        groups: ['basic'],
+        model: {
+            style: {
+                margin: '1px',
+                padding: '1px',
+                layout: {
+                    direction: 'column'
+                },
+                size: {
+                    minHeight: '16px',
+                    minWidth: '16px'
+                }
+            }
+        },
+        // functional properties
+        template: function(model){
+            var groupType = model.groupType | 'div';
+            if(groupType === 'form'){
+                return '<form></form>';
+            }
+            if(groupType === 'section'){
+                return '<section></section>';
+            }
+            return '<div></div>';
+        },
+        help: 'http://dpq.co.ir/more-information-link',
+        helpId: 'wb-widget-group'
+    });
+    /**
+     * @ngdoc Widgets
+     * @name Text
+     * @description Add rich text to page
+     * 
+     * This is a RTF to add to a page.
+     * 
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'HtmlText',
+        title: 'Text',
+        description: 'An text block.',
+        icon: 'wb-widget-html',
+        groups: ['basic'],
+        model: {
+            text: '<h2>Text element</h2><p>Click on the text box to edit.</p>',
+            style: {
+                padding: '8px'
+            }
+        },
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-html',
+        // functional properties
+        template: '<div ng-bind-html="ctrl.text | wbunsafe" class="wb-widget-fill wb-widget-text"></div>',
+        /*
+         * @ngInject
+         */
+        controller: function(){
+            this.text = '';
+            this.setText = function(text){
+                this.text = text;
+            };
+            this.initWidget = function(){
+                var ctrl = this;
+                this.on('modelUpdated', function($event){
+                    if($event.key === 'text'){
+                        ctrl.setText($event.newValue);
+                    }
+                });
+                this.setText(this.getModelProperty('text'));
+            };
+        },
+        controllerAs: 'ctrl'
+    });
+    /**
+     * @ngdoc Widgets
+     * @name iframe
+     * @description Add inline frame to show another document within current one.
+     * 
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'iframe',
+        title: 'Inline Frame',
+        description: 'Add inline frame to show another document within current one.',
+        icon: 'wb-widget-iframe',
+        groups: ['basic'],
+        model: {
+            name: 'iframe',
+            sandbox: 'allow-same-origin allow-scripts',
+            src: 'https://www.google.com',
+            style: {
+                padding: '8px'
+            }
+        },
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-iframe',
+        // functional properties
+        template: '<iframe>Frame Not Supported?!</iframe>',
+        setting: ['iframe'],
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function(){
+            // list of element attributes
+            // NOTE: maso, 2019: the width and height of the iframe is set from 
+            // the style section.
+            //
+            // 'width', 'height'
+            var iframeElementAttribute = [
+                'name',
+                'src', 
+                'srcdoc', 
+                'sandbox', 
+                ];
 
-			this.initWidget = function(){
-				var ctrl = this;
-				function elementAttribute(key, value){
-					ctrl.setElementAttribute(key, value);
-					if(key === 'inputType'){
-						ctrl.setElementAttribute('type', value);
-					}
-				}
-				function eventHandler(event){
-					if(elementAttributes.includes(event.key)){
-						var key = event.key;
-						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-						elementAttribute(key, value);
-					}
-				}
-				// listen on change
-				this.on('modelUpdated', eventHandler);
-				this.on('runtimeModelUpdated', eventHandler);
-				// load initial data
-				for(var i =0; i < elementAttributes.length;i++){
-					var key = elementAttributes[i];
-					elementAttribute(key, ctrl.getModelProperty(key));
-				}
-			};
+            this.initWidget = function(){
+                var ctrl = this;
+                function elementAttribute(key, value){
+                    ctrl.setElementAttribute(key, value);
+                }
+                function eventHandler(event){
+                    if(iframeElementAttribute.includes(event.key)){
+                        var key = event.key;
+                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                        elementAttribute(key, value);
+                    }
+                }
+                // listen on change
+                this.on('modelUpdated', eventHandler);
+                this.on('runtimeModelUpdated', eventHandler);
+                // load initial data
+                for(var i =0; i < iframeElementAttribute.length;i++){
+                    var key = iframeElementAttribute[i];
+                    elementAttribute(key, ctrl.getModelProperty(key));
+                }
+            };
+        },
+    });
 
-			/**
-			 * Gets value of the input
-			 */
-			this.val = function(){
-				var value = arguments[0];
-				if(value){
-					this.setElementAttribute('value', value);
-				}
-				var element = this.getElement();
-				return element.val.apply(element, arguments);
-			};
-		},
-	});
+    /**
+     * @ngdoc Widgets
+     * @name input
+     * @description Add input to get user value
+     * 
+     * It is used to create intractive page with users
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'input',
+        title: 'Input field',
+        description: 'A widget to get data from users.',
+        icon: 'wb-widget-input',
+        groups: ['basic'],
+        model: {
+            name: 'input',
+            sandbox: 'allow-same-origin allow-scripts',
+            src: 'https://www.google.com',
+            style: {
+                padding: '8px'
+            }
+        },
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-input',
+        // functional properties
+        template: '<input></input>',
+        setting: ['input'],
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function(){
+            // list of element attributes
+            var elementAttributes = [
+                'accept',
+                'alt', 
+                'autocomplete', 
+                'autofocus', 
+                'checked', 
+                'dirname', 
+                'disabled', 
+                'form',
+                'max', 
+                'maxlength', 
+                'min', 
+                'multiple', 
+                'name', 
+                'pattern', 
+                'placeholder', 
+                'readonly', 
+                'required', 
+                'size', 
+                'src', 
+                'step',
+                'inputType',
+                'value',
+                ];
 
-	/**
-	 * @ngdoc Widgets
-	 * @name textarea
-	 * @description Add textarea to get user value
-	 * 
-	 * It is used to create textarea
-	 */
-	$widget.newWidget({
-		// widget description
-		type: 'textarea',
-		title: 'Text Area field',
-		description: 'A widget to get data from users.',
-		icon: 'wb-widget-textarea',
-		groups: ['basic'],
-		model: {
-			name: 'textarea',
-			style: {
-				padding: '8px'
-			}
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-textarea',
-		// functional properties
-		template: '<textarea></textarea>',
-		setting: ['textarea'],
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function(){
-			// list of element attributes
-			var elementAttributes = [
-				'autofocus',
-				'cols',
-				'dirname',
-				'disabled',
-				'form',
-				'maxlength',
-				'name',
-				'placeholder',
-				'readonly',
-				'required',
-				'rows',
-				'wrap',
-				'value'
-				];
+            this.initWidget = function(){
+                var ctrl = this;
+                function elementAttribute(key, value){
+                    ctrl.setElementAttribute(key, value);
+                    if(key === 'inputType'){
+                        ctrl.setElementAttribute('type', value);
+                    }
+                }
+                function eventHandler(event){
+                    if(elementAttributes.includes(event.key)){
+                        var key = event.key;
+                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                        elementAttribute(key, value);
+                    }
+                }
+                // listen on change
+                this.on('modelUpdated', eventHandler);
+                this.on('runtimeModelUpdated', eventHandler);
+                // load initial data
+                for(var i =0; i < elementAttributes.length;i++){
+                    var key = elementAttributes[i];
+                    elementAttribute(key, ctrl.getModelProperty(key));
+                }
+            };
 
-			this.initWidget = function(){
-				var ctrl = this;
-				function elementAttribute(key, value){
-					ctrl.setElementAttribute(key, value);
-					if(key === 'value'){
-						ctrl.val(value);
-					}
-				}
-				function eventHandler(event){
-					if(elementAttributes.includes(event.key)){
-						var key = event.key;
-						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-						elementAttribute(key, value);
-					}
-				}
-				// listen on change
-				this.on('modelUpdated', eventHandler);
-				this.on('runtimeModelUpdated', eventHandler);
-				// load initial data
-				for(var i =0; i < elementAttributes.length;i++){
-					var key = elementAttributes[i];
-					elementAttribute(key, ctrl.getModelProperty(key));
-				}
-			};
+            /**
+             * Gets value of the input
+             */
+            this.val = function(){
+                var value = arguments[0];
+                if(value){
+                    this.setElementAttribute('value', value);
+                }
+                var element = this.getElement();
+                return element.val.apply(element, arguments);
+            };
+        },
+    });
 
-			/**
-			 * Gets value of the input
-			 */
-			this.val = function(){
-				var value = arguments[0];
-				if(value){
-					this.setElementAttribute('value', value);
-				}
-				var element = this.getElement();
-				return element.val.apply(element, arguments);
-			};
-		},
-	});
+    /**
+     * @ngdoc Widgets
+     * @name textarea
+     * @description Add textarea to get user value
+     * 
+     * It is used to create textarea
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'textarea',
+        title: 'Text Area field',
+        description: 'A widget to get data from users.',
+        icon: 'wb-widget-textarea',
+        groups: ['basic'],
+        model: {
+            name: 'textarea',
+            style: {
+                padding: '8px'
+            }
+        },
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-textarea',
+        // functional properties
+        template: '<textarea></textarea>',
+        setting: ['textarea'],
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function(){
+            // list of element attributes
+            var elementAttributes = [
+                'autofocus',
+                'cols',
+                'dirname',
+                'disabled',
+                'form',
+                'maxlength',
+                'name',
+                'placeholder',
+                'readonly',
+                'required',
+                'rows',
+                'wrap',
+                'value'
+                ];
 
-	/**
-	 * @ngdoc Widgets
-	 * @name a
-	 * @description Add a to get user value
-	 * 
-	 * It is used to create textarea
-	 */
-	$widget.newWidget({
-		// widget description
-		type: 'a',
-		title: 'A link',
-		description: 'A widget to add external link. It is used as block item.',
-		icon: 'wb-widget-a',
-		groups: ['basic'],
-		model: {
-			name: 'Link',
-			style: {
-				padding: '8px'
-			}
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-a',
-		// functional properties
-		template: '<a></a>',
-		setting: ['a'],
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function(){
-			// list of element attributes
-			var elementAttributes = [
-				'download',
-				'href',
-				'hreflang',
-				'media',
-				'ping',
-				'referrerpolicy',
-				'rel',
-				'target',
-				'type',
-				'html'
-				];
+            this.initWidget = function(){
+                var ctrl = this;
+                function elementAttribute(key, value){
+                    ctrl.setElementAttribute(key, value);
+                    if(key === 'value'){
+                        ctrl.val(value);
+                    }
+                }
+                function eventHandler(event){
+                    if(elementAttributes.includes(event.key)){
+                        var key = event.key;
+                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                        elementAttribute(key, value);
+                    }
+                }
+                // listen on change
+                this.on('modelUpdated', eventHandler);
+                this.on('runtimeModelUpdated', eventHandler);
+                // load initial data
+                for(var i =0; i < elementAttributes.length;i++){
+                    var key = elementAttributes[i];
+                    elementAttribute(key, ctrl.getModelProperty(key));
+                }
+            };
 
-			this.initWidget = function(){
-				var ctrl = this;
-				function elementAttribute(key, value){
-					if(key === 'html'){
-						ctrl.getElement().html(value) || '..';
-					}
-					ctrl.setElementAttribute(key, value);
-				}
-				function eventHandler(event){
-					if(elementAttributes.includes(event.key)){
-						var key = event.key;
-						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-						elementAttribute(key, value);
-					}
-				}
-				// listen on change
-				this.on('modelUpdated', eventHandler);
-				this.on('runtimeModelUpdated', eventHandler);
-				// load initial data
-				for(var i =0; i < elementAttributes.length;i++){
-					var key = elementAttributes[i];
-					elementAttribute(key, ctrl.getModelProperty(key));
-				}
-			};
+            /**
+             * Gets value of the input
+             */
+            this.val = function(){
+                var value = arguments[0];
+                if(value){
+                    this.setElementAttribute('value', value);
+                }
+                var element = this.getElement();
+                return element.val.apply(element, arguments);
+            };
+        },
+    });
 
-			/**
-			 * Gets value of the input
-			 */
-			this.html = function(){
-				var value = arguments[0];
-				if(value){
-					this.setElementAttribute('html', value);
-				}
-				var element = this.getElement();
-				return element.html.apply(element, arguments);
-			};
-		},
-	});
-	
-	
+    /**
+     * @ngdoc Widgets
+     * @name a
+     * @description Add a to get user value
+     * 
+     * It is used to create textarea
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'a',
+        title: 'A link',
+        description: 'A widget to add external link. It is used as block item.',
+        icon: 'wb-widget-a',
+        groups: ['basic'],
+        model: {
+            name: 'Link',
+            style: {
+                padding: '8px'
+            }
+        },
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-a',
+        // functional properties
+        template: '<a></a>',
+        setting: ['a'],
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function(){
+            // list of element attributes
+            var elementAttributes = [
+                'download',
+                'href',
+                'hreflang',
+                'media',
+                'ping',
+                'referrerpolicy',
+                'rel',
+                'target',
+                'type',
+                'html'
+                ];
 
-	/**
-	 * @ngdoc Widgets
-	 * @name p
-	 * @description Add p to get user value
-	 * 
-	 * It is used to create p
-	 */
-	$widget.newWidget({
-		// widget description
-		type: 'p',
-		title: 'Paragraph',
-		description: 'A widget to add paragraph.',
-		icon: 'wb-widget-p',
-		groups: ['basic'],
-		model: {
-			name: 'Pragraph',
-			style: {
-				padding: '8px'
-			}
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-p',
-		// functional properties
-		template: '<p></p>',
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function(){
-			// list of element attributes
-			var elementAttributes = [
-				'html'
-				];
+            this.initWidget = function(){
+                var ctrl = this;
+                function elementAttribute(key, value){
+                    if(key === 'html'){
+                        ctrl.getElement().html(value) || '..';
+                    }
+                    ctrl.setElementAttribute(key, value);
+                }
+                function eventHandler(event){
+                    if(elementAttributes.includes(event.key)){
+                        var key = event.key;
+                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                        elementAttribute(key, value);
+                    }
+                }
+                // listen on change
+                this.on('modelUpdated', eventHandler);
+                this.on('runtimeModelUpdated', eventHandler);
+                // load initial data
+                for(var i =0; i < elementAttributes.length;i++){
+                    var key = elementAttributes[i];
+                    elementAttribute(key, ctrl.getModelProperty(key));
+                }
+            };
 
-			this.initWidget = function(){
-				var ctrl = this;
-				function elementAttribute(key, value){
-					if(key === 'html'){
-						ctrl.getElement().html(value);
-					}
-					ctrl.setElementAttribute(key, value);
-				}
-				function eventHandler(event){
-					if(elementAttributes.includes(event.key)){
-						var key = event.key;
-						var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-						elementAttribute(key, value);
-					}
-				}
-				// listen on change
-				this.on('modelUpdated', eventHandler);
-				this.on('runtimeModelUpdated', eventHandler);
-				// load initial data
-				for(var i =0; i < elementAttributes.length;i++){
-					var key = elementAttributes[i];
-					elementAttribute(key, ctrl.getModelProperty(key));
-				}
-			};
+            /**
+             * Gets value of the input
+             */
+            this.html = function(){
+                var value = arguments[0];
+                if(value){
+                    this.setElementAttribute('html', value);
+                }
+                var element = this.getElement();
+                return element.html.apply(element, arguments);
+            };
+        },
+    });
 
-			/**
-			 * Gets value of the input
-			 */
-			this.html = function(){
-				var value = arguments[0];
-				if(value){
-					this.setElementAttribute('html', value);
-				}
-				var element = this.getElement();
-				return element.html.apply(element, arguments);
-			};
-		},
-	});
+
+
+    /**
+     * @ngdoc Widgets
+     * @name p
+     * @description Add p to get user value
+     * 
+     * It is used to create p
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'p',
+        title: 'Paragraph',
+        description: 'A widget to add paragraph.',
+        icon: 'wb-widget-p',
+        groups: ['basic'],
+        model: {
+            name: 'Pragraph',
+            style: {
+                padding: '8px'
+            }
+        },
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-p',
+        // functional properties
+        template: '<p></p>',
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function(){
+            // list of element attributes
+            var elementAttributes = [
+                'html'
+                ];
+
+            this.initWidget = function(){
+                var ctrl = this;
+                function elementAttribute(key, value){
+                    if(key === 'html'){
+                        ctrl.getElement().html(value);
+                    }
+                    ctrl.setElementAttribute(key, value);
+                }
+                function eventHandler(event){
+                    if(elementAttributes.includes(event.key)){
+                        var key = event.key;
+                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                        elementAttribute(key, value);
+                    }
+                }
+                // listen on change
+                this.on('modelUpdated', eventHandler);
+                this.on('runtimeModelUpdated', eventHandler);
+                // load initial data
+                for(var i =0; i < elementAttributes.length;i++){
+                    var key = elementAttributes[i];
+                    elementAttribute(key, ctrl.getModelProperty(key));
+                }
+            };
+
+            /**
+             * Gets value of the input
+             */
+            this.html = function(){
+                var value = arguments[0];
+                if(value){
+                    this.setElementAttribute('html', value);
+                }
+                var element = this.getElement();
+                return element.html.apply(element, arguments);
+            };
+        },
+    });
+    
+
+
+    var headerEditorDescription =  {
+            type: 'WidgetEditorTinymce',
+            options:{
+                property: 'html',
+                inline: true
+            }
+    };
+
+    /**
+     * @ngdoc Widgets
+     * @name h1
+     * @description Hader of level 1
+     * 
+     * It is used to create h1
+     */
+    for(var i = 1; i < 7; i++){
+        var type = 'h'+i;
+        $widget.setEditor(type, headerEditorDescription);
+        $widget.newWidget({
+            // widget description
+            type: type,
+            title: 'Header Level '+i,
+            description: 'A header widget',
+            icon: 'wb-widget-h'+i,
+            groups: ['basic'],
+            model: {
+                name: 'Header-'+i,
+                style: {
+                    padding: '8px'
+                }
+            },
+            // help id
+            help: 'http://dpq.co.ir',
+            helpId: 'wb-widget-hx',
+            // functional properties
+            template: '<h' +i +'></h' + i + '>',
+            controllerAs: 'ctrl',
+            controller:'MbWidgetHeaderCtrl'
+        });
+    }
 });
 
 /* 
@@ -16523,7 +16971,6 @@ angular.module('am-wb-core')
 
         // 2- create element
         var service = this;
-
         var gettingTemplatePromisse;
         if(preElement){
             gettingTemplatePromisse = $q.resolve(preElement);
@@ -16555,25 +17002,7 @@ angular.module('am-wb-core')
                 element.attr('dnd-callback','1');
             }
             var link = $compile(element);
-            var wlocals = _.merge({
-                $scope : childScope,
-                $element : element
-            }, service.providers);
-            var ctrl;
-            if (model.type !== 'Group') {
-                ctrl = $controller('WbWidgetCtrl', wlocals);
-            } else {
-                ctrl = $controller('WbWidgetGroupCtrl', wlocals);
-            }
-            ctrl.setParent(parentWidget);
-
-            // NOTE: can inject widget controller as WidgetCtrl
-            wlocals.WidgetCtrl = ctrl;
-            wlocals.$parent = parentWidget;
-            // extend element controller
-            if (angular.isDefined(widget.controller)) {
-                angular.extend(ctrl, $controller(widget.controller, wlocals));
-            }
+            var ctrl = createWidgetController(widget, model, parentWidget, childScope, element, service.providers);
 
             ctrl.setModel(model);
             childScope[widget.controllerAs || 'ctrl'] = ctrl;
@@ -16589,6 +17018,31 @@ angular.module('am-wb-core')
             }
             return ctrl;
         });
+    }
+    
+    function createWidgetController(widget, model, parentWidget, childScope, element, providers){
+        var wlocals = _.merge({
+            $scope : childScope,
+            $element : element
+        }, providers);
+        var ctrl;
+        if (model.type !== 'Group') {
+            ctrl = $controller('WbWidgetCtrl', wlocals);
+        } else {
+            ctrl = $controller('WbWidgetGroupCtrl', wlocals);
+        }
+        ctrl.setParent(parentWidget);
+
+        // NOTE: can inject widget controller as WidgetCtrl
+        wlocals.WidgetCtrl = ctrl;
+        wlocals.$parent = parentWidget;
+        // extend element controller
+        if (angular.isDefined(widget.controller)) {
+            var wctrl = $controller(widget.controller, wlocals);
+            // extend the controller
+            angular.extend(ctrl, wctrl);
+        }
+        return ctrl;
     }
 
     /**
@@ -16697,30 +17151,31 @@ angular.module('am-wb-core')
 
 
     /***********************************************Editors***************************************/
-    var editors = {
-            'a': {
-                type: 'WidgetEditorTinymce',
-                options:{
-                    property: 'html',
-                    inline: true
-                }
-            },
-            'p': {
-                type: 'WidgetEditorTinymce',
-                options:{
-                    property: 'html',
-                    inline: true
-                }
-            },
-            'h1': {
-                type: 'WidgetEditorTinymce',
-                options:{
-                    property: 'html',
-                    inline: true
-                }
-            }
-    }
+    var editors = {};
     var fakeEditor = new WidgetEditorFake();
+    
+    
+
+    /**
+     * Set editor of a widgets
+     * 
+     * on double click editors are used to edit the widget.
+     * 
+     * @params type {string} type of the widget
+     * @params editor {Editor} editor
+     * @memberof $widget
+     */
+    this.setEditor = function(type, editor){
+        editors[type] = editor;
+    };
+
+    /**
+     * Find editor for the given widget
+     * 
+     * @params widget {WbWidget} the widget
+     * @return the editor or fake editor
+     * @memberof $widget
+     */
     this.getEditor = function(widget){
         if(widget.$$wbEditor){
             // return old editor
@@ -16733,11 +17188,16 @@ angular.module('am-wb-core')
         // create editor
         var Editor = $injector.get(register.type);
         var editor = new Editor(widget, register.options || {});
+        var ctrl = this;
         widget.$$wbEditor = editor;
-        return widget.$$wbEditor;
+        editor.on('destroy', function(){
+            ctrl.removeEditorFromList(editor);
+        });
+        return editor;
     };
-    this.getEditors = function(){};
-    this.getActiveEditor = function(){};
+    
+//    this.getEditors = function(){};
+//    this.getActiveEditor = function(){};
 
 
 });
