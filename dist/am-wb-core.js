@@ -10123,7 +10123,7 @@ angular.module('am-wb-core')
  */
 
 angular.module('am-wb-core')
-.factory('NativeWindowWrapper', function($q, $injector, $window, $wbFloat, $rootScope) {
+.factory('NativeWindowWrapper', function($q, $injector, $rootScope) {
     'use strict';
 
     /**
@@ -10137,6 +10137,7 @@ angular.module('am-wb-core')
         this.location = nativeWindow.location;
         this.libs = {};
         this.styles = {};
+        this.fonts = {};
     };
 
 
@@ -10162,34 +10163,34 @@ angular.module('am-wb-core')
         }
         window.setCloseOnEscape(options.closeOnEscape);
         if(angular.isDefined(options.showTitle)) {
-        	window.setTitleVisible(options.showTitle);
+            window.setTitleVisible(options.showTitle);
         }
         if(angular.isDefined(options.size)) {
-        	var size = options.size;
-        	window.setWidth(size.width);
-        	window.setHeight(size.height);
+            var size = options.size;
+            window.setWidth(size.width);
+            window.setHeight(size.height);
         }
         if(angular.isDefined(options.showTitle)){
-        	window.setTitleVisible(options.showTitle);
+            window.setTitleVisible(options.showTitle);
         }
         window.setVisible(true);
-        
+
         if(angular.isString(options.url)){
-        	// Open URL
-        	window.write('<iframe style="width:100%; height: 100%;" src="'+options.url+'"></iframe>');
+            // Open URL
+            window.write('<iframe style="width:100%; height: 100%;" src="'+options.url+'"></iframe>');
         } else if(angular.isObject(options.url)){
-        	var view = options.url;
-        	if(view.type === 'view'){
-        		window.setView(view);
-        	}
+            var view = options.url;
+            if(view.type === 'view'){
+                window.setView(view);
+            }
         } else {
-        	throw {
-        		message: 'Not supported type of URL',
-        		url: options.url
-        	}
+            throw {
+                message: 'Not supported type of URL',
+                url: options.url
+            }
         }
-        
-        
+
+
         return window;
     }
 
@@ -10204,11 +10205,11 @@ angular.module('am-wb-core')
      * Open window based on options
      */
     function openWindow(window, options) {
-    	// check input url
+        // check input url
         if(!angular.isString(options.url)){
-        	throw {
-        		message: 'Impossible to open window with weburger'
-        	};
+            throw {
+                message: 'Impossible to open window with weburger'
+            };
         }
         var windowNative = window.open(
                 options.url, 
@@ -10256,7 +10257,7 @@ angular.module('am-wb-core')
     nativeWindowWrapper.prototype.getLocation = function(){
         return this.nw.location;
     };
-    
+
     /**
      * Sets title of the window
      * 
@@ -10330,8 +10331,8 @@ angular.module('am-wb-core')
      * @memberof NativeWindowWrapper
      */
     nativeWindowWrapper.prototype.close = function(){
-    	this.nw.close();
-    	// TODO: maso, 2019: remove all resources
+        this.nw.close();
+        // TODO: maso, 2019: remove all resources
     };
 
 
@@ -10361,7 +10362,9 @@ angular.module('am-wb-core')
                 path: path,
                 message: 'loaded'
             });
-            $rootScope.$digest();
+            if (!$rootScope.$$phase) {
+                $rootScope.$digest();
+            }
         };
         script.onerror = function() {
             ctrl.libs[path] = false;
@@ -10369,7 +10372,9 @@ angular.module('am-wb-core')
                 path: path,
                 message: 'fail'
             });
-            $rootScope.$digest();
+            if (!$rootScope.$$phase) {
+                $rootScope.$digest();
+            }
         };
         document.getElementsByTagName('head')[0].appendChild(script);
         return defer.promise;
@@ -10387,7 +10392,7 @@ angular.module('am-wb-core')
         }
         return false;
     };
-    
+
     /**
      * Loads a style
      * 
@@ -10404,7 +10409,7 @@ angular.module('am-wb-core')
             });
         }
         var defer = $q.defer();
-        
+
         var document = this.getDocument();
         var style = document.createElement('link');
         style.setAttribute("rel", "stylesheet")
@@ -10417,7 +10422,9 @@ angular.module('am-wb-core')
                 path: path,
                 message: 'loaded'
             });
-            $rootScope.$digest();
+            if (!$rootScope.$$phase) {
+                $rootScope.$digest();
+            }
         };
         style.onerror = function() {
             ctrl.styles[path] = false;
@@ -10425,12 +10432,14 @@ angular.module('am-wb-core')
                 path: path,
                 message: 'fail'
             });
-            $rootScope.$digest();
+            if (!$rootScope.$$phase) {
+                $rootScope.$digest();
+            }
         };
         document.getElementsByTagName('head')[0].appendChild(style);
         return defer.promise;
     };
-    
+
     /**
      * Check if the library is loaded
      * 
@@ -10444,6 +10453,61 @@ angular.module('am-wb-core')
         return false;
     };
 
+    /**
+     * Loads font
+     * 
+     * In some cases you are about to load font and use in your page design. This
+     * function is about to load font into your application window.
+     * 
+     * @memberof NativeWindowWrapper
+     * @path path of font
+     * @return promise to load the font
+     */
+    nativeWindowWrapper.prototype.loadFont = function(family, source, descriptors){
+        if(this.isFontLoaded(source)){
+            return $q.resolve({
+                message: 'isload'
+            });
+        }
+        var def = $q.defer();
+
+        var ctrl = this;
+        var junction_font = new FontFace(family, source, descriptors);
+        junction_font.load()
+        .then(function(loaded_face) {
+            document.fonts.add(loaded_face);
+            ctrl.fonts[source] = true;
+            def.resolve({
+                'message': 'isload',
+                'source': source,
+                'family': family
+            });
+            if (!$rootScope.$$phase) {
+                $rootScope.$digest();
+            }
+        })
+        .catch(function(error) {
+            // error occurred
+            def.reject(error    );
+            if (!$rootScope.$$phase) {
+                $rootScope.$digest();
+            }
+        });
+        return def.promise;
+    };
+
+    /**
+     * Check if the library is loaded
+     * 
+     * @memberof NativeWindowWrapper
+     * @return true if the library is loaded
+     */
+    nativeWindowWrapper.prototype.isFontLoaded = function(source){
+        if(this.fonts[source]){
+            return true;
+        }
+        return false;
+    };
 
     /**
      * Set meta
@@ -10491,45 +10555,45 @@ angular.module('am-wb-core')
         }
     };
 
-    
+
     nativeWindowWrapper.prototype.setWidth = function(width){
-    	this.resizeTo(width, this.getHeight());
+        this.resizeTo(width, this.getHeight());
     };
-    
+
     nativeWindowWrapper.prototype.getWidth = function(){
-    	return this.nw.innerWidth;
+        return this.nw.innerWidth;
     };
-    
+
     nativeWindowWrapper.prototype.setHeight = function(){
-    	this.resizeTo(this.getWidth(), height);
+        this.resizeTo(this.getWidth(), height);
     };
-    
+
     nativeWindowWrapper.prototype.getHeight = function(){
-    	return this.nw.innerHeight;
+        return this.nw.innerHeight;
     };
-    
+
     nativeWindowWrapper.prototype.resizeTo = function(width, height) {
-    	this.nw.resizeTo(width, height);
+        this.nw.resizeTo(width, height);
     };
 
     /**
      * Sets position of the window
      */
     nativeWindowWrapper.prototype.setPosition = function(x, y) {
-    	this.x = x;
-    	this.y = y;
-    	// TODO: maso, 2019: set position of the window
+        this.x = x;
+        this.y = y;
+        // TODO: maso, 2019: set position of the window
     };
-    
+
     /**
      * Gets current position of the window
      */
     nativeWindowWrapper.prototype.getPosition = function() {
-    	return {
-    		x: this.x,
-    		y: this.y
-    	};
-    	// TODO: maso, 2019: set position of the window
+        return {
+            x: this.x,
+            y: this.y
+        };
+        // TODO: maso, 2019: set position of the window
     };
 
     return nativeWindowWrapper;
