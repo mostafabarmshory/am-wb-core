@@ -25,26 +25,33 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
- * @name MbWidgetHeaderCtrl
- * @description Manage a header
+ * @name MbWidgetIframeCtrl
+ * @description Manage an iframe
+ * 
+ * Iframe is a widget to incloud other pages as a part of current page. This widget is
+ * used as Iframe manager.
  * 
  */
-.controller('MbWidgetHeaderCtrl', function () {
+.controller('MbWidgetIframeCtrl', function () {
     // list of element attributes
-    var elementAttributes = [
-        'html'
+    // NOTE: maso, 2019: the width and height of the iframe is set from 
+    // the style section.
+    //
+    // 'width', 'height'
+    var iframeElementAttribute = [
+        'name',
+        'src', 
+        'srcdoc', 
+        'sandbox', 
         ];
 
     this.initWidget = function(){
         var ctrl = this;
         function elementAttribute(key, value){
-            if(key === 'html'){
-                ctrl.getElement().html(value);
-            }
             ctrl.setElementAttribute(key, value);
         }
         function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
+            if(iframeElementAttribute.includes(event.key)){
                 var key = event.key;
                 var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
                 elementAttribute(key, value);
@@ -54,21 +61,9 @@ angular.module('am-wb-core')//
         this.on('modelUpdated', eventHandler);
         this.on('runtimeModelUpdated', eventHandler);
         // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
+        for(var i =0; i < iframeElementAttribute.length;i++){
+            var key = iframeElementAttribute[i];
             elementAttribute(key, ctrl.getModelProperty(key));
         }
-    };
-
-    /**
-     * Gets value of the input
-     */
-    this.html = function(){
-        var value = arguments[0];
-        if(value){
-            this.setElementAttribute('html', value);
-        }
-        var element = this.getElement();
-        return element.html.apply(element, arguments);
     };
 });

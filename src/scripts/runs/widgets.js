@@ -1,4 +1,5 @@
 /* 
+
  * The MIT License (MIT)
  * 
  * Copyright (c) 2016 weburger
@@ -23,13 +24,6 @@
  */
 'use strict';
 
-class A{
-    x(){
-        //
-    }
-}
-
-
 angular.module('am-wb-core')
 
 /*
@@ -37,18 +31,27 @@ angular.module('am-wb-core')
  */
 .run(function ($widget) {
 
-    $widget.setEditor('a', {
-        type: 'WidgetEditorTinymce',
-        options:{
-            property: 'html',
-            inline: true
-        }
-    });
     $widget.setEditor('p', {
         type: 'WidgetEditorTinymce',
         options:{
             property: 'html',
-            inline: true
+            inline: true,
+            menubar: false,
+            plugins: [
+                'link',
+                'lists',
+                'powerpaste',
+                'autolink',
+                'tinymcespellchecker'],
+            toolbar: [
+                'undo redo | bold italic underline | fontselect fontsizeselect',
+                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
+            valid_styles: {
+                '*': 'font-size,font-family,color,text-decoration,text-align'
+            },
+            powerpaste_word_import: 'clean',
+            powerpaste_html_import: 'clean',
         }
     });
 
@@ -145,7 +148,6 @@ angular.module('am-wb-core')
      * @ngdoc Widgets
      * @name iframe
      * @description Add inline frame to show another document within current one.
-     * 
      */
     $widget.newWidget({
         // widget description
@@ -169,44 +171,7 @@ angular.module('am-wb-core')
         template: '<iframe>Frame Not Supported?!</iframe>',
         setting: ['iframe'],
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function(){
-            // list of element attributes
-            // NOTE: maso, 2019: the width and height of the iframe is set from 
-            // the style section.
-            //
-            // 'width', 'height'
-            var iframeElementAttribute = [
-                'name',
-                'src', 
-                'srcdoc', 
-                'sandbox', 
-                ];
-
-            this.initWidget = function(){
-                var ctrl = this;
-                function elementAttribute(key, value){
-                    ctrl.setElementAttribute(key, value);
-                }
-                function eventHandler(event){
-                    if(iframeElementAttribute.includes(event.key)){
-                        var key = event.key;
-                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                        elementAttribute(key, value);
-                    }
-                }
-                // listen on change
-                this.on('modelUpdated', eventHandler);
-                this.on('runtimeModelUpdated', eventHandler);
-                // load initial data
-                for(var i =0; i < iframeElementAttribute.length;i++){
-                    var key = iframeElementAttribute[i];
-                    elementAttribute(key, ctrl.getModelProperty(key));
-                }
-            };
-        },
+        controller: 'MbWidgetIframeCtrl',
     });
 
     /**
@@ -238,73 +203,7 @@ angular.module('am-wb-core')
         template: '<input></input>',
         setting: ['input'],
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function(){
-            // list of element attributes
-            var elementAttributes = [
-                'accept',
-                'alt', 
-                'autocomplete', 
-                'autofocus', 
-                'checked', 
-                'dirname', 
-                'disabled', 
-                'form',
-                'max', 
-                'maxlength', 
-                'min', 
-                'multiple', 
-                'name', 
-                'pattern', 
-                'placeholder', 
-                'readonly', 
-                'required', 
-                'size', 
-                'src', 
-                'step',
-                'inputType',
-                'value',
-                ];
-
-            this.initWidget = function(){
-                var ctrl = this;
-                function elementAttribute(key, value){
-                    ctrl.setElementAttribute(key, value);
-                    if(key === 'inputType'){
-                        ctrl.setElementAttribute('type', value);
-                    }
-                }
-                function eventHandler(event){
-                    if(elementAttributes.includes(event.key)){
-                        var key = event.key;
-                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                        elementAttribute(key, value);
-                    }
-                }
-                // listen on change
-                this.on('modelUpdated', eventHandler);
-                this.on('runtimeModelUpdated', eventHandler);
-                // load initial data
-                for(var i =0; i < elementAttributes.length;i++){
-                    var key = elementAttributes[i];
-                    elementAttribute(key, ctrl.getModelProperty(key));
-                }
-            };
-
-            /**
-             * Gets value of the input
-             */
-            this.val = function(){
-                var value = arguments[0];
-                if(value){
-                    this.setElementAttribute('value', value);
-                }
-                var element = this.getElement();
-                return element.val.apply(element, arguments);
-            };
-        },
+        controller: 'MbWidgetInputCtrl',
     });
 
     /**
@@ -334,64 +233,7 @@ angular.module('am-wb-core')
         template: '<textarea></textarea>',
         setting: ['textarea'],
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function(){
-            // list of element attributes
-            var elementAttributes = [
-                'autofocus',
-                'cols',
-                'dirname',
-                'disabled',
-                'form',
-                'maxlength',
-                'name',
-                'placeholder',
-                'readonly',
-                'required',
-                'rows',
-                'wrap',
-                'value'
-                ];
-
-            this.initWidget = function(){
-                var ctrl = this;
-                function elementAttribute(key, value){
-                    ctrl.setElementAttribute(key, value);
-                    if(key === 'value'){
-                        ctrl.val(value);
-                    }
-                }
-                function eventHandler(event){
-                    if(elementAttributes.includes(event.key)){
-                        var key = event.key;
-                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                        elementAttribute(key, value);
-                    }
-                }
-                // listen on change
-                this.on('modelUpdated', eventHandler);
-                this.on('runtimeModelUpdated', eventHandler);
-                // load initial data
-                for(var i =0; i < elementAttributes.length;i++){
-                    var key = elementAttributes[i];
-                    elementAttribute(key, ctrl.getModelProperty(key));
-                }
-            };
-
-            /**
-             * Gets value of the input
-             */
-            this.val = function(){
-                var value = arguments[0];
-                if(value){
-                    this.setElementAttribute('value', value);
-                }
-                var element = this.getElement();
-                return element.val.apply(element, arguments);
-            };
-        },
+        controller: 'MbWidgetTextareaCtrl',
     });
 
     /**
@@ -421,61 +263,7 @@ angular.module('am-wb-core')
         template: '<a></a>',
         setting: ['a'],
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function(){
-            // list of element attributes
-            var elementAttributes = [
-                'download',
-                'href',
-                'hreflang',
-                'media',
-                'ping',
-                'referrerpolicy',
-                'rel',
-                'target',
-                'type',
-                'html'
-                ];
-
-            this.initWidget = function(){
-                var ctrl = this;
-                function elementAttribute(key, value){
-                    if(key === 'html'){
-                        ctrl.getElement().html(value) || '..';
-                    }
-                    ctrl.setElementAttribute(key, value);
-                }
-                function eventHandler(event){
-                    if(elementAttributes.includes(event.key)){
-                        var key = event.key;
-                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                        elementAttribute(key, value);
-                    }
-                }
-                // listen on change
-                this.on('modelUpdated', eventHandler);
-                this.on('runtimeModelUpdated', eventHandler);
-                // load initial data
-                for(var i =0; i < elementAttributes.length;i++){
-                    var key = elementAttributes[i];
-                    elementAttribute(key, ctrl.getModelProperty(key));
-                }
-            };
-
-            /**
-             * Gets value of the input
-             */
-            this.html = function(){
-                var value = arguments[0];
-                if(value){
-                    this.setElementAttribute('html', value);
-                }
-                var element = this.getElement();
-                return element.html.apply(element, arguments);
-            };
-        },
+        controller: 'MbWidgetACtrl'
     });
 
 
@@ -506,68 +294,68 @@ angular.module('am-wb-core')
         // functional properties
         template: '<p></p>',
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function(){
-            // list of element attributes
-            var elementAttributes = [
-                'html'
-                ];
-
-            this.initWidget = function(){
-                var ctrl = this;
-                function elementAttribute(key, value){
-                    if(key === 'html'){
-                        ctrl.getElement().html(value);
-                    }
-                    ctrl.setElementAttribute(key, value);
-                }
-                function eventHandler(event){
-                    if(elementAttributes.includes(event.key)){
-                        var key = event.key;
-                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                        elementAttribute(key, value);
-                    }
-                }
-                // listen on change
-                this.on('modelUpdated', eventHandler);
-                this.on('runtimeModelUpdated', eventHandler);
-                // load initial data
-                for(var i =0; i < elementAttributes.length;i++){
-                    var key = elementAttributes[i];
-                    elementAttribute(key, ctrl.getModelProperty(key));
-                }
-            };
-
-            /**
-             * Gets value of the input
-             */
-            this.html = function(){
-                var value = arguments[0];
-                if(value){
-                    this.setElementAttribute('html', value);
-                }
-                var element = this.getElement();
-                return element.html.apply(element, arguments);
-            };
-        },
+        controller: 'MbWidgetHtmlCtrl'
     });
     
+    /**
+     * @ngdoc Widgets
+     * @name progress
+     * @description Add Progress into the page
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'progress',
+        title: 'Progress',
+        description: 'A widget to add progress.',
+        icon: 'wb-widget-progress',
+        groups: ['basic'],
+        model: {
+            name: 'progress',
+            style: {
+                padding: '8px',
+                margin: '8px',
+                size: {
+                    height: '30px'
+                }
+            }
+        },
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-progress',
+        // functional properties
+        template: '<progress value="22" max="100"></progress>',
+        controllerAs: 'ctrl',
+        controller: 'MbWidgetProgressCtrl'
+    });
+
 
 
     var headerEditorDescription =  {
             type: 'WidgetEditorTinymce',
             options:{
                 property: 'html',
-                inline: true
+                inline: true,
+                menubar: false,
+                plugins: [
+                  'lists',
+                  'powerpaste',
+                  'autolink'
+                ],
+                toolbar: 'undo redo | bold italic underline',
+                valid_elements: 'strong,em,span[style],a[href]',
+                valid_styles: {
+                  '*': 'font-size,font-family,color,text-decoration,text-align'
+                },
+                powerpaste_word_import: 'clean',
+                powerpaste_html_import: 'clean',
             }
     };
+    $widget.setEditor('a', headerEditorDescription);
 
     /**
      * @ngdoc Widgets
      * @name h1
-     * @description Hader of level 1
+     * @description Header of level 1
      * 
      * It is used to create h1
      */
@@ -593,7 +381,7 @@ angular.module('am-wb-core')
             // functional properties
             template: '<h' +i +'></h' + i + '>',
             controllerAs: 'ctrl',
-            controller:'MbWidgetHeaderCtrl'
+            controller:'MbWidgetHtmlCtrl'
         });
     }
 });

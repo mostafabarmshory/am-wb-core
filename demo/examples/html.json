@@ -58,6 +58,33 @@
 									"style": {
 										"margin": "8px"
 									}
+								},{
+									"type": "h1",
+									"html": "this is h1"
+								},{
+									"type": "h2",
+									"html": "this is h2"
+								},{
+									"type": "h3",
+									"html": "this is h3"
+								},{
+									"type": "h4",
+									"html": "this is h4"
+								},{
+									"type": "h5",
+									"html": "this is h5"
+								},{
+									"type": "h6",
+									"html": "this is h6"
+								},{
+									"type": "progress",
+									"value": "20",
+									"max": "100",
+									"style": {
+									    "size": {
+									        "height": "30px"
+									    }
+									}
 								}
 							]
 						}

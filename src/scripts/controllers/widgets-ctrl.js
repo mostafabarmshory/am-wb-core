@@ -460,7 +460,7 @@ WbAbstractWidget.prototype.setModelProperty = function (key, value){
     }
 
     // refresh the view
-    this.refresh();
+    this.refresh($event);
     this.fire('modelUpdated', $event);
 };
 

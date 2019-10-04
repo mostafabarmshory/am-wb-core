@@ -104,8 +104,12 @@ angular.module('am-wb-core')//
      * 
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.setDirty = function(){
-        this.dirty = true;
+    widgetEditor.prototype.setDirty = function(dirty){
+        if(typeof(dirty) !== 'undefined'){
+            this.dirty = dirty;
+        } else {
+            this.dirty = true;
+        }
     };
 
     /**
@@ -124,7 +128,7 @@ angular.module('am-wb-core')//
      * @param callback {function} the function
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.Off = function(type, callback){
+    widgetEditor.prototype.off = function(type, callback){
         if (!angular.isArray(this.callbacks[type])) {
             return;
         }
@@ -142,7 +146,7 @@ angular.module('am-wb-core')//
      * @param callback {function} the function
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.On = function(type, callback){
+    widgetEditor.prototype.on = function(type, callback){
         if (!angular.isArray(this.callbacks[type])) {
             this.callbacks[type] = [];
         }
@@ -177,9 +181,9 @@ angular.module('am-wb-core')//
             }
         }
     }; // internal
-    
-    
-    
+
+
+
 
 
     widgetEditor.prototype.setActive = function(){}; // focus|skipFocuse

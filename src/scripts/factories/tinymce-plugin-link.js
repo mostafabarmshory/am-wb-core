@@ -334,7 +334,7 @@ angular.module('am-wb-core')//
 	tinymcePluginLink.prototype.setupButtons = function () {
 		var editor = this.getEditor();
 		var factory = this;
-		editor.addButton('link', {
+		editor.ui.registry.addSplitButton('link', {
 			active: false,
 			icon: 'link',
 			tooltip: 'Insert/edit link',
@@ -345,7 +345,7 @@ angular.module('am-wb-core')//
 				factory.toggleActiveState();
 			}
 		});
-		editor.addButton('unlink', {
+		editor.ui.registry.addSplitButton('unlink', {
 			active: false,
 			icon: 'unlink',
 			tooltip: 'Remove link',
@@ -356,8 +356,8 @@ angular.module('am-wb-core')//
 				factory.toggleActiveState();
 			}
 		});
-		if (editor.addContextToolbar) {
-			editor.addButton('openlink', {
+		if (editor.ui.registry.addContextToolbar) {
+			editor.ui.registry.addSplitButton('openlink', {
 				icon: 'newtab',
 				tooltip: 'Open link',
 				onclick: function () {
@@ -370,7 +370,7 @@ angular.module('am-wb-core')//
 	tinymcePluginLink.prototype.setupMenuItems = function () {
 		var editor = this.getEditor();
 		var factory = this;
-		editor.addMenuItem('openlink', {
+		editor.ui.registry.addMenuItem('openlink', {
 			text: 'Open link',
 			icon: 'newtab',
 			onclick: function () {
@@ -395,7 +395,7 @@ angular.module('am-wb-core')//
 			},
 			prependToContext: true
 		});
-		editor.addMenuItem('link', {
+		editor.ui.registry.addMenuItem('link', {
 			icon: 'link',
 			text: 'Link',
 			shortcut: 'Meta+K',
@@ -406,7 +406,7 @@ angular.module('am-wb-core')//
 			context: 'insert',
 			prependToContext: true
 		});
-		editor.addMenuItem('unlink', {
+		editor.ui.registry.addMenuItem('unlink', {
 			icon: 'unlink',
 			text: 'Remove link',
 			onclick: function(){
@@ -418,8 +418,8 @@ angular.module('am-wb-core')//
 
 	tinymcePluginLink.prototype.setupContextToolbars = function () {
 		var editor = this.getEditor();
-		if (editor.addContextToolbar) {
-			editor.addContextToolbar(function (elm) {
+		if (editor.ui.registry.addContextToolbar) {
+			editor.ui.registry.addContextToolbar(function (elm) {
 				var sel, rng, node;
 				if (hasContextToolbar(editor.settings) && !isContextMenuVisible(editor) && isLink(elm)) {
 					sel = editor.selection;

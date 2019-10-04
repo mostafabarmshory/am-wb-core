@@ -4960,11 +4960,103 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
- * @name MbWidgetHeaderCtrl
- * @description Manage a header
+ * @name MbWidgetACtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
  * 
  */
-.controller('MbWidgetHeaderCtrl', function () {
+.controller('MbWidgetACtrl', function () {
+    // list of element attributes
+    var elementAttributes = [
+        'download',
+        'href',
+        'hreflang',
+        'media',
+        'ping',
+        'referrerpolicy',
+        'rel',
+        'target',
+        'type',
+        'html'
+        ];
+
+    this.initWidget = function(){
+        var ctrl = this;
+        function elementAttribute(key, value){
+            if(key === 'html'){
+                ctrl.getElement().html(value) || '..';
+            }
+            ctrl.setElementAttribute(key, value);
+        }
+        function eventHandler(event){
+            if(elementAttributes.includes(event.key)){
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                elementAttribute(key, value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data
+        for(var i =0; i < elementAttributes.length;i++){
+            var key = elementAttributes[i];
+            elementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+
+    /**
+     * Gets value of the input
+     */
+    this.html = function(){
+        var value = arguments[0];
+        if(value){
+            this.setElementAttribute('html', value);
+        }
+        var element = this.getElement();
+        return element.html.apply(element, arguments);
+    };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name MbWidgetHtmlCtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
+ * 
+ */
+.controller('MbWidgetHtmlCtrl', function () {
     // list of element attributes
     var elementAttributes = [
         'html'
@@ -5005,6 +5097,325 @@ angular.module('am-wb-core')//
         }
         var element = this.getElement();
         return element.html.apply(element, arguments);
+    };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name MbWidgetIframeCtrl
+ * @description Manage an iframe
+ * 
+ * Iframe is a widget to incloud other pages as a part of current page. This widget is
+ * used as Iframe manager.
+ * 
+ */
+.controller('MbWidgetIframeCtrl', function () {
+    // list of element attributes
+    // NOTE: maso, 2019: the width and height of the iframe is set from 
+    // the style section.
+    //
+    // 'width', 'height'
+    var iframeElementAttribute = [
+        'name',
+        'src', 
+        'srcdoc', 
+        'sandbox', 
+        ];
+
+    this.initWidget = function(){
+        var ctrl = this;
+        function elementAttribute(key, value){
+            ctrl.setElementAttribute(key, value);
+        }
+        function eventHandler(event){
+            if(iframeElementAttribute.includes(event.key)){
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                elementAttribute(key, value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data
+        for(var i =0; i < iframeElementAttribute.length;i++){
+            var key = iframeElementAttribute[i];
+            elementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name MbWidgetInputCtrl
+ * @description Manage an input field
+ * 
+ * The most used widget to get information from clients is an input. The input
+ * are responsible to get most of data types (email, text, number, ex.) from
+ * clients.
+ * 
+ */
+.controller('MbWidgetInputCtrl', function () {
+    // list of element attributes
+    var elementAttributes = [
+        'accept',
+        'alt', 
+        'autocomplete', 
+        'autofocus', 
+        'checked', 
+        'dirname', 
+        'disabled', 
+        'form',
+        'max', 
+        'maxlength', 
+        'min', 
+        'multiple', 
+        'name', 
+        'pattern', 
+        'placeholder', 
+        'readonly', 
+        'required', 
+        'size', 
+        'src', 
+        'step',
+        'inputType',
+        'value',
+        ];
+
+    this.initWidget = function(){
+        var ctrl = this;
+        function elementAttribute(key, value){
+            ctrl.setElementAttribute(key, value);
+            if(key === 'inputType'){
+                ctrl.setElementAttribute('type', value);
+            }
+        }
+        function eventHandler(event){
+            if(elementAttributes.includes(event.key)){
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                elementAttribute(key, value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data
+        for(var i =0; i < elementAttributes.length;i++){
+            var key = elementAttributes[i];
+            elementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+
+    /**
+     * Gets value of the input
+     */
+    this.val = function(){
+        var value = arguments[0];
+        if(value){
+            this.setElementAttribute('value', value);
+        }
+        var element = this.getElement();
+        return element.val.apply(element, arguments);
+    };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name MbWidgetHeaderCtrl
+ * @description Manage a header
+ * 
+ */
+.controller('MbWidgetProgressCtrl', function () {
+    // list of element attributes
+    var elementAttributes = [ 'value', 'max' ];
+
+    /*
+     * This method will be call from the parent to initialize the widget
+     */
+    this.initWidget = function () {
+        var ctrl = this;
+        function eventHandler(event) {
+            // Get an event and update the view if the event key is one of element attributes
+            if (elementAttributes.includes(event.key)) {
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                ctrl.setElementAttribute(key, value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data from the model
+        for (var i = 0; i < elementAttributes.length; i++) {
+            var key = elementAttributes[i];
+            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name MbWidgetTextareaCtrl
+ * @description Manage a textarea
+ * 
+ * Textarea is one of input widgets used to get textual information from clients.
+ * This controller is about to manage a textarea.
+ * 
+ */
+.controller('MbWidgetTextareaCtrl', function () {
+    // list of element attributes
+    var elementAttributes = [
+        'autofocus',
+        'cols',
+        'dirname',
+        'disabled',
+        'form',
+        'maxlength',
+        'name',
+        'placeholder',
+        'readonly',
+        'required',
+        'rows',
+        'wrap',
+        'value'
+        ];
+
+    this.initWidget = function(){
+        var ctrl = this;
+        function elementAttribute(key, value){
+            ctrl.setElementAttribute(key, value);
+            if(key === 'value'){
+                ctrl.val(value);
+            }
+        }
+        function eventHandler(event){
+            if(elementAttributes.includes(event.key)){
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                elementAttribute(key, value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data
+        for(var i =0; i < elementAttributes.length;i++){
+            var key = elementAttributes[i];
+            elementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+
+    /**
+     * Gets value of the input
+     */
+    this.val = function(){
+        var value = arguments[0];
+        if(value){
+            this.setElementAttribute('value', value);
+        }
+        var element = this.getElement();
+        return element.val.apply(element, arguments);
     };
 });
 
@@ -5470,7 +5881,7 @@ WbAbstractWidget.prototype.setModelProperty = function (key, value){
     }
 
     // refresh the view
-    this.refresh();
+    this.refresh($event);
     this.fire('modelUpdated', $event);
 };
 
@@ -10839,7 +11250,7 @@ angular.module('am-wb-core')//
 	tinymcePluginLink.prototype.setupButtons = function () {
 		var editor = this.getEditor();
 		var factory = this;
-		editor.addButton('link', {
+		editor.ui.registry.addSplitButton('link', {
 			active: false,
 			icon: 'link',
 			tooltip: 'Insert/edit link',
@@ -10850,7 +11261,7 @@ angular.module('am-wb-core')//
 				factory.toggleActiveState();
 			}
 		});
-		editor.addButton('unlink', {
+		editor.ui.registry.addSplitButton('unlink', {
 			active: false,
 			icon: 'unlink',
 			tooltip: 'Remove link',
@@ -10861,8 +11272,8 @@ angular.module('am-wb-core')//
 				factory.toggleActiveState();
 			}
 		});
-		if (editor.addContextToolbar) {
-			editor.addButton('openlink', {
+		if (editor.ui.registry.addContextToolbar) {
+			editor.ui.registry.addSplitButton('openlink', {
 				icon: 'newtab',
 				tooltip: 'Open link',
 				onclick: function () {
@@ -10875,7 +11286,7 @@ angular.module('am-wb-core')//
 	tinymcePluginLink.prototype.setupMenuItems = function () {
 		var editor = this.getEditor();
 		var factory = this;
-		editor.addMenuItem('openlink', {
+		editor.ui.registry.addMenuItem('openlink', {
 			text: 'Open link',
 			icon: 'newtab',
 			onclick: function () {
@@ -10900,7 +11311,7 @@ angular.module('am-wb-core')//
 			},
 			prependToContext: true
 		});
-		editor.addMenuItem('link', {
+		editor.ui.registry.addMenuItem('link', {
 			icon: 'link',
 			text: 'Link',
 			shortcut: 'Meta+K',
@@ -10911,7 +11322,7 @@ angular.module('am-wb-core')//
 			context: 'insert',
 			prependToContext: true
 		});
-		editor.addMenuItem('unlink', {
+		editor.ui.registry.addMenuItem('unlink', {
 			icon: 'unlink',
 			text: 'Remove link',
 			onclick: function(){
@@ -10923,8 +11334,8 @@ angular.module('am-wb-core')//
 
 	tinymcePluginLink.prototype.setupContextToolbars = function () {
 		var editor = this.getEditor();
-		if (editor.addContextToolbar) {
-			editor.addContextToolbar(function (elm) {
+		if (editor.ui.registry.addContextToolbar) {
+			editor.ui.registry.addContextToolbar(function (elm) {
 				var sel, rng, node;
 				if (hasContextToolbar(editor.settings) && !isContextMenuVisible(editor) && isLink(elm)) {
 					sel = editor.selection;
@@ -11400,7 +11811,7 @@ angular.module('am-wb-core')//
  * 
  */
 
-.factory('WidgetEditorTinymce', function ($q, WidgetEditor) {
+.factory('WidgetEditorTinymce', function ($sce, WidgetEditor) {
 
     /**
      * TODO: maso, 2019: extends WidgetEditorFake
@@ -11409,8 +11820,10 @@ angular.module('am-wb-core')//
      */
     function editor(widget, options) {
         options = options || {};
-        WidgetEditor.apply(this, widget, options);
+        WidgetEditor.apply(this, [widget, options]);
     }
+    
+    editor.prototype = new WidgetEditor();
 
     /**
      * remove all resources
@@ -11430,6 +11843,10 @@ angular.module('am-wb-core')//
             return;
         }
         this._hide = true;
+        // remove editor
+        if(this.isDirty()){
+            this.widget.setModelProperty(this.options.property, this._content);
+        }
         tinymce.remove(this.widget.getElement().getPath())
     };
 
@@ -11439,21 +11856,36 @@ angular.module('am-wb-core')//
     editor.prototype.show = function () {
         this._hide = false;
         var ctrl = this;
-        var selectorPath = this.widget.getElement().getPath();
+        var widget = this.getWidget();
+        var element = widget.getElement();
+        var selectorPath = element.getPath();
         tinymce.init(_.merge(this.options, {
             selector : selectorPath,
             themes : 'modern',
             setup: function (editor) {
                 editor.on('keydown', function(e) {
-                    var tinyMceEditor = tinyMCE.get(selectorPath);
                     if (e.keyCode === 27) { // escape
-                        ctrl.hide();
+                        ctrl.closeWithoutSave();
                     }
-                })
+                    if (e.keyCode === 13){
+                        ctrl.saveAndClose();
+                    }
+                });
+
+                // Update model when:
+                // - a button has been clicked [ExecCommand]
+                // - the editor content has been modified [change]
+                // - the node has changed [NodeChange]
+                // - an object has been resized (table, image) [ObjectResized]
+                editor.on('ExecCommand change NodeChange ObjectResized', function() {
+                    editor.save();
+                    ctrl.updateView(editor);
+                    return;
+                });
             }
         }))
         .then(function () {
-            ctrl.widget.getElement().focus();
+            element.focus();
         });
     };
 
@@ -11466,12 +11898,29 @@ angular.module('am-wb-core')//
      */
     editor.prototype.updateView = function (editor) {
         var content = editor.getContent({
-            format : options.format
+            format : this.options.format || 'html'
         }).trim();
-        content = $sce.trustAsHtml(content);
-        this.widget.setModelProperty(this.property, content);
+        this._content = content;
+        this.setDirty(true);
     };
 
+    
+    editor.prototype.closeWithoutSave = function(){
+        this.setDirty(false);
+        this.hide();
+        // reset old value
+        var widget = this.widget;
+        widget.fire('modelUpdated', {
+            key: this.options.property,
+            oldValue: '',
+            value: this.widget.getModelProperty(this.options.property)
+        });
+    }
+    
+    editor.prototype.saveAndClose = function(){
+        this.hide();
+    }
+    
 //  the editor type
     return editor;
 });
@@ -11582,8 +12031,12 @@ angular.module('am-wb-core')//
      * 
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.setDirty = function(){
-        this.dirty = true;
+    widgetEditor.prototype.setDirty = function(dirty){
+        if(typeof(dirty) !== 'undefined'){
+            this.dirty = dirty;
+        } else {
+            this.dirty = true;
+        }
     };
 
     /**
@@ -11602,7 +12055,7 @@ angular.module('am-wb-core')//
      * @param callback {function} the function
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.Off = function(type, callback){
+    widgetEditor.prototype.off = function(type, callback){
         if (!angular.isArray(this.callbacks[type])) {
             return;
         }
@@ -11620,7 +12073,7 @@ angular.module('am-wb-core')//
      * @param callback {function} the function
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.On = function(type, callback){
+    widgetEditor.prototype.on = function(type, callback){
         if (!angular.isArray(this.callbacks[type])) {
             this.callbacks[type] = [];
         }
@@ -11655,9 +12108,9 @@ angular.module('am-wb-core')//
             }
         }
     }; // internal
-    
-    
-    
+
+
+
 
 
     widgetEditor.prototype.setActive = function(){}; // focus|skipFocuse
@@ -14164,12 +14617,14 @@ angular.module('am-wb-core')
  */
 .run(function($resource, TinymcePluginImageTool, TinymcePluginCodesample, TinymcePluginLink) {
 	var pluginManager = tinymce.PluginManager;
-	pluginManager.add('codesample', TinymcePluginCodesample);
-	pluginManager.add('image', TinymcePluginImageTool);
-	pluginManager.add('link', TinymcePluginLink);
+	// XXX: maso, 2019: update to tinymce5
+//	pluginManager.add('codesample', TinymcePluginCodesample);
+//	pluginManager.add('image', TinymcePluginImageTool);
+//	pluginManager.add('link', TinymcePluginLink);
 });
 
 /* 
+
  * The MIT License (MIT)
  * 
  * Copyright (c) 2016 weburger
@@ -14194,13 +14649,6 @@ angular.module('am-wb-core')
  */
 'use strict';
 
-class A{
-    x(){
-        //
-    }
-}
-
-
 angular.module('am-wb-core')
 
 /*
@@ -14208,18 +14656,27 @@ angular.module('am-wb-core')
  */
 .run(function ($widget) {
 
-    $widget.setEditor('a', {
-        type: 'WidgetEditorTinymce',
-        options:{
-            property: 'html',
-            inline: true
-        }
-    });
     $widget.setEditor('p', {
         type: 'WidgetEditorTinymce',
         options:{
             property: 'html',
-            inline: true
+            inline: true,
+            menubar: false,
+            plugins: [
+                'link',
+                'lists',
+                'powerpaste',
+                'autolink',
+                'tinymcespellchecker'],
+            toolbar: [
+                'undo redo | bold italic underline | fontselect fontsizeselect',
+                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
+            valid_styles: {
+                '*': 'font-size,font-family,color,text-decoration,text-align'
+            },
+            powerpaste_word_import: 'clean',
+            powerpaste_html_import: 'clean',
         }
     });
 
@@ -14316,7 +14773,6 @@ angular.module('am-wb-core')
      * @ngdoc Widgets
      * @name iframe
      * @description Add inline frame to show another document within current one.
-     * 
      */
     $widget.newWidget({
         // widget description
@@ -14340,44 +14796,7 @@ angular.module('am-wb-core')
         template: '<iframe>Frame Not Supported?!</iframe>',
         setting: ['iframe'],
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function(){
-            // list of element attributes
-            // NOTE: maso, 2019: the width and height of the iframe is set from 
-            // the style section.
-            //
-            // 'width', 'height'
-            var iframeElementAttribute = [
-                'name',
-                'src', 
-                'srcdoc', 
-                'sandbox', 
-                ];
-
-            this.initWidget = function(){
-                var ctrl = this;
-                function elementAttribute(key, value){
-                    ctrl.setElementAttribute(key, value);
-                }
-                function eventHandler(event){
-                    if(iframeElementAttribute.includes(event.key)){
-                        var key = event.key;
-                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                        elementAttribute(key, value);
-                    }
-                }
-                // listen on change
-                this.on('modelUpdated', eventHandler);
-                this.on('runtimeModelUpdated', eventHandler);
-                // load initial data
-                for(var i =0; i < iframeElementAttribute.length;i++){
-                    var key = iframeElementAttribute[i];
-                    elementAttribute(key, ctrl.getModelProperty(key));
-                }
-            };
-        },
+        controller: 'MbWidgetIframeCtrl',
     });
 
     /**
@@ -14409,73 +14828,7 @@ angular.module('am-wb-core')
         template: '<input></input>',
         setting: ['input'],
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function(){
-            // list of element attributes
-            var elementAttributes = [
-                'accept',
-                'alt', 
-                'autocomplete', 
-                'autofocus', 
-                'checked', 
-                'dirname', 
-                'disabled', 
-                'form',
-                'max', 
-                'maxlength', 
-                'min', 
-                'multiple', 
-                'name', 
-                'pattern', 
-                'placeholder', 
-                'readonly', 
-                'required', 
-                'size', 
-                'src', 
-                'step',
-                'inputType',
-                'value',
-                ];
-
-            this.initWidget = function(){
-                var ctrl = this;
-                function elementAttribute(key, value){
-                    ctrl.setElementAttribute(key, value);
-                    if(key === 'inputType'){
-                        ctrl.setElementAttribute('type', value);
-                    }
-                }
-                function eventHandler(event){
-                    if(elementAttributes.includes(event.key)){
-                        var key = event.key;
-                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                        elementAttribute(key, value);
-                    }
-                }
-                // listen on change
-                this.on('modelUpdated', eventHandler);
-                this.on('runtimeModelUpdated', eventHandler);
-                // load initial data
-                for(var i =0; i < elementAttributes.length;i++){
-                    var key = elementAttributes[i];
-                    elementAttribute(key, ctrl.getModelProperty(key));
-                }
-            };
-
-            /**
-             * Gets value of the input
-             */
-            this.val = function(){
-                var value = arguments[0];
-                if(value){
-                    this.setElementAttribute('value', value);
-                }
-                var element = this.getElement();
-                return element.val.apply(element, arguments);
-            };
-        },
+        controller: 'MbWidgetInputCtrl',
     });
 
     /**
@@ -14505,64 +14858,7 @@ angular.module('am-wb-core')
         template: '<textarea></textarea>',
         setting: ['textarea'],
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function(){
-            // list of element attributes
-            var elementAttributes = [
-                'autofocus',
-                'cols',
-                'dirname',
-                'disabled',
-                'form',
-                'maxlength',
-                'name',
-                'placeholder',
-                'readonly',
-                'required',
-                'rows',
-                'wrap',
-                'value'
-                ];
-
-            this.initWidget = function(){
-                var ctrl = this;
-                function elementAttribute(key, value){
-                    ctrl.setElementAttribute(key, value);
-                    if(key === 'value'){
-                        ctrl.val(value);
-                    }
-                }
-                function eventHandler(event){
-                    if(elementAttributes.includes(event.key)){
-                        var key = event.key;
-                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                        elementAttribute(key, value);
-                    }
-                }
-                // listen on change
-                this.on('modelUpdated', eventHandler);
-                this.on('runtimeModelUpdated', eventHandler);
-                // load initial data
-                for(var i =0; i < elementAttributes.length;i++){
-                    var key = elementAttributes[i];
-                    elementAttribute(key, ctrl.getModelProperty(key));
-                }
-            };
-
-            /**
-             * Gets value of the input
-             */
-            this.val = function(){
-                var value = arguments[0];
-                if(value){
-                    this.setElementAttribute('value', value);
-                }
-                var element = this.getElement();
-                return element.val.apply(element, arguments);
-            };
-        },
+        controller: 'MbWidgetTextareaCtrl',
     });
 
     /**
@@ -14592,61 +14888,7 @@ angular.module('am-wb-core')
         template: '<a></a>',
         setting: ['a'],
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function(){
-            // list of element attributes
-            var elementAttributes = [
-                'download',
-                'href',
-                'hreflang',
-                'media',
-                'ping',
-                'referrerpolicy',
-                'rel',
-                'target',
-                'type',
-                'html'
-                ];
-
-            this.initWidget = function(){
-                var ctrl = this;
-                function elementAttribute(key, value){
-                    if(key === 'html'){
-                        ctrl.getElement().html(value) || '..';
-                    }
-                    ctrl.setElementAttribute(key, value);
-                }
-                function eventHandler(event){
-                    if(elementAttributes.includes(event.key)){
-                        var key = event.key;
-                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                        elementAttribute(key, value);
-                    }
-                }
-                // listen on change
-                this.on('modelUpdated', eventHandler);
-                this.on('runtimeModelUpdated', eventHandler);
-                // load initial data
-                for(var i =0; i < elementAttributes.length;i++){
-                    var key = elementAttributes[i];
-                    elementAttribute(key, ctrl.getModelProperty(key));
-                }
-            };
-
-            /**
-             * Gets value of the input
-             */
-            this.html = function(){
-                var value = arguments[0];
-                if(value){
-                    this.setElementAttribute('html', value);
-                }
-                var element = this.getElement();
-                return element.html.apply(element, arguments);
-            };
-        },
+        controller: 'MbWidgetACtrl'
     });
 
 
@@ -14677,68 +14919,68 @@ angular.module('am-wb-core')
         // functional properties
         template: '<p></p>',
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function(){
-            // list of element attributes
-            var elementAttributes = [
-                'html'
-                ];
-
-            this.initWidget = function(){
-                var ctrl = this;
-                function elementAttribute(key, value){
-                    if(key === 'html'){
-                        ctrl.getElement().html(value);
-                    }
-                    ctrl.setElementAttribute(key, value);
-                }
-                function eventHandler(event){
-                    if(elementAttributes.includes(event.key)){
-                        var key = event.key;
-                        var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                        elementAttribute(key, value);
-                    }
-                }
-                // listen on change
-                this.on('modelUpdated', eventHandler);
-                this.on('runtimeModelUpdated', eventHandler);
-                // load initial data
-                for(var i =0; i < elementAttributes.length;i++){
-                    var key = elementAttributes[i];
-                    elementAttribute(key, ctrl.getModelProperty(key));
-                }
-            };
-
-            /**
-             * Gets value of the input
-             */
-            this.html = function(){
-                var value = arguments[0];
-                if(value){
-                    this.setElementAttribute('html', value);
-                }
-                var element = this.getElement();
-                return element.html.apply(element, arguments);
-            };
-        },
+        controller: 'MbWidgetHtmlCtrl'
     });
     
+    /**
+     * @ngdoc Widgets
+     * @name progress
+     * @description Add Progress into the page
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'progress',
+        title: 'Progress',
+        description: 'A widget to add progress.',
+        icon: 'wb-widget-progress',
+        groups: ['basic'],
+        model: {
+            name: 'progress',
+            style: {
+                padding: '8px',
+                margin: '8px',
+                size: {
+                    height: '30px'
+                }
+            }
+        },
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-progress',
+        // functional properties
+        template: '<progress value="22" max="100"></progress>',
+        controllerAs: 'ctrl',
+        controller: 'MbWidgetProgressCtrl'
+    });
+
 
 
     var headerEditorDescription =  {
             type: 'WidgetEditorTinymce',
             options:{
                 property: 'html',
-                inline: true
+                inline: true,
+                menubar: false,
+                plugins: [
+                  'lists',
+                  'powerpaste',
+                  'autolink'
+                ],
+                toolbar: 'undo redo | bold italic underline',
+                valid_elements: 'strong,em,span[style],a[href]',
+                valid_styles: {
+                  '*': 'font-size,font-family,color,text-decoration,text-align'
+                },
+                powerpaste_word_import: 'clean',
+                powerpaste_html_import: 'clean',
             }
     };
+    $widget.setEditor('a', headerEditorDescription);
 
     /**
      * @ngdoc Widgets
      * @name h1
-     * @description Hader of level 1
+     * @description Header of level 1
      * 
      * It is used to create h1
      */
@@ -14764,7 +15006,7 @@ angular.module('am-wb-core')
             // functional properties
             template: '<h' +i +'></h' + i + '>',
             controllerAs: 'ctrl',
-            controller:'MbWidgetHeaderCtrl'
+            controller:'MbWidgetHtmlCtrl'
         });
     }
 });
