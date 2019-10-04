@@ -5874,7 +5874,7 @@ WbAbstractWidget.prototype.setModelProperty = function (key, value){
     }
 
     // Set the address
-    if(angular.isDefined(value)){
+    if(value){
         objectPath.set(this.getModel(), key, value);
     } else {
         objectPath.del(this.getModel(), key);
