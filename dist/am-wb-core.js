@@ -5297,6 +5297,68 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
+ * @name MbWidgetMetaCtrl
+ * @description Manage a meta data 
+ * 
+ * In seo (or equivalient usecase) 
+ * 
+ */
+.controller('MbWidgetMetaCtrl', function () {
+	// list of element attributes
+	var elementAttributes = [
+		'charset',
+		'content',
+		'http-equiv',
+		'name',
+		];
+
+	this.initWidget = function(){
+		var ctrl = this;
+		function eventHandler(event){
+			if(elementAttributes.includes(event.key)){
+				var key = event.key;
+				var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+				ctrl.setElementAttribute(key, value);
+			}
+		}
+		// listen on change
+		this.on('modelUpdated', eventHandler);
+		this.on('runtimeModelUpdated', eventHandler);
+		// load initial data
+		for(var i =0; i < elementAttributes.length;i++){
+			var key = elementAttributes[i];
+			ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
+		}
+	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
  * @name MbWidgetHeaderCtrl
  * @description Manage a header
  * 
@@ -5449,6 +5511,7 @@ var widgetBasicWidgetAttributes = [
     'dir',
     /*
      * NOTE: We must manage D&D internally to mange user D&D codes
+     * TODO: maso, 2019: move dnd into a processor
      */
 //  'draggable',
 //  'dropzone',
@@ -5643,43 +5706,6 @@ var WbAbstractWidget = function () {
     }, options);
 };
 
-/**
- * Loads SEO information from the model and update the element
- * 
- * NOTE: this is utility class and can move into a service
- * 
- * @param model
- *            {object} to load from
- * @member WbAbstractWidget
- */
-WbAbstractWidget.prototype.loadSeo = function () {
-    var model = this.getModel();
-    if (!model) {
-        return;
-    }
-    var $element = this.getElement();
-
-    // Add item scope
-    if (model.category) {
-        $element.attr('itemscope', '');
-        $element.attr('itemtype', model.category);
-    } else {
-        $element.removeAttr('itemscope');
-        $element.removeAttr('itemtype');
-    }
-
-    // Add item property
-    if (model.property) {
-        $element.attr('itemprop', model.property);
-    } else {
-        $element.removeAttr('itemprop');
-    }
-
-    // TODO: support of
-//  - {Text} label (https://schema.org/title)
-//  - {Text} description (https://schema.org/description)
-//  - {Text} keywords (https://schema.org/keywords)
-};
 
 /**
  * Loads all basic elements attributes.
@@ -5776,7 +5802,6 @@ WbAbstractWidget.prototype.refresh = function($event) {
     } 
     this.eventFunctions = {};
     this.loadStyle();
-    this.loadSeo();
     this.loadBasicProperties();
 };
 
@@ -5789,12 +5814,8 @@ WbAbstractWidget.prototype.refresh = function($event) {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.reload = function(){
-    // clean runtime model
     this.runtimeModel = {};
-
-    // refresh the view
     this.refresh();
-
     // fire init
     var $event = {
             source: this,
@@ -5828,12 +5849,14 @@ WbAbstractWidget.prototype.getModel = function () {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.setModel = function (model) {
+	this.setState('init');
     if (model === this.wbModel) {
         return;
     }
     this.wbModel = model;
     this.fire('modelChanged');
     this.reload();
+    this.setState('ready');
 };
 
 /**
@@ -6291,6 +6314,8 @@ WbAbstractWidget.prototype.off = function (type, callback) {
 /**
  * Call all callbacks on the given event type.
  * 
+ * Before callbacks, widget processors will process the widget and event.
+ * 
  * @param type
  *            of the event
  * @param params
@@ -6298,16 +6323,17 @@ WbAbstractWidget.prototype.off = function (type, callback) {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.fire = function (type, params) {
-    if (this.isSilent() || !angular.isDefined(this.callbacks[type])) {
+	// 1- Call processors
+	var event = _.merge({
+		source: this,
+		type: type
+	}, params || {});
+	this.$widget.applyProcessors(this, event);
+
+	// 2- call listeners
+	if (this.isSilent() || !angular.isDefined(this.callbacks[type])) {
         return;
     }
-    // TODO: maso, 2018: create event object
-    var event = _.merge({
-        source: this,
-        type: type
-    }, params || {});
-
-    // fire
     var callbacks = this.callbacks[type];
     for(var i = 0; i < callbacks.length; i++){
         // TODO: maso, 2018: check if the event is stopped to propagate
@@ -6420,6 +6446,22 @@ WbAbstractWidget.prototype.getScope = function () {
 };
 
 /**
+ * Sets the state fo the widget
+ * 
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.setState = function (state) {
+	var oldState = this.state;
+	this.state = state;
+	this.fire('stateChanged', {
+		oldValue: oldState,
+		value: state
+	});
+};
+
+
+
+/**
  * Checks if the editable mode is enable
  * 
  * @memberof WbAbstractWidget
@@ -6449,11 +6491,20 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
     });
 
     // TODO: maso, 2019: add event data
+    var oldState = this.state;
     if (editable) {
+    	this.state = 'edit';
         this.fire('editable');
     } else {
+    	this.state = 'ready';
         this.fire('noneditable');
     }
+    
+    this.fire('stateChanged', {
+    	source: this,
+    	oldValue: oldState,
+    	value: this.state
+    });
     var ctrl = this;
     this.$timeout(function(){
         ctrl.reload();
@@ -6823,6 +6874,7 @@ WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
  * @param model Object to set into the group
  */
 WbWidgetGroupCtrl.prototype.setModel = function (model) {
+	this.setState('init');
     if (model === this.wbModel) {
         return;
     }
@@ -6830,6 +6882,7 @@ WbWidgetGroupCtrl.prototype.setModel = function (model) {
     this.loadWidgets(model);
     this.fire('modelChanged');
     this.reload();
+    this.setState('ready');
 };
 
 /**
@@ -14713,6 +14766,106 @@ angular.module('am-wb-core')
  */
 'use strict';
 
+angular.module('am-wb-core').run(function ($widget) {
+	
+	function loadWidgetAttributes(widget, attributes){
+		var $element = widget.getElement();
+		angular.forEach(attributes, function(key){
+			var value = widget.getProperty(key) || widget.getModelProperty(key);
+	        if(value){
+	            $element.attr(key, value);
+	        } else {
+	            $element.removeAttr(key);
+	        }
+		});
+	}
+
+	var microdataAttributes = [
+		'itemscope', // groups list of item properties
+		'itemtype', // can use if it is item scope
+		'itemprop',
+		'itemref',
+		'itemid',
+		// extera properties
+		'content',
+		'value',
+	];
+
+	/**
+	 * @ngdoc Widget Processors
+	 * @name microdata
+	 * @description Handle widget microdata specification
+	 * 
+	 * Widget microdata is an specification which makes the widget readable by
+	 * search engines. This processor just run in ready mode.
+	 */
+	$widget.setProcessor('microdata', function(widget, event){
+		if(widget.state !== 'ready') {
+			return;
+		}
+		
+		// 1- Handle model load
+		if(event.type === 'modelChanged' || event.type === 'stateChanged'){
+			loadWidgetAttributes(widget, microdataAttributes);
+			return;
+		}
+		
+		// 2- Handle model update
+		if(event.key === 'modelUpdate'){
+			loadWidgetAttributes(widget, microdataAttributes);
+			return;
+		}
+	});
+
+	/**
+	 * @ngdoc Widget Processors
+	 * @name microdata
+	 * @description Handle widget microdata specification
+	 * 
+	 * Widget microdata is an specification which makes the widget readable by
+	 * search engines. This processor just run in ready mode.
+	 */
+	$widget.setProcessor('style', function(widget, event){});
+
+	/**
+	 * @ngdoc Widget Processors
+	 * @name microdata
+	 * @description Handle widget microdata specification
+	 * 
+	 * Widget microdata is an specification which makes the widget readable by
+	 * search engines. This processor just run in ready mode.
+	 * 
+	 */
+	$widget.setProcessor('dnd', function(widget, event){});
+
+});
+
+/* 
+
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
 angular.module('am-wb-core')
 
 /*
@@ -15017,7 +15170,37 @@ angular.module('am-wb-core')
         controller: 'MbWidgetProgressCtrl'
     });
 
-
+    
+    /**
+     * @ngdoc Widgets
+     * @name progress
+     * @description Add Progress into the page
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'meta',
+        title: 'Meta',
+        description: 'A widget to add meta data.',
+        icon: 'wb-widget-meta',
+        groups: ['basic'],
+        model: {
+            name: 'meta',
+            style: {
+                padding: '8px',
+                margin: '8px',
+                size: {
+                    height: '30px'
+                }
+            }
+        },
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-meta',
+        // functional properties
+        template: '<meta></meta>',
+        controllerAs: 'ctrl',
+        controller: 'MbWidgetMetaCtrl'
+    });
 
     var headerEditorDescription =  {
             type: 'WidgetEditorTinymce',
@@ -17104,407 +17287,463 @@ angular.module('am-wb-core')
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$widget', function(
-        $wbUtil, $rootScope,
-        $q, $compile, $controller, $mdTheming, $injector,
-        WidgetEditorFake) {
+		$wbUtil, $rootScope,
+		$q, $compile, $controller, $mdTheming, $injector,
+		WidgetEditorFake) {
 
 
-    this.providers =  {};
-    var _group_repo = [];
-    var contentElementAsso = [];
-    var elementKey = [];
-    var service = this;
+	this.providers =  {};
+	var _group_repo = [];
+	var contentElementAsso = [];
+	var elementKey = [];
+	var service = this;
 
-    var notFoundWidget = {
-            template : '<div ng-show="wbEditable">Unsuported widget?!</div>',
-            label : 'Not found',
-            description : 'Element not found'
-    };
-    var container = {
-            type : 'Page',
-            label : 'Page',
-            description : 'Panel contains list of widgets.',
-            image : 'images/wb/content.svg'
-    };
+	/**
+	 * List of all widget processor
+	 * 
+	 * A processor is a function which accepts widget and event then 
+	 * update widget based on the event. There are many predefined processor
+	 * such as style, microdata, and DND processors.
+	 * 
+	 * @memberof $widget
+	 */
+	var processors = {};
 
-    function _group(groupId){
-        for(var i = 0; i < _group_repo.length; i++){
-            if(_group_repo[i].id === groupId){
-                return _group_repo[i];
-            }
-        }
-        var group = {
-                id: groupId
-        };
-        _group_repo.push(group);
-        return group;
-    }
+	var notFoundWidget = {
+			template : '<div ng-show="wbEditable">Unsuported widget?!</div>',
+			label : 'Not found',
+			description : 'Element not found'
+	};
+	var container = {
+			type : 'Page',
+			label : 'Page',
+			description : 'Panel contains list of widgets.',
+			image : 'images/wb/content.svg'
+	};
 
-    function _newGroup(group){
-        var g = _group(group.id);
-        angular.extend(g, group);
-    }
+	function _group(groupId){
+		for(var i = 0; i < _group_repo.length; i++){
+			if(_group_repo[i].id === groupId){
+				return _group_repo[i];
+			}
+		}
+		var group = {
+				id: groupId
+		};
+		_group_repo.push(group);
+		return group;
+	}
 
-    function _groups(){
-        return _group_repo;
-    }
+	function _newGroup(group){
+		var g = _group(group.id);
+		angular.extend(g, group);
+	}
 
-    function _widget(model){
-        if (model.type in contentElementAsso) {
-            return contentElementAsso[model.type];
-        }
-        if (model.type === 'Page') {
-            return container;
-        }
-        return notFoundWidget;
-    }
-    /**
-     * Finds a widget related to the input model.
-     * 
-     * Widget type is stored in the widget data model. This function get the
-     * model type from the input data type and return related widget.
-     * 
-     * NotFoundElement widget is returned if the widget type is not found.
-     * 
-     * @memberof $widget
-     * @param model to find a widget
-     * @returns promise to find a widget
-     */
-    function widget(model) {
-        return $q.when(_widget(model));
-    }
+	function _groups(){
+		return _group_repo;
+	}
 
-    /**
-     * Returns list of all registerd widgets.
-     * 
-     * @memberof $widget
-     * @returns promise to load all widgets
-     */
-    function widgets() {
-        var widgets = {};
-        // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-        widgets.items = [];
-        elementKey.forEach(function(type) {
-            widgets.items.push(contentElementAsso[type]);
-        });
-        return $q.when(widgets);
-    }
+	function _widget(model){
+		if (model.type in contentElementAsso) {
+			return contentElementAsso[model.type];
+		}
+		if (model.type === 'Page') {
+			return container;
+		}
+		return notFoundWidget;
+	}
+	/**
+	 * Finds a widget related to the input model.
+	 * 
+	 * Widget type is stored in the widget data model. This function get the
+	 * model type from the input data type and return related widget.
+	 * 
+	 * NotFoundElement widget is returned if the widget type is not found.
+	 * 
+	 * @memberof $widget
+	 * @param model to find a widget
+	 * @returns promise to find a widget
+	 */
+	function widget(model) {
+		return $q.when(_widget(model));
+	}
 
-    /**
-     * List of all registered widgets
-     * 
-     * @memberof $widget
-     * @returns keys {array} list of all keys
-     */
-    function getWidgetsKey(){
-        return elementKey;
-    }
+	/**
+	 * Returns list of all registerd widgets.
+	 * 
+	 * @memberof $widget
+	 * @returns promise to load all widgets
+	 */
+	function widgets() {
+		var widgets = {};
+		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+		widgets.items = [];
+		elementKey.forEach(function(type) {
+			widgets.items.push(contentElementAsso[type]);
+		});
+		return $q.when(widgets);
+	}
 
-    /**
-     * Registers new widget
-     * 
-     * The old widget will be override if a new widget with the same type is registered.
-     * 
-     * @See the following page for more information:
-     * 
-     *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
-     *    
-     * 
-     * @memberof $widget
-     * @param widget to add
-     * @return the service
-     */
-    function newWidget(widget) {
-        if (widget.type in contentElementAsso) {
-            // TODO: maso, 2017: Add log for duplication
-        }
-        // fix widget data
-        widget.model = widget.model || {style:{}};
-        widget.model.type = widget.type;
-        widget.model.name = widget.model.name || widget.title; 
+	/**
+	 * List of all registered widgets
+	 * 
+	 * @memberof $widget
+	 * @returns keys {array} list of all keys
+	 */
+	function getWidgetsKey(){
+		return elementKey;
+	}
 
-        contentElementAsso[widget.type] = widget;
-        elementKey.push(widget.type);
-        return service;
-    }
+	/**
+	 * Registers new widget
+	 * 
+	 * The old widget will be override if a new widget with the same type is registered.
+	 * 
+	 * @See the following page for more information:
+	 * 
+	 *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
+	 *    
+	 * 
+	 * @memberof $widget
+	 * @param widget to add
+	 * @return the service
+	 */
+	function newWidget(widget) {
+		if (widget.type in contentElementAsso) {
+			// TODO: maso, 2017: Add log for duplication
+		}
+		// fix widget data
+		widget.model = widget.model || {style:{}};
+		widget.model.type = widget.type;
+		widget.model.name = widget.model.name || widget.title; 
 
-    /**
-     * Compile element 
-     * 
-     * @name show
-     * @memberof $widget
-     * @param model
-     *            {object}
-     *            <ul>
-     *            <li>templateUrl - {string=}: The URL of a template that will
-     *            be used as the content of the dialog.</li>
-     *            <li>template- {string=}: HTML template to show in the dialog.
-     *            This must be trusted HTML with respect to Angular's $sce
-     *            service. This template should never be constructed with any
-     *            kind of user input or user data.</li>
-     *            <li>contentElement:</li>
-     *            <li>scope - {object=}: the scope to link the template
-     *            controller to. If none is specified, it will create a new
-     *            isolate scope. This scope will be destroyed when the dialog is
-     *            removed unless preserveScope is set to true.</li>
-     *            <li>controller - {function|string=}: The controller to
-     *            associate with the dialog. The controller will be injected
-     *            with the local $mdDialog, which passes along a scope for the
-     *            dialog.</li>
-     *            <li>controllerAs - {string=}: An alias to assign the
-     *            controller to on the scope.</li>
-     *            <li>parent - {element=}: The element to append the dialog to.
-     *            Defaults to appending to the root element of the application.</li>
-     *            </ul>
-     * @param parentWidget
-     *     {WbWidget} the parent
-     * @param preElement {Element} pre build element
-     * @return promise A promise that resolve created element
-     */
-    function compile(model, parentWidget, preElement){
-        var widget = _widget(model);
-        var childScope = null;
+		contentElementAsso[widget.type] = widget;
+		elementKey.push(widget.type);
+		return service;
+	}
 
-        // 1- create scope
-        var parentScope;
-        if(parentWidget){
-            parentScope = parentWidget.getScope();
-        } else {
-            // this is a root widget
-            parentScope = $rootScope;
-        }
-        childScope = parentScope.$new(false, parentScope);
+	/**
+	 * Compile element 
+	 * 
+	 * @name show
+	 * @memberof $widget
+	 * @param model
+	 *            {object}
+	 *            <ul>
+	 *            <li>templateUrl - {string=}: The URL of a template that will
+	 *            be used as the content of the dialog.</li>
+	 *            <li>template- {string=}: HTML template to show in the dialog.
+	 *            This must be trusted HTML with respect to Angular's $sce
+	 *            service. This template should never be constructed with any
+	 *            kind of user input or user data.</li>
+	 *            <li>contentElement:</li>
+	 *            <li>scope - {object=}: the scope to link the template
+	 *            controller to. If none is specified, it will create a new
+	 *            isolate scope. This scope will be destroyed when the dialog is
+	 *            removed unless preserveScope is set to true.</li>
+	 *            <li>controller - {function|string=}: The controller to
+	 *            associate with the dialog. The controller will be injected
+	 *            with the local $mdDialog, which passes along a scope for the
+	 *            dialog.</li>
+	 *            <li>controllerAs - {string=}: An alias to assign the
+	 *            controller to on the scope.</li>
+	 *            <li>parent - {element=}: The element to append the dialog to.
+	 *            Defaults to appending to the root element of the application.</li>
+	 *            </ul>
+	 * @param parentWidget
+	 *     {WbWidget} the parent
+	 * @param preElement {Element} pre build element
+	 * @return promise A promise that resolve created element
+	 */
+	function compile(model, parentWidget, preElement){
+		var widget = _widget(model);
+		var childScope = null;
 
-        // 2- create element
-        var service = this;
-        var gettingTemplatePromisse;
-        if(preElement){
-            gettingTemplatePromisse = $q.resolve(preElement);
-        } else {
-            gettingTemplatePromisse = $wbUtil.getTemplateFor(widget)
-            .then(function(template) {
-                // 3- bind controller
-                return angular.element(template);
-            });
-        }
-        return gettingTemplatePromisse.then(function(element){
-            // init widget
-            element.attr('dnd-disable-if','!ctrl.isEditable()');
-            element.attr('dnd-draggable','wbModel');
-            element.attr('dnd-type','wbModel.type');
-            element.attr('dnd-effect-allowed','copyMove');
-            element.attr('dnd-moved','ctrl.delete()');
-            element.attr('md-theme-watch','true');
-            if (model.type == 'Group'){
-                element.addClass('wb-group');
-                element.attr('dnd-list','wbModel.contents');
-                element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
-                element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
-                element.attr('dnd-external-sources','true');
-                element.attr('dnd-drop','ctrl.addChild(index, item)');
-                element.attr('dnd-horizontal-list','wbModel.style.layout.direction==="row"');
-            }else {
-                element.addClass('wb-widget');
-                element.attr('dnd-callback','1');
-            }
-            var link = $compile(element);
-            var ctrl = createWidgetController(widget, model, parentWidget, childScope, element, service.providers);
+		// 1- create scope
+		var parentScope;
+		if(parentWidget){
+			parentScope = parentWidget.getScope();
+		} else {
+			// this is a root widget
+			parentScope = $rootScope;
+		}
+		childScope = parentScope.$new(false, parentScope);
 
-            ctrl.setModel(model);
-            childScope[widget.controllerAs || 'ctrl'] = ctrl;
+		// 2- create element
+		var service = this;
+		var gettingTemplatePromisse;
+		if(preElement){
+			gettingTemplatePromisse = $q.resolve(preElement);
+		} else {
+			gettingTemplatePromisse = $wbUtil.getTemplateFor(widget)
+			.then(function(template) {
+				// 3- bind controller
+				return angular.element(template);
+			});
+		}
+		return gettingTemplatePromisse.then(function(element){
+			// init widget
+			element.attr('dnd-disable-if','!ctrl.isEditable()');
+			element.attr('dnd-draggable','wbModel');
+			element.attr('dnd-type','wbModel.type');
+			element.attr('dnd-effect-allowed','copyMove');
+			element.attr('dnd-moved','ctrl.delete()');
+			element.attr('md-theme-watch','true');
+			if (model.type == 'Group'){
+				element.addClass('wb-group');
+				element.attr('dnd-list','wbModel.contents');
+				element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
+				element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
+				element.attr('dnd-external-sources','true');
+				element.attr('dnd-drop','ctrl.addChild(index, item)');
+				element.attr('dnd-horizontal-list','wbModel.style.layout.direction==="row"');
+			}else {
+				element.addClass('wb-widget');
+				element.attr('dnd-callback','1');
+			}
+			var link = $compile(element);
+			var ctrl = createWidgetController(widget, model, parentWidget, childScope, element, service.providers);
 
-            // bind ctrl
-            element.data('$ngControllerController', ctrl);
-            link(childScope);
-            $mdTheming(element);
+			ctrl.setModel(model);
+			childScope[widget.controllerAs || 'ctrl'] = ctrl;
 
-            // return widget
-            if(angular.isFunction(ctrl.initWidget)){
-                ctrl.initWidget();
-            }
-            return ctrl;
-        });
-    }
-    
-    function createWidgetController(widget, model, parentWidget, childScope, element, providers){
-        var wlocals = _.merge({
-            $scope : childScope,
-            $element : element
-        }, providers);
-        var ctrl;
-        if (model.type !== 'Group') {
-            ctrl = $controller('WbWidgetCtrl', wlocals);
-        } else {
-            ctrl = $controller('WbWidgetGroupCtrl', wlocals);
-        }
-        ctrl.setParent(parentWidget);
+			// bind ctrl
+			element.data('$ngControllerController', ctrl);
+			link(childScope);
+			$mdTheming(element);
 
-        // NOTE: can inject widget controller as WidgetCtrl
-        wlocals.WidgetCtrl = ctrl;
-        wlocals.$parent = parentWidget;
-        // extend element controller
-        if (angular.isDefined(widget.controller)) {
-            var wctrl = $controller(widget.controller, wlocals);
-            // extend the controller
-            angular.extend(ctrl, wctrl);
-        }
-        return ctrl;
-    }
+			// return widget
+			if(angular.isFunction(ctrl.initWidget)){
+				ctrl.initWidget();
+			}
+			return ctrl;
+		});
+	}
 
-    /**
-     * Creates new serialized data of widget
-     * 
-     * @memberof $widget
-     * @param widget
-     * @returns
-     */
-    function widgetData(widget){
-        return angular.copy(widget.model);
-    }
+	function createWidgetController(widget, model, parentWidget, childScope, element, providers){
+		var wlocals = _.merge({
+			$scope : childScope,
+			$element : element
+		}, providers);
+		var ctrl;
+		if (model.type !== 'Group') {
+			ctrl = $controller('WbWidgetCtrl', wlocals);
+		} else {
+			ctrl = $controller('WbWidgetGroupCtrl', wlocals);
+		}
+		ctrl.setParent(parentWidget);
 
-    // widgets
-    service.newWidget = newWidget;
-    service.widget = widget;
-    service.widgets = widgets;
-    service.widgetData = widgetData;
-    service.getWidgetsKey = getWidgetsKey;
+		// NOTE: can inject widget controller as WidgetCtrl
+		wlocals.WidgetCtrl = ctrl;
+		wlocals.$parent = parentWidget;
+		// extend element controller
+		if (angular.isDefined(widget.controller)) {
+			var wctrl = $controller(widget.controller, wlocals);
+			// extend the controller
+			angular.extend(ctrl, wctrl);
+		}
+		return ctrl;
+	}
 
-    // new api
-    service.getWidget = _widget;
-    service.getWidgets =  function(){
-        var widgets = {};
-        // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-        widgets.items = [];
-        elementKey.forEach(function(type) {
-            widgets.items.push(contentElementAsso[type]);
-        });
-        return widgets;
-    };
+	/**
+	 * Creates new serialized data of widget
+	 * 
+	 * @memberof $widget
+	 * @param widget
+	 * @returns
+	 */
+	function widgetData(widget){
+		return angular.copy(widget.model);
+	}
 
-    // widget groups
-    service.group = _group;
-    service.groups = _groups;
-    service.newGroup = _newGroup;
+	// widgets
+	service.newWidget = newWidget;
+	service.widget = widget;
+	service.widgets = widgets;
+	service.widgetData = widgetData;
+	service.getWidgetsKey = getWidgetsKey;
 
-    // utils
-    service.compile = compile;
+	// new api
+	service.getWidget = _widget;
+	service.getWidgets =  function(){
+		var widgets = {};
+		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+		widgets.items = [];
+		elementKey.forEach(function(type) {
+			widgets.items.push(contentElementAsso[type]);
+		});
+		return widgets;
+	};
 
-    /**
-     * Gets list of all children from the widget
-     * 
-     * The list is consist of all children and sub-children from the given 
-     * widget.
-     * 
-     * @params widget {AbstractWidgetCtrl} the widget
-     * @return List of widgets
-     * @memberof $widget
-     */
-    this.getChildren = function(widget) {
-        // Check if it is group
-        var widgets = [];
-        if(!angular.isDefined(widget) || widget.getType() !== 'Group') {
-            return widgets;
-        }
+	// widget groups
+	service.group = _group;
+	service.groups = _groups;
+	service.newGroup = _newGroup;
 
-        // load list of widgets
-        var groups = [];
-        groups.push(widget);
-        while(groups.length) {
-            widget = groups.pop();
-            var children = widget.getChildren();
-            for(var i = 0; i < children.length; i++) {
-                var child = children[i];
-                widgets.push(child);
-                if(child.getType() === 'Group') {
-                    groups.push(child);
-                }
-            }
-        }
+	// utils
+	service.compile = compile;
 
-        //return the list
-        return widgets;
-    };
+	/**
+	 * Gets list of all children from the widget
+	 * 
+	 * The list is consist of all children and sub-children from the given 
+	 * widget.
+	 * 
+	 * @params widget {AbstractWidgetCtrl} the widget
+	 * @return List of widgets
+	 * @memberof $widget
+	 */
+	this.getChildren = function(widget) {
+		// Check if it is group
+		var widgets = [];
+		if(!angular.isDefined(widget) || widget.getType() !== 'Group') {
+			return widgets;
+		}
 
+		// load list of widgets
+		var groups = [];
+		groups.push(widget);
+		while(groups.length) {
+			widget = groups.pop();
+			var children = widget.getChildren();
+			for(var i = 0; i < children.length; i++) {
+				var child = children[i];
+				widgets.push(child);
+				if(child.getType() === 'Group') {
+					groups.push(child);
+				}
+			}
+		}
 
-    this.addProvider = function(key, value) {
-        this.providers[key] = value;
-    };
-
-
-    // Returns a function, that, as long as it continues to be invoked, will not
-    // be triggered. The function will be called after it stops being called for
-    // N milliseconds. If `immediate` is passed, trigger the function on the
-    // leading edge, instead of the trailing.
-    this.debounce = function (func, wait, immediate) {
-        var timeout;
-        return function() {
-            var context = this;
-            var args = arguments;
-            var later = function() {
-                timeout = null;
-                if (!immediate) {
-                    func.apply(context, args);
-                }
-            };
-            var callNow = immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) {
-                func.apply(context, args);
-            }
-        };
-    };
+		//return the list
+		return widgets;
+	};
 
 
-    /***********************************************Editors***************************************/
-    var editors = {};
-    var fakeEditor = new WidgetEditorFake();
-    
-    
+	this.addProvider = function(key, value) {
+		this.providers[key] = value;
+	};
 
-    /**
-     * Set editor of a widgets
-     * 
-     * on double click editors are used to edit the widget.
-     * 
-     * @params type {string} type of the widget
-     * @params editor {Editor} editor
-     * @memberof $widget
-     */
-    this.setEditor = function(type, editor){
-        editors[type] = editor;
-    };
 
-    /**
-     * Find editor for the given widget
-     * 
-     * @params widget {WbWidget} the widget
-     * @return the editor or fake editor
-     * @memberof $widget
-     */
-    this.getEditor = function(widget){
-        if(widget.$$wbEditor){
-            // return old editor
-            return widget.$$wbEditor;
-        }
-        if(editors[widget.getType()] == undefined){
-            return fakeEditor;
-        }
-        var register = editors[widget.getType()];
-        // create editor
-        var Editor = $injector.get(register.type);
-        var editor = new Editor(widget, register.options || {});
-        var ctrl = this;
-        widget.$$wbEditor = editor;
-        editor.on('destroy', function(){
-            ctrl.removeEditorFromList(editor);
-        });
-        return editor;
-    };
-    
-//    this.getEditors = function(){};
-//    this.getActiveEditor = function(){};
+	// Returns a function, that, as long as it continues to be invoked, will not
+	// be triggered. The function will be called after it stops being called for
+	// N milliseconds. If `immediate` is passed, trigger the function on the
+	// leading edge, instead of the trailing.
+	this.debounce = function (func, wait, immediate) {
+		var timeout;
+		return function() {
+			var context = this;
+			var args = arguments;
+			var later = function() {
+				timeout = null;
+				if (!immediate) {
+					func.apply(context, args);
+				}
+			};
+			var callNow = immediate && !timeout;
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+			if (callNow) {
+				func.apply(context, args);
+			}
+		};
+	};
 
+
+	/***********************************************Editors***************************************/
+	var editors = {};
+	var fakeEditor = new WidgetEditorFake();
+
+
+
+	/**
+	 * Set editor of a widgets
+	 * 
+	 * on double click editors are used to edit the widget.
+	 * 
+	 * @params type {string} type of the widget
+	 * @params editor {Editor} editor
+	 * @memberof $widget
+	 */
+	this.setEditor = function(type, editor){
+		editors[type] = editor;
+	};
+
+	/**
+	 * Find editor for the given widget
+	 * 
+	 * @params widget {WbWidget} the widget
+	 * @return the editor or fake editor
+	 * @memberof $widget
+	 */
+	this.getEditor = function(widget){
+		if(widget.$$wbEditor){
+			// return old editor
+			return widget.$$wbEditor;
+		}
+		if(editors[widget.getType()] == undefined){
+			return fakeEditor;
+		}
+		var register = editors[widget.getType()];
+		// create editor
+		var Editor = $injector.get(register.type);
+		var editor = new Editor(widget, register.options || {});
+		var ctrl = this;
+		widget.$$wbEditor = editor;
+		editor.on('destroy', function(){
+			ctrl.removeEditorFromList(editor);
+		});
+		return editor;
+	};
+
+//	this.getEditors = function(){};
+//	this.getActiveEditor = function(){};
+
+
+	/**
+	 * set a processor of the type
+	 * 
+	 * @memberof $widget
+	 */
+	this.setProcessor = function(type, processor){
+		processors[type] = processor;
+	};
+
+	/**
+	 * gets processor of the type
+	 * 
+	 * @memberof $widget
+	 */
+	this.getProcessor = function(type) {
+		return processors[type];
+	};
+
+	/**
+	 * gets list of processors
+	 * 
+	 * @memberof $widget
+	 */
+	this.getProcessors = function(){
+		return processors;
+	};
+
+
+	/**
+	 * Apply processor on the given widget
+	 * 
+	 * @memberof $widget
+	 */
+	this.applyProcessors = function(widget, event){
+		event = event || {};
+		angular.forEach(processors, function(processor){
+			try{
+				processor.apply(processor, [widget, event]);
+			} catch (ex){
+				console.error('Fail to run the processor');
+				console.error(ex);
+			}
+		});
+	}
 
 });
 

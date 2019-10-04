@@ -28,6 +28,7 @@ var widgetBasicWidgetAttributes = [
     'dir',
     /*
      * NOTE: We must manage D&D internally to mange user D&D codes
+     * TODO: maso, 2019: move dnd into a processor
      */
 //  'draggable',
 //  'dropzone',
@@ -222,43 +223,6 @@ var WbAbstractWidget = function () {
     }, options);
 };
 
-/**
- * Loads SEO information from the model and update the element
- * 
- * NOTE: this is utility class and can move into a service
- * 
- * @param model
- *            {object} to load from
- * @member WbAbstractWidget
- */
-WbAbstractWidget.prototype.loadSeo = function () {
-    var model = this.getModel();
-    if (!model) {
-        return;
-    }
-    var $element = this.getElement();
-
-    // Add item scope
-    if (model.category) {
-        $element.attr('itemscope', '');
-        $element.attr('itemtype', model.category);
-    } else {
-        $element.removeAttr('itemscope');
-        $element.removeAttr('itemtype');
-    }
-
-    // Add item property
-    if (model.property) {
-        $element.attr('itemprop', model.property);
-    } else {
-        $element.removeAttr('itemprop');
-    }
-
-    // TODO: support of
-//  - {Text} label (https://schema.org/title)
-//  - {Text} description (https://schema.org/description)
-//  - {Text} keywords (https://schema.org/keywords)
-};
 
 /**
  * Loads all basic elements attributes.
@@ -355,7 +319,6 @@ WbAbstractWidget.prototype.refresh = function($event) {
     } 
     this.eventFunctions = {};
     this.loadStyle();
-    this.loadSeo();
     this.loadBasicProperties();
 };
 
@@ -368,12 +331,8 @@ WbAbstractWidget.prototype.refresh = function($event) {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.reload = function(){
-    // clean runtime model
     this.runtimeModel = {};
-
-    // refresh the view
     this.refresh();
-
     // fire init
     var $event = {
             source: this,
@@ -407,12 +366,14 @@ WbAbstractWidget.prototype.getModel = function () {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.setModel = function (model) {
+	this.setState('init');
     if (model === this.wbModel) {
         return;
     }
     this.wbModel = model;
     this.fire('modelChanged');
     this.reload();
+    this.setState('ready');
 };
 
 /**
@@ -870,6 +831,8 @@ WbAbstractWidget.prototype.off = function (type, callback) {
 /**
  * Call all callbacks on the given event type.
  * 
+ * Before callbacks, widget processors will process the widget and event.
+ * 
  * @param type
  *            of the event
  * @param params
@@ -877,16 +840,17 @@ WbAbstractWidget.prototype.off = function (type, callback) {
  * @memberof WbAbstractWidget
  */
 WbAbstractWidget.prototype.fire = function (type, params) {
-    if (this.isSilent() || !angular.isDefined(this.callbacks[type])) {
+	// 1- Call processors
+	var event = _.merge({
+		source: this,
+		type: type
+	}, params || {});
+	this.$widget.applyProcessors(this, event);
+
+	// 2- call listeners
+	if (this.isSilent() || !angular.isDefined(this.callbacks[type])) {
         return;
     }
-    // TODO: maso, 2018: create event object
-    var event = _.merge({
-        source: this,
-        type: type
-    }, params || {});
-
-    // fire
     var callbacks = this.callbacks[type];
     for(var i = 0; i < callbacks.length; i++){
         // TODO: maso, 2018: check if the event is stopped to propagate
@@ -999,6 +963,22 @@ WbAbstractWidget.prototype.getScope = function () {
 };
 
 /**
+ * Sets the state fo the widget
+ * 
+ * @memberof WbAbstractWidget
+ */
+WbAbstractWidget.prototype.setState = function (state) {
+	var oldState = this.state;
+	this.state = state;
+	this.fire('stateChanged', {
+		oldValue: oldState,
+		value: state
+	});
+};
+
+
+
+/**
  * Checks if the editable mode is enable
  * 
  * @memberof WbAbstractWidget
@@ -1028,11 +1008,20 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
     });
 
     // TODO: maso, 2019: add event data
+    var oldState = this.state;
     if (editable) {
+    	this.state = 'edit';
         this.fire('editable');
     } else {
+    	this.state = 'ready';
         this.fire('noneditable');
     }
+    
+    this.fire('stateChanged', {
+    	source: this,
+    	oldValue: oldState,
+    	value: this.state
+    });
     var ctrl = this;
     this.$timeout(function(){
         ctrl.reload();
@@ -1402,6 +1391,7 @@ WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
  * @param model Object to set into the group
  */
 WbWidgetGroupCtrl.prototype.setModel = function (model) {
+	this.setState('init');
     if (model === this.wbModel) {
         return;
     }
@@ -1409,6 +1399,7 @@ WbWidgetGroupCtrl.prototype.setModel = function (model) {
     this.loadWidgets(model);
     this.fire('modelChanged');
     this.reload();
+    this.setState('ready');
 };
 
 /**

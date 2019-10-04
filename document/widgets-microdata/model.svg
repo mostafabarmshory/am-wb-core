@@ -1,0 +1,25 @@
+<svg viewBox="0 0 300 45">
+	<style>
+	rect, ellipse { fill: none}
+	.item {stroke: #005; stroke-width: 2}
+	.value-box {stroke: #dd0; stroke-width: 2}
+	text { font-family: "Arial"; font-size: 14px; fill: #f00 }
+	.property, .iteminfo { fill: #00a ; font-size: 8px }
+	.value { fill: #000 }
+	</style>
+	<g id="diagram1-item">
+		<title>An Item</title>
+		<ellipse class="item" cx="50" cy="25" rx="40" ry="15"></ellipse>
+		<text x="35" y="30">Item</text>
+	</g>
+	<g id="diagram1-property">
+		<title>A Property</title>
+		<path d="M95,23h90v-8l10,10l-10,10v-8h-90z"></path>
+		<text x="105" y="19">Property</text>
+	</g>
+	<g id="diagram1-value">
+		<title>A Value</title>
+		<rect class="value-box" x="200" y="10" width="80" height="30"></rect>
+		<text x="215" y="30">Value</text>
+	</g>
+</svg>

@@ -18,6 +18,8 @@
 				{
 					"type": "Group",
 					"name": "group#2",
+					"itemscope": "",
+					"itemtype": "https://schema.org/LocalBusiness",
 					"style": {
 						"margin": "8px",
 						"padding": "80px"
@@ -32,9 +34,18 @@
 							},
 							"contents": [
 								{
+									"type": "meta",
+									"content": "test",
+									"style": {
+										"margin": "8px",
+										"size": {
+											"height": "60px"
+										}
+									}
+								},{
 									"type": "HtmlText",
-									"name": "text1",
-									"text": "<h2>HTML Text #1</h2>",
+									"name": "text2",
+									"text": "<h2>HTML Text #2</h2>",
 									"style": {
 										"margin": "8px"
 									}

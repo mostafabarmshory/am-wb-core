@@ -328,7 +328,37 @@ angular.module('am-wb-core')
         controller: 'MbWidgetProgressCtrl'
     });
 
-
+    
+    /**
+     * @ngdoc Widgets
+     * @name progress
+     * @description Add Progress into the page
+     */
+    $widget.newWidget({
+        // widget description
+        type: 'meta',
+        title: 'Meta',
+        description: 'A widget to add meta data.',
+        icon: 'wb-widget-meta',
+        groups: ['basic'],
+        model: {
+            name: 'meta',
+            style: {
+                padding: '8px',
+                margin: '8px',
+                size: {
+                    height: '30px'
+                }
+            }
+        },
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-meta',
+        // functional properties
+        template: '<meta></meta>',
+        controllerAs: 'ctrl',
+        controller: 'MbWidgetMetaCtrl'
+    });
 
     var headerEditorDescription =  {
             type: 'WidgetEditorTinymce',
