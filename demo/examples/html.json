@@ -8,6 +8,21 @@
 	},
 	"contents": [
 		{
+			"type": "meta",
+			"itemscope": true,
+			"itemtype": "http://maso.com",
+			"name": "key",
+			"content": "value",
+			"style": {
+				"margin": "1px",
+				"background": {
+					"color": "gray"
+				},
+				"size": {
+					"minHeight": "32px"
+				}
+			}
+		},{
 			"type": "Group",
 			"name": "group#1",
 			"style": {

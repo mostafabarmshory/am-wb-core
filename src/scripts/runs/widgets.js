@@ -342,13 +342,19 @@ angular.module('am-wb-core')
         icon: 'wb-widget-meta',
         groups: ['basic'],
         model: {
-            name: 'meta',
+            name: 'name',
+            content: 'content',
             style: {
-                padding: '8px',
                 margin: '8px',
-                size: {
-                    height: '30px'
-                }
+                background: {
+                	color: '#313131',
+                },
+                border: {
+	                style:  "dotted",
+	                color:  "#afafaf"
+                },
+                color:  "#ffffff",
+            	padding:  "8px"
             }
         },
         // help id

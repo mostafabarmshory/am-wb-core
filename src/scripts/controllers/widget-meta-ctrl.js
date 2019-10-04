@@ -42,20 +42,34 @@ angular.module('am-wb-core')//
 
 	this.initWidget = function(){
 		var ctrl = this;
+		function updateView(){
+			var name = ctrl.getProperty('name') || ctrl.getModelProperty('name');
+			var content = ctrl.getProperty('content') || ctrl.getModelProperty('content');
+			ctrl.getElement().html(name + ':' + content);
+		}
 		function eventHandler(event){
 			if(elementAttributes.includes(event.key)){
 				var key = event.key;
 				var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
 				ctrl.setElementAttribute(key, value);
 			}
+			updateView();
 		}
 		// listen on change
 		this.on('modelUpdated', eventHandler);
 		this.on('runtimeModelUpdated', eventHandler);
+		this.on('stateChanged', function(){
+			if(ctrl.state === 'edit'){
+				ctrl.getElement().show();
+				return;
+			}
+			ctrl.getElement().hide();
+		});
 		// load initial data
 		for(var i =0; i < elementAttributes.length;i++){
 			var key = elementAttributes[i];
 			ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
 		}
+		updateView();
 	};
 });
