@@ -23,57 +23,57 @@
  */
 'use strict';
 describe('Dispatcher test', function () {
-    // instantiate service
-    var $rootScope;
-    var $widget;
-    var widgetType = 'TestWidget-' + Math.random();
+	// instantiate service
+	var $rootScope;
+	var $widget;
+	var widgetType = 'TestWidget-' + Math.random();
 
-    function MockRootWidget() {
-	// TODO;
-	this.scope = $rootScope.$new();
-    };
+	function MockRootWidget() {
+		// TODO;
+		this.scope = $rootScope.$new();
+	};
 
-    MockRootWidget.prototype.getScope = function () {
-	return this.scope;
-    };
+	MockRootWidget.prototype.getScope = function () {
+		return this.scope;
+	};
 
-    // load the service's module
-    beforeEach(module('am-wb-core'));
-    beforeEach(inject(function (_$rootScope_, _$widget_) {
-	$rootScope = _$rootScope_;
-	$widget = _$widget_;
-	/*
-	 * Register a test widget
-	 */
-	$widget.newWidget({
-	    type: widgetType,
-	    controller: function () {},
-	    controllerAs: 'ctrl',
-	    template: '<h1>{{ctrl.text}}</h1>'
-	});
-    }));
-
-    it('should define $dispatcher service', function (done) {
-	var root = new MockRootWidget();
-	// Create new instance
-	$widget.compile({
-	    type: widgetType,
-	    id: 'test',
-	    name: 'Widget',
-	    text: '<h2>Dispatcher Test</h2>',
-	    style: {
-		background: {
-		    color: 'black'
-		}
-	    },
-	    event: {
-		init: 'if ($dispatcher) {$widget.setProperty(\'style.background.color\',\'red\')}'
-	    }
-	}, root)
-		.then(function (widget) {
-		    expect(widget.getProperty('style.background.color')).toBe('red');
-		    done();
+	// load the service's module
+	beforeEach(module('am-wb-core'));
+	beforeEach(inject(function (_$rootScope_, _$widget_) {
+		$rootScope = _$rootScope_;
+		$widget = _$widget_;
+		/*
+		 * Register a test widget
+		 */
+		$widget.newWidget({
+			type: widgetType,
+			controller: function () {},
+			controllerAs: 'ctrl',
+			template: '<h1>{{ctrl.text}}</h1>'
 		});
-	$rootScope.$apply();
-    });
+	}));
+
+	it('should define $dispatcher service', function (done) {
+		var root = new MockRootWidget();
+		// Create new instance
+		$widget.compile({
+			type: widgetType,
+			id: 'test',
+			name: 'Widget',
+			text: '<h2>Dispatcher Test</h2>',
+			style: {
+				background: {
+					color: 'black'
+				}
+			},
+			event: {
+				init: 'if ($dispatcher) {$widget.setProperty(\'style.background.color\',\'red\')}'
+			}
+		}, root)
+		.then(function (widget) {
+			expect(widget.getProperty('style.background.color')).toBe('red');
+			done();
+		});
+		$rootScope.$apply();
+	});
 });

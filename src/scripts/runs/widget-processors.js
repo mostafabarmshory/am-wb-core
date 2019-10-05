@@ -25,16 +25,16 @@
 'use strict';
 
 angular.module('am-wb-core').run(function ($widget) {
-	
+
 	function loadWidgetAttributes(widget, attributes){
 		var $element = widget.getElement();
 		angular.forEach(attributes, function(key){
 			var value = widget.getProperty(key) || widget.getModelProperty(key);
-	        if(value){
-	            $element.attr(key, value);
-	        } else {
-	            $element.removeAttr(key);
-	        }
+			if(value){
+				$element.attr(key, value);
+			} else {
+				$element.removeAttr(key);
+			}
 		});
 	}
 
@@ -47,7 +47,7 @@ angular.module('am-wb-core').run(function ($widget) {
 		// extera properties
 		'content',
 		'value',
-	];
+		];
 
 	/**
 	 * @ngdoc Widget Processors
@@ -55,19 +55,21 @@ angular.module('am-wb-core').run(function ($widget) {
 	 * @description Handle widget microdata specification
 	 * 
 	 * Widget microdata is an specification which makes the widget readable by
-	 * search engines. This processor just run in ready mode.
+	 * search engines. This processor just run in ready mode. 
+	 * 
+	 * @see document/widgets-microdata.md
 	 */
 	$widget.setProcessor('microdata', function(widget, event){
 		if(widget.state !== 'ready') {
 			return;
 		}
-		
+
 		// 1- Handle model load
 		if(event.type === 'modelChanged' || event.type === 'stateChanged'){
 			loadWidgetAttributes(widget, microdataAttributes);
 			return;
 		}
-		
+
 		// 2- Handle model update
 		if(event.key === 'modelUpdate'){
 			loadWidgetAttributes(widget, microdataAttributes);
@@ -95,5 +97,6 @@ angular.module('am-wb-core').run(function ($widget) {
 	 * 
 	 */
 	$widget.setProcessor('dnd', function(widget, event){});
+
 
 });

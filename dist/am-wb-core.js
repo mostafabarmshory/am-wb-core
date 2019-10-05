@@ -5658,7 +5658,6 @@ var WbAbstractWidget = function () {
                     $event.stopPropagation();
                 }
                 ctrl.fire('click', $event);
-                ctrl.evalWidgetEvent('click', $event);
             },
             dblclick: function ($event) {
                 if (ctrl.isEditable()) {
@@ -5669,31 +5668,24 @@ var WbAbstractWidget = function () {
                     editor.show();
                 }
                 ctrl.fire('dblclick', $event);
-                ctrl.evalWidgetEvent('dblclick', $event);
             },
             mouseout: function ($event) {
                 ctrl.fire('mouseout', $event);
-                ctrl.evalWidgetEvent('mouseout', $event);
             },
             mouseover: function ($event) {
                 ctrl.fire('mouseover', $event);
-                ctrl.evalWidgetEvent('mouseover', $event);
             },
             mousedown: function ($event) {
                 ctrl.fire('mousedown', $event);
-                ctrl.evalWidgetEvent('mousedown', $event);
             },
             mouseup: function ($event) {
                 ctrl.fire('mouseup', $event);
-                ctrl.evalWidgetEvent('mouseup', $event);
             },
             mouseenter: function ($event) {
                 ctrl.fire('mouseenter', $event);
-                ctrl.evalWidgetEvent('mouseenter', $event);
             },
             mouseleave: function ($event) {
                 ctrl.fire('mouseleave', $event);
-                ctrl.evalWidgetEvent('mouseleave', $event);
             }
     };
 
@@ -5705,7 +5697,6 @@ var WbAbstractWidget = function () {
             $event = $event[0];
         }
         ctrl.fire('resize', $event);
-        ctrl.evalWidgetEvent('resize', $event);
     }, 300));
 
     var options = {
@@ -5830,12 +5821,6 @@ WbAbstractWidget.prototype.refresh = function($event) {
 WbAbstractWidget.prototype.reload = function(){
     this.runtimeModel = {};
     this.refresh();
-    // fire init
-    var $event = {
-            source: this,
-            type: 'init'
-    };
-    this.evalWidgetEvent('init', $event);
 };
 
 
@@ -6074,71 +6059,6 @@ WbAbstractWidget.prototype.setStyle = function(key, value) {
  */
 WbAbstractWidget.prototype.getStyle = function(key) {
     return this.getProperty('style.' + key);
-};
-
-/**
- * Loads events for the widget
- * 
- * @param event
- *            {object} part of the widget data model
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
-    if (this.isEditable()) {
-        // User function will not evaluate in edit mode
-        return;
-    }
-
-    event = event || {};
-    event.type = type;
-    event.source = this;
-
-    var eventFunction;
-    if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
-        try{
-            var body = '\'use strict\';'+
-            'var $event = arguments[0],' + 
-            '$widget = arguments[1],' + 
-            '$http = arguments[2],' + 
-            '$media =  arguments[3],' + 
-            '$window =  arguments[4],' + 
-            '$local =  arguments[5],' + 
-            '$timeout = arguments[6],' + 
-            '$dispatcher = arguments[7],' + 
-            '$storage = arguments[8],' + 
-            '$routeParams = arguments[9];' + 
-            this.getEvent()[type];
-            this.eventFunctions[type] = new Function(body);
-        }catch(ex){
-            console.log(ex);
-        }
-    }
-    eventFunction = this.eventFunctions[type];
-    if (eventFunction) {
-        try{
-            return eventFunction(
-                    event, // -> $event
-                    this, // -> $widget
-                    this.$http, // -> $http
-                    this.$mdMedia, // -> $mdMedia
-                    this.$wbWindow, // -> $wbWindow
-                    this.$wbLocal, // -> $wbLocal
-                    // FIXME: wratp timeout and remove timers on edit mode (or distroy)
-                    this.$timeout,// -> $timeout
-                    // FIXME: wratp dispatcher and remove listeners
-                    this.$dispatcher, // -> $dispatcher
-                    this.$storage, // -> $storage
-                    this.$routeParams// -> $routeParams
-            );
-        } catch(ex){
-            console.log('Fail to run event code');
-            console.log({
-                type: type,
-                event: event
-            });
-            console.log(ex);
-        }
-    }
 };
 
 /**
@@ -6544,7 +6464,6 @@ WbAbstractWidget.prototype.isIntersecting = function(){
 WbAbstractWidget.prototype.setIntersecting = function(intersecting, $event){
     this.intersecting = intersecting;
     this.fire('intersection', $event);
-    this.evalWidgetEvent('intersection', $event);
 };
 
 
@@ -6825,20 +6744,14 @@ WbAbstractWidget.prototype.getWindow = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout, $routeParams, $dispatcher, $storage, $wbWindow, $wbLocal) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $widget, $timeout, $wbWindow) {
     WbAbstractWidget.call(this);
     this.setElement($element);
     this.setScope($scope);
     this.$wbUtil = $wbUtil;
-    this.$http = $http;
     this.$widget = $widget;
-    this.$mdMedia = $mdMedia;
     this.$timeout = $timeout;
     this.$wbWindow = $wbWindow;
-    this.$routeParams = $routeParams;
-    this.$wbLocal = $wbLocal;
-    this.$dispatcher = $dispatcher;
-    this.$storage = $storage;
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
@@ -6856,25 +6769,16 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $storage, $dispatcher, $routeParams, $wbWindow, $wbLocal) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $q, $timeout, $wbWindow) {
     WbAbstractWidget.call(this);
     this.setElement($element);
     this.setScope($scope);
 
     this.$widget = $widget;
     this.$q = $q;
-    this.$mdTheming = $mdTheming;
     this.$wbUtil = $wbUtil;
-    this.$http = $http;
-    this.$mdMedia = $mdMedia;
     this.$timeout = $timeout;
     this.$wbWindow = $wbWindow;
-    this.$routeParams = $routeParams;
-    this.$wbLocal = $wbLocal;
-    this.$dispatcher = $dispatcher;
-    this.$storage = $storage;
-
-    var ctrl = this;
 };
 WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
 
@@ -6941,7 +6845,6 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
 
     // create contents
     var $widget = this.$widget;
-    var $mdTheming = this.$mdTheming;
     var parentWidget = this;
     var $q = this.$q;
 
@@ -14778,19 +14681,190 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+/**
+ * @ngdoc Widget Processors
+ * @name events
+ * @description Handle widget events specification
+ * 
+ * There is many event where the widget must handle. This processor enable/disable
+ * event handling with widget. In the other hand, this processor manage scripting
+ * of a widget.
+ * 
+ * Event processor works on the state change event. If the state of a widget is
+ * edit, then all events handlers will be removed from the widget. When the state
+ * is changed to ready all events will be loaded.
+ */
+angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
+		$wbLocal, $timeout, $dispatcher, $storage, $routeParams) {
+	'use strict';
+
+
+	/**
+	 * Loads events for the widget
+	 * 
+	 * @param event
+	 *            {object} part of the widget data model
+	 * @memberof WbAbstractWidget
+	 */
+	function evalWidgetEvent(widget, type, event) {
+		var eventFunction;
+		if (!widget.eventFunctions.hasOwnProperty(type)) {
+			try{
+				var body = '\'use strict\';'+
+				'var $event = arguments[0],' + 
+				'$widget = arguments[1],' + 
+				'$http = arguments[2],' + 
+				'$media =  arguments[3],' + 
+				'$window =  arguments[4],' + 
+				'$local =  arguments[5],' + 
+				'$timeout = arguments[6],' + 
+				'$dispatcher = arguments[7],' + 
+				'$storage = arguments[8],' + 
+				'$routeParams = arguments[9];' + 
+				widget.getEvent()[type];
+				widget.eventFunctions[type] = new Function(body);
+			}catch(ex){
+				console.log(ex);
+			}
+		}
+		eventFunction = widget.eventFunctions[type];
+		if (eventFunction) {
+			try{
+				return eventFunction.apply(widget, [
+						event, // -> $event
+						widget, // -> $widget
+						$http, // -> $http
+						$mdMedia, // -> $mdMedia
+						$wbWindow, // -> $wbWindow
+						$wbLocal, // -> $wbLocal
+						// FIXME: wratp timeout and remove timers on edit mode (or distroy)
+						$timeout,// -> $timeout
+						// FIXME: wratp dispatcher and remove listeners
+						$dispatcher, // -> $dispatcher
+						$storage, // -> $storage
+						$routeParams// -> $routeParams
+					]);
+			} catch(ex){
+				console.log('Fail to run event code');
+				console.log({
+					type: type,
+					event: event
+				});
+				console.log(ex);
+			}
+		}
+	};
+
+	function loadWidgetEventsHandlers(widget){
+		widget.__eventListeners = {
+				click: function ($event) {
+					evalWidgetEvent(widget, 'click', $event);
+				},
+				dblclick: function ($event) {
+					evalWidgetEvent(widget, 'dblclick', $event);
+				},
+				mouseout: function ($event) {
+					evalWidgetEvent(widget, 'mouseout', $event);
+				},
+				mouseover: function ($event) {
+					evalWidgetEvent(widget, 'mouseover', $event);
+				},
+				mousedown: function ($event) {
+					evalWidgetEvent(widget, 'mousedown', $event);
+				},
+				mouseup: function ($event) {
+					evalWidgetEvent(widget, 'mouseup', $event);
+				},
+				mouseenter: function ($event) {
+					evalWidgetEvent(widget, 'mouseenter', $event);
+				},
+				mouseleave: function ($event) {
+					evalWidgetEvent(widget, 'mouseleave', $event);
+				},
+				resize: function ($event) {
+					evalWidgetEvent(widget, 'resize', $event);
+				},
+				intersection: function ($event) {
+					evalWidgetEvent(widget, 'intersection', $event);
+				},
+		};
+		angular.forEach(widget.__eventListeners, function (listener, key) {
+			widget.on(key, listener);
+		});
+	}
+
+	function removeWidgetEventsHandlers(widget){
+		if(!angular.isDefined(widget.__eventListeners)){
+			return;
+		}
+		angular.forEach(widget.__eventListeners, function (listener, key) {
+			widget.off(key, listener);
+		});
+		delete widget.__eventListeners;
+	}
+
+	/*
+	 * manages events handler
+	 */
+	function eventProcessor(widget, event){
+		if(event.type !== 'stateChanged') {
+			return;
+		}
+		if(widget.state === 'ready') {
+			loadWidgetEventsHandlers(widget);
+			evalWidgetEvent(widget, 'stateChanged', event);
+			// TODO: maso, 2019: remove in next major version
+			// support legecy
+			var newEvent = _.clone(event);
+			newEvent.type = 'init';
+			evalWidgetEvent(widget, newEvent.type, newEvent);
+		} else {
+			removeWidgetEventsHandlers(widget);
+		}
+	}
+
+	// register the processor
+	$widget.setProcessor('event', eventProcessor);
+});
+
+/* 
+
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 'use strict';
 
 angular.module('am-wb-core').run(function ($widget) {
-	
+
 	function loadWidgetAttributes(widget, attributes){
 		var $element = widget.getElement();
 		angular.forEach(attributes, function(key){
 			var value = widget.getProperty(key) || widget.getModelProperty(key);
-	        if(value){
-	            $element.attr(key, value);
-	        } else {
-	            $element.removeAttr(key);
-	        }
+			if(value){
+				$element.attr(key, value);
+			} else {
+				$element.removeAttr(key);
+			}
 		});
 	}
 
@@ -14803,7 +14877,7 @@ angular.module('am-wb-core').run(function ($widget) {
 		// extera properties
 		'content',
 		'value',
-	];
+		];
 
 	/**
 	 * @ngdoc Widget Processors
@@ -14811,19 +14885,21 @@ angular.module('am-wb-core').run(function ($widget) {
 	 * @description Handle widget microdata specification
 	 * 
 	 * Widget microdata is an specification which makes the widget readable by
-	 * search engines. This processor just run in ready mode.
+	 * search engines. This processor just run in ready mode. 
+	 * 
+	 * @see document/widgets-microdata.md
 	 */
 	$widget.setProcessor('microdata', function(widget, event){
 		if(widget.state !== 'ready') {
 			return;
 		}
-		
+
 		// 1- Handle model load
 		if(event.type === 'modelChanged' || event.type === 'stateChanged'){
 			loadWidgetAttributes(widget, microdataAttributes);
 			return;
 		}
-		
+
 		// 2- Handle model update
 		if(event.key === 'modelUpdate'){
 			loadWidgetAttributes(widget, microdataAttributes);
@@ -14851,6 +14927,7 @@ angular.module('am-wb-core').run(function ($widget) {
 	 * 
 	 */
 	$widget.setProcessor('dnd', function(widget, event){});
+
 
 });
 

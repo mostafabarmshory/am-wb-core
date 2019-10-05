@@ -11,13 +11,7 @@ Here is list of widget states:
 - edit: widget is going to the edit mode
 - deleted: widget is remvoed.
 
-Here are list of common events changed the state of a widget.
-
-- loaded: All properties and data of the widget is loaded and the widget is ready to work.
-- editEnabled: Widget is going to the edit state.
-- editDisabled The edit mode is finished and the widget is going to the normal state.
-- destroy: This is the end of widget state and all resources are going to be removed.
-
+If the state of the widget is going to change then a event of stateChanged will be propagated inot the system. 
 
 ## Styles
 

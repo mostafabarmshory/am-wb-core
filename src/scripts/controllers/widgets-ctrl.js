@@ -161,7 +161,6 @@ var WbAbstractWidget = function () {
                     $event.stopPropagation();
                 }
                 ctrl.fire('click', $event);
-                ctrl.evalWidgetEvent('click', $event);
             },
             dblclick: function ($event) {
                 if (ctrl.isEditable()) {
@@ -172,31 +171,24 @@ var WbAbstractWidget = function () {
                     editor.show();
                 }
                 ctrl.fire('dblclick', $event);
-                ctrl.evalWidgetEvent('dblclick', $event);
             },
             mouseout: function ($event) {
                 ctrl.fire('mouseout', $event);
-                ctrl.evalWidgetEvent('mouseout', $event);
             },
             mouseover: function ($event) {
                 ctrl.fire('mouseover', $event);
-                ctrl.evalWidgetEvent('mouseover', $event);
             },
             mousedown: function ($event) {
                 ctrl.fire('mousedown', $event);
-                ctrl.evalWidgetEvent('mousedown', $event);
             },
             mouseup: function ($event) {
                 ctrl.fire('mouseup', $event);
-                ctrl.evalWidgetEvent('mouseup', $event);
             },
             mouseenter: function ($event) {
                 ctrl.fire('mouseenter', $event);
-                ctrl.evalWidgetEvent('mouseenter', $event);
             },
             mouseleave: function ($event) {
                 ctrl.fire('mouseleave', $event);
-                ctrl.evalWidgetEvent('mouseleave', $event);
             }
     };
 
@@ -208,7 +200,6 @@ var WbAbstractWidget = function () {
             $event = $event[0];
         }
         ctrl.fire('resize', $event);
-        ctrl.evalWidgetEvent('resize', $event);
     }, 300));
 
     var options = {
@@ -333,12 +324,6 @@ WbAbstractWidget.prototype.refresh = function($event) {
 WbAbstractWidget.prototype.reload = function(){
     this.runtimeModel = {};
     this.refresh();
-    // fire init
-    var $event = {
-            source: this,
-            type: 'init'
-    };
-    this.evalWidgetEvent('init', $event);
 };
 
 
@@ -577,71 +562,6 @@ WbAbstractWidget.prototype.setStyle = function(key, value) {
  */
 WbAbstractWidget.prototype.getStyle = function(key) {
     return this.getProperty('style.' + key);
-};
-
-/**
- * Loads events for the widget
- * 
- * @param event
- *            {object} part of the widget data model
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.evalWidgetEvent = function (type, event) {
-    if (this.isEditable()) {
-        // User function will not evaluate in edit mode
-        return;
-    }
-
-    event = event || {};
-    event.type = type;
-    event.source = this;
-
-    var eventFunction;
-    if (!this.eventFunctions.hasOwnProperty(type) && this.getEvent().hasOwnProperty(type)) {
-        try{
-            var body = '\'use strict\';'+
-            'var $event = arguments[0],' + 
-            '$widget = arguments[1],' + 
-            '$http = arguments[2],' + 
-            '$media =  arguments[3],' + 
-            '$window =  arguments[4],' + 
-            '$local =  arguments[5],' + 
-            '$timeout = arguments[6],' + 
-            '$dispatcher = arguments[7],' + 
-            '$storage = arguments[8],' + 
-            '$routeParams = arguments[9];' + 
-            this.getEvent()[type];
-            this.eventFunctions[type] = new Function(body);
-        }catch(ex){
-            console.log(ex);
-        }
-    }
-    eventFunction = this.eventFunctions[type];
-    if (eventFunction) {
-        try{
-            return eventFunction(
-                    event, // -> $event
-                    this, // -> $widget
-                    this.$http, // -> $http
-                    this.$mdMedia, // -> $mdMedia
-                    this.$wbWindow, // -> $wbWindow
-                    this.$wbLocal, // -> $wbLocal
-                    // FIXME: wratp timeout and remove timers on edit mode (or distroy)
-                    this.$timeout,// -> $timeout
-                    // FIXME: wratp dispatcher and remove listeners
-                    this.$dispatcher, // -> $dispatcher
-                    this.$storage, // -> $storage
-                    this.$routeParams// -> $routeParams
-            );
-        } catch(ex){
-            console.log('Fail to run event code');
-            console.log({
-                type: type,
-                event: event
-            });
-            console.log(ex);
-        }
-    }
 };
 
 /**
@@ -1047,7 +967,6 @@ WbAbstractWidget.prototype.isIntersecting = function(){
 WbAbstractWidget.prototype.setIntersecting = function(intersecting, $event){
     this.intersecting = intersecting;
     this.fire('intersection', $event);
-    this.evalWidgetEvent('intersection', $event);
 };
 
 
@@ -1328,20 +1247,14 @@ WbAbstractWidget.prototype.getWindow = function () {
  * 
  * @ngInject
  */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $http, $widget, $mdMedia, $timeout, $routeParams, $dispatcher, $storage, $wbWindow, $wbLocal) {
+var WbWidgetCtrl = function ($scope, $element, $wbUtil, $widget, $timeout, $wbWindow) {
     WbAbstractWidget.call(this);
     this.setElement($element);
     this.setScope($scope);
     this.$wbUtil = $wbUtil;
-    this.$http = $http;
     this.$widget = $widget;
-    this.$mdMedia = $mdMedia;
     this.$timeout = $timeout;
     this.$wbWindow = $wbWindow;
-    this.$routeParams = $routeParams;
-    this.$wbLocal = $wbLocal;
-    this.$dispatcher = $dispatcher;
-    this.$storage = $storage;
 };
 WbWidgetCtrl.prototype = new WbAbstractWidget();
 
@@ -1359,25 +1272,16 @@ WbWidgetCtrl.prototype = new WbAbstractWidget();
  * 
  * @ngInject
  */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $mdTheming, $q, $http, $mdMedia, $timeout, $storage, $dispatcher, $routeParams, $wbWindow, $wbLocal) {
+var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $q, $timeout, $wbWindow) {
     WbAbstractWidget.call(this);
     this.setElement($element);
     this.setScope($scope);
 
     this.$widget = $widget;
     this.$q = $q;
-    this.$mdTheming = $mdTheming;
     this.$wbUtil = $wbUtil;
-    this.$http = $http;
-    this.$mdMedia = $mdMedia;
     this.$timeout = $timeout;
     this.$wbWindow = $wbWindow;
-    this.$routeParams = $routeParams;
-    this.$wbLocal = $wbLocal;
-    this.$dispatcher = $dispatcher;
-    this.$storage = $storage;
-
-    var ctrl = this;
 };
 WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
 
@@ -1444,7 +1348,6 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
 
     // create contents
     var $widget = this.$widget;
-    var $mdTheming = this.$mdTheming;
     var parentWidget = this;
     var $q = this.$q;
 
