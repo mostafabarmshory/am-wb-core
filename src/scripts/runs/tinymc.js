@@ -28,7 +28,8 @@ angular.module('am-wb-core')
  */
 .run(function($resource, TinymcePluginImageTool, TinymcePluginCodesample, TinymcePluginLink) {
 	var pluginManager = tinymce.PluginManager;
-	pluginManager.add('codesample', TinymcePluginCodesample);
-	pluginManager.add('image', TinymcePluginImageTool);
-	pluginManager.add('link', TinymcePluginLink);
+	// XXX: maso, 2019: update to tinymce5
+//	pluginManager.add('codesample', TinymcePluginCodesample);
+//	pluginManager.add('image', TinymcePluginImageTool);
+//	pluginManager.add('link', TinymcePluginLink);
 });

@@ -32,7 +32,7 @@ angular.module('am-wb-core')//
  * 
  */
 
-.factory('WidgetEditorTinymce', function ($q) {
+.factory('WidgetEditorTinymce', function ($sce, WidgetEditor) {
 
     /**
      * TODO: maso, 2019: extends WidgetEditorFake
@@ -40,27 +40,22 @@ angular.module('am-wb-core')//
      * Creates new instace of an editor
      */
     function editor(widget, options) {
-        this.widget = widget;
-        this.options = options;
+        options = options || {};
+        WidgetEditor.apply(this, [widget, options]);
     }
+    
+    editor.prototype = new WidgetEditor();
 
+    /**
+     * remove all resources
+     * 
+     * @memberof WidgetEditorTinymce
+     */
     editor.prototype.destroy = function () {
+        this.hide();
+        WidgetEditor.prototype.destroy.call(this);
     };
-    editor.prototype.fire = function () {
-    }; // internal
-    editor.prototype.setActive = function () {
-    }; // focus|skipFocuse
-    editor.prototype.isActive = function () {
-    };
-    editor.prototype.getWidget = function () {
-    };
-    editor.prototype.setDirty = function () {
-    };
-    editor.prototype.isDirty = function () {
-    };
-    editor.prototype.save = function () {
-    };
-
+    
     /**
      * Remove editor
      */
@@ -69,6 +64,10 @@ angular.module('am-wb-core')//
             return;
         }
         this._hide = true;
+        // remove editor
+        if(this.isDirty()){
+            this.widget.setModelProperty(this.options.property, this._content);
+        }
         tinymce.remove(this.widget.getElement().getPath())
     };
 
@@ -78,30 +77,41 @@ angular.module('am-wb-core')//
     editor.prototype.show = function () {
         this._hide = false;
         var ctrl = this;
-        var selectorPath = this.widget.getElement().getPath();
+        var widget = this.getWidget();
+        var element = widget.getElement();
+        var selectorPath = element.getPath();
         tinymce.init(_.merge(this.options, {
             selector : selectorPath,
             themes : 'modern',
             setup: function (editor) {
                 editor.on('keydown', function(e) {
-                    var tinyMceEditor = tinyMCE.get(selectorPath);
                     if (e.keyCode === 27) { // escape
-                        ctrl.hide();
+                        ctrl.closeWithoutSave();
                     }
-                })
+                    if (e.keyCode === 13){
+                        ctrl.saveAndClose();
+                    }
+                });
+
+                // Update model when:
+                // - a button has been clicked [ExecCommand]
+                // - the editor content has been modified [change]
+                // - the node has changed [NodeChange]
+                // - an object has been resized (table, image) [ObjectResized]
+                editor.on('ExecCommand change NodeChange ObjectResized', function() {
+                    editor.save();
+                    ctrl.updateView(editor);
+                    return;
+                });
             }
         }))
-        .then(function (editor) {
-            ctrl.widget.getElement().focus();
+        .then(function () {
+            element.focus();
         });
     };
 
     editor.prototype.isHidden = function () {
         return this._hide;
-    };
-    editor.prototype.Off = function () {
-    };
-    editor.prototype.On = function () {
     };
 
     /**
@@ -109,12 +119,29 @@ angular.module('am-wb-core')//
      */
     editor.prototype.updateView = function (editor) {
         var content = editor.getContent({
-            format : options.format
+            format : this.options.format || 'html'
         }).trim();
-        content = $sce.trustAsHtml(content);
-        this.widget.setModelProperty(this.property, content);
+        this._content = content;
+        this.setDirty(true);
     };
 
+    
+    editor.prototype.closeWithoutSave = function(){
+        this.setDirty(false);
+        this.hide();
+        // reset old value
+        var widget = this.widget;
+        widget.fire('modelUpdated', {
+            key: this.options.property,
+            oldValue: '',
+            value: this.widget.getModelProperty(this.options.property)
+        });
+    }
+    
+    editor.prototype.saveAndClose = function(){
+        this.hide();
+    }
+    
 //  the editor type
     return editor;
 });

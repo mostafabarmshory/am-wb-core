@@ -51,25 +51,26 @@ Created by masood.
 
 
 
-   <!--CURSOR SECTION-->
+<!--CURSOR SECTION-->
 <fieldset
    	layout="column">
    	<legend translate>Mouse</legend>
-       <md-input-container>
-        <wb-icon>mouse</wb-icon>
-        <label translate>Cursor</label>
-           <md-select 
-               style="max-width:75px;"
-               ng-model="ctrl.cursor"
-   			ng-change="ctrl.setStyle('cursor', ctrl.cursor)">
-               <md-option 
-                   ng-repeat="cursor in ::ctrl.cursors"
-                   value="{{::cursor.value}}">
-                   {{::cursor.title}}
-               </md-option>
-           </md-select>
-       </md-input-container> 
-   </fieldset>
+    <md-input-container
+    	class="md-icon-float md-icon-right md-block">
+		<wb-icon>mouse</wb-icon>
+		<label translate>Cursor</label>
+		<md-select 
+			style="max-width:75px;"
+			ng-model="ctrl.cursor"
+			ng-change="ctrl.setStyle('cursor', ctrl.cursor)">
+			<md-option 
+				ng-repeat="cursor in ::ctrl.cursors"
+				value="{{::cursor.value}}">
+					{{::cursor.title}}
+			</md-option>
+		</md-select>
+    </md-input-container> 
+</fieldset>
 
 
 <!--OPACITY SECTION-->
@@ -77,8 +78,8 @@ Created by masood.
 	layout="column">
 	<legend translate>Visibility</legend>
 	<md-input-container
-    	layout-align="end center">
-    	<label translate>Visibility</label>
+		layout-align="end center">
+		<label translate>Visibility</label>
 		<md-select 
 			ng-model="ctrl.visibility" 
 			ng-change="ctrl.setStyle('visibility', ctrl.visibility)"
@@ -94,15 +95,15 @@ Created by masood.
 			</md-option>
 		</md-select>
 	</md-input-container>
-       <md-input-container 
-           style="margin:0px; padding:0px; width:60px; height:30px;">
-        <wb-icon>opacity</wb-icon>
-        <label translate>Opacity</label>
-           <input 
-               type="text" 
-               ng-model="ctrl.opacity"
+	<md-input-container 
+		class="md-icon-float md-icon-right md-block">
+		<wb-icon>opacity</wb-icon>
+		<label translate>Opacity</label>
+		<input 
+			type="text" 
+			ng-model="ctrl.opacity"
 			ng-change="ctrl.setStyle('opacity', ctrl.opacity)">
-       </md-input-container>
+	</md-input-container>
 </fieldset>
 
 

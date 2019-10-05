@@ -25,109 +25,107 @@
 
 angular.module('am-wb-core')
 
+/**
+ * @ngdoc Directives
+ * @name wb-event-panel
+ * @description Widgets settings
+ * 
+ * Loads list of settings.
+ * 
+ */
+.directive('wbEventPanel', function ($settings, $widget) {
 	/**
-	 * @ngdoc Directives
-	 * @name wb-setting-panel-group
-	 * @description Widgets settings
-	 * 
-	 * Loads list of settings.
-	 * 
+	 * Init settings
 	 */
-	.directive('wbEventPanel', function ($settings, $widget) {
-	    /**
-	     * Init settings
-	     */
-	    function postLink($scope, $element, $attrs, $ctrls) {
+	function postLink($scope, $element, $attrs, $ctrls) {
 		// Load ngModel
 		var ngModelCtrl = $ctrls[0];
 		var widget = null;
 		var eventTypes = [{
 			key: 'init',
 			title: 'Initialization'
-		    }, {
+		}, {
 			key: 'click',
 			title: 'Click'
-		    }, {
+		}, {
 			key: 'dblclick',
 			title: 'Double click'
-		    }, {
+		}, {
 			key: 'mouseout',
 			title: 'Mouse out'
-		    }, {
+		}, {
 			key: 'mouseover',
 			title: 'Mouse over'
-		    }, {
+		}, {
 			key: 'mousedown',
 			title: 'Mouse down'
-		    }, {
+		}, {
 			key: 'mouseup',
 			title: 'Mouse up'
-		    }, {
+		}, {
 			key: 'mouseenter',
 			title: 'Mouse enter'
-		    }, {
+		}, {
 			key: 'mouseleave',
 			title: 'Mouse leave'
-		    }, {
+		}, {
 			key: 'resize',
 			title: 'Resize'
-		    }, {
+		}, {
 			key: 'intersection',
 			title: 'Intersection'
-		    }, {
+		}, {
 			key: 'success',
 			title: 'Success'
-		    }, {
+		}, {
 			key: 'failure',
 			title: 'Failure'
-		    }];
+		}];
 
 		ngModelCtrl.$render = function () {
-		    if (ngModelCtrl.$viewValue) {
-			widget = ngModelCtrl.$viewValue;
-			if (angular.isArray(widget)
-				&& widget.length > 0) {
-			    widget = widget[0];
-			    loadEvents();
-			} else {
-			    cleanEvents();
+			if (ngModelCtrl.$viewValue) {
+				cleanEvents();
+				widget = ngModelCtrl.$viewValue;
+				if (angular.isArray(widget) && widget.length > 0) {
+					widget = widget[0];
+				}
+				loadEvents();
 			}
-		    }
 		};
 
 		function cleanEvents() {
-		    $scope.events = [];
+			$scope.events = [];
 		}
 
 		function loadEvents() {
-		    cleanEvents();
-		    for (var i = 0; i < eventTypes.length; i++) {
-			var event = eventTypes[i];
-			event.code = widget.getModelProperty('event.' + event.key);
-			$scope.events.push(event);
-		    }
+			cleanEvents();
+			for (var i = 0; i < eventTypes.length; i++) {
+				var event = eventTypes[i];
+				event.code = widget.getModelProperty('event.' + event.key);
+				$scope.events.push(event);
+			}
 		}
 
 		function saveEvents() {
-		    for (var i = 0; i < $scope.events.length; i++) {
-			var event = $scope.events[i];
-			if (event.code) {
-			    widget.setModelProperty('event.'
-				    + event.key, event.code);
-			} else {
-			    widget.setModelProperty('event.'
-				    + event.key, undefined);
+			for (var i = 0; i < $scope.events.length; i++) {
+				var event = $scope.events[i];
+				if (event.code) {
+					widget.setModelProperty('event.'
+							+ event.key, event.code);
+				} else {
+					widget.setModelProperty('event.'
+							+ event.key, undefined);
+				}
 			}
-		    }
 		}
 
 		/**
 		 * Save events into the model
 		 */
 		$scope.saveEvents = saveEvents;
-	    }
+	}
 
-	    return {
+	return {
 		restrict: 'E',
 		replace: true,
 		templateUrl: 'views/directives/wb-event-panel.html',
@@ -140,30 +138,32 @@ angular.module('am-wb-core')
 		 */
 		controller: function ($scope, $resource) {
 
-		    var defaultLanguages = [{
-			    text: 'JavaScript',
-			    value: 'javascript'
+			var defaultLanguages = [{
+				text: 'JavaScript',
+				value: 'javascript'
 			}];
-		    this.editEvent = function (event) {
-			$resource.get('script', {
-			    data: {
-				language: 'javascript',
-				languages: defaultLanguages,
-				code: event.code
-			    }
-			}).then(function (value) {
-			    event.code = value.code;
-			    if (!value) {
-				delete event.code;
-			    }
-			    $scope.saveEvents();
-			});
-		    };
+			this.editEvent = function (event, $evn) {
+				$evn.stopPropagation();
+				$resource.get('script', {
+					data: {
+						language: 'javascript',
+						languages: defaultLanguages,
+						code: event.code
+					}
+				}).then(function (value) {
+					event.code = value.code;
+					if (!value) {
+						delete event.code;
+					}
+					$scope.saveEvents();
+				});
+			};
 
-		    this.deleteEvent = function (event) {
-			delete event.code;
-			$scope.saveEvents();
-		    };
+			this.deleteEvent = function (event, $evn) {
+				$evn.stopPropagation();
+				delete event.code;
+				$scope.saveEvents();
+			};
 		}
-	    };
-	});
+	};
+});
