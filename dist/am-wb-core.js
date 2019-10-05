@@ -7246,109 +7246,107 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
+/**
+ * @ngdoc Directives
+ * @name wb-event-panel
+ * @description Widgets settings
+ * 
+ * Loads list of settings.
+ * 
+ */
+.directive('wbEventPanel', function ($settings, $widget) {
 	/**
-	 * @ngdoc Directives
-	 * @name wb-setting-panel-group
-	 * @description Widgets settings
-	 * 
-	 * Loads list of settings.
-	 * 
+	 * Init settings
 	 */
-	.directive('wbEventPanel', function ($settings, $widget) {
-	    /**
-	     * Init settings
-	     */
-	    function postLink($scope, $element, $attrs, $ctrls) {
+	function postLink($scope, $element, $attrs, $ctrls) {
 		// Load ngModel
 		var ngModelCtrl = $ctrls[0];
 		var widget = null;
 		var eventTypes = [{
 			key: 'init',
 			title: 'Initialization'
-		    }, {
+		}, {
 			key: 'click',
 			title: 'Click'
-		    }, {
+		}, {
 			key: 'dblclick',
 			title: 'Double click'
-		    }, {
+		}, {
 			key: 'mouseout',
 			title: 'Mouse out'
-		    }, {
+		}, {
 			key: 'mouseover',
 			title: 'Mouse over'
-		    }, {
+		}, {
 			key: 'mousedown',
 			title: 'Mouse down'
-		    }, {
+		}, {
 			key: 'mouseup',
 			title: 'Mouse up'
-		    }, {
+		}, {
 			key: 'mouseenter',
 			title: 'Mouse enter'
-		    }, {
+		}, {
 			key: 'mouseleave',
 			title: 'Mouse leave'
-		    }, {
+		}, {
 			key: 'resize',
 			title: 'Resize'
-		    }, {
+		}, {
 			key: 'intersection',
 			title: 'Intersection'
-		    }, {
+		}, {
 			key: 'success',
 			title: 'Success'
-		    }, {
+		}, {
 			key: 'failure',
 			title: 'Failure'
-		    }];
+		}];
 
 		ngModelCtrl.$render = function () {
-		    if (ngModelCtrl.$viewValue) {
-			widget = ngModelCtrl.$viewValue;
-			if (angular.isArray(widget)
-				&& widget.length > 0) {
-			    widget = widget[0];
-			    loadEvents();
-			} else {
-			    cleanEvents();
+			if (ngModelCtrl.$viewValue) {
+				cleanEvents();
+				widget = ngModelCtrl.$viewValue;
+				if (angular.isArray(widget) && widget.length > 0) {
+					widget = widget[0];
+				}
+				loadEvents();
 			}
-		    }
 		};
 
 		function cleanEvents() {
-		    $scope.events = [];
+			$scope.events = [];
 		}
 
 		function loadEvents() {
-		    cleanEvents();
-		    for (var i = 0; i < eventTypes.length; i++) {
-			var event = eventTypes[i];
-			event.code = widget.getModelProperty('event.' + event.key);
-			$scope.events.push(event);
-		    }
+			cleanEvents();
+			for (var i = 0; i < eventTypes.length; i++) {
+				var event = eventTypes[i];
+				event.code = widget.getModelProperty('event.' + event.key);
+				$scope.events.push(event);
+			}
 		}
 
 		function saveEvents() {
-		    for (var i = 0; i < $scope.events.length; i++) {
-			var event = $scope.events[i];
-			if (event.code) {
-			    widget.setModelProperty('event.'
-				    + event.key, event.code);
-			} else {
-			    widget.setModelProperty('event.'
-				    + event.key, undefined);
+			for (var i = 0; i < $scope.events.length; i++) {
+				var event = $scope.events[i];
+				if (event.code) {
+					widget.setModelProperty('event.'
+							+ event.key, event.code);
+				} else {
+					widget.setModelProperty('event.'
+							+ event.key, undefined);
+				}
 			}
-		    }
 		}
 
 		/**
 		 * Save events into the model
 		 */
 		$scope.saveEvents = saveEvents;
-	    }
+	}
 
-	    return {
+	return {
 		restrict: 'E',
 		replace: true,
 		templateUrl: 'views/directives/wb-event-panel.html',
@@ -7361,33 +7359,35 @@ angular.module('am-wb-core')
 		 */
 		controller: function ($scope, $resource) {
 
-		    var defaultLanguages = [{
-			    text: 'JavaScript',
-			    value: 'javascript'
+			var defaultLanguages = [{
+				text: 'JavaScript',
+				value: 'javascript'
 			}];
-		    this.editEvent = function (event) {
-			$resource.get('script', {
-			    data: {
-				language: 'javascript',
-				languages: defaultLanguages,
-				code: event.code
-			    }
-			}).then(function (value) {
-			    event.code = value.code;
-			    if (!value) {
-				delete event.code;
-			    }
-			    $scope.saveEvents();
-			});
-		    };
+			this.editEvent = function (event, $evn) {
+				$evn.stopPropagation();
+				$resource.get('script', {
+					data: {
+						language: 'javascript',
+						languages: defaultLanguages,
+						code: event.code
+					}
+				}).then(function (value) {
+					event.code = value.code;
+					if (!value) {
+						delete event.code;
+					}
+					$scope.saveEvents();
+				});
+			};
 
-		    this.deleteEvent = function (event) {
-			delete event.code;
-			$scope.saveEvents();
-		    };
+			this.deleteEvent = function (event, $evn) {
+				$evn.stopPropagation();
+				delete event.code;
+				$scope.saveEvents();
+			};
 		}
-	    };
-	});
+	};
+});
 
 /* 
  * The MIT License (MIT)
@@ -17818,7 +17818,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-event-panel.html',
-    "<table class=mb-table style=\"font-size: 10px\"> <thead> <tr md-colors=\"{color: 'primary-700'}\"> <td translate=\"\">Name</td> <td translate=\"\">Code</td> <td></td> </tr> </thead> <tbody> <tr ng-repeat=\"event in events track by $index\"> <td ng-click=\"ctrl.editEvent(event, $event)\" style=\"cursor: pointer\">{{event.title}} </td> <td style=\"cursor: pointer\">{{event.code| limitTo:13 }} ...</td> <td align=center style=\"cursor: pointer;min-height: 22px\"> <md-button style=\"min-height: 20px;height: 20px;margin: 0px;line-height: 20px;padding: 0px\" ng-if=event.code ng-click=\"ctrl.deleteEvent(event, $event)\" class=md-icon-button> <wb-icon>delete</wb-icon> </md-button> </td> </tr> </tbody> </table>"
+    "<table class=mb-table style=\"font-size: 10px\"> <thead> <tr md-colors=\"{color: 'primary-700'}\"> <td translate=\"\">Name</td> <td translate=\"\">Code</td> <td></td> </tr> </thead> <tbody> <tr ng-click=\"ctrl.editEvent(event, $event)\" ng-repeat=\"event in events track by $index\" style=\"cursor: pointer\"> <td translate>{{event.title}}</td> <td style=\"cursor: pointer\">{{event.code| limitTo:13 }} ...</td> <td align=center style=\"cursor: pointer;min-height: 22px\"> <md-button style=\"min-height: 20px;height: 20px;margin: 0px;line-height: 20px;padding: 0px\" ng-if=event.code ng-click=\"ctrl.deleteEvent(event, $event)\" class=md-icon-button> <wb-icon>delete</wb-icon> </md-button> </td> </tr> </tbody> </table>"
   );
 
 
@@ -18042,7 +18042,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/settings/wb-seo.html',
     " <fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Id</label> <input ng-model=ctrl.id ng-change=\"ctrl.setProperty('id', ctrl.id)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Label</label> <input ng-model=ctrl.label ng-change=\"ctrl.setProperty('label', ctrl.label)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Description</label> <textarea name=description ng-model=ctrl.description ng-change=\"ctrl.setProperty('description', ctrl.description)\">\n" +
-    "        </textarea> </md-input-container> </fieldset> <fieldset layout=column style=\"padding: 0px\"> <legend translate=\"\">Schema</legend> <md-input-container flex=100 style=\"padding-left: 8px;padding-right: 8px\"> <label translate=\"\">Type</label> <md-select ng-model=ctrl.category ng-change=\"ctrl.setProperty('category', ctrl.category)\"> <md-option ng-repeat=\"type in ctrl.schemaTypes\" value={{type.value}}> {{type.key}} </md-option> </md-select> </md-input-container> <div layout=row layout-align=\"center center\" ng-if=ctrl.alert style=\"padding-left: 8px; padding-right: 8px\"> <p style=\"color: red\">! <span translate=\"\">{{ctrl.alert}}</span></p> </div> <md-input-container ng-if=!ctrl.alert flex=100 style=\"padding-left: 8px;padding-right: 8px\"> <label translate=\"\">Property</label> <md-select md-on-open=ctrl.setProperties() ng-model=ctrl.property ng-change=\"ctrl.setProperty('property', ctrl.property)\"> <md-option ng-repeat=\"property in ctrl.properties\" value=property> {{property}} </md-option> </md-select> </md-input-container> </fieldset>"
+    "\t\t</textarea> </md-input-container> </fieldset> <fieldset layout=column style=\"padding: 0px\"> <legend translate=\"\">Schema</legend> <md-input-container flex=100 style=\"padding-left: 8px;padding-right: 8px\"> <label translate=\"\">Type</label> <md-select ng-model=ctrl.category ng-change=\"ctrl.setProperty('category', ctrl.category)\"> <md-option ng-repeat=\"type in ctrl.schemaTypes\" value={{type.value}}> {{type.key}} </md-option> </md-select> </md-input-container> <div layout=row layout-align=\"center center\" ng-if=ctrl.alert style=\"padding-left: 8px; padding-right: 8px\"> <p style=\"color: red\">! <span translate=\"\">{{ctrl.alert}}</span></p> </div> <md-input-container ng-if=!ctrl.alert flex=100 style=\"padding-left: 8px;padding-right: 8px\"> <label translate=\"\">Property</label> <md-select md-on-open=ctrl.setProperties() ng-model=ctrl.property ng-change=\"ctrl.setProperty('property', ctrl.property)\"> <md-option ng-repeat=\"property in ctrl.properties\" value=property> {{property}} </md-option> </md-select> </md-input-container> </fieldset>"
   );
 
 
