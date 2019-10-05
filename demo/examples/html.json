@@ -6,6 +6,9 @@
 			"direction": "column"
 		}
 	},
+    "event": {
+        "init": "function update(){$widget.setProperty(\"style.background.color\", \"red\"); $timeout(update, 5);} $timeout(update);"
+    },
 	"contents": [
 		{
 			"type": "meta",
