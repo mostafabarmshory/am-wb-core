@@ -1316,10 +1316,15 @@ WbWidgetGroupCtrl.prototype.setModel = function (model) {
         return;
     }
     this.wbModel = model;
-    this.loadWidgets(model);
     this.fire('modelChanged');
-    this.reload();
-    this.setState('ready');
+
+    var ctrl = this;
+    this.loadWidgets(model)
+    .finally(function () {
+        ctrl.fire('loaded');
+        ctrl.reload();
+        ctrl.setState('ready');
+    })
 };
 
 /**
@@ -1358,14 +1363,14 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
     this.childWidgets = [];
 
     // check for new contents
+    var $q = this.$q;
     if (!model || !angular.isArray(model.contents)) {
-        return;
+        return $q.resolve();
     }
 
     // create contents
     var $widget = this.$widget;
     var parentWidget = this;
-    var $q = this.$q;
 
     var compilesJob = [];
     model.contents.forEach(function (item, index) {
@@ -1384,9 +1389,6 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
             widget.setEditable(ctrl.isEditable());
             $element.append(widget.getElement());
         });
-    })
-    .finally(function () {
-        ctrl.fire('loaded');
     });
 };
 

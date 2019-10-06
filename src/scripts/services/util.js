@@ -199,6 +199,8 @@ angular.module('am-wb-core')
         // layout
         if(style.visibility === 'hidden'){
             css.display = 'none';
+        } else {
+        	css.display = '';
         }
 
         css = _.merge(css, 
@@ -216,16 +218,34 @@ angular.module('am-wb-core')
                 convertToWidgetCssTransfrom(style.transform || {}),
                 // Overflow
                 convertToWidgetCssOverflow(style.overflow || {}),
+                // text
+                convertToWidgetCssText(style.text || {}),
                 // color, cursor, opacity, direction
                 {
-            padding: style.padding,
-            margin: style.margin,
-            direction: style.direction || 'ltr',
-            color: style.color || 'initial',
-            cursor: style.cursor || 'auto',
-            opacity: style.opacity || '1',
+		            padding: style.padding,
+		            margin: style.margin,
+		            direction: style.direction || 'ltr',
+		            color: style.color || 'initial',
+		            cursor: style.cursor || 'auto',
+		            opacity: style.opacity || '1',
                 });
 
+        return css;
+    }
+    
+    function convertToWidgetCssText(textOptions){
+    	var css =  {
+            'text-decoration': textOptions.decoration || 'none',
+            'text-shadow': textOptions.shadow || 'none',
+            'text-transform': textOptions.transform || 'none',
+            'text-overflow': textOptions.overflow || 'clip',
+            'text-justify': textOptions.justify || 'auto',
+            'text-indent': textOptions.indent || 'indent',
+            'text-align-last': textOptions.alignLast || 'auto',
+        };
+        if(textOptions.align){
+        	css['text-align'] = textOptions.align || 'indent';
+        }
         return css;
     }
 
@@ -614,10 +634,14 @@ angular.module('am-wb-core')
     
 
     function cleanType(model){
-        if(model.type == 'Link') {
+        if(model.type === 'Link') {
             model.type = 'a';
             model.html = model.title;
             model.href = model.url;
+            model.style.text = {
+            		align: 'center'
+            };
+            model.style.cursor = 'pointer';
             
             delete model.title;
             delete model.url;
@@ -653,11 +677,11 @@ angular.module('am-wb-core')
         if (!model.type || model.type === 'Page') {
             model.type = 'Group';
         }
-        if (model.version === 'wb1' && !force) {
+        if (model.version === 'wb2' && !force) {
             return model;
         }
         var newModel = cleanInternal(model);
-        newModel.version = 'wb1';
+        newModel.version = 'wb2';
         return newModel;
     }
 

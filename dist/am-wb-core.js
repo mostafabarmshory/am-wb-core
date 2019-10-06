@@ -5297,6 +5297,74 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
+ * @name MbWidgetACtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
+ * 
+ */
+.controller('MbWidgetLinkCtrl', function () {
+    // list of element attributes
+    var elementAttributes = [
+        'crossorigin',
+        'href',
+        'hreflang',
+        'media',
+        'rel',
+        'size',
+        'type',
+        ];
+
+    this.initWidget = function(){
+        var ctrl = this;
+        function eventHandler(event){
+            if(elementAttributes.includes(event.key)){
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                ctrl.setElementAttribute(key, value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data
+        for(var i =0; i < elementAttributes.length;i++){
+            var key = elementAttributes[i];
+            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
  * @name MbWidgetMetaCtrl
  * @description Manage a meta data 
  * 
@@ -5651,11 +5719,15 @@ var WbAbstractWidget = function () {
 
     // event listeners
     var ctrl = this;
+    /*
+     * TODO: maso, 2019: move to event manager.
+     */
     this.eventListeners = {
             click: function ($event) {
                 if (ctrl.isEditable()) {
                     ctrl.setSelected(true, $event);
                     $event.stopPropagation();
+                    $event.preventDefault();
                 }
                 ctrl.fire('click', $event);
             },
@@ -5663,6 +5735,7 @@ var WbAbstractWidget = function () {
                 if (ctrl.isEditable()) {
                     ctrl.setSelected(true, $event);
                     $event.stopPropagation();
+                    $event.preventDefault();
                     // Open an editor 
                     var editor = ctrl.$widget.getEditor(ctrl);
                     editor.show();
@@ -5686,6 +5759,17 @@ var WbAbstractWidget = function () {
             },
             mouseleave: function ($event) {
                 ctrl.fire('mouseleave', $event);
+            },
+            
+            // Media events
+            error: function ($event) {
+                ctrl.fire('error', $event);
+            },
+            success: function ($event) {
+                ctrl.fire('error', $event);
+            },
+            load: function ($event) {
+                ctrl.fire('load', $event);
             }
     };
 
@@ -5701,7 +5785,7 @@ var WbAbstractWidget = function () {
 
     var options = {
             root: null,
-            rootMargin: "0px",
+            rootMargin: '0px',
     };
     this.intersectionObserver = new IntersectionObserver(function ($event) {
         if(angular.isArray($event)){
@@ -6212,7 +6296,7 @@ WbAbstractWidget.prototype.isSilent = function() {
 WbAbstractWidget.prototype.on = function (type, callback) {
     if (!angular.isFunction(callback)) {
         throw {
-            message: "Callback must be a function"
+            message: 'Callback must be a function'
         };
     }
     if (!angular.isArray(this.callbacks[type])) {
@@ -6797,10 +6881,15 @@ WbWidgetGroupCtrl.prototype.setModel = function (model) {
         return;
     }
     this.wbModel = model;
-    this.loadWidgets(model);
     this.fire('modelChanged');
-    this.reload();
-    this.setState('ready');
+
+    var ctrl = this;
+    this.loadWidgets(model)
+    .finally(function () {
+        ctrl.fire('loaded');
+        ctrl.reload();
+        ctrl.setState('ready');
+    })
 };
 
 /**
@@ -6839,14 +6928,14 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
     this.childWidgets = [];
 
     // check for new contents
+    var $q = this.$q;
     if (!model || !angular.isArray(model.contents)) {
-        return;
+        return $q.resolve();
     }
 
     // create contents
     var $widget = this.$widget;
     var parentWidget = this;
-    var $q = this.$q;
 
     var compilesJob = [];
     model.contents.forEach(function (item, index) {
@@ -6865,9 +6954,6 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
             widget.setEditable(ctrl.isEditable());
             $element.append(widget.getElement());
         });
-    })
-    .finally(function () {
-        ctrl.fire('loaded');
     });
 };
 
@@ -7202,8 +7288,14 @@ angular.module('am-wb-core')
 			key: 'success',
 			title: 'Success'
 		}, {
-			key: 'failure',
+			key: 'error',
 			title: 'Failure'
+		}, {
+		    key: 'load',
+		    title: 'Load'
+		}, {
+		    key: 'load',
+		    title: 'Load'
 		}];
 
 		ngModelCtrl.$render = function () {
@@ -14619,6 +14711,26 @@ angular.module('am-wb-core')
             };
         }
     });
+
+    /**
+     * @ngDoc Settings
+     * @name amh-common-link
+     * @description Link setting page
+     */
+    $settings.newPage({
+        type: 'a',
+        label: 'Link',
+        description: 'Manage link in the current widget.',
+        icon: 'settings',
+        templateUrl: 'views/settings/wb-a.html',
+        controllerAs: 'ctrl',
+        controller: function () {
+            this.init = function () {
+                this.href = this.getProperty('href');
+                this.html = this.getProperty('html');
+            };
+        }
+    });
 });
 
 /* 
@@ -14757,7 +14869,11 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 		var eventFunction;
 		if (!widget.eventFunctions.hasOwnProperty(type)) {
 			try{
-				var body = '\'use strict\';'+
+				var ucode = widget.getEvent()[type];
+				if(!ucode){
+					return;
+				}
+				var body = '\'use strict\';\n'+
 				'var $event = arguments[0],' + 
 				'$widget = arguments[1],' + 
 				'$http = arguments[2],' + 
@@ -14767,8 +14883,7 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 				'$timeout = arguments[6],' + 
 				'$dispatcher = arguments[7],' + 
 				'$storage = arguments[8],' + 
-				'$routeParams = arguments[9];' + 
-				widget.getEvent()[type];
+				'$routeParams = arguments[9];\n' + ucode;
 				widget.eventFunctions[type] = new Function(body);
 			}catch(ex){
 				console.log(ex);
@@ -14838,6 +14953,30 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 				intersection: function ($event) {
 					evalWidgetEvent(widget, 'intersection', $event);
 				},
+				
+				//
+				// Common media events
+				//
+				success: function ($event) {
+				    evalWidgetEvent(widget, 'success', $event);
+				},
+				error: function ($event) {
+				    evalWidgetEvent(widget, 'error', $event);
+				},
+				abort: function ($event) {
+				    evalWidgetEvent(widget, 'abort', $event);
+				},
+				load: function ($event) {
+				    evalWidgetEvent(widget, 'load', $event);
+				},
+				beforeunload: function ($event) {
+				    evalWidgetEvent(widget, 'beforeunload', $event);
+				},
+				unload: function ($event) {
+				    evalWidgetEvent(widget, 'unload', $event);
+				},
+				
+				
 		};
 		angular.forEach(widget.__eventListeners, function (listener, key) {
 			widget.on(key, listener);
@@ -15019,30 +15158,6 @@ angular.module('am-wb-core')
  */
 .run(function ($widget) {
 
-    $widget.setEditor('p', {
-        type: 'WidgetEditorTinymce',
-        options:{
-            property: 'html',
-            inline: true,
-            menubar: false,
-            plugins: [
-                'link',
-                'lists',
-                'powerpaste',
-                'autolink',
-                'tinymcespellchecker'],
-            toolbar: [
-                'undo redo | bold italic underline | fontselect fontsizeselect',
-                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
-            valid_styles: {
-                '*': 'font-size,font-family,color,text-decoration,text-align'
-            },
-            powerpaste_word_import: 'clean',
-            powerpaste_html_import: 'clean',
-        }
-    });
-
 
     /**
      * @ngdoc Widgets
@@ -15131,6 +15246,30 @@ angular.module('am-wb-core')
             };
         },
         controllerAs: 'ctrl'
+    });
+
+    $widget.setEditor('HtmlText', {
+        type: 'WidgetEditorTinymce',
+        options:{
+            property: 'html',
+            inline: true,
+            menubar: false,
+            plugins: [
+                'link',
+                'lists',
+                'powerpaste',
+                'autolink',
+                'tinymcespellchecker'],
+            toolbar: [
+                'undo redo | bold italic underline | fontselect fontsizeselect',
+                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
+            valid_styles: {
+                '*': 'font-size,font-family,color,text-decoration,text-align'
+            },
+            powerpaste_word_import: 'clean',
+            powerpaste_html_import: 'clean',
+        }
     });
     /**
      * @ngdoc Widgets
@@ -15284,6 +15423,30 @@ angular.module('am-wb-core')
         controllerAs: 'ctrl',
         controller: 'MbWidgetHtmlCtrl'
     });
+
+    $widget.setEditor('p', {
+        type: 'WidgetEditorTinymce',
+        options:{
+            property: 'html',
+            inline: true,
+            menubar: false,
+            plugins: [
+                'link',
+                'lists',
+                'powerpaste',
+                'autolink',
+                'tinymcespellchecker'],
+            toolbar: [
+                'undo redo | bold italic underline | fontselect fontsizeselect',
+                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
+            valid_styles: {
+                '*': 'font-size,font-family,color,text-decoration,text-align'
+            },
+            powerpaste_word_import: 'clean',
+            powerpaste_html_import: 'clean',
+        }
+    });
     
     /**
      * @ngdoc Widgets
@@ -15365,7 +15528,7 @@ angular.module('am-wb-core')
                   'powerpaste',
                   'autolink'
                 ],
-                toolbar: 'undo redo | bold italic underline',
+                toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignjustify alignright alignfull ',
                 valid_elements: 'strong,em,span[style],a[href]',
                 valid_styles: {
                   '*': 'font-size,font-family,color,text-decoration,text-align'
@@ -15374,6 +15537,23 @@ angular.module('am-wb-core')
                 powerpaste_html_import: 'clean',
             }
     };
+//    menubar: true,
+//    inline: true,
+//    theme: 'modern',
+//    plugins : ['advlist','autolink','autoresize','autosave','bbcode','charmap',
+//        'code','codesample','colorpicker','contextmenu', 'directionality','emoticons',
+//        'hr','image','imagetools','importcss','insertdatetime','legacyoutput',
+//        'link','lists','media','nonbreaking','noneditable','paste','save','searchreplace',
+//        'spellchecker','tabfocus','table','template','textcolor','textpattern',
+//        'toc','visualblocks','wordcount'
+//    ],
+//    toolbar: [
+//        'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',
+//        'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'
+//    ],
+//    powerpaste_word_import: 'clean',
+//    powerpaste_html_import: 'clean',
+//    format: 'raw'
     $widget.setEditor('a', headerEditorDescription);
 
     /**
@@ -15408,6 +15588,34 @@ angular.module('am-wb-core')
             controller:'MbWidgetHtmlCtrl'
         });
     }
+    
+    
+    
+
+    /**
+     * @ngdoc Widgets
+     * @name Link
+     * @description A widget to add document link 
+     */
+    $widget.newWidget({
+        type: 'link',
+        title: 'Link',
+        label: 'link',
+        icon: 'link',
+        description: 'A widget to insert an link to page.',
+        groups: ['basic'],
+        setting: ['link'],
+        template: '<link></link>',
+        help: 'http://dpq.co.ir/more-information-link',
+        model: {
+            html: 'Link',
+            url: 'http://www.gitlab.com/am-wb/am-wb-common'
+        },
+        controllerAs: 'ctrl',
+        controller: 'MbWidgetLinkCtrl', 
+    });
+    
+    
 });
 
 /* 
@@ -16770,638 +16978,681 @@ angular.module('am-wb-core')
  */
 angular.module('am-wb-core')
 .service('$wbUtil', function ($q, $templateRequest, $sce) {
-	'use strict';
-	var REGEX_BACKGROUND_IMAGE_SPEC = RegExp('(repeating\-)?(linear|radial)\-(gradient)');
-	var service = this;
+    'use strict';
+    var REGEX_BACKGROUND_IMAGE_SPEC = RegExp('(repeating\-)?(linear|radial)\-(gradient)');
+    var service = this;
 
-	function cleanMap(oldStyle, newStyle, map) {
-		for (var i = 0; i < map.length; i++) {
-			if (oldStyle[map[i][0]]) {
-				newStyle[map[i][1]] = oldStyle[map[i][0]];
-				delete oldStyle[map[i][0]];
-			}
-		}
-	}
+    function cleanMap(oldStyle, newStyle, map) {
+        for (var i = 0; i < map.length; i++) {
+            if (oldStyle[map[i][0]]) {
+                newStyle[map[i][1]] = oldStyle[map[i][0]];
+                delete oldStyle[map[i][0]];
+            }
+        }
+    }
 
-	function getTemplateOf(page)
-	{
-		var template = page.template;
-		var templateUrl = page.templateUrl;
-		if (angular.isDefined(template)) {
-			if (angular.isFunction(template)) {
-				template = template(page.params | page);
-			}
-		} else if (angular.isDefined(templateUrl)) {
-			if (angular.isFunction(templateUrl)) {
-				templateUrl = templateUrl(page.params);
-			}
-			if (angular.isDefined(templateUrl)) {
-				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
-				template = $templateRequest(templateUrl);
-			}
-		}
-		return template;
-	}
+    function getTemplateOf(page)
+    {
+        var template = page.template;
+        var templateUrl = page.templateUrl;
+        if (angular.isDefined(template)) {
+            if (angular.isFunction(template)) {
+                template = template(page.params | page);
+            }
+        } else if (angular.isDefined(templateUrl)) {
+            if (angular.isFunction(templateUrl)) {
+                templateUrl = templateUrl(page.params);
+            }
+            if (angular.isDefined(templateUrl)) {
+                page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+                template = $templateRequest(templateUrl);
+            }
+        }
+        return template;
+    }
 
-	/**
-	 * Loading template of the page
-	 * 
-	 * @name getTemplateFor
-	 * @memberof $wbUtil
-	 * @param page
-	 *            {object} properties of a page, widget , ..
-	 * @return promise to load template on resolve.
-	 */
-	function getTemplateFor(page)
-	{
-		return $q.when(getTemplateOf(page));
-	}
+    /**
+     * Loading template of the page
+     * 
+     * @name getTemplateFor
+     * @memberof $wbUtil
+     * @param page
+     *            {object} properties of a page, widget , ..
+     * @return promise to load template on resolve.
+     */
+    function getTemplateFor(page)
+    {
+        return $q.when(getTemplateOf(page));
+    }
 
-	/**
-	 * Converts data into a valid CSS attributes
-	 */
-	function convertToGroupCss(style) {
-		var style = style || {};
-		var css = convertToWidgetCss(style);
+    /**
+     * Converts data into a valid CSS attributes
+     */
+    function convertToGroupCss(style) {
+        var style = style || {};
+        var css = convertToWidgetCss(style);
 
-		if(style.visibility === 'hidden'){
-			css.display = 'none';
-		} else {
-			/*
-			 * Group
-			 * 
-			 * check if is group apply flex flow
-			 */
-			css.display = 'flex';
-			var layout = style.layout || {};
-			// row
-			if (layout.direction === 'row') {
-				css['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
-				css['overflow-x'] = layout.wrap ? 'visible' : 'auto';
-				css['overflow-y'] = 'visible';
-			} else {
-				css['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
-				css['overflow-x'] = 'visible';
-				css['overflow-y'] = layout.wrap ? 'visible' : 'auto';
-			}
-
-
-			// wrap
-			if (layout.wrap) {
-				css['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
-				// wrap align
-				var alignContent;
-				switch (layout.wrap_align) {
-				case 'start':
-					alignContent = 'flex-start';
-					break;
-				case 'end':
-					alignContent = 'flex-end';
-					break;
-				case 'center':
-					alignContent = 'center';
-					break;
-				case 'space-between':
-					alignContent = 'space-between';
-					break;
-				case 'space-around':
-					alignContent = 'space-around';
-					break;
-				case 'stretch':
-					alignContent = 'stretch';
-					break;
-				default:
-					alignContent = 'stretch';
-				}
-				css['align-content'] = alignContent;
-			} else {
-				css['flex-wrap'] = 'nowrap';
-			}
+        if(style.visibility === 'hidden'){
+            css.display = 'none';
+        } else {
+            /*
+             * Group
+             * 
+             * check if is group apply flex flow
+             */
+            css.display = 'flex';
+            var layout = style.layout || {};
+            // row
+            if (layout.direction === 'row') {
+                css['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
+                css['overflow-x'] = layout.wrap ? 'visible' : 'auto';
+                css['overflow-y'] = 'visible';
+            } else {
+                css['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
+                css['overflow-x'] = 'visible';
+                css['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+            }
 
 
-			// justify
-			var justify;
-			switch (layout.justify) {
-			case 'start':
-				justify = 'flex-start';
-				break;
-			case 'end':
-				justify = 'flex-end';
-				break;
-			case 'center':
-				justify = 'center';
-				break;
-			case 'space-between':
-				justify = 'space-between';
-				break;
-			case 'space-around':
-				justify = 'space-around';
-				break;
-			case 'space-evenly':
-				justify = 'space-evenly';
-				break;
-			default:
-				justify = 'flex-start';
-			}
-			css['justify-content'] = justify;
+            // wrap
+            if (layout.wrap) {
+                css['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
+                // wrap align
+                var alignContent;
+                switch (layout.wrap_align) {
+                case 'start':
+                    alignContent = 'flex-start';
+                    break;
+                case 'end':
+                    alignContent = 'flex-end';
+                    break;
+                case 'center':
+                    alignContent = 'center';
+                    break;
+                case 'space-between':
+                    alignContent = 'space-between';
+                    break;
+                case 'space-around':
+                    alignContent = 'space-around';
+                    break;
+                case 'stretch':
+                    alignContent = 'stretch';
+                    break;
+                default:
+                    alignContent = 'stretch';
+                }
+                css['align-content'] = alignContent;
+            } else {
+                css['flex-wrap'] = 'nowrap';
+            }
 
-			// align
-			var align;
-			switch (layout.align) {
-			case 'start':
-				align = 'flex-start';
-				break;
-			case 'end':
-				align = 'flex-end';
-				break;
-			case 'center':
-				align = 'center';
-				break;
-			case 'baseline':
-				align = 'baseline';
-				break;
-			case 'stretch':
-				align = 'stretch';
-				break;
-			default:
-				align = 'stretch';
-			}
-			css['align-items'] = align;
-		}
 
-		return css;
-	}
+            // justify
+            var justify;
+            switch (layout.justify) {
+            case 'start':
+                justify = 'flex-start';
+                break;
+            case 'end':
+                justify = 'flex-end';
+                break;
+            case 'center':
+                justify = 'center';
+                break;
+            case 'space-between':
+                justify = 'space-between';
+                break;
+            case 'space-around':
+                justify = 'space-around';
+                break;
+            case 'space-evenly':
+                justify = 'space-evenly';
+                break;
+            default:
+                justify = 'flex-start';
+            }
+            css['justify-content'] = justify;
 
-	/**
-	 * Converts data into a valid CSS attributes
-	 */
-	function convertToWidgetCss(style) {
-		var style = style || {};
-		var css = {};
+            // align
+            var align;
+            switch (layout.align) {
+            case 'start':
+                align = 'flex-start';
+                break;
+            case 'end':
+                align = 'flex-end';
+                break;
+            case 'center':
+                align = 'center';
+                break;
+            case 'baseline':
+                align = 'baseline';
+                break;
+            case 'stretch':
+                align = 'stretch';
+                break;
+            default:
+                align = 'stretch';
+            }
+            css['align-items'] = align;
+        }
 
-		// layout
-		if(style.visibility === 'hidden'){
-			css.display = 'none';
-		}
+        return css;
+    }
 
-		css = _.merge(css, 
-				// layout
-				convertToWidgetCssLayout(style.layout || {}),
-				// size
-				convertToWidgetCssSize(style.size || {}),
-				// background
-				convertToWidgetCssBackground(style.background || {}),
-				// border
-				convertToWidgetCssBoarder(style.border || {}),
-				// shadows
-				convertToWidgetCssShadows(style.shadows || {}),
-				// transform
-				convertToWidgetCssTransfrom(style.transform || {}),
-				// Overflow
-				convertToWidgetCssOverflow(style.overflow || {}),
-				// color, cursor, opacity, direction
-				{
-			padding: style.padding,
-			margin: style.margin,
-			direction: style.direction || 'ltr',
-			color: style.color || 'initial',
-			cursor: style.cursor || 'auto',
-			opacity: style.opacity || '1',
-				});
+    /**
+     * Converts data into a valid CSS attributes
+     */
+    function convertToWidgetCss(style) {
+        var style = style || {};
+        var css = {};
 
-		return css;
-	}
+        // layout
+        if(style.visibility === 'hidden'){
+            css.display = 'none';
+        } else {
+        	css.display = '';
+        }
 
-	function convertToWidgetCssOverflow(overflowOption) {
-		return {
-			'overflow-x': overflowOption.x || 'visible',
-			'overflow-y': overflowOption.y || 'visible'
-		};
-	}
+        css = _.merge(css, 
+                // layout
+                convertToWidgetCssLayout(style.layout || {}),
+                // size
+                convertToWidgetCssSize(style.size || {}),
+                // background
+                convertToWidgetCssBackground(style.background || {}),
+                // border
+                convertToWidgetCssBoarder(style.border || {}),
+                // shadows
+                convertToWidgetCssShadows(style.shadows || {}),
+                // transform
+                convertToWidgetCssTransfrom(style.transform || {}),
+                // Overflow
+                convertToWidgetCssOverflow(style.overflow || {}),
+                // text
+                convertToWidgetCssText(style.text || {}),
+                // color, cursor, opacity, direction
+                {
+		            padding: style.padding,
+		            margin: style.margin,
+		            direction: style.direction || 'ltr',
+		            color: style.color || 'initial',
+		            cursor: style.cursor || 'auto',
+		            opacity: style.opacity || '1',
+                });
 
-	function convertToWidgetCssTransfrom(transformOptions) {
-		var transform = '';
+        return css;
+    }
+    
+    function convertToWidgetCssText(textOptions){
+    	var css =  {
+            'text-decoration': textOptions.decoration || 'none',
+            'text-shadow': textOptions.shadow || 'none',
+            'text-transform': textOptions.transform || 'none',
+            'text-overflow': textOptions.overflow || 'clip',
+            'text-justify': textOptions.justify || 'auto',
+            'text-indent': textOptions.indent || 'indent',
+            'text-align-last': textOptions.alignLast || 'auto',
+        };
+        if(textOptions.align){
+        	css['text-align'] = textOptions.align || 'indent';
+        }
+        return css;
+    }
 
-		if(transformOptions.x){
-			var x = transformOptions.x;
-			if(x.rotate){
-				transform += ' rotateX('+x.rotate+')';
-			}
-			if(x.translate){
-				transform  += ' translateX('+x.translate+')';
-			}
-			if(x.scale){
-				transform += ' scaleX('+ x.scale+')';
-			}
-			if(x.skew){
-				transform += ' skewX('+ x.skew+')';
-			}
-		}
-		if(transformOptions.y){
-			var y = transformOptions.y;
-			if(y.rotate){
-				transform += ' rotateY('+y.rotate+')';
-			}
-			if(y.translate){
-				transform += ' translateY('+y.translate+')';
-			}
-			if(y.scale){
-				transform += ' scaleY('+y.scale+')';
-			}
-			if(y.skew){
-				transform += ' skewY('+y.skew+')';
-			}
-		}
-		if(transformOptions.z){
-			var z = transformOptions.z;
-			if(z.rotate){
-				transform += ' rotateZ('+z.rotate+')';
-			}
-			if(z.translate){
-				transform += ' translateZ('+z.translate+')';
-			}
-			if(z.scale){
-				transform += ' scaleZ('+z.scale+')';
-			}
-		}
+    function convertToWidgetCssOverflow(overflowOption) {
+        return {
+            'overflow-x': overflowOption.x || 'visible',
+            'overflow-y': overflowOption.y || 'visible'
+        };
+    }
 
-		if(transformOptions.perspective){
-			transform += ' perspective('+transformOptions.perspective+')';
-		}
+    function convertToWidgetCssTransfrom(transformOptions) {
+        var transform = '';
 
-		if(!transform) {
-			return {
-				transform: 'none'
-			};
-		}
+        if(transformOptions.x){
+            var x = transformOptions.x;
+            if(x.rotate){
+                transform += ' rotateX('+x.rotate+')';
+            }
+            if(x.translate){
+                transform  += ' translateX('+x.translate+')';
+            }
+            if(x.scale){
+                transform += ' scaleX('+ x.scale+')';
+            }
+            if(x.skew){
+                transform += ' skewX('+ x.skew+')';
+            }
+        }
+        if(transformOptions.y){
+            var y = transformOptions.y;
+            if(y.rotate){
+                transform += ' rotateY('+y.rotate+')';
+            }
+            if(y.translate){
+                transform += ' translateY('+y.translate+')';
+            }
+            if(y.scale){
+                transform += ' scaleY('+y.scale+')';
+            }
+            if(y.skew){
+                transform += ' skewY('+y.skew+')';
+            }
+        }
+        if(transformOptions.z){
+            var z = transformOptions.z;
+            if(z.rotate){
+                transform += ' rotateZ('+z.rotate+')';
+            }
+            if(z.translate){
+                transform += ' translateZ('+z.translate+')';
+            }
+            if(z.scale){
+                transform += ' scaleZ('+z.scale+')';
+            }
+        }
 
-		return {
-			transform: transform,
-			'transform-origin': transformOptions.origin || 'center',
-			'transform-style': transformOptions.style || 'flat'
-		};
-	};
+        if(transformOptions.perspective){
+            transform += ' perspective('+transformOptions.perspective+')';
+        }
 
-	function createShadowStr(shadow) {
-		var hShift = shadow.hShift || '0px';
-		var vShift = shadow.vShift || '0px';
-		var blur = shadow.blur || '0px';
-		var spread = shadow.spread || '0px';
-		var color = shadow.color || 'black';
+        if(!transform) {
+            return {
+                transform: 'none'
+            };
+        }
 
-		var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
+        return {
+            transform: transform,
+            'transform-origin': transformOptions.origin || 'center',
+            'transform-style': transformOptions.style || 'flat'
+        };
+    };
 
-		if(shadow.inset) {
-			boxShadow = boxShadow.concat(' ' + 'inset');
-		}
+    function createShadowStr(shadow) {
+        var hShift = shadow.hShift || '0px';
+        var vShift = shadow.vShift || '0px';
+        var blur = shadow.blur || '0px';
+        var spread = shadow.spread || '0px';
+        var color = shadow.color || 'black';
 
-		return boxShadow;
-	}
+        var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
 
-	function convertToWidgetCssShadows(shadows) {
-		var shadowStr = '';
+        if(shadow.inset) {
+            boxShadow = boxShadow.concat(' ' + 'inset');
+        }
 
-		if (!angular.isArray(shadows) || shadows.length === 0) {
-			shadowStr = 'none';
-		} else {
-			angular.forEach(shadows, function (shadow, index) {
-				shadowStr += createShadowStr(shadow);
-				if(index + 1 < shadows.length){
-					shadowStr += ', ';
-				}
-			});
-		}
+        return boxShadow;
+    }
 
-		return {
-			'box-shadow': shadowStr
-		};
-	}
+    function convertToWidgetCssShadows(shadows) {
+        var shadowStr = '';
 
-	function convertToWidgetCssBoarder(style) {
-		var conf = {};
-		if (style.style) {
-			conf['border-style'] = style.style;
-		}
-		if (style.width) {
-			conf['border-width'] = style.width;
-		}
-		if (style.color) {
-			conf['border-color'] = style.color;
-		}
-		if (style.radius) {
-			conf['border-radius'] = style.radius;
-		}
+        if (!angular.isArray(shadows) || shadows.length === 0) {
+            shadowStr = 'none';
+        } else {
+            angular.forEach(shadows, function (shadow, index) {
+                shadowStr += createShadowStr(shadow);
+                if(index + 1 < shadows.length){
+                    shadowStr += ', ';
+                }
+            });
+        }
 
-		return conf;
-	}
+        return {
+            'box-shadow': shadowStr
+        };
+    }
 
-	function convertToWidgetCssBackground(style){
-		var cssValue = {};
-		if(style.background){
-			cssValue.background = style.background;
-			return;
-		}
-		// image
-		var image = 'none';
-		if(style.image){
-			if(REGEX_BACKGROUND_IMAGE_SPEC.test(style.image)){
-				image = style.image;
-			} else {
-				image = 'url(\''+style.image+'\')';
-			}
-		}
+    function convertToWidgetCssBoarder(style) {
+        var conf = {};
+        if (style.style) {
+            conf['border-style'] = style.style;
+        }
+        if (style.width) {
+            conf['border-width'] = style.width;
+        }
+        if (style.color) {
+            conf['border-color'] = style.color;
+        }
+        if (style.radius) {
+            conf['border-radius'] = style.radius;
+        }
 
-		cssValue['background-image'] = image;
-		cssValue['background-color'] = style.color || 'initial';
-		cssValue['background-size'] = style.size || 'auto';
-		cssValue['background-repeat'] = style.repeat || 'repeat';
-		cssValue['background-position'] = style.position || '0px 0px';
-		cssValue['background-attachment'] = style.attachment || 'scroll';
-		cssValue['background-origin'] = style.origin || 'padding-box';
-		cssValue['background-clip'] = style.clip || 'border-box';
+        return conf;
+    }
 
-		return cssValue;
-	}
+    function convertToWidgetCssBackground(style){
+        var cssValue = {};
+        if(style.background){
+            cssValue.background = style.background;
+            return;
+        }
+        // image
+        var image = 'none';
+        if(style.image){
+            if(REGEX_BACKGROUND_IMAGE_SPEC.test(style.image)){
+                image = style.image;
+            } else {
+                image = 'url(\''+style.image+'\')';
+            }
+        }
 
-	/**
-	 * Converts data into a layout CSS3
-	 */
-	function convertToWidgetCssLayout(layout){
-		var flexLayout = {};
-		/*
-		 * Widget
-		 */
-		flexLayout.order = layout.order >= 0 ? layout.order : 0;
-		flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
-		flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
-		flexLayout['flex-basis'] = layout.basis || 'auto';
+        cssValue['background-image'] = image;
+        cssValue['background-color'] = style.color || 'initial';
+        cssValue['background-size'] = style.size || 'auto';
+        cssValue['background-repeat'] = style.repeat || 'repeat';
+        cssValue['background-position'] = style.position || '0px 0px';
+        cssValue['background-attachment'] = style.attachment || 'scroll';
+        cssValue['background-origin'] = style.origin || 'padding-box';
+        cssValue['background-clip'] = style.clip || 'border-box';
 
-		// align-self
-		// auto | flex-start | flex-end | center | baseline | stretch;
-		var alignSelf;
-		switch (layout.align_self) {
-		case 'start':
-			alignSelf = 'flex-start';
-			break;
-		case 'end':
-			alignSelf = 'flex-end';
-			break;
-		case 'center':
-			alignSelf = 'center';
-			break;
-		case 'baseline':
-			alignSelf = 'baseline';
-			break;
-		case 'stretch':
-			alignSelf = 'stretch';
-			break;
-		default:
-			alignSelf = 'auto';
-		}
-		flexLayout['align-self'] = alignSelf;
+        return cssValue;
+    }
 
-		return flexLayout;
-	}
+    /**
+     * Converts data into a layout CSS3
+     */
+    function convertToWidgetCssLayout(layout){
+        var flexLayout = {};
+        /*
+         * Widget
+         */
+        flexLayout.order = layout.order >= 0 ? layout.order : 0;
+        flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
+        flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
+        flexLayout['flex-basis'] = layout.basis || 'auto';
 
-	/*
-	 * Convert size object to valid CSS size
-	 */
-	function convertToWidgetCssSize(size) {
-		return {
-			'width': size.width || 'auto',
-			'min-width': size.minWidth || '0',
-			'max-width': size.maxWidth || 'none',
+        // align-self
+        // auto | flex-start | flex-end | center | baseline | stretch;
+        var alignSelf;
+        switch (layout.align_self) {
+        case 'start':
+            alignSelf = 'flex-start';
+            break;
+        case 'end':
+            alignSelf = 'flex-end';
+            break;
+        case 'center':
+            alignSelf = 'center';
+            break;
+        case 'baseline':
+            alignSelf = 'baseline';
+            break;
+        case 'stretch':
+            alignSelf = 'stretch';
+            break;
+        default:
+            alignSelf = 'auto';
+        }
+        flexLayout['align-self'] = alignSelf;
 
-			'height': size.height || 'auto',
-			'min-height': size.minHeight || '0',
-			'max-height': size.maxHeight || 'none',
-		};
-	}
+        return flexLayout;
+    }
 
-	function cleanEvetns(model)
-	{
-		// event
-		if (!model.event) {
-			model.event = {};
-		}
-	}
+    /*
+     * Convert size object to valid CSS size
+     */
+    function convertToWidgetCssSize(size) {
+        return {
+            'width': size.width || 'auto',
+            'min-width': size.minWidth || '0',
+            'max-width': size.maxWidth || 'none',
 
-	function cleanLayout(model)
-	{
-		if (!model.style.layout) {
-			model.style.layout = {};
-		}
-		if (model.type === 'Group' || model.type === 'Page') {
-			// convert
-			var newStyle = model.style.layout;
-			var oldStyle = model.style;
+            'height': size.height || 'auto',
+            'min-height': size.minHeight || '0',
+            'max-height': size.maxHeight || 'none',
+        };
+    }
 
-			if (oldStyle.flexDirection) {
-				if (oldStyle.flexDirection === 'wb-flex-row') {
-					newStyle.direction = 'row';
-				} else {
-					newStyle.direction = 'column';
-				}
-				delete oldStyle.flexDirection;
-			}
-			if (!newStyle.direction) {
-				newStyle.direction = 'column';
-			}
+    function cleanEvetns(model)
+    {
+        // event
+        if (!model.event) {
+            model.event = {};
+        }
 
-			switch (oldStyle.flexAlignItem) {
-			case 'wb-flex-align-items-center':
-				newStyle.align = 'center';
-				break;
-			case 'wb-flex-align-items-end':
-				newStyle.align = 'end';
-				break;
-			case 'wb-flex-align-items-start':
-				newStyle.align = 'start';
-				break;
-			case 'wb-flex-align-items-stretch':
-				newStyle.align = 'stretch';
-				break;
-			default:
-				newStyle.align = 'stretch';
-			}
-			delete oldStyle.flexAlignItem;
+        // load legecy events
+        if(model.event.failure){
+            model.event.error = model.event.failure;
+            delete model.event.failure;
+        }
+    }
 
-			switch (oldStyle.justifyContent) {
-			case 'wb-flex-justify-content-center':
-				newStyle.justify = 'center';
-				break;
-			case 'wb-flex-justify-content-end':
-				newStyle.justify = 'end';
-				break;
-			case 'wb-flex-justify-content-start':
-				newStyle.justify = 'start';
-				break;
-			case 'wb-flex-justify-content-space-between':
-				newStyle.justify = 'space-between';
-				break;
-			case 'wb-flex-justify-content-space-around':
-				newStyle.justify = 'space-around';
-				break;
-			default:
-				newStyle.justify = 'center';
-			}
-			delete oldStyle.justifyContent;
-		}
-	}
+    function cleanLayout(model)
+    {
+        if (!model.style.layout) {
+            model.style.layout = {};
+        }
+        if (model.type === 'Group' || model.type === 'Page') {
+            // convert
+            var newStyle = model.style.layout;
+            var oldStyle = model.style;
 
-	function cleanSize(model)
-	{
-		if (!model.style.size) {
-			model.style.size = {};
-		}
-		var newStyle = model.style.size;
-		var oldStyle = model.style;
-		var map = [['width', 'width'],
-			['height', 'height']];
-		cleanMap(oldStyle, newStyle, map);
-	}
+            if (oldStyle.flexDirection) {
+                if (oldStyle.flexDirection === 'wb-flex-row') {
+                    newStyle.direction = 'row';
+                } else {
+                    newStyle.direction = 'column';
+                }
+                delete oldStyle.flexDirection;
+            }
+            if (!newStyle.direction) {
+                newStyle.direction = 'column';
+            }
 
-	function cleanBackground(model)
-	{
-		if (!model.style.background) {
-			model.style.background = {};
-		}
-		var newStyle = model.style.background;
-		var oldStyle = model.style;
-		var map = [['backgroundImage', 'image'],
-			['backgroundColor', 'color'],
-			['backgroundSize', 'size'],
-			['backgroundRepeat', 'repeat'],
-			['backgroundPosition', 'position']];
-		cleanMap(oldStyle, newStyle, map);
-	}
+            switch (oldStyle.flexAlignItem) {
+            case 'wb-flex-align-items-center':
+                newStyle.align = 'center';
+                break;
+            case 'wb-flex-align-items-end':
+                newStyle.align = 'end';
+                break;
+            case 'wb-flex-align-items-start':
+                newStyle.align = 'start';
+                break;
+            case 'wb-flex-align-items-stretch':
+                newStyle.align = 'stretch';
+                break;
+            default:
+                newStyle.align = 'stretch';
+            }
+            delete oldStyle.flexAlignItem;
 
-	function cleanBorder(model)
-	{
-		if (!model.style.border) {
-			model.style.border = {};
-		}
-		var oldStyle = model.style;
-		var newStyle = model.style.border;
+            switch (oldStyle.justifyContent) {
+            case 'wb-flex-justify-content-center':
+                newStyle.justify = 'center';
+                break;
+            case 'wb-flex-justify-content-end':
+                newStyle.justify = 'end';
+                break;
+            case 'wb-flex-justify-content-start':
+                newStyle.justify = 'start';
+                break;
+            case 'wb-flex-justify-content-space-between':
+                newStyle.justify = 'space-between';
+                break;
+            case 'wb-flex-justify-content-space-around':
+                newStyle.justify = 'space-around';
+                break;
+            default:
+                newStyle.justify = 'center';
+            }
+            delete oldStyle.justifyContent;
+        }
+    }
 
-		if (oldStyle.borderRadius) {
-			if (oldStyle.borderRadius.uniform) {
-				newStyle.radius = oldStyle.borderRadius.all + 'px';
-			}
-			// TODO: maso, 2018: support other models
-		}
-		// delete old values
-		delete model.style.borderColor;
-		delete model.style.borderRadius;
-		delete model.style.borderStyleColorWidth;
-		delete model.style.borderStyle;
-		delete model.style.borderWidth;
-	}
+    function cleanSize(model)
+    {
+        if (!model.style.size) {
+            model.style.size = {};
+        }
+        var newStyle = model.style.size;
+        var oldStyle = model.style;
+        var map = [['width', 'width'],
+            ['height', 'height']];
+        cleanMap(oldStyle, newStyle, map);
+    }
 
-	function cleanSpace(model)
-	{
-		// Margin and padding
-		if (model.style.padding && angular.isObject(model.style.padding)) {
-			var padding = '';
-			if (model.style.padding.isUniform) {
-				padding = model.style.padding.uniform;
-			} else {
-				padding = model.style.padding.top || '0px' + ' ' +
-				model.style.padding.right || '0px' + ' ' +
-				model.style.padding.bottom || '0px' + ' ' +
-				model.style.padding.left || '0px' + ' ';
-			}
-			model.style.padding = padding;
-		}
+    function cleanBackground(model)
+    {
+        if (!model.style.background) {
+            model.style.background = {};
+        }
+        var newStyle = model.style.background;
+        var oldStyle = model.style;
+        var map = [['backgroundImage', 'image'],
+            ['backgroundColor', 'color'],
+            ['backgroundSize', 'size'],
+            ['backgroundRepeat', 'repeat'],
+            ['backgroundPosition', 'position']];
+        cleanMap(oldStyle, newStyle, map);
+    }
 
-		if (model.style.margin && angular.isObject(model.style.margin)) {
-			var margin = '';
-			if (model.style.margin.isUniform) {
-				margin = model.style.margin.uniform;
-			} else {
-				margin = model.style.margin.top || '0px' + ' ' +
-				model.style.margin.right || '0px' + ' ' +
-				model.style.margin.bottom || '0px' + ' ' +
-				model.style.margin.left || '0px' + ' ';
-			}
-			model.style.margin = margin;
-		}
+    function cleanBorder(model)
+    {
+        if (!model.style.border) {
+            model.style.border = {};
+        }
+        var oldStyle = model.style;
+        var newStyle = model.style.border;
 
-	}
+        if (oldStyle.borderRadius) {
+            if (oldStyle.borderRadius.uniform) {
+                newStyle.radius = oldStyle.borderRadius.all + 'px';
+            }
+            // TODO: maso, 2018: support other models
+        }
+        // delete old values
+        delete model.style.borderColor;
+        delete model.style.borderRadius;
+        delete model.style.borderStyleColorWidth;
+        delete model.style.borderStyle;
+        delete model.style.borderWidth;
+    }
 
-	function cleanAlign(model)
-	{
-		if (!model.style.align) {
-			model.style.align = {};
-		}
-	}
+    function cleanSpace(model)
+    {
+        // Margin and padding
+        if (model.style.padding && angular.isObject(model.style.padding)) {
+            var padding = '';
+            if (model.style.padding.isUniform) {
+                padding = model.style.padding.uniform;
+            } else {
+                padding = model.style.padding.top || '0px' + ' ' +
+                model.style.padding.right || '0px' + ' ' +
+                model.style.padding.bottom || '0px' + ' ' +
+                model.style.padding.left || '0px' + ' ';
+            }
+            model.style.padding = padding;
+        }
 
-	function cleanStyle(model)
-	{
-		if (!model.style) {
-			model.style = {};
-		}
-		cleanLayout(model);
-		cleanSize(model);
-		cleanBackground(model);
-		cleanBorder(model);
-		cleanSpace(model);
-		cleanAlign(model);
-	}
+        if (model.style.margin && angular.isObject(model.style.margin)) {
+            var margin = '';
+            if (model.style.margin.isUniform) {
+                margin = model.style.margin.uniform;
+            } else {
+                margin = model.style.margin.top || '0px' + ' ' +
+                model.style.margin.right || '0px' + ' ' +
+                model.style.margin.bottom || '0px' + ' ' +
+                model.style.margin.left || '0px' + ' ';
+            }
+            model.style.margin = margin;
+        }
 
-	function cleanInternal(model)
-	{
-		cleanEvetns(model);
-		cleanStyle(model);
-		if (model.type === 'Group' || model.type === 'Page') {
-			if (!model.contents) {
-				model.contents = [];
-			}
-			if (model.contents.length) {
-				for (var i = 0; i < model.contents.length; i++) {
-					cleanInternal(model.contents[i]);
-				}
-			}
-		}
-		return model;
-	}
+    }
 
-	/**
-	 * Clean data model
-	 * @name clean 
-	 * @param {object} model 
-	 * @param {type} force
-	 */
-	function clean(model, force)
-	{
-		if (!model.type || model.type === 'Page') {
-			model.type = 'Group';
-		}
-		if (model.version === 'wb1' && !force) {
-			return model;
-		}
-		var newModel = cleanInternal(model);
-		newModel.version = 'wb1';
-		return newModel;
-	}
+    function cleanAlign(model)
+    {
+        if (!model.style.align) {
+            model.style.align = {};
+        }
+    }
 
-	service.cleanMap = cleanMap;
-	service.clean = clean;
-	service.cleanInternal = cleanInternal;
-	service.cleanStyle = cleanStyle;
-	service.cleanAlign = cleanAlign;
-	service.cleanSpace = cleanSpace;
-	service.cleanBorder = cleanBorder;
-	service.cleanBackground = cleanBackground;
-	service.cleanSize = cleanSize;
-	service.cleanLayout = cleanLayout;
-	service.cleanEvetns = cleanEvetns;
+    function cleanStyle(model)
+    {
+        if (!model.style) {
+            model.style = {};
+        }
+        cleanLayout(model);
+        cleanSize(model);
+        cleanBackground(model);
+        cleanBorder(model);
+        cleanSpace(model);
+        cleanAlign(model);
+    }
+    
 
-	service.getTemplateFor = getTemplateFor;
-	service.getTemplateOf = getTemplateOf;
-	service.convertToGroupCss = convertToGroupCss;
-	service.convertToWidgetCss = convertToWidgetCss;
-	service.convertToWidgetCssLayout = convertToWidgetCssLayout;
+    function cleanType(model){
+        if(model.type === 'Link') {
+            model.type = 'a';
+            model.html = model.title;
+            model.href = model.url;
+            model.style.text = {
+            		align: 'center'
+            };
+            model.style.cursor = 'pointer';
+            
+            delete model.title;
+            delete model.url;
+        }
+    }
+
+    function cleanInternal(model)
+    {
+        cleanEvetns(model);
+        cleanStyle(model);
+        if (model.type === 'Group' || model.type === 'Page') {
+            if (!model.contents) {
+                model.contents = [];
+            }
+            if (model.contents.length) {
+                for (var i = 0; i < model.contents.length; i++) {
+                    cleanInternal(model.contents[i]);
+                }
+            }
+        }
+        cleanType(model);
+        return model;
+    }
+
+    /**
+     * Clean data model
+     * @name clean 
+     * @param {object} model 
+     * @param {type} force
+     */
+    function clean(model, force)
+    {
+        if (!model.type || model.type === 'Page') {
+            model.type = 'Group';
+        }
+        if (model.version === 'wb2' && !force) {
+            return model;
+        }
+        var newModel = cleanInternal(model);
+        newModel.version = 'wb2';
+        return newModel;
+    }
+
+    service.cleanMap = cleanMap;
+    service.clean = clean;
+    service.cleanInternal = cleanInternal;
+    service.cleanStyle = cleanStyle;
+    service.cleanAlign = cleanAlign;
+    service.cleanSpace = cleanSpace;
+    service.cleanBorder = cleanBorder;
+    service.cleanBackground = cleanBackground;
+    service.cleanSize = cleanSize;
+    service.cleanLayout = cleanLayout;
+    service.cleanEvetns = cleanEvetns;
+
+    service.getTemplateFor = getTemplateFor;
+    service.getTemplateOf = getTemplateOf;
+    service.convertToGroupCss = convertToGroupCss;
+    service.convertToWidgetCss = convertToWidgetCss;
+    service.convertToWidgetCssLayout = convertToWidgetCssLayout;
 });
 
 /* 
@@ -18100,6 +18351,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/resources/wb-url.html',
     "<div layout=column layout-padding flex> <p translate>Insert a valid URL, please.</p> <md-input-container class=\"md-icon-float md-block\"> <label translate>URL</label> <input ng-model=value> </md-input-container> </div>"
+  );
+
+
+  $templateCache.put('views/settings/wb-a.html',
+    "<div layout-padding layout=column> <md-input-container> <label translate>Title</label> <input ng-model=ctrl.html ng-change=\"ctrl.setProperty('html', ctrl.html)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <wb-ui-setting-link title=URL ng-model=ctrl.href ng-change=\"ctrl.setProperty('href', ctrl.href)\" ng-model-options=\"{debounce: 200}\"> </wb-ui-setting-link> </div>"
   );
 
 

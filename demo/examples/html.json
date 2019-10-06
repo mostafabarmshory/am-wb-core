@@ -31,7 +31,12 @@
 			"itemtype": "http://maso.com",
 			"name": "key",
 			"href": "google.com",
-			"html": "Link to google"
+			"html": "Link to google",
+			"style": {
+				"text": {
+					"align": "center"
+				}
+			}
 		},{
 			"type": "Link",
 			"itemscope": true,

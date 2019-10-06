@@ -36,6 +36,13 @@ of a widget:
 	min-height: 32px;
 }
 
+a.wb-widget > p {
+	margin: '0px';
+	padding: '0px';
+	margin-block-start: 0px;
+	margin-block-end: 0px;
+}
+
 /*
  * Body of a widget to fill
  */

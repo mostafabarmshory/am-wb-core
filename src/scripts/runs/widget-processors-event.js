@@ -98,7 +98,11 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 		var eventFunction;
 		if (!widget.eventFunctions.hasOwnProperty(type)) {
 			try{
-				var body = '\'use strict\';'+
+				var ucode = widget.getEvent()[type];
+				if(!ucode){
+					return;
+				}
+				var body = '\'use strict\';\n'+
 				'var $event = arguments[0],' + 
 				'$widget = arguments[1],' + 
 				'$http = arguments[2],' + 
@@ -108,8 +112,7 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 				'$timeout = arguments[6],' + 
 				'$dispatcher = arguments[7],' + 
 				'$storage = arguments[8],' + 
-				'$routeParams = arguments[9];' + 
-				widget.getEvent()[type];
+				'$routeParams = arguments[9];\n' + ucode;
 				widget.eventFunctions[type] = new Function(body);
 			}catch(ex){
 				console.log(ex);
