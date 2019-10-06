@@ -154,6 +154,9 @@ var WbAbstractWidget = function () {
 
     // event listeners
     var ctrl = this;
+    /*
+     * TODO: maso, 2019: move to event manager.
+     */
     this.eventListeners = {
             click: function ($event) {
                 if (ctrl.isEditable()) {
@@ -189,6 +192,17 @@ var WbAbstractWidget = function () {
             },
             mouseleave: function ($event) {
                 ctrl.fire('mouseleave', $event);
+            },
+            
+            // Media events
+            error: function ($event) {
+                ctrl.fire('error', $event);
+            },
+            success: function ($event) {
+                ctrl.fire('error', $event);
+            },
+            load: function ($event) {
+                ctrl.fire('load', $event);
             }
     };
 
@@ -204,7 +218,7 @@ var WbAbstractWidget = function () {
 
     var options = {
             root: null,
-            rootMargin: "0px",
+            rootMargin: '0px',
     };
     this.intersectionObserver = new IntersectionObserver(function ($event) {
         if(angular.isArray($event)){
@@ -715,7 +729,7 @@ WbAbstractWidget.prototype.isSilent = function() {
 WbAbstractWidget.prototype.on = function (type, callback) {
     if (!angular.isFunction(callback)) {
         throw {
-            message: "Callback must be a function"
+            message: 'Callback must be a function'
         };
     }
     if (!angular.isArray(this.callbacks[type])) {

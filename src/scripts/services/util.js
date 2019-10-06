@@ -441,6 +441,12 @@ angular.module('am-wb-core')
 		if (!model.event) {
 			model.event = {};
 		}
+		
+		// load legecy events
+		if(model.event.failure){
+		    model.event.error = model.event.failure;
+		    delete model.event.failure;
+		}
 	}
 
 	function cleanLayout(model)

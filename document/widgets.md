@@ -247,9 +247,22 @@ Script to be run when something bad happens and the file is suddenly unavailable
 
 Script to be run when the media has reach the end (a useful event for messages like "thanks for listening")
 
-### onerror
+### Error
 
 Script to be run when an error occurs when the file is being loaded
+
+In script
+
+	$widget.on('error', function(){});
+
+In model
+
+	{
+		type: 'img',
+		event:{
+			error: 'alert("error of loading img");'
+		}
+	}
 
 ### onloadeddata
 

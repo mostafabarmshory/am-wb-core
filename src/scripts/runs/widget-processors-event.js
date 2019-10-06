@@ -179,6 +179,30 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 				intersection: function ($event) {
 					evalWidgetEvent(widget, 'intersection', $event);
 				},
+				
+				//
+				// Common media events
+				//
+				success: function ($event) {
+				    evalWidgetEvent(widget, 'success', $event);
+				},
+				error: function ($event) {
+				    evalWidgetEvent(widget, 'error', $event);
+				},
+				abort: function ($event) {
+				    evalWidgetEvent(widget, 'abort', $event);
+				},
+				load: function ($event) {
+				    evalWidgetEvent(widget, 'load', $event);
+				},
+				beforeunload: function ($event) {
+				    evalWidgetEvent(widget, 'beforeunload', $event);
+				},
+				unload: function ($event) {
+				    evalWidgetEvent(widget, 'unload', $event);
+				},
+				
+				
 		};
 		angular.forEach(widget.__eventListeners, function (listener, key) {
 			widget.on(key, listener);

@@ -31,30 +31,6 @@ angular.module('am-wb-core')
  */
 .run(function ($widget) {
 
-    $widget.setEditor('p', {
-        type: 'WidgetEditorTinymce',
-        options:{
-            property: 'html',
-            inline: true,
-            menubar: false,
-            plugins: [
-                'link',
-                'lists',
-                'powerpaste',
-                'autolink',
-                'tinymcespellchecker'],
-            toolbar: [
-                'undo redo | bold italic underline | fontselect fontsizeselect',
-                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
-            valid_styles: {
-                '*': 'font-size,font-family,color,text-decoration,text-align'
-            },
-            powerpaste_word_import: 'clean',
-            powerpaste_html_import: 'clean',
-        }
-    });
-
 
     /**
      * @ngdoc Widgets
@@ -143,6 +119,30 @@ angular.module('am-wb-core')
             };
         },
         controllerAs: 'ctrl'
+    });
+
+    $widget.setEditor('HtmlText', {
+        type: 'WidgetEditorTinymce',
+        options:{
+            property: 'html',
+            inline: true,
+            menubar: false,
+            plugins: [
+                'link',
+                'lists',
+                'powerpaste',
+                'autolink',
+                'tinymcespellchecker'],
+            toolbar: [
+                'undo redo | bold italic underline | fontselect fontsizeselect',
+                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
+            valid_styles: {
+                '*': 'font-size,font-family,color,text-decoration,text-align'
+            },
+            powerpaste_word_import: 'clean',
+            powerpaste_html_import: 'clean',
+        }
     });
     /**
      * @ngdoc Widgets
@@ -295,6 +295,30 @@ angular.module('am-wb-core')
         template: '<p></p>',
         controllerAs: 'ctrl',
         controller: 'MbWidgetHtmlCtrl'
+    });
+
+    $widget.setEditor('p', {
+        type: 'WidgetEditorTinymce',
+        options:{
+            property: 'html',
+            inline: true,
+            menubar: false,
+            plugins: [
+                'link',
+                'lists',
+                'powerpaste',
+                'autolink',
+                'tinymcespellchecker'],
+            toolbar: [
+                'undo redo | bold italic underline | fontselect fontsizeselect',
+                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
+            valid_styles: {
+                '*': 'font-size,font-family,color,text-decoration,text-align'
+            },
+            powerpaste_word_import: 'clean',
+            powerpaste_html_import: 'clean',
+        }
     });
     
     /**

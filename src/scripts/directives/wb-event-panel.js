@@ -78,8 +78,14 @@ angular.module('am-wb-core')
 			key: 'success',
 			title: 'Success'
 		}, {
-			key: 'failure',
+			key: 'error',
 			title: 'Failure'
+		}, {
+		    key: 'load',
+		    title: 'Load'
+		}, {
+		    key: 'load',
+		    title: 'Load'
 		}];
 
 		ngModelCtrl.$render = function () {
