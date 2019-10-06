@@ -4795,6 +4795,433 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
+ * @name MbWidgetACtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
+ * 
+ */
+.controller('MbSettingGeneralCtrl', function () {
+	
+	var attrs = [
+		// id
+		'id',
+		'name',
+		
+		'style.direction',
+		'style.visibility',
+		'style.color',
+		'style.cursor',
+		'style.opacity',
+		// overflow
+		'style.overflow.x',
+		'style.overflow.y',
+		];
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		/*
+		 * Load data of the widget
+		 */
+		var ctrl = this;
+		angular.forEach(attrs, function(attr){
+			ctrl[attr] = ctrl.getProperty(attr);
+		});
+	};
+
+
+	// TODO: maso, 2019: move to the view
+	this.cursors = [{
+		title: 'alias',
+		value: 'alias',  
+		description: 'The cursor indicates an alias of something is to be created'
+	},{
+		title: 'All Scroll',
+		value: 'all-scroll',
+		description: 'The cursor indicates that something can be scrolled in any direction'
+	},{
+		title: 'Auto',
+		value: 'auto  ',
+		description: 'Default. The browser sets a cursor'
+	},{
+		title: 'Cell',
+		value: 'cell', 
+		description: 'The cursor indicates that a cell (or set of cells) may be selected'
+	},{
+		title: 'Context Menu',
+		value: 'context-menu',
+		description: 'The cursor indicates that a context-menu is available'
+	},{
+		title: 'Columne resize',
+		value: 'col-resize',  
+		description: 'The cursor indicates that the column can be resized horizontally'
+	},{
+		title: 'Copy',
+		value: 'copy',
+		description: 'The cursor indicates something is to be copied'
+	},{
+		title: 'Crosshair',
+		value: 'crosshair',
+		description: 'The cursor render as a crosshair'
+	},{
+		title: 'Default',
+		value: 'default',
+		description: 'The default cursor'
+	},{
+		title: 'Edge Resize',
+		value: 'e-resize',
+		description: 'The cursor indicates that an edge of a box is to be moved right (east)'
+	},{
+		title: 'Bidirectional Resize',
+		value: 'ew-resize',
+		description: 'Indicates a bidirectional resize cursor'
+	},{
+		title: 'Grab',
+		value: 'grab',
+		description: 'The cursor indicates that something can be grabbed '
+	},{
+		title: 'Grabbing',
+		value: 'grabbing',
+		description: 'The cursor indicates that something can be grabbed'
+	},{
+		title: 'Help',
+		value: 'help',
+		description: 'The cursor indicates that help is available '
+	},{
+		title: 'Move',
+		value: 'move',
+		description: 'The cursor indicates something is to be moved'
+	},{
+		title: 'North Resize',
+		value: 'n-resize',
+		description: 'The cursor indicates that an edge of a box is to be moved up (north)'
+	},{
+		title: 'North/East Resize',
+		value: 'ne-resize',
+		description: 'The cursor indicates that an edge of a box is to be moved up and right (north/east)'
+	},{
+		title: 'NS Bidirectional Resize',
+		value: 'ns-resize',
+		description: 'Indicates a bidirectional resize cursor'
+	},{
+		title: 'North/West Resize',
+		value: 'nw-resize',
+		description: 'The cursor indicates that an edge of a box is to be moved up and left (north/west)'
+	},{
+		title: 'Bidirectional Resize',
+		value: 'nwse-resize',
+		description: 'Indicates a bidirectional resize cursor'
+	},{
+		title: 'No Drop',
+		value: 'no-drop',
+		description: 'The cursor indicates that the dragged item cannot be dropped here '
+	},{
+		title: 'None',
+		value: 'none',
+		description: 'No cursor is rendered for the element  '
+	},{
+		title: 'Not Allowed',
+		value: 'not-allowed',
+		description: 'The cursor indicates that the requested action will not be executed'
+	},{
+		title: 'Pointer',
+		value: 'pointer',
+		description: 'The cursor is a pointer and indicates a link'
+	},{
+		title: 'Progress',
+		value: 'progress',
+		description: 'The cursor indicates that the program is busy (in progress)'
+	},{
+		title: 'Row Resize',
+		value: 'row-resize',
+		description: 'The cursor indicates that the row can be resized vertically'
+	},{
+		title: 'South Resize',
+		value: 's-resize',
+		description: 'The cursor indicates that an edge of a box is to be moved down (south)'
+	},{
+		title: 'South/East Resize',
+		value: 'se-resize',
+		description: 'The cursor indicates that an edge of a box is to be moved down and right (south/east)'
+	},{
+		title: 'South/West Resize',
+		value: 'sw-resize',
+		description: 'The cursor indicates that an edge of a box is to be moved down and left (south/west)'
+	},{
+		title: 'Text',
+		value: 'text',
+		description: 'The cursor indicates text that may be selected'
+	},{
+		title: 'Vertical text',
+		value: 'vertical-text',
+		description: 'The cursor indicates vertical-text that may be selected'
+	},{
+		title: 'West Resize',
+		value: 'w-resize',
+		description: 'The cursor indicates that an edge of a box is to be moved left (west)'
+	},{
+		title: 'Wait',
+		value: 'wait',
+		description: 'The cursor indicates that the program is busy'
+	},{
+		title: 'Zoom In',
+		value: 'zoom-in',
+		description: 'The cursor indicates that something can be zoomed in'
+	},{
+		title: 'Zoom Out',
+		value: 'zoom-out',
+		description: 'The cursor indicates that something can be zoomed out'
+	},{
+		title: 'Initial',
+		value: 'Sets this property to its default value. Read about initial',
+		description: 'Sets this property to its default value. Read about initial'
+	},{
+		title: 'Inherit',
+		value: 'inherit',
+		description: 'Inherits this property from its parent element. Read about inherit'
+	}];
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name MbWidgetACtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
+ * 
+ */
+.controller('MbSettingMicrodataCtrl', function () {
+	var attrs = [
+		'itemscope',
+		'itemtype',
+		'itemprop',
+		'itemid',
+		'itemref',
+		// extra attributes
+		'value',
+		'content',
+		];
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		/*
+		 * Load data of the widget
+		 */
+		var ctrl = this;
+		angular.forEach(attrs, function(attr){
+			ctrl[attr] = ctrl.getProperty(attr);
+		});
+	};
+
+
+
+//	/*
+//	* Supported Schema Types:
+//	* Article, Book, Image, Person, Product, Service, Text, Thing, WebPage
+//	*/
+//	this.schemaTypes = [
+//	{
+//	key: 'Article',
+//	value: 'http://schema.org/Article'
+
+//	}, {
+//	key: 'Book',
+//	value: 'http://schema.org/Book'
+
+//	}, {
+//	key: 'Image',
+//	value: 'http://schema.org/ImageObject'
+
+//	}, {
+//	key: 'Movie',
+//	value: 'http://schema.org/Movie'
+//	}, {
+//	key: 'Person',
+//	value: 'http://schema.org/Person'
+//	}, {
+//	key: 'Product',
+//	value: 'http://schema.org/Product'
+
+//	}, {
+//	key: 'Service',
+//	value: 'http://schema.org/Service'
+
+//	}, {
+//	key: 'Text',
+//	value: 'http://schema.org/Text'
+//	}, {
+//	key: 'Thing',
+//	value: 'http://schema.org/Thing'
+//	}, {
+//	key: 'WebPage',
+//	value: 'http://schema.org/WebPage'
+
+//	}
+//	];
+
+//	this.getParentCategory = function () {
+//	var widget = this.getWidget();
+//	while (!widget.isRoot() && !widget.getModelProperty('category')) {
+//	widget = widget.getParent();
+//	}
+//	this.parentCategory = widget.getModelProperty('category');
+//	};
+
+//	this.setProperties = function () {
+//	if (!this.parentCategory) {
+//	this.alert = 'No parent type is defined.';
+//	} else {
+//	this.setType(this.parentCategory);
+//	}
+//	};
+
+//	this.setType = function (type) {
+//	switch (type) {
+//	case 'http://schema.org/Article':
+//	this.properties =
+//	[
+//	'articleBody', 'articleSection', 'about', 'author', 'comment',
+//	'commentCount', 'contributor', 'creator', 'description', 'editor',
+//	'genre', 'headline', 'keywords', 'publisher', 'text', 'translator',
+//	'video'
+//	];
+//	break;
+
+//	case 'http://schema.org/Book':
+//	this.properties =
+//	[
+//	'about', 'author', 'bookFormat', 'comment', 'creator', 'genre',
+//	'headline', 'image', 'keywords', 'name', 'publisher', 'text',
+//	'translator', 'video'
+//	];
+//	break;
+
+//	case 'http://schema.org/Image':
+//	this.properties =
+//	[
+//	'about', 'description', 'caption', 'comment', 'thumbnail',
+//	'keywords', 'image', 'name', 'url'
+//	];
+//	break;
+
+//	case 'http://schema.org/Movie':
+//	this.properties =
+//	[
+//	'about', 'actor', 'comment', 'commentCount', 'copyrightYear',
+//	'countryOfOrigin', 'creator', 'dateCreated', 'description',
+//	'director', 'duration', 'genre', 'headline', 'isBasedOn',
+//	'image', 'keywords', 'musicBy', 'name', 'provider', 'productionCompany',
+//	'sponsor', 'subtitleLanguage', 'text', 'thumbnailUrl', 'trailer'
+//	];
+//	break;
+
+//	case 'http://schema.org/Person':
+//	this.properties =
+//	[
+//	'additionalName', 'address', 'birthDate', 'birthPlace',
+//	'children', 'deathDate', 'daethPlace', 'email', 'familyName',
+//	'gender', 'homeLocation', 'parent', 'telephone', 'description',
+//	'image', 'spouse'
+//	];
+//	break;
+
+//	case 'http://schema.org/Product':
+//	this.properties =
+//	[
+//	'brand', 'category', 'color', 'description', 'height',
+//	'isConsumableFor', 'genre', 'headline', 'image', 'name'
+//	];
+//	break;
+
+//	case 'http://schema.org/Service':
+//	this.properties =
+//	[
+//	'areaServed', 'brand', 'category', 'logo', 'serviceType',
+//	'description', 'image', 'name'
+//	];
+//	break;
+
+//	case 'http://schema.org/Thing':
+//	this.properties = ['description', 'image', 'name'];
+//	break;
+
+//	case 'http://schema.org/Text':
+//	this.properties = ['description', 'image', 'keywords', 'name'];
+//	break;
+
+//	case 'http://schema.org/WebPage':
+//	this.properties =
+//	[
+//	'about', 'author', 'comment', 'description', 'image', 'headline',
+//	'keywords', 'commentCount', 'mainContentOfPage', 'primaryImageOfPage',
+//	'video'
+//	];
+//	break;
+//	}
+//	};
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
  * @name MbSettingsCtrl
  * @description Manages settings page
  * 
@@ -13592,183 +14019,7 @@ angular.module('am-wb-core')
         icon: 'opacity',
         templateUrl: 'views/settings/wb-general.html',
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function () {
-            // TODO: maso, 2019: move to the view
-            this.cursors = [{
-                title: 'alias',
-                value: 'alias',  
-                description: 'The cursor indicates an alias of something is to be created'
-            },{
-                title: 'All Scroll',
-                value: 'all-scroll',
-                description: 'The cursor indicates that something can be scrolled in any direction'
-            },{
-                title: 'Auto',
-                value: 'auto  ',
-                description: 'Default. The browser sets a cursor'
-            },{
-                title: 'Cell',
-                value: 'cell', 
-                description: 'The cursor indicates that a cell (or set of cells) may be selected'
-            },{
-                title: 'Context Menu',
-                value: 'context-menu',
-                description: 'The cursor indicates that a context-menu is available'
-            },{
-                title: 'Columne resize',
-                value: 'col-resize',  
-                description: 'The cursor indicates that the column can be resized horizontally'
-            },{
-                title: 'Copy',
-                value: 'copy',
-                description: 'The cursor indicates something is to be copied'
-            },{
-                title: 'Crosshair',
-                value: 'crosshair',
-                description: 'The cursor render as a crosshair'
-            },{
-                title: 'Default',
-                value: 'default',
-                description: 'The default cursor'
-            },{
-                title: 'Edge Resize',
-                value: 'e-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved right (east)'
-            },{
-                title: 'Bidirectional Resize',
-                value: 'ew-resize',
-                description: 'Indicates a bidirectional resize cursor'
-            },{
-                title: 'Grab',
-                value: 'grab',
-                description: 'The cursor indicates that something can be grabbed '
-            },{
-                title: 'Grabbing',
-                value: 'grabbing',
-                description: 'The cursor indicates that something can be grabbed'
-            },{
-                title: 'Help',
-                value: 'help',
-                description: 'The cursor indicates that help is available '
-            },{
-                title: 'Move',
-                value: 'move',
-                description: 'The cursor indicates something is to be moved'
-            },{
-                title: 'North Resize',
-                value: 'n-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved up (north)'
-            },{
-                title: 'North/East Resize',
-                value: 'ne-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved up and right (north/east)'
-            },{
-                title: 'NS Bidirectional Resize',
-                value: 'ns-resize',
-                description: 'Indicates a bidirectional resize cursor'
-            },{
-                title: 'North/West Resize',
-                value: 'nw-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved up and left (north/west)'
-            },{
-                title: 'Bidirectional Resize',
-                value: 'nwse-resize',
-                description: 'Indicates a bidirectional resize cursor'
-            },{
-                title: 'No Drop',
-                value: 'no-drop',
-                description: 'The cursor indicates that the dragged item cannot be dropped here '
-            },{
-                title: 'None',
-                value: 'none',
-                description: 'No cursor is rendered for the element  '
-            },{
-                title: 'Not Allowed',
-                value: 'not-allowed',
-                description: 'The cursor indicates that the requested action will not be executed'
-            },{
-                title: 'Pointer',
-                value: 'pointer',
-                description: 'The cursor is a pointer and indicates a link'
-            },{
-                title: 'Progress',
-                value: 'progress',
-                description: 'The cursor indicates that the program is busy (in progress)'
-            },{
-                title: 'Row Resize',
-                value: 'row-resize',
-                description: 'The cursor indicates that the row can be resized vertically'
-            },{
-                title: 'South Resize',
-                value: 's-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved down (south)'
-            },{
-                title: 'South/East Resize',
-                value: 'se-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved down and right (south/east)'
-            },{
-                title: 'South/West Resize',
-                value: 'sw-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved down and left (south/west)'
-            },{
-                title: 'Text',
-                value: 'text',
-                description: 'The cursor indicates text that may be selected'
-            },{
-                title: 'Vertical text',
-                value: 'vertical-text',
-                description: 'The cursor indicates vertical-text that may be selected'
-            },{
-                title: 'West Resize',
-                value: 'w-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved left (west)'
-            },{
-                title: 'Wait',
-                value: 'wait',
-                description: 'The cursor indicates that the program is busy'
-            },{
-                title: 'Zoom In',
-                value: 'zoom-in',
-                description: 'The cursor indicates that something can be zoomed in'
-            },{
-                title: 'Zoom Out',
-                value: 'zoom-out',
-                description: 'The cursor indicates that something can be zoomed out'
-            },{
-                title: 'Initial',
-                value: 'Sets this property to its default value. Read about initial',
-                description: 'Sets this property to its default value. Read about initial'
-            },{
-                title: 'Inherit',
-                value: 'inherit',
-                description: 'Inherits this property from its parent element. Read about inherit'
-            }];
-//          TODO: maso, 2019: URL A comma separated list of URLs to custom cursors. Note: Always specify a generic cursor at the end of the list, in case none of the URL-defined cursors can be used 
-
-            this.init = function () {
-                this.direction = this.getStyle('direction') || 'ltr';
-                this.color = this.getStyle('color');
-
-                this.cursor = this.getStyle('cursor');
-
-                this.visibility = this.getStyle('visibility') || 'visible';
-                this.opacity = this.getStyle('opacity');
-
-                // overflow
-                this.overflowX = this.getStyle('overflow.x') || 'visible';
-                this.overflowY = this.getStyle('overflow.y') || 'visible';
-            };
-
-            this.updateOverflowX = function () {
-                this.setStyle('overflow.x', this.overflowX);
-            };
-            this.updateOverflowY = function () {
-                this.setStyle('overflow.y', this.overflowY);
-            };
-        }
+        controller: 'MbSettingGeneralCtrl',
     });
 
     $settings.newPage({
@@ -13819,172 +14070,17 @@ angular.module('am-wb-core')
         }
     });
 
+    /**
+     * Widget Microdata Editor
+     * 
+     * Manages widget microdata editor.
+     */
     $settings.newPage({
-        type: 'SEO',
-        label: 'SEO',
-        templateUrl: 'views/settings/wb-seo.html',
+        type: 'microdata',
+        label: 'Widget Microdata',
+        templateUrl: 'views/settings/wb-microdata.html',
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function ($translate) {
-            /*
-             * Supported Schema Types:
-             * Article, Book, Image, Person, Product, Service, Text, Thing, WebPage
-             */
-            this.schemaTypes = [
-                {
-                    key: 'Article',
-                    value: 'http://schema.org/Article'
-
-                }, {
-                    key: 'Book',
-                    value: 'http://schema.org/Book'
-
-                }, {
-                    key: 'Image',
-                    value: 'http://schema.org/ImageObject'
-
-                }, {
-                    key: 'Movie',
-                    value: 'http://schema.org/Movie'
-                }, {
-                    key: 'Person',
-                    value: 'http://schema.org/Person'
-                }, {
-                    key: 'Product',
-                    value: 'http://schema.org/Product'
-
-                }, {
-                    key: 'Service',
-                    value: 'http://schema.org/Service'
-
-                }, {
-                    key: 'Text',
-                    value: 'http://schema.org/Text'
-                }, {
-                    key: 'Thing',
-                    value: 'http://schema.org/Thing'
-                }, {
-                    key: 'WebPage',
-                    value: 'http://schema.org/WebPage'
-
-                }
-                ];
-            this.init = function () {
-                // load data from model
-                this.id = this.getProperty('id');
-                this.label = this.getProperty('label');
-                this.description = this.getProperty('description');
-                this.category = this.getProperty('category');
-                this.type = this.getProperty('type');
-                this.property = this.getProperty('property');
-                this.alert = null;
-                this.getParentCategory();
-                // NOTE: cover is removed from weburger
-            };
-
-            this.getParentCategory = function () {
-                var widget = this.getWidget();
-                while (!widget.isRoot() && !widget.getModelProperty('category')) {
-                    widget = widget.getParent();
-                }
-                this.parentCategory = widget.getModelProperty('category');
-            };
-
-            this.setProperties = function () {
-                if (!this.parentCategory) {
-                    this.alert = 'No parent type is defined.';
-                } else {
-                    this.setType(this.parentCategory);
-                }
-            };
-
-            this.setType = function (type) {
-                switch (type) {
-                case 'http://schema.org/Article':
-                    this.properties =
-                        [
-                            'articleBody', 'articleSection', 'about', 'author', 'comment',
-                            'commentCount', 'contributor', 'creator', 'description', 'editor',
-                            'genre', 'headline', 'keywords', 'publisher', 'text', 'translator',
-                            'video'
-                            ];
-                    break;
-
-                case 'http://schema.org/Book':
-                    this.properties =
-                        [
-                            'about', 'author', 'bookFormat', 'comment', 'creator', 'genre',
-                            'headline', 'image', 'keywords', 'name', 'publisher', 'text',
-                            'translator', 'video'
-                            ];
-                    break;
-
-                case 'http://schema.org/Image':
-                    this.properties =
-                        [
-                            'about', 'description', 'caption', 'comment', 'thumbnail',
-                            'keywords', 'image', 'name', 'url'
-                            ];
-                    break;
-
-                case 'http://schema.org/Movie':
-                    this.properties =
-                        [
-                            'about', 'actor', 'comment', 'commentCount', 'copyrightYear',
-                            'countryOfOrigin', 'creator', 'dateCreated', 'description',
-                            'director', 'duration', 'genre', 'headline', 'isBasedOn',
-                            'image', 'keywords', 'musicBy', 'name', 'provider', 'productionCompany',
-                            'sponsor', 'subtitleLanguage', 'text', 'thumbnailUrl', 'trailer'
-                            ];
-                    break;
-
-                case 'http://schema.org/Person':
-                    this.properties =
-                        [
-                            'additionalName', 'address', 'birthDate', 'birthPlace',
-                            'children', 'deathDate', 'daethPlace', 'email', 'familyName',
-                            'gender', 'homeLocation', 'parent', 'telephone', 'description',
-                            'image', 'spouse'
-                            ];
-                    break;
-
-                case 'http://schema.org/Product':
-                    this.properties =
-                        [
-                            'brand', 'category', 'color', 'description', 'height',
-                            'isConsumableFor', 'genre', 'headline', 'image', 'name'
-                            ];
-                    break;
-
-                case 'http://schema.org/Service':
-                    this.properties =
-                        [
-                            'areaServed', 'brand', 'category', 'logo', 'serviceType',
-                            'description', 'image', 'name'
-                            ];
-                    break;
-
-                case 'http://schema.org/Thing':
-                    this.properties = ['description', 'image', 'name'];
-                    break;
-
-                case 'http://schema.org/Text':
-                    this.properties = ['description', 'image', 'keywords', 'name'];
-                    break;
-
-                case 'http://schema.org/WebPage':
-                    this.properties =
-                        [
-                            'about', 'author', 'comment', 'description', 'image', 'headline',
-                            'keywords', 'commentCount', 'mainContentOfPage', 'primaryImageOfPage',
-                            'video'
-                            ];
-                    break;
-                }
-            };
-        }
+        controller: 'MbSettingMicrodataCtrl'
     });
 
     $settings.newPage({
@@ -16703,9 +16799,9 @@ angular.module('am-wb-core')
 	 * Default settings
 	 */
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'general', 'transform', 'border',
-		'background', 'layout', 'layout-self', 'marginPadding', 'size', 'shadow', 'SEO' ];
+		'background', 'layout', 'layout-self', 'marginPadding', 'size', 'shadow', 'microdata' ];
 	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'transform', 'border',
-		'background', 'marginPadding', 'layout-self', 'size', 'shadow', 'SEO' ];
+		'background', 'marginPadding', 'layout-self', 'size', 'shadow', 'microdata' ];
 
 	/**
 	 * Setting page storage
@@ -18370,7 +18466,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-general.html',
-    " <fieldset layout=column> <legend translate>Text</legend> <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setStyle('direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setStyle('color', ctrl.color)\"> </wb-ui-setting-color> </fieldset>  <fieldset layout=column> <legend translate>Mouse</legend> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>mouse</wb-icon> <label translate>Cursor</label> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setStyle('cursor', ctrl.cursor)\"> <md-option ng-repeat=\"cursor in ::ctrl.cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Visibility</legend> <md-input-container layout-align=\"end center\"> <label translate>Visibility</label> <md-select ng-model=ctrl.visibility ng-change=\"ctrl.setStyle('visibility', ctrl.visibility)\" style=\"min-width: 200px\" disabled> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> </md-select> </md-input-container> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>opacity</wb-icon> <label translate>Opacity</label> <input ng-model=ctrl.opacity ng-change=\"ctrl.setStyle('opacity', ctrl.opacity)\"> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Overflow</legend> <md-input-container layout-align=\"end center\"> <label translate>X</label> <md-select ng-model=ctrl.overflowX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOverflowX() style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> <md-input-container layout-align=\"end center\"> <label translate>Y</label> <md-select ng-model=ctrl.overflowY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOverflowY() style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> </fieldset>"
+    " <fieldset layout=column> <legend translate>Identifier</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Id</label> <input ng-model=ctrl.id ng-change=\"ctrl.setProperty('id', ctrl.id)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Name</label> <input ng-model=ctrl.name ng-change=\"ctrl.setProperty('name', ctrl.name)\"> </md-input-container> </fieldset>   <fieldset layout=column> <legend translate>Text</legend> <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setProperty('style.direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setProperty('style.color', ctrl.color)\"> </wb-ui-setting-color> </fieldset>  <fieldset layout=column> <legend translate>Mouse</legend> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>mouse</wb-icon> <label translate>Cursor</label> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setProperty('style.cursor', ctrl.cursor)\"> <md-option ng-repeat=\"cursor in ::ctrl.cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Visibility</legend> <md-input-container layout-align=\"end center\"> <label translate>Visibility</label> <md-select ng-model=ctrl.visibility ng-change=\"ctrl.setProperty('style.visibility', ctrl.visibility)\" style=\"min-width: 200px\" disabled> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> </md-select> </md-input-container> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>opacity</wb-icon> <label translate>Opacity</label> <input ng-model=ctrl.opacity ng-change=\"ctrl.setProperty('style.opacity', ctrl.opacity)\"> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Overflow</legend> <md-input-container layout-align=\"end center\"> <label translate>X</label> <md-select ng-model=ctrl.overflowX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOverflowX() style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> <md-input-container layout-align=\"end center\"> <label translate>Y</label> <md-select ng-model=ctrl.overflowY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOverflowY() style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> </fieldset>"
   );
 
 
@@ -18423,14 +18519,13 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/settings/wb-notfound.html',
-    " <wb-icon>bug</wb-icon> <h2>Settings page not found</h2>"
+  $templateCache.put('views/settings/wb-microdata.html',
+    " <fieldset layout=column style=\"padding: 0px\"> <legend translate=\"\">Widget Microdata</legend> <md-switch ng-model=ctrl.itemscope ng-change=\"ctrl.setProperty('itemscope', ctrl.itemscope)\" aria-label=itemscope translate=\"\">Item Scope</md-switch> <md-input-container style=\"margin: 0px\"> <label translate=\"\">itemtype</label> <input ng-model=ctrl.itemtype ng-change=\"ctrl.setProperty('itemtype', ctrl.itemtype)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">itemprop</label> <input ng-model=ctrl.itemprop ng-change=\"ctrl.setProperty('itemprop', ctrl.itemprop)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">itemid</label> <input ng-model=ctrl.itemid ng-change=\"ctrl.setProperty('itemid', ctrl.itemid)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">itemref</label> <input ng-model=ctrl.itemref ng-change=\"ctrl.setProperty('itemref', ctrl.itemref)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Value</label> <input ng-model=ctrl.value ng-change=\"ctrl.setProperty('value', ctrl.value)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Content</label> <input ng-model=ctrl.content ng-change=\"ctrl.setProperty('content', ctrl.content)\"> </md-input-container> </fieldset>"
   );
 
 
-  $templateCache.put('views/settings/wb-seo.html',
-    " <fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Id</label> <input ng-model=ctrl.id ng-change=\"ctrl.setProperty('id', ctrl.id)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Label</label> <input ng-model=ctrl.label ng-change=\"ctrl.setProperty('label', ctrl.label)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Description</label> <textarea name=description ng-model=ctrl.description ng-change=\"ctrl.setProperty('description', ctrl.description)\">\n" +
-    "\t\t</textarea> </md-input-container> </fieldset> <fieldset layout=column style=\"padding: 0px\"> <legend translate=\"\">Schema</legend> <md-input-container flex=100 style=\"padding-left: 8px;padding-right: 8px\"> <label translate=\"\">Type</label> <md-select ng-model=ctrl.category ng-change=\"ctrl.setProperty('category', ctrl.category)\"> <md-option ng-repeat=\"type in ctrl.schemaTypes\" value={{type.value}}> {{type.key}} </md-option> </md-select> </md-input-container> <div layout=row layout-align=\"center center\" ng-if=ctrl.alert style=\"padding-left: 8px; padding-right: 8px\"> <p style=\"color: red\">! <span translate=\"\">{{ctrl.alert}}</span></p> </div> <md-input-container ng-if=!ctrl.alert flex=100 style=\"padding-left: 8px;padding-right: 8px\"> <label translate=\"\">Property</label> <md-select md-on-open=ctrl.setProperties() ng-model=ctrl.property ng-change=\"ctrl.setProperty('property', ctrl.property)\"> <md-option ng-repeat=\"property in ctrl.properties\" value=property> {{property}} </md-option> </md-select> </md-input-container> </fieldset>"
+  $templateCache.put('views/settings/wb-notfound.html',
+    " <wb-icon>bug</wb-icon> <h2>Settings page not found</h2>"
   );
 
 
