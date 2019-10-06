@@ -1262,4 +1262,24 @@ angular.module('am-wb-core')
             };
         }
     });
+
+    /**
+     * @ngDoc Settings
+     * @name amh-common-link
+     * @description Link setting page
+     */
+    $settings.newPage({
+        type: 'a',
+        label: 'Link',
+        description: 'Manage link in the current widget.',
+        icon: 'settings',
+        templateUrl: 'views/settings/wb-a.html',
+        controllerAs: 'ctrl',
+        controller: function () {
+            this.init = function () {
+                this.href = this.getProperty('href');
+                this.html = this.getProperty('html');
+            };
+        }
+    });
 });

@@ -162,6 +162,7 @@ var WbAbstractWidget = function () {
                 if (ctrl.isEditable()) {
                     ctrl.setSelected(true, $event);
                     $event.stopPropagation();
+                    $event.preventDefault();
                 }
                 ctrl.fire('click', $event);
             },
@@ -169,6 +170,7 @@ var WbAbstractWidget = function () {
                 if (ctrl.isEditable()) {
                     ctrl.setSelected(true, $event);
                     $event.stopPropagation();
+                    $event.preventDefault();
                     // Open an editor 
                     var editor = ctrl.$widget.getEditor(ctrl);
                     editor.show();
