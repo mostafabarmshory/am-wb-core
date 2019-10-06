@@ -26,10 +26,14 @@
 				}
 			}
 		},{
+			"id": "aid",
 			"type": "a",
+			"name": "key",
 			"itemscope": true,
 			"itemtype": "http://maso.com",
-			"name": "key",
+			"itemid": "id",
+			"itemprop": "prop",
+			"itemref": "adsfasd",
 			"href": "google.com",
 			"html": "Link to google",
 			"style": {

@@ -1,3 +1,31 @@
+
+<!--
+Element Identifier
+
+Contains:
+- id
+- name
+
+-->
+<fieldset
+	layout="column">
+	<legend translate>Identifier</legend>
+	<md-input-container style="margin: 0px;margin-top: 10px">
+		<label translate="">Id</label>
+		<input 
+			type="text" 
+			ng-model="ctrl.id"
+			ng-change="ctrl.setProperty('id', ctrl.id)">
+	</md-input-container>
+	<md-input-container style="margin: 0px">
+		<label translate="">Name</label>
+		<input 
+			type="text" 
+			ng-model="ctrl.name"
+			ng-change="ctrl.setProperty('name', ctrl.name)">
+	</md-input-container>
+</fieldset>
+
 <!--
 General setting
 
@@ -19,7 +47,7 @@ Created by masood.
     	layout-align="end center">
 		<md-select 
 			ng-model="ctrl.direction" 
-			ng-change="ctrl.setStyle('direction', ctrl.direction)"
+			ng-change="ctrl.setProperty('style.direction', ctrl.direction)"
 			style="min-width: 200px;">
 			<md-option 
 				ng-value="'ltr'">
@@ -45,7 +73,7 @@ Created by masood.
         wb-ui-setting-clear-button="true"
         wb-ui-setting-preview="true"
         ng-model="ctrl.color"
-    	ng-change="ctrl.setStyle('color', ctrl.color)">
+    	ng-change="ctrl.setProperty('style.color', ctrl.color)">
     </wb-ui-setting-color>
 </fieldset>
 
@@ -62,7 +90,7 @@ Created by masood.
 		<md-select 
 			style="max-width:75px;"
 			ng-model="ctrl.cursor"
-			ng-change="ctrl.setStyle('cursor', ctrl.cursor)">
+			ng-change="ctrl.setProperty('style.cursor', ctrl.cursor)">
 			<md-option 
 				ng-repeat="cursor in ::ctrl.cursors"
 				value="{{::cursor.value}}">
@@ -82,7 +110,7 @@ Created by masood.
 		<label translate>Visibility</label>
 		<md-select 
 			ng-model="ctrl.visibility" 
-			ng-change="ctrl.setStyle('visibility', ctrl.visibility)"
+			ng-change="ctrl.setProperty('style.visibility', ctrl.visibility)"
 			style="min-width: 200px;"
 			disabled>
 			<md-option 
@@ -102,7 +130,7 @@ Created by masood.
 		<input 
 			type="text" 
 			ng-model="ctrl.opacity"
-			ng-change="ctrl.setStyle('opacity', ctrl.opacity)">
+			ng-change="ctrl.setProperty('style.opacity', ctrl.opacity)">
 	</md-input-container>
 </fieldset>
 
