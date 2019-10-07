@@ -21,6 +21,19 @@ The style is an specific widget attribute which controll the display of the widg
 
 The cursor property specifies the mouse cursor to be displayed when pointing over an element.
 
+
+	{
+		style: {
+			cursor: 'pointer'
+		}
+	}
+
+The property path is:
+
+	style.cursor
+
+Valid values are:
+
 - alias:	The cursor indicates an alias of something is to be created	
 - all-scroll:	The cursor indicates that something can be scrolled in any direction	
 - auto:	Default. The browser sets a cursor	
