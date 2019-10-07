@@ -4809,12 +4809,27 @@ angular.module('am-wb-core')//
 		// id
 		'id',
 		'name',
+		'title',
 		
+		// language
+		'dir',
+		'lang',
+		'translate',
+		'spellcheck',
+
+		// access
+		'accesskey',
+		'contenteditable',
+		'tabindex',
+		'hidden',
+		
+		// General style
 		'style.direction',
 		'style.visibility',
 		'style.color',
 		'style.cursor',
 		'style.opacity',
+		
 		// overflow
 		'style.overflow.x',
 		'style.overflow.y',
@@ -4832,158 +4847,6 @@ angular.module('am-wb-core')//
 			ctrl[attr] = ctrl.getProperty(attr);
 		});
 	};
-
-
-	// TODO: maso, 2019: move to the view
-	this.cursors = [{
-		title: 'alias',
-		value: 'alias',  
-		description: 'The cursor indicates an alias of something is to be created'
-	},{
-		title: 'All Scroll',
-		value: 'all-scroll',
-		description: 'The cursor indicates that something can be scrolled in any direction'
-	},{
-		title: 'Auto',
-		value: 'auto  ',
-		description: 'Default. The browser sets a cursor'
-	},{
-		title: 'Cell',
-		value: 'cell', 
-		description: 'The cursor indicates that a cell (or set of cells) may be selected'
-	},{
-		title: 'Context Menu',
-		value: 'context-menu',
-		description: 'The cursor indicates that a context-menu is available'
-	},{
-		title: 'Columne resize',
-		value: 'col-resize',  
-		description: 'The cursor indicates that the column can be resized horizontally'
-	},{
-		title: 'Copy',
-		value: 'copy',
-		description: 'The cursor indicates something is to be copied'
-	},{
-		title: 'Crosshair',
-		value: 'crosshair',
-		description: 'The cursor render as a crosshair'
-	},{
-		title: 'Default',
-		value: 'default',
-		description: 'The default cursor'
-	},{
-		title: 'Edge Resize',
-		value: 'e-resize',
-		description: 'The cursor indicates that an edge of a box is to be moved right (east)'
-	},{
-		title: 'Bidirectional Resize',
-		value: 'ew-resize',
-		description: 'Indicates a bidirectional resize cursor'
-	},{
-		title: 'Grab',
-		value: 'grab',
-		description: 'The cursor indicates that something can be grabbed '
-	},{
-		title: 'Grabbing',
-		value: 'grabbing',
-		description: 'The cursor indicates that something can be grabbed'
-	},{
-		title: 'Help',
-		value: 'help',
-		description: 'The cursor indicates that help is available '
-	},{
-		title: 'Move',
-		value: 'move',
-		description: 'The cursor indicates something is to be moved'
-	},{
-		title: 'North Resize',
-		value: 'n-resize',
-		description: 'The cursor indicates that an edge of a box is to be moved up (north)'
-	},{
-		title: 'North/East Resize',
-		value: 'ne-resize',
-		description: 'The cursor indicates that an edge of a box is to be moved up and right (north/east)'
-	},{
-		title: 'NS Bidirectional Resize',
-		value: 'ns-resize',
-		description: 'Indicates a bidirectional resize cursor'
-	},{
-		title: 'North/West Resize',
-		value: 'nw-resize',
-		description: 'The cursor indicates that an edge of a box is to be moved up and left (north/west)'
-	},{
-		title: 'Bidirectional Resize',
-		value: 'nwse-resize',
-		description: 'Indicates a bidirectional resize cursor'
-	},{
-		title: 'No Drop',
-		value: 'no-drop',
-		description: 'The cursor indicates that the dragged item cannot be dropped here '
-	},{
-		title: 'None',
-		value: 'none',
-		description: 'No cursor is rendered for the element  '
-	},{
-		title: 'Not Allowed',
-		value: 'not-allowed',
-		description: 'The cursor indicates that the requested action will not be executed'
-	},{
-		title: 'Pointer',
-		value: 'pointer',
-		description: 'The cursor is a pointer and indicates a link'
-	},{
-		title: 'Progress',
-		value: 'progress',
-		description: 'The cursor indicates that the program is busy (in progress)'
-	},{
-		title: 'Row Resize',
-		value: 'row-resize',
-		description: 'The cursor indicates that the row can be resized vertically'
-	},{
-		title: 'South Resize',
-		value: 's-resize',
-		description: 'The cursor indicates that an edge of a box is to be moved down (south)'
-	},{
-		title: 'South/East Resize',
-		value: 'se-resize',
-		description: 'The cursor indicates that an edge of a box is to be moved down and right (south/east)'
-	},{
-		title: 'South/West Resize',
-		value: 'sw-resize',
-		description: 'The cursor indicates that an edge of a box is to be moved down and left (south/west)'
-	},{
-		title: 'Text',
-		value: 'text',
-		description: 'The cursor indicates text that may be selected'
-	},{
-		title: 'Vertical text',
-		value: 'vertical-text',
-		description: 'The cursor indicates vertical-text that may be selected'
-	},{
-		title: 'West Resize',
-		value: 'w-resize',
-		description: 'The cursor indicates that an edge of a box is to be moved left (west)'
-	},{
-		title: 'Wait',
-		value: 'wait',
-		description: 'The cursor indicates that the program is busy'
-	},{
-		title: 'Zoom In',
-		value: 'zoom-in',
-		description: 'The cursor indicates that something can be zoomed in'
-	},{
-		title: 'Zoom Out',
-		value: 'zoom-out',
-		description: 'The cursor indicates that something can be zoomed out'
-	},{
-		title: 'Initial',
-		value: 'Sets this property to its default value. Read about initial',
-		description: 'Sets this property to its default value. Read about initial'
-	},{
-		title: 'Inherit',
-		value: 'inherit',
-		description: 'Inherits this property from its parent element. Read about inherit'
-	}];
 });
 
 /*
@@ -17074,681 +16937,685 @@ angular.module('am-wb-core')
  */
 angular.module('am-wb-core')
 .service('$wbUtil', function ($q, $templateRequest, $sce) {
-    'use strict';
-    var REGEX_BACKGROUND_IMAGE_SPEC = RegExp('(repeating\-)?(linear|radial)\-(gradient)');
-    var service = this;
+	'use strict';
+	var REGEX_BACKGROUND_IMAGE_SPEC = RegExp('(repeating\-)?(linear|radial)\-(gradient)');
+	var service = this;
 
-    function cleanMap(oldStyle, newStyle, map) {
-        for (var i = 0; i < map.length; i++) {
-            if (oldStyle[map[i][0]]) {
-                newStyle[map[i][1]] = oldStyle[map[i][0]];
-                delete oldStyle[map[i][0]];
-            }
-        }
-    }
+	function cleanMap(oldStyle, newStyle, map) {
+		for (var i = 0; i < map.length; i++) {
+			if (oldStyle[map[i][0]]) {
+				newStyle[map[i][1]] = oldStyle[map[i][0]];
+				delete oldStyle[map[i][0]];
+			}
+		}
+	}
 
-    function getTemplateOf(page)
-    {
-        var template = page.template;
-        var templateUrl = page.templateUrl;
-        if (angular.isDefined(template)) {
-            if (angular.isFunction(template)) {
-                template = template(page.params | page);
-            }
-        } else if (angular.isDefined(templateUrl)) {
-            if (angular.isFunction(templateUrl)) {
-                templateUrl = templateUrl(page.params);
-            }
-            if (angular.isDefined(templateUrl)) {
-                page.loadedTemplateUrl = $sce.valueOf(templateUrl);
-                template = $templateRequest(templateUrl);
-            }
-        }
-        return template;
-    }
+	function getTemplateOf(page)
+	{
+		var template = page.template;
+		var templateUrl = page.templateUrl;
+		if (angular.isDefined(template)) {
+			if (angular.isFunction(template)) {
+				template = template(page.params | page);
+			}
+		} else if (angular.isDefined(templateUrl)) {
+			if (angular.isFunction(templateUrl)) {
+				templateUrl = templateUrl(page.params);
+			}
+			if (angular.isDefined(templateUrl)) {
+				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+				template = $templateRequest(templateUrl);
+			}
+		}
+		return template;
+	}
 
-    /**
-     * Loading template of the page
-     * 
-     * @name getTemplateFor
-     * @memberof $wbUtil
-     * @param page
-     *            {object} properties of a page, widget , ..
-     * @return promise to load template on resolve.
-     */
-    function getTemplateFor(page)
-    {
-        return $q.when(getTemplateOf(page));
-    }
+	/**
+	 * Loading template of the page
+	 * 
+	 * @name getTemplateFor
+	 * @memberof $wbUtil
+	 * @param page
+	 *            {object} properties of a page, widget , ..
+	 * @return promise to load template on resolve.
+	 */
+	function getTemplateFor(page)
+	{
+		return $q.when(getTemplateOf(page));
+	}
 
-    /**
-     * Converts data into a valid CSS attributes
-     */
-    function convertToGroupCss(style) {
-        var style = style || {};
-        var css = convertToWidgetCss(style);
+	/**
+	 * Converts data into a valid CSS attributes
+	 */
+	function convertToGroupCss(style) {
+		var style = style || {};
+		var css = convertToWidgetCss(style);
 
-        if(style.visibility === 'hidden'){
-            css.display = 'none';
-        } else {
-            /*
-             * Group
-             * 
-             * check if is group apply flex flow
-             */
-            css.display = 'flex';
-            var layout = style.layout || {};
-            // row
-            if (layout.direction === 'row') {
-                css['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
-                css['overflow-x'] = layout.wrap ? 'visible' : 'auto';
-                css['overflow-y'] = 'visible';
-            } else {
-                css['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
-                css['overflow-x'] = 'visible';
-                css['overflow-y'] = layout.wrap ? 'visible' : 'auto';
-            }
-
-
-            // wrap
-            if (layout.wrap) {
-                css['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
-                // wrap align
-                var alignContent;
-                switch (layout.wrap_align) {
-                case 'start':
-                    alignContent = 'flex-start';
-                    break;
-                case 'end':
-                    alignContent = 'flex-end';
-                    break;
-                case 'center':
-                    alignContent = 'center';
-                    break;
-                case 'space-between':
-                    alignContent = 'space-between';
-                    break;
-                case 'space-around':
-                    alignContent = 'space-around';
-                    break;
-                case 'stretch':
-                    alignContent = 'stretch';
-                    break;
-                default:
-                    alignContent = 'stretch';
-                }
-                css['align-content'] = alignContent;
-            } else {
-                css['flex-wrap'] = 'nowrap';
-            }
+		if(style.visibility === 'hidden'){
+			css.display = 'none';
+		} else {
+			/*
+			 * Group
+			 * 
+			 * check if is group apply flex flow
+			 */
+			css.display = 'flex';
+			var layout = style.layout || {};
+			// row
+			if (layout.direction === 'row') {
+				css['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
+				if(!style.overflow){
+					css['overflow-x'] = layout.wrap ? 'visible' : 'auto';
+					css['overflow-y'] = 'visible';
+				}
+			} else {
+				css['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
+				if(!style.overflow){
+					css['overflow-x'] = 'visible';
+					css['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+				}
+			}
 
 
-            // justify
-            var justify;
-            switch (layout.justify) {
-            case 'start':
-                justify = 'flex-start';
-                break;
-            case 'end':
-                justify = 'flex-end';
-                break;
-            case 'center':
-                justify = 'center';
-                break;
-            case 'space-between':
-                justify = 'space-between';
-                break;
-            case 'space-around':
-                justify = 'space-around';
-                break;
-            case 'space-evenly':
-                justify = 'space-evenly';
-                break;
-            default:
-                justify = 'flex-start';
-            }
-            css['justify-content'] = justify;
+			// wrap
+			if (layout.wrap) {
+				css['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
+				// wrap align
+				var alignContent;
+				switch (layout.wrap_align) {
+				case 'start':
+					alignContent = 'flex-start';
+					break;
+				case 'end':
+					alignContent = 'flex-end';
+					break;
+				case 'center':
+					alignContent = 'center';
+					break;
+				case 'space-between':
+					alignContent = 'space-between';
+					break;
+				case 'space-around':
+					alignContent = 'space-around';
+					break;
+				case 'stretch':
+					alignContent = 'stretch';
+					break;
+				default:
+					alignContent = 'stretch';
+				}
+				css['align-content'] = alignContent;
+			} else {
+				css['flex-wrap'] = 'nowrap';
+			}
 
-            // align
-            var align;
-            switch (layout.align) {
-            case 'start':
-                align = 'flex-start';
-                break;
-            case 'end':
-                align = 'flex-end';
-                break;
-            case 'center':
-                align = 'center';
-                break;
-            case 'baseline':
-                align = 'baseline';
-                break;
-            case 'stretch':
-                align = 'stretch';
-                break;
-            default:
-                align = 'stretch';
-            }
-            css['align-items'] = align;
-        }
 
-        return css;
-    }
+			// justify
+			var justify;
+			switch (layout.justify) {
+			case 'start':
+				justify = 'flex-start';
+				break;
+			case 'end':
+				justify = 'flex-end';
+				break;
+			case 'center':
+				justify = 'center';
+				break;
+			case 'space-between':
+				justify = 'space-between';
+				break;
+			case 'space-around':
+				justify = 'space-around';
+				break;
+			case 'space-evenly':
+				justify = 'space-evenly';
+				break;
+			default:
+				justify = 'flex-start';
+			}
+			css['justify-content'] = justify;
 
-    /**
-     * Converts data into a valid CSS attributes
-     */
-    function convertToWidgetCss(style) {
-        var style = style || {};
-        var css = {};
+			// align
+			var align;
+			switch (layout.align) {
+			case 'start':
+				align = 'flex-start';
+				break;
+			case 'end':
+				align = 'flex-end';
+				break;
+			case 'center':
+				align = 'center';
+				break;
+			case 'baseline':
+				align = 'baseline';
+				break;
+			case 'stretch':
+				align = 'stretch';
+				break;
+			default:
+				align = 'stretch';
+			}
+			css['align-items'] = align;
+		}
 
-        // layout
-        if(style.visibility === 'hidden'){
-            css.display = 'none';
-        } else {
-        	css.display = '';
-        }
+		return css;
+	}
 
-        css = _.merge(css, 
-                // layout
-                convertToWidgetCssLayout(style.layout || {}),
-                // size
-                convertToWidgetCssSize(style.size || {}),
-                // background
-                convertToWidgetCssBackground(style.background || {}),
-                // border
-                convertToWidgetCssBoarder(style.border || {}),
-                // shadows
-                convertToWidgetCssShadows(style.shadows || {}),
-                // transform
-                convertToWidgetCssTransfrom(style.transform || {}),
-                // Overflow
-                convertToWidgetCssOverflow(style.overflow || {}),
-                // text
-                convertToWidgetCssText(style.text || {}),
-                // color, cursor, opacity, direction
-                {
-		            padding: style.padding,
-		            margin: style.margin,
-		            direction: style.direction || 'ltr',
-		            color: style.color || 'initial',
-		            cursor: style.cursor || 'auto',
-		            opacity: style.opacity || '1',
-                });
+	/**
+	 * Converts data into a valid CSS attributes
+	 */
+	function convertToWidgetCss(style) {
+		var style = style || {};
+		var css = {};
 
-        return css;
-    }
-    
-    function convertToWidgetCssText(textOptions){
-    	var css =  {
-            'text-decoration': textOptions.decoration || 'none',
-            'text-shadow': textOptions.shadow || 'none',
-            'text-transform': textOptions.transform || 'none',
-            'text-overflow': textOptions.overflow || 'clip',
-            'text-justify': textOptions.justify || 'auto',
-            'text-indent': textOptions.indent || 'indent',
-            'text-align-last': textOptions.alignLast || 'auto',
-        };
-        if(textOptions.align){
-        	css['text-align'] = textOptions.align || 'indent';
-        }
-        return css;
-    }
+		// layout
+		if(style.visibility === 'hidden'){
+			css.display = 'none';
+		} else {
+			css.display = '';
+		}
 
-    function convertToWidgetCssOverflow(overflowOption) {
-        return {
-            'overflow-x': overflowOption.x || 'visible',
-            'overflow-y': overflowOption.y || 'visible'
-        };
-    }
+		css = _.merge(css, 
+				// layout
+				convertToWidgetCssLayout(style.layout || {}),
+				// size
+				convertToWidgetCssSize(style.size || {}),
+				// background
+				convertToWidgetCssBackground(style.background || {}),
+				// border
+				convertToWidgetCssBoarder(style.border || {}),
+				// shadows
+				convertToWidgetCssShadows(style.shadows || {}),
+				// transform
+				convertToWidgetCssTransfrom(style.transform || {}),
+				// Overflow
+				convertToWidgetCssOverflow(style.overflow || {}),
+				// text
+				convertToWidgetCssText(style.text || {}),
+				// color, cursor, opacity, direction
+				{
+			padding: style.padding,
+			margin: style.margin,
+			direction: style.direction || 'ltr',
+			color: style.color || 'initial',
+			cursor: style.cursor || 'auto',
+			opacity: style.opacity || '1',
+				});
 
-    function convertToWidgetCssTransfrom(transformOptions) {
-        var transform = '';
+		return css;
+	}
 
-        if(transformOptions.x){
-            var x = transformOptions.x;
-            if(x.rotate){
-                transform += ' rotateX('+x.rotate+')';
-            }
-            if(x.translate){
-                transform  += ' translateX('+x.translate+')';
-            }
-            if(x.scale){
-                transform += ' scaleX('+ x.scale+')';
-            }
-            if(x.skew){
-                transform += ' skewX('+ x.skew+')';
-            }
-        }
-        if(transformOptions.y){
-            var y = transformOptions.y;
-            if(y.rotate){
-                transform += ' rotateY('+y.rotate+')';
-            }
-            if(y.translate){
-                transform += ' translateY('+y.translate+')';
-            }
-            if(y.scale){
-                transform += ' scaleY('+y.scale+')';
-            }
-            if(y.skew){
-                transform += ' skewY('+y.skew+')';
-            }
-        }
-        if(transformOptions.z){
-            var z = transformOptions.z;
-            if(z.rotate){
-                transform += ' rotateZ('+z.rotate+')';
-            }
-            if(z.translate){
-                transform += ' translateZ('+z.translate+')';
-            }
-            if(z.scale){
-                transform += ' scaleZ('+z.scale+')';
-            }
-        }
+	function convertToWidgetCssText(textOptions){
+		var css =  {
+				'text-decoration': textOptions.decoration || 'none',
+				'text-shadow': textOptions.shadow || 'none',
+				'text-transform': textOptions.transform || 'none',
+				'text-overflow': textOptions.overflow || 'clip',
+				'text-justify': textOptions.justify || 'auto',
+				'text-indent': textOptions.indent || 'indent',
+				'text-align-last': textOptions.alignLast || 'auto',
+		};
+		if(textOptions.align){
+			css['text-align'] = textOptions.align || 'indent';
+		}
+		return css;
+	}
 
-        if(transformOptions.perspective){
-            transform += ' perspective('+transformOptions.perspective+')';
-        }
+	function convertToWidgetCssOverflow(overflowOption) {
+		return {
+			'overflow-x': overflowOption.x || 'visible',
+			'overflow-y': overflowOption.y || 'visible'
+		};
+	}
 
-        if(!transform) {
-            return {
-                transform: 'none'
-            };
-        }
+	function convertToWidgetCssTransfrom(transformOptions) {
+		var transform = '';
 
-        return {
-            transform: transform,
-            'transform-origin': transformOptions.origin || 'center',
-            'transform-style': transformOptions.style || 'flat'
-        };
-    };
+		if(transformOptions.x){
+			var x = transformOptions.x;
+			if(x.rotate){
+				transform += ' rotateX('+x.rotate+')';
+			}
+			if(x.translate){
+				transform  += ' translateX('+x.translate+')';
+			}
+			if(x.scale){
+				transform += ' scaleX('+ x.scale+')';
+			}
+			if(x.skew){
+				transform += ' skewX('+ x.skew+')';
+			}
+		}
+		if(transformOptions.y){
+			var y = transformOptions.y;
+			if(y.rotate){
+				transform += ' rotateY('+y.rotate+')';
+			}
+			if(y.translate){
+				transform += ' translateY('+y.translate+')';
+			}
+			if(y.scale){
+				transform += ' scaleY('+y.scale+')';
+			}
+			if(y.skew){
+				transform += ' skewY('+y.skew+')';
+			}
+		}
+		if(transformOptions.z){
+			var z = transformOptions.z;
+			if(z.rotate){
+				transform += ' rotateZ('+z.rotate+')';
+			}
+			if(z.translate){
+				transform += ' translateZ('+z.translate+')';
+			}
+			if(z.scale){
+				transform += ' scaleZ('+z.scale+')';
+			}
+		}
 
-    function createShadowStr(shadow) {
-        var hShift = shadow.hShift || '0px';
-        var vShift = shadow.vShift || '0px';
-        var blur = shadow.blur || '0px';
-        var spread = shadow.spread || '0px';
-        var color = shadow.color || 'black';
+		if(transformOptions.perspective){
+			transform += ' perspective('+transformOptions.perspective+')';
+		}
 
-        var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
+		if(!transform) {
+			return {
+				transform: 'none'
+			};
+		}
 
-        if(shadow.inset) {
-            boxShadow = boxShadow.concat(' ' + 'inset');
-        }
+		return {
+			transform: transform,
+			'transform-origin': transformOptions.origin || 'center',
+			'transform-style': transformOptions.style || 'flat'
+		};
+	};
 
-        return boxShadow;
-    }
+	function createShadowStr(shadow) {
+		var hShift = shadow.hShift || '0px';
+		var vShift = shadow.vShift || '0px';
+		var blur = shadow.blur || '0px';
+		var spread = shadow.spread || '0px';
+		var color = shadow.color || 'black';
 
-    function convertToWidgetCssShadows(shadows) {
-        var shadowStr = '';
+		var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
 
-        if (!angular.isArray(shadows) || shadows.length === 0) {
-            shadowStr = 'none';
-        } else {
-            angular.forEach(shadows, function (shadow, index) {
-                shadowStr += createShadowStr(shadow);
-                if(index + 1 < shadows.length){
-                    shadowStr += ', ';
-                }
-            });
-        }
+		if(shadow.inset) {
+			boxShadow = boxShadow.concat(' ' + 'inset');
+		}
 
-        return {
-            'box-shadow': shadowStr
-        };
-    }
+		return boxShadow;
+	}
 
-    function convertToWidgetCssBoarder(style) {
-        var conf = {};
-        if (style.style) {
-            conf['border-style'] = style.style;
-        }
-        if (style.width) {
-            conf['border-width'] = style.width;
-        }
-        if (style.color) {
-            conf['border-color'] = style.color;
-        }
-        if (style.radius) {
-            conf['border-radius'] = style.radius;
-        }
+	function convertToWidgetCssShadows(shadows) {
+		var shadowStr = '';
 
-        return conf;
-    }
+		if (!angular.isArray(shadows) || shadows.length === 0) {
+			shadowStr = 'none';
+		} else {
+			angular.forEach(shadows, function (shadow, index) {
+				shadowStr += createShadowStr(shadow);
+				if(index + 1 < shadows.length){
+					shadowStr += ', ';
+				}
+			});
+		}
 
-    function convertToWidgetCssBackground(style){
-        var cssValue = {};
-        if(style.background){
-            cssValue.background = style.background;
-            return;
-        }
-        // image
-        var image = 'none';
-        if(style.image){
-            if(REGEX_BACKGROUND_IMAGE_SPEC.test(style.image)){
-                image = style.image;
-            } else {
-                image = 'url(\''+style.image+'\')';
-            }
-        }
+		return {
+			'box-shadow': shadowStr
+		};
+	}
 
-        cssValue['background-image'] = image;
-        cssValue['background-color'] = style.color || 'initial';
-        cssValue['background-size'] = style.size || 'auto';
-        cssValue['background-repeat'] = style.repeat || 'repeat';
-        cssValue['background-position'] = style.position || '0px 0px';
-        cssValue['background-attachment'] = style.attachment || 'scroll';
-        cssValue['background-origin'] = style.origin || 'padding-box';
-        cssValue['background-clip'] = style.clip || 'border-box';
+	function convertToWidgetCssBoarder(style) {
+		var conf = {};
+		if (style.style) {
+			conf['border-style'] = style.style;
+		}
+		if (style.width) {
+			conf['border-width'] = style.width;
+		}
+		if (style.color) {
+			conf['border-color'] = style.color;
+		}
+		if (style.radius) {
+			conf['border-radius'] = style.radius;
+		}
 
-        return cssValue;
-    }
+		return conf;
+	}
 
-    /**
-     * Converts data into a layout CSS3
-     */
-    function convertToWidgetCssLayout(layout){
-        var flexLayout = {};
-        /*
-         * Widget
-         */
-        flexLayout.order = layout.order >= 0 ? layout.order : 0;
-        flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
-        flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
-        flexLayout['flex-basis'] = layout.basis || 'auto';
+	function convertToWidgetCssBackground(style){
+		var cssValue = {};
+		if(style.background){
+			cssValue.background = style.background;
+			return;
+		}
+		// image
+		var image = 'none';
+		if(style.image){
+			if(REGEX_BACKGROUND_IMAGE_SPEC.test(style.image)){
+				image = style.image;
+			} else {
+				image = 'url(\''+style.image+'\')';
+			}
+		}
 
-        // align-self
-        // auto | flex-start | flex-end | center | baseline | stretch;
-        var alignSelf;
-        switch (layout.align_self) {
-        case 'start':
-            alignSelf = 'flex-start';
-            break;
-        case 'end':
-            alignSelf = 'flex-end';
-            break;
-        case 'center':
-            alignSelf = 'center';
-            break;
-        case 'baseline':
-            alignSelf = 'baseline';
-            break;
-        case 'stretch':
-            alignSelf = 'stretch';
-            break;
-        default:
-            alignSelf = 'auto';
-        }
-        flexLayout['align-self'] = alignSelf;
+		cssValue['background-image'] = image;
+		cssValue['background-color'] = style.color || 'initial';
+		cssValue['background-size'] = style.size || 'auto';
+		cssValue['background-repeat'] = style.repeat || 'repeat';
+		cssValue['background-position'] = style.position || '0px 0px';
+		cssValue['background-attachment'] = style.attachment || 'scroll';
+		cssValue['background-origin'] = style.origin || 'padding-box';
+		cssValue['background-clip'] = style.clip || 'border-box';
 
-        return flexLayout;
-    }
+		return cssValue;
+	}
 
-    /*
-     * Convert size object to valid CSS size
-     */
-    function convertToWidgetCssSize(size) {
-        return {
-            'width': size.width || 'auto',
-            'min-width': size.minWidth || '0',
-            'max-width': size.maxWidth || 'none',
+	/**
+	 * Converts data into a layout CSS3
+	 */
+	function convertToWidgetCssLayout(layout){
+		var flexLayout = {};
+		/*
+		 * Widget
+		 */
+		flexLayout.order = layout.order >= 0 ? layout.order : 0;
+		flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
+		flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
+		flexLayout['flex-basis'] = layout.basis || 'auto';
 
-            'height': size.height || 'auto',
-            'min-height': size.minHeight || '0',
-            'max-height': size.maxHeight || 'none',
-        };
-    }
+		// align-self
+		// auto | flex-start | flex-end | center | baseline | stretch;
+		var alignSelf;
+		switch (layout.align_self) {
+		case 'start':
+			alignSelf = 'flex-start';
+			break;
+		case 'end':
+			alignSelf = 'flex-end';
+			break;
+		case 'center':
+			alignSelf = 'center';
+			break;
+		case 'baseline':
+			alignSelf = 'baseline';
+			break;
+		case 'stretch':
+			alignSelf = 'stretch';
+			break;
+		default:
+			alignSelf = 'auto';
+		}
+		flexLayout['align-self'] = alignSelf;
 
-    function cleanEvetns(model)
-    {
-        // event
-        if (!model.event) {
-            model.event = {};
-        }
+		return flexLayout;
+	}
 
-        // load legecy events
-        if(model.event.failure){
-            model.event.error = model.event.failure;
-            delete model.event.failure;
-        }
-    }
+	/*
+	 * Convert size object to valid CSS size
+	 */
+	function convertToWidgetCssSize(size) {
+		return {
+			'width': size.width || 'auto',
+			'min-width': size.minWidth || '0',
+			'max-width': size.maxWidth || 'none',
 
-    function cleanLayout(model)
-    {
-        if (!model.style.layout) {
-            model.style.layout = {};
-        }
-        if (model.type === 'Group' || model.type === 'Page') {
-            // convert
-            var newStyle = model.style.layout;
-            var oldStyle = model.style;
+			'height': size.height || 'auto',
+			'min-height': size.minHeight || '0',
+			'max-height': size.maxHeight || 'none',
+		};
+	}
 
-            if (oldStyle.flexDirection) {
-                if (oldStyle.flexDirection === 'wb-flex-row') {
-                    newStyle.direction = 'row';
-                } else {
-                    newStyle.direction = 'column';
-                }
-                delete oldStyle.flexDirection;
-            }
-            if (!newStyle.direction) {
-                newStyle.direction = 'column';
-            }
+	function cleanEvetns(model)
+	{
+		// event
+		if (!model.event) {
+			model.event = {};
+		}
 
-            switch (oldStyle.flexAlignItem) {
-            case 'wb-flex-align-items-center':
-                newStyle.align = 'center';
-                break;
-            case 'wb-flex-align-items-end':
-                newStyle.align = 'end';
-                break;
-            case 'wb-flex-align-items-start':
-                newStyle.align = 'start';
-                break;
-            case 'wb-flex-align-items-stretch':
-                newStyle.align = 'stretch';
-                break;
-            default:
-                newStyle.align = 'stretch';
-            }
-            delete oldStyle.flexAlignItem;
+		// load legecy events
+		if(model.event.failure){
+			model.event.error = model.event.failure;
+			delete model.event.failure;
+		}
+	}
 
-            switch (oldStyle.justifyContent) {
-            case 'wb-flex-justify-content-center':
-                newStyle.justify = 'center';
-                break;
-            case 'wb-flex-justify-content-end':
-                newStyle.justify = 'end';
-                break;
-            case 'wb-flex-justify-content-start':
-                newStyle.justify = 'start';
-                break;
-            case 'wb-flex-justify-content-space-between':
-                newStyle.justify = 'space-between';
-                break;
-            case 'wb-flex-justify-content-space-around':
-                newStyle.justify = 'space-around';
-                break;
-            default:
-                newStyle.justify = 'center';
-            }
-            delete oldStyle.justifyContent;
-        }
-    }
+	function cleanLayout(model)
+	{
+		if (!model.style.layout) {
+			model.style.layout = {};
+		}
+		if (model.type === 'Group' || model.type === 'Page') {
+			// convert
+			var newStyle = model.style.layout;
+			var oldStyle = model.style;
 
-    function cleanSize(model)
-    {
-        if (!model.style.size) {
-            model.style.size = {};
-        }
-        var newStyle = model.style.size;
-        var oldStyle = model.style;
-        var map = [['width', 'width'],
-            ['height', 'height']];
-        cleanMap(oldStyle, newStyle, map);
-    }
+			if (oldStyle.flexDirection) {
+				if (oldStyle.flexDirection === 'wb-flex-row') {
+					newStyle.direction = 'row';
+				} else {
+					newStyle.direction = 'column';
+				}
+				delete oldStyle.flexDirection;
+			}
+			if (!newStyle.direction) {
+				newStyle.direction = 'column';
+			}
 
-    function cleanBackground(model)
-    {
-        if (!model.style.background) {
-            model.style.background = {};
-        }
-        var newStyle = model.style.background;
-        var oldStyle = model.style;
-        var map = [['backgroundImage', 'image'],
-            ['backgroundColor', 'color'],
-            ['backgroundSize', 'size'],
-            ['backgroundRepeat', 'repeat'],
-            ['backgroundPosition', 'position']];
-        cleanMap(oldStyle, newStyle, map);
-    }
+			switch (oldStyle.flexAlignItem) {
+			case 'wb-flex-align-items-center':
+				newStyle.align = 'center';
+				break;
+			case 'wb-flex-align-items-end':
+				newStyle.align = 'end';
+				break;
+			case 'wb-flex-align-items-start':
+				newStyle.align = 'start';
+				break;
+			case 'wb-flex-align-items-stretch':
+				newStyle.align = 'stretch';
+				break;
+			default:
+				newStyle.align = 'stretch';
+			}
+			delete oldStyle.flexAlignItem;
 
-    function cleanBorder(model)
-    {
-        if (!model.style.border) {
-            model.style.border = {};
-        }
-        var oldStyle = model.style;
-        var newStyle = model.style.border;
+			switch (oldStyle.justifyContent) {
+			case 'wb-flex-justify-content-center':
+				newStyle.justify = 'center';
+				break;
+			case 'wb-flex-justify-content-end':
+				newStyle.justify = 'end';
+				break;
+			case 'wb-flex-justify-content-start':
+				newStyle.justify = 'start';
+				break;
+			case 'wb-flex-justify-content-space-between':
+				newStyle.justify = 'space-between';
+				break;
+			case 'wb-flex-justify-content-space-around':
+				newStyle.justify = 'space-around';
+				break;
+			default:
+				newStyle.justify = 'center';
+			}
+			delete oldStyle.justifyContent;
+		}
+	}
 
-        if (oldStyle.borderRadius) {
-            if (oldStyle.borderRadius.uniform) {
-                newStyle.radius = oldStyle.borderRadius.all + 'px';
-            }
-            // TODO: maso, 2018: support other models
-        }
-        // delete old values
-        delete model.style.borderColor;
-        delete model.style.borderRadius;
-        delete model.style.borderStyleColorWidth;
-        delete model.style.borderStyle;
-        delete model.style.borderWidth;
-    }
+	function cleanSize(model)
+	{
+		if (!model.style.size) {
+			model.style.size = {};
+		}
+		var newStyle = model.style.size;
+		var oldStyle = model.style;
+		var map = [['width', 'width'],
+			['height', 'height']];
+		cleanMap(oldStyle, newStyle, map);
+	}
 
-    function cleanSpace(model)
-    {
-        // Margin and padding
-        if (model.style.padding && angular.isObject(model.style.padding)) {
-            var padding = '';
-            if (model.style.padding.isUniform) {
-                padding = model.style.padding.uniform;
-            } else {
-                padding = model.style.padding.top || '0px' + ' ' +
-                model.style.padding.right || '0px' + ' ' +
-                model.style.padding.bottom || '0px' + ' ' +
-                model.style.padding.left || '0px' + ' ';
-            }
-            model.style.padding = padding;
-        }
+	function cleanBackground(model)
+	{
+		if (!model.style.background) {
+			model.style.background = {};
+		}
+		var newStyle = model.style.background;
+		var oldStyle = model.style;
+		var map = [['backgroundImage', 'image'],
+			['backgroundColor', 'color'],
+			['backgroundSize', 'size'],
+			['backgroundRepeat', 'repeat'],
+			['backgroundPosition', 'position']];
+		cleanMap(oldStyle, newStyle, map);
+	}
 
-        if (model.style.margin && angular.isObject(model.style.margin)) {
-            var margin = '';
-            if (model.style.margin.isUniform) {
-                margin = model.style.margin.uniform;
-            } else {
-                margin = model.style.margin.top || '0px' + ' ' +
-                model.style.margin.right || '0px' + ' ' +
-                model.style.margin.bottom || '0px' + ' ' +
-                model.style.margin.left || '0px' + ' ';
-            }
-            model.style.margin = margin;
-        }
+	function cleanBorder(model)
+	{
+		if (!model.style.border) {
+			model.style.border = {};
+		}
+		var oldStyle = model.style;
+		var newStyle = model.style.border;
 
-    }
+		if (oldStyle.borderRadius) {
+			if (oldStyle.borderRadius.uniform) {
+				newStyle.radius = oldStyle.borderRadius.all + 'px';
+			}
+			// TODO: maso, 2018: support other models
+		}
+		// delete old values
+		delete model.style.borderColor;
+		delete model.style.borderRadius;
+		delete model.style.borderStyleColorWidth;
+		delete model.style.borderStyle;
+		delete model.style.borderWidth;
+	}
 
-    function cleanAlign(model)
-    {
-        if (!model.style.align) {
-            model.style.align = {};
-        }
-    }
+	function cleanSpace(model)
+	{
+		// Margin and padding
+		if (model.style.padding && angular.isObject(model.style.padding)) {
+			var padding = '';
+			if (model.style.padding.isUniform) {
+				padding = model.style.padding.uniform;
+			} else {
+				padding = model.style.padding.top || '0px' + ' ' +
+				model.style.padding.right || '0px' + ' ' +
+				model.style.padding.bottom || '0px' + ' ' +
+				model.style.padding.left || '0px' + ' ';
+			}
+			model.style.padding = padding;
+		}
 
-    function cleanStyle(model)
-    {
-        if (!model.style) {
-            model.style = {};
-        }
-        cleanLayout(model);
-        cleanSize(model);
-        cleanBackground(model);
-        cleanBorder(model);
-        cleanSpace(model);
-        cleanAlign(model);
-    }
-    
+		if (model.style.margin && angular.isObject(model.style.margin)) {
+			var margin = '';
+			if (model.style.margin.isUniform) {
+				margin = model.style.margin.uniform;
+			} else {
+				margin = model.style.margin.top || '0px' + ' ' +
+				model.style.margin.right || '0px' + ' ' +
+				model.style.margin.bottom || '0px' + ' ' +
+				model.style.margin.left || '0px' + ' ';
+			}
+			model.style.margin = margin;
+		}
 
-    function cleanType(model){
-        if(model.type === 'Link') {
-            model.type = 'a';
-            model.html = model.title;
-            model.href = model.url;
-            model.style.text = {
-            		align: 'center'
-            };
-            model.style.cursor = 'pointer';
-            
-            delete model.title;
-            delete model.url;
-        }
-    }
+	}
 
-    function cleanInternal(model)
-    {
-        cleanEvetns(model);
-        cleanStyle(model);
-        if (model.type === 'Group' || model.type === 'Page') {
-            if (!model.contents) {
-                model.contents = [];
-            }
-            if (model.contents.length) {
-                for (var i = 0; i < model.contents.length; i++) {
-                    cleanInternal(model.contents[i]);
-                }
-            }
-        }
-        cleanType(model);
-        return model;
-    }
+	function cleanAlign(model)
+	{
+		if (!model.style.align) {
+			model.style.align = {};
+		}
+	}
 
-    /**
-     * Clean data model
-     * @name clean 
-     * @param {object} model 
-     * @param {type} force
-     */
-    function clean(model, force)
-    {
-        if (!model.type || model.type === 'Page') {
-            model.type = 'Group';
-        }
-        if (model.version === 'wb2' && !force) {
-            return model;
-        }
-        var newModel = cleanInternal(model);
-        newModel.version = 'wb2';
-        return newModel;
-    }
+	function cleanStyle(model)
+	{
+		if (!model.style) {
+			model.style = {};
+		}
+		cleanLayout(model);
+		cleanSize(model);
+		cleanBackground(model);
+		cleanBorder(model);
+		cleanSpace(model);
+		cleanAlign(model);
+	}
 
-    service.cleanMap = cleanMap;
-    service.clean = clean;
-    service.cleanInternal = cleanInternal;
-    service.cleanStyle = cleanStyle;
-    service.cleanAlign = cleanAlign;
-    service.cleanSpace = cleanSpace;
-    service.cleanBorder = cleanBorder;
-    service.cleanBackground = cleanBackground;
-    service.cleanSize = cleanSize;
-    service.cleanLayout = cleanLayout;
-    service.cleanEvetns = cleanEvetns;
 
-    service.getTemplateFor = getTemplateFor;
-    service.getTemplateOf = getTemplateOf;
-    service.convertToGroupCss = convertToGroupCss;
-    service.convertToWidgetCss = convertToWidgetCss;
-    service.convertToWidgetCssLayout = convertToWidgetCssLayout;
+	function cleanType(model){
+		if(model.type === 'Link') {
+			model.type = 'a';
+			model.html = model.title;
+			model.href = model.url;
+			model.style.text = {
+					align: 'center'
+			};
+			model.style.cursor = 'pointer';
+
+			delete model.title;
+			delete model.url;
+		}
+	}
+
+	function cleanInternal(model)
+	{
+		cleanEvetns(model);
+		cleanStyle(model);
+		if (model.type === 'Group' || model.type === 'Page') {
+			if (!model.contents) {
+				model.contents = [];
+			}
+			if (model.contents.length) {
+				for (var i = 0; i < model.contents.length; i++) {
+					cleanInternal(model.contents[i]);
+				}
+			}
+		}
+		cleanType(model);
+		return model;
+	}
+
+	/**
+	 * Clean data model
+	 * @name clean 
+	 * @param {object} model 
+	 * @param {type} force
+	 */
+	function clean(model, force)
+	{
+		if (!model.type || model.type === 'Page') {
+			model.type = 'Group';
+		}
+		if (model.version === 'wb2' && !force) {
+			return model;
+		}
+		var newModel = cleanInternal(model);
+		newModel.version = 'wb2';
+		return newModel;
+	}
+
+	service.cleanMap = cleanMap;
+	service.clean = clean;
+	service.cleanInternal = cleanInternal;
+	service.cleanStyle = cleanStyle;
+	service.cleanAlign = cleanAlign;
+	service.cleanSpace = cleanSpace;
+	service.cleanBorder = cleanBorder;
+	service.cleanBackground = cleanBackground;
+	service.cleanSize = cleanSize;
+	service.cleanLayout = cleanLayout;
+	service.cleanEvetns = cleanEvetns;
+
+	service.getTemplateFor = getTemplateFor;
+	service.getTemplateOf = getTemplateOf;
+	service.convertToGroupCss = convertToGroupCss;
+	service.convertToWidgetCss = convertToWidgetCss;
+	service.convertToWidgetCssLayout = convertToWidgetCssLayout;
 });
 
 /* 
@@ -18466,7 +18333,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-general.html',
-    " <fieldset layout=column> <legend translate>Identifier</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Id</label> <input ng-model=ctrl.id ng-change=\"ctrl.setProperty('id', ctrl.id)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Name</label> <input ng-model=ctrl.name ng-change=\"ctrl.setProperty('name', ctrl.name)\"> </md-input-container> </fieldset>   <fieldset layout=column> <legend translate>Text</legend> <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setProperty('style.direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setProperty('style.color', ctrl.color)\"> </wb-ui-setting-color> </fieldset>  <fieldset layout=column> <legend translate>Mouse</legend> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>mouse</wb-icon> <label translate>Cursor</label> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setProperty('style.cursor', ctrl.cursor)\"> <md-option ng-repeat=\"cursor in ::ctrl.cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Visibility</legend> <md-input-container layout-align=\"end center\"> <label translate>Visibility</label> <md-select ng-model=ctrl.visibility ng-change=\"ctrl.setProperty('style.visibility', ctrl.visibility)\" style=\"min-width: 200px\" disabled> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> </md-select> </md-input-container> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>opacity</wb-icon> <label translate>Opacity</label> <input ng-model=ctrl.opacity ng-change=\"ctrl.setProperty('style.opacity', ctrl.opacity)\"> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Overflow</legend> <md-input-container layout-align=\"end center\"> <label translate>X</label> <md-select ng-model=ctrl.overflowX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOverflowX() style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> <md-input-container layout-align=\"end center\"> <label translate>Y</label> <md-select ng-model=ctrl.overflowY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOverflowY() style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> </fieldset>"
+    " <fieldset layout=column> <legend translate>Identifier</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Id</label> <input ng-model=ctrl.id ng-change=\"ctrl.setProperty('id', ctrl.id)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Name</label> <input ng-model=ctrl.name ng-change=\"ctrl.setProperty('name', ctrl.name)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Title</label> <input ng-model=ctrl.title ng-change=\"ctrl.setProperty('title', ctrl.title)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Language</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Direction</label> <input ng-model=ctrl.dir ng-change=\"ctrl.setProperty('dir', ctrl.dir)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Language</label> <input ng-model=ctrl.lang ng-change=\"ctrl.setProperty('lang', ctrl.lang)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Translate</label> <input ng-model=ctrl.translate ng-change=\"ctrl.setProperty('translate', ctrl.translate)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">spellcheck</label> <input ng-model=ctrl.spellcheck ng-change=\"ctrl.setProperty('spellcheck', ctrl.spellcheck)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Access</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Access Key</label> <input ng-model=ctrl.accesskey ng-change=\"ctrl.setProperty('accesskey', ctrl.accesskey)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">contenteditable</label> <input ng-model=ctrl.contenteditable ng-change=\"ctrl.setProperty('contenteditable', ctrl.contenteditable)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">tabindex</label> <input ng-model=ctrl.tabindex ng-change=\"ctrl.setProperty('tabindex', ctrl.tabindex)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">hidden</label> <input ng-model=ctrl.hidden ng-change=\"ctrl.setProperty('hidden', ctrl.hidden)\"> </md-input-container> </fieldset>   <fieldset layout=column> <legend translate>Style</legend> <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setProperty('style.direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setProperty('style.color', ctrl.color)\"> </wb-ui-setting-color> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>mouse</wb-icon> <label translate>Cursor</label> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setProperty('style.cursor', ctrl.cursor)\"> <md-option value=alias tooltip=\"The cursor indicates an alias of something is to be created\" translate=\"\">Alias</md-option> <md-option value=all-scroll tooltip=\"The cursor indicates that something can be scrolled in any direction\" translate=\"\">All Acroll</md-option> <md-option value=auto tooltip=\"Default. The browser sets a cursor\" translate=\"\">Auto</md-option> <md-option value=cell tooltip=\"The cursor indicates that a cell (or set of cells) may be selected\" translate=\"\">Cell</md-option> <md-option value=context-menu tooltip=\"The cursor indicates that a context-menu is available\" translate=\"\">Context Menu</md-option> <md-option value=col-resize tooltip=\"The cursor indicates that the column can be resized horizontally\" translate=\"\">Columne resize</md-option> <md-option value=copy tooltip=\"The cursor indicates something is to be copied\" translate=\"\">Copy</md-option> <md-option value=crosshair tooltip=\"The cursor render as a crosshair\" translate=\"\">Crosshair</md-option> <md-option value=default tooltip=\"The default cursor\" translate=\"\">Default</md-option> <md-option value=e-resize tooltip=\"The cursor indicates that an edge of a box is to be moved right (east)\" translate=\"\">Edge Resize</md-option> <md-option value=ew-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">Bidirectional Resize</md-option> <md-option value=grab tooltip=\"The cursor indicates that something can be grabbed\" translate=\"\">Grab</md-option> <md-option value=grabbing tooltip=\"The cursor indicates that something can be grabbed\" translate=\"\">Grabbing</md-option> <md-option value=help tooltip=\"The cursor indicates that help is available\" translate=\"\">Help</md-option> <md-option value=move tooltip=\"The cursor indicates something is to be moved\" translate=\"\">Move</md-option> <md-option value=n-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up (north)\" translate=\"\">North Resize</md-option> <md-option value=ne-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up and right (north/east)\" translate=\"\">North/East Resize</md-option> <md-option value=ns-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">NS Bidirectional Resize</md-option> <md-option value=nw-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up and left (north/west)\" translate=\"\">North/West Resize</md-option> <md-option value=nwse-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">Bidirectional Resize</md-option> <md-option value=no-drop tooltip=\"The cursor indicates that the dragged item cannot be dropped here\" translate=\"\">No Drop</md-option> <md-option value=none tooltip=\"No cursor is rendered for the element\" translate=\"\">None</md-option> <md-option value=not-allowed tooltip=\"The cursor indicates that the requested action will not be executed\" translate=\"\">Not Allowed</md-option> <md-option value=pointer tooltip=\"The cursor is a pointer and indicates a link\" translate=\"\">Pointer</md-option> <md-option value=progress tooltip=\"The cursor indicates that the program is busy (in progress)\" translate=\"\">Progress</md-option> <md-option value=row-resize tooltip=\"The cursor indicates that the row can be resized vertically\" translate=\"\">Row Resize</md-option> <md-option value=s-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down (south)\" translate=\"\">South Resize</md-option> <md-option value=se-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down and right (south/east)\" translate=\"\">South/East Resize</md-option> <md-option value=sw-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down and left (south/west)\" translate=\"\">South/West Resize</md-option> <md-option value=text tooltip=\"The cursor indicates text that may be selected\" translate=\"\">Text</md-option> <md-option value=vertical-text tooltip=\"The cursor indicates vertical-text that may be selected\" translate=\"\">Vertical text</md-option> <md-option value=w-resize tooltip=\"The cursor indicates that an edge of a box is to be moved left (west)\" translate=\"\">West Resize</md-option> <md-option value=wait tooltip=\"The cursor indicates that the program is busy\" translate=\"\">Wait</md-option> <md-option value=zoom-in tooltip=\"The cursor indicates that something can be zoomed in\" translate=\"\">Zoom In</md-option> <md-option value=\"zoom-out'\" tooltip=\"The cursor indicates that something can be zoomed out\" translate=\"\">Zoom Out</md-option> <md-option value=initial tooltip=\"Sets this property to its default value. Read about initial\" translate=\"\">Initial</md-option> <md-option value=inherit tooltip=\"Inherits this property from its parent element. Read about inherit\" translate=\"\">Inherit</md-option> </md-select> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Visibility</legend> <md-input-container layout-align=\"end center\"> <label translate>Visibility</label> <md-select ng-model=ctrl.visibility ng-change=\"ctrl.setProperty('style.visibility', ctrl.visibility)\" style=\"min-width: 200px\" disabled> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> </md-select> </md-input-container> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>opacity</wb-icon> <label translate>Opacity</label> <input ng-model=ctrl.opacity ng-change=\"ctrl.setProperty('style.opacity', ctrl.opacity)\"> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Overflow</legend> <md-input-container layout-align=\"end center\"> <label translate>X</label> <md-select ng-model=ctrl.overflowX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setProperty('style.overflow.x', ctrl.overflowX)\" style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> <md-input-container layout-align=\"end center\"> <label translate>Y</label> <md-select ng-model=ctrl.overflowY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setProperty('style.overflow.y', ctrl.overflowY)\" style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> </fieldset>"
   );
 
 
