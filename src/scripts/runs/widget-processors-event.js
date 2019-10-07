@@ -98,7 +98,11 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 		var eventFunction;
 		if (!widget.eventFunctions.hasOwnProperty(type)) {
 			try{
-				var body = '\'use strict\';'+
+				var ucode = widget.getEvent()[type];
+				if(!ucode){
+					return;
+				}
+				var body = '\'use strict\';\n'+
 				'var $event = arguments[0],' + 
 				'$widget = arguments[1],' + 
 				'$http = arguments[2],' + 
@@ -108,8 +112,7 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 				'$timeout = arguments[6],' + 
 				'$dispatcher = arguments[7],' + 
 				'$storage = arguments[8],' + 
-				'$routeParams = arguments[9];' + 
-				widget.getEvent()[type];
+				'$routeParams = arguments[9];\n' + ucode;
 				widget.eventFunctions[type] = new Function(body);
 			}catch(ex){
 				console.log(ex);
@@ -179,6 +182,30 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 				intersection: function ($event) {
 					evalWidgetEvent(widget, 'intersection', $event);
 				},
+				
+				//
+				// Common media events
+				//
+				success: function ($event) {
+				    evalWidgetEvent(widget, 'success', $event);
+				},
+				error: function ($event) {
+				    evalWidgetEvent(widget, 'error', $event);
+				},
+				abort: function ($event) {
+				    evalWidgetEvent(widget, 'abort', $event);
+				},
+				load: function ($event) {
+				    evalWidgetEvent(widget, 'load', $event);
+				},
+				beforeunload: function ($event) {
+				    evalWidgetEvent(widget, 'beforeunload', $event);
+				},
+				unload: function ($event) {
+				    evalWidgetEvent(widget, 'unload', $event);
+				},
+				
+				
 		};
 		angular.forEach(widget.__eventListeners, function (listener, key) {
 			widget.on(key, listener);

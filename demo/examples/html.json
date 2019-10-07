@@ -26,6 +26,29 @@
 				}
 			}
 		},{
+			"id": "aid",
+			"type": "a",
+			"name": "key",
+			"itemscope": true,
+			"itemtype": "http://maso.com",
+			"itemid": "id",
+			"itemprop": "prop",
+			"itemref": "adsfasd",
+			"href": "google.com",
+			"html": "Link to google",
+			"style": {
+				"text": {
+					"align": "center"
+				}
+			}
+		},{
+			"type": "Link",
+			"itemscope": true,
+			"itemtype": "http://maso.com",
+			"name": "key",
+			"url": "google.com",
+			"title": "Old <a> widget (link)"
+		},{
 			"type": "Group",
 			"name": "group#1",
 			"style": {

@@ -31,30 +31,6 @@ angular.module('am-wb-core')
  */
 .run(function ($widget) {
 
-    $widget.setEditor('p', {
-        type: 'WidgetEditorTinymce',
-        options:{
-            property: 'html',
-            inline: true,
-            menubar: false,
-            plugins: [
-                'link',
-                'lists',
-                'powerpaste',
-                'autolink',
-                'tinymcespellchecker'],
-            toolbar: [
-                'undo redo | bold italic underline | fontselect fontsizeselect',
-                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
-            valid_styles: {
-                '*': 'font-size,font-family,color,text-decoration,text-align'
-            },
-            powerpaste_word_import: 'clean',
-            powerpaste_html_import: 'clean',
-        }
-    });
-
 
     /**
      * @ngdoc Widgets
@@ -143,6 +119,30 @@ angular.module('am-wb-core')
             };
         },
         controllerAs: 'ctrl'
+    });
+
+    $widget.setEditor('HtmlText', {
+        type: 'WidgetEditorTinymce',
+        options:{
+            property: 'html',
+            inline: true,
+            menubar: false,
+            plugins: [
+                'link',
+                'lists',
+                'powerpaste',
+                'autolink',
+                'tinymcespellchecker'],
+            toolbar: [
+                'undo redo | bold italic underline | fontselect fontsizeselect',
+                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
+            valid_styles: {
+                '*': 'font-size,font-family,color,text-decoration,text-align'
+            },
+            powerpaste_word_import: 'clean',
+            powerpaste_html_import: 'clean',
+        }
     });
     /**
      * @ngdoc Widgets
@@ -296,6 +296,30 @@ angular.module('am-wb-core')
         controllerAs: 'ctrl',
         controller: 'MbWidgetHtmlCtrl'
     });
+
+    $widget.setEditor('p', {
+        type: 'WidgetEditorTinymce',
+        options:{
+            property: 'html',
+            inline: true,
+            menubar: false,
+            plugins: [
+                'link',
+                'lists',
+                'powerpaste',
+                'autolink',
+                'tinymcespellchecker'],
+            toolbar: [
+                'undo redo | bold italic underline | fontselect fontsizeselect',
+                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
+            valid_styles: {
+                '*': 'font-size,font-family,color,text-decoration,text-align'
+            },
+            powerpaste_word_import: 'clean',
+            powerpaste_html_import: 'clean',
+        }
+    });
     
     /**
      * @ngdoc Widgets
@@ -377,7 +401,7 @@ angular.module('am-wb-core')
                   'powerpaste',
                   'autolink'
                 ],
-                toolbar: 'undo redo | bold italic underline',
+                toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignjustify alignright alignfull ',
                 valid_elements: 'strong,em,span[style],a[href]',
                 valid_styles: {
                   '*': 'font-size,font-family,color,text-decoration,text-align'
@@ -386,6 +410,23 @@ angular.module('am-wb-core')
                 powerpaste_html_import: 'clean',
             }
     };
+//    menubar: true,
+//    inline: true,
+//    theme: 'modern',
+//    plugins : ['advlist','autolink','autoresize','autosave','bbcode','charmap',
+//        'code','codesample','colorpicker','contextmenu', 'directionality','emoticons',
+//        'hr','image','imagetools','importcss','insertdatetime','legacyoutput',
+//        'link','lists','media','nonbreaking','noneditable','paste','save','searchreplace',
+//        'spellchecker','tabfocus','table','template','textcolor','textpattern',
+//        'toc','visualblocks','wordcount'
+//    ],
+//    toolbar: [
+//        'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',
+//        'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'
+//    ],
+//    powerpaste_word_import: 'clean',
+//    powerpaste_html_import: 'clean',
+//    format: 'raw'
     $widget.setEditor('a', headerEditorDescription);
 
     /**
@@ -420,4 +461,32 @@ angular.module('am-wb-core')
             controller:'MbWidgetHtmlCtrl'
         });
     }
+    
+    
+    
+
+    /**
+     * @ngdoc Widgets
+     * @name Link
+     * @description A widget to add document link 
+     */
+    $widget.newWidget({
+        type: 'link',
+        title: 'Link',
+        label: 'link',
+        icon: 'link',
+        description: 'A widget to insert an link to page.',
+        groups: ['basic'],
+        setting: ['link'],
+        template: '<link></link>',
+        help: 'http://dpq.co.ir/more-information-link',
+        model: {
+            html: 'Link',
+            url: 'http://www.gitlab.com/am-wb/am-wb-common'
+        },
+        controllerAs: 'ctrl',
+        controller: 'MbWidgetLinkCtrl', 
+    });
+    
+    
 });

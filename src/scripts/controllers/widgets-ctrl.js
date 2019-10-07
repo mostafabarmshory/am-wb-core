@@ -154,11 +154,15 @@ var WbAbstractWidget = function () {
 
     // event listeners
     var ctrl = this;
+    /*
+     * TODO: maso, 2019: move to event manager.
+     */
     this.eventListeners = {
             click: function ($event) {
                 if (ctrl.isEditable()) {
                     ctrl.setSelected(true, $event);
                     $event.stopPropagation();
+                    $event.preventDefault();
                 }
                 ctrl.fire('click', $event);
             },
@@ -166,6 +170,7 @@ var WbAbstractWidget = function () {
                 if (ctrl.isEditable()) {
                     ctrl.setSelected(true, $event);
                     $event.stopPropagation();
+                    $event.preventDefault();
                     // Open an editor 
                     var editor = ctrl.$widget.getEditor(ctrl);
                     editor.show();
@@ -189,6 +194,17 @@ var WbAbstractWidget = function () {
             },
             mouseleave: function ($event) {
                 ctrl.fire('mouseleave', $event);
+            },
+            
+            // Media events
+            error: function ($event) {
+                ctrl.fire('error', $event);
+            },
+            success: function ($event) {
+                ctrl.fire('error', $event);
+            },
+            load: function ($event) {
+                ctrl.fire('load', $event);
             }
     };
 
@@ -204,7 +220,7 @@ var WbAbstractWidget = function () {
 
     var options = {
             root: null,
-            rootMargin: "0px",
+            rootMargin: '0px',
     };
     this.intersectionObserver = new IntersectionObserver(function ($event) {
         if(angular.isArray($event)){
@@ -715,7 +731,7 @@ WbAbstractWidget.prototype.isSilent = function() {
 WbAbstractWidget.prototype.on = function (type, callback) {
     if (!angular.isFunction(callback)) {
         throw {
-            message: "Callback must be a function"
+            message: 'Callback must be a function'
         };
     }
     if (!angular.isArray(this.callbacks[type])) {
@@ -1300,10 +1316,15 @@ WbWidgetGroupCtrl.prototype.setModel = function (model) {
         return;
     }
     this.wbModel = model;
-    this.loadWidgets(model);
     this.fire('modelChanged');
-    this.reload();
-    this.setState('ready');
+
+    var ctrl = this;
+    this.loadWidgets(model)
+    .finally(function () {
+        ctrl.fire('loaded');
+        ctrl.reload();
+        ctrl.setState('ready');
+    })
 };
 
 /**
@@ -1342,14 +1363,14 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
     this.childWidgets = [];
 
     // check for new contents
+    var $q = this.$q;
     if (!model || !angular.isArray(model.contents)) {
-        return;
+        return $q.resolve();
     }
 
     // create contents
     var $widget = this.$widget;
     var parentWidget = this;
-    var $q = this.$q;
 
     var compilesJob = [];
     model.contents.forEach(function (item, index) {
@@ -1368,9 +1389,6 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
             widget.setEditable(ctrl.isEditable());
             $element.append(widget.getElement());
         });
-    })
-    .finally(function () {
-        ctrl.fire('loaded');
     });
 };
 

@@ -1,0 +1,72 @@
+<!-- Microdata Specification Editor -->
+<!-- 
+ Widget Microdata Specification is an extension of HTML Microdata to add
+metadata into a document. These microdata are used to make a document readable
+for Search Engines.
+
+Some widgets need simple description in text. This is a setting to manage
+these attributes. Here is list of attributes:
+
+- {Text} id 
+- {Text} label
+- {URL} category SEE: schema.org
+- {Text} description 
+- {Text} keywords
+- {Text} property
+- {URL} cover
+
+These attributes are useful in SEO.
+SEE: document/widgets-microdata.md
+-->
+<fieldset
+	layout="column"
+	style="padding: 0px">
+	<legend translate="">Widget Microdata</legend>
+	<md-switch 
+		ng-model="ctrl.itemscope"
+		ng-change="ctrl.setProperty('itemscope', ctrl.itemscope)"
+		aria-label="itemscope"
+		translate="">Item Scope</md-switch>
+	<md-input-container style="margin: 0px">
+		<label translate="">itemtype</label>
+		<input 
+			type="text" 
+			ng-model="ctrl.itemtype"
+			ng-change="ctrl.setProperty('itemtype', ctrl.itemtype)">
+	</md-input-container>
+	<md-input-container style="margin: 0px">
+		<label translate="">itemprop</label>
+		<input 
+			type="text" 
+			ng-model="ctrl.itemprop"
+			ng-change="ctrl.setProperty('itemprop', ctrl.itemprop)">
+	</md-input-container>
+	<md-input-container style="margin: 0px">
+		<label translate="">itemid</label>
+		<input 
+			type="text" 
+			ng-model="ctrl.itemid"
+			ng-change="ctrl.setProperty('itemid', ctrl.itemid)">
+	</md-input-container>
+	<md-input-container style="margin: 0px">
+		<label translate="">itemref</label>
+		<input 
+			type="text" 
+			ng-model="ctrl.itemref"
+			ng-change="ctrl.setProperty('itemref', ctrl.itemref)">
+	</md-input-container>
+	<md-input-container style="margin: 0px">
+		<label translate="">Value</label>
+		<input 
+			type="text" 
+			ng-model="ctrl.value"
+			ng-change="ctrl.setProperty('value', ctrl.value)">
+	</md-input-container>
+	<md-input-container style="margin: 0px">
+		<label translate="">Content</label>
+		<input 
+			type="text" 
+			ng-model="ctrl.content"
+			ng-change="ctrl.setProperty('content', ctrl.content)">
+	</md-input-container>
+</fieldset>

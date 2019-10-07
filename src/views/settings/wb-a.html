@@ -1,0 +1,17 @@
+<div 
+    layout-padding
+    layout="column">
+    <md-input-container>
+        <label translate>Title</label>
+        <input 
+        	ng-model="ctrl.html"
+        	ng-change="ctrl.setProperty('html', ctrl.html)"
+			ng-model-options="{debounce: 200}">
+    </md-input-container>
+    <wb-ui-setting-link
+        title="URL" 
+        ng-model="ctrl.href"
+        ng-change="ctrl.setProperty('href', ctrl.href)"
+		ng-model-options="{debounce: 200}">
+    </wb-ui-setting-link>
+</div>

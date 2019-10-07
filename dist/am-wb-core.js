@@ -4795,6 +4795,296 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
+ * @name MbWidgetACtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
+ * 
+ */
+.controller('MbSettingGeneralCtrl', function () {
+	
+	var attrs = [
+		// id
+		'id',
+		'name',
+		'title',
+		
+		// language
+		'dir',
+		'lang',
+		'translate',
+		'spellcheck',
+
+		// access
+		'accesskey',
+		'contenteditable',
+		'tabindex',
+		'hidden',
+		
+		// General style
+		'style.direction',
+		'style.visibility',
+		'style.color',
+		'style.cursor',
+		'style.opacity',
+		
+		// overflow
+		'style.overflow.x',
+		'style.overflow.y',
+		];
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		/*
+		 * Load data of the widget
+		 */
+		var ctrl = this;
+		angular.forEach(attrs, function(attr){
+			ctrl[attr] = ctrl.getProperty(attr);
+		});
+	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name MbWidgetACtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
+ * 
+ */
+.controller('MbSettingMicrodataCtrl', function () {
+	var attrs = [
+		'itemscope',
+		'itemtype',
+		'itemprop',
+		'itemid',
+		'itemref',
+		// extra attributes
+		'value',
+		'content',
+		];
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		/*
+		 * Load data of the widget
+		 */
+		var ctrl = this;
+		angular.forEach(attrs, function(attr){
+			ctrl[attr] = ctrl.getProperty(attr);
+		});
+	};
+
+
+
+//	/*
+//	* Supported Schema Types:
+//	* Article, Book, Image, Person, Product, Service, Text, Thing, WebPage
+//	*/
+//	this.schemaTypes = [
+//	{
+//	key: 'Article',
+//	value: 'http://schema.org/Article'
+
+//	}, {
+//	key: 'Book',
+//	value: 'http://schema.org/Book'
+
+//	}, {
+//	key: 'Image',
+//	value: 'http://schema.org/ImageObject'
+
+//	}, {
+//	key: 'Movie',
+//	value: 'http://schema.org/Movie'
+//	}, {
+//	key: 'Person',
+//	value: 'http://schema.org/Person'
+//	}, {
+//	key: 'Product',
+//	value: 'http://schema.org/Product'
+
+//	}, {
+//	key: 'Service',
+//	value: 'http://schema.org/Service'
+
+//	}, {
+//	key: 'Text',
+//	value: 'http://schema.org/Text'
+//	}, {
+//	key: 'Thing',
+//	value: 'http://schema.org/Thing'
+//	}, {
+//	key: 'WebPage',
+//	value: 'http://schema.org/WebPage'
+
+//	}
+//	];
+
+//	this.getParentCategory = function () {
+//	var widget = this.getWidget();
+//	while (!widget.isRoot() && !widget.getModelProperty('category')) {
+//	widget = widget.getParent();
+//	}
+//	this.parentCategory = widget.getModelProperty('category');
+//	};
+
+//	this.setProperties = function () {
+//	if (!this.parentCategory) {
+//	this.alert = 'No parent type is defined.';
+//	} else {
+//	this.setType(this.parentCategory);
+//	}
+//	};
+
+//	this.setType = function (type) {
+//	switch (type) {
+//	case 'http://schema.org/Article':
+//	this.properties =
+//	[
+//	'articleBody', 'articleSection', 'about', 'author', 'comment',
+//	'commentCount', 'contributor', 'creator', 'description', 'editor',
+//	'genre', 'headline', 'keywords', 'publisher', 'text', 'translator',
+//	'video'
+//	];
+//	break;
+
+//	case 'http://schema.org/Book':
+//	this.properties =
+//	[
+//	'about', 'author', 'bookFormat', 'comment', 'creator', 'genre',
+//	'headline', 'image', 'keywords', 'name', 'publisher', 'text',
+//	'translator', 'video'
+//	];
+//	break;
+
+//	case 'http://schema.org/Image':
+//	this.properties =
+//	[
+//	'about', 'description', 'caption', 'comment', 'thumbnail',
+//	'keywords', 'image', 'name', 'url'
+//	];
+//	break;
+
+//	case 'http://schema.org/Movie':
+//	this.properties =
+//	[
+//	'about', 'actor', 'comment', 'commentCount', 'copyrightYear',
+//	'countryOfOrigin', 'creator', 'dateCreated', 'description',
+//	'director', 'duration', 'genre', 'headline', 'isBasedOn',
+//	'image', 'keywords', 'musicBy', 'name', 'provider', 'productionCompany',
+//	'sponsor', 'subtitleLanguage', 'text', 'thumbnailUrl', 'trailer'
+//	];
+//	break;
+
+//	case 'http://schema.org/Person':
+//	this.properties =
+//	[
+//	'additionalName', 'address', 'birthDate', 'birthPlace',
+//	'children', 'deathDate', 'daethPlace', 'email', 'familyName',
+//	'gender', 'homeLocation', 'parent', 'telephone', 'description',
+//	'image', 'spouse'
+//	];
+//	break;
+
+//	case 'http://schema.org/Product':
+//	this.properties =
+//	[
+//	'brand', 'category', 'color', 'description', 'height',
+//	'isConsumableFor', 'genre', 'headline', 'image', 'name'
+//	];
+//	break;
+
+//	case 'http://schema.org/Service':
+//	this.properties =
+//	[
+//	'areaServed', 'brand', 'category', 'logo', 'serviceType',
+//	'description', 'image', 'name'
+//	];
+//	break;
+
+//	case 'http://schema.org/Thing':
+//	this.properties = ['description', 'image', 'name'];
+//	break;
+
+//	case 'http://schema.org/Text':
+//	this.properties = ['description', 'image', 'keywords', 'name'];
+//	break;
+
+//	case 'http://schema.org/WebPage':
+//	this.properties =
+//	[
+//	'about', 'author', 'comment', 'description', 'image', 'headline',
+//	'keywords', 'commentCount', 'mainContentOfPage', 'primaryImageOfPage',
+//	'video'
+//	];
+//	break;
+//	}
+//	};
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
  * @name MbSettingsCtrl
  * @description Manages settings page
  * 
@@ -5297,6 +5587,74 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
+ * @name MbWidgetACtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
+ * 
+ */
+.controller('MbWidgetLinkCtrl', function () {
+    // list of element attributes
+    var elementAttributes = [
+        'crossorigin',
+        'href',
+        'hreflang',
+        'media',
+        'rel',
+        'size',
+        'type',
+        ];
+
+    this.initWidget = function(){
+        var ctrl = this;
+        function eventHandler(event){
+            if(elementAttributes.includes(event.key)){
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                ctrl.setElementAttribute(key, value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data
+        for(var i =0; i < elementAttributes.length;i++){
+            var key = elementAttributes[i];
+            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
  * @name MbWidgetMetaCtrl
  * @description Manage a meta data 
  * 
@@ -5651,11 +6009,15 @@ var WbAbstractWidget = function () {
 
     // event listeners
     var ctrl = this;
+    /*
+     * TODO: maso, 2019: move to event manager.
+     */
     this.eventListeners = {
             click: function ($event) {
                 if (ctrl.isEditable()) {
                     ctrl.setSelected(true, $event);
                     $event.stopPropagation();
+                    $event.preventDefault();
                 }
                 ctrl.fire('click', $event);
             },
@@ -5663,6 +6025,7 @@ var WbAbstractWidget = function () {
                 if (ctrl.isEditable()) {
                     ctrl.setSelected(true, $event);
                     $event.stopPropagation();
+                    $event.preventDefault();
                     // Open an editor 
                     var editor = ctrl.$widget.getEditor(ctrl);
                     editor.show();
@@ -5686,6 +6049,17 @@ var WbAbstractWidget = function () {
             },
             mouseleave: function ($event) {
                 ctrl.fire('mouseleave', $event);
+            },
+            
+            // Media events
+            error: function ($event) {
+                ctrl.fire('error', $event);
+            },
+            success: function ($event) {
+                ctrl.fire('error', $event);
+            },
+            load: function ($event) {
+                ctrl.fire('load', $event);
             }
     };
 
@@ -5701,7 +6075,7 @@ var WbAbstractWidget = function () {
 
     var options = {
             root: null,
-            rootMargin: "0px",
+            rootMargin: '0px',
     };
     this.intersectionObserver = new IntersectionObserver(function ($event) {
         if(angular.isArray($event)){
@@ -6212,7 +6586,7 @@ WbAbstractWidget.prototype.isSilent = function() {
 WbAbstractWidget.prototype.on = function (type, callback) {
     if (!angular.isFunction(callback)) {
         throw {
-            message: "Callback must be a function"
+            message: 'Callback must be a function'
         };
     }
     if (!angular.isArray(this.callbacks[type])) {
@@ -6797,10 +7171,15 @@ WbWidgetGroupCtrl.prototype.setModel = function (model) {
         return;
     }
     this.wbModel = model;
-    this.loadWidgets(model);
     this.fire('modelChanged');
-    this.reload();
-    this.setState('ready');
+
+    var ctrl = this;
+    this.loadWidgets(model)
+    .finally(function () {
+        ctrl.fire('loaded');
+        ctrl.reload();
+        ctrl.setState('ready');
+    })
 };
 
 /**
@@ -6839,14 +7218,14 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
     this.childWidgets = [];
 
     // check for new contents
+    var $q = this.$q;
     if (!model || !angular.isArray(model.contents)) {
-        return;
+        return $q.resolve();
     }
 
     // create contents
     var $widget = this.$widget;
     var parentWidget = this;
-    var $q = this.$q;
 
     var compilesJob = [];
     model.contents.forEach(function (item, index) {
@@ -6865,9 +7244,6 @@ WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
             widget.setEditable(ctrl.isEditable());
             $element.append(widget.getElement());
         });
-    })
-    .finally(function () {
-        ctrl.fire('loaded');
     });
 };
 
@@ -7202,8 +7578,14 @@ angular.module('am-wb-core')
 			key: 'success',
 			title: 'Success'
 		}, {
-			key: 'failure',
+			key: 'error',
 			title: 'Failure'
+		}, {
+		    key: 'load',
+		    title: 'Load'
+		}, {
+		    key: 'load',
+		    title: 'Load'
 		}];
 
 		ngModelCtrl.$render = function () {
@@ -13500,183 +13882,7 @@ angular.module('am-wb-core')
         icon: 'opacity',
         templateUrl: 'views/settings/wb-general.html',
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function () {
-            // TODO: maso, 2019: move to the view
-            this.cursors = [{
-                title: 'alias',
-                value: 'alias',  
-                description: 'The cursor indicates an alias of something is to be created'
-            },{
-                title: 'All Scroll',
-                value: 'all-scroll',
-                description: 'The cursor indicates that something can be scrolled in any direction'
-            },{
-                title: 'Auto',
-                value: 'auto  ',
-                description: 'Default. The browser sets a cursor'
-            },{
-                title: 'Cell',
-                value: 'cell', 
-                description: 'The cursor indicates that a cell (or set of cells) may be selected'
-            },{
-                title: 'Context Menu',
-                value: 'context-menu',
-                description: 'The cursor indicates that a context-menu is available'
-            },{
-                title: 'Columne resize',
-                value: 'col-resize',  
-                description: 'The cursor indicates that the column can be resized horizontally'
-            },{
-                title: 'Copy',
-                value: 'copy',
-                description: 'The cursor indicates something is to be copied'
-            },{
-                title: 'Crosshair',
-                value: 'crosshair',
-                description: 'The cursor render as a crosshair'
-            },{
-                title: 'Default',
-                value: 'default',
-                description: 'The default cursor'
-            },{
-                title: 'Edge Resize',
-                value: 'e-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved right (east)'
-            },{
-                title: 'Bidirectional Resize',
-                value: 'ew-resize',
-                description: 'Indicates a bidirectional resize cursor'
-            },{
-                title: 'Grab',
-                value: 'grab',
-                description: 'The cursor indicates that something can be grabbed '
-            },{
-                title: 'Grabbing',
-                value: 'grabbing',
-                description: 'The cursor indicates that something can be grabbed'
-            },{
-                title: 'Help',
-                value: 'help',
-                description: 'The cursor indicates that help is available '
-            },{
-                title: 'Move',
-                value: 'move',
-                description: 'The cursor indicates something is to be moved'
-            },{
-                title: 'North Resize',
-                value: 'n-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved up (north)'
-            },{
-                title: 'North/East Resize',
-                value: 'ne-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved up and right (north/east)'
-            },{
-                title: 'NS Bidirectional Resize',
-                value: 'ns-resize',
-                description: 'Indicates a bidirectional resize cursor'
-            },{
-                title: 'North/West Resize',
-                value: 'nw-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved up and left (north/west)'
-            },{
-                title: 'Bidirectional Resize',
-                value: 'nwse-resize',
-                description: 'Indicates a bidirectional resize cursor'
-            },{
-                title: 'No Drop',
-                value: 'no-drop',
-                description: 'The cursor indicates that the dragged item cannot be dropped here '
-            },{
-                title: 'None',
-                value: 'none',
-                description: 'No cursor is rendered for the element  '
-            },{
-                title: 'Not Allowed',
-                value: 'not-allowed',
-                description: 'The cursor indicates that the requested action will not be executed'
-            },{
-                title: 'Pointer',
-                value: 'pointer',
-                description: 'The cursor is a pointer and indicates a link'
-            },{
-                title: 'Progress',
-                value: 'progress',
-                description: 'The cursor indicates that the program is busy (in progress)'
-            },{
-                title: 'Row Resize',
-                value: 'row-resize',
-                description: 'The cursor indicates that the row can be resized vertically'
-            },{
-                title: 'South Resize',
-                value: 's-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved down (south)'
-            },{
-                title: 'South/East Resize',
-                value: 'se-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved down and right (south/east)'
-            },{
-                title: 'South/West Resize',
-                value: 'sw-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved down and left (south/west)'
-            },{
-                title: 'Text',
-                value: 'text',
-                description: 'The cursor indicates text that may be selected'
-            },{
-                title: 'Vertical text',
-                value: 'vertical-text',
-                description: 'The cursor indicates vertical-text that may be selected'
-            },{
-                title: 'West Resize',
-                value: 'w-resize',
-                description: 'The cursor indicates that an edge of a box is to be moved left (west)'
-            },{
-                title: 'Wait',
-                value: 'wait',
-                description: 'The cursor indicates that the program is busy'
-            },{
-                title: 'Zoom In',
-                value: 'zoom-in',
-                description: 'The cursor indicates that something can be zoomed in'
-            },{
-                title: 'Zoom Out',
-                value: 'zoom-out',
-                description: 'The cursor indicates that something can be zoomed out'
-            },{
-                title: 'Initial',
-                value: 'Sets this property to its default value. Read about initial',
-                description: 'Sets this property to its default value. Read about initial'
-            },{
-                title: 'Inherit',
-                value: 'inherit',
-                description: 'Inherits this property from its parent element. Read about inherit'
-            }];
-//          TODO: maso, 2019: URL A comma separated list of URLs to custom cursors. Note: Always specify a generic cursor at the end of the list, in case none of the URL-defined cursors can be used 
-
-            this.init = function () {
-                this.direction = this.getStyle('direction') || 'ltr';
-                this.color = this.getStyle('color');
-
-                this.cursor = this.getStyle('cursor');
-
-                this.visibility = this.getStyle('visibility') || 'visible';
-                this.opacity = this.getStyle('opacity');
-
-                // overflow
-                this.overflowX = this.getStyle('overflow.x') || 'visible';
-                this.overflowY = this.getStyle('overflow.y') || 'visible';
-            };
-
-            this.updateOverflowX = function () {
-                this.setStyle('overflow.x', this.overflowX);
-            };
-            this.updateOverflowY = function () {
-                this.setStyle('overflow.y', this.overflowY);
-            };
-        }
+        controller: 'MbSettingGeneralCtrl',
     });
 
     $settings.newPage({
@@ -13727,172 +13933,17 @@ angular.module('am-wb-core')
         }
     });
 
+    /**
+     * Widget Microdata Editor
+     * 
+     * Manages widget microdata editor.
+     */
     $settings.newPage({
-        type: 'SEO',
-        label: 'SEO',
-        templateUrl: 'views/settings/wb-seo.html',
+        type: 'microdata',
+        label: 'Widget Microdata',
+        templateUrl: 'views/settings/wb-microdata.html',
         controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function ($translate) {
-            /*
-             * Supported Schema Types:
-             * Article, Book, Image, Person, Product, Service, Text, Thing, WebPage
-             */
-            this.schemaTypes = [
-                {
-                    key: 'Article',
-                    value: 'http://schema.org/Article'
-
-                }, {
-                    key: 'Book',
-                    value: 'http://schema.org/Book'
-
-                }, {
-                    key: 'Image',
-                    value: 'http://schema.org/ImageObject'
-
-                }, {
-                    key: 'Movie',
-                    value: 'http://schema.org/Movie'
-                }, {
-                    key: 'Person',
-                    value: 'http://schema.org/Person'
-                }, {
-                    key: 'Product',
-                    value: 'http://schema.org/Product'
-
-                }, {
-                    key: 'Service',
-                    value: 'http://schema.org/Service'
-
-                }, {
-                    key: 'Text',
-                    value: 'http://schema.org/Text'
-                }, {
-                    key: 'Thing',
-                    value: 'http://schema.org/Thing'
-                }, {
-                    key: 'WebPage',
-                    value: 'http://schema.org/WebPage'
-
-                }
-                ];
-            this.init = function () {
-                // load data from model
-                this.id = this.getProperty('id');
-                this.label = this.getProperty('label');
-                this.description = this.getProperty('description');
-                this.category = this.getProperty('category');
-                this.type = this.getProperty('type');
-                this.property = this.getProperty('property');
-                this.alert = null;
-                this.getParentCategory();
-                // NOTE: cover is removed from weburger
-            };
-
-            this.getParentCategory = function () {
-                var widget = this.getWidget();
-                while (!widget.isRoot() && !widget.getModelProperty('category')) {
-                    widget = widget.getParent();
-                }
-                this.parentCategory = widget.getModelProperty('category');
-            };
-
-            this.setProperties = function () {
-                if (!this.parentCategory) {
-                    this.alert = 'No parent type is defined.';
-                } else {
-                    this.setType(this.parentCategory);
-                }
-            };
-
-            this.setType = function (type) {
-                switch (type) {
-                case 'http://schema.org/Article':
-                    this.properties =
-                        [
-                            'articleBody', 'articleSection', 'about', 'author', 'comment',
-                            'commentCount', 'contributor', 'creator', 'description', 'editor',
-                            'genre', 'headline', 'keywords', 'publisher', 'text', 'translator',
-                            'video'
-                            ];
-                    break;
-
-                case 'http://schema.org/Book':
-                    this.properties =
-                        [
-                            'about', 'author', 'bookFormat', 'comment', 'creator', 'genre',
-                            'headline', 'image', 'keywords', 'name', 'publisher', 'text',
-                            'translator', 'video'
-                            ];
-                    break;
-
-                case 'http://schema.org/Image':
-                    this.properties =
-                        [
-                            'about', 'description', 'caption', 'comment', 'thumbnail',
-                            'keywords', 'image', 'name', 'url'
-                            ];
-                    break;
-
-                case 'http://schema.org/Movie':
-                    this.properties =
-                        [
-                            'about', 'actor', 'comment', 'commentCount', 'copyrightYear',
-                            'countryOfOrigin', 'creator', 'dateCreated', 'description',
-                            'director', 'duration', 'genre', 'headline', 'isBasedOn',
-                            'image', 'keywords', 'musicBy', 'name', 'provider', 'productionCompany',
-                            'sponsor', 'subtitleLanguage', 'text', 'thumbnailUrl', 'trailer'
-                            ];
-                    break;
-
-                case 'http://schema.org/Person':
-                    this.properties =
-                        [
-                            'additionalName', 'address', 'birthDate', 'birthPlace',
-                            'children', 'deathDate', 'daethPlace', 'email', 'familyName',
-                            'gender', 'homeLocation', 'parent', 'telephone', 'description',
-                            'image', 'spouse'
-                            ];
-                    break;
-
-                case 'http://schema.org/Product':
-                    this.properties =
-                        [
-                            'brand', 'category', 'color', 'description', 'height',
-                            'isConsumableFor', 'genre', 'headline', 'image', 'name'
-                            ];
-                    break;
-
-                case 'http://schema.org/Service':
-                    this.properties =
-                        [
-                            'areaServed', 'brand', 'category', 'logo', 'serviceType',
-                            'description', 'image', 'name'
-                            ];
-                    break;
-
-                case 'http://schema.org/Thing':
-                    this.properties = ['description', 'image', 'name'];
-                    break;
-
-                case 'http://schema.org/Text':
-                    this.properties = ['description', 'image', 'keywords', 'name'];
-                    break;
-
-                case 'http://schema.org/WebPage':
-                    this.properties =
-                        [
-                            'about', 'author', 'comment', 'description', 'image', 'headline',
-                            'keywords', 'commentCount', 'mainContentOfPage', 'primaryImageOfPage',
-                            'video'
-                            ];
-                    break;
-                }
-            };
-        }
+        controller: 'MbSettingMicrodataCtrl'
     });
 
     $settings.newPage({
@@ -14619,6 +14670,26 @@ angular.module('am-wb-core')
             };
         }
     });
+
+    /**
+     * @ngDoc Settings
+     * @name amh-common-link
+     * @description Link setting page
+     */
+    $settings.newPage({
+        type: 'a',
+        label: 'Link',
+        description: 'Manage link in the current widget.',
+        icon: 'settings',
+        templateUrl: 'views/settings/wb-a.html',
+        controllerAs: 'ctrl',
+        controller: function () {
+            this.init = function () {
+                this.href = this.getProperty('href');
+                this.html = this.getProperty('html');
+            };
+        }
+    });
 });
 
 /* 
@@ -14757,7 +14828,11 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 		var eventFunction;
 		if (!widget.eventFunctions.hasOwnProperty(type)) {
 			try{
-				var body = '\'use strict\';'+
+				var ucode = widget.getEvent()[type];
+				if(!ucode){
+					return;
+				}
+				var body = '\'use strict\';\n'+
 				'var $event = arguments[0],' + 
 				'$widget = arguments[1],' + 
 				'$http = arguments[2],' + 
@@ -14767,8 +14842,7 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 				'$timeout = arguments[6],' + 
 				'$dispatcher = arguments[7],' + 
 				'$storage = arguments[8],' + 
-				'$routeParams = arguments[9];' + 
-				widget.getEvent()[type];
+				'$routeParams = arguments[9];\n' + ucode;
 				widget.eventFunctions[type] = new Function(body);
 			}catch(ex){
 				console.log(ex);
@@ -14838,6 +14912,30 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 				intersection: function ($event) {
 					evalWidgetEvent(widget, 'intersection', $event);
 				},
+				
+				//
+				// Common media events
+				//
+				success: function ($event) {
+				    evalWidgetEvent(widget, 'success', $event);
+				},
+				error: function ($event) {
+				    evalWidgetEvent(widget, 'error', $event);
+				},
+				abort: function ($event) {
+				    evalWidgetEvent(widget, 'abort', $event);
+				},
+				load: function ($event) {
+				    evalWidgetEvent(widget, 'load', $event);
+				},
+				beforeunload: function ($event) {
+				    evalWidgetEvent(widget, 'beforeunload', $event);
+				},
+				unload: function ($event) {
+				    evalWidgetEvent(widget, 'unload', $event);
+				},
+				
+				
 		};
 		angular.forEach(widget.__eventListeners, function (listener, key) {
 			widget.on(key, listener);
@@ -15019,30 +15117,6 @@ angular.module('am-wb-core')
  */
 .run(function ($widget) {
 
-    $widget.setEditor('p', {
-        type: 'WidgetEditorTinymce',
-        options:{
-            property: 'html',
-            inline: true,
-            menubar: false,
-            plugins: [
-                'link',
-                'lists',
-                'powerpaste',
-                'autolink',
-                'tinymcespellchecker'],
-            toolbar: [
-                'undo redo | bold italic underline | fontselect fontsizeselect',
-                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
-            valid_styles: {
-                '*': 'font-size,font-family,color,text-decoration,text-align'
-            },
-            powerpaste_word_import: 'clean',
-            powerpaste_html_import: 'clean',
-        }
-    });
-
 
     /**
      * @ngdoc Widgets
@@ -15131,6 +15205,30 @@ angular.module('am-wb-core')
             };
         },
         controllerAs: 'ctrl'
+    });
+
+    $widget.setEditor('HtmlText', {
+        type: 'WidgetEditorTinymce',
+        options:{
+            property: 'html',
+            inline: true,
+            menubar: false,
+            plugins: [
+                'link',
+                'lists',
+                'powerpaste',
+                'autolink',
+                'tinymcespellchecker'],
+            toolbar: [
+                'undo redo | bold italic underline | fontselect fontsizeselect',
+                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
+            valid_styles: {
+                '*': 'font-size,font-family,color,text-decoration,text-align'
+            },
+            powerpaste_word_import: 'clean',
+            powerpaste_html_import: 'clean',
+        }
     });
     /**
      * @ngdoc Widgets
@@ -15284,6 +15382,30 @@ angular.module('am-wb-core')
         controllerAs: 'ctrl',
         controller: 'MbWidgetHtmlCtrl'
     });
+
+    $widget.setEditor('p', {
+        type: 'WidgetEditorTinymce',
+        options:{
+            property: 'html',
+            inline: true,
+            menubar: false,
+            plugins: [
+                'link',
+                'lists',
+                'powerpaste',
+                'autolink',
+                'tinymcespellchecker'],
+            toolbar: [
+                'undo redo | bold italic underline | fontselect fontsizeselect',
+                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
+            valid_styles: {
+                '*': 'font-size,font-family,color,text-decoration,text-align'
+            },
+            powerpaste_word_import: 'clean',
+            powerpaste_html_import: 'clean',
+        }
+    });
     
     /**
      * @ngdoc Widgets
@@ -15365,7 +15487,7 @@ angular.module('am-wb-core')
                   'powerpaste',
                   'autolink'
                 ],
-                toolbar: 'undo redo | bold italic underline',
+                toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignjustify alignright alignfull ',
                 valid_elements: 'strong,em,span[style],a[href]',
                 valid_styles: {
                   '*': 'font-size,font-family,color,text-decoration,text-align'
@@ -15374,6 +15496,23 @@ angular.module('am-wb-core')
                 powerpaste_html_import: 'clean',
             }
     };
+//    menubar: true,
+//    inline: true,
+//    theme: 'modern',
+//    plugins : ['advlist','autolink','autoresize','autosave','bbcode','charmap',
+//        'code','codesample','colorpicker','contextmenu', 'directionality','emoticons',
+//        'hr','image','imagetools','importcss','insertdatetime','legacyoutput',
+//        'link','lists','media','nonbreaking','noneditable','paste','save','searchreplace',
+//        'spellchecker','tabfocus','table','template','textcolor','textpattern',
+//        'toc','visualblocks','wordcount'
+//    ],
+//    toolbar: [
+//        'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',
+//        'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'
+//    ],
+//    powerpaste_word_import: 'clean',
+//    powerpaste_html_import: 'clean',
+//    format: 'raw'
     $widget.setEditor('a', headerEditorDescription);
 
     /**
@@ -15408,6 +15547,34 @@ angular.module('am-wb-core')
             controller:'MbWidgetHtmlCtrl'
         });
     }
+    
+    
+    
+
+    /**
+     * @ngdoc Widgets
+     * @name Link
+     * @description A widget to add document link 
+     */
+    $widget.newWidget({
+        type: 'link',
+        title: 'Link',
+        label: 'link',
+        icon: 'link',
+        description: 'A widget to insert an link to page.',
+        groups: ['basic'],
+        setting: ['link'],
+        template: '<link></link>',
+        help: 'http://dpq.co.ir/more-information-link',
+        model: {
+            html: 'Link',
+            url: 'http://www.gitlab.com/am-wb/am-wb-common'
+        },
+        controllerAs: 'ctrl',
+        controller: 'MbWidgetLinkCtrl', 
+    });
+    
+    
 });
 
 /* 
@@ -16495,9 +16662,9 @@ angular.module('am-wb-core')
 	 * Default settings
 	 */
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'general', 'transform', 'border',
-		'background', 'layout', 'layout-self', 'marginPadding', 'size', 'shadow', 'SEO' ];
+		'background', 'layout', 'layout-self', 'marginPadding', 'size', 'shadow', 'microdata' ];
 	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'transform', 'border',
-		'background', 'marginPadding', 'layout-self', 'size', 'shadow', 'SEO' ];
+		'background', 'marginPadding', 'layout-self', 'size', 'shadow', 'microdata' ];
 
 	/**
 	 * Setting page storage
@@ -16837,12 +17004,16 @@ angular.module('am-wb-core')
 			// row
 			if (layout.direction === 'row') {
 				css['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
-				css['overflow-x'] = layout.wrap ? 'visible' : 'auto';
-				css['overflow-y'] = 'visible';
+				if(!style.overflow){
+					css['overflow-x'] = layout.wrap ? 'visible' : 'auto';
+					css['overflow-y'] = 'visible';
+				}
 			} else {
 				css['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
-				css['overflow-x'] = 'visible';
-				css['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+				if(!style.overflow){
+					css['overflow-x'] = 'visible';
+					css['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+				}
 			}
 
 
@@ -16942,6 +17113,8 @@ angular.module('am-wb-core')
 		// layout
 		if(style.visibility === 'hidden'){
 			css.display = 'none';
+		} else {
+			css.display = '';
 		}
 
 		css = _.merge(css, 
@@ -16959,6 +17132,8 @@ angular.module('am-wb-core')
 				convertToWidgetCssTransfrom(style.transform || {}),
 				// Overflow
 				convertToWidgetCssOverflow(style.overflow || {}),
+				// text
+				convertToWidgetCssText(style.text || {}),
 				// color, cursor, opacity, direction
 				{
 			padding: style.padding,
@@ -16969,6 +17144,22 @@ angular.module('am-wb-core')
 			opacity: style.opacity || '1',
 				});
 
+		return css;
+	}
+
+	function convertToWidgetCssText(textOptions){
+		var css =  {
+				'text-decoration': textOptions.decoration || 'none',
+				'text-shadow': textOptions.shadow || 'none',
+				'text-transform': textOptions.transform || 'none',
+				'text-overflow': textOptions.overflow || 'clip',
+				'text-justify': textOptions.justify || 'auto',
+				'text-indent': textOptions.indent || 'indent',
+				'text-align-last': textOptions.alignLast || 'auto',
+		};
+		if(textOptions.align){
+			css['text-align'] = textOptions.align || 'indent';
+		}
 		return css;
 	}
 
@@ -17184,6 +17375,12 @@ angular.module('am-wb-core')
 		if (!model.event) {
 			model.event = {};
 		}
+
+		// load legecy events
+		if(model.event.failure){
+			model.event.error = model.event.failure;
+			delete model.event.failure;
+		}
 	}
 
 	function cleanLayout(model)
@@ -17349,6 +17546,22 @@ angular.module('am-wb-core')
 		cleanAlign(model);
 	}
 
+
+	function cleanType(model){
+		if(model.type === 'Link') {
+			model.type = 'a';
+			model.html = model.title;
+			model.href = model.url;
+			model.style.text = {
+					align: 'center'
+			};
+			model.style.cursor = 'pointer';
+
+			delete model.title;
+			delete model.url;
+		}
+	}
+
 	function cleanInternal(model)
 	{
 		cleanEvetns(model);
@@ -17363,6 +17576,7 @@ angular.module('am-wb-core')
 				}
 			}
 		}
+		cleanType(model);
 		return model;
 	}
 
@@ -17377,11 +17591,11 @@ angular.module('am-wb-core')
 		if (!model.type || model.type === 'Page') {
 			model.type = 'Group';
 		}
-		if (model.version === 'wb1' && !force) {
+		if (model.version === 'wb2' && !force) {
 			return model;
 		}
 		var newModel = cleanInternal(model);
-		newModel.version = 'wb1';
+		newModel.version = 'wb2';
 		return newModel;
 	}
 
@@ -18103,6 +18317,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/settings/wb-a.html',
+    "<div layout-padding layout=column> <md-input-container> <label translate>Title</label> <input ng-model=ctrl.html ng-change=\"ctrl.setProperty('html', ctrl.html)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <wb-ui-setting-link title=URL ng-model=ctrl.href ng-change=\"ctrl.setProperty('href', ctrl.href)\" ng-model-options=\"{debounce: 200}\"> </wb-ui-setting-link> </div>"
+  );
+
+
   $templateCache.put('views/settings/wb-background.html',
     " <wb-ui-setting-image title=\"Background image\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.image ng-change=\"ctrl.setStyleBackground('image', ctrl.image)\"> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setStyleBackground('color', ctrl.color)\"> </wb-ui-setting-color> <wb-ui-setting-background-size ng-model=ctrl.size ng-change=\"ctrl.setStyleBackground('size', ctrl.size)\"> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat ng-model=ctrl.repeat ng-change=\"ctrl.setStyleBackground('repeat', ctrl.repeat)\"> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment ng-model=ctrl.attachment ng-change=\"ctrl.setStyleBackground('attachment', ctrl.attachment)\"> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin ng-model=ctrl.origin ng-change=\"ctrl.setStyleBackground('origin', ctrl.origin)\"> </wb-ui-setting-background-origin> <wb-ui-setting-background-position ng-model=ctrl.position ng-change=\"ctrl.setStyleBackground('position', ctrl.position)\"> </wb-ui-setting-background-position>"
   );
@@ -18114,7 +18333,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-general.html',
-    " <fieldset layout=column> <legend translate>Text</legend> <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setStyle('direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setStyle('color', ctrl.color)\"> </wb-ui-setting-color> </fieldset>  <fieldset layout=column> <legend translate>Mouse</legend> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>mouse</wb-icon> <label translate>Cursor</label> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setStyle('cursor', ctrl.cursor)\"> <md-option ng-repeat=\"cursor in ::ctrl.cursors\" value={{::cursor.value}}> {{::cursor.title}} </md-option> </md-select> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Visibility</legend> <md-input-container layout-align=\"end center\"> <label translate>Visibility</label> <md-select ng-model=ctrl.visibility ng-change=\"ctrl.setStyle('visibility', ctrl.visibility)\" style=\"min-width: 200px\" disabled> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> </md-select> </md-input-container> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>opacity</wb-icon> <label translate>Opacity</label> <input ng-model=ctrl.opacity ng-change=\"ctrl.setStyle('opacity', ctrl.opacity)\"> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Overflow</legend> <md-input-container layout-align=\"end center\"> <label translate>X</label> <md-select ng-model=ctrl.overflowX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOverflowX() style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> <md-input-container layout-align=\"end center\"> <label translate>Y</label> <md-select ng-model=ctrl.overflowY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOverflowY() style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> </fieldset>"
+    " <fieldset layout=column> <legend translate>Identifier</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Id</label> <input ng-model=ctrl.id ng-change=\"ctrl.setProperty('id', ctrl.id)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Name</label> <input ng-model=ctrl.name ng-change=\"ctrl.setProperty('name', ctrl.name)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Title</label> <input ng-model=ctrl.title ng-change=\"ctrl.setProperty('title', ctrl.title)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Language</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Direction</label> <input ng-model=ctrl.dir ng-change=\"ctrl.setProperty('dir', ctrl.dir)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Language</label> <input ng-model=ctrl.lang ng-change=\"ctrl.setProperty('lang', ctrl.lang)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Translate</label> <input ng-model=ctrl.translate ng-change=\"ctrl.setProperty('translate', ctrl.translate)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">spellcheck</label> <input ng-model=ctrl.spellcheck ng-change=\"ctrl.setProperty('spellcheck', ctrl.spellcheck)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Access</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Access Key</label> <input ng-model=ctrl.accesskey ng-change=\"ctrl.setProperty('accesskey', ctrl.accesskey)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">contenteditable</label> <input ng-model=ctrl.contenteditable ng-change=\"ctrl.setProperty('contenteditable', ctrl.contenteditable)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">tabindex</label> <input ng-model=ctrl.tabindex ng-change=\"ctrl.setProperty('tabindex', ctrl.tabindex)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">hidden</label> <input ng-model=ctrl.hidden ng-change=\"ctrl.setProperty('hidden', ctrl.hidden)\"> </md-input-container> </fieldset>   <fieldset layout=column> <legend translate>Style</legend> <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setProperty('style.direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setProperty('style.color', ctrl.color)\"> </wb-ui-setting-color> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>mouse</wb-icon> <label translate>Cursor</label> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setProperty('style.cursor', ctrl.cursor)\"> <md-option value=alias tooltip=\"The cursor indicates an alias of something is to be created\" translate=\"\">Alias</md-option> <md-option value=all-scroll tooltip=\"The cursor indicates that something can be scrolled in any direction\" translate=\"\">All Acroll</md-option> <md-option value=auto tooltip=\"Default. The browser sets a cursor\" translate=\"\">Auto</md-option> <md-option value=cell tooltip=\"The cursor indicates that a cell (or set of cells) may be selected\" translate=\"\">Cell</md-option> <md-option value=context-menu tooltip=\"The cursor indicates that a context-menu is available\" translate=\"\">Context Menu</md-option> <md-option value=col-resize tooltip=\"The cursor indicates that the column can be resized horizontally\" translate=\"\">Columne resize</md-option> <md-option value=copy tooltip=\"The cursor indicates something is to be copied\" translate=\"\">Copy</md-option> <md-option value=crosshair tooltip=\"The cursor render as a crosshair\" translate=\"\">Crosshair</md-option> <md-option value=default tooltip=\"The default cursor\" translate=\"\">Default</md-option> <md-option value=e-resize tooltip=\"The cursor indicates that an edge of a box is to be moved right (east)\" translate=\"\">Edge Resize</md-option> <md-option value=ew-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">Bidirectional Resize</md-option> <md-option value=grab tooltip=\"The cursor indicates that something can be grabbed\" translate=\"\">Grab</md-option> <md-option value=grabbing tooltip=\"The cursor indicates that something can be grabbed\" translate=\"\">Grabbing</md-option> <md-option value=help tooltip=\"The cursor indicates that help is available\" translate=\"\">Help</md-option> <md-option value=move tooltip=\"The cursor indicates something is to be moved\" translate=\"\">Move</md-option> <md-option value=n-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up (north)\" translate=\"\">North Resize</md-option> <md-option value=ne-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up and right (north/east)\" translate=\"\">North/East Resize</md-option> <md-option value=ns-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">NS Bidirectional Resize</md-option> <md-option value=nw-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up and left (north/west)\" translate=\"\">North/West Resize</md-option> <md-option value=nwse-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">Bidirectional Resize</md-option> <md-option value=no-drop tooltip=\"The cursor indicates that the dragged item cannot be dropped here\" translate=\"\">No Drop</md-option> <md-option value=none tooltip=\"No cursor is rendered for the element\" translate=\"\">None</md-option> <md-option value=not-allowed tooltip=\"The cursor indicates that the requested action will not be executed\" translate=\"\">Not Allowed</md-option> <md-option value=pointer tooltip=\"The cursor is a pointer and indicates a link\" translate=\"\">Pointer</md-option> <md-option value=progress tooltip=\"The cursor indicates that the program is busy (in progress)\" translate=\"\">Progress</md-option> <md-option value=row-resize tooltip=\"The cursor indicates that the row can be resized vertically\" translate=\"\">Row Resize</md-option> <md-option value=s-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down (south)\" translate=\"\">South Resize</md-option> <md-option value=se-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down and right (south/east)\" translate=\"\">South/East Resize</md-option> <md-option value=sw-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down and left (south/west)\" translate=\"\">South/West Resize</md-option> <md-option value=text tooltip=\"The cursor indicates text that may be selected\" translate=\"\">Text</md-option> <md-option value=vertical-text tooltip=\"The cursor indicates vertical-text that may be selected\" translate=\"\">Vertical text</md-option> <md-option value=w-resize tooltip=\"The cursor indicates that an edge of a box is to be moved left (west)\" translate=\"\">West Resize</md-option> <md-option value=wait tooltip=\"The cursor indicates that the program is busy\" translate=\"\">Wait</md-option> <md-option value=zoom-in tooltip=\"The cursor indicates that something can be zoomed in\" translate=\"\">Zoom In</md-option> <md-option value=\"zoom-out'\" tooltip=\"The cursor indicates that something can be zoomed out\" translate=\"\">Zoom Out</md-option> <md-option value=initial tooltip=\"Sets this property to its default value. Read about initial\" translate=\"\">Initial</md-option> <md-option value=inherit tooltip=\"Inherits this property from its parent element. Read about inherit\" translate=\"\">Inherit</md-option> </md-select> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Visibility</legend> <md-input-container layout-align=\"end center\"> <label translate>Visibility</label> <md-select ng-model=ctrl.visibility ng-change=\"ctrl.setProperty('style.visibility', ctrl.visibility)\" style=\"min-width: 200px\" disabled> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> </md-select> </md-input-container> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>opacity</wb-icon> <label translate>Opacity</label> <input ng-model=ctrl.opacity ng-change=\"ctrl.setProperty('style.opacity', ctrl.opacity)\"> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Overflow</legend> <md-input-container layout-align=\"end center\"> <label translate>X</label> <md-select ng-model=ctrl.overflowX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setProperty('style.overflow.x', ctrl.overflowX)\" style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> <md-input-container layout-align=\"end center\"> <label translate>Y</label> <md-select ng-model=ctrl.overflowY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setProperty('style.overflow.y', ctrl.overflowY)\" style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> </fieldset>"
   );
 
 
@@ -18167,14 +18386,13 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/settings/wb-notfound.html',
-    " <wb-icon>bug</wb-icon> <h2>Settings page not found</h2>"
+  $templateCache.put('views/settings/wb-microdata.html',
+    " <fieldset layout=column style=\"padding: 0px\"> <legend translate=\"\">Widget Microdata</legend> <md-switch ng-model=ctrl.itemscope ng-change=\"ctrl.setProperty('itemscope', ctrl.itemscope)\" aria-label=itemscope translate=\"\">Item Scope</md-switch> <md-input-container style=\"margin: 0px\"> <label translate=\"\">itemtype</label> <input ng-model=ctrl.itemtype ng-change=\"ctrl.setProperty('itemtype', ctrl.itemtype)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">itemprop</label> <input ng-model=ctrl.itemprop ng-change=\"ctrl.setProperty('itemprop', ctrl.itemprop)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">itemid</label> <input ng-model=ctrl.itemid ng-change=\"ctrl.setProperty('itemid', ctrl.itemid)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">itemref</label> <input ng-model=ctrl.itemref ng-change=\"ctrl.setProperty('itemref', ctrl.itemref)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Value</label> <input ng-model=ctrl.value ng-change=\"ctrl.setProperty('value', ctrl.value)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Content</label> <input ng-model=ctrl.content ng-change=\"ctrl.setProperty('content', ctrl.content)\"> </md-input-container> </fieldset>"
   );
 
 
-  $templateCache.put('views/settings/wb-seo.html',
-    " <fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Id</label> <input ng-model=ctrl.id ng-change=\"ctrl.setProperty('id', ctrl.id)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Label</label> <input ng-model=ctrl.label ng-change=\"ctrl.setProperty('label', ctrl.label)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Description</label> <textarea name=description ng-model=ctrl.description ng-change=\"ctrl.setProperty('description', ctrl.description)\">\n" +
-    "\t\t</textarea> </md-input-container> </fieldset> <fieldset layout=column style=\"padding: 0px\"> <legend translate=\"\">Schema</legend> <md-input-container flex=100 style=\"padding-left: 8px;padding-right: 8px\"> <label translate=\"\">Type</label> <md-select ng-model=ctrl.category ng-change=\"ctrl.setProperty('category', ctrl.category)\"> <md-option ng-repeat=\"type in ctrl.schemaTypes\" value={{type.value}}> {{type.key}} </md-option> </md-select> </md-input-container> <div layout=row layout-align=\"center center\" ng-if=ctrl.alert style=\"padding-left: 8px; padding-right: 8px\"> <p style=\"color: red\">! <span translate=\"\">{{ctrl.alert}}</span></p> </div> <md-input-container ng-if=!ctrl.alert flex=100 style=\"padding-left: 8px;padding-right: 8px\"> <label translate=\"\">Property</label> <md-select md-on-open=ctrl.setProperties() ng-model=ctrl.property ng-change=\"ctrl.setProperty('property', ctrl.property)\"> <md-option ng-repeat=\"property in ctrl.properties\" value=property> {{property}} </md-option> </md-select> </md-input-container> </fieldset>"
+  $templateCache.put('views/settings/wb-notfound.html',
+    " <wb-icon>bug</wb-icon> <h2>Settings page not found</h2>"
   );
 
 

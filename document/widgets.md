@@ -21,6 +21,19 @@ The style is an specific widget attribute which controll the display of the widg
 
 The cursor property specifies the mouse cursor to be displayed when pointing over an element.
 
+
+	{
+		style: {
+			cursor: 'pointer'
+		}
+	}
+
+The property path is:
+
+	style.cursor
+
+Valid values are:
+
 - alias:	The cursor indicates an alias of something is to be created	
 - all-scroll:	The cursor indicates that something can be scrolled in any direction	
 - auto:	Default. The browser sets a cursor	
@@ -247,9 +260,22 @@ Script to be run when something bad happens and the file is suddenly unavailable
 
 Script to be run when the media has reach the end (a useful event for messages like "thanks for listening")
 
-### onerror
+### Error
 
 Script to be run when an error occurs when the file is being loaded
+
+In script
+
+	$widget.on('error', function(){});
+
+In model
+
+	{
+		type: 'img',
+		event:{
+			error: 'alert("error of loading img");'
+		}
+	}
 
 ### onloadeddata
 

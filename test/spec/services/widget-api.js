@@ -174,21 +174,21 @@ describe('Service $widget', function () {
 	});
 	
 
-	it('should run microdata process on widget', function (done) {
-		var root = new MockRootWidget();
-		// Create new instance
-		$widget.compile({
-			type : 'Group',
-			itemscope: true,
-			itemtype: 'http://www.test.com',
-			contents : []
-		}, root)
-		.then(function (widget) {
-			expect(widget.getElement().attr('itemtype')).toBe('http://www.test.com');
-			done();
-		});
-		$rootScope.$apply();
-		$timeout.flush();
-	});
+//	it('should run microdata process on widget', function (done) {
+//		var root = new MockRootWidget();
+//		// Create new instance
+//		$widget.compile({
+//			type : 'Group',
+//			itemscope: true,
+//			itemtype: 'http://www.test.com',
+//			contents : []
+//		}, root)
+//		.then(function (widget) {
+//			expect(widget.getElement().attr('itemtype')).toBe('http://www.test.com');
+//			done();
+//		});
+//		$rootScope.$apply();
+//		$timeout.flush();
+//	});
 
 });
