@@ -30,7 +30,6 @@
     "angular-route": "1.7.x",
     "weakmap-polyfill": "2.0.x",
     "ngHandsontable": "0.13.x",
-    "angular-material-expansion-panel": "https://github.com/mostafabarmshory/angular-material-expansion-panel.git#0.7.x",
     "md-color-picker": "https://github.com/mostafabarmshory/md-color-picker.git#0.2.x",
     "angular-drag-and-drop-lists": "https://github.com/mostafabarmshory/angular-drag-and-drop-lists.git#2.1.x",
     "jspanel4x": "master",
