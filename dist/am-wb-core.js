@@ -5487,6 +5487,81 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
+ * @name MbWidgetACtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
+ * 
+ */
+.controller('MbWidgetImgCtrl', function () {
+    // list of element attributes
+    var elementAttributes = [
+        'alt',
+        'crossorigin',
+        'height',
+        'hspace',
+        'ismap',
+        'longdesc',
+        'sizes',
+        'src',
+        'usemap',
+        'width',
+        ];
+
+    this.initWidget = function(){
+        var ctrl = this;
+        function eventHandler(event){
+            if(elementAttributes.includes(event.key)){
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                ctrl.setElementAttribute(key, value);
+            }
+            // support legacy image
+            if(event.key === 'url'){
+            	ctrl.setElementAttribute('src', value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data
+        for(var i =0; i < elementAttributes.length;i++){
+            var key = elementAttributes[i];
+            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
  * @name MbWidgetInputCtrl
  * @description Manage an input field
  * 
@@ -6056,7 +6131,7 @@ var WbAbstractWidget = function () {
                 ctrl.fire('error', $event);
             },
             success: function ($event) {
-                ctrl.fire('error', $event);
+                ctrl.fire('success', $event);
             },
             load: function ($event) {
                 ctrl.fire('load', $event);
@@ -6141,7 +6216,7 @@ WbAbstractWidget.prototype.loadStyle = function () {
 
     // load style
     var css;
-    if(model.type == 'Group'){
+    if(model.type == 'Group' || model.type == 'ObjectCollection'){
         css = this.$wbUtil.convertToGroupCss(this.computedStyle || {});
     } else {
         css = this.$wbUtil.convertToWidgetCss(this.computedStyle || {});
@@ -6643,15 +6718,17 @@ WbAbstractWidget.prototype.fire = function (type, params) {
         return;
     }
     var callbacks = this.callbacks[type];
+    var resultData = null;
     for(var i = 0; i < callbacks.length; i++){
         // TODO: maso, 2018: check if the event is stopped to propagate
         try {
-            callbacks[i](event);
+        	resultData = callbacks[i](event) || resultData;
         } catch (error) {
             // NOTE: remove on release
             console.log(error);
         }
     }
+    return resultData;
 };
 
 /**
@@ -16184,56 +16261,56 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 	function loadWidgetEventsHandlers(widget){
 		widget.__eventListeners = {
 				click: function ($event) {
-					evalWidgetEvent(widget, 'click', $event);
+					return evalWidgetEvent(widget, 'click', $event);
 				},
 				dblclick: function ($event) {
-					evalWidgetEvent(widget, 'dblclick', $event);
+					return evalWidgetEvent(widget, 'dblclick', $event);
 				},
 				mouseout: function ($event) {
-					evalWidgetEvent(widget, 'mouseout', $event);
+					return evalWidgetEvent(widget, 'mouseout', $event);
 				},
 				mouseover: function ($event) {
-					evalWidgetEvent(widget, 'mouseover', $event);
+					return evalWidgetEvent(widget, 'mouseover', $event);
 				},
 				mousedown: function ($event) {
-					evalWidgetEvent(widget, 'mousedown', $event);
+					return evalWidgetEvent(widget, 'mousedown', $event);
 				},
 				mouseup: function ($event) {
-					evalWidgetEvent(widget, 'mouseup', $event);
+					return evalWidgetEvent(widget, 'mouseup', $event);
 				},
 				mouseenter: function ($event) {
-					evalWidgetEvent(widget, 'mouseenter', $event);
+					return evalWidgetEvent(widget, 'mouseenter', $event);
 				},
 				mouseleave: function ($event) {
-					evalWidgetEvent(widget, 'mouseleave', $event);
+					return evalWidgetEvent(widget, 'mouseleave', $event);
 				},
 				resize: function ($event) {
-					evalWidgetEvent(widget, 'resize', $event);
+					return evalWidgetEvent(widget, 'resize', $event);
 				},
 				intersection: function ($event) {
-					evalWidgetEvent(widget, 'intersection', $event);
+					return evalWidgetEvent(widget, 'intersection', $event);
 				},
 				
 				//
 				// Common media events
 				//
 				success: function ($event) {
-				    evalWidgetEvent(widget, 'success', $event);
+					return evalWidgetEvent(widget, 'success', $event);
 				},
 				error: function ($event) {
-				    evalWidgetEvent(widget, 'error', $event);
+					return evalWidgetEvent(widget, 'error', $event);
 				},
 				abort: function ($event) {
-				    evalWidgetEvent(widget, 'abort', $event);
+					return evalWidgetEvent(widget, 'abort', $event);
 				},
 				load: function ($event) {
-				    evalWidgetEvent(widget, 'load', $event);
+					return evalWidgetEvent(widget, 'load', $event);
 				},
 				beforeunload: function ($event) {
-				    evalWidgetEvent(widget, 'beforeunload', $event);
+					return evalWidgetEvent(widget, 'beforeunload', $event);
 				},
 				unload: function ($event) {
-				    evalWidgetEvent(widget, 'unload', $event);
+				    return evalWidgetEvent(widget, 'unload', $event);
 				},
 				
 				
@@ -16861,7 +16938,7 @@ angular.module('am-wb-core')
         type: 'link',
         title: 'Link',
         label: 'link',
-        icon: 'link',
+        icon: 'wb-widget-link',
         description: 'A widget to insert an link to page.',
         groups: ['basic'],
         setting: ['link'],
@@ -16875,6 +16952,161 @@ angular.module('am-wb-core')
         controller: 'MbWidgetLinkCtrl', 
     });
     
+    /**
+	 * @ngdoc Widgets
+	 * @name img
+	 * @description Image widget
+	 * 
+	 * Display an image with meta tag for SEO. Here is minimal list of attributes:
+     */
+    $widget.newWidget({
+    	type: 'img',
+    	title: 'Image',
+    	label: 'image',
+    	icon: 'wb-widget-img',
+    	description: 'A widget to insert an link to page.',
+    	groups: ['basic'],
+    	setting: ['link'],
+    	template: '<img></img>',
+    	help: 'http://dpq.co.ir/more-information-img',
+    	model: {
+    		html: 'img',
+    		src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+    	},
+    	controllerAs: 'ctrl',
+    	controller: 'MbWidgetImgCtrl', 
+    });
+//	$widget.newWidget({
+//	type: 'Image',
+//	title: 'Image',
+//	label: 'image',
+//	icon: 'photo',
+//	description: 'A widget to insert an image to page.',
+//	setting: ['amh-common-image'],
+//	templateUrl: 'views/am-wb-common-widgets/image.html',
+//	help: 'http://gitlab.com/am-wb/am-wb-common',
+//	model: {
+//		style: {
+//			size: {
+//				width: 'auto',
+//				height: 'auto'
+//			},
+//			overflow: {
+//				x: 'hidden',
+//				y: 'hidden'
+//			}
+//		}
+//	},
+//	/*
+//	 * @ngInject
+//	 */
+//	controller: function ($scope) {
+//		var keys = ['fit', 'url', 'description', 'label', 'keywords'];
+//		this.setUrl = function (url) {
+//			this.url = url;
+//		};
+//		/**
+//		 * Loads all parameters from model
+//		 * 
+//		 * @memberof AmWbCommonVideoCtrl
+//		 */
+//		this.fillMedia = function () {
+//			for (var i = 0; i < keys.length; i++) {
+//				var key = keys[i];
+//				this[key] = this.getModelProperty(key);
+//			}
+//		};
+//		/**
+//		 * Initialize the widget
+//		 * 
+//		 * @memberof AmWbCommonVideoCtrl
+//		 */
+//		this.initWidget = function () {
+//			var ctrl = this;
+//
+//			// pass event to setting panel if video loaded successfully
+//			this.onLoad = function () {
+//				var event = {};
+//				event.source = ctrl;
+//				event.key = 'success';
+//				ctrl.fire('success', event);
+//			};
+//
+//			// pass event to setting panel if video doesn't load successfully
+//			this.onError = function () {
+//				var event = {};
+//				event.source = ctrl;
+//				event.key = 'failure';
+//				ctrl.fire('error', event);
+//			};
+//
+//			this.on('modelUpdated', function ($event) {
+//				if (keys.indexOf($event.key) > -1) {
+//					var key = $event.key;
+//					ctrl[key] = ctrl.getModelProperty(key);
+//				}
+//			});
+//			this.on('runtimeModelUpdated', function ($event) {
+//				if (keys.indexOf($event.key) > -1) {
+//					var key = $event.key;
+//					ctrl[key] = ctrl.getProperty(key);
+//				}
+//			});
+//			this.on('modelChanged', function () {
+//				ctrl.fillMedia();
+//			});
+//			this.fillMedia();
+//		};
+//	},
+//	controllerAs: 'ctrl'
+//});
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+//	$widget.newWidget({
+//		// widget
+//		type: 'CommonVideoPlayer',
+//		title: 'Video Player',
+//		description: 'A video player component.',
+//		groups: ['commons'],
+//		icon: 'wb-common-video',
+//		// help
+//		help: 'https://gitlab.com/weburger/am-wb-common/wikis/video-player',
+//		helpId: '',
+//		// page
+//		templateUrl: 'views/am-wb-common-widgets/video-player.html',
+//		controller: 'AmWbCommonVideoCtrl',
+//		controllerAs: 'ctrl',
+//		setting: ['common-video-player', 'SEO']
+//	});
+	// NOTE: audio is moved to core component
+//	$widget.newWidget({
+//		// widget
+//		type: 'CommonAudioPlayer',
+//		title: 'Audio Player',
+//		description: 'An audio player component.',
+//		groups: ['commons'],
+//		icon: 'wb-common-audio',
+//		// help
+//		help: 'https://gitlab.com/weburger/am-wb-common/wikis/audio-player',
+//		helpId: '',
+//		// page
+//		templateUrl: 'views/am-wb-common-widgets/audio-player.html',
+//		controller: 'AmWbCommonAudioCtrl',
+//		controllerAs: 'ctrl',
+//		setting: ['common-audio-player']
+//	});
     
 });
 
@@ -18859,6 +19091,12 @@ angular.module('am-wb-core')
 			model.style.cursor = 'pointer';
 
 			delete model.title;
+			delete model.url;
+		}
+		if(model.type === 'Image'){
+			model.type = 'img';
+			model.src = model.url;
+			
 			delete model.url;
 		}
 	}

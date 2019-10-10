@@ -650,6 +650,12 @@ angular.module('am-wb-core')
 			delete model.title;
 			delete model.url;
 		}
+		if(model.type === 'Image'){
+			model.type = 'img';
+			model.src = model.url;
+			
+			delete model.url;
+		}
 	}
 
 	function cleanInternal(model)

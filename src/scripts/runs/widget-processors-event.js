@@ -153,56 +153,56 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 	function loadWidgetEventsHandlers(widget){
 		widget.__eventListeners = {
 				click: function ($event) {
-					evalWidgetEvent(widget, 'click', $event);
+					return evalWidgetEvent(widget, 'click', $event);
 				},
 				dblclick: function ($event) {
-					evalWidgetEvent(widget, 'dblclick', $event);
+					return evalWidgetEvent(widget, 'dblclick', $event);
 				},
 				mouseout: function ($event) {
-					evalWidgetEvent(widget, 'mouseout', $event);
+					return evalWidgetEvent(widget, 'mouseout', $event);
 				},
 				mouseover: function ($event) {
-					evalWidgetEvent(widget, 'mouseover', $event);
+					return evalWidgetEvent(widget, 'mouseover', $event);
 				},
 				mousedown: function ($event) {
-					evalWidgetEvent(widget, 'mousedown', $event);
+					return evalWidgetEvent(widget, 'mousedown', $event);
 				},
 				mouseup: function ($event) {
-					evalWidgetEvent(widget, 'mouseup', $event);
+					return evalWidgetEvent(widget, 'mouseup', $event);
 				},
 				mouseenter: function ($event) {
-					evalWidgetEvent(widget, 'mouseenter', $event);
+					return evalWidgetEvent(widget, 'mouseenter', $event);
 				},
 				mouseleave: function ($event) {
-					evalWidgetEvent(widget, 'mouseleave', $event);
+					return evalWidgetEvent(widget, 'mouseleave', $event);
 				},
 				resize: function ($event) {
-					evalWidgetEvent(widget, 'resize', $event);
+					return evalWidgetEvent(widget, 'resize', $event);
 				},
 				intersection: function ($event) {
-					evalWidgetEvent(widget, 'intersection', $event);
+					return evalWidgetEvent(widget, 'intersection', $event);
 				},
 				
 				//
 				// Common media events
 				//
 				success: function ($event) {
-				    evalWidgetEvent(widget, 'success', $event);
+					return evalWidgetEvent(widget, 'success', $event);
 				},
 				error: function ($event) {
-				    evalWidgetEvent(widget, 'error', $event);
+					return evalWidgetEvent(widget, 'error', $event);
 				},
 				abort: function ($event) {
-				    evalWidgetEvent(widget, 'abort', $event);
+					return evalWidgetEvent(widget, 'abort', $event);
 				},
 				load: function ($event) {
-				    evalWidgetEvent(widget, 'load', $event);
+					return evalWidgetEvent(widget, 'load', $event);
 				},
 				beforeunload: function ($event) {
-				    evalWidgetEvent(widget, 'beforeunload', $event);
+					return evalWidgetEvent(widget, 'beforeunload', $event);
 				},
 				unload: function ($event) {
-				    evalWidgetEvent(widget, 'unload', $event);
+				    return evalWidgetEvent(widget, 'unload', $event);
 				},
 				
 				
