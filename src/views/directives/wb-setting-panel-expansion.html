@@ -5,7 +5,8 @@
         ng-show="setting.visible">
         <md-expansion-panel-collapsed>
         	<div
-        		layout="row">
+        		layout="row"
+        		layout-align="start center">
 	        	<wb-icon size="12px" ng-if="setting.icon">{{setting.icon}}</wb-icon>
 	            <div class="md-title" translate="" flex>{{setting.label}}</div>
             </div>
@@ -14,7 +15,8 @@
             <md-expansion-panel-header
                 ng-click="$panel.collapse()">
 	        	<div
-	        		layout="row">
+	        		layout="row"
+	        		layout-align="start center">
 		        	<wb-icon size="12px" ng-if="setting.icon">{{setting.icon}}</wb-icon>
 		            <div class="md-title" translate="" flex>{{setting.label}}</div>
 		            <!-- TODO: hadd description button -->

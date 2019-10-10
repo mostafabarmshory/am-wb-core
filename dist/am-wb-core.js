@@ -10212,7 +10212,6 @@ angular.module('am-wb-core')
 		var footerCtrl;
 		var deregister;
 		var scrollContainer;
-		var stickyContainer;
 		var topKiller;
 		var resizeKiller;
 		var onRemoveCallback;
@@ -10642,15 +10641,13 @@ angular.module('am-wb-core')
 	
 	
 
-    var directive = {
+    return {
         restrict: 'E',
         require: ['mdExpansionPanel', '?^^mdExpansionPanelGroup'],
         scope: true,
         compile: compile,
         controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', '$animate', '$parse', controller]
     };
-    return directive;
-	
 });
 
 
@@ -10864,13 +10861,7 @@ angular.module('am-wb-core')
  * @param {string=} auto-expand - panels expand when added to `<md-expansion-panel-group>`
  * @param {string=} multiple - allows for more than one panel to be expanded at a time
  **/
-.directive('mdExpansionPanelGroup', 
-		function() {
-	var directive = {
-			restrict: 'E',
-			controller: ['$scope', '$attrs', '$element', '$mdComponentRegistry', controller]
-	};
-	return directive;
+.directive('mdExpansionPanelGroup', function() {
 
 
 	function controller($scope, $attrs, $element, $mdComponentRegistry) {
@@ -11012,6 +11003,12 @@ angular.module('am-wb-core')
 			});
 		}
 	}
+	
+
+	return {
+			restrict: 'E',
+			controller: ['$scope', '$attrs', '$element', '$mdComponentRegistry', controller]
+	};
 });
 
 
@@ -19468,12 +19465,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-event-panel.html',
-    "<table class=mb-table style=\"font-size: 10px\"> <thead> <tr md-colors=\"{color: 'primary-700'}\"> <td translate=\"\">Name</td> <td translate=\"\">Code</td> <td></td> </tr> </thead> <tbody> <tr ng-click=\"ctrl.editEvent(event, $event)\" ng-repeat=\"event in events track by $index\" style=\"cursor: pointer\"> <td translate>{{event.title}}</td> <td style=\"cursor: pointer\">{{event.code| limitTo:13 }} ...</td> <td align=center style=\"cursor: pointer;min-height: 22px\"> <md-button style=\"min-height: 20px;height: 20px;margin: 0px;line-height: 20px;padding: 0px\" ng-if=event.code ng-click=\"ctrl.deleteEvent(event, $event)\" class=md-icon-button> <wb-icon>delete</wb-icon> </md-button> </td> </tr> </tbody> </table>"
+    "<table class=mb-table style=\"font-size: 10px\"> <thead> <tr md-colors=\"{color: 'primary-700'}\"> <td translate=\"\">Name</td> <td translate=\"\">Code</td> <td></td> </tr> </thead> <tbody> <tr ng-click=\"ctrl.editEvent(event, $event)\" ng-repeat=\"event in events track by $index\" style=\"cursor: pointer\"> <td translate>{{event.title}}</td> <td style=\"cursor: pointer\">{{event.code| limitTo:13 }} ...</td> <td align=center style=\"cursor: pointer;min-height: 22px\"> <md-button style=\"min-height: 20px;height: 20px;margin: 0px;line-height: 20px;padding: 0px\" ng-if=event.code ng-click=\"ctrl.deleteEvent(event, $event)\" class=md-icon-button> <wb-icon size=16px>delete</wb-icon> </md-button> </td> </tr> </tbody> </table>"
   );
 
 
   $templateCache.put('views/directives/wb-setting-panel-expansion.html',
-    "<div id=WB-SETTING-PANEL> <md-expansion-panel ng-repeat=\"setting in settings| orderBy:priority track by setting.type\" ng-show=setting.visible> <md-expansion-panel-collapsed> <div class=md-title>{{setting.label}}</div> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header ng-click=$panel.collapse()> <div class=md-title>{{setting.label}}</div> <div class=md-summary>{{setting.description}}</div> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </div>"
+    "<div id=WB-SETTING-PANEL> <md-expansion-panel ng-repeat=\"setting in settings| orderBy:priority track by setting.type\" ng-show=setting.visible> <md-expansion-panel-collapsed> <div layout=row layout-align=\"start center\"> <wb-icon size=12px ng-if=setting.icon>{{setting.icon}}</wb-icon> <div class=md-title translate=\"\" flex>{{setting.label}}</div> </div> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header ng-click=$panel.collapse()> <div layout=row layout-align=\"start center\"> <wb-icon size=12px ng-if=setting.icon>{{setting.icon}}</wb-icon> <div class=md-title translate=\"\" flex>{{setting.label}}</div>   </div> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </div>"
   );
 
 
