@@ -155,12 +155,12 @@ angular.module('am-wb-core')//
         if (bound.top < 32) {
             this.titleElement.css({
                 top: bound.top + bound.height,
-                left: bound.left + bound.width- this.titleElement.width() - 5
+                left: bound.left + bound.width/2 - this.titleElement.width()/2
             });
         } else {
             this.titleElement.css({
                 top: bound.top -  this.titleElement.height(),
-                left: bound.left + bound.width - this.titleElement.width() - 5
+                left: bound.left + bound.width/2 - this.titleElement.width()/2
             });
         }
         var widget = this.getWidget();

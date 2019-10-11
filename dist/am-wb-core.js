@@ -6381,7 +6381,6 @@ var WbAbstractWidget = function () {
                 if (ctrl.isEditable()) {
                     ctrl.setSelected(true, $event);
                     $event.stopPropagation();
-                    $event.preventDefault();
                 }
                 ctrl.fire('click', $event);
             },
@@ -13965,6 +13964,11 @@ angular.module('am-wb-core')//
                         ctrl.saveAndClose();
                     }
                 });
+                
+                editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
+                	event.stopPropagation();
+                	editor.save();
+                });
 
                 // Update model when:
                 // - a button has been clicked [ExecCommand]
@@ -15065,12 +15069,12 @@ angular.module('am-wb-core')//
         if (bound.top < 32) {
             this.titleElement.css({
                 top: bound.top + bound.height,
-                left: bound.left + bound.width- this.titleElement.width() - 5
+                left: bound.left + bound.width/2 - this.titleElement.width()/2
             });
         } else {
             this.titleElement.css({
                 top: bound.top -  this.titleElement.height(),
-                left: bound.left + bound.width - this.titleElement.width() - 5
+                left: bound.left + bound.width/2 - this.titleElement.width()/2
             });
         }
         var widget = this.getWidget();
