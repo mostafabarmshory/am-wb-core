@@ -1,0 +1,68 @@
+<div 
+    layout-padding
+    layout="column">
+    <md-input-container>
+        <label translate>Align</label>
+        <input
+        	aria-label="align"
+        	ng-model="ctrl.align"
+        	ng-change="ctrl.setProperty('style.text.align', ctrl.align)"
+			ng-model-options="{debounce: 200}">
+    </md-input-container>
+    <md-input-container>
+        <label translate>Align Last</label>
+        <input
+        	aria-label="alignLast"
+        	ng-model="ctrl.alignLast"
+        	ng-change="ctrl.setProperty('style.text.alignLast', ctrl.alignLast)"
+			ng-model-options="{debounce: 200}">
+    </md-input-container>
+    <md-input-container>
+        <label translate>Decoration</label>
+        <input
+        	aria-label="decoration"
+        	ng-model="ctrl.decoration"
+        	ng-change="ctrl.setProperty('style.text.decoration', ctrl.decoration)"
+			ng-model-options="{debounce: 200}">
+    </md-input-container>
+    <md-input-container>
+        <label translate>Indent</label>
+        <input
+        	aria-label="indent"
+        	ng-model="ctrl.indent"
+        	ng-change="ctrl.setProperty('style.text.indent', ctrl.indent)"
+			ng-model-options="{debounce: 200}">
+    </md-input-container>
+    <md-input-container>
+        <label translate>Justify</label>
+        <input
+        	aria-label="justify"
+        	ng-model="ctrl.justify"
+        	ng-change="ctrl.setProperty('style.text.justify', ctrl.justify)"
+			ng-model-options="{debounce: 200}">
+    </md-input-container>
+    <md-input-container>
+        <label translate>Overflow</label>
+        <input
+        	aria-label="overflow"
+        	ng-model="ctrl.overflow"
+        	ng-change="ctrl.setProperty('style.text.overflow', ctrl.overflow)"
+			ng-model-options="{debounce: 200}">
+    </md-input-container>
+    <md-input-container>
+        <label translate>Shadow</label>
+        <input
+        	aria-label="shadow"
+        	ng-model="ctrl.shadow"
+        	ng-change="ctrl.setProperty('style.text.shadow', ctrl.shadow)"
+			ng-model-options="{debounce: 200}">
+    </md-input-container>
+    <md-input-container>
+        <label translate>Transform</label>
+        <input
+        	aria-label="transform"
+        	ng-model="ctrl.transform"
+        	ng-change="ctrl.setProperty('style.text.transform', ctrl.transform)"
+			ng-model-options="{debounce: 200}">
+    </md-input-container>
+</div>

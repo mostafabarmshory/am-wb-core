@@ -29,6 +29,82 @@ angular.module('am-wb-core')
 .service('$wbUtil', function ($q, $templateRequest, $sce) {
 	'use strict';
 	var REGEX_BACKGROUND_IMAGE_SPEC = RegExp('(repeating\-)?(linear|radial)\-(gradient)');
+
+	var styleMap = [
+		//==============================================
+		// Text
+		//==============================================
+	{
+		cssKey: 'text-align',
+		key: 'text.align',
+		defaultValue: 'none'
+	},{
+		cssKey: 'text-align-last',
+		key: 'text.alignLast', 
+		defaultValue: 'auto'
+	},{
+		cssKey: 'text-decoration',
+		key: 'text.decoration',
+		defaultValue: 'none'
+	},{
+		cssKey: 'text-shadow',
+		key: 'text.shadow',
+		defaultValue: 'none'
+	},{
+		cssKey: 'text-transform',
+		key: 'text.transform',
+		defaultValue: 'none'
+	},{
+		cssKey: 'text-overflow',
+		key: 'text.overflow',
+		defaultValue: 'clip'
+	},{
+		cssKey: 'text-justify',
+		key: 'text.justify',
+		defaultValue: 'auto'
+	},{
+		cssKey: 'text-indent',
+		key: 'text.indent',
+		defaultValue: ''
+	},
+
+	//==============================================
+	// general
+	//==============================================
+	{
+		cssKey: 'padding',
+		key: 'padding', 
+		defaultValue: ''
+	},{
+		cssKey: 'margin',
+		key: 'margin', 
+		defaultValue: ''
+	},{
+		cssKey: 'direction',
+		key: 'direction', 
+		defaultValue: 'ltr'
+	},{
+		cssKey: 'color',
+		key: 'color', 
+		defaultValue: 'initial'
+	},{
+		cssKey: 'cursor',
+		key: 'cursor', 
+		defaultValue: 'auto'
+	},{
+		cssKey: 'opacity',
+		key: 'opacity', 
+		defaultValue: ''
+	},{
+		cssKey: 'overflow-x',
+		key: 'overflow.x', 
+		defaultValue: 'visible'
+	},{
+		cssKey: 'overflow-y',
+		key: 'overflow.y', 
+		defaultValue: 'visible'
+	}];
+	
 	var service = this;
 
 	function cleanMap(oldStyle, newStyle, map) {
@@ -219,46 +295,18 @@ angular.module('am-wb-core')
 				// shadows
 				convertToWidgetCssShadows(style.shadows || {}),
 				// transform
-				convertToWidgetCssTransfrom(style.transform || {}),
-				// Overflow
-				convertToWidgetCssOverflow(style.overflow || {}),
-				// text
-				convertToWidgetCssText(style.text || {}),
-				// color, cursor, opacity, direction
-				{
-			padding: style.padding,
-			margin: style.margin,
-			direction: style.direction || 'ltr',
-			color: style.color || 'initial',
-			cursor: style.cursor || 'auto',
-			opacity: style.opacity || '1',
-				});
-
-		return css;
-	}
-
-	function convertToWidgetCssText(textOptions){
-		var css =  {
-				'text-decoration': textOptions.decoration || 'none',
-				'text-shadow': textOptions.shadow || 'none',
-				'text-transform': textOptions.transform || 'none',
-				'text-overflow': textOptions.overflow || 'clip',
-				'text-justify': textOptions.justify || 'auto',
-				'text-indent': textOptions.indent || 'indent',
-				'text-align-last': textOptions.alignLast || 'auto',
-		};
-		if(textOptions.align){
-			css['text-align'] = textOptions.align || 'indent';
+				convertToWidgetCssTransfrom(style.transform || {}));		
+		
+		for(var i = 0; i < styleMap.length; i++){
+			var cssItem = styleMap[i];
+			var value = objectPath.get(style, cssItem.key) || cssItem.defaultValue;
+			objectPath.set(css, cssItem.cssKey, value);
 		}
 		return css;
 	}
 
-	function convertToWidgetCssOverflow(overflowOption) {
-		return {
-			'overflow-x': overflowOption.x || 'visible',
-			'overflow-y': overflowOption.y || 'visible'
-		};
-	}
+
+
 
 	function convertToWidgetCssTransfrom(transformOptions) {
 		var transform = '';

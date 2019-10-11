@@ -951,4 +951,19 @@ angular.module('am-wb-core')
             };
         }
     });
+    
+    /**
+     * @ngDoc Settings
+     * @name style.text
+     * @description Text setting
+     */
+    $settings.newPage({
+    	type: 'style.text',
+    	label: 'Text',
+    	description: 'Text style.',
+    	icon: 'settings',
+    	templateUrl: 'views/settings/wb-style-text.html',
+    	controllerAs: 'ctrl',
+    	controller: 'MbSettingStyleTextCtrl'
+    });
 });

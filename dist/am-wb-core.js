@@ -5250,6 +5250,79 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
+ * @name MbSettingStyleTextCtrl
+ * @description Edit text style of a widget
+ * 
+ */
+.controller('MbSettingStyleTextCtrl', function () {
+	var attrs = [{
+		key: 'style.text.align',
+		ctrlKey: 'align'
+	},{
+		key: 'style.text.alignLast',
+		ctrlKey: 'alignLast'
+	},{
+		key: 'style.text.decoration',
+		ctrlKey: 'decoration'
+	},{
+		key: 'style.text.indent',
+		ctrlKey: 'indent'
+	},{
+		key: 'style.text.justify',
+		ctrlKey: 'justify'
+	},{
+		key: 'style.text.overflow',
+		ctrlKey: 'overflow'
+	},{
+		key: 'style.text.shadow',
+		ctrlKey: 'shadow'
+	},{
+		key: 'style.text.transform',
+		ctrlKey: 'transform'
+	}];
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		/*
+		 * Load data of the widget
+		 */
+		var ctrl = this;
+		angular.forEach(attrs, function(attr){
+			ctrl[attr.ctrlKey] = ctrl.getProperty(attr.key);
+		});
+	};
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
  * @name MbWidgetACtrl
  * @description Manage a widget with html text.
  * 
@@ -9036,27 +9109,27 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-	/**
-	 * @ngdoc Directives
-	 * @name wbUiSettingColor
-	 * @description a setting section to set color.
-	 *
-	 */
-	.directive('wbUiSettingBackgroundPosition', function () {
-	    
-	    function postLink(scope, element, attr, ctrls) {
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
+ *
+ */
+.directive('wbUiSettingBackgroundPosition', function () {
+
+	function postLink(scope, element, attr, ctrls) {
 		var ngModelCtrl = ctrls[0];
 
 		ngModelCtrl.$render = function () {
-		    scope.position = ngModelCtrl.$modelValue;
+			scope.position = ngModelCtrl.$modelValue;
 		};
 
 		scope.positionChanged = function (newPosition) {
-		    ngModelCtrl.$setViewValue(newPosition);
+			ngModelCtrl.$setViewValue(newPosition);
 		};
-	    }
+	}
 
-	    return {
+	return {
 		templateUrl: 'views/directives/wb-ui-setting-background-position.html',
 		restrict: 'E',
 		scope: {},
@@ -9068,23 +9141,24 @@ angular.module('am-wb-core')
 		 * @ngInject
 		 */
 		controller: function ($scope) {
-		    $scope.items = [
-			{title: 'Left top', value: 'left top'},
-			{title: 'Left center', value: 'left center'},
-			{title: 'Left bottom', value: 'left bottom'},
-			{title: 'Right top', value: 'right top'},
-			{title: 'Right center', value: 'right center'},
-			{title: 'Center top', value: 'center top'},
-			{title: 'Center center', value: 'center center'},
-			{title: 'Center bottom', value: 'center bottom'},
-			{title: 'Initial', value: 'initial'},
-			{title: 'Inherit', value: 'inherit'},
-			{title: 'Nothing', value: ''}
-		    ];
+			$scope.items = [
+				{title: 'Left top', value: 'left top'},
+				{title: 'Left center', value: 'left center'},
+				{title: 'Left bottom', value: 'left bottom'},
+				{title: 'Right top', value: 'right top'},
+				{title: 'Right center', value: 'right center'},
+				{title: 'Right center', value: 'right bottom'},
+				{title: 'Center top', value: 'center top'},
+				{title: 'Center center', value: 'center center'},
+				{title: 'Center bottom', value: 'center bottom'},
+				{title: 'Initial', value: 'initial'},
+				{title: 'Inherit', value: 'inherit'},
+				{title: 'Nothing', value: ''}
+				];
 
 		}
-	    };
-	});
+	};
+});
 /* 
  * The MIT License (MIT)
  * 
@@ -16294,6 +16368,21 @@ angular.module('am-wb-core')
             };
         }
     });
+    
+    /**
+     * @ngDoc Settings
+     * @name style.text
+     * @description Text setting
+     */
+    $settings.newPage({
+    	type: 'style.text',
+    	label: 'Text',
+    	description: 'Text style.',
+    	icon: 'settings',
+    	templateUrl: 'views/settings/wb-style-text.html',
+    	controllerAs: 'ctrl',
+    	controller: 'MbSettingStyleTextCtrl'
+    });
 });
 
 /* 
@@ -18421,9 +18510,11 @@ angular.module('am-wb-core')
 	 * Default settings
 	 */
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'general', 'transform', 'border',
-		'background', 'layout', 'layout-self', 'marginPadding', 'size', 'shadow', 'microdata' ];
-	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'transform', 'border',
-		'background', 'marginPadding', 'layout-self', 'size', 'shadow', 'microdata' ];
+		'background', 'layout', 'layout-self', 'marginPadding',
+		'size', 'shadow', 'microdata', 'style.text' ];
+	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'transform',
+		'border', 'background', 'marginPadding', 'layout-self',
+		'size', 'shadow', 'microdata', 'style.text' ];
 
 	/**
 	 * Setting page storage
@@ -18484,12 +18575,10 @@ angular.module('am-wb-core')
 		}
 
 		if (angular.isArray(widget.setting)) {
-			widgetSettings = widgetSettings
-			.concat(widget.setting);
+			widgetSettings = widgetSettings.concat(widget.setting);
 		}
 		return widgetSettings;
 	}
-
 
 	// تعیین سرویس‌ها
 	this.page = page;
@@ -18698,6 +18787,82 @@ angular.module('am-wb-core')
 .service('$wbUtil', function ($q, $templateRequest, $sce) {
 	'use strict';
 	var REGEX_BACKGROUND_IMAGE_SPEC = RegExp('(repeating\-)?(linear|radial)\-(gradient)');
+
+	var styleMap = [
+		//==============================================
+		// Text
+		//==============================================
+	{
+		cssKey: 'text-align',
+		key: 'text.align',
+		defaultValue: 'none'
+	},{
+		cssKey: 'text-align-last',
+		key: 'text.alignLast', 
+		defaultValue: 'auto'
+	},{
+		cssKey: 'text-decoration',
+		key: 'text.decoration',
+		defaultValue: 'none'
+	},{
+		cssKey: 'text-shadow',
+		key: 'text.shadow',
+		defaultValue: 'none'
+	},{
+		cssKey: 'text-transform',
+		key: 'text.transform',
+		defaultValue: 'none'
+	},{
+		cssKey: 'text-overflow',
+		key: 'text.overflow',
+		defaultValue: 'clip'
+	},{
+		cssKey: 'text-justify',
+		key: 'text.justify',
+		defaultValue: 'auto'
+	},{
+		cssKey: 'text-indent',
+		key: 'text.indent',
+		defaultValue: ''
+	},
+
+	//==============================================
+	// general
+	//==============================================
+	{
+		cssKey: 'padding',
+		key: 'padding', 
+		defaultValue: ''
+	},{
+		cssKey: 'margin',
+		key: 'margin', 
+		defaultValue: ''
+	},{
+		cssKey: 'direction',
+		key: 'direction', 
+		defaultValue: 'ltr'
+	},{
+		cssKey: 'color',
+		key: 'color', 
+		defaultValue: 'initial'
+	},{
+		cssKey: 'cursor',
+		key: 'cursor', 
+		defaultValue: 'auto'
+	},{
+		cssKey: 'opacity',
+		key: 'opacity', 
+		defaultValue: ''
+	},{
+		cssKey: 'overflow-x',
+		key: 'overflow.x', 
+		defaultValue: 'visible'
+	},{
+		cssKey: 'overflow-y',
+		key: 'overflow.y', 
+		defaultValue: 'visible'
+	}];
+	
 	var service = this;
 
 	function cleanMap(oldStyle, newStyle, map) {
@@ -18888,46 +19053,18 @@ angular.module('am-wb-core')
 				// shadows
 				convertToWidgetCssShadows(style.shadows || {}),
 				// transform
-				convertToWidgetCssTransfrom(style.transform || {}),
-				// Overflow
-				convertToWidgetCssOverflow(style.overflow || {}),
-				// text
-				convertToWidgetCssText(style.text || {}),
-				// color, cursor, opacity, direction
-				{
-			padding: style.padding,
-			margin: style.margin,
-			direction: style.direction || 'ltr',
-			color: style.color || 'initial',
-			cursor: style.cursor || 'auto',
-			opacity: style.opacity || '1',
-				});
-
-		return css;
-	}
-
-	function convertToWidgetCssText(textOptions){
-		var css =  {
-				'text-decoration': textOptions.decoration || 'none',
-				'text-shadow': textOptions.shadow || 'none',
-				'text-transform': textOptions.transform || 'none',
-				'text-overflow': textOptions.overflow || 'clip',
-				'text-justify': textOptions.justify || 'auto',
-				'text-indent': textOptions.indent || 'indent',
-				'text-align-last': textOptions.alignLast || 'auto',
-		};
-		if(textOptions.align){
-			css['text-align'] = textOptions.align || 'indent';
+				convertToWidgetCssTransfrom(style.transform || {}));		
+		
+		for(var i = 0; i < styleMap.length; i++){
+			var cssItem = styleMap[i];
+			var value = objectPath.get(style, cssItem.key) || cssItem.defaultValue;
+			objectPath.set(css, cssItem.cssKey, value);
 		}
 		return css;
 	}
 
-	function convertToWidgetCssOverflow(overflowOption) {
-		return {
-			'overflow-x': overflowOption.x || 'visible',
-			'overflow-y': overflowOption.y || 'visible'
-		};
-	}
+
+
 
 	function convertToWidgetCssTransfrom(transformOptions) {
 		var transform = '';
@@ -19970,7 +20107,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-position.html',
-    "<md-input-container> <label translate=\"\">Background position</label> <md-select aria-label=\"background option\" ng-model=position ng-change=positionChanged(position)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.title}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label translate=\"\">Background position</label> <md-select aria-label=\"background option\" ng-model=position ng-change=positionChanged(position)> <md-option ng-repeat=\"item in items\" value={{::item.value}} translate=\"\">{{::item.title}}</md-option> </md-select> </md-input-container>"
   );
 
 
@@ -20174,6 +20311,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/settings/wb-size.html',
     " <fieldset> <legend translate>Width</legend> <wb-ui-setting-length title=Width description=\"Set the width\" ng-model=ctrl.width ng-change=ctrl.widthChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min width\" description=\"Set the minimum width\" ng-model=ctrl.minWidth ng-change=ctrl.minWidthChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max width\" description=\"Set the maximum width\" ng-model=ctrl.maxWidth ng-change=ctrl.maxWidthChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset> <fieldset> <legend translate>Height</legend> <wb-ui-setting-length title=Height description=\"Set the height\" ng-model=ctrl.height ng-change=ctrl.heightChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" description=\"Set the minimum height\" ng-model=ctrl.minHeight ng-change=ctrl.minHeightChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" description=\"Set the maximum height\" ng-model=ctrl.maxHeight ng-change=ctrl.maxHeightChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-style-text.html',
+    "<div layout-padding layout=column> <md-input-container> <label translate>Align</label> <input aria-label=align ng-model=ctrl.align ng-change=\"ctrl.setProperty('style.text.align', ctrl.align)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Align Last</label> <input aria-label=alignLast ng-model=ctrl.alignLast ng-change=\"ctrl.setProperty('style.text.alignLast', ctrl.alignLast)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Decoration</label> <input aria-label=decoration ng-model=ctrl.decoration ng-change=\"ctrl.setProperty('style.text.decoration', ctrl.decoration)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Indent</label> <input aria-label=indent ng-model=ctrl.indent ng-change=\"ctrl.setProperty('style.text.indent', ctrl.indent)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Justify</label> <input aria-label=justify ng-model=ctrl.justify ng-change=\"ctrl.setProperty('style.text.justify', ctrl.justify)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Overflow</label> <input aria-label=overflow ng-model=ctrl.overflow ng-change=\"ctrl.setProperty('style.text.overflow', ctrl.overflow)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Shadow</label> <input aria-label=shadow ng-model=ctrl.shadow ng-change=\"ctrl.setProperty('style.text.shadow', ctrl.shadow)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Transform</label> <input aria-label=transform ng-model=ctrl.transform ng-change=\"ctrl.setProperty('style.text.transform', ctrl.transform)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> </div>"
   );
 
 
