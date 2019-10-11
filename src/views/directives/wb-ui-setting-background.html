@@ -1,6 +1,8 @@
 <md-input-container>
     <label translate="">Background Size</label>
-    <md-select ng-model="value">
+    <md-select 
+    	aria-label="background size"
+    	ng-model="value">
         <md-option 
             ng-repeat="value in items" 
             value="{{value.value}}"

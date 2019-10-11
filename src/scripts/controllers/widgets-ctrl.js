@@ -201,7 +201,7 @@ var WbAbstractWidget = function () {
                 ctrl.fire('error', $event);
             },
             success: function ($event) {
-                ctrl.fire('error', $event);
+                ctrl.fire('success', $event);
             },
             load: function ($event) {
                 ctrl.fire('load', $event);
@@ -286,7 +286,7 @@ WbAbstractWidget.prototype.loadStyle = function () {
 
     // load style
     var css;
-    if(model.type == 'Group'){
+    if(model.type == 'Group' || model.type == 'ObjectCollection'){
         css = this.$wbUtil.convertToGroupCss(this.computedStyle || {});
     } else {
         css = this.$wbUtil.convertToWidgetCss(this.computedStyle || {});
@@ -788,15 +788,17 @@ WbAbstractWidget.prototype.fire = function (type, params) {
         return;
     }
     var callbacks = this.callbacks[type];
+    var resultData = null;
     for(var i = 0; i < callbacks.length; i++){
         // TODO: maso, 2018: check if the event is stopped to propagate
         try {
-            callbacks[i](event);
+        	resultData = callbacks[i](event) || resultData;
         } catch (error) {
             // NOTE: remove on release
             console.log(error);
         }
     }
+    return resultData;
 };
 
 /**

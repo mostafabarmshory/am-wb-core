@@ -1,16 +1,28 @@
-<div 
+<md-expansion-panel-group 
      id="WB-SETTING-PANEL">
     <md-expansion-panel
         ng-repeat="setting in settings| orderBy:priority track by setting.type"
         ng-show="setting.visible">
         <md-expansion-panel-collapsed>
-            <div class="md-title">{{setting.label}}</div>
+        	<div
+        		layout="row"
+        		layout-align="start center">
+	        	<wb-icon size="12px" ng-if="setting.icon">{{setting.icon}}</wb-icon>
+	            <div class="md-title" translate="" flex>{{setting.label}}</div>
+				<md-tooltip md-direction="left">
+					<span translat="">{{setting.description || setting.label}}</span>
+				</md-tooltip>
+            </div>
         </md-expansion-panel-collapsed>
         <md-expansion-panel-expanded>
             <md-expansion-panel-header
                 ng-click="$panel.collapse()">
-                <div class="md-title">{{setting.label}}</div>
-                <div class="md-summary">{{setting.description}}</div>
+	        	<div
+	        		layout="row"
+	        		layout-align="start center">
+		        	<wb-icon size="12px" ng-if="setting.icon">{{setting.icon}}</wb-icon>
+		            <div class="md-title" translate="" flex>{{setting.label}}</div>
+	            </div>
             </md-expansion-panel-header>
             <md-expansion-panel-content 
                 layout="column"
@@ -22,4 +34,4 @@
             </md-expansion-panel-content>
         </md-expansion-panel-expanded>
     </md-expansion-panel>
-</div>
+</md-expansion-panel-group >

@@ -60,7 +60,7 @@ angular.module('am-wb-core', [
 	'mdColorPicker',
 	'ui.tinymce',
 	'dndLists',
-	'material.components.expansionPanels',
+//	'material.components.expansionPanels',
 	'ngMdIcons',
 	'ngHandsontable',
 	'ngStorage' // https://github.com/gsklee/ngStorage

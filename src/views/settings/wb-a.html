@@ -3,7 +3,8 @@
     layout="column">
     <md-input-container>
         <label translate>Title</label>
-        <input 
+        <input
+        	aria-label="title"
         	ng-model="ctrl.html"
         	ng-change="ctrl.setProperty('html', ctrl.html)"
 			ng-model-options="{debounce: 200}">

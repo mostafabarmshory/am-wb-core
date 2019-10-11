@@ -3627,7 +3627,7 @@ angular.module('am-wb-core', [
 	'mdColorPicker',
 	'ui.tinymce',
 	'dndLists',
-	'material.components.expansionPanels',
+//	'material.components.expansionPanels',
 	'ngMdIcons',
 	'ngHandsontable',
 	'ngStorage' // https://github.com/gsklee/ngStorage
@@ -5338,6 +5338,78 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
+ * @name MbWidgetAudioCtrl
+ * @description Manage a widget with audio.
+ * 
+ * 
+ */
+.controller('MbWidgetAudioCtrl', function () {
+    // list of element attributes
+    var elementAttributes = [
+        'alt',
+        'crossorigin',
+        'height',
+        'hspace',
+        'ismap',
+        'longdesc',
+        'sizes',
+        'src',
+        'usemap',
+        'width',
+        ];
+
+    this.initWidget = function(){
+        var ctrl = this;
+        function eventHandler(event){
+            if(elementAttributes.includes(event.key)){
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                ctrl.setElementAttribute(key, value);
+            }
+            // support legacy image
+            if(event.key === 'url'){
+            	ctrl.setElementAttribute('src', value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data
+        for(var i =0; i < elementAttributes.length;i++){
+            var key = elementAttributes[i];
+            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
  * @name MbWidgetHtmlCtrl
  * @description Manage a widget with html text.
  * 
@@ -5458,6 +5530,81 @@ angular.module('am-wb-core')//
             elementAttribute(key, ctrl.getModelProperty(key));
         }
     };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name MbWidgetACtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
+ * 
+ */
+.controller('MbWidgetImgCtrl', function () {
+    // list of element attributes
+    var elementAttributes = [
+        'alt',
+        'crossorigin',
+        'height',
+        'hspace',
+        'ismap',
+        'longdesc',
+        'sizes',
+        'src',
+        'usemap',
+        'width',
+        ];
+
+    this.initWidget = function(){
+        var ctrl = this;
+        function eventHandler(event){
+            if(elementAttributes.includes(event.key)){
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                ctrl.setElementAttribute(key, value);
+            }
+            // support legacy image
+            if(event.key === 'url'){
+            	ctrl.setElementAttribute('src', value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data
+        for(var i =0; i < elementAttributes.length;i++){
+            var key = elementAttributes[i];
+            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+
 });
 
 /*
@@ -5731,6 +5878,78 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
+ * @name MbWidgetPictureCtrl
+ * @description Manage a widget with audio.
+ * 
+ * 
+ */
+.controller('MbWidgetPictureCtrl', function () {
+    // list of element attributes
+    var elementAttributes = [
+        'alt',
+        'crossorigin',
+        'height',
+        'hspace',
+        'ismap',
+        'longdesc',
+        'sizes',
+        'src',
+        'usemap',
+        'width',
+        ];
+
+    this.initWidget = function(){
+        var ctrl = this;
+        function eventHandler(event){
+            if(elementAttributes.includes(event.key)){
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                ctrl.setElementAttribute(key, value);
+            }
+            // support legacy image
+            if(event.key === 'url'){
+            	ctrl.setElementAttribute('src', value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data
+        for(var i =0; i < elementAttributes.length;i++){
+            var key = elementAttributes[i];
+            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
  * @name MbWidgetHeaderCtrl
  * @description Manage a header
  * 
@@ -5851,6 +6070,78 @@ angular.module('am-wb-core')//
         var element = this.getElement();
         return element.val.apply(element, arguments);
     };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name MbWidgetVideoCtrl
+ * @description Manage a widget with audio.
+ * 
+ * 
+ */
+.controller('MbWidgetVideoCtrl', function () {
+    // list of element attributes
+    var elementAttributes = [
+        'alt',
+        'crossorigin',
+        'height',
+        'hspace',
+        'ismap',
+        'longdesc',
+        'sizes',
+        'src',
+        'usemap',
+        'width',
+        ];
+
+    this.initWidget = function(){
+        var ctrl = this;
+        function eventHandler(event){
+            if(elementAttributes.includes(event.key)){
+                var key = event.key;
+                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+                ctrl.setElementAttribute(key, value);
+            }
+            // support legacy image
+            if(event.key === 'url'){
+            	ctrl.setElementAttribute('src', value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+        // load initial data
+        for(var i =0; i < elementAttributes.length;i++){
+            var key = elementAttributes[i];
+            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
+        }
+    };
+
 });
 
 /* 
@@ -6056,7 +6347,7 @@ var WbAbstractWidget = function () {
                 ctrl.fire('error', $event);
             },
             success: function ($event) {
-                ctrl.fire('error', $event);
+                ctrl.fire('success', $event);
             },
             load: function ($event) {
                 ctrl.fire('load', $event);
@@ -6141,7 +6432,7 @@ WbAbstractWidget.prototype.loadStyle = function () {
 
     // load style
     var css;
-    if(model.type == 'Group'){
+    if(model.type == 'Group' || model.type == 'ObjectCollection'){
         css = this.$wbUtil.convertToGroupCss(this.computedStyle || {});
     } else {
         css = this.$wbUtil.convertToWidgetCss(this.computedStyle || {});
@@ -6643,15 +6934,17 @@ WbAbstractWidget.prototype.fire = function (type, params) {
         return;
     }
     var callbacks = this.callbacks[type];
+    var resultData = null;
     for(var i = 0; i < callbacks.length; i++){
         // TODO: maso, 2018: check if the event is stopped to propagate
         try {
-            callbacks[i](event);
+        	resultData = callbacks[i](event) || resultData;
         } catch (error) {
             // NOTE: remove on release
             console.log(error);
         }
     }
+    return resultData;
 };
 
 /**
@@ -7592,8 +7885,12 @@ angular.module('am-wb-core')
 			if (ngModelCtrl.$viewValue) {
 				cleanEvents();
 				widget = ngModelCtrl.$viewValue;
-				if (angular.isArray(widget) && widget.length > 0) {
-					widget = widget[0];
+				if (angular.isArray(widget)) {
+					if(widget.length > 0){
+						widget = widget[0];
+					}else {
+						widget = null;
+					}
 				}
 				loadEvents();
 			}
@@ -7605,6 +7902,9 @@ angular.module('am-wb-core')
 
 		function loadEvents() {
 			cleanEvents();
+			if(!widget){
+				return;
+			}
 			for (var i = 0; i < eventTypes.length; i++) {
 				var event = eventTypes[i];
 				event.code = widget.getModelProperty('event.' + event.key);
@@ -7613,6 +7913,9 @@ angular.module('am-wb-core')
 		}
 
 		function saveEvents() {
+			if(!widget){
+				return;
+			}
 			for (var i = 0; i < $scope.events.length; i++) {
 				var event = $scope.events[i];
 				if (event.code) {
@@ -10062,6 +10365,1307 @@ angular.module('am-wb-core')
 		}
 	};
 });
+
+
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanelCollapsed
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanelCollapsed` is used to contain content when the panel is collapsed
+ **/
+.directive('mdExpansionPanelCollapsed', function($animateCss, $timeout) {
+
+	function link(scope, element, attrs, expansionPanelCtrl) {
+		expansionPanelCtrl.registerCollapsed({
+			show: show,
+			hide: hide
+		});
+
+
+		element.on('click', function () {
+			expansionPanelCtrl.expand();
+		});
+
+
+		function hide(options) {
+			// set width to maintian demensions when element is set to postion: absolute
+			element.css('width', element[0].offsetWidth + 'px');
+			// set min height so the expansion panel does not shrink when collapsed element is set to position: absolute
+			expansionPanelCtrl.$element.css('min-height', element[0].offsetHeight + 'px');
+
+			var animationParams = {
+					addClass: 'md-absolute md-hide',
+					from: {opacity: 1},
+					to: {opacity: 0}
+			};
+			if (options.animation === false) { animationParams.duration = 0; }
+			$animateCss(element, animationParams)
+			.start()
+			.then(function () {
+				element.removeClass('md-hide');
+				element.css('display', 'none');
+			});
+		}
+
+
+		function show(options) {
+			element.css('display', '');
+			// set width to maintian demensions when element is set to postion: absolute
+			element.css('width', element[0].parentNode.offsetWidth + 'px');
+
+			var animationParams = {
+					addClass: 'md-show',
+					from: {opacity: 0},
+					to: {opacity: 1}
+			};
+			if (options.animation === false) { 
+				animationParams.duration = 0; 
+			
+			}
+			$animateCss(element, animationParams)
+			.start()
+			.then(function () {
+				// safari will animate the min-height if transition is not set to 0
+				expansionPanelCtrl.$element.css('transition', 'none');
+				element.removeClass('md-absolute md-show');
+
+				// remove width when element is no longer position: absolute
+				element.css('width', '');
+
+
+				// remove min height when element is no longer position: absolute
+				expansionPanelCtrl.$element.css('min-height', '');
+				// remove transition block on next digest
+				$timeout(function () {
+					expansionPanelCtrl.$element.css('transition', '');
+				}, 0);
+			});
+		}
+	}
+	
+	var directive = {
+			restrict: 'E',
+			require: '^^mdExpansionPanel',
+			link: link
+	};
+	return directive;
+});
+
+
+
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanel
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanel` is the main container for panels
+ *
+ * @param {string=} md-component-id - add an id if you want to acces the panel via the `$mdExpansionPanel` service
+ **/
+.directive('mdExpansionPanel', function() {
+
+	"use strict";
+	var ANIMATION_TIME = 180; //ms
+
+
+
+
+	function compile(tElement, tAttrs) {
+		var INVALID_PREFIX = 'Invalid HTML for md-expansion-panel: ';
+
+		tElement.attr('tabindex', tAttrs.tabindex || '0');
+
+		if (tElement[0].querySelector('md-expansion-panel-collapsed') === null) {
+			throw Error(INVALID_PREFIX + 'Expected a child element of `md-epxansion-panel-collapsed`');
+		}
+		if (tElement[0].querySelector('md-expansion-panel-expanded') === null) {
+			throw Error(INVALID_PREFIX + 'Expected a child element of `md-epxansion-panel-expanded`');
+		}
+
+		return function postLink(scope, element, attrs, ctrls) {
+			var epxansionPanelCtrl = ctrls[0];
+			var epxansionPanelGroupCtrl = ctrls[1];
+
+			epxansionPanelCtrl.epxansionPanelGroupCtrl = epxansionPanelGroupCtrl || undefined;
+			epxansionPanelCtrl.init();
+		};
+	}
+
+
+
+
+	function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q, $animate, $parse) {
+		/* jshint validthis: true */
+		var vm = this;
+
+		var collapsedCtrl;
+		var expandedCtrl;
+		var headerCtrl;
+		var footerCtrl;
+		var deregister;
+		var scrollContainer;
+		var topKiller;
+		var resizeKiller;
+		var onRemoveCallback;
+		var transformParent;
+		var backdrop;
+		var inited = false;
+		var registerOnInit = false;
+		var _isOpen = false;
+		var isDisabled = false;
+		var debouncedUpdateScroll = $$rAF.throttle(updateScroll);
+		var debouncedUpdateResize = $$rAF.throttle(updateResize);
+
+		vm.registerCollapsed = function (ctrl) {
+			collapsedCtrl = ctrl;
+		};
+		vm.registerExpanded = function (ctrl) {
+			expandedCtrl = ctrl;
+		};
+		vm.registerHeader = function (ctrl) {
+			headerCtrl = ctrl;
+		};
+		vm.registerFooter = function (ctrl) {
+			footerCtrl = ctrl;
+		};
+
+
+
+		if ($attrs.mdComponentId === undefined) {
+			$attrs.$set('mdComponentId', '_expansion_panel_id_' + $mdUtil.nextUid());
+			registerPanel();
+		} else {
+			$attrs.$observe('mdComponentId', function () {
+				registerPanel();
+			});
+		}
+
+		vm.$element = $element;
+		vm.expand = expand;
+		vm.collapse = collapse;
+		vm.remove = remove;
+		vm.destroy = destroy;
+		vm.onRemove = onRemove;
+		vm.init = init;
+
+		if ($attrs.ngDisabled !== undefined) {
+			$scope.$watch($attrs.ngDisabled, function (value) {
+				isDisabled = value;
+				$element.attr('tabindex', isDisabled ? -1 : 0);
+			});
+		} else if ($attrs.disabled !== undefined) {
+			isDisabled = ($attrs.disabled !== undefined && $attrs.disabled !== 'false' && $attrs.disabled !== false);
+			$element.attr('tabindex', isDisabled ? -1 : 0);
+		}
+
+		$element
+		.on('focus', function (ev) {
+			$element.on('keydown', handleKeypress);
+		})
+		.on('blur', function (ev) {
+			$element.off('keydown', handleKeypress);
+		});
+
+		$element.addClass('md-whiteframe-1dp');
+
+		function handleKeypress(ev) {
+			var keyCodes = $mdConstant.KEY_CODE;
+			switch (ev.keyCode) {
+			case keyCodes.ENTER:
+				expand();
+				break;
+			case keyCodes.ESCAPE:
+				collapse();
+				break;
+			}
+		}
+
+
+		$scope.$panel = {
+				collapse: collapse,
+				expand: expand,
+				remove: remove,
+				isOpen: isOpen
+		};
+
+		$scope.$on('$destroy', function () {
+			removeClickCatcher();
+
+			// remove component from registry
+			if (typeof deregister === 'function') {
+				deregister();
+				deregister = undefined;
+			}
+			killEvents();
+		});
+
+
+
+
+
+		function init() {
+			inited = true;
+			if (registerOnInit === true) {
+				registerPanel();
+			}
+		}
+
+
+		function registerPanel() {
+			if (inited === false) {
+				registerOnInit = true;
+				return;
+			}
+
+			// deregister if component was already registered
+			if (typeof deregister === 'function') {
+				deregister();
+				deregister = undefined;
+			}
+			// remove component from group ctrl if component was already added
+			if (vm.componentId && vm.epxansionPanelGroupCtrl) {
+				vm.epxansionPanelGroupCtrl.removePanel(vm.componentId);
+			}
+
+			// if componentId was removed then set one
+			if ($attrs.mdComponentId === undefined) {
+				$attrs.$set('mdComponentId', '_expansion_panel_id_' + $mdUtil.nextUid());
+			}
+
+			vm.componentId = $attrs.mdComponentId;
+			deregister = $mdComponentRegistry.register({
+				expand: expand,
+				collapse: collapse,
+				remove: remove,
+				onRemove: onRemove,
+				isOpen: isOpen,
+				addClickCatcher: addClickCatcher,
+				removeClickCatcher: removeClickCatcher,
+				componentId: $attrs.mdComponentId
+			}, $attrs.mdComponentId);
+
+			if (vm.epxansionPanelGroupCtrl) {
+				vm.epxansionPanelGroupCtrl.addPanel(vm.componentId, {
+					expand: expand,
+					collapse: collapse,
+					remove: remove,
+					onRemove: onRemove,
+					destroy: destroy,
+					isOpen: isOpen
+				});
+			}
+		}
+
+
+		function isOpen() {
+			return _isOpen;
+		}
+
+		function expand(options) {
+			if (_isOpen === true || isDisabled === true) {
+				return;
+			}
+			_isOpen = true;
+			options = options || {};
+
+			var deferred = $q.defer();
+
+			if (vm.epxansionPanelGroupCtrl) {
+				vm.epxansionPanelGroupCtrl.expandPanel(vm.componentId);
+			}
+
+			$element.removeClass('md-close');
+			$element.addClass('md-open');
+			if (options.animation === false) {
+				$element.addClass('md-no-animation');
+			} else {
+				$element.removeClass('md-no-animation');
+			}
+
+			initEvents();
+			collapsedCtrl.hide(options);
+			expandedCtrl.show(options);
+
+			if (headerCtrl) {
+				headerCtrl.show(options);
+			}
+			if (footerCtrl) {
+				footerCtrl.show(options);
+			}
+
+			$timeout(function () {
+				deferred.resolve();
+			}, options.animation === false ? 0 : ANIMATION_TIME);
+			return deferred.promise;
+		}
+
+
+		function collapse(options) {
+			if (_isOpen === false) {
+				return;
+			}
+			_isOpen = false;
+			options = options || {};
+
+			var deferred = $q.defer();
+
+			$element.addClass('md-close');
+			$element.removeClass('md-open');
+			if (options.animation === false) {
+				$element.addClass('md-no-animation');
+			} else {
+				$element.removeClass('md-no-animation');
+			}
+
+			killEvents();
+			collapsedCtrl.show(options);
+			expandedCtrl.hide(options);
+
+			if (headerCtrl) {
+				headerCtrl.hide(options);
+			}
+			if (footerCtrl) {
+				footerCtrl.hide(options);
+			}
+
+			$timeout(function () {
+				deferred.resolve();
+			}, options.animation === false ? 0 : ANIMATION_TIME);
+			return deferred.promise;
+		}
+
+
+		function remove(options) {
+			options = options || {};
+			var deferred = $q.defer();
+
+			if (vm.epxansionPanelGroupCtrl) {
+				vm.epxansionPanelGroupCtrl.removePanel(vm.componentId);
+			}
+
+			if (typeof deregister === 'function') {
+				deregister();
+				deregister = undefined;
+			}
+
+			if (options.animation === false || _isOpen === false) {
+				$scope.$destroy();
+				$element.remove();
+				deferred.resolve();
+				callbackRemove();
+			} else {
+				collapse();
+				$timeout(function () {
+					$scope.$destroy();
+					$element.remove();
+					deferred.resolve();
+					callbackRemove();
+				}, ANIMATION_TIME);
+			}
+
+			return deferred.promise;
+		}
+
+		function onRemove(callback) {
+			onRemoveCallback = callback;
+		}
+
+		function callbackRemove() {
+			if (typeof onRemoveCallback === 'function') {
+				onRemoveCallback();
+				onRemoveCallback = undefined;
+			}
+		}
+
+		function destroy() {
+			$scope.$destroy();
+		}
+
+
+
+		function initEvents() {
+			if ((!footerCtrl || footerCtrl.noSticky === true) && (!headerCtrl || headerCtrl.noSticky === true)) {
+				return;
+			}
+
+			// watch for panel position changes
+			topKiller = $scope.$watch(function () {
+				return $element[0].offsetTop;
+			}, debouncedUpdateScroll, true);
+
+			// watch for panel position changes
+			resizeKiller = $scope.$watch(function () {
+				return $element[0].offsetWidth;
+			}, debouncedUpdateResize, true);
+
+			// listen to md-content scroll events id we are nested in one
+			scrollContainer = $mdUtil.getNearestContentElement($element);
+			if (scrollContainer.nodeName === 'MD-CONTENT') {
+				transformParent = getTransformParent(scrollContainer);
+				angular.element(scrollContainer).on('scroll', debouncedUpdateScroll);
+			} else {
+				transformParent = undefined;
+			}
+
+			// listen to expanded content scroll if height is set
+			if (expandedCtrl.setHeight === true) {
+				expandedCtrl.$element.on('scroll', debouncedUpdateScroll);
+			}
+
+			// listen to window scroll events
+			angular.element($window)
+			.on('scroll', debouncedUpdateScroll)
+			.on('resize', debouncedUpdateScroll)
+			.on('resize', debouncedUpdateResize);
+		}
+
+
+		function killEvents() {
+			if (typeof topKiller === 'function') {
+				topKiller();
+				topKiller = undefined;
+			}
+
+			if (typeof resizeKiller === 'function') {
+				resizeKiller();
+				resizeKiller = undefined;
+			}
+
+			if (scrollContainer && scrollContainer.nodeName === 'MD-CONTENT') {
+				angular.element(scrollContainer).off('scroll', debouncedUpdateScroll);
+			}
+
+			if (expandedCtrl.setHeight === true) {
+				expandedCtrl.$element.off('scroll', debouncedUpdateScroll);
+			}
+
+			angular.element($window)
+			.off('scroll', debouncedUpdateScroll)
+			.off('resize', debouncedUpdateScroll)
+			.off('resize', debouncedUpdateResize);
+		}
+
+
+
+		function getTransformParent(el) {
+			var parent = el.parentNode;
+
+			while (parent && parent !== document) {
+				if (hasComputedStyle(parent, 'transform')) {
+					return parent;
+				}
+				parent = parent.parentNode;
+			}
+
+			return undefined;
+		}
+
+		function hasComputedStyle(target, key) {
+			var hasValue = false;
+
+			if (target) {
+				var computedStyles = $window.getComputedStyle(target);
+				hasValue = computedStyles[key] !== undefined && computedStyles[key] !== 'none';
+			}
+
+			return hasValue;
+		}
+
+
+		function updateScroll(e) {
+			var top;
+			var bottom;
+			var bounds;
+			if (expandedCtrl.setHeight === true) {
+				bounds = expandedCtrl.$element[0].getBoundingClientRect();
+			} else {
+				bounds = scrollContainer.getBoundingClientRect();
+			}
+			var transformTop = transformParent ? transformParent.getBoundingClientRect().top : 0;
+
+			// we never want the header going post the top of the page. to prevent this don't allow top to go below 0
+			top = Math.max(bounds.top, 0);
+			bottom = top + bounds.height;
+
+			if (footerCtrl && footerCtrl.noSticky === false) {
+				footerCtrl.onScroll(top, bottom, transformTop);
+			}
+			if (headerCtrl && headerCtrl.noSticky === false) {
+				headerCtrl.onScroll(top, bottom, transformTop);
+			}
+		}
+
+
+		function updateResize() {
+			var value = $element[0].offsetWidth;
+			if (footerCtrl && footerCtrl.noSticky === false) {
+				footerCtrl.onResize(value);
+			}
+			if (headerCtrl && headerCtrl.noSticky === false) {
+				headerCtrl.onResize(value);
+			}
+		}
+
+
+
+
+		function addClickCatcher(clickCallback) {
+			backdrop = $mdUtil.createBackdrop($scope);
+			backdrop[0].tabIndex = -1;
+
+			if (typeof clickCallback === 'function') {
+				backdrop.on('click', clickCallback);
+			}
+
+			$animate.enter(backdrop, $element.parent(), null, {duration: 0});
+			$element.css('z-index', 60);
+		}
+
+		function removeClickCatcher() {
+			if (backdrop) {
+				backdrop.remove();
+				backdrop.off('click');
+				backdrop = undefined;
+				$element.css('z-index', '');
+			}
+		}
+	}
+	
+	
+
+    return {
+        restrict: 'E',
+        require: ['mdExpansionPanel', '?^^mdExpansionPanelGroup'],
+        scope: true,
+        compile: compile,
+        controller: ['$scope', '$element', '$attrs', '$window', '$$rAF', '$mdConstant', '$mdUtil', '$mdComponentRegistry', '$timeout', '$q', '$animate', '$parse', controller]
+    };
+});
+
+
+
+
+
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanelExpanded
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanelExpanded` is used to contain content when the panel is expanded
+ *
+ * @param {number=} height - add this aatribute set the max height of the expanded content. The container will be set to scroll
+ **/
+.directive('mdExpansionPanelExpanded', function ($animateCss, $timeout) {
+	var directive = {
+			restrict: 'E',
+			require: '^^mdExpansionPanel',
+			link: link
+	};
+	return directive;
+
+
+	function link(scope, element, attrs, expansionPanelCtrl) {
+		var setHeight = attrs.height || undefined;
+		if (setHeight !== undefined) { setHeight = setHeight.replace('px', '') + 'px'; }
+
+		expansionPanelCtrl.registerExpanded({
+			show: show,
+			hide: hide,
+			setHeight: setHeight !== undefined,
+			$element: element
+		});
+
+
+
+
+		function hide(options) {
+			var height = setHeight ? setHeight : element[0].scrollHeight + 'px';
+			element.addClass('md-hide md-overflow');
+			element.removeClass('md-show md-scroll-y');
+
+			var animationParams = {
+					from: {'max-height': height, opacity: 1},
+					to: {'max-height': '48px', opacity: 0}
+			};
+			if (options.animation === false) { animationParams.duration = 0; }
+			$animateCss(element, animationParams)
+			.start()
+			.then(function () {
+				element.css('display', 'none');
+				element.removeClass('md-hide');
+			});
+		}
+
+
+		function show(options) {
+			element.css('display', '');
+			element.addClass('md-show md-overflow');
+			// use passed in height or the contents height
+			var height = setHeight ? setHeight : element[0].scrollHeight + 'px';
+
+			var animationParams = {
+					from: {'max-height': '48px', opacity: 0},
+					to: {'max-height': height, opacity: 1}
+			};
+			if (options.animation === false) { animationParams.duration = 0; }
+			$animateCss(element, animationParams)
+			.start()
+			.then(function () {
+
+				// if height was passed in then set div to scroll
+				if (setHeight !== undefined) {
+					element.addClass('md-scroll-y');
+				} else {
+					// safari will animate the max-height if transition is not set to 0
+					element.css('transition', 'none');
+					element.css('max-height', 'none');
+					// remove transition block on next digest
+					$timeout(function () {
+						element.css('transition', '');
+					}, 0);
+				}
+
+				element.removeClass('md-overflow');
+			});
+		}
+	}
+});
+
+
+
+
+
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanelFooter
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanelFooter` is nested inside of `mdExpansionPanelExpanded` and contains content you want at the bottom.
+ * By default the Footer will stick to the bottom of the page if the panel expands past
+ * this is optional
+ *
+ * @param {boolean=} md-no-sticky - add this aatribute to disable sticky
+ **/
+.directive('mdExpansionPanelFooter', function() {
+	var directive = {
+			restrict: 'E',
+			transclude: true,
+			template: '<div class="md-expansion-panel-footer-container" ng-transclude></div>',
+			require: '^^mdExpansionPanel',
+			link: link
+	};
+	return directive;
+
+
+
+	function link(scope, element, attrs, expansionPanelCtrl) {
+		var isStuck = false;
+		var noSticky = attrs.mdNoSticky !== undefined;
+		var container = angular.element(element[0].querySelector('.md-expansion-panel-footer-container'));
+
+		expansionPanelCtrl.registerFooter({
+			show: show,
+			hide: hide,
+			onScroll: onScroll,
+			onResize: onResize,
+			noSticky: noSticky
+		});
+
+
+
+		function show() {
+
+		}
+		function hide() {
+			unstick();
+		}
+
+		function onScroll(top, bottom, transformTop) {
+			var height;
+			var footerBounds = element[0].getBoundingClientRect();
+			var offset;
+
+			if (footerBounds.bottom > bottom) {
+				height = container[0].offsetHeight;
+				offset = bottom - height - transformTop;
+				if (offset < element[0].parentNode.getBoundingClientRect().top) {
+					offset = element[0].parentNode.getBoundingClientRect().top;
+				}
+
+				// set container width because element becomes postion fixed
+				container.css('width', expansionPanelCtrl.$element[0].offsetWidth + 'px');
+
+				// set element height so it does not loose its height when container is position fixed
+				element.css('height', height + 'px');
+				container.css('top', offset + 'px');
+
+				element.addClass('md-stick');
+				isStuck = true;
+			} else if (isStuck === true) {
+				unstick();
+			}
+		}
+
+		function onResize(width) {
+			if (isStuck === false) { return; }
+			container.css('width', width + 'px');
+		}
+
+
+		function unstick() {
+			isStuck = false;
+			container.css('width', '');
+			container.css('top', '');
+			element.css('height', '');
+			element.removeClass('md-stick');
+		}
+	}
+});
+
+
+
+
+
+
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanelGroup
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanelGroup` is a container used to manage multiple expansion panels
+ *
+ * @param {string=} md-component-id - add an id if you want to acces the panel via the `$mdExpansionPanelGroup` service
+ * @param {string=} auto-expand - panels expand when added to `<md-expansion-panel-group>`
+ * @param {string=} multiple - allows for more than one panel to be expanded at a time
+ **/
+.directive('mdExpansionPanelGroup', function() {
+
+
+	function controller($scope, $attrs, $element, $mdComponentRegistry) {
+		/* jshint validthis: true */
+		var vm = this;
+
+		var deregister;
+		var registered = {};
+		var panels = {};
+		var onChangeFuncs = [];
+		var multipleExpand = $attrs.mdMultiple !== undefined || $attrs.multiple !== undefined;
+		var autoExpand = $attrs.mdAutoExpand !== undefined || $attrs.autoExpand !== undefined;
+
+
+		deregister = $mdComponentRegistry.register({
+			$element: $element,
+			register: register,
+			getRegistered: getRegistered,
+			getAll: getAll,
+			getOpen: getOpen,
+			remove: remove,
+			removeAll: removeAll,
+			collapseAll: collapseAll,
+			onChange: onChange,
+			count: panelCount
+		}, $attrs.mdComponentId);
+
+		vm.addPanel = addPanel;
+		vm.expandPanel = expandPanel;
+		vm.removePanel = removePanel;
+
+
+		$scope.$on('$destroy', function () {
+			if (typeof deregister === 'function') {
+				deregister();
+				deregister = undefined;
+			}
+
+			// destroy all panels
+			// for some reason the child panels scopes are not getting destroyed
+			Object.keys(panels).forEach(function (key) {
+				panels[key].destroy();
+			});
+		});
+
+
+
+		function onChange(callback) {
+			onChangeFuncs.push(callback);
+
+			return function () {
+				onChangeFuncs.splice(onChangeFuncs.indexOf(callback), 1);
+			};
+		}
+
+		function callOnChange() {
+			var count = panelCount();
+			onChangeFuncs.forEach(function (func) {
+				func(count);
+			});
+		}
+
+
+		function addPanel(componentId, panelCtrl) {
+			panels[componentId] = panelCtrl;
+			if (autoExpand === true) {
+				panelCtrl.expand();
+				closeOthers(componentId);
+			}
+			callOnChange();
+		}
+
+		function expandPanel(componentId) {
+			closeOthers(componentId);
+		}
+
+		function remove(componentId, options) {
+			return panels[componentId].remove(options);
+		}
+
+		function removeAll(options) {
+			Object.keys(panels).forEach(function (panelId) {
+				panels[panelId].remove(options);
+			});
+		}
+
+		function removePanel(componentId) {
+			delete panels[componentId];
+			callOnChange();
+		}
+
+		function panelCount() {
+			return Object.keys(panels).length;
+		}
+
+		function closeOthers(id) {
+			if (multipleExpand === false) {
+				Object.keys(panels).forEach(function (panelId) {
+					if (panelId !== id) { panels[panelId].collapse(); }
+				});
+			}
+		}
+
+
+		function register(name, options) {
+			if (registered[name] !== undefined) {
+				throw Error('$mdExpansionPanelGroup.register() The name "' + name + '" has already been registered');
+			}
+			registered[name] = options;
+		}
+
+
+		function getRegistered(name) {
+			if (registered[name] === undefined) {
+				throw Error('$mdExpansionPanelGroup.addPanel() Cannot find Panel with name of "' + name + '"');
+			}
+			return registered[name];
+		}
+
+
+		function getAll() {
+			return Object.keys(panels).map(function (panelId) {
+				return panels[panelId];
+			});
+		}
+
+		function getOpen() {
+			return Object.keys(panels).map(function (panelId) {
+				return panels[panelId];
+			}).filter(function (instance) {
+				return instance.isOpen();
+			});
+		}
+
+		function collapseAll(noAnimation) {
+			var animation = noAnimation === true ? false : true;
+			Object.keys(panels).forEach(function (panelId) {
+				panels[panelId].collapse({animation: animation});
+			});
+		}
+	}
+	
+
+	return {
+			restrict: 'E',
+			controller: ['$scope', '$attrs', '$element', '$mdComponentRegistry', controller]
+	};
+});
+
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc service
+ * @name $mdExpansionPanelGroup
+ * @module material.components.expansionPanels
+ *
+ * @description
+ * Expand and collapse Expansion Panel using its `md-component-id`
+ *
+ * @example
+ * $mdExpansionPanelGroup('comonentId').then(function (instance) {
+ *  instance.register({
+ *    componentId: 'cardComponentId',
+ *    templateUrl: 'template.html',
+ *    controller: 'Controller'
+ *  });
+ *  instance.add('cardComponentId', {local: localData});
+ *  instance.remove('cardComponentId', {animation: false});
+ *  instance.removeAll({animation: false});
+ * });
+ */
+.factory('$mdExpansionPanelGroup', function ($mdComponentRegistry, $mdUtil, $mdExpansionPanel, $templateRequest, $rootScope, $compile, $controller, $q, $log) {
+	var errorMsg = "ExpansionPanelGroup '{0}' is not available! Did you use md-component-id='{0}'?";
+	var service = {
+			find: findInstance,
+			waitFor: waitForInstance
+	};
+
+	return function (handle) {
+		if (handle === undefined) { return service; }
+		return findInstance(handle);
+	};
+
+
+
+	function findInstance(handle) {
+		var instance = $mdComponentRegistry.get(handle);
+
+		if (!instance) {
+			// Report missing instance
+			$log.error( $mdUtil.supplant(errorMsg, [handle || ""]) );
+			return undefined;
+		}
+
+		return createGroupInstance(instance);
+	}
+
+	function waitForInstance(handle) {
+		var deffered = $q.defer();
+
+		$mdComponentRegistry.when(handle).then(function (instance) {
+			deffered.resolve(createGroupInstance(instance));
+		}).catch(function (error) {
+			deffered.reject();
+			$log.error(error);
+		});
+
+		return deffered.promise;
+	}
+
+
+
+
+
+	// --- returned service for group instance ---
+
+	function createGroupInstance(instance) {
+		var service = {
+				add: add,
+				register: register,
+				getAll: getAll,
+				getOpen: getOpen,
+				remove: remove,
+				removeAll: removeAll,
+				collapseAll: collapseAll,
+				onChange: onChange,
+				count: count
+		};
+
+		return service;
+
+
+		function register(name, options) {
+			if (typeof name !== 'string') {
+				throw Error('$mdExpansionPanelGroup.register() Expects name to be a string');
+			}
+
+			validateOptions(options);
+			instance.register(name, options);
+		}
+
+		function remove(componentId, options) {
+			return instance.remove(componentId, options);
+		}
+
+		function removeAll(options) {
+			instance.removeAll(options);
+		}
+
+		function onChange(callback) {
+			return instance.onChange(callback);
+		}
+
+		function count() {
+			return instance.count();
+		}
+
+		function getAll() {
+			return instance.getAll();
+		}
+
+		function getOpen() {
+			return instance.getOpen();
+		}
+
+		function collapseAll(noAnimation) {
+			instance.collapseAll(noAnimation);
+		}
+
+
+		function add(options, locals) {
+			locals = locals || {};
+			// assume if options is a string then they are calling a registered card by its component id
+			if (typeof options === 'string') {
+				// call add panel with the stored options
+				return add(instance.getRegistered(options), locals);
+			}
+
+			validateOptions(options);
+			if (options.componentId && instance.isPanelActive(options.componentId)) {
+				return $q.reject('panel with componentId "' + options.componentId + '" is currently active');
+			}
+
+
+			var deffered = $q.defer();
+			var scope = $rootScope.$new();
+			angular.extend(scope, options.scope);
+
+			getTemplate(options, function (template) {
+				var element = angular.element(template);
+				var componentId = options.componentId || element.attr('md-component-id') || '_panelComponentId_' + $mdUtil.nextUid();
+				var panelPromise = $mdExpansionPanel().waitFor(componentId);
+				element.attr('md-component-id', componentId);
+
+				var linkFunc = $compile(element);
+				if (options.controller) {
+					angular.extend(locals, options.locals || {});
+					locals.$scope = scope;
+					locals.$panel = panelPromise;
+					var invokeCtrl = $controller(options.controller, locals, true);
+					var ctrl = invokeCtrl();
+					element.data('$ngControllerController', ctrl);
+					element.children().data('$ngControllerController', ctrl);
+					if (options.controllerAs) {
+						scope[options.controllerAs] = ctrl;
+					}
+				}
+
+				// link after the element is added so we can find card manager directive
+				instance.$element.append(element);
+				linkFunc(scope);
+
+				panelPromise.then(function (instance) {
+					deffered.resolve(instance);
+				});
+			});
+
+			return deffered.promise;
+		}
+
+
+		function validateOptions(options) {
+			if (typeof options !== 'object' || options === null) {
+				throw Error('$mdExapnsionPanelGroup.add()/.register() : Requires an options object to be passed in');
+			}
+
+			// if none of these exist then a dialog box cannot be created
+			if (!options.template && !options.templateUrl) {
+				throw Error('$mdExapnsionPanelGroup.add()/.register() : Is missing required paramters to create. Required One of the following: template, templateUrl');
+			}
+		}
+
+
+
+		function getTemplate(options, callback) {
+			var template;
+
+			if (options.templateUrl !== undefined) {
+				$templateRequest(options.templateUrl)
+				.then(function(response) {
+					callback(response);
+				});
+			} else {
+				callback(options.template);
+			}
+		}
+	}
+});
+
+
+
+
+
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc directive
+ * @name mdExpansionPanelHeader
+ * @module material.components.expansionPanels
+ *
+ * @restrict E
+ *
+ * @description
+ * `mdExpansionPanelHeader` is nested inside of `mdExpansionPanelExpanded` and contains content you want in place of the collapsed content
+ * this is optional
+ *
+ * @param {boolean=} md-no-sticky - add this aatribute to disable sticky
+ **/
+.directive('mdExpansionPanelHeader', function () {
+	var directive = {
+			restrict: 'E',
+			transclude: true,
+			template: '<div class="md-expansion-panel-header-container" ng-transclude></div>',
+			require: '^^mdExpansionPanel',
+			link: link
+	};
+	return directive;
+
+
+
+	function link(scope, element, attrs, expansionPanelCtrl) {
+		var isStuck = false;
+		var noSticky = attrs.mdNoSticky !== undefined;
+		var container = angular.element(element[0].querySelector('.md-expansion-panel-header-container'));
+
+		expansionPanelCtrl.registerHeader({
+			show: show,
+			hide: hide,
+			noSticky: noSticky,
+			onScroll: onScroll,
+			onResize: onResize
+		});
+
+
+		function show() {
+
+		}
+		function hide() {
+			unstick();
+		}
+
+
+		function onScroll(top, bottom, transformTop) {
+			var offset;
+			var panelbottom;
+			var bounds = element[0].getBoundingClientRect();
+
+
+			if (bounds.top < top) {
+				offset = top - transformTop;
+				panelbottom = element[0].parentNode.getBoundingClientRect().bottom - top - bounds.height;
+				if (panelbottom < 0) {
+					offset += panelbottom;
+				}
+
+				// set container width because element becomes postion fixed
+				container.css('width', element[0].offsetWidth + 'px');
+				container.css('top', offset + 'px');
+
+				// set element height so it does not shink when container is position fixed
+				element.css('height', container[0].offsetHeight + 'px');
+
+				element.removeClass('md-no-stick');
+				element.addClass('md-stick');
+				isStuck = true;
+			} else if (isStuck === true) {
+				unstick();
+			}
+		}
+
+		function onResize(width) {
+			if (isStuck === false) { return; }
+			container.css('width', width + 'px');
+		}
+
+
+		function unstick() {
+			isStuck = false;
+			container.css('width', '');
+			element.css('height', '');
+			element.css('top', '');
+			element.removeClass('md-stick');
+			element.addClass('md-no-stick');
+		}
+	}
+});
+
+
+
+
+
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc service
+ * @name $mdExpansionPanel
+ * @module material.components.expansionPanels
+ *
+ * @description
+ * Expand and collapse Expansion Panel using its `md-component-id`
+ *
+ * @example
+ * $mdExpansionPanel('comonentId').then(function (instance) {
+ *  instance.exapand();
+ *  instance.collapse({animation: false});
+ *  instance.remove({animation: false});
+ *  instance.onRemove(function () {});
+ * });
+ */
+.factory('$mdExpansionPanel', function ($mdComponentRegistry, $mdUtil, $log) {
+	var errorMsg = "ExpansionPanel '{0}' is not available! Did you use md-component-id='{0}'?";
+	var service = {
+			find: findInstance,
+			waitFor: waitForInstance
+	};
+
+	return function (handle) {
+		if (handle === undefined) { return service; }
+		return findInstance(handle);
+	};
+
+
+
+	function findInstance(handle) {
+		var instance = $mdComponentRegistry.get(handle);
+
+		if (!instance) {
+			// Report missing instance
+			$log.error( $mdUtil.supplant(errorMsg, [handle || ""]) );
+			return undefined;
+		}
+
+		return instance;
+	}
+
+	function waitForInstance(handle) {
+		return $mdComponentRegistry.when(handle).catch($log.error);
+	}
+});
+
+
 /* 
  * The MIT License (MIT)
  * 
@@ -14883,56 +16487,56 @@ angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
 	function loadWidgetEventsHandlers(widget){
 		widget.__eventListeners = {
 				click: function ($event) {
-					evalWidgetEvent(widget, 'click', $event);
+					return evalWidgetEvent(widget, 'click', $event);
 				},
 				dblclick: function ($event) {
-					evalWidgetEvent(widget, 'dblclick', $event);
+					return evalWidgetEvent(widget, 'dblclick', $event);
 				},
 				mouseout: function ($event) {
-					evalWidgetEvent(widget, 'mouseout', $event);
+					return evalWidgetEvent(widget, 'mouseout', $event);
 				},
 				mouseover: function ($event) {
-					evalWidgetEvent(widget, 'mouseover', $event);
+					return evalWidgetEvent(widget, 'mouseover', $event);
 				},
 				mousedown: function ($event) {
-					evalWidgetEvent(widget, 'mousedown', $event);
+					return evalWidgetEvent(widget, 'mousedown', $event);
 				},
 				mouseup: function ($event) {
-					evalWidgetEvent(widget, 'mouseup', $event);
+					return evalWidgetEvent(widget, 'mouseup', $event);
 				},
 				mouseenter: function ($event) {
-					evalWidgetEvent(widget, 'mouseenter', $event);
+					return evalWidgetEvent(widget, 'mouseenter', $event);
 				},
 				mouseleave: function ($event) {
-					evalWidgetEvent(widget, 'mouseleave', $event);
+					return evalWidgetEvent(widget, 'mouseleave', $event);
 				},
 				resize: function ($event) {
-					evalWidgetEvent(widget, 'resize', $event);
+					return evalWidgetEvent(widget, 'resize', $event);
 				},
 				intersection: function ($event) {
-					evalWidgetEvent(widget, 'intersection', $event);
+					return evalWidgetEvent(widget, 'intersection', $event);
 				},
 				
 				//
 				// Common media events
 				//
 				success: function ($event) {
-				    evalWidgetEvent(widget, 'success', $event);
+					return evalWidgetEvent(widget, 'success', $event);
 				},
 				error: function ($event) {
-				    evalWidgetEvent(widget, 'error', $event);
+					return evalWidgetEvent(widget, 'error', $event);
 				},
 				abort: function ($event) {
-				    evalWidgetEvent(widget, 'abort', $event);
+					return evalWidgetEvent(widget, 'abort', $event);
 				},
 				load: function ($event) {
-				    evalWidgetEvent(widget, 'load', $event);
+					return evalWidgetEvent(widget, 'load', $event);
 				},
 				beforeunload: function ($event) {
-				    evalWidgetEvent(widget, 'beforeunload', $event);
+					return evalWidgetEvent(widget, 'beforeunload', $event);
 				},
 				unload: function ($event) {
-				    evalWidgetEvent(widget, 'unload', $event);
+				    return evalWidgetEvent(widget, 'unload', $event);
 				},
 				
 				
@@ -15560,7 +17164,7 @@ angular.module('am-wb-core')
         type: 'link',
         title: 'Link',
         label: 'link',
-        icon: 'link',
+        icon: 'wb-widget-link',
         description: 'A widget to insert an link to page.',
         groups: ['basic'],
         setting: ['link'],
@@ -15574,6 +17178,161 @@ angular.module('am-wb-core')
         controller: 'MbWidgetLinkCtrl', 
     });
     
+    /**
+	 * @ngdoc Widgets
+	 * @name img
+	 * @description Image widget
+	 * 
+	 * Display an image with meta tag for SEO. Here is minimal list of attributes:
+     */
+    $widget.newWidget({
+    	type: 'img',
+    	title: 'Image',
+    	label: 'image',
+    	icon: 'wb-widget-img',
+    	description: 'A widget to insert an link to page.',
+    	groups: ['basic'],
+    	setting: ['link'],
+    	template: '<img></img>',
+    	help: 'http://dpq.co.ir/more-information-img',
+    	model: {
+    		html: 'img',
+    		src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+    	},
+    	controllerAs: 'ctrl',
+    	controller: 'MbWidgetImgCtrl', 
+    });
+//	$widget.newWidget({
+//	type: 'Image',
+//	title: 'Image',
+//	label: 'image',
+//	icon: 'photo',
+//	description: 'A widget to insert an image to page.',
+//	setting: ['amh-common-image'],
+//	templateUrl: 'views/am-wb-common-widgets/image.html',
+//	help: 'http://gitlab.com/am-wb/am-wb-common',
+//	model: {
+//		style: {
+//			size: {
+//				width: 'auto',
+//				height: 'auto'
+//			},
+//			overflow: {
+//				x: 'hidden',
+//				y: 'hidden'
+//			}
+//		}
+//	},
+//	/*
+//	 * @ngInject
+//	 */
+//	controller: function ($scope) {
+//		var keys = ['fit', 'url', 'description', 'label', 'keywords'];
+//		this.setUrl = function (url) {
+//			this.url = url;
+//		};
+//		/**
+//		 * Loads all parameters from model
+//		 * 
+//		 * @memberof AmWbCommonVideoCtrl
+//		 */
+//		this.fillMedia = function () {
+//			for (var i = 0; i < keys.length; i++) {
+//				var key = keys[i];
+//				this[key] = this.getModelProperty(key);
+//			}
+//		};
+//		/**
+//		 * Initialize the widget
+//		 * 
+//		 * @memberof AmWbCommonVideoCtrl
+//		 */
+//		this.initWidget = function () {
+//			var ctrl = this;
+//
+//			// pass event to setting panel if video loaded successfully
+//			this.onLoad = function () {
+//				var event = {};
+//				event.source = ctrl;
+//				event.key = 'success';
+//				ctrl.fire('success', event);
+//			};
+//
+//			// pass event to setting panel if video doesn't load successfully
+//			this.onError = function () {
+//				var event = {};
+//				event.source = ctrl;
+//				event.key = 'failure';
+//				ctrl.fire('error', event);
+//			};
+//
+//			this.on('modelUpdated', function ($event) {
+//				if (keys.indexOf($event.key) > -1) {
+//					var key = $event.key;
+//					ctrl[key] = ctrl.getModelProperty(key);
+//				}
+//			});
+//			this.on('runtimeModelUpdated', function ($event) {
+//				if (keys.indexOf($event.key) > -1) {
+//					var key = $event.key;
+//					ctrl[key] = ctrl.getProperty(key);
+//				}
+//			});
+//			this.on('modelChanged', function () {
+//				ctrl.fillMedia();
+//			});
+//			this.fillMedia();
+//		};
+//	},
+//	controllerAs: 'ctrl'
+//});
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+//	$widget.newWidget({
+//		// widget
+//		type: 'CommonVideoPlayer',
+//		title: 'Video Player',
+//		description: 'A video player component.',
+//		groups: ['commons'],
+//		icon: 'wb-common-video',
+//		// help
+//		help: 'https://gitlab.com/weburger/am-wb-common/wikis/video-player',
+//		helpId: '',
+//		// page
+//		templateUrl: 'views/am-wb-common-widgets/video-player.html',
+//		controller: 'AmWbCommonVideoCtrl',
+//		controllerAs: 'ctrl',
+//		setting: ['common-video-player', 'SEO']
+//	});
+	// NOTE: audio is moved to core component
+//	$widget.newWidget({
+//		// widget
+//		type: 'CommonAudioPlayer',
+//		title: 'Audio Player',
+//		description: 'An audio player component.',
+//		groups: ['commons'],
+//		icon: 'wb-common-audio',
+//		// help
+//		help: 'https://gitlab.com/weburger/am-wb-common/wikis/audio-player',
+//		helpId: '',
+//		// page
+//		templateUrl: 'views/am-wb-common-widgets/audio-player.html',
+//		controller: 'AmWbCommonAudioCtrl',
+//		controllerAs: 'ctrl',
+//		setting: ['common-audio-player']
+//	});
     
 });
 
@@ -17535,7 +19294,7 @@ angular.module('am-wb-core')
 
 	function cleanStyle(model)
 	{
-		if (!model.style) {
+		if (!angular.isObject(model.style)) {
 			model.style = {};
 		}
 		cleanLayout(model);
@@ -17558,6 +19317,12 @@ angular.module('am-wb-core')
 			model.style.cursor = 'pointer';
 
 			delete model.title;
+			delete model.url;
+		}
+		if(model.type === 'Image'){
+			model.type = 'img';
+			model.src = model.url;
+			
 			delete model.url;
 		}
 	}
@@ -17775,7 +19540,7 @@ angular.module('am-wb-core')
 	 * @return the service
 	 */
 	function newWidget(widget) {
-		if (widget.type in contentElementAsso) {
+		if (hasWidget(widget.type)) {
 			// TODO: maso, 2017: Add log for duplication
 		}
 		// fix widget data
@@ -17787,6 +19552,12 @@ angular.module('am-wb-core')
 		elementKey.push(widget.type);
 		return service;
 	}
+
+
+	function hasWidget(type) {
+		return type in contentElementAsso;
+	}
+	this.hasWidget = hasWidget;
 
 	/**
 	 * Compile element 
@@ -18164,12 +19935,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-event-panel.html',
-    "<table class=mb-table style=\"font-size: 10px\"> <thead> <tr md-colors=\"{color: 'primary-700'}\"> <td translate=\"\">Name</td> <td translate=\"\">Code</td> <td></td> </tr> </thead> <tbody> <tr ng-click=\"ctrl.editEvent(event, $event)\" ng-repeat=\"event in events track by $index\" style=\"cursor: pointer\"> <td translate>{{event.title}}</td> <td style=\"cursor: pointer\">{{event.code| limitTo:13 }} ...</td> <td align=center style=\"cursor: pointer;min-height: 22px\"> <md-button style=\"min-height: 20px;height: 20px;margin: 0px;line-height: 20px;padding: 0px\" ng-if=event.code ng-click=\"ctrl.deleteEvent(event, $event)\" class=md-icon-button> <wb-icon>delete</wb-icon> </md-button> </td> </tr> </tbody> </table>"
+    "<table class=mb-table style=\"font-size: 10px\"> <thead> <tr md-colors=\"{color: 'primary-700'}\"> <td translate=\"\">Name</td> <td translate=\"\">Code</td> <td></td> </tr> </thead> <tbody> <tr ng-click=\"ctrl.editEvent(event, $event)\" ng-repeat=\"event in events track by $index\" style=\"cursor: pointer\"> <td translate>{{event.title}}</td> <td style=\"cursor: pointer\">{{event.code| limitTo:13 }} ...</td> <td align=center style=\"cursor: pointer;min-height: 22px\"> <md-button style=\"min-height: 20px;height: 20px;margin: 0px;line-height: 20px;padding: 0px\" ng-if=event.code ng-click=\"ctrl.deleteEvent(event, $event)\" class=md-icon-button> <wb-icon size=16px>delete</wb-icon> </md-button> </td> </tr> </tbody> </table>"
   );
 
 
   $templateCache.put('views/directives/wb-setting-panel-expansion.html',
-    "<div id=WB-SETTING-PANEL> <md-expansion-panel ng-repeat=\"setting in settings| orderBy:priority track by setting.type\" ng-show=setting.visible> <md-expansion-panel-collapsed> <div class=md-title>{{setting.label}}</div> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header ng-click=$panel.collapse()> <div class=md-title>{{setting.label}}</div> <div class=md-summary>{{setting.description}}</div> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </div>"
+    "<md-expansion-panel-group id=WB-SETTING-PANEL> <md-expansion-panel ng-repeat=\"setting in settings| orderBy:priority track by setting.type\" ng-show=setting.visible> <md-expansion-panel-collapsed> <div layout=row layout-align=\"start center\"> <wb-icon size=12px ng-if=setting.icon>{{setting.icon}}</wb-icon> <div class=md-title translate=\"\" flex>{{setting.label}}</div> <md-tooltip md-direction=left> <span translat=\"\">{{setting.description || setting.label}}</span> </md-tooltip> </div> </md-expansion-panel-collapsed> <md-expansion-panel-expanded> <md-expansion-panel-header ng-click=$panel.collapse()> <div layout=row layout-align=\"start center\"> <wb-icon size=12px ng-if=setting.icon>{{setting.icon}}</wb-icon> <div class=md-title translate=\"\" flex>{{setting.label}}</div> </div> </md-expansion-panel-header> <md-expansion-panel-content layout=column style=\"padding: 2px\"> <wb-setting-page ng-model=wbModel wb-type={{setting.type}}> </wb-setting-page> </md-expansion-panel-content> </md-expansion-panel-expanded> </md-expansion-panel> </md-expansion-panel-group>"
   );
 
 
@@ -18184,37 +19955,37 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-audio.html',
-    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=ctrl.editValue(value)> <wb-icon>wb-object-audio</wb-icon> </md-button> <md-input-container> <input ng-model=value ng-change=ctrl.updateValue(value)> </md-input-container> </md-list-item>"
+    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=ctrl.editValue(value)> <wb-icon>wb-object-audio</wb-icon> </md-button> <md-input-container> <input aria-label=\"field value\" ng-model=value ng-change=ctrl.updateValue(value)> </md-input-container> </md-list-item>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-attachment.html',
-    "<md-input-container> <label translate=\"\">Background attachment</label> <md-select ng-model=attachment ng-change=attachmentChanged(attachment)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label translate=\"\">Background attachment</label> <md-select aria-label=\"back ground attachment\" ng-model=attachment ng-change=attachmentChanged(attachment)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-origin.html',
-    "<md-input-container> <label translate=\"\">Background origin</label> <md-select ng-model=origin ng-change=originChanged(origin)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label translate=\"\">Background origin</label> <md-select aria-label=\"background origin\" ng-model=origin ng-change=originChanged(origin)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-position.html',
-    "<md-input-container> <label translate=\"\">Background position</label> <md-select ng-model=position ng-change=positionChanged(position)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.title}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label translate=\"\">Background position</label> <md-select aria-label=\"background option\" ng-model=position ng-change=positionChanged(position)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.title}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-repeat.html',
-    "<md-input-container> <label translate=\"\">Background repeat</label> <md-select ng-model=repeat ng-change=repeatChanged(repeat)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label translate=\"\">Background repeat</label> <md-select aria-label=\"background repeat\" ng-model=repeat ng-change=repeatChanged(repeat)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background-size.html',
-    "<md-input-container> <label translate=\"\">Background Size</label> <md-select ng-model=size ng-change=sizeChanged(size)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label translate=\"\">Background Size</label> <md-select aria-label=size ng-model=size ng-change=sizeChanged(size)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-background.html',
-    "<md-input-container> <label translate=\"\">Background Size</label> <md-select ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate=\"\">{{value.name}}</md-option> </md-select> </md-input-container>"
+    "<md-input-container> <label translate=\"\">Background Size</label> <md-select aria-label=\"background size\" ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate=\"\">{{value.name}}</md-option> </md-select> </md-input-container>"
   );
 
 
@@ -18229,37 +20000,37 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-data.html',
-    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>{{icon || 'wb-object-data'}}</wb-icon> </md-button> <md-input-container> <input ng-model=value.key> </md-input-container> </md-list-item>"
+    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>{{icon || 'wb-object-data'}}</wb-icon> </md-button> <md-input-container> <input aria-label=\"text value\" ng-model=value.key> </md-input-container> </md-list-item>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-dropdown-value.html',
-    " <md-list-item> <wb-icon ng-hide=\"icon===undefined || icon===null || icon===''\">{{icon}}</wb-icon> <p ng-hide=\"title===undefined || title===null || title===''\">{{title}}</p> <md-select style=\"margin: 0px\" ng-model=value> <md-option ng-repeat=\"item in items\" ng-value=item.value> {{item.title}} </md-option> </md-select> </md-list-item>"
+    " <md-list-item> <wb-icon ng-hide=\"icon===undefined || icon===null || icon===''\">{{icon}}</wb-icon> <p ng-hide=\"title===undefined || title===null || title===''\">{{title}}</p> <md-select aria-label=\"value list\" style=\"margin: 0px\" ng-model=value> <md-option ng-repeat=\"item in items\" ng-value=item.value> {{item.title}} </md-option> </md-select> </md-list-item>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-dropdown.html',
-    "<div layout=row> <wb-icon ng-show=icon>{{::icon}}</wb-icon> <p style=\"margin: 0px 4px\" ng-show=title>{{::title}}</p> <md-select style=\"margin: 0px\" ng-model=value ng-change=valueChanged(value) flex> <md-option ng-repeat=\"item in items track by $index\" value={{::item.value}}> <span translate>{{::item.title}}</span> </md-option> </md-select> </div>"
+    "<div layout=row> <wb-icon ng-show=icon>{{::icon}}</wb-icon> <p style=\"margin: 0px 4px\" ng-show=title>{{::title}}</p> <md-select aria-label=\"value list\" style=\"margin: 0px\" ng-model=value ng-change=valueChanged(value) flex> <md-option ng-repeat=\"item in items track by $index\" value={{::item.value}}> <span translate>{{::item.title}}</span> </md-option> </md-select> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-image.html',
-    "<div class=\"wb-ui-setting-image wb-ui-setting-image-container\" layout=row> <div class=wb-ui-setting-image-preview ng-click=ctrl.showImagePicker($event) ng-if=wbUiSettingPreview> <img ng-if=ctrl.value class=wb-ui-setting-image-result ng-src=\"{{ctrl.value}}\"> </div> <md-input-container class=md-icon-float flex> <label ng-if=title> <span translate=\"\">{{title}}</span> </label> <input type=input ng-model=ctrl.value ng-change=ctrl.setValue(ctrl.value) class=wb-ui-setting-image-input ng-mousedown=\"(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)\"> </md-input-container> <md-button class=\"md-icon-button wb-ui-setting-image-clear\" ng-if=\"wbUiSettingClearButton && ctrl.value\" ng-click=ctrl.clearValue($event) aria-label=\"Clear image\"> <md-icon md-svg-icon=clear.svg></md-icon> </md-button> </div>"
+    "<div class=\"wb-ui-setting-image wb-ui-setting-image-container\" layout=row> <div class=wb-ui-setting-image-preview ng-click=ctrl.showImagePicker($event) ng-if=wbUiSettingPreview> <img ng-if=ctrl.value class=wb-ui-setting-image-result ng-src=\"{{ctrl.value}}\"> </div> <md-input-container class=md-icon-float flex> <label ng-if=title> <span translate=\"\">{{title}}</span> </label> <input aria-label=file type=input ng-model=ctrl.value ng-change=ctrl.setValue(ctrl.value) class=wb-ui-setting-image-input ng-mousedown=\"(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)\"> </md-input-container> <md-button class=\"md-icon-button wb-ui-setting-image-clear\" ng-if=\"wbUiSettingClearButton && ctrl.value\" ng-click=ctrl.clearValue($event) aria-label=\"Clear image\"> <md-icon md-svg-icon=clear.svg></md-icon> </md-button> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-length.html',
-    " <div layout=row layout-align=\"end center\"> <wb-icon ng-if=icon>{{icon}}</wb-icon> <md-tooltip ng-if=description md-delay=1500> <span translate>{{::description}}</span> </md-tooltip> <span flex ng-if=title translate>{{::title}}</span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input type=number ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select style=max-width:75px ng-model=internalUnit ng-change=\"updateLength(internalUnit, internalValue)\"> <md-option ng-repeat=\"type in ::types track by $index\" value={{::type}}> <span translate>{{::type}}</span> </md-option> </md-select> </md-input-container> </div>             "
+    "<div layout=row layout-align=\"end center\"> <wb-icon ng-if=icon>{{icon}}</wb-icon> <md-tooltip ng-if=description md-delay=1500> <span translate>{{::description}}</span> </md-tooltip> <span flex ng-if=title translate>{{::title}}</span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input aria-label=value type=number ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select aria-label=types style=max-width:75px ng-model=internalUnit ng-change=\"updateLength(internalUnit, internalValue)\"> <md-option ng-repeat=\"type in ::types track by $index\" value={{::type}}> <span translate>{{::type}}</span> </md-option> </md-select> </md-input-container> </div>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-link.html',
-    "<md-input-container class=md-icon-float> <lable ng-if=title translate>{{::title}}</lable> <input ng-model=url ng-change=urlChanged(url)> <wb-icon ng-click=ctrl.selectlink()>more_horiz</wb-icon> </md-input-container>"
+    "<md-input-container class=md-icon-float> <lable ng-if=title translate>{{::title}}</lable> <input aria-label=url ng-model=url ng-change=urlChanged(url)> <wb-icon ng-click=ctrl.selectlink()>more_horiz</wb-icon> </md-input-container>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-number.html',
-    "<md-list-item ng-show=\"slider==undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input style=\"width: 50px\" type=number ng-model=value ng-change=valueChanged(value) flex> </md-input-container> </md-list-item> <md-list-item ng-show=\"slider!=undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='' || icon=='wb-blank'\">{{icon}}</wb-icon> <div ng-show=\"icon=='wb-blank'\" style=\"display: inline-block; width: 32px; opacity: 0.0\"></div> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-slider min=0 max=100 ng-model=value ng-change=valueChanged(value) flex></md-slider> </md-list-item>"
+    "<md-list-item ng-show=\"slider==undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input aria-label=\"number value\" style=\"width: 50px\" type=number ng-model=value ng-change=valueChanged(value) flex> </md-input-container> </md-list-item> <md-list-item ng-show=\"slider!=undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='' || icon=='wb-blank'\">{{icon}}</wb-icon> <div ng-show=\"icon=='wb-blank'\" style=\"display: inline-block; width: 32px; opacity: 0.0\"></div> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-slider min=0 max=100 ng-model=value ng-change=valueChanged(value) flex></md-slider> </md-list-item>"
   );
 
 
@@ -18269,12 +20040,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-text.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input style=\"width: 200px\" ng-model=value flex> </md-input-container> </md-list-item>"
+    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input aria-label=value style=\"width: 200px\" ng-model=value flex> </md-input-container> </md-list-item>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-video.html',
-    "<md-input-container class=\"md-icon-float md-icon-right md-block\"> <label>{{::title}}</label> <wb-icon ng-click=ctrl.selectValue()>wb-object-video</wb-icon> <input ng-model=value ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.changeValue(value)> <wb-icon ng-click=ctrl.clearValue()>close</wb-icon> </md-input-container>"
+    "<md-input-container class=\"md-icon-float md-icon-right md-block\"> <label>{{::title}}</label> <wb-icon ng-click=ctrl.selectValue()>wb-object-video</wb-icon> <input aria-label=video ng-model=value ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.changeValue(value)> <wb-icon ng-click=ctrl.clearValue()>close</wb-icon> </md-input-container>"
   );
 
 
@@ -18318,7 +20089,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-a.html',
-    "<div layout-padding layout=column> <md-input-container> <label translate>Title</label> <input ng-model=ctrl.html ng-change=\"ctrl.setProperty('html', ctrl.html)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <wb-ui-setting-link title=URL ng-model=ctrl.href ng-change=\"ctrl.setProperty('href', ctrl.href)\" ng-model-options=\"{debounce: 200}\"> </wb-ui-setting-link> </div>"
+    "<div layout-padding layout=column> <md-input-container> <label translate>Title</label> <input aria-label=title ng-model=ctrl.html ng-change=\"ctrl.setProperty('html', ctrl.html)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <wb-ui-setting-link title=URL ng-model=ctrl.href ng-change=\"ctrl.setProperty('href', ctrl.href)\" ng-model-options=\"{debounce: 200}\"> </wb-ui-setting-link> </div>"
   );
 
 
@@ -18328,12 +20099,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-border.html',
-    " <fieldset layout=column> <legend translate>Style and Color</legend>  <md-input-container class=md-block> <label translate>Style</label> <md-select ng-model=ctrl.style ng-change=\"ctrl.setStyleBorder('style', ctrl.style)\"> <md-option ng-repeat=\"style in ::ctrl.styles\" value={{::style.value}}> <span translate>{{::style.title}}</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=ctrl.color ng-change=\"ctrl.setStyleBorder('color', ctrl.color)\"> </wb-ui-setting-color> </fieldset>  <fieldset layout=column> <legend translate>Width</legend> <wb-ui-setting-length title=All icon=border_all description=\"Set all sides width\" ng-model=ctrl.widthAll ng-change=ctrl.widthAllChanged(ctrl.widthAll) extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=Top icon=border_top ng-model=ctrl.width.top ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Right icon=border_right ng-model=ctrl.width.right ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=ctrl.width.bottom ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Left icon=border_left ng-model=ctrl.width.left ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset>  <fieldset layout=column> <legend translate>Radius</legend> <wb-ui-setting-length title=All icon=full_rounded description=\"Set all sides radius\" ng-model=ctrl.radiusAll ng-change=ctrl.radiusAllChanged(ctrl.radiusAll) extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=\"Top left\" icon=corner_top_left ng-model=ctrl.radius.topLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Top right\" icon=corner_top_right ng-model=ctrl.radius.topRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom right\" icon=corner_bottom_right ng-model=ctrl.radius.bottomRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom left\" icon=corner_bottom_left ng-model=ctrl.radius.bottomLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset>"
+    " <fieldset layout=column> <legend translate>Style and Color</legend>  <md-input-container class=md-block> <label translate>Style</label> <md-select aria-label=style ng-model=ctrl.style ng-change=\"ctrl.setStyleBorder('style', ctrl.style)\"> <md-option ng-repeat=\"style in ::ctrl.styles\" value={{::style.value}}> <span translate>{{::style.title}}</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=ctrl.color ng-change=\"ctrl.setStyleBorder('color', ctrl.color)\"> </wb-ui-setting-color> </fieldset>  <fieldset layout=column> <legend translate>Width</legend> <wb-ui-setting-length title=All icon=border_all description=\"Set all sides width\" ng-model=ctrl.widthAll ng-change=ctrl.widthAllChanged(ctrl.widthAll) extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=Top icon=border_top ng-model=ctrl.width.top ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Right icon=border_right ng-model=ctrl.width.right ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=ctrl.width.bottom ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Left icon=border_left ng-model=ctrl.width.left ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset>  <fieldset layout=column> <legend translate>Radius</legend> <wb-ui-setting-length title=All icon=full_rounded description=\"Set all sides radius\" ng-model=ctrl.radiusAll ng-change=ctrl.radiusAllChanged(ctrl.radiusAll) extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=\"Top left\" icon=corner_top_left ng-model=ctrl.radius.topLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Top right\" icon=corner_top_right ng-model=ctrl.radius.topRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom right\" icon=corner_bottom_right ng-model=ctrl.radius.bottomRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom left\" icon=corner_bottom_left ng-model=ctrl.radius.bottomLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset>"
   );
 
 
   $templateCache.put('views/settings/wb-general.html',
-    " <fieldset layout=column> <legend translate>Identifier</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Id</label> <input ng-model=ctrl.id ng-change=\"ctrl.setProperty('id', ctrl.id)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Name</label> <input ng-model=ctrl.name ng-change=\"ctrl.setProperty('name', ctrl.name)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Title</label> <input ng-model=ctrl.title ng-change=\"ctrl.setProperty('title', ctrl.title)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Language</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Direction</label> <input ng-model=ctrl.dir ng-change=\"ctrl.setProperty('dir', ctrl.dir)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Language</label> <input ng-model=ctrl.lang ng-change=\"ctrl.setProperty('lang', ctrl.lang)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Translate</label> <input ng-model=ctrl.translate ng-change=\"ctrl.setProperty('translate', ctrl.translate)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">spellcheck</label> <input ng-model=ctrl.spellcheck ng-change=\"ctrl.setProperty('spellcheck', ctrl.spellcheck)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Access</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Access Key</label> <input ng-model=ctrl.accesskey ng-change=\"ctrl.setProperty('accesskey', ctrl.accesskey)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">contenteditable</label> <input ng-model=ctrl.contenteditable ng-change=\"ctrl.setProperty('contenteditable', ctrl.contenteditable)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">tabindex</label> <input ng-model=ctrl.tabindex ng-change=\"ctrl.setProperty('tabindex', ctrl.tabindex)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">hidden</label> <input ng-model=ctrl.hidden ng-change=\"ctrl.setProperty('hidden', ctrl.hidden)\"> </md-input-container> </fieldset>   <fieldset layout=column> <legend translate>Style</legend> <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setProperty('style.direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setProperty('style.color', ctrl.color)\"> </wb-ui-setting-color> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>mouse</wb-icon> <label translate>Cursor</label> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setProperty('style.cursor', ctrl.cursor)\"> <md-option value=alias tooltip=\"The cursor indicates an alias of something is to be created\" translate=\"\">Alias</md-option> <md-option value=all-scroll tooltip=\"The cursor indicates that something can be scrolled in any direction\" translate=\"\">All Acroll</md-option> <md-option value=auto tooltip=\"Default. The browser sets a cursor\" translate=\"\">Auto</md-option> <md-option value=cell tooltip=\"The cursor indicates that a cell (or set of cells) may be selected\" translate=\"\">Cell</md-option> <md-option value=context-menu tooltip=\"The cursor indicates that a context-menu is available\" translate=\"\">Context Menu</md-option> <md-option value=col-resize tooltip=\"The cursor indicates that the column can be resized horizontally\" translate=\"\">Columne resize</md-option> <md-option value=copy tooltip=\"The cursor indicates something is to be copied\" translate=\"\">Copy</md-option> <md-option value=crosshair tooltip=\"The cursor render as a crosshair\" translate=\"\">Crosshair</md-option> <md-option value=default tooltip=\"The default cursor\" translate=\"\">Default</md-option> <md-option value=e-resize tooltip=\"The cursor indicates that an edge of a box is to be moved right (east)\" translate=\"\">Edge Resize</md-option> <md-option value=ew-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">Bidirectional Resize</md-option> <md-option value=grab tooltip=\"The cursor indicates that something can be grabbed\" translate=\"\">Grab</md-option> <md-option value=grabbing tooltip=\"The cursor indicates that something can be grabbed\" translate=\"\">Grabbing</md-option> <md-option value=help tooltip=\"The cursor indicates that help is available\" translate=\"\">Help</md-option> <md-option value=move tooltip=\"The cursor indicates something is to be moved\" translate=\"\">Move</md-option> <md-option value=n-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up (north)\" translate=\"\">North Resize</md-option> <md-option value=ne-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up and right (north/east)\" translate=\"\">North/East Resize</md-option> <md-option value=ns-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">NS Bidirectional Resize</md-option> <md-option value=nw-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up and left (north/west)\" translate=\"\">North/West Resize</md-option> <md-option value=nwse-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">Bidirectional Resize</md-option> <md-option value=no-drop tooltip=\"The cursor indicates that the dragged item cannot be dropped here\" translate=\"\">No Drop</md-option> <md-option value=none tooltip=\"No cursor is rendered for the element\" translate=\"\">None</md-option> <md-option value=not-allowed tooltip=\"The cursor indicates that the requested action will not be executed\" translate=\"\">Not Allowed</md-option> <md-option value=pointer tooltip=\"The cursor is a pointer and indicates a link\" translate=\"\">Pointer</md-option> <md-option value=progress tooltip=\"The cursor indicates that the program is busy (in progress)\" translate=\"\">Progress</md-option> <md-option value=row-resize tooltip=\"The cursor indicates that the row can be resized vertically\" translate=\"\">Row Resize</md-option> <md-option value=s-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down (south)\" translate=\"\">South Resize</md-option> <md-option value=se-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down and right (south/east)\" translate=\"\">South/East Resize</md-option> <md-option value=sw-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down and left (south/west)\" translate=\"\">South/West Resize</md-option> <md-option value=text tooltip=\"The cursor indicates text that may be selected\" translate=\"\">Text</md-option> <md-option value=vertical-text tooltip=\"The cursor indicates vertical-text that may be selected\" translate=\"\">Vertical text</md-option> <md-option value=w-resize tooltip=\"The cursor indicates that an edge of a box is to be moved left (west)\" translate=\"\">West Resize</md-option> <md-option value=wait tooltip=\"The cursor indicates that the program is busy\" translate=\"\">Wait</md-option> <md-option value=zoom-in tooltip=\"The cursor indicates that something can be zoomed in\" translate=\"\">Zoom In</md-option> <md-option value=\"zoom-out'\" tooltip=\"The cursor indicates that something can be zoomed out\" translate=\"\">Zoom Out</md-option> <md-option value=initial tooltip=\"Sets this property to its default value. Read about initial\" translate=\"\">Initial</md-option> <md-option value=inherit tooltip=\"Inherits this property from its parent element. Read about inherit\" translate=\"\">Inherit</md-option> </md-select> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Visibility</legend> <md-input-container layout-align=\"end center\"> <label translate>Visibility</label> <md-select ng-model=ctrl.visibility ng-change=\"ctrl.setProperty('style.visibility', ctrl.visibility)\" style=\"min-width: 200px\" disabled> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> </md-select> </md-input-container> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>opacity</wb-icon> <label translate>Opacity</label> <input ng-model=ctrl.opacity ng-change=\"ctrl.setProperty('style.opacity', ctrl.opacity)\"> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Overflow</legend> <md-input-container layout-align=\"end center\"> <label translate>X</label> <md-select ng-model=ctrl.overflowX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setProperty('style.overflow.x', ctrl.overflowX)\" style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> <md-input-container layout-align=\"end center\"> <label translate>Y</label> <md-select ng-model=ctrl.overflowY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setProperty('style.overflow.y', ctrl.overflowY)\" style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> </fieldset>"
+    " <fieldset layout=column> <legend translate>Identifier</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Id</label> <input ng-model=ctrl.id ng-change=\"ctrl.setProperty('id', ctrl.id)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Name</label> <input ng-model=ctrl.name ng-change=\"ctrl.setProperty('name', ctrl.name)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Title</label> <input ng-model=ctrl.title ng-change=\"ctrl.setProperty('title', ctrl.title)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Language</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Direction</label> <input ng-model=ctrl.dir ng-change=\"ctrl.setProperty('dir', ctrl.dir)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Language</label> <input ng-model=ctrl.lang ng-change=\"ctrl.setProperty('lang', ctrl.lang)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Translate</label> <input ng-model=ctrl.translate ng-change=\"ctrl.setProperty('translate', ctrl.translate)\"> </md-input-container> <md-input-container style=\"margin: 0px; margin-top: 10px\"> <label translate=\"\">Spell check</label> <input ng-model=ctrl.spellcheck ng-change=\"ctrl.setProperty('spellcheck', ctrl.spellcheck)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Access</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Access Key</label> <input ng-model=ctrl.accesskey ng-change=\"ctrl.setProperty('accesskey', ctrl.accesskey)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">contenteditable</label> <input ng-model=ctrl.contenteditable ng-change=\"ctrl.setProperty('contenteditable', ctrl.contenteditable)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">tabindex</label> <input ng-model=ctrl.tabindex ng-change=\"ctrl.setProperty('tabindex', ctrl.tabindex)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">hidden</label> <input ng-model=ctrl.hidden ng-change=\"ctrl.setProperty('hidden', ctrl.hidden)\"> </md-input-container> </fieldset>   <fieldset layout=column> <legend translate>Style</legend> <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setProperty('style.direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setProperty('style.color', ctrl.color)\"> </wb-ui-setting-color> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>mouse</wb-icon> <label translate>Cursor</label> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setProperty('style.cursor', ctrl.cursor)\"> <md-option value=alias tooltip=\"The cursor indicates an alias of something is to be created\" translate=\"\">Alias</md-option> <md-option value=all-scroll tooltip=\"The cursor indicates that something can be scrolled in any direction\" translate=\"\">All Acroll</md-option> <md-option value=auto tooltip=\"Default. The browser sets a cursor\" translate=\"\">Auto</md-option> <md-option value=cell tooltip=\"The cursor indicates that a cell (or set of cells) may be selected\" translate=\"\">Cell</md-option> <md-option value=context-menu tooltip=\"The cursor indicates that a context-menu is available\" translate=\"\">Context Menu</md-option> <md-option value=col-resize tooltip=\"The cursor indicates that the column can be resized horizontally\" translate=\"\">Columne resize</md-option> <md-option value=copy tooltip=\"The cursor indicates something is to be copied\" translate=\"\">Copy</md-option> <md-option value=crosshair tooltip=\"The cursor render as a crosshair\" translate=\"\">Crosshair</md-option> <md-option value=default tooltip=\"The default cursor\" translate=\"\">Default</md-option> <md-option value=e-resize tooltip=\"The cursor indicates that an edge of a box is to be moved right (east)\" translate=\"\">Edge Resize</md-option> <md-option value=ew-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">Bidirectional Resize</md-option> <md-option value=grab tooltip=\"The cursor indicates that something can be grabbed\" translate=\"\">Grab</md-option> <md-option value=grabbing tooltip=\"The cursor indicates that something can be grabbed\" translate=\"\">Grabbing</md-option> <md-option value=help tooltip=\"The cursor indicates that help is available\" translate=\"\">Help</md-option> <md-option value=move tooltip=\"The cursor indicates something is to be moved\" translate=\"\">Move</md-option> <md-option value=n-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up (north)\" translate=\"\">North Resize</md-option> <md-option value=ne-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up and right (north/east)\" translate=\"\">North/East Resize</md-option> <md-option value=ns-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">NS Bidirectional Resize</md-option> <md-option value=nw-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up and left (north/west)\" translate=\"\">North/West Resize</md-option> <md-option value=nwse-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">Bidirectional Resize</md-option> <md-option value=no-drop tooltip=\"The cursor indicates that the dragged item cannot be dropped here\" translate=\"\">No Drop</md-option> <md-option value=none tooltip=\"No cursor is rendered for the element\" translate=\"\">None</md-option> <md-option value=not-allowed tooltip=\"The cursor indicates that the requested action will not be executed\" translate=\"\">Not Allowed</md-option> <md-option value=pointer tooltip=\"The cursor is a pointer and indicates a link\" translate=\"\">Pointer</md-option> <md-option value=progress tooltip=\"The cursor indicates that the program is busy (in progress)\" translate=\"\">Progress</md-option> <md-option value=row-resize tooltip=\"The cursor indicates that the row can be resized vertically\" translate=\"\">Row Resize</md-option> <md-option value=s-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down (south)\" translate=\"\">South Resize</md-option> <md-option value=se-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down and right (south/east)\" translate=\"\">South/East Resize</md-option> <md-option value=sw-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down and left (south/west)\" translate=\"\">South/West Resize</md-option> <md-option value=text tooltip=\"The cursor indicates text that may be selected\" translate=\"\">Text</md-option> <md-option value=vertical-text tooltip=\"The cursor indicates vertical-text that may be selected\" translate=\"\">Vertical text</md-option> <md-option value=w-resize tooltip=\"The cursor indicates that an edge of a box is to be moved left (west)\" translate=\"\">West Resize</md-option> <md-option value=wait tooltip=\"The cursor indicates that the program is busy\" translate=\"\">Wait</md-option> <md-option value=zoom-in tooltip=\"The cursor indicates that something can be zoomed in\" translate=\"\">Zoom In</md-option> <md-option value=\"zoom-out'\" tooltip=\"The cursor indicates that something can be zoomed out\" translate=\"\">Zoom Out</md-option> <md-option value=initial tooltip=\"Sets this property to its default value. Read about initial\" translate=\"\">Initial</md-option> <md-option value=inherit tooltip=\"Inherits this property from its parent element. Read about inherit\" translate=\"\">Inherit</md-option> </md-select> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Visibility</legend> <md-input-container layout-align=\"end center\"> <label translate>Visibility</label> <md-select ng-model=ctrl.visibility ng-change=\"ctrl.setProperty('style.visibility', ctrl.visibility)\" style=\"min-width: 200px\" disabled> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> </md-select> </md-input-container> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>opacity</wb-icon> <label translate>Opacity</label> <input ng-model=ctrl.opacity ng-change=\"ctrl.setProperty('style.opacity', ctrl.opacity)\"> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Overflow</legend> <md-input-container layout-align=\"end center\"> <label translate>X</label> <md-select ng-model=ctrl.overflowX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setProperty('style.overflow.x', ctrl.overflowX)\" style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> <md-input-container layout-align=\"end center\"> <label translate>Y</label> <md-select ng-model=ctrl.overflowY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setProperty('style.overflow.y', ctrl.overflowY)\" style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> </fieldset>"
   );
 
 

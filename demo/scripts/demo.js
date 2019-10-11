@@ -142,6 +142,34 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 				offsetY: 5
 			}
 		});
+		dialogs.settings1 = $wbWindow.open({
+			type: 'view',
+			title: 'Settings (tabs)',
+			template:'<wb-setting-panel-group ng-model="model" flex></wb-setting-panel-group>',
+			parent: $scope,
+			controller: function($scope, $wbFloat){
+				$scope.$watch('editable', function(value){
+					if(value === false) {
+						$wbFloat.hide();
+					}
+				});
+				$scope.$watch('selectedWidget', function(value){
+					$scope.model = value;
+				});
+			}
+		}, 'Settings', {
+			internal: true,
+			// Extera options
+			position: {
+				my: 'left-top',
+				at: 'left-top',
+				autoposition: 'down',
+				offsetX: -5,
+				offsetY: 5
+			}
+		});
+		
+		
 	}
 
 	function openEvents(){

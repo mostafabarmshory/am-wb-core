@@ -474,7 +474,7 @@ angular.module('am-wb-core')
         type: 'link',
         title: 'Link',
         label: 'link',
-        icon: 'link',
+        icon: 'wb-widget-link',
         description: 'A widget to insert an link to page.',
         groups: ['basic'],
         setting: ['link'],
@@ -488,5 +488,160 @@ angular.module('am-wb-core')
         controller: 'MbWidgetLinkCtrl', 
     });
     
+    /**
+	 * @ngdoc Widgets
+	 * @name img
+	 * @description Image widget
+	 * 
+	 * Display an image with meta tag for SEO. Here is minimal list of attributes:
+     */
+    $widget.newWidget({
+    	type: 'img',
+    	title: 'Image',
+    	label: 'image',
+    	icon: 'wb-widget-img',
+    	description: 'A widget to insert an link to page.',
+    	groups: ['basic'],
+    	setting: ['link'],
+    	template: '<img></img>',
+    	help: 'http://dpq.co.ir/more-information-img',
+    	model: {
+    		html: 'img',
+    		src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+    	},
+    	controllerAs: 'ctrl',
+    	controller: 'MbWidgetImgCtrl', 
+    });
+//	$widget.newWidget({
+//	type: 'Image',
+//	title: 'Image',
+//	label: 'image',
+//	icon: 'photo',
+//	description: 'A widget to insert an image to page.',
+//	setting: ['amh-common-image'],
+//	templateUrl: 'views/am-wb-common-widgets/image.html',
+//	help: 'http://gitlab.com/am-wb/am-wb-common',
+//	model: {
+//		style: {
+//			size: {
+//				width: 'auto',
+//				height: 'auto'
+//			},
+//			overflow: {
+//				x: 'hidden',
+//				y: 'hidden'
+//			}
+//		}
+//	},
+//	/*
+//	 * @ngInject
+//	 */
+//	controller: function ($scope) {
+//		var keys = ['fit', 'url', 'description', 'label', 'keywords'];
+//		this.setUrl = function (url) {
+//			this.url = url;
+//		};
+//		/**
+//		 * Loads all parameters from model
+//		 * 
+//		 * @memberof AmWbCommonVideoCtrl
+//		 */
+//		this.fillMedia = function () {
+//			for (var i = 0; i < keys.length; i++) {
+//				var key = keys[i];
+//				this[key] = this.getModelProperty(key);
+//			}
+//		};
+//		/**
+//		 * Initialize the widget
+//		 * 
+//		 * @memberof AmWbCommonVideoCtrl
+//		 */
+//		this.initWidget = function () {
+//			var ctrl = this;
+//
+//			// pass event to setting panel if video loaded successfully
+//			this.onLoad = function () {
+//				var event = {};
+//				event.source = ctrl;
+//				event.key = 'success';
+//				ctrl.fire('success', event);
+//			};
+//
+//			// pass event to setting panel if video doesn't load successfully
+//			this.onError = function () {
+//				var event = {};
+//				event.source = ctrl;
+//				event.key = 'failure';
+//				ctrl.fire('error', event);
+//			};
+//
+//			this.on('modelUpdated', function ($event) {
+//				if (keys.indexOf($event.key) > -1) {
+//					var key = $event.key;
+//					ctrl[key] = ctrl.getModelProperty(key);
+//				}
+//			});
+//			this.on('runtimeModelUpdated', function ($event) {
+//				if (keys.indexOf($event.key) > -1) {
+//					var key = $event.key;
+//					ctrl[key] = ctrl.getProperty(key);
+//				}
+//			});
+//			this.on('modelChanged', function () {
+//				ctrl.fillMedia();
+//			});
+//			this.fillMedia();
+//		};
+//	},
+//	controllerAs: 'ctrl'
+//});
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+//	$widget.newWidget({
+//		// widget
+//		type: 'CommonVideoPlayer',
+//		title: 'Video Player',
+//		description: 'A video player component.',
+//		groups: ['commons'],
+//		icon: 'wb-common-video',
+//		// help
+//		help: 'https://gitlab.com/weburger/am-wb-common/wikis/video-player',
+//		helpId: '',
+//		// page
+//		templateUrl: 'views/am-wb-common-widgets/video-player.html',
+//		controller: 'AmWbCommonVideoCtrl',
+//		controllerAs: 'ctrl',
+//		setting: ['common-video-player', 'SEO']
+//	});
+	// NOTE: audio is moved to core component
+//	$widget.newWidget({
+//		// widget
+//		type: 'CommonAudioPlayer',
+//		title: 'Audio Player',
+//		description: 'An audio player component.',
+//		groups: ['commons'],
+//		icon: 'wb-common-audio',
+//		// help
+//		help: 'https://gitlab.com/weburger/am-wb-common/wikis/audio-player',
+//		helpId: '',
+//		// page
+//		templateUrl: 'views/am-wb-common-widgets/audio-player.html',
+//		controller: 'AmWbCommonAudioCtrl',
+//		controllerAs: 'ctrl',
+//		setting: ['common-audio-player']
+//	});
     
 });

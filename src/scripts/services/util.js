@@ -625,7 +625,7 @@ angular.module('am-wb-core')
 
 	function cleanStyle(model)
 	{
-		if (!model.style) {
+		if (!angular.isObject(model.style)) {
 			model.style = {};
 		}
 		cleanLayout(model);
@@ -648,6 +648,12 @@ angular.module('am-wb-core')
 			model.style.cursor = 'pointer';
 
 			delete model.title;
+			delete model.url;
+		}
+		if(model.type === 'Image'){
+			model.type = 'img';
+			model.src = model.url;
+			
 			delete model.url;
 		}
 	}
