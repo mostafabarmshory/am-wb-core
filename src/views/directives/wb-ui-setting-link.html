@@ -2,6 +2,7 @@
 	class="md-icon-float">
 	<lable ng-if="title" translate>{{::title}}</lable>
 	<input 
+		aria-label="url"
 		ng-model="url" 
 		ng-change="urlChanged(url)"
 		type="text">

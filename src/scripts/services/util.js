@@ -625,7 +625,7 @@ angular.module('am-wb-core')
 
 	function cleanStyle(model)
 	{
-		if (!model.style) {
+		if (!angular.isObject(model.style)) {
 			model.style = {};
 		}
 		cleanLayout(model);

@@ -155,7 +155,7 @@ angular.module('am-wb-core')
 	 * @return the service
 	 */
 	function newWidget(widget) {
-		if (widget.type in contentElementAsso) {
+		if (hasWidget(widget.type)) {
 			// TODO: maso, 2017: Add log for duplication
 		}
 		// fix widget data
@@ -167,6 +167,12 @@ angular.module('am-wb-core')
 		elementKey.push(widget.type);
 		return service;
 	}
+
+
+	function hasWidget(type) {
+		return type in contentElementAsso;
+	}
+	this.hasWidget = hasWidget;
 
 	/**
 	 * Compile element 

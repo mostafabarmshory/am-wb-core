@@ -92,8 +92,12 @@ angular.module('am-wb-core')
 			if (ngModelCtrl.$viewValue) {
 				cleanEvents();
 				widget = ngModelCtrl.$viewValue;
-				if (angular.isArray(widget) && widget.length > 0) {
-					widget = widget[0];
+				if (angular.isArray(widget)) {
+					if(widget.length > 0){
+						widget = widget[0];
+					}else {
+						widget = null;
+					}
 				}
 				loadEvents();
 			}
@@ -105,6 +109,9 @@ angular.module('am-wb-core')
 
 		function loadEvents() {
 			cleanEvents();
+			if(!widget){
+				return;
+			}
 			for (var i = 0; i < eventTypes.length; i++) {
 				var event = eventTypes[i];
 				event.code = widget.getModelProperty('event.' + event.key);
@@ -113,6 +120,9 @@ angular.module('am-wb-core')
 		}
 
 		function saveEvents() {
+			if(!widget){
+				return;
+			}
 			for (var i = 0; i < $scope.events.length; i++) {
 				var event = $scope.events[i];
 				if (event.code) {
