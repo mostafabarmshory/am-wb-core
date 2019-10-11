@@ -37,9 +37,11 @@ angular.module('am-wb-core')
 	 * Default settings
 	 */
 	var WB_SETTINGS_GROUP_DEFAULT = [ 'general', 'transform', 'border',
-		'background', 'layout', 'layout-self', 'marginPadding', 'size', 'shadow', 'microdata' ];
-	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'transform', 'border',
-		'background', 'marginPadding', 'layout-self', 'size', 'shadow', 'microdata' ];
+		'background', 'layout', 'layout-self', 'marginPadding',
+		'size', 'shadow', 'microdata', 'style.text' ];
+	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'transform',
+		'border', 'background', 'marginPadding', 'layout-self',
+		'size', 'shadow', 'microdata', 'style.text' ];
 
 	/**
 	 * Setting page storage
@@ -100,12 +102,10 @@ angular.module('am-wb-core')
 		}
 
 		if (angular.isArray(widget.setting)) {
-			widgetSettings = widgetSettings
-			.concat(widget.setting);
+			widgetSettings = widgetSettings.concat(widget.setting);
 		}
 		return widgetSettings;
 	}
-
 
 	// تعیین سرویس‌ها
 	this.page = page;

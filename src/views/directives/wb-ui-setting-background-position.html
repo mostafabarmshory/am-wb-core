@@ -6,7 +6,7 @@
         ng-change="positionChanged(position)">
         <md-option 
             ng-repeat="item in items" 
-            value="{{item.value}}"
-            translate="">{{item.title}}</md-option>
+            value="{{::item.value}}"
+            translate="">{{::item.title}}</md-option>
     </md-select>
 </md-input-container>
