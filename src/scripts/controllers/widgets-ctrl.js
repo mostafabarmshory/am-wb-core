@@ -900,7 +900,7 @@ WbAbstractWidget.prototype.getScope = function () {
 };
 
 /**
- * Sets the state fo the widget
+ * Sets the state of the widget
  * 
  * @memberof WbAbstractWidget
  */
@@ -945,20 +945,14 @@ WbAbstractWidget.prototype.setEditable = function (editable) {
     });
 
     // TODO: maso, 2019: add event data
-    var oldState = this.state;
     if (editable) {
-    	this.state = 'edit';
-        this.fire('editable');
+    	this.setState('edit');
+        this.fire('editable'); // depricated
     } else {
-    	this.state = 'ready';
-        this.fire('noneditable');
+    	this.setState('ready');
+        this.fire('noneditable'); // depricated
     }
-    
-    this.fire('stateChanged', {
-    	source: this,
-    	oldValue: oldState,
-    	value: this.state
-    });
+    // TODO: no need to reload?!!
     var ctrl = this;
     this.$timeout(function(){
         ctrl.reload();

@@ -34,54 +34,65 @@ angular.module('am-wb-core')//
  * 
  */
 .controller('MbWidgetACtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'download',
-        'href',
-        'hreflang',
-        'media',
-        'ping',
-        'referrerpolicy',
-        'rel',
-        'target',
-        'type',
-        'html'
-        ];
+	// list of element attributes
+	var elementAttributes = [
+		'download',
+		'href',
+		'hreflang',
+		'media',
+		'ping',
+		'referrerpolicy',
+		'rel',
+		'target',
+		'type',
+		'html'
+		];
 
-    this.initWidget = function(){
-        var ctrl = this;
-        function elementAttribute(key, value){
-            if(key === 'html'){
-                ctrl.getElement().html(value) || '..';
-            }
-            ctrl.setElementAttribute(key, value);
-        }
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                elementAttribute(key, value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            elementAttribute(key, ctrl.getModelProperty(key));
-        }
-    };
+	this.initWidget = function(){
+		var ctrl = this;
+		function elementAttribute(key, value){
+			if(key === 'html'){
+				ctrl.getElement().html(value) || '..';
+			}
+			ctrl.setElementAttribute(key, value);
+		}
+		function eventHandler(event){
+			if(elementAttributes.includes(event.key)){
+				var key = event.key;
+				var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+				elementAttribute(key, value);
+			}
+		}
+		// listen on change
+		this.on('modelUpdated', eventHandler);
+		this.on('runtimeModelUpdated', eventHandler);
+		// load initial data
+		for(var i =0; i < elementAttributes.length;i++){
+			var key = elementAttributes[i];
+			elementAttribute(key, ctrl.getModelProperty(key));
+		}
+		
+		function removeDefaultAction($event){
+			$event.preventDefault();
+		}
+		this.on('stateChanged', function(event){
+			if(event.value === 'edit'){
+				ctrl.getElement().on('click dblclick', removeDefaultAction);
+			} else {
+				ctrl.getElement().off('click dblclick', removeDefaultAction);
+			}
+		});
+	};
 
-    /**
-     * Gets value of the input
-     */
-    this.html = function(){
-        var value = arguments[0];
-        if(value){
-            this.setElementAttribute('html', value);
-        }
-        var element = this.getElement();
-        return element.html.apply(element, arguments);
-    };
+	/**
+	 * Gets value of the input
+	 */
+	this.html = function(){
+		var value = arguments[0];
+		if(value){
+			this.setElementAttribute('html', value);
+		}
+		var element = this.getElement();
+		return element.html.apply(element, arguments);
+	};
 });
