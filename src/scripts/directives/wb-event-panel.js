@@ -139,6 +139,10 @@ angular.module('am-wb-core')
 		 * Save events into the model
 		 */
 		$scope.saveEvents = saveEvents;
+
+		$element.on('keypress keyup keydown paste copy', function(event){
+			event.stopPropagation();
+		});
 	}
 
 	return {

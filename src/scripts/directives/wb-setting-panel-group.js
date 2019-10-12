@@ -92,6 +92,11 @@ angular.module('am-wb-core')
 				}
 			}
 		};
+		
+		
+		$element.on('keypress keyup keydown paste copy', function(event){
+			event.stopPropagation();
+		});
 	}
 	
 	return {
