@@ -934,7 +934,7 @@ angular.module('am-wb-core')
 
     /**
      * @ngDoc Settings
-     * @name amh-common-link
+     * @name a
      * @description Link setting page
      */
     $settings.newPage({
@@ -944,12 +944,22 @@ angular.module('am-wb-core')
         icon: 'settings',
         templateUrl: 'views/settings/wb-a.html',
         controllerAs: 'ctrl',
-        controller: function () {
-            this.init = function () {
-                this.href = this.getProperty('href');
-                this.html = this.getProperty('html');
-            };
-        }
+        controller: 'MbSettingACtrl'
+    });
+    
+    /**
+     * @ngDoc Settings
+     * @name img
+     * @description Image settings
+     */
+    $settings.newPage({
+    	type: 'img',
+    	label: 'Image',
+    	description: 'Manage image widget settings.',
+    	icon: 'settings',
+    	templateUrl: 'views/settings/wb-img.html',
+    	controllerAs: 'ctrl',
+    	controller: 'MbSettingImgCtrl'
     });
     
     /**

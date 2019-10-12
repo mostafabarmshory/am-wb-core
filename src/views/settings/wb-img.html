@@ -1,0 +1,83 @@
+<md-input-container>
+	<label translate>alg</label>
+	<input 
+		ng-model-options="{updateOn : 'change blur'}"
+		ng-model="ctrl.alg" 
+    	ng-change="ctrl.contentChanged('alg', ctrl.alg)"
+		type="text">
+</md-input-container>
+<md-input-container>
+	<label translate>crossorigin</label>
+	<input 
+		ng-model-options="{updateOn : 'change blur'}"
+		ng-model="ctrl.crossorigin" 
+    	ng-change="ctrl.contentChanged('crossorigin', ctrl.crossorigin)"
+		type="text">
+</md-input-container>
+<md-input-container>
+	<label translate>height</label>
+	<input 
+		ng-model-options="{updateOn : 'change blur'}"
+		ng-model="ctrl.height" 
+    	ng-change="ctrl.contentChanged('height', ctrl.height)"
+		type="text">
+</md-input-container>
+<md-input-container>
+	<label translate>ismap</label>
+	<input 
+		ng-model-options="{updateOn : 'change blur'}"
+		ng-model="ctrl.ismap" 
+    	ng-change="ctrl.contentChanged('ismap', ctrl.ismap)"
+		type="text">
+</md-input-container>
+<md-input-container>
+	<label translate>longdesc</label>
+	<input 
+		ng-model-options="{updateOn : 'change blur'}"
+		ng-model="ctrl.longdesc" 
+    	ng-change="ctrl.contentChanged('longdesc', ctrl.longdesc)"
+		type="text">
+</md-input-container>
+<wb-ui-setting-image 
+	title="Image address" 
+	ng-model="ctrl.src"
+    ng-model-options="{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}"
+	ng-change="ctrl.setProperty('src', ctrl.src)">
+</wb-ui-setting-image>
+<md-input-container>
+	<label translate>srcset</label>
+	<input 
+		ng-model-options="{updateOn : 'change blur'}"
+		ng-model="ctrl.srcset" 
+    	ng-change="ctrl.contentChanged('srcset', ctrl.srcset)"
+		type="text">
+</md-input-container>
+<md-input-container>
+	<label translate>usemap</label>
+	<input 
+		ng-model-options="{updateOn : 'change blur'}"
+		ng-model="ctrl.usemap" 
+    	ng-change="ctrl.contentChanged('usemap', ctrl.usemap)"
+		type="text">
+</md-input-container>
+<md-input-container>
+	<label translate>width</label>
+	<input 
+		ng-model-options="{updateOn : 'change blur'}"
+		ng-model="ctrl.width" 
+    	ng-change="ctrl.contentChanged('width', ctrl.width)"
+		type="text">
+</md-input-container>
+
+<!-- <wb-ui-setting-dropdown  -->
+<!-- 	title="Fit"  -->
+<!-- 	icon="cached" -->
+<!-- 	items="[{'title':'fill','value':'fill'}, -->
+<!-- 			{'title':'contain','value':'contain'}, -->
+<!-- 			{'title':'cover','value':'cover'}, -->
+<!-- 			{'title':'scale-down','value':'scale-down'}, -->
+<!-- 			{'title':'none','value':'none'}]"  -->
+<!-- 	ng-model="ctrl.fit" -->
+<!--        ng-model-options="{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}" -->
+<!-- 	ng-change="ctrl.updateFit()"> -->
+<!-- </wb-ui-setting-dropdown> -->
