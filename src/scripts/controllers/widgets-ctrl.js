@@ -162,7 +162,6 @@ var WbAbstractWidget = function () {
                 if (ctrl.isEditable()) {
                     ctrl.setSelected(true, $event);
                     $event.stopPropagation();
-                    $event.preventDefault();
                 }
                 ctrl.fire('click', $event);
             },

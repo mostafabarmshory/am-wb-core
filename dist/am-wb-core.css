@@ -1158,7 +1158,8 @@ in the edit mode. This part of the the CSS fix basic settings of the widgets.
 }
 
 #header.wb-widget-locator.selection {
-	padding: 1px;
+	padding: 0px 8px;
+	margin: 0px;
 }
 
 #top.wb-widget-locator.selection {

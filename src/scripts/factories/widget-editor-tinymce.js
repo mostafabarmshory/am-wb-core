@@ -92,6 +92,11 @@ angular.module('am-wb-core')//
                         ctrl.saveAndClose();
                     }
                 });
+                
+                editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
+                	event.stopPropagation();
+                	editor.save();
+                });
 
                 // Update model when:
                 // - a button has been clicked [ExecCommand]
