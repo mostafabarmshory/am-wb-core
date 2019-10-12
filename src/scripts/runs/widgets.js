@@ -512,30 +512,6 @@ angular.module('am-wb-core')
     	controllerAs: 'ctrl',
     	controller: 'MbWidgetImgCtrl', 
     });
-//	$widget.newWidget({
-//	type: 'Image',
-//	title: 'Image',
-//	label: 'image',
-//	icon: 'photo',
-//	description: 'A widget to insert an image to page.',
-//	setting: ['amh-common-image'],
-//	templateUrl: 'views/am-wb-common-widgets/image.html',
-//	help: 'http://gitlab.com/am-wb/am-wb-common',
-//	model: {
-//		style: {
-//			size: {
-//				width: 'auto',
-//				height: 'auto'
-//			},
-//			overflow: {
-//				x: 'hidden',
-//				y: 'hidden'
-//			}
-//		}
-//	},
-//	/*
-//	 * @ngInject
-//	 */
 //	controller: function ($scope) {
 //		var keys = ['fit', 'url', 'description', 'label', 'keywords'];
 //		this.setUrl = function (url) {

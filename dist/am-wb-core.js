@@ -4936,6 +4936,66 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
+ * @name MbSettingImgCtrl
+ * @description Manage Widget img 
+ * 
+ */
+.controller('MbSettingImgCtrl', function () {
+	
+	var attrs = [
+		// id
+		'alg',
+		'crossorigin',
+		'height',
+		'ismap',
+		'longdesc',
+		'src',
+		'srcset',
+		'usemap',
+		'width',
+		];
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		/*
+		 * Load data of the widget
+		 */
+		var ctrl = this;
+		angular.forEach(attrs, function(attr){
+			ctrl[attr] = ctrl.getProperty(attr);
+		});
+	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
  * @name MbWidgetACtrl
  * @description Manage a widget with html text.
  * 
@@ -16429,7 +16489,7 @@ angular.module('am-wb-core')
 
     /**
      * @ngDoc Settings
-     * @name amh-common-link
+     * @name a
      * @description Link setting page
      */
     $settings.newPage({
@@ -16440,6 +16500,21 @@ angular.module('am-wb-core')
         templateUrl: 'views/settings/wb-a.html',
         controllerAs: 'ctrl',
         controller: 'MbSettingACtrl'
+    });
+    
+    /**
+     * @ngDoc Settings
+     * @name img
+     * @description Image settings
+     */
+    $settings.newPage({
+    	type: 'img',
+    	label: 'Image',
+    	description: 'Manage image widget settings.',
+    	icon: 'settings',
+    	templateUrl: 'views/settings/wb-img.html',
+    	controllerAs: 'ctrl',
+    	controller: 'MbSettingImgCtrl'
     });
     
     /**
@@ -17354,7 +17429,7 @@ angular.module('am-wb-core')
     	icon: 'wb-widget-img',
     	description: 'A widget to insert an link to page.',
     	groups: ['basic'],
-    	setting: ['link'],
+    	setting: ['img'],
     	template: '<img></img>',
     	help: 'http://dpq.co.ir/more-information-img',
     	model: {
@@ -17364,30 +17439,6 @@ angular.module('am-wb-core')
     	controllerAs: 'ctrl',
     	controller: 'MbWidgetImgCtrl', 
     });
-//	$widget.newWidget({
-//	type: 'Image',
-//	title: 'Image',
-//	label: 'image',
-//	icon: 'photo',
-//	description: 'A widget to insert an image to page.',
-//	setting: ['amh-common-image'],
-//	templateUrl: 'views/am-wb-common-widgets/image.html',
-//	help: 'http://gitlab.com/am-wb/am-wb-common',
-//	model: {
-//		style: {
-//			size: {
-//				width: 'auto',
-//				height: 'auto'
-//			},
-//			overflow: {
-//				x: 'hidden',
-//				y: 'hidden'
-//			}
-//		}
-//	},
-//	/*
-//	 * @ngInject
-//	 */
 //	controller: function ($scope) {
 //		var keys = ['fit', 'url', 'description', 'label', 'keywords'];
 //		this.setUrl = function (url) {
@@ -20299,7 +20350,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-a.html',
-    "<div layout-padding layout=column> <md-input-container> <label translate>download</label> <input aria-label=download ng-model=ctrl.download ng-change=\"ctrl.setProperty('download', ctrl.download)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <wb-ui-setting-link title=URL ng-model=ctrl.href ng-change=\"ctrl.setProperty('href', ctrl.href)\" ng-model-options=\"{debounce: 200}\"> </wb-ui-setting-link> <md-input-container> <label translate>hreflang</label> <input aria-label=hreflang ng-model=ctrl.hreflang ng-change=\"ctrl.setProperty('hreflang', ctrl.hreflang)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>media</label> <input aria-label=media ng-model=ctrl.media ng-change=\"ctrl.setProperty('media', ctrl.media)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>ping</label> <input aria-label=ping ng-model=ctrl.ping ng-change=\"ctrl.setProperty('ping', ctrl.ping)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>referrerpolicy</label> <input aria-label=referrerpolicy ng-model=ctrl.referrerpolicy ng-change=\"ctrl.setProperty('referrerpolicy', ctrl.referrerpolicy)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>rel</label> <input aria-label=rel ng-model=ctrl.rel ng-change=\"ctrl.setProperty('rel', ctrl.rel)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>target</label> <input aria-label=target ng-model=ctrl.target ng-change=\"ctrl.setProperty('target', ctrl.target)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>type</label> <input aria-label=type ng-model=ctrl.type ng-change=\"ctrl.setProperty('type', ctrl.type)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> </div>"
+    "<div layout-padding layout=column> <md-input-container> <label translate>download</label> <input aria-label=download ng-model=ctrl.download ng-change=\"ctrl.setProperty('download', ctrl.download)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <wb-ui-setting-link title=URL ng-model=ctrl.href ng-change=\"ctrl.setProperty('href', ctrl.href)\" ng-model-options=\"{debounce: 200}\"> </wb-ui-setting-link> <md-input-container> <label translate>hreflang</label> <input aria-label=hreflang ng-model=ctrl.hreflang ng-change=\"ctrl.setProperty('hreflang', ctrl.hreflang)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>media</label> <input aria-label=media ng-model=ctrl.media ng-change=\"ctrl.setProperty('media', ctrl.media)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>ping</label> <input aria-label=ping ng-model=ctrl.ping ng-change=\"ctrl.setProperty('ping', ctrl.ping)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>referrerpolicy</label> <input aria-label=referrerpolicy ng-model=ctrl.referrerpolicy ng-change=\"ctrl.setProperty('referrerpolicy', ctrl.referrerpolicy)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>rel</label> <input aria-label=rel ng-model=ctrl.rel ng-change=\"ctrl.setProperty('rel', ctrl.rel)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>target</label> <input aria-label=target ng-model=ctrl.target ng-change=\"ctrl.setProperty('target', ctrl.target)\" ng-model-options=\"{debounce: 200}\"> </md-input-container>          </div>"
   );
 
 
@@ -20321,6 +20372,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   $templateCache.put('views/settings/wb-iframe.html',
     "<fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Name</label> <input ng-model=name ng-change=\"ctrl.setProperty('name', name)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Sandbox</label> <input ng-model=sandbox ng-change=\"ctrl.setProperty('sandbox', sandbox)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Source</legend> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Source</label> <input ng-model=src ng-change=\"ctrl.setProperty('src', src)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Source Document</label> <textarea name=srcdoc ng-model=srcdoc ng-change=\"ctrl.setProperty('srcdoc', srcdoc)\">\n" +
     "        </textarea> </md-input-container> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-img.html',
+    "<md-input-container> <label translate>alg</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.alg ng-change=\"ctrl.contentChanged('alg', ctrl.alg)\"> </md-input-container> <md-input-container> <label translate>crossorigin</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.crossorigin ng-change=\"ctrl.contentChanged('crossorigin', ctrl.crossorigin)\"> </md-input-container> <md-input-container> <label translate>height</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.height ng-change=\"ctrl.contentChanged('height', ctrl.height)\"> </md-input-container> <md-input-container> <label translate>ismap</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.ismap ng-change=\"ctrl.contentChanged('ismap', ctrl.ismap)\"> </md-input-container> <md-input-container> <label translate>longdesc</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.longdesc ng-change=\"ctrl.contentChanged('longdesc', ctrl.longdesc)\"> </md-input-container> <wb-ui-setting-image title=\"Image address\" ng-model=ctrl.src ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setProperty('src', ctrl.src)\"> </wb-ui-setting-image> <md-input-container> <label translate>srcset</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.srcset ng-change=\"ctrl.contentChanged('srcset', ctrl.srcset)\"> </md-input-container> <md-input-container> <label translate>usemap</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.usemap ng-change=\"ctrl.contentChanged('usemap', ctrl.usemap)\"> </md-input-container> <md-input-container> <label translate>width</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.width ng-change=\"ctrl.contentChanged('width', ctrl.width)\"> </md-input-container>            "
   );
 
 
