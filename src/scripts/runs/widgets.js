@@ -502,7 +502,7 @@ angular.module('am-wb-core')
     	icon: 'wb-widget-img',
     	description: 'A widget to insert an link to page.',
     	groups: ['basic'],
-    	setting: ['link'],
+    	setting: ['img'],
     	template: '<img></img>',
     	help: 'http://dpq.co.ir/more-information-img',
     	model: {

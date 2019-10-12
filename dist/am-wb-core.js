@@ -4795,6 +4795,66 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
+ * @name MbSettingACtrl
+ * @description Manage Widget A 
+ * 
+ */
+.controller('MbSettingACtrl', function () {
+	
+	var attrs = [
+		// id
+		'download',
+		'href',
+		'hreflang',
+		'media',
+		'ping',
+		'referrerpolicy',
+		'rel',
+		'target',
+		'type',
+		];
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		/*
+		 * Load data of the widget
+		 */
+		var ctrl = this;
+		angular.forEach(attrs, function(attr){
+			ctrl[attr] = ctrl.getProperty(attr);
+		});
+	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
  * @name MbWidgetACtrl
  * @description Manage a widget with html text.
  * 
@@ -16379,12 +16439,7 @@ angular.module('am-wb-core')
         icon: 'settings',
         templateUrl: 'views/settings/wb-a.html',
         controllerAs: 'ctrl',
-        controller: function () {
-            this.init = function () {
-                this.href = this.getProperty('href');
-                this.html = this.getProperty('html');
-            };
-        }
+        controller: 'MbSettingACtrl'
     });
     
     /**
@@ -20244,7 +20299,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-a.html',
-    "<div layout-padding layout=column> <md-input-container> <label translate>Title</label> <input aria-label=title ng-model=ctrl.html ng-change=\"ctrl.setProperty('html', ctrl.html)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <wb-ui-setting-link title=URL ng-model=ctrl.href ng-change=\"ctrl.setProperty('href', ctrl.href)\" ng-model-options=\"{debounce: 200}\"> </wb-ui-setting-link> </div>"
+    "<div layout-padding layout=column> <md-input-container> <label translate>download</label> <input aria-label=download ng-model=ctrl.download ng-change=\"ctrl.setProperty('download', ctrl.download)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <wb-ui-setting-link title=URL ng-model=ctrl.href ng-change=\"ctrl.setProperty('href', ctrl.href)\" ng-model-options=\"{debounce: 200}\"> </wb-ui-setting-link> <md-input-container> <label translate>hreflang</label> <input aria-label=hreflang ng-model=ctrl.hreflang ng-change=\"ctrl.setProperty('hreflang', ctrl.hreflang)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>media</label> <input aria-label=media ng-model=ctrl.media ng-change=\"ctrl.setProperty('media', ctrl.media)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>ping</label> <input aria-label=ping ng-model=ctrl.ping ng-change=\"ctrl.setProperty('ping', ctrl.ping)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>referrerpolicy</label> <input aria-label=referrerpolicy ng-model=ctrl.referrerpolicy ng-change=\"ctrl.setProperty('referrerpolicy', ctrl.referrerpolicy)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>rel</label> <input aria-label=rel ng-model=ctrl.rel ng-change=\"ctrl.setProperty('rel', ctrl.rel)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>target</label> <input aria-label=target ng-model=ctrl.target ng-change=\"ctrl.setProperty('target', ctrl.target)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>type</label> <input aria-label=type ng-model=ctrl.type ng-change=\"ctrl.setProperty('type', ctrl.type)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> </div>"
   );
 
 

@@ -944,12 +944,7 @@ angular.module('am-wb-core')
         icon: 'settings',
         templateUrl: 'views/settings/wb-a.html',
         controllerAs: 'ctrl',
-        controller: function () {
-            this.init = function () {
-                this.href = this.getProperty('href');
-                this.html = this.getProperty('html');
-            };
-        }
+        controller: 'MbSettingACtrl'
     });
     
     /**
