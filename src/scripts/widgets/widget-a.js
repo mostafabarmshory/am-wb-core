@@ -24,48 +24,42 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Controllers
- * @name MbWidgetPictureCtrl
- * @description Manage a widget with audio.
- * 
+ * @ngdoc Widgets
+ * @name a
+ * @description Manage a link to other documents
  * 
  */
-.controller('MbWidgetPictureCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'alt',
-        'crossorigin',
-        'height',
-        'hspace',
-        'ismap',
-        'longdesc',
-        'sizes',
-        'src',
-        'usemap',
-        'width',
-        ];
+.factory('WbWidgetA', function (WbWidgetAbstractHtml) {
 
-    this.initWidget = function(){
+
+    /**
+     * Creates new instance of the group
+     * 
+     * @memberof WbWidgetGroupCtrl
+     * @ngInject
+     */
+    function Widget($scope, $element, $parent){
+        // call super constractor
+        WbWidgetAbstractHtml.apply(this, [$scope, $element, $parent]);
+        this.addElementAttributes('download', 'href',
+                'hreflang', 'media', 'ping', 'referrerpolicy',
+                'rel', 'target', 'type');
+
+        // chack edit mode
+        function removeDefaultAction($event){
+            $event.preventDefault();
+        }
         var ctrl = this;
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                ctrl.setElementAttribute(key, value);
+        this.on('stateChanged', function(event){
+            if(event.value === 'edit'){
+                ctrl.getElement().on('click dblclick', removeDefaultAction);
+            } else {
+                ctrl.getElement().off('click dblclick', removeDefaultAction);
             }
-            // support legacy image
-            if(event.key === 'url'){
-            	ctrl.setElementAttribute('src', value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-        }
+        });
     };
 
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
 });

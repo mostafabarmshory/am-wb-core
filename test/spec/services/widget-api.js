@@ -39,7 +39,6 @@ describe('Service $widget', function () {
 			return this.scope;
 		};
 	}
-	;
 
 	// load the service's module
 	beforeEach(module('am-wb-core'));
@@ -65,10 +64,7 @@ describe('Service $widget', function () {
 		$widget.newWidget({
 		    type : 'BoostForm',
 		    template : '<form></form>',
-		    boost: 'WbWidgetGroupCtrl',
-		    controller: function(){
-		        this.boostFunction = function(){};
-		    },
+		    controller: 'WbWidgetGroup',
 		    controllerAs: 'ctrl'
 		});
 	}));
@@ -183,7 +179,7 @@ describe('Service $widget', function () {
 		$timeout.flush();
 	});
 	
-    it('should support widget boost ', function (done) {
+    it('should support widget controller ', function (done) {
         var root = new MockRootWidget();
         // Create new instance
         $widget.compile({
@@ -193,7 +189,7 @@ describe('Service $widget', function () {
             }]
         }, root)
         .then(function (widget) {
-            expect(angular.isFunction(widget.boostFunction)).toBe(true);
+            expect(angular.isFunction(widget.isRoot)).toBe(true);
             expect(angular.isFunction(widget.getChildren)).toBe(true);
             done();
         });

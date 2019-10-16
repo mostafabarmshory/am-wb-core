@@ -61,19 +61,12 @@ angular.module('am-wb-core')
             }
         },
         // functional properties
-        template: function(model){
-            var groupType = model.groupType | 'div';
-            if(groupType === 'form'){
-                return '<form></form>';
-            }
-            if(groupType === 'section'){
-                return '<section></section>';
-            }
-            return '<div></div>';
-        },
+        template: '<div></div>',
         help: 'http://dpq.co.ir/more-information-link',
-        helpId: 'wb-widget-group'
+        helpId: 'wb-widget-group',
+        controller: 'WbWidgetGroup'
     });
+    
     /**
      * @ngdoc Widgets
      * @name Text
@@ -99,26 +92,8 @@ angular.module('am-wb-core')
         help: 'http://dpq.co.ir',
         helpId: 'wb-widget-html',
         // functional properties
-        template: '<div ng-bind-html="ctrl.text | wbunsafe" class="wb-widget-fill wb-widget-text"></div>',
-        /*
-         * @ngInject
-         */
-        controller: function(){
-            this.text = '';
-            this.setText = function(text){
-                this.text = text;
-            };
-            this.initWidget = function(){
-                var ctrl = this;
-                this.on('modelUpdated', function($event){
-                    if($event.key === 'text'){
-                        ctrl.setText($event.newValue);
-                    }
-                });
-                this.setText(this.getModelProperty('text'));
-            };
-        },
-        controllerAs: 'ctrl'
+        template: '<div></div>',
+        controller: 'WbWidgetAbstractHtml',
     });
 
     $widget.setEditor('HtmlText', {
@@ -171,7 +146,7 @@ angular.module('am-wb-core')
         template: '<iframe>Frame Not Supported?!</iframe>',
         setting: ['iframe'],
         controllerAs: 'ctrl',
-        controller: 'MbWidgetIframeCtrl',
+        controller: 'WbWidgetIframe',
     });
 
     /**
@@ -202,17 +177,10 @@ angular.module('am-wb-core')
         // functional properties
         template: '<input></input>',
         setting: ['input'],
+        controller: 'WbWidgetInput',
         controllerAs: 'ctrl',
-        controller: 'MbWidgetInputCtrl',
     });
 
-    /**
-     * @ngdoc Widgets
-     * @name textarea
-     * @description Add textarea to get user value
-     * 
-     * It is used to create textarea
-     */
     $widget.newWidget({
         // widget description
         type: 'textarea',
@@ -232,8 +200,7 @@ angular.module('am-wb-core')
         // functional properties
         template: '<textarea></textarea>',
         setting: ['textarea'],
-        controllerAs: 'ctrl',
-        controller: 'MbWidgetTextareaCtrl',
+        controller: 'WbWidgetTextarea',
     });
 
     /**
@@ -262,8 +229,7 @@ angular.module('am-wb-core')
         // functional properties
         template: '<a></a>',
         setting: ['a'],
-        controllerAs: 'ctrl',
-        controller: 'MbWidgetACtrl'
+        controller: 'WbWidgetA'
     });
 
 
@@ -294,7 +260,7 @@ angular.module('am-wb-core')
         // functional properties
         template: '<p></p>',
         controllerAs: 'ctrl',
-        controller: 'MbWidgetHtmlCtrl'
+        controller: 'WbWidgetP'
     });
 
     $widget.setEditor('p', {
@@ -348,8 +314,7 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-progress',
         // functional properties
         template: '<progress value="22" max="100"></progress>',
-        controllerAs: 'ctrl',
-        controller: 'MbWidgetProgressCtrl'
+        controller: 'WbWidgetProgress'
     });
 
     
@@ -387,7 +352,7 @@ angular.module('am-wb-core')
         // functional properties
         template: '<meta></meta>',
         controllerAs: 'ctrl',
-        controller: 'MbWidgetMetaCtrl'
+        controller: 'WbWidgetMeta'
     });
 
     var headerEditorDescription =  {
@@ -458,7 +423,7 @@ angular.module('am-wb-core')
             // functional properties
             template: '<h' +i +'></h' + i + '>',
             controllerAs: 'ctrl',
-            controller:'MbWidgetHtmlCtrl'
+            controller:'WbWidgetAbstractHtml'
         });
     }
     
@@ -485,7 +450,7 @@ angular.module('am-wb-core')
             url: 'http://www.gitlab.com/am-wb/am-wb-common'
         },
         controllerAs: 'ctrl',
-        controller: 'MbWidgetLinkCtrl', 
+        controller: 'WbWidgetLink', 
     });
     
     /**
@@ -505,7 +470,7 @@ angular.module('am-wb-core')
         model: {
             html: 'class A {\n\tint a;\n}',
         },
-        controller: 'MbWidgetPreCtrl', 
+        controller: 'WbWidgetPre', 
         controllerAs: 'ctrl'
     });
     
@@ -537,7 +502,7 @@ angular.module('am-wb-core')
     		src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
     	},
     	controllerAs: 'ctrl',
-    	controller: 'MbWidgetImgCtrl', 
+    	controller: 'WbWidgetImg', 
     });
 //	controller: function ($scope) {
 //		var keys = ['fit', 'url', 'description', 'label', 'keywords'];
@@ -612,7 +577,6 @@ angular.module('am-wb-core')
     
     
     
-
 //	$widget.newWidget({
 //		// widget
 //		type: 'CommonVideoPlayer',

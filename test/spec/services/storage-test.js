@@ -31,7 +31,7 @@ describe('Service $storage', function () {
 
     // instantiate service
     beforeEach(inject(function (_$storage_) {
-    	$storage = _$storage_;
+        $storage = _$storage_;
     }));
 
     it('must implements WB $storage API', function () {
@@ -42,21 +42,21 @@ describe('Service $storage', function () {
     });
 
     it('should be same the pushed and poped data in storage', function () {
-    	$storage.put('number' , 10);
-	var data = $storage.get('number');
-    	expect(data).toBe(10);
+        $storage.put('number' , 10);
+        var data = $storage.get('number');
+        expect(data).toBe(10);
     });
 
     it('should remove data with a spacial key', function () {
-    	$storage.put('number' , 10);
-    	$storage.remove('number');
-	var data = $storage.get('number');
-    	expect(data).toBe(undefined);
+        $storage.put('number' , 10);
+        $storage.remove('number');
+        var data = $storage.get('number');
+        expect(data).toBe(undefined);
     });
-    
+
     it('should check the existense of a spacial item in storage', function () {
-    	$storage.put('number' , 10);
-	var flag = $storage.has('number');
-    	expect(flag).toBe(true);
+        $storage.put('number' , 10);
+        var flag = $storage.has('number');
+        expect(flag).toBe(true);
     });
 });

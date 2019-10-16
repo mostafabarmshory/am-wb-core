@@ -24,46 +24,60 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Controllers
- * @name MbWidgetIframeCtrl
- * @description Manage an iframe
+ * @ngdoc Widgets
+ * @name AbstractHtml
+ * @description Manage a widget with html text.
  * 
- * Iframe is a widget to incloud other pages as a part of current page. This widget is
- * used as Iframe manager.
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
  * 
  */
-.controller('MbWidgetIframeCtrl', function () {
-    // list of element attributes
-    // NOTE: maso, 2019: the width and height of the iframe is set from 
-    // the style section.
-    //
-    // 'width', 'height'
-    var iframeElementAttribute = [
-        'name',
-        'src', 
-        'srcdoc', 
-        'sandbox', 
-        ];
+.factory('WbWidgetAbstractHtml', function (WbWidgetAbstract) {
 
-    this.initWidget = function(){
+    /**
+     * Creates new instance 
+     * 
+     * @memberof WbWidgetGroupCtrl
+     */
+    function Widget($scope, $element, $parent){
+
+        // call super constractor
+        WbWidgetAbstract.apply(this, [$scope, $element, $parent]);
+        this.addElementAttributes('html');
         var ctrl = this;
-        function elementAttribute(key, value){
-            ctrl.setElementAttribute(key, value);
-        }
+
+        /*
+         * set element attribute
+         */
         function eventHandler(event){
-            if(iframeElementAttribute.includes(event.key)){
-                var key = event.key;
+            if(event.key === 'html'){
                 var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                elementAttribute(key, value);
+                ctrl.getElement().html(value);
             }
         }
+
         // listen on change
         this.on('modelUpdated', eventHandler);
         this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < iframeElementAttribute.length;i++){
-            var key = iframeElementAttribute[i];
-            elementAttribute(key, ctrl.getModelProperty(key));
-        }
     };
+
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+
+    /**
+     * Gets value of the input
+     * 
+     * @memberof WbWidgetAbstractHtml
+     */
+    Widget.prototype.html = function(){
+        var value = arguments[0];
+        if(value){
+            this.setElementAttribute('html', value);
+        }
+        var element = this.getElement();
+        return element.html.apply(element, arguments);
+    };
+
+    return Widget;
 });

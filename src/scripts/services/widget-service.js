@@ -257,40 +257,29 @@ angular.module('am-wb-core')
 			var ctrl = createWidgetController(widget, model, parentWidget, childScope, element, service.providers);
 
 			ctrl.setModel(model);
+			
+			// deprecated
 			childScope[widget.controllerAs || 'ctrl'] = ctrl;
-
-			// bind ctrl
 			element.data('$ngControllerController', ctrl);
 			link(childScope);
 			$mdTheming(element);
-
-			// return widget
 			if(angular.isFunction(ctrl.initWidget)){
-				ctrl.initWidget();
+			    ctrl.initWidget();
 			}
+
 			return ctrl;
 		});
 	}
 
 	function createWidgetController(widget, model, parentWidget, childScope, element, providers){
+		var srcCtrl = (model.type === 'Group') ? 'WbWidgetGroup' : 'WbWidgetAbstract';
+		srcCtrl = widget.controller || srcCtrl;
 		var wlocals = _.merge({
 			$scope : childScope,
 			$element : element,
 			$parent: parentWidget
 		}, providers);
-		
-		var srcCtrl = (model.type === 'Group') ? 'WbWidgetGroupCtrl' : 'WbWidgetGroupCtrl';
-		var ctrl = $controller(widget.boost || srcCtrl, wlocals);
-
-		// NOTE: can inject widget controller as WidgetCtrl
-		wlocals.WidgetCtrl = ctrl;
-		
-		// extend element controller
-		if (angular.isDefined(widget.controller)) {
-			var wctrl = $controller(widget.controller, wlocals);
-			angular.extend(ctrl, wctrl);
-		}
-		return ctrl;
+		return $injector.instantiate($injector.get(srcCtrl), wlocals);
 	}
 
 	/**

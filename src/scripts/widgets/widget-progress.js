@@ -24,58 +24,17 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Controllers
- * @name MbWidgetACtrl
- * @description Manage a widget with html text.
- * 
- * Most of textual widgets (such as h1..h6, p, a, html) just used html
- * text in view. This controller are about to manage html attribute of
- * a widget.
+ * @ngdoc Widgets
+ * @name progress
+ * @description Manage a header
  * 
  */
-.controller('MbSettingGeneralCtrl', function () {
-	
-	var attrs = [
-		// id
-		'id',
-		'name',
-		'title',
-		'class',
-		
-		// language
-		'dir',
-		'lang',
-		'translate',
-		'spellcheck',
-
-		// access
-		'accesskey',
-		'contenteditable',
-		'tabindex',
-		'hidden',
-		
-		// General style
-		'style.direction',
-		'style.visibility',
-		'style.color',
-		'style.cursor',
-		'style.opacity',
-		
-		// overflow
-		'style.overflow.x',
-		'style.overflow.y',
-		];
-
-	/*
-	 * Initial the setting editor
-	 */
-	this.init = function () {
-		/*
-		 * Load data of the widget
-		 */
-		var ctrl = this;
-		angular.forEach(attrs, function(attr){
-			ctrl[attr] = ctrl.getProperty(attr);
-		});
-	};
+.factory('WbWidgetProgress', function (WbWidgetAbstract) {
+    function Widget($scope, $element, $parent) {
+        WbWidgetAbstract.apply(this, [ $scope, $element, $parent ]);
+        this.addElementAttributes('value', 'max');
+    }
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
 });

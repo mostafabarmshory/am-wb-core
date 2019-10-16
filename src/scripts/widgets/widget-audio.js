@@ -24,48 +24,24 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Controllers
- * @name MbWidgetAudioCtrl
+ * @ngdoc Widgets
+ * @name audio
  * @description Manage a widget with audio.
  * 
  * 
  */
-.controller('MbWidgetAudioCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'alt',
-        'crossorigin',
-        'height',
-        'hspace',
-        'ismap',
-        'longdesc',
-        'sizes',
-        'src',
-        'usemap',
-        'width',
-        ];
-
-    this.initWidget = function(){
-        var ctrl = this;
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                ctrl.setElementAttribute(key, value);
-            }
-            // support legacy image
-            if(event.key === 'url'){
-            	ctrl.setElementAttribute('src', value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-        }
+.controller('WbWidgetAudio', function (WbWidgetAbstractHtml) {
+    /**
+     * Creates new instance of the widget
+     * 
+     * @memberof audio
+     */
+    function Widget($scope, $element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$scope, $element, $parent]);
+        this.addElementAttributes('alt', 'crossorigin',
+                'height', 'hspace', 'ismap', 'longdesc',
+                'sizes', 'src', 'usemap', 'width');
     };
-
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
 });

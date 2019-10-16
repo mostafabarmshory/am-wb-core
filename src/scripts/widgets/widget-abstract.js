@@ -27,10 +27,9 @@
 //submit the controller
 angular.module('am-wb-core')//
 /**
- * @ngdoc Controllers
- * @name WbAbstractWidget
- * @class
- * @descreption root of the widgets
+ * @ngdoc Widgets
+ * @name WbWidgetAbstract
+ * @descreption Abstract widget
  * 
  * This is an abstract implementation of the widgets. ## Models
  * 
@@ -75,30 +74,10 @@ angular.module('am-wb-core')//
  * <li>widgetSelected</li>
  * </ul>
  */
-.controller('WbWidgetAbstractCtrl', function($scope, $element, $wbUtil, $widget, $timeout, $wbWindow){
+.factory('WbWidgetAbstract', function($wbUtil, $widget, $timeout, $wbWindow ){
     'use strict';
 
-    var widgetBasicWidgetAttributes = [
-        'id',
-        'name',
-        'title',
-        'class',
 
-        'accesskey',
-        'contenteditable',
-        'dir',
-        'hidden',
-        'spellcheck',
-        'tabindex',
-        'lang',
-        'translate',
-        /*
-         * NOTE: We must manage D&D internally to mange user D&D codes
-         * TODO: maso, 2019: move dnd into a processor
-         */
-        //  'draggable',
-        //  'dropzone',
-        ];
 
 
     function debounce(func, wait) {
@@ -115,130 +94,177 @@ angular.module('am-wb-core')//
         };
     }
 
-    /**
-     * State of the widget
-     * 
-     * - init
-     * - edit
-     * - ready
-     * - deleted
-     * 
-     * @memberof WbAbstractWidget
-     */
-    this.state = 'init';
 
-    this.actions = [];
-    this.callbacks = [];
-    this.childWidgets = [];
 
-    /*
-     * This is a cache of customer function
-     * 
-     */
-    this.eventFunctions = {};
-    this.computedStyle = {};
+    function WbWidgetAbstract ($scope, $element, $parent){
+        this.elementAttributes = [
+            // identification
+            'id',
+            'name',
+            'title',
+            'class',
+            // access
+            'accesskey',
+            'contenteditable',
+            'hidden',
+            'tabindex',
+            // language
+            'dir',
+            'lang',
+            'translate',
+            'spellcheck',
+            /*
+             * NOTE: We must manage D&D internally to mange user D&D codes
+             * TODO: maso, 2019: move dnd into a processor
+             */
+            //  'draggable',
+            //  'dropzone',
+            ];
+        this.$scope = $scope;
+        this.$element = $element;
+        this.$parent = $parent;
+        /**
+         * State of the widget
+         * 
+         * - init
+         * - edit
+         * - ready
+         * - deleted
+         * 
+         * @memberof WbAbstractWidget
+         */
+        this.state = 'init';
 
-    // models
-    this.runtimeModel = {};
-    this.model = {};
+        this.actions = [];
+        this.callbacks = [];
+        this.childWidgets = [];
 
-    // event listeners
-    var ctrl = this;
-    /*
-     * TODO: maso, 2019: move to event manager.
-     */
-    this.eventListeners = {
-            click: function ($event) {
-                if (ctrl.isEditable()) {
-                    ctrl.setSelected(true, $event);
-                    $event.stopPropagation();
+        /*
+         * This is a cache of customer function
+         * 
+         */
+        this.eventFunctions = {};
+        this.computedStyle = {};
+
+        // models
+        this.runtimeModel = {};
+        this.model = {};
+        // event listeners
+        var ctrl = this;
+        /*
+         * TODO: maso, 2019: move to event manager.
+         */
+        this.eventListeners = {
+                click: function ($event) {
+                    if (ctrl.isEditable()) {
+                        ctrl.setSelected(true, $event);
+                        $event.stopPropagation();
+                    }
+                    ctrl.fire('click', $event);
+                },
+                dblclick: function ($event) {
+                    if (ctrl.isEditable()) {
+                        ctrl.setSelected(true, $event);
+                        $event.stopPropagation();
+                        $event.preventDefault();
+                        // Open an editor 
+                        var editor = ctrl.$widget.getEditor(ctrl);
+                        editor.show();
+                    }
+                    ctrl.fire('dblclick', $event);
+                },
+                mouseout: function ($event) {
+                    ctrl.fire('mouseout', $event);
+                },
+                mouseover: function ($event) {
+                    ctrl.fire('mouseover', $event);
+                },
+                mousedown: function ($event) {
+                    ctrl.fire('mousedown', $event);
+                },
+                mouseup: function ($event) {
+                    ctrl.fire('mouseup', $event);
+                },
+                mouseenter: function ($event) {
+                    ctrl.fire('mouseenter', $event);
+                },
+                mouseleave: function ($event) {
+                    ctrl.fire('mouseleave', $event);
+                },
+
+                // Media events
+                error: function ($event) {
+                    ctrl.fire('error', $event);
+                },
+                success: function ($event) {
+                    ctrl.fire('success', $event);
+                },
+                load: function ($event) {
+                    ctrl.fire('load', $event);
                 }
-                ctrl.fire('click', $event);
-            },
-            dblclick: function ($event) {
-                if (ctrl.isEditable()) {
-                    ctrl.setSelected(true, $event);
-                    $event.stopPropagation();
-                    $event.preventDefault();
-                    // Open an editor 
-                    var editor = ctrl.$widget.getEditor(ctrl);
-                    editor.show();
-                }
-                ctrl.fire('dblclick', $event);
-            },
-            mouseout: function ($event) {
-                ctrl.fire('mouseout', $event);
-            },
-            mouseover: function ($event) {
-                ctrl.fire('mouseover', $event);
-            },
-            mousedown: function ($event) {
-                ctrl.fire('mousedown', $event);
-            },
-            mouseup: function ($event) {
-                ctrl.fire('mouseup', $event);
-            },
-            mouseenter: function ($event) {
-                ctrl.fire('mouseenter', $event);
-            },
-            mouseleave: function ($event) {
-                ctrl.fire('mouseleave', $event);
-            },
+        };
 
-            // Media events
-            error: function ($event) {
-                ctrl.fire('error', $event);
-            },
-            success: function ($event) {
-                ctrl.fire('success', $event);
-            },
-            load: function ($event) {
-                ctrl.fire('load', $event);
+        /*
+         * Add resize observer to the element
+         */
+        this.resizeObserver = new ResizeObserver(debounce(function ($event) {
+            if(angular.isArray($event)){
+                $event = $event[0];
             }
-    };
+            ctrl.fire('resize', $event);
+        }, 300));
 
-    /*
-     * Add resize observer to the element
-     */
-    this.resizeObserver = new ResizeObserver(debounce(function ($event) {
-        if(angular.isArray($event)){
-            $event = $event[0];
-        }
-        ctrl.fire('resize', $event);
-    }, 300));
+        var options = {
+                root: null,
+                rootMargin: '0px',
+        };
 
-    var options = {
-            root: null,
-            rootMargin: '0px',
-    };
-    
-    this.intersectionObserver = new IntersectionObserver(function ($event) {
-        if(angular.isArray($event)){
-            $event = $event[0];
-        }
-        ctrl.setIntersecting($event.isIntersecting, $event);
-    }, options);
+        this.intersectionObserver = new IntersectionObserver(function ($event) {
+            if(angular.isArray($event)){
+                $event = $event[0];
+            }
+            ctrl.setIntersecting($event.isIntersecting, $event);
+        }, options);
+
+        // Init the widget
+        this.connect();
+    }
+
 
 
     /**
      * Loads all basic elements attributes.
      * 
+     * TODO: move to processor
      * 
      * @memberof WbAbstractWidget
      */
-    this.loadBasicProperties = function () {
+    WbWidgetAbstract.prototype.loadBasicProperties = function () {
         var model = this.getModel();
         if (!model) {
             return;
         }
         var $element = this.getElement();
-        for(var i =0; i < widgetBasicWidgetAttributes.length; i++){
-            var key = widgetBasicWidgetAttributes[i];
+        for(var i =0; i < this.elementAttributes.length; i++){
+            var key = this.elementAttributes[i];
             var value = this.getProperty(key) || this.getModelProperty(key);
             if(value){
                 $element.attr(key, value);
             } else {
                 $element.removeAttr(key);
+            }
+            // NOTE: html is special value
+            if(key === 'html'){
+                $element.html(value);
+            }
+            if(key === 'inputType'){
+                this.setElementAttribute('type', value);
+            }
+            if(key === 'inputType'){
+                this.setElementAttribute('type', value);
+            }
+            if(key === 'value'){
+                $element.val(value);
             }
         }
     };
@@ -254,7 +280,7 @@ angular.module('am-wb-core')//
      *            {object} part of widget model
      * @memberof WbAbstractWidget
      */
-    this.loadStyle = function () {
+    WbWidgetAbstract.prototype.loadStyle = function () {
         var model = this.getModel();
         var runtimeModel = this.getRuntimeModel();
         if (!model) {
@@ -280,7 +306,7 @@ angular.module('am-wb-core')//
         } else {
             css = $wbUtil.convertToWidgetCss(this.computedStyle || {});
         }
-        $element.css(css);
+        this.$element.css(css);
         this.fire('styleChanged', $event);
     };
 
@@ -292,7 +318,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.refresh = function($event) {
+    WbWidgetAbstract.prototype.refresh = function($event) {
         if(this.isSilent()) {
             return;
         }
@@ -307,7 +333,7 @@ angular.module('am-wb-core')//
                 this.eventFunctions = {};
             } else if(key.startsWith('style')) {
                 this.loadStyle();
-            } else if(_.includes(widgetBasicWidgetAttributes, key)){
+            } else if(_.includes(this.elementAttributes, key)){
                 var value = this.getProperty(key) || this.getModelProperty(key);
                 this.setElementAttribute(key, value);
             }
@@ -326,7 +352,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.reload = function(){
+    WbWidgetAbstract.prototype.reload = function(){
         this.runtimeModel = {};
         this.refresh();
     };
@@ -345,7 +371,7 @@ angular.module('am-wb-core')//
      * @see #setModelProperty(key, value)
      * @memberof WbAbstractWidget
      */
-    this.getModel = function () {
+    WbWidgetAbstract.prototype.getModel = function () {
         return this.wbModel;
     };
 
@@ -355,7 +381,7 @@ angular.module('am-wb-core')//
      * @see #getModel()
      * @memberof WbAbstractWidget
      */
-    this.setModel = function (model) {
+    WbWidgetAbstract.prototype.setModel = function (model) {
         this.setState('init');
         if (model === this.wbModel) {
             return;
@@ -371,7 +397,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.hasModelProperty = function(key){
+    WbWidgetAbstract.prototype.hasModelProperty = function(key){
         return objectPath.has(this.getModel(), key);
     };
 
@@ -381,7 +407,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getModelProperty = function(key){
+    WbWidgetAbstract.prototype.getModelProperty = function(key){
         return objectPath.get(this.getModel(), key);
     };
 
@@ -390,7 +416,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.setModelProperty = function (key, value){
+    WbWidgetAbstract.prototype.setModelProperty = function (key, value){
         // create the event
         var $event = {};
         $event.source = this;
@@ -420,7 +446,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getRuntimeModel = function () {
+    WbWidgetAbstract.prototype.getRuntimeModel = function () {
         return this.runtimeModel;
     };
 
@@ -432,7 +458,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.hasProperty = function (key){
+    WbWidgetAbstract.prototype.hasProperty = function (key){
         return objectPath.has(this.getRuntimeModel(), key);
     };
 
@@ -441,7 +467,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getProperty = function (key){
+    WbWidgetAbstract.prototype.getProperty = function (key){
         return objectPath.get(this.getRuntimeModel(), key);
     };
 
@@ -450,7 +476,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.removeProperty = function (key){
+    WbWidgetAbstract.prototype.removeProperty = function (key){
         var model = this.getRuntimeModel();
         objectPath.del(model, key);
     };
@@ -464,7 +490,7 @@ angular.module('am-wb-core')//
      * @memberof WbAbstractWidget
      * @name setProperty
      */
-    this.setProperty = function (key, value){
+    WbWidgetAbstract.prototype.setProperty = function (key, value){
         // create the event
         var $event = {};
         $event.source = this;
@@ -534,7 +560,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.style = function (style, value) {
+    WbWidgetAbstract.prototype.style = function (style, value) {
         // there is no argument so act as get
         if(!angular.isDefined(style)){
             return angular.copy(this.getProperty('style'));
@@ -555,7 +581,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.setStyle = function(key, value) {
+    WbWidgetAbstract.prototype.setStyle = function(key, value) {
         this.setProperty('style.' + key, value);
     };
 
@@ -565,7 +591,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getStyle = function(key) {
+    WbWidgetAbstract.prototype.getStyle = function(key) {
         return this.getProperty('style.' + key);
     };
 
@@ -575,7 +601,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.destroy = function ($event) {
+    WbWidgetAbstract.prototype.destroy = function ($event) {
         // remove callbacks
         this.callbacks = [];
         this.actions = [];
@@ -587,10 +613,12 @@ angular.module('am-wb-core')//
         this.childWidgets = [];
 
         // destroy view
+        var $element = this.getElement();
         $element.remove();
         $element = null;
 
         // remove scope
+        var $scope = this.getScope();
         $scope.$destroy();
         $scope = null;
         this.fire('destroy', $event);
@@ -601,7 +629,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.disconnect = function () {
+    WbWidgetAbstract.prototype.disconnect = function () {
         var $element = this.getElement();
         if (!$element) {
             return;
@@ -619,7 +647,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.connect = function () {
+    WbWidgetAbstract.prototype.connect = function () {
         var $element = this.getElement();
         if (!$element) {
             return;
@@ -636,8 +664,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getElement = function () {
-        return $element;
+    WbWidgetAbstract.prototype.getElement = function () {
+        return this.$element;
     };
 
     /**
@@ -645,7 +673,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.setElementAttribute = function(key, value){
+    WbWidgetAbstract.prototype.setElementAttribute = function(key, value){
+        var $element = this.$element;
         if(value){
             $element.attr(key, value);
         } else {
@@ -659,8 +688,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getElementAttribute = function(key){
-        return $element.attr(key);
+    WbWidgetAbstract.prototype.getElementAttribute = function(key){
+        return this.$element.attr(key);
     };
 
     /**
@@ -669,8 +698,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.removeElementAttribute = function(key){
-        $element.removeAttr(key);
+    WbWidgetAbstract.prototype.removeElementAttribute = function(key){
+        this.$element.removeAttr(key);
     };
 
     /**
@@ -679,7 +708,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.setSilent = function(silent) {
+    WbWidgetAbstract.prototype.setSilent = function(silent) {
         this.silent = silent;
     };
 
@@ -689,7 +718,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.isSilent = function() {
+    WbWidgetAbstract.prototype.isSilent = function() {
         return this.silent;
     };
 
@@ -702,7 +731,7 @@ angular.module('am-wb-core')//
      *            to call on the event
      * @memberof WbAbstractWidget
      */
-    this.on = function (type, callback) {
+    WbWidgetAbstract.prototype.on = function (type, callback) {
         if (!angular.isFunction(callback)) {
             throw {
                 message: 'Callback must be a function'
@@ -726,7 +755,7 @@ angular.module('am-wb-core')//
      *            to remove
      * @memberof WbAbstractWidget
      */
-    this.off = function (type, callback) {
+    WbWidgetAbstract.prototype.off = function (type, callback) {
         if (!angular.isArray(this.callbacks[type])) {
             return;
         }
@@ -749,7 +778,7 @@ angular.module('am-wb-core')//
      *            to add to the event
      * @memberof WbAbstractWidget
      */
-    this.fire = function (type, params) {
+    WbWidgetAbstract.prototype.fire = function (type, params) {
         // 1- Call processors
         var event = _.merge({
             source: this,
@@ -787,7 +816,7 @@ angular.module('am-wb-core')//
      * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
      * @memberof WbAbstractWidget
      */
-    this.getDirection = function () {
+    WbWidgetAbstract.prototype.getDirection = function () {
         return this.getModelProperty('style.layout.direction') || 'column';
     };
 
@@ -797,7 +826,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getEvent = function () {
+    WbWidgetAbstract.prototype.getEvent = function () {
         return this.getModelProperty('event') || {};
     };
 
@@ -807,7 +836,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getTitle = function () {
+    WbWidgetAbstract.prototype.getTitle = function () {
         return this.getModelProperty('label');
     };
 
@@ -817,7 +846,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getType = function () {
+    WbWidgetAbstract.prototype.getType = function () {
         return this.getModelProperty('type');
     };
 
@@ -827,7 +856,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getId = function () {
+    WbWidgetAbstract.prototype.getId = function () {
         return this.getModelProperty('id');
     };
 
@@ -840,8 +869,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getParent = function () {
-        return $parent;
+    WbWidgetAbstract.prototype.getParent = function () {
+        return this.$parent;
     };
 
     /**
@@ -850,8 +879,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getScope = function () {
-        return $scope;
+    WbWidgetAbstract.prototype.getScope = function () {
+        return this.$scope;
     };
 
     /**
@@ -859,7 +888,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.setState = function (state) {
+    WbWidgetAbstract.prototype.setState = function (state) {
         var oldState = this.state;
         this.state = state;
         this.fire('stateChanged', {
@@ -875,7 +904,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.isEditable = function () {
+    WbWidgetAbstract.prototype.isEditable = function () {
         return this.editable;
     };
 
@@ -885,7 +914,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.setEditable = function (editable) {
+    WbWidgetAbstract.prototype.setEditable = function (editable) {
         if (this.editable === editable) {
             return;
         }
@@ -920,7 +949,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.isIntersecting = function(){
+    WbWidgetAbstract.prototype.isIntersecting = function(){
         return this.intersecting;
     };
 
@@ -930,7 +959,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.setIntersecting = function(intersecting, $event){
+    WbWidgetAbstract.prototype.setIntersecting = function(intersecting, $event){
         this.intersecting = intersecting;
         this.fire('intersection', $event);
     };
@@ -943,9 +972,10 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.delete = function () {
+    WbWidgetAbstract.prototype.delete = function () {
         // remove itself
         this.fire('delete');
+        var $parent = this.getParent();
         $parent.removeChild(this);
     };
 
@@ -954,7 +984,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.clone = function () {
+    WbWidgetAbstract.prototype.clone = function () {
+        var $parent = this.getParent();
         var index = $parent.indexOfChild(this);
         $parent.addChild(index, angular.copy(this.getModel()));
     };
@@ -964,7 +995,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.moveNext = function () {
+    WbWidgetAbstract.prototype.moveNext = function () {
+        var $parent = this.getParent();
         $parent.moveChild(this, $parent.indexOfChild(this) + 1);
     };
 
@@ -973,7 +1005,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.moveBefore = function () {
+    WbWidgetAbstract.prototype.moveBefore = function () {
+        var $parent = this.getParent();
         $parent.moveChild(this, $parent.indexOfChild(this) - 1);
     };
 
@@ -982,7 +1015,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.moveFirst = function () {
+    WbWidgetAbstract.prototype.moveFirst = function () {
+        var $parent = this.getParent();
         $parent.moveChild(this, 0);
     };
 
@@ -991,7 +1025,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.moveLast = function () {
+    WbWidgetAbstract.prototype.moveLast = function () {
+        var $parent = this.getParent();
         $parent.moveChild(this, $parent.getChildren().length - 1);
     };
 
@@ -1003,7 +1038,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.isRoot = function () {
+    WbWidgetAbstract.prototype.isRoot = function () {
+        var $parent = this.getParent();
         return angular.isUndefined($parent) || $parent === null;
     };
 
@@ -1013,7 +1049,7 @@ angular.module('am-wb-core')//
      * @return the root widget
      * @memberof WbAbstractWidget
      */
-    this.getRoot = function () {
+    WbWidgetAbstract.prototype.getRoot = function () {
         // check if the root is set
         if (this.rootWidget) {
             return this.rootWidget;
@@ -1035,11 +1071,11 @@ angular.module('am-wb-core')//
      * @return true if the widget is selected.
      * @memberof WbAbstractWidget
      */
-    this.isSelected = function () {
+    WbWidgetAbstract.prototype.isSelected = function () {
         return this.selected;
     };
 
-    this.setSelected = function (flag, $event) {
+    WbWidgetAbstract.prototype.setSelected = function (flag, $event) {
         if (this.isRoot()) {
             return;
         }
@@ -1066,7 +1102,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.addAction = function (action) {
+    WbWidgetAbstract.prototype.addAction = function (action) {
         this.actions.push(action);
     };
 
@@ -1075,7 +1111,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.getActions = function () {
+    WbWidgetAbstract.prototype.getActions = function () {
         return this.actions;
     };
 
@@ -1086,7 +1122,7 @@ angular.module('am-wb-core')//
      * @return bounding rectangle
      * @memberof WbAbstractWidget
      */
-    this.getBoundingClientRect = function () {
+    WbWidgetAbstract.prototype.getBoundingClientRect = function () {
         var element = this.getElement();
         if(!element){
             return {
@@ -1117,7 +1153,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.animate = function (options) {
+    WbWidgetAbstract.prototype.animate = function (options) {
         var ctrl = this;
         var keys = [];
         var animation = {
@@ -1175,7 +1211,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbAbstractWidget
      */
-    this.removeAnimation = function () {
+    WbWidgetAbstract.prototype.removeAnimation = function () {
         // The animation will not add to element so there is no need to remove
     };
 
@@ -1185,7 +1221,7 @@ angular.module('am-wb-core')//
      * @memberof WbAbstractWidget
      * @params window {WbWindow} of the current widget
      */
-    this.setWindow = function (window) {
+    WbWidgetAbstract.prototype.setWindow = function (window) {
         this.window = window;
     };
 
@@ -1195,10 +1231,32 @@ angular.module('am-wb-core')//
      * @memberof WbAbstractWidget
      * @return window of the current widget or from the root
      */
-    this.getWindow = function () {
+    WbWidgetAbstract.prototype.getWindow = function () {
         return this.window || this.getRoot().getWindow() || $wbWindow;
     };
 
+
+    /**
+     * Adds attributes into the element attributes
+     * 
+     * $widget.addElementAttributes('a', 'b');
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.addElementAttributes = function(){
+        this.elementAttributes = _.union(this.elementAttributes, arguments);
+    };
+
+    /**
+     * Gets element attributes
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getElementAttributes = function(){
+        return this.elementAttributes;
+    }
+
+    return WbWidgetAbstract;
 
 });
 

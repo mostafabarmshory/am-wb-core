@@ -50,16 +50,7 @@ describe('WbAbstractWidget ', function () {
 		 */
 		$widget.newWidget({
 		    type: widgetType,
-		    controller: function(){
-		        this.testFunction = function(){
-		            return true;
-		        };
-		        this.initWidget = function() {
-		            // TODO;
-		        };
-		    },
-		    controllerAs: 'ctrl',
-		    template: '<h1>{{ctrl.text}}</h1>'
+		    template: '<h1></h1>'
 		});
 	}));
 

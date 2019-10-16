@@ -121,6 +121,7 @@
 									"type": "a",
 									"src": "http://localhost",
 									"html": "this is a link",
+									"class": "test my-class",
 									"style": {
 										"margin": "8px"
 									}

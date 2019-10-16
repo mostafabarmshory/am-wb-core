@@ -24,55 +24,60 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Controllers
- * @name MbWidgetHtmlCtrl
- * @description Manage a widget with html text.
+ * @ngdoc Widget
+ * @name input
+ * @description Manage an input field
  * 
- * Most of textual widgets (such as h1..h6, p, a, html) just used html
- * text in view. This controller are about to manage html attribute of
- * a widget.
+ * The most used widget to get information from clients is an input. The input
+ * are responsible to get most of data types (email, text, number, ex.) from
+ * clients.
  * 
  */
-.controller('MbWidgetHtmlCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'html'
-        ];
-
-    this.initWidget = function(){
+.factory('WbWidgetInput', function (WbWidgetAbstractHtml) {
+    /**
+     * Creates new instance of the group
+     * 
+     * @memberof WbWidgetGroupCtrl
+     * @ngInject
+     */
+    function Widget($scope, $element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$scope, $element, $parent]);
+        this.addElementAttributes('accept', 'alt',
+                'autocomplete', 'autofocus', 'checked',
+                'dirname', 'disabled', 'form', 'max',
+                'maxlength', 'min', 'multiple', 'name',
+                'pattern', 'placeholder', 'readonly',
+                'required', 'size', 'src', 'step', 'inputType',
+                'value');
+        // init input
         var ctrl = this;
-        function elementAttribute(key, value){
-            if(key === 'html'){
-                ctrl.getElement().html(value);
-            }
-            ctrl.setElementAttribute(key, value);
-        }
         function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                elementAttribute(key, value);
+            if(event.key === 'inputType'){
+                ctrl.setElementAttribute('type', value);
             }
         }
         // listen on change
         this.on('modelUpdated', eventHandler);
         this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            elementAttribute(key, ctrl.getModelProperty(key));
-        }
-    };
+    }
+
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+
 
     /**
      * Gets value of the input
+     * 
+     * @memberof input
      */
-    this.html = function(){
+    Widget.prototype.val = function(){
         var value = arguments[0];
         if(value){
-            this.setElementAttribute('html', value);
+            this.setElementAttribute('value', value);
         }
         var element = this.getElement();
-        return element.html.apply(element, arguments);
+        return element.val.apply(element, arguments);
     };
+
+    return Widget;
 });

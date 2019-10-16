@@ -49,9 +49,7 @@ describe('Timeout test', function () {
 		 */
 		$widget.newWidget({
 			type: widgetType,
-			controller: function () {},
-			controllerAs: 'ctrl',
-			template: '<h1>{{ctrl.text}}</h1>'
+			template: '<h1></h1>'
 		});
 	}));
 

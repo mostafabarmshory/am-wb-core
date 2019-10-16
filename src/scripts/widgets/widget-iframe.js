@@ -24,48 +24,20 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Controllers
- * @name MbWidgetVideoCtrl
- * @description Manage a widget with audio.
+ * @ngdoc Widgets
+ * @name iframe
+ * @description Manage an iframe
  * 
+ * Iframe is a widget to incloud other pages as a part of current page. This widget is
+ * used as Iframe manager.
  * 
  */
-.controller('MbWidgetVideoCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'alt',
-        'crossorigin',
-        'height',
-        'hspace',
-        'ismap',
-        'longdesc',
-        'sizes',
-        'src',
-        'usemap',
-        'width',
-        ];
-
-    this.initWidget = function(){
-        var ctrl = this;
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                ctrl.setElementAttribute(key, value);
-            }
-            // support legacy image
-            if(event.key === 'url'){
-            	ctrl.setElementAttribute('src', value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-        }
+.factory('WbWidgetIframe', function (WbWidgetAbstractHtml) {
+    function Widget($scope, $element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$scope, $element, $parent]);
+        this.addElementAttributes('name', 'src', 'srcdoc', 'sandbox');
     };
-
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
 });

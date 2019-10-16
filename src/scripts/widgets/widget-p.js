@@ -24,35 +24,15 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Controllers
- * @name MbWidgetHeaderCtrl
- * @description Manage a header
+ * @ngdoc Widgets
+ * @name pre
+ * @description Manage a widget with preformatted text.
  * 
  */
-.controller('MbWidgetProgressCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [ 'value', 'max' ];
-
-    /*
-     * This method will be call from the parent to initialize the widget
-     */
-    this.initWidget = function () {
-        var ctrl = this;
-        function eventHandler(event) {
-            // Get an event and update the view if the event key is one of element attributes
-            if (elementAttributes.includes(event.key)) {
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                ctrl.setElementAttribute(key, value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data from the model
-        for (var i = 0; i < elementAttributes.length; i++) {
-            var key = elementAttributes[i];
-            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-        }
+.factory('WbWidgetP', function (WbWidgetAbstractHtml) {
+    function Widget($scope, $element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$scope, $element, $parent]);
     };
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
 });

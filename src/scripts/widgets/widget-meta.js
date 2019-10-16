@@ -24,52 +24,37 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Controllers
- * @name MbWidgetMetaCtrl
+ * @ngdoc Widgets
+ * @name meta
  * @description Manage a meta data 
  * 
  * In seo (or equivalient usecase) 
  * 
  */
-.controller('MbWidgetMetaCtrl', function () {
-	// list of element attributes
-	var elementAttributes = [
-		'charset',
-		'content',
-		'http-equiv',
-		'name',
-		];
+.factory('WbWidgetMeta', function (WbWidgetAbstractHtml) {
+    function Widget($scope, $element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$scope, $element, $parent]);
+        this.addElementAttributes('charset', 'content',
+                'http-equiv', 'name');
 
-	this.initWidget = function(){
-		var ctrl = this;
-		function updateView(){
-			var name = ctrl.getProperty('name') || ctrl.getModelProperty('name');
-			var content = ctrl.getProperty('content') || ctrl.getModelProperty('content');
-			ctrl.getElement().html(name + ':' + content);
-		}
-		function eventHandler(event){
-			if(elementAttributes.includes(event.key)){
-				var key = event.key;
-				var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-				ctrl.setElementAttribute(key, value);
-			}
-			updateView();
-		}
-		// listen on change
-		this.on('modelUpdated', eventHandler);
-		this.on('runtimeModelUpdated', eventHandler);
-		this.on('stateChanged', function(){
-			if(ctrl.state === 'edit'){
-				ctrl.getElement().show();
-				return;
-			}
-			ctrl.getElement().hide();
-		});
-		// load initial data
-		for(var i =0; i < elementAttributes.length;i++){
-			var key = elementAttributes[i];
-			ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-		}
-		updateView();
-	};
+        var ctrl = this;
+        function updateView(){
+            var name = ctrl.getProperty('name') || ctrl.getModelProperty('name');
+            var content = ctrl.getProperty('content') || ctrl.getModelProperty('content');
+            ctrl.getElement().html(name + ':' + content);
+        }
+
+        this.on('stateChanged', function(){
+            if(ctrl.state === 'edit'){
+                ctrl.getElement().show();
+                return;
+            }
+            ctrl.getElement().hide();
+        });
+        updateView();
+    };
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
 });
+

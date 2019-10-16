@@ -122,7 +122,7 @@ describe('Service $wbUtil', function () {
 			var data = dataList[i];
 			var clone = $wbUtil.clean(data);
 
-			expect(clone.version).toBe('wb2');
+			expect(clone.version).toBe('wb3');
 
 			expect(angular.isDefined(clone.style.borderColor)).toBe(false);
 			expect(angular.isDefined(clone.style.borderRadius)).toBe(false);

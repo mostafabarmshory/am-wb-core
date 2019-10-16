@@ -24,44 +24,18 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Controllers
- * @name MbWidgetACtrl
- * @description Manage a widget with html text.
- * 
- * Most of textual widgets (such as h1..h6, p, a, html) just used html
- * text in view. This controller are about to manage html attribute of
- * a widget.
- * 
+ * @ngdoc Widgets
+ * @name video
+ * @description Manage a widget with 
  */
-.controller('MbWidgetLinkCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'crossorigin',
-        'href',
-        'hreflang',
-        'media',
-        'rel',
-        'size',
-        'type',
-        ];
+ .factory('MbWidgetVideo', function (WbWidgetAbstract) {
 
-    this.initWidget = function(){
-        var ctrl = this;
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                ctrl.setElementAttribute(key, value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-        }
+    function Widget($scope, $element, $parent) {
+        WbWidgetAbstract.apply(this, [ $scope, $element, $parent ]);
+        this.addElementAttributes('alt', 'crossorigin', 'height',
+                'hspace', 'ismap', 'longdesc', 'sizes', 'src',
+                'usemap', 'width');
     };
-
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
 });

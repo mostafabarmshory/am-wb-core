@@ -27,22 +27,30 @@
 //submit the controller
 angular.module('am-wb-core')//
 /**
- * @ngdoc Controllers
- * @name WbWidgetGroupCtrl
- * @description Manages a group widget
+ * @ngdoc Widget
+ * @name WbWidgetGroup
+ * @description Manages a group widgets
  * 
  * This is a group controller
  * 
- * @ngInject
  */
-.controller('WbWidgetGroupCtrl', function($scope, $element, $wbUtil, $widget, $q, $parent, $controller){
+.factory('WbWidgetGroup', function( $wbUtil, $widget, $q, WbWidgetAbstract){
 
-    // extend the controller
-    angular.extend(this, $controller('WbWidgetAbstractCtrl', {
-        $scope: $scope,
-        $element: $element,
-        $parent: $parent
-    }));
+    /**
+     * Creates new instance of the group
+     * 
+     * @memberof WbWidgetGroupCtrl
+     * @ngInject
+     */
+    function WbWidgetGroupCtrl($scope, $element, $parent){
+        // call super constractor
+        WbWidgetAbstract.apply(this, [$scope, $element, $parent]);
+        
+        // init group
+    }
+    
+    // extend functionality
+    WbWidgetGroupCtrl.prototype = Object.create(WbWidgetAbstract.prototype);
 
 
     /**
@@ -54,7 +62,7 @@ angular.module('am-wb-core')//
      * @memberof WbWidgetGroupCtrl
      * @param model Object to set into the group
      */
-    this.setModel = function (model) {
+    WbWidgetGroupCtrl.prototype.setModel = function (model) {
         this.setState('init');
         if (model === this.wbModel) {
             return;
@@ -74,14 +82,14 @@ angular.module('am-wb-core')//
     /**
      * Check if the widget is selected
      */
-    this.isChildSelected = function (widget) {
+    WbWidgetGroupCtrl.prototype.isChildSelected = function (widget) {
         if (this.isRoot()) {
             return widget === this.lastSelectedItem;
         }
         return this.getParent().isChildSelected(widget);
     };
 
-    this.getChildById = function (id) {
+    WbWidgetGroupCtrl.prototype.getChildById = function (id) {
         var widgets = this.childWidgets;
         for (var i = 0; i < widgets.length; i++) {
             if (widgets[i].getId() === id) {
@@ -95,11 +103,11 @@ angular.module('am-wb-core')//
      * 
      * @return list of all widgets
      */
-    this.getChildren = function () {
+    WbWidgetGroupCtrl.prototype.getChildren = function () {
         return this.childWidgets;
     };
 
-    this.loadWidgets = function (model) {
+    WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
         // destroy all children
         angular.forEach(this.childWidgets, function (widget) {
             widget.destroy();
@@ -136,7 +144,7 @@ angular.module('am-wb-core')//
 
 
 
-    this.childSelected = function (ctrl, $event) {
+    WbWidgetGroupCtrl.prototype.childSelected = function (ctrl, $event) {
         if (!this.isRoot()) {
             return this.getRoot().childSelected(ctrl, $event);
         }
@@ -162,7 +170,7 @@ angular.module('am-wb-core')//
         });
     };
 
-    this.childUnSelected = function(widget, $event){
+    WbWidgetGroupCtrl.prototype.childUnSelected = function(widget, $event){
         if (!this.isRoot()) {
             return this.getRoot().childSelected(widget, $event);
         }
@@ -186,7 +194,7 @@ angular.module('am-wb-core')//
      * 
      * Data model and visual element related to the input model will be removed.
      */
-    this.removeChild = function (widget) {
+    WbWidgetGroupCtrl.prototype.removeChild = function (widget) {
         var index = this.indexOfChild(widget);
 
         if (index > -1) {
@@ -210,7 +218,7 @@ angular.module('am-wb-core')//
     /**
      * Adds dragged widget
      */
-    this.addChild = function (index, item) {
+    WbWidgetGroupCtrl.prototype.addChild = function (index, item) {
         var model = this.getModel();
         var ctrl = this;
 
@@ -239,7 +247,7 @@ angular.module('am-wb-core')//
     /**
      * Finds index of child element
      */
-    this.moveChild = function (widget, index) {
+    WbWidgetGroupCtrl.prototype.moveChild = function (widget, index) {
 
         function arraymove(arr, fromIndex, toIndex) {
             var element = arr[fromIndex];
@@ -271,7 +279,7 @@ angular.module('am-wb-core')//
     /**
      * Finds index of child element
      */
-    this.indexOfChild = function (widget) {
+    WbWidgetGroupCtrl.prototype.indexOfChild = function (widget) {
         if (!this.childWidgets || !this.childWidgets.length) {
             return -1;
         }
@@ -286,7 +294,7 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbWidgetGroupCtrl
      */
-    this.delete = function () {
+    WbWidgetGroupCtrl.prototype.delete = function () {
         // remove all children
         var widgets = this.getChildren();
         angular.forEach(widgets, function (widget) {
@@ -306,16 +314,24 @@ angular.module('am-wb-core')//
      * 
      * @memeberof WbWidgetGroupCtrl
      */
-    this.getAllowedTypes = function () {
+    WbWidgetGroupCtrl.prototype.getAllowedTypes = function () {
         if (!this.isRoot()) {
             return this.getParent().getAllowedTypes();
         }
         return this.allowedTypes;
     };
 
-    this.setAllowedTypes = function (allowedTypes) {
-        return this.allowedTypes = allowedTypes;
+    /**
+     * set acceptable widgets
+     * 
+     * $widget.setAcceptableChild('a', 'b');
+     * 
+     * @memberof WbWidgetGroupCtrl
+     */
+    WbWidgetGroupCtrl.prototype.setAllowedTypes = function () {
+        this.allowedTypes = arguments;
     };
 
+    return WbWidgetGroupCtrl;
 });
 
