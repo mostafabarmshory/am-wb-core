@@ -489,6 +489,33 @@ angular.module('am-wb-core')
     });
     
     /**
+     * @ngdoc Widgets
+     * @name pre
+     * @description A widget to add Preformatted text
+     */
+    $widget.newWidget({
+        type: 'pre',
+        title: 'Preformatted',
+        label: 'preformatted',
+        icon: 'wb-widget-pre',
+        description: 'A widget to insert an Preformatted text to page.',
+        groups: ['basic'],
+        template: '<pre></pre>',
+        help: 'http://dpq.co.ir/more-information-pre',
+        model: {
+            html: 'class A {\n\tint a;\n}',
+        },
+        controller: 'MbWidgetPreCtrl', 
+        controllerAs: 'ctrl'
+    });
+    
+
+    $widget.setEditor('pre', {
+        type: 'WidgetEditorCode',
+        options: {}
+    });
+    
+    /**
 	 * @ngdoc Widgets
 	 * @name img
 	 * @description Image widget
