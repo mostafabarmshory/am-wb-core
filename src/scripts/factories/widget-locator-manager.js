@@ -281,7 +281,7 @@ angular
 	 * Sets the root widget
 	 * 
 	 * @param rootWidget
-	 *            {WbWidgetCtrl} root widget
+	 *            {WbAbstractWidget} root widget
 	 * @memberof WidgetLocatorManager
 	 */
 	WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {

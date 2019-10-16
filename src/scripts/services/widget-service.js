@@ -275,23 +275,19 @@ angular.module('am-wb-core')
 	function createWidgetController(widget, model, parentWidget, childScope, element, providers){
 		var wlocals = _.merge({
 			$scope : childScope,
-			$element : element
+			$element : element,
+			$parent: parentWidget
 		}, providers);
-		var ctrl;
-		if (model.type !== 'Group') {
-			ctrl = $controller('WbWidgetCtrl', wlocals);
-		} else {
-			ctrl = $controller('WbWidgetGroupCtrl', wlocals);
-		}
-		ctrl.setParent(parentWidget);
+		
+		var srcCtrl = (model.type === 'Group') ? 'WbWidgetGroupCtrl' : 'WbWidgetGroupCtrl';
+		var ctrl = $controller(widget.boost || srcCtrl, wlocals);
 
 		// NOTE: can inject widget controller as WidgetCtrl
 		wlocals.WidgetCtrl = ctrl;
-		wlocals.$parent = parentWidget;
+		
 		// extend element controller
 		if (angular.isDefined(widget.controller)) {
 			var wctrl = $controller(widget.controller, wlocals);
-			// extend the controller
 			angular.extend(ctrl, wctrl);
 		}
 		return ctrl;

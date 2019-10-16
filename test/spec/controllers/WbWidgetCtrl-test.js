@@ -23,7 +23,7 @@
  */
 'use strict';
 
-describe('WbWidgetCtrl ', function () {
+describe('WbAbstractWidget ', function () {
 	// instantiate service
 	var $rootScope;
 	var $widget;

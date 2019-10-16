@@ -5515,6 +5515,1211 @@ angular.module('am-wb-core')//
 	};
 });
 
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+
+
+//submit the controller
+angular.module('am-wb-core')//
+/**
+ * @ngdoc Controllers
+ * @name WbAbstractWidget
+ * @class
+ * @descreption root of the widgets
+ * 
+ * This is an abstract implementation of the widgets. ## Models
+ * 
+ * The model of the widget is consist of two main part:
+ * 
+ * <ul>
+ * <li>User data</li>
+ * <li>Runtime data</li>
+ * </ul>
+ * 
+ * User data is set as input data model and the runtime data is managed by
+ * events and user functions.
+ * 
+ * Finally the combination of user and runtime data is used to update the view.
+ * 
+ * The setModelProperty changes the user data model.
+ * 
+ * The setProperty changes the runtime properties.
+ *  ## Events
+ * 
+ * 
+ * Here is list of allowed types:
+ * 
+ * <ul>
+ * <li>modelChanged: some properties of the model is changed.</li>
+ * <li>modelUpdated: A new data model is replaced with the current one.</li>
+ * <li>styleChanged: Computed style of the current widget is update.</li>
+ * <li>widgetIsEditable: Widget is in editable state (so the result of
+ * isEditable() is true)</li>
+ * <li>widgetIsNotEditable: widget is not in editable mode any more(so the
+ * result of isEditable() is false)</li>
+ * <li>widgetDeleted: the widgets is removed.</li>
+ * <li>widgetUnderCursor: The widget is under the mouse</li>
+ * <li>widgetSelected: the widget is selected</li>
+ * <li>widgetUnselected: the widget is unselected</li>
+ * </ul>
+ * 
+ * Following event propagate on the root too
+ * 
+ * <ul>
+ * <li>widgetUnderCursor</li>
+ * <li>widgetSelected</li>
+ * </ul>
+ */
+.controller('WbWidgetAbstractCtrl', function($scope, $element, $wbUtil, $widget, $timeout, $wbWindow){
+    'use strict';
+
+    var widgetBasicWidgetAttributes = [
+        'id',
+        'name',
+        'title',
+        'class',
+
+        'accesskey',
+        'contenteditable',
+        'dir',
+        'hidden',
+        'spellcheck',
+        'tabindex',
+        'lang',
+        'translate',
+        /*
+         * NOTE: We must manage D&D internally to mange user D&D codes
+         * TODO: maso, 2019: move dnd into a processor
+         */
+        //  'draggable',
+        //  'dropzone',
+        ];
+
+
+    function debounce(func, wait) {
+        var timeout;
+        return function() {
+            var context = this;
+            var args = arguments;
+            var later = function() {
+                timeout = null;
+                func.apply(context, args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    /**
+     * State of the widget
+     * 
+     * - init
+     * - edit
+     * - ready
+     * - deleted
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.state = 'init';
+
+    this.actions = [];
+    this.callbacks = [];
+    this.childWidgets = [];
+
+    /*
+     * This is a cache of customer function
+     * 
+     */
+    this.eventFunctions = {};
+    this.computedStyle = {};
+
+    // models
+    this.runtimeModel = {};
+    this.model = {};
+
+    // event listeners
+    var ctrl = this;
+    /*
+     * TODO: maso, 2019: move to event manager.
+     */
+    this.eventListeners = {
+            click: function ($event) {
+                if (ctrl.isEditable()) {
+                    ctrl.setSelected(true, $event);
+                    $event.stopPropagation();
+                }
+                ctrl.fire('click', $event);
+            },
+            dblclick: function ($event) {
+                if (ctrl.isEditable()) {
+                    ctrl.setSelected(true, $event);
+                    $event.stopPropagation();
+                    $event.preventDefault();
+                    // Open an editor 
+                    var editor = ctrl.$widget.getEditor(ctrl);
+                    editor.show();
+                }
+                ctrl.fire('dblclick', $event);
+            },
+            mouseout: function ($event) {
+                ctrl.fire('mouseout', $event);
+            },
+            mouseover: function ($event) {
+                ctrl.fire('mouseover', $event);
+            },
+            mousedown: function ($event) {
+                ctrl.fire('mousedown', $event);
+            },
+            mouseup: function ($event) {
+                ctrl.fire('mouseup', $event);
+            },
+            mouseenter: function ($event) {
+                ctrl.fire('mouseenter', $event);
+            },
+            mouseleave: function ($event) {
+                ctrl.fire('mouseleave', $event);
+            },
+
+            // Media events
+            error: function ($event) {
+                ctrl.fire('error', $event);
+            },
+            success: function ($event) {
+                ctrl.fire('success', $event);
+            },
+            load: function ($event) {
+                ctrl.fire('load', $event);
+            }
+    };
+
+    /*
+     * Add resize observer to the element
+     */
+    this.resizeObserver = new ResizeObserver(debounce(function ($event) {
+        if(angular.isArray($event)){
+            $event = $event[0];
+        }
+        ctrl.fire('resize', $event);
+    }, 300));
+
+    var options = {
+            root: null,
+            rootMargin: '0px',
+    };
+    
+    this.intersectionObserver = new IntersectionObserver(function ($event) {
+        if(angular.isArray($event)){
+            $event = $event[0];
+        }
+        ctrl.setIntersecting($event.isIntersecting, $event);
+    }, options);
+
+
+    /**
+     * Loads all basic elements attributes.
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.loadBasicProperties = function () {
+        var model = this.getModel();
+        if (!model) {
+            return;
+        }
+        var $element = this.getElement();
+        for(var i =0; i < widgetBasicWidgetAttributes.length; i++){
+            var key = widgetBasicWidgetAttributes[i];
+            var value = this.getProperty(key) || this.getModelProperty(key);
+            if(value){
+                $element.attr(key, value);
+            } else {
+                $element.removeAttr(key);
+            }
+        }
+    };
+
+    /**
+     * Loads style from the input model.
+     * 
+     * The style is a part of widget data model.
+     * 
+     * NOTE: this is an internal function and supposed not to call from outside.
+     * 
+     * @param style
+     *            {object} part of widget model
+     * @memberof WbAbstractWidget
+     */
+    this.loadStyle = function () {
+        var model = this.getModel();
+        var runtimeModel = this.getRuntimeModel();
+        if (!model) {
+            return;
+        }
+        var computedStyle = angular.merge({}, model.style, runtimeModel.style);
+        if(angular.equals(computedStyle, this.computedStyle)){
+            return;
+        }
+        // TODO: maso, 2018:Create event
+        var $event = {}
+        $event.source = this;
+        $event.oldValue = this.computedStyle;
+        $event.newValue = computedStyle;
+
+        // save computedStyle
+        this.computedStyle = computedStyle;
+
+        // load style
+        var css;
+        if(model.type == 'Group' || model.type == 'ObjectCollection'){
+            css = $wbUtil.convertToGroupCss(this.computedStyle || {});
+        } else {
+            css = $wbUtil.convertToWidgetCss(this.computedStyle || {});
+        }
+        $element.css(css);
+        this.fire('styleChanged', $event);
+    };
+
+    /**
+     * Refreshes the view based on the current data
+     * 
+     * It used runtime and model data to update the view.
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.refresh = function($event) {
+        if(this.isSilent()) {
+            return;
+        }
+        // to support old widget
+        var model = this.getModel();
+        this.getScope().wbModel = model;
+
+        if($event){
+            var key = $event.key || 'xxx';
+            // update event
+            if(key.startsWith('event')){
+                this.eventFunctions = {};
+            } else if(key.startsWith('style')) {
+                this.loadStyle();
+            } else if(_.includes(widgetBasicWidgetAttributes, key)){
+                var value = this.getProperty(key) || this.getModelProperty(key);
+                this.setElementAttribute(key, value);
+            }
+            return;
+        } 
+        this.eventFunctions = {};
+        this.loadStyle();
+        this.loadBasicProperties();
+    };
+
+    /**
+     * Reload all data to run the widget from the start
+     * 
+     * This function clean the runtime data and refresh the widget. On the other
+     * hand the init event will be fired.
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.reload = function(){
+        this.runtimeModel = {};
+        this.refresh();
+    };
+
+
+    /**
+     * Returns model of the widget
+     * 
+     * The model is managed by other entity and used as read only part in the
+     * widget.
+     * 
+     * By the way it is supposed that the model is used just in a widget and to
+     * modify the model, a method of the widget is called. In this case the widget
+     * fire the changes of the model.
+     * 
+     * @see #setModelProperty(key, value)
+     * @memberof WbAbstractWidget
+     */
+    this.getModel = function () {
+        return this.wbModel;
+    };
+
+    /**
+     * Sets model of the widget
+     * 
+     * @see #getModel()
+     * @memberof WbAbstractWidget
+     */
+    this.setModel = function (model) {
+        this.setState('init');
+        if (model === this.wbModel) {
+            return;
+        }
+        this.wbModel = model;
+        this.fire('modelChanged');
+        this.reload();
+        this.setState('ready');
+    };
+
+    /**
+     * Checks if the key exist in the widget model
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.hasModelProperty = function(key){
+        return objectPath.has(this.getModel(), key);
+    };
+
+    /**
+     * Get model property
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getModelProperty = function(key){
+        return objectPath.get(this.getModel(), key);
+    };
+
+    /**
+     * Sets new model property value
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.setModelProperty = function (key, value){
+        // create the event
+        var $event = {};
+        $event.source = this;
+        $event.key = key;
+        $event.oldValue = this.getModelProperty(key);
+        $event.newValue =  value;
+
+        // check if value changed
+        if(angular.equals($event.oldValue, $event.newValue)){
+            return;
+        }
+
+        // Set the address
+        if(value){
+            objectPath.set(this.getModel(), key, value);
+        } else {
+            objectPath.del(this.getModel(), key);
+        }
+
+        // refresh the view
+        this.refresh($event);
+        this.fire('modelUpdated', $event);
+    };
+
+    /**
+     * Gets runtime model
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getRuntimeModel = function () {
+        return this.runtimeModel;
+    };
+
+    /**
+     * Checks if property exist
+     * 
+     * NOTE: just look for runtime property
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.hasProperty = function (key){
+        return objectPath.has(this.getRuntimeModel(), key);
+    };
+
+    /**
+     * Gets property of the model
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getProperty = function (key){
+        return objectPath.get(this.getRuntimeModel(), key);
+    };
+
+    /**
+     * Remove property
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.removeProperty = function (key){
+        var model = this.getRuntimeModel();
+        objectPath.del(model, key);
+    };
+
+    /**
+     * Changes property value
+     * 
+     * If the change cause the view to update then this function will update and
+     * render the view.
+     * 
+     * @memberof WbAbstractWidget
+     * @name setProperty
+     */
+    this.setProperty = function (key, value){
+        // create the event
+        var $event = {};
+        $event.source = this;
+        $event.key = key;
+        $event.oldValue = this.getProperty(key);
+        $event.newValue =  value;
+        $event.value =  value;
+
+        // check if value changed
+        if(angular.equals($event.oldValue, $event.value)){
+            return;
+        }
+
+        // Set the address
+        var model = this.getRuntimeModel();
+        if(angular.isDefined(value)){
+            objectPath.set(model, key, value);
+        } else {
+            objectPath.del(model, key);
+        }
+
+
+        // refresh the view
+        this.refresh($event);
+        this.fire('runtimeModelUpdated', $event);
+        //To change the view in runtime
+        var ctrl = this;
+        // Update angular
+        // TODO: maso, 2019: replace with this model
+//      if (!$rootScope.$$phase) {
+//      scope.$digest();
+//      }
+        $timeout( function() {
+            ctrl.getScope().$digest();
+        });
+
+    };
+
+    /**
+     * Sets or gets style of the widget
+     * 
+     * The function effect on runtime style not the model. To change the model use
+     * #setModelProperty(key,value).
+     * 
+     * NOTE: this function is part of widget API.
+     * 
+     * Set style by key:
+     * 
+     * widget.style('background.color', '#ff00aa');
+     * 
+     * Get style by key:
+     * 
+     * var color = widget.style('background.color');
+     * 
+     * Remove style by key:
+     * 
+     * widget.style('background.color', null);
+     * 
+     * Set style by object:
+     * 
+     * widgt.style({ background: { color: 'red', image: null } });
+     * 
+     * The style object is read only and you can get it as follow:
+     * 
+     * var style = widget.style();
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.style = function (style, value) {
+        // there is no argument so act as get
+        if(!angular.isDefined(style)){
+            return angular.copy(this.getProperty('style'));
+        }
+        // style is a key
+        if(angular.isString(style)){
+            if(angular.isDefined(value)){
+                return this.setStyle(style, value);
+            } else {
+                return this.getStyle(style);
+            }
+        }
+    };
+
+    /**
+     * Sets style of the widget
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.setStyle = function(key, value) {
+        this.setProperty('style.' + key, value);
+    };
+
+    /**
+     * Get style from widget
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getStyle = function(key) {
+        return this.getProperty('style.' + key);
+    };
+
+    /**
+     * Remove the widgets
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.destroy = function ($event) {
+        // remove callbacks
+        this.callbacks = [];
+        this.actions = [];
+
+        // destroy children
+        angular.forEach(this.childWidgets, function (widget) {
+            widget.destroy();
+        });
+        this.childWidgets = [];
+
+        // destroy view
+        $element.remove();
+        $element = null;
+
+        // remove scope
+        $scope.$destroy();
+        $scope = null;
+        this.fire('destroy', $event);
+    };
+
+    /**
+     * Disconnect view with the widget
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.disconnect = function () {
+        var $element = this.getElement();
+        if (!$element) {
+            return;
+        }
+        this.resizeObserver.unobserve($element[0]);
+        this.intersectionObserver.unobserve($element[0]);
+        angular.forEach(this.eventListeners, function (listener, key) {
+            $element.off(key, listener);
+        });
+    };
+
+    /**
+     * Connects view with widget
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.connect = function () {
+        var $element = this.getElement();
+        if (!$element) {
+            return;
+        }
+        angular.forEach(this.eventListeners, function (listener, key) {
+            $element.on(key, listener);
+        });
+        this.resizeObserver.observe($element[0]);
+        this.intersectionObserver.observe($element[0]);
+    };
+
+    /**
+     * Get elements of the widget
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getElement = function () {
+        return $element;
+    };
+
+    /**
+     * Sets element attributes
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.setElementAttribute = function(key, value){
+        if(value){
+            $element.attr(key, value);
+        } else {
+            $element.removeAttr(key);
+        }
+    };
+
+    /**
+     * Get element attribute
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getElementAttribute = function(key){
+        return $element.attr(key);
+    };
+
+    /**
+     * Remove element attribute
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.removeElementAttribute = function(key){
+        $element.removeAttr(key);
+    };
+
+    /**
+     * Set widget silent
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.setSilent = function(silent) {
+        this.silent = silent;
+    };
+
+    /**
+     * Checks if the element is silent
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.isSilent = function() {
+        return this.silent;
+    };
+
+    /**
+     * Adds new callback of type
+     * 
+     * @param typeof
+     *            the event
+     * @param callback
+     *            to call on the event
+     * @memberof WbAbstractWidget
+     */
+    this.on = function (type, callback) {
+        if (!angular.isFunction(callback)) {
+            throw {
+                message: 'Callback must be a function'
+            };
+        }
+        if (!angular.isArray(this.callbacks[type])) {
+            this.callbacks[type] = [];
+        }
+        if(this.callbacks[type].includes(callback)){
+            return;
+        }
+        this.callbacks[type].push(callback);
+    };
+
+    /**
+     * Remove the callback
+     * 
+     * @param type
+     *            of the event
+     * @param callback
+     *            to remove
+     * @memberof WbAbstractWidget
+     */
+    this.off = function (type, callback) {
+        if (!angular.isArray(this.callbacks[type])) {
+            return;
+        }
+        // remove callback
+        var callbacks = this.callbacks[type];
+        var index = callbacks.indexOf(callback);
+        if (index > -1) {
+            callbacks.splice(index, 1);
+        }
+    };
+
+    /**
+     * Call all callbacks on the given event type.
+     * 
+     * Before callbacks, widget processors will process the widget and event.
+     * 
+     * @param type
+     *            of the event
+     * @param params
+     *            to add to the event
+     * @memberof WbAbstractWidget
+     */
+    this.fire = function (type, params) {
+        // 1- Call processors
+        var event = _.merge({
+            source: this,
+            type: type
+        }, params || {});
+        $widget.applyProcessors(this, event);
+
+        // 2- call listeners
+        if (this.isSilent() || !angular.isDefined(this.callbacks[type])) {
+            return;
+        }
+        var callbacks = this.callbacks[type];
+        var resultData = null;
+        for(var i = 0; i < callbacks.length; i++){
+            // TODO: maso, 2018: check if the event is stopped to propagate
+            try {
+                resultData = callbacks[i](event) || resultData;
+            } catch (error) {
+                // NOTE: remove on release
+                console.log(error);
+            }
+        }
+        return resultData;
+    };
+
+    /**
+     * Gets direction of the widget
+     * 
+     * This function get direction from user model and is equals to:
+     * 
+     * widget.getModelProperty('style.layout.direction');
+     * 
+     * NOTE: default layout direction is column.
+     * 
+     * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
+     * @memberof WbAbstractWidget
+     */
+    this.getDirection = function () {
+        return this.getModelProperty('style.layout.direction') || 'column';
+    };
+
+    /**
+     * Get events of the widget
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getEvent = function () {
+        return this.getModelProperty('event') || {};
+    };
+
+    /**
+     * Get title of the widget
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getTitle = function () {
+        return this.getModelProperty('label');
+    };
+
+    /**
+     * Gets type
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getType = function () {
+        return this.getModelProperty('type');
+    };
+
+    /**
+     * Gets Id of the model
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getId = function () {
+        return this.getModelProperty('id');
+    };
+
+    /**
+     * Get parent widget
+     * 
+     * Parent widget is called container in this model. It is attached dynamically
+     * on the render phease.
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getParent = function () {
+        return $parent;
+    };
+
+    /**
+     * Gets Scope data
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getScope = function () {
+        return $scope;
+    };
+
+    /**
+     * Sets the state of the widget
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.setState = function (state) {
+        var oldState = this.state;
+        this.state = state;
+        this.fire('stateChanged', {
+            oldValue: oldState,
+            value: state
+        });
+    };
+
+
+
+    /**
+     * Checks if the editable mode is enable
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.isEditable = function () {
+        return this.editable;
+    };
+
+    /**
+     * Set edit mode
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.setEditable = function (editable) {
+        if (this.editable === editable) {
+            return;
+        }
+        this.editable = editable;
+        if (this.isRoot()) {
+            delete this.lastSelectedItem;
+            this.setSelected(true);
+        }
+        // propagate to child
+        angular.forEach(this.childWidgets, function (widget) {
+            widget.setEditable(editable);
+        });
+
+        // TODO: maso, 2019: add event data
+        if (editable) {
+            this.setState('edit');
+            this.fire('editable'); // depricated
+        } else {
+            this.setState('ready');
+            this.fire('noneditable'); // depricated
+        }
+        // TODO: no need to reload?!!
+        var ctrl = this;
+        $timeout(function(){
+            ctrl.reload();
+        }, 100);
+    };
+
+    /**
+     * Check if intersecting
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.isIntersecting = function(){
+        return this.intersecting;
+    };
+
+    /**
+     * Set intersecting true
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.setIntersecting = function(intersecting, $event){
+        this.intersecting = intersecting;
+        this.fire('intersection', $event);
+    };
+
+
+    /**
+     * Delete the widget
+     * 
+     * This function just used in edit mode
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.delete = function () {
+        // remove itself
+        this.fire('delete');
+        $parent.removeChild(this);
+    };
+
+    /**
+     * Clone current widget This method works in edit mode only.
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.clone = function () {
+        var index = $parent.indexOfChild(this);
+        $parent.addChild(index, angular.copy(this.getModel()));
+    };
+
+    /**
+     * This method moves widget one to next.
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.moveNext = function () {
+        $parent.moveChild(this, $parent.indexOfChild(this) + 1);
+    };
+
+    /**
+     * This method moves widget one to before
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.moveBefore = function () {
+        $parent.moveChild(this, $parent.indexOfChild(this) - 1);
+    };
+
+    /**
+     * This method moves widget to the first of it's parent
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.moveFirst = function () {
+        $parent.moveChild(this, 0);
+    };
+
+    /**
+     * This method moves widget to the last of it's parent
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.moveLast = function () {
+        $parent.moveChild(this, $parent.getChildren().length - 1);
+    };
+
+    /**
+     * Checks if the widget is root
+     * 
+     * If there is no parent controller then this is a root one.
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.isRoot = function () {
+        return angular.isUndefined($parent) || $parent === null;
+    };
+
+    /**
+     * Gets root widgets of the widget
+     * 
+     * @return the root widget
+     * @memberof WbAbstractWidget
+     */
+    this.getRoot = function () {
+        // check if the root is set
+        if (this.rootWidget) {
+            return this.rootWidget;
+        }
+        // find root if is empty
+        this.rootWidget = this;
+        while (!this.rootWidget.isRoot()) {
+            this.rootWidget = this.rootWidget.getParent();
+        }
+        return this.rootWidget;
+    };
+
+
+    /**
+     * Checks if the widget is selected.
+     * 
+     * NOTE: it is not possible to select root widget
+     * 
+     * @return true if the widget is selected.
+     * @memberof WbAbstractWidget
+     */
+    this.isSelected = function () {
+        return this.selected;
+    };
+
+    this.setSelected = function (flag, $event) {
+        if (this.isRoot()) {
+            return;
+        }
+        if (this.selected === flag) {
+            return;
+        }
+
+        // fire events
+        this.selected = flag;
+        if (flag) {
+            this.getRoot().childSelected(this, $event);
+            this.fire('select');
+        } else {
+            this.getRoot().childUnSelected(this, {});
+            this.fire('unselect');
+            // Open an editor 
+            var editor = $widget.getEditor(this);
+            editor.hide();
+        }
+    };
+
+    /**
+     * Add new action in actions list
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.addAction = function (action) {
+        this.actions.push(action);
+    };
+
+    /**
+     * Gets widget actions
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.getActions = function () {
+        return this.actions;
+    };
+
+
+    /**
+     * Returns bounding client rectangle to parent
+     * 
+     * @return bounding rectangle
+     * @memberof WbAbstractWidget
+     */
+    this.getBoundingClientRect = function () {
+        var element = this.getElement();
+        if(!element){
+            return {
+                width: 0,
+                height: 0,
+                top: 0,
+                left: 0
+            };
+        }
+
+        var offset = element.position();
+        var width = element.outerWidth();
+        var height = element.outerHeight();
+
+        return {
+            // rect
+            width: width,
+            height: height,
+            // offset
+            top: offset.top + parseInt(element.css('marginTop'), 10) + element.scrollTop(),
+            left: offset.left + parseInt(element.css('marginLeft'), 10)
+        };
+    };
+
+
+    /**
+     * Adds animation to the page
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.animate = function (options) {
+        var ctrl = this;
+        var keys = [];
+        var animation = {
+                targets: this.getRuntimeModel(),
+                update: function(/* anim */) {
+                    // XXX: maso, 2019: support multiple key in event
+                    ctrl.refresh();
+                }
+        };
+
+        // copy animation properties
+        if(options.duration){
+            animation.duration = options.duration;
+        }
+        if(options.loop){
+            animation.loop = options.loop;
+        }
+        if(options.autoplay){
+            animation.autoplay = options.autoplay;
+        }
+        if(options.delay){
+            animation.delay = options.delay;
+        }
+        if(options.easing){
+            animation.easing = options.easing;
+        }
+
+        // Create list of attributes
+        for(var key in options){
+            // ignore keys
+            if(key === 'duration'|| 
+                    key === 'loop'|| 
+                    key === 'autoplay'||
+                    key === 'delay'||
+                    key === 'easing'){
+                continue;
+            }
+            keys.push(key);
+            animation[key] = options[key];
+
+            // set initial value
+            var val = this.getProperty(key);
+            if(!val) {
+                this.setProperty(key, this.getModelProperty(key));
+            }
+
+            // NOTE: if the value is empty then you have to set from values
+        }
+
+        return anime(animation);
+    };
+
+    /**
+     * Remove animations from the widget
+     * 
+     * @memberof WbAbstractWidget
+     */
+    this.removeAnimation = function () {
+        // The animation will not add to element so there is no need to remove
+    };
+
+    /**
+     * Sets window of the widget
+     * 
+     * @memberof WbAbstractWidget
+     * @params window {WbWindow} of the current widget
+     */
+    this.setWindow = function (window) {
+        this.window = window;
+    };
+
+    /**
+     * Gets window of the widget
+     * 
+     * @memberof WbAbstractWidget
+     * @return window of the current widget or from the root
+     */
+    this.getWindow = function () {
+        return this.window || this.getRoot().getWindow() || $wbWindow;
+    };
+
+
+});
+
+
 /*
  * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
  * 
@@ -5586,6 +6791,328 @@ angular.module('am-wb-core')//
     };
 
 });
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+
+//submit the controller
+angular.module('am-wb-core')//
+/**
+ * @ngdoc Controllers
+ * @name WbWidgetGroupCtrl
+ * @description Manages a group widget
+ * 
+ * This is a group controller
+ * 
+ * @ngInject
+ */
+.controller('WbWidgetGroupCtrl', function($scope, $element, $wbUtil, $widget, $q, $parent, $controller){
+
+    // extend the controller
+    angular.extend(this, $controller('WbWidgetAbstractCtrl', {
+        $scope: $scope,
+        $element: $element,
+        $parent: $parent
+    }));
+
+
+    /**
+     * Set model to a group
+     * 
+     * Setting model to a group is differs from setting in widget. In group 
+     * we try to load children and finally loading the group itself.
+     * 
+     * @memberof WbWidgetGroupCtrl
+     * @param model Object to set into the group
+     */
+    this.setModel = function (model) {
+        this.setState('init');
+        if (model === this.wbModel) {
+            return;
+        }
+        this.wbModel = model;
+        this.fire('modelChanged');
+
+        var ctrl = this;
+        this.loadWidgets(model)
+        .finally(function () {
+            ctrl.fire('loaded');
+            ctrl.reload();
+            ctrl.setState('ready');
+        })
+    };
+
+    /**
+     * Check if the widget is selected
+     */
+    this.isChildSelected = function (widget) {
+        if (this.isRoot()) {
+            return widget === this.lastSelectedItem;
+        }
+        return this.getParent().isChildSelected(widget);
+    };
+
+    this.getChildById = function (id) {
+        var widgets = this.childWidgets;
+        for (var i = 0; i < widgets.length; i++) {
+            if (widgets[i].getId() === id) {
+                return widgets[i];
+            }
+        }
+    };
+
+    /**
+     * Gets all children of the group
+     * 
+     * @return list of all widgets
+     */
+    this.getChildren = function () {
+        return this.childWidgets;
+    };
+
+    this.loadWidgets = function (model) {
+        // destroy all children
+        angular.forEach(this.childWidgets, function (widget) {
+            widget.destroy();
+        });
+        this.childWidgets = [];
+
+        // check for new contents
+        if (!model || !angular.isArray(model.contents)) {
+            return $q.resolve();
+        }
+
+        // create contents
+        var parentWidget = this;
+
+        var compilesJob = [];
+        model.contents.forEach(function (item, index) {
+            var job = $widget.compile(item, parentWidget)//
+            .then(function (widget) {
+                parentWidget.childWidgets[index] = widget;
+            });
+            compilesJob.push(job);
+        });
+
+        var ctrl = this;
+        return $q.all(compilesJob)//
+        .then(function () {
+            var $element = parentWidget.getElement();
+            parentWidget.childWidgets.forEach(function (widget) {
+                widget.setEditable(ctrl.isEditable());
+                $element.append(widget.getElement());
+            });
+        });
+    };
+
+
+
+    this.childSelected = function (ctrl, $event) {
+        if (!this.isRoot()) {
+            return this.getRoot().childSelected(ctrl, $event);
+        }
+        $event = $event || {};
+        if (!$event.shiftKey) {
+            this.selectionLock = true;
+            angular.forEach(this.lastSelectedItems, function (widget) {
+                widget.setSelected(false);
+            });
+            this.selectionLock = false;
+            this.lastSelectedItems = [];
+        }
+
+        if (this.lastSelectedItems.indexOf(ctrl) >= 0) {
+            return;
+        }
+
+        this.lastSelectedItems.push(ctrl);
+
+        // maso, 2018: call the parent controller function
+        this.fire('select', {
+            widgets: this.lastSelectedItems
+        });
+    };
+
+    this.childUnSelected = function(widget, $event){
+        if (!this.isRoot()) {
+            return this.getRoot().childSelected(widget, $event);
+        }
+        if(this.selectionLock){
+            return;
+        }
+        $event = $event || {};
+        var index = this.lastSelectedItems.indexOf(widget);
+        if(index < 0)  {
+            return;
+        }
+        this.lastSelectedItems.splice(index, 1);
+        // maso, 2018: call the parent controller function
+        this.fire('select', {
+            widgets: this.lastSelectedItems
+        });
+    };
+
+    /**
+     * Removes a widget
+     * 
+     * Data model and visual element related to the input model will be removed.
+     */
+    this.removeChild = function (widget) {
+        var index = this.indexOfChild(widget);
+
+        if (index > -1) {
+            // remove selection
+            if (widget.isSelected()) {
+                widget.setSelected(false);
+            }
+            // remove model
+            this.childWidgets.splice(index, 1);
+
+            var model = this.getModel();
+            index = model.contents.indexOf(widget.getModel());
+            model.contents.splice(index, 1);
+
+            // destroy widget
+            widget.destroy();
+        }
+        return false;
+    };
+
+    /**
+     * Adds dragged widget
+     */
+    this.addChild = function (index, item) {
+        var model = this.getModel();
+        var ctrl = this;
+
+        // add widget
+        item = $wbUtil.clean(item);
+        $widget.compile(item, this)//
+        .then(function (newWidget) {
+            if (index < ctrl.childWidgets.length) {
+                newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
+            } else {
+                ctrl.getElement().append(newWidget.getElement());
+            }
+            model.contents.splice(index, 0, item);
+            ctrl.childWidgets.splice(index, 0, newWidget);
+
+            // init the widget
+            newWidget.setEditable(ctrl.isEditable());
+            ctrl.fire('newchild', {
+                widget: newWidget
+            });
+        });
+        // TODO: replace with promise
+        return true;
+    };
+
+    /**
+     * Finds index of child element
+     */
+    this.moveChild = function (widget, index) {
+
+        function arraymove(arr, fromIndex, toIndex) {
+            var element = arr[fromIndex];
+            arr.splice(fromIndex, 1);
+            arr.splice(toIndex, 0, element);
+        }
+
+        if (index < 0 || index > this.getChildren().length - 1 || this.getChildren().length === 1) {
+            return;
+        }
+        if (this.getModel().contents.indexOf(widget.getModel()) === index) {
+            return;
+        }
+        var positionWidget = this.getChildren()[index];
+        // move element
+        if (this.getModel().contents.indexOf(widget.getModel()) < index) {
+            positionWidget.getElement().after(widget.getElement());
+        } else {
+            positionWidget.getElement().before(widget.getElement());
+        }
+
+        // move model
+        arraymove(this.getModel().contents, this.getModel().contents.indexOf(widget.getModel()), index);
+
+        // move controller
+        arraymove(this.getChildren(), this.indexOfChild(widget), index);
+    };
+
+    /**
+     * Finds index of child element
+     */
+    this.indexOfChild = function (widget) {
+        if (!this.childWidgets || !this.childWidgets.length) {
+            return -1;
+        }
+        return this.childWidgets.indexOf(widget);
+    };
+
+
+    /**
+     * Delete the widget
+     * 
+     * This function just used in edit mode
+     * 
+     * @memberof WbWidgetGroupCtrl
+     */
+    this.delete = function () {
+        // remove all children
+        var widgets = this.getChildren();
+        angular.forEach(widgets, function (widget) {
+            widget.delete();
+        });
+
+        // remove itself
+        this.fire('delete');
+        if (!this.isRoot()) {
+            this.getParent()
+            .removeChild(this);
+        }
+    };
+
+    /**
+     * List of allowed child
+     * 
+     * @memeberof WbWidgetGroupCtrl
+     */
+    this.getAllowedTypes = function () {
+        if (!this.isRoot()) {
+            return this.getParent().getAllowedTypes();
+        }
+        return this.allowedTypes;
+    };
+
+    this.setAllowedTypes = function (allowedTypes) {
+        return this.allowedTypes = allowedTypes;
+    };
+
+});
+
 
 /*
  * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
@@ -6154,6 +7681,81 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
+ * @name MbWidgetPreCtrl
+ * @description Manage a widget with preformatted text.
+ * 
+ */
+.controller('MbWidgetPreCtrl', function () {
+	// list of element attributes
+	var elementAttributes = [
+		'html'
+		];
+
+	this.initWidget = function(){
+		var ctrl = this;
+		function elementAttribute(key, value){
+			if(key === 'html'){
+				ctrl.getElement().html(value) || '..';
+			}
+			ctrl.setElementAttribute(key, value);
+		}
+		function eventHandler(event){
+			if(elementAttributes.includes(event.key)){
+				var key = event.key;
+				var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
+				elementAttribute(key, value);
+			}
+		}
+		// listen on change
+		this.on('modelUpdated', eventHandler);
+		this.on('runtimeModelUpdated', eventHandler);
+		// load initial data
+		for(var i =0; i < elementAttributes.length;i++){
+			var key = elementAttributes[i];
+			elementAttribute(key, ctrl.getModelProperty(key));
+		}
+	};
+
+	/**
+	 * Gets value of the input
+	 */
+	this.html = function(){
+		var value = arguments[0];
+		if(value){
+			this.setElementAttribute('html', value);
+		}
+		var element = this.getElement();
+		return element.html.apply(element, arguments);
+	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
  * @name MbWidgetHeaderCtrl
  * @description Manage a header
  * 
@@ -6347,1585 +7949,6 @@ angular.module('am-wb-core')//
     };
 
 });
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-var widgetBasicWidgetAttributes = [
-    'accesskey',
-    'contenteditable',
-    'dir',
-    /*
-     * NOTE: We must manage D&D internally to mange user D&D codes
-     * TODO: maso, 2019: move dnd into a processor
-     */
-//  'draggable',
-//  'dropzone',
-    'hidden',
-    'id',
-    'lang',
-    'spellcheck',
-    'tabindex',
-    'title',
-    'translate',
-    ];
-/**
- * @ngdoc Controllers
- * @name WbAbstractWidget
- * @class
- * @descreption root of the widgets
- * 
- * This is an abstract implementation of the widgets. ## Models
- * 
- * The model of the widget is consist of two main part:
- * 
- * <ul>
- * <li>User data</li>
- * <li>Runtime data</li>
- * </ul>
- * 
- * User data is set as input data model and the runtime data is managed by
- * events and user functions.
- * 
- * Finally the combination of user and runtime data is used to update the view.
- * 
- * The setModelProperty changes the user data model.
- * 
- * The setProperty changes the runtime properties.
- *  ## Events
- * 
- * 
- * Here is list of allowed types:
- * 
- * <ul>
- * <li>modelChanged: some properties of the model is changed.</li>
- * <li>modelUpdated: A new data model is replaced with the current one.</li>
- * <li>styleChanged: Computed style of the current widget is update.</li>
- * <li>widgetIsEditable: Widget is in editable state (so the result of
- * isEditable() is true)</li>
- * <li>widgetIsNotEditable: widget is not in editable mode any more(so the
- * result of isEditable() is false)</li>
- * <li>widgetDeleted: the widgets is removed.</li>
- * <li>widgetUnderCursor: The widget is under the mouse</li>
- * <li>widgetSelected: the widget is selected</li>
- * <li>widgetUnselected: the widget is unselected</li>
- * </ul>
- * 
- * Following event propagate on the root too
- * 
- * <ul>
- * <li>widgetUnderCursor</li>
- * <li>widgetSelected</li>
- * </ul>
- */
-
-var WbAbstractWidget = function () {
-    'use strict';
-
-    function debounce(func, wait) {
-        var timeout;
-        return function() {
-            var context = this;
-            var args = arguments;
-            var later = function() {
-                timeout = null;
-                func.apply(context, args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-    
-    /**
-     * State of the widget
-     * 
-     * - init
-     * - edit
-     * - ready
-     * - deleted
-     * 
-     * @memberof WbAbstractWidget
-     */
-    this.state = 'init';
-
-    this.actions = [];
-    this.callbacks = [];
-    this.childWidgets = [];
-
-    /**
-     * AngularJS scope of the widget. This field is used in our old pattern and
-     * will be removed in our next major version.
-     * 
-     * @deprecated This will be removed in the next major version.
-     * @memberof WbAbstractWidget
-     */
-    this.$scope = null;
-
-    /**
-     * View element of the widget
-     * 
-     * This element is used to draw and managed view widget.
-     * 
-     * @memberof WbAbstractWidget
-     */
-    this.$element = null;
-    
-    /*
-     * This is a cache of customer function
-     * 
-     */
-    this.eventFunctions = {};
-    this.computedStyle = {};
-
-    // models
-    this.runtimeModel = {};
-    this.model = {};
-
-    // event listeners
-    var ctrl = this;
-    /*
-     * TODO: maso, 2019: move to event manager.
-     */
-    this.eventListeners = {
-            click: function ($event) {
-                if (ctrl.isEditable()) {
-                    ctrl.setSelected(true, $event);
-                    $event.stopPropagation();
-                }
-                ctrl.fire('click', $event);
-            },
-            dblclick: function ($event) {
-                if (ctrl.isEditable()) {
-                    ctrl.setSelected(true, $event);
-                    $event.stopPropagation();
-                    $event.preventDefault();
-                    // Open an editor 
-                    var editor = ctrl.$widget.getEditor(ctrl);
-                    editor.show();
-                }
-                ctrl.fire('dblclick', $event);
-            },
-            mouseout: function ($event) {
-                ctrl.fire('mouseout', $event);
-            },
-            mouseover: function ($event) {
-                ctrl.fire('mouseover', $event);
-            },
-            mousedown: function ($event) {
-                ctrl.fire('mousedown', $event);
-            },
-            mouseup: function ($event) {
-                ctrl.fire('mouseup', $event);
-            },
-            mouseenter: function ($event) {
-                ctrl.fire('mouseenter', $event);
-            },
-            mouseleave: function ($event) {
-                ctrl.fire('mouseleave', $event);
-            },
-            
-            // Media events
-            error: function ($event) {
-                ctrl.fire('error', $event);
-            },
-            success: function ($event) {
-                ctrl.fire('success', $event);
-            },
-            load: function ($event) {
-                ctrl.fire('load', $event);
-            }
-    };
-
-    /*
-     * Add resize observer to the element
-     */
-    this.resizeObserver = new ResizeObserver(debounce(function ($event) {
-        if(angular.isArray($event)){
-            $event = $event[0];
-        }
-        ctrl.fire('resize', $event);
-    }, 300));
-
-    var options = {
-            root: null,
-            rootMargin: '0px',
-    };
-    this.intersectionObserver = new IntersectionObserver(function ($event) {
-        if(angular.isArray($event)){
-            $event = $event[0];
-        }
-        ctrl.setIntersecting($event.isIntersecting, $event);
-    }, options);
-};
-
-
-/**
- * Loads all basic elements attributes.
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.loadBasicProperties = function () {
-    var model = this.getModel();
-    if (!model) {
-        return;
-    }
-    var $element = this.getElement();
-    for(var i =0; i < widgetBasicWidgetAttributes.length; i++){
-        var key = widgetBasicWidgetAttributes[i];
-        var value = this.getProperty(key) || this.getModelProperty(key);
-        if(value){
-            $element.attr(key, value);
-        } else {
-            $element.removeAttr(key);
-        }
-    }
-};
-
-/**
- * Loads style from the input model.
- * 
- * The style is a part of widget data model.
- * 
- * NOTE: this is an internal function and supposed not to call from outside.
- * 
- * @param style
- *            {object} part of widget model
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.loadStyle = function () {
-    var model = this.getModel();
-    var runtimeModel = this.getRuntimeModel();
-    if (!model) {
-        return;
-    }
-    var computedStyle = angular.merge({}, model.style, runtimeModel.style);
-    if(angular.equals(computedStyle, this.computedStyle)){
-        return;
-    }
-    // TODO: maso, 2018:Create event
-    var $event = {}
-    $event.source = this;
-    $event.oldValue = this.computedStyle;
-    $event.newValue = computedStyle;
-
-    // save computedStyle
-    this.computedStyle = computedStyle;
-
-    // load style
-    var css;
-    if(model.type == 'Group' || model.type == 'ObjectCollection'){
-        css = this.$wbUtil.convertToGroupCss(this.computedStyle || {});
-    } else {
-        css = this.$wbUtil.convertToWidgetCss(this.computedStyle || {});
-    }
-    this.$element.css(css);
-    this.fire('styleChanged', $event);
-};
-
-/**
- * Refreshes the view based on the current data
- * 
- * It used runtime and model data to update the view.
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.refresh = function($event) {
-    if(this.isSilent()) {
-        return;
-    }
-    // to support old widget
-    var model = this.getModel();
-    this.getScope().wbModel = model;
-
-    if($event){
-        var key = $event.key || 'xxx';
-        // update event
-        if(key.startsWith('event')){
-            this.eventFunctions = {};
-        } else if(key.startsWith('style')) {
-            this.loadStyle();
-        } else if(_.includes(widgetBasicWidgetAttributes, key)){
-            var value = this.getProperty(key) || this.getModelProperty(key);
-            this.setElementAttribute(key, value);
-        }
-        return;
-    } 
-    this.eventFunctions = {};
-    this.loadStyle();
-    this.loadBasicProperties();
-};
-
-/**
- * Reload all data to run the widget from the start
- * 
- * This function clean the runtime data and refresh the widget. On the other
- * hand the init event will be fired.
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.reload = function(){
-    this.runtimeModel = {};
-    this.refresh();
-};
-
-
-/**
- * Returns model of the widget
- * 
- * The model is managed by other entity and used as read only part in the
- * widget.
- * 
- * By the way it is supposed that the model is used just in a widget and to
- * modify the model, a method of the widget is called. In this case the widget
- * fire the changes of the model.
- * 
- * @see #setModelProperty(key, value)
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getModel = function () {
-    return this.wbModel;
-};
-
-/**
- * Sets model of the widget
- * 
- * @see #getModel()
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setModel = function (model) {
-	this.setState('init');
-    if (model === this.wbModel) {
-        return;
-    }
-    this.wbModel = model;
-    this.fire('modelChanged');
-    this.reload();
-    this.setState('ready');
-};
-
-/**
- * Checks if the key exist in the widget model
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.hasModelProperty = function(key){
-    return objectPath.has(this.getModel(), key);
-};
-
-/**
- * Get model property
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getModelProperty = function(key){
-    return objectPath.get(this.getModel(), key);
-};
-
-/**
- * Sets new model property value
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setModelProperty = function (key, value){
-    // create the event
-    var $event = {};
-    $event.source = this;
-    $event.key = key;
-    $event.oldValue = this.getModelProperty(key);
-    $event.newValue =  value;
-
-    // check if value changed
-    if(angular.equals($event.oldValue, $event.newValue)){
-        return;
-    }
-
-    // Set the address
-    if(value){
-        objectPath.set(this.getModel(), key, value);
-    } else {
-        objectPath.del(this.getModel(), key);
-    }
-
-    // refresh the view
-    this.refresh($event);
-    this.fire('modelUpdated', $event);
-};
-
-/**
- * Gets runtime model
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getRuntimeModel = function () {
-    return this.runtimeModel;
-};
-
-/**
- * Checks if property exist
- * 
- * NOTE: just look for runtime property
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.hasProperty = function (key){
-    return objectPath.has(this.getRuntimeModel(), key);
-};
-
-/**
- * Gets property of the model
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getProperty = function (key){
-    return objectPath.get(this.getRuntimeModel(), key);
-};
-
-/**
- * Remove property
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.removeProperty = function (key){
-    var model = this.getRuntimeModel();
-    objectPath.del(model, key);
-};
-
-/**
- * Changes property value
- * 
- * If the change cause the view to update then this function will update and
- * render the view.
- * 
- * @memberof WbAbstractWidget
- * @name setProperty
- */
-WbAbstractWidget.prototype.setProperty = function (key, value){
-    // create the event
-    var $event = {};
-    $event.source = this;
-    $event.key = key;
-    $event.oldValue = this.getProperty(key);
-    $event.newValue =  value;
-    $event.value =  value;
-
-    // check if value changed
-    if(angular.equals($event.oldValue, $event.value)){
-        return;
-    }
-
-    // Set the address
-    var model = this.getRuntimeModel();
-    if(angular.isDefined(value)){
-        objectPath.set(model, key, value);
-    } else {
-        objectPath.del(model, key);
-    }
-
-
-    // refresh the view
-    this.refresh($event);
-    this.fire('runtimeModelUpdated', $event);
-    //To change the view in runtime
-    var ctrl = this;
-    // Update angular
-    // TODO: maso, 2019: replace with this model
-//    if (!$rootScope.$$phase) {
-//        scope.$digest();
-//    }
-    this.$timeout( function() {
-        ctrl.getScope().$digest();
-    });
-
-};
-
-/**
- * Sets or gets style of the widget
- * 
- * The function effect on runtime style not the model. To change the model use
- * #setModelProperty(key,value).
- * 
- * NOTE: this function is part of widget API.
- * 
- * Set style by key:
- * 
- * widget.style('background.color', '#ff00aa');
- * 
- * Get style by key:
- * 
- * var color = widget.style('background.color');
- * 
- * Remove style by key:
- * 
- * widget.style('background.color', null);
- * 
- * Set style by object:
- * 
- * widgt.style({ background: { color: 'red', image: null } });
- * 
- * The style object is read only and you can get it as follow:
- * 
- * var style = widget.style();
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.style = function (style, value) {
-    // there is no argument so act as get
-    if(!angular.isDefined(style)){
-        return angular.copy(this.getProperty('style'));
-    }
-    // style is a key
-    if(angular.isString(style)){
-        if(angular.isDefined(value)){
-            return this.setStyle(style, value);
-        } else {
-            return this.getStyle(style);
-        }
-    }
-};
-
-/**
- * Sets style of the widget
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setStyle = function(key, value) {
-    this.setProperty('style.' + key, value);
-};
-
-/**
- * Get style from widget
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getStyle = function(key) {
-    return this.getProperty('style.' + key);
-};
-
-/**
- * Remove the widgets
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.destroy = function ($event) {
-    // remove callbacks
-    this.callbacks = [];
-    this.actions = [];
-
-    // destroy children
-    angular.forEach(this.childWidgets, function (widget) {
-        widget.destroy();
-    });
-    this.childWidgets = [];
-
-    // destroy view
-    this.$element.remove();
-    this.$element = null;
-
-    // remove scope
-    this.$scope.$destroy();
-    this.$scope = null;
-    this.fire('destroy', $event);
-};
-
-/**
- * Set widget element
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setElement = function ($element) {
-    try{
-        this.disconnect();
-    } finally{
-        this.$element = $element;
-        this.connect();
-    }
-};
-
-/**
- * Disconnect view with the widget
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.disconnect = function () {
-    var $element = this.getElement();
-    if (!$element) {
-        return;
-    }
-    this.resizeObserver.unobserve($element[0]);
-    this.intersectionObserver.unobserve($element[0]);
-    angular.forEach(this.eventListeners, function (listener, key) {
-        $element.off(key, listener);
-    });
-};
-
-/**
- * Connects view with widget
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.connect = function () {
-    var $element = this.getElement();
-    if (!$element) {
-        return;
-    }
-    angular.forEach(this.eventListeners, function (listener, key) {
-        $element.on(key, listener);
-    });
-    this.resizeObserver.observe($element[0]);
-    this.intersectionObserver.observe($element[0]);
-};
-
-/**
- * Get elements of the widget
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getElement = function () {
-    return this.$element;
-};
-
-/**
- * Sets element attributes
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setElementAttribute = function(key, value){
-    if(value){
-        this.$element.attr(key, value);
-    } else {
-        this.$element.removeAttr(key);
-    }
-};
-
-/**
- * Get element attribute
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getElementAttribute = function(key){
-    return this.$element.attr(key);
-};
-
-/**
- * Remove element attribute
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.removeElementAttribute = function(key){
-    this.$element.removeAttr(key);
-};
-
-/**
- * Set widget silent
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setSilent = function(silent) {
-    this.silent = silent;
-};
-
-/**
- * Checks if the element is silent
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.isSilent = function() {
-    return this.silent;
-};
-
-/**
- * Adds new callback of type
- * 
- * @param typeof
- *            the event
- * @param callback
- *            to call on the event
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.on = function (type, callback) {
-    if (!angular.isFunction(callback)) {
-        throw {
-            message: 'Callback must be a function'
-        };
-    }
-    if (!angular.isArray(this.callbacks[type])) {
-        this.callbacks[type] = [];
-    }
-    if(this.callbacks[type].includes(callback)){
-        return;
-    }
-    this.callbacks[type].push(callback);
-};
-
-/**
- * Remove the callback
- * 
- * @param type
- *            of the event
- * @param callback
- *            to remove
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.off = function (type, callback) {
-    if (!angular.isArray(this.callbacks[type])) {
-        return;
-    }
-    // remove callback
-    var callbacks = this.callbacks[type];
-    var index = callbacks.indexOf(callback);
-    if (index > -1) {
-        callbacks.splice(index, 1);
-    }
-};
-
-/**
- * Call all callbacks on the given event type.
- * 
- * Before callbacks, widget processors will process the widget and event.
- * 
- * @param type
- *            of the event
- * @param params
- *            to add to the event
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.fire = function (type, params) {
-	// 1- Call processors
-	var event = _.merge({
-		source: this,
-		type: type
-	}, params || {});
-	this.$widget.applyProcessors(this, event);
-
-	// 2- call listeners
-	if (this.isSilent() || !angular.isDefined(this.callbacks[type])) {
-        return;
-    }
-    var callbacks = this.callbacks[type];
-    var resultData = null;
-    for(var i = 0; i < callbacks.length; i++){
-        // TODO: maso, 2018: check if the event is stopped to propagate
-        try {
-        	resultData = callbacks[i](event) || resultData;
-        } catch (error) {
-            // NOTE: remove on release
-            console.log(error);
-        }
-    }
-    return resultData;
-};
-
-/**
- * Gets direction of the widget
- * 
- * This function get direction from user model and is equals to:
- * 
- * widget.getModelProperty('style.layout.direction');
- * 
- * NOTE: default layout direction is column.
- * 
- * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getDirection = function () {
-    return this.getModelProperty('style.layout.direction') || 'column';
-};
-
-/**
- * Get events of the widget
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getEvent = function () {
-    return this.getModelProperty('event') || {};
-};
-
-/**
- * Get title of the widget
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getTitle = function () {
-    return this.getModelProperty('label');
-};
-
-/**
- * Gets type
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getType = function () {
-    return this.getModelProperty('type');
-};
-
-/**
- * Gets Id of the model
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getId = function () {
-    return this.getModelProperty('id');
-};
-
-/**
- * Get parent widget
- * 
- * Parent widget is called container in this model. It is attached dynamically
- * on the render phease.
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getParent = function () {
-    return this.parent;
-};
-
-/**
- * Sets parent
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setParent = function (widget) {
-    return this.parent = widget;
-};
-
-/**
- * Set scope data
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setScope = function ($scope) {
-    this.$scope = $scope;
-};
-
-/**
- * Gets Scope data
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getScope = function () {
-    return this.$scope;
-};
-
-/**
- * Sets the state of the widget
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setState = function (state) {
-	var oldState = this.state;
-	this.state = state;
-	this.fire('stateChanged', {
-		oldValue: oldState,
-		value: state
-	});
-};
-
-
-
-/**
- * Checks if the editable mode is enable
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.isEditable = function () {
-    return this.editable;
-};
-
-/**
- * Set edit mode
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setEditable = function (editable) {
-    if (this.editable === editable) {
-        return;
-    }
-    this.editable = editable;
-    if (this.isRoot()) {
-        delete this.lastSelectedItem;
-        this.setSelected(true);
-    }
-    // propagate to child
-    angular.forEach(this.childWidgets, function (widget) {
-        widget.setEditable(editable);
-    });
-
-    // TODO: maso, 2019: add event data
-    if (editable) {
-    	this.setState('edit');
-        this.fire('editable'); // depricated
-    } else {
-    	this.setState('ready');
-        this.fire('noneditable'); // depricated
-    }
-    // TODO: no need to reload?!!
-    var ctrl = this;
-    this.$timeout(function(){
-        ctrl.reload();
-    }, 100);
-};
-
-/**
- * Check if intersecting
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.isIntersecting = function(){
-    return this.intersecting;
-};
-
-/**
- * Set intersecting true
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setIntersecting = function(intersecting, $event){
-    this.intersecting = intersecting;
-    this.fire('intersection', $event);
-};
-
-
-/**
- * Delete the widget
- * 
- * This function just used in edit mode
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.delete = function () {
-    // remove itself
-    this.fire('delete');
-    this.getParent()
-    .removeChild(this);
-};
-
-/**
- * Clone current widget This method works in edit mode only.
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.clone = function () {
-    var index = this.getParent().indexOfChild(this);
-    this.getParent()//
-    .addChild(index, angular.copy(this.getModel()));
-};
-
-/**
- * This method moves widget one to next.
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.moveNext = function () {
-    this.getParent().moveChild(this, this.getParent().indexOfChild(this) + 1);
-};
-
-/**
- * This method moves widget one to before
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.moveBefore = function () {
-    this.getParent().moveChild(this, this.getParent().indexOfChild(this) - 1);
-};
-
-/**
- * This method moves widget to the first of it's parent
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.moveFirst = function () {
-    this.getParent().moveChild(this, 0);
-};
-
-/**
- * This method moves widget to the last of it's parent
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.moveLast = function () {
-    this.getParent().moveChild(this, this.getParent().getChildren().length - 1);
-};
-
-/**
- * Checks if the widget is root
- * 
- * If there is no parent controller then this is a root one.
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.isRoot = function () {
-    var parent = this.getParent();
-    return angular.isUndefined(parent) || parent === null;
-};
-
-/**
- * Gets root widgets of the widget
- * 
- * @return the root widget
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getRoot = function () {
-    // check if the root is set
-    if (this.rootWidget) {
-        return this.rootWidget;
-    }
-    // find root if is empty
-    this.rootWidget = this;
-    while (!this.rootWidget.isRoot()) {
-        this.rootWidget = this.rootWidget.getParent();
-    }
-    return this.rootWidget;
-};
-
-
-/**
- * Checks if the widget is selected.
- * 
- * NOTE: it is not possible to select root widget
- * 
- * @return true if the widget is selected.
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.isSelected = function () {
-    return this.selected;
-};
-
-WbAbstractWidget.prototype.setSelected = function (flag, $event) {
-    if (this.isRoot()) {
-        return;
-    }
-    if (this.selected === flag) {
-        return;
-    }
-
-    // fire events
-    this.selected = flag;
-    if (flag) {
-        this.getRoot().childSelected(this, $event);
-        this.fire('select');
-    } else {
-        this.getRoot().childUnSelected(this, {});
-        this.fire('unselect');
-        // Open an editor 
-        var editor = this.$widget.getEditor(this);
-        editor.hide();
-    }
-};
-
-/**
- * Add new action in actions list
- * 
- * @memberof WbWidgetCtrl
- */
-WbAbstractWidget.prototype.addAction = function (action) {
-    this.actions.push(action);
-};
-
-/**
- * Gets widget actions
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getActions = function () {
-    return this.actions;
-};
-
-
-/**
- * Returns bounding client rectangle to parent
- * 
- * @return bounding rectangle
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getBoundingClientRect = function () {
-    var element = this.getElement();
-    if(!element){
-        return {
-            width: 0,
-            height: 0,
-            top: 0,
-            left: 0
-        };
-    }
-
-    var offset = element.position();
-    var width = element.outerWidth();
-    var height = element.outerHeight();
-
-    return {
-        // rect
-        width: width,
-        height: height,
-        // offset
-        top: offset.top + parseInt(element.css('marginTop'), 10) + element.scrollTop(),
-        left: offset.left + parseInt(element.css('marginLeft'), 10)
-    };
-};
-
-
-/**
- * Adds animation to the page
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.animate = function (options) {
-    var ctrl = this;
-    var keys = [];
-    var animation = {
-            targets: this.getRuntimeModel(),
-            update: function(/* anim */) {
-                // XXX: maso, 2019: support multiple key in event
-                ctrl.refresh();
-            }
-    };
-
-    // copy animation properties
-    if(options.duration){
-        animation.duration = options.duration;
-    }
-    if(options.loop){
-        animation.loop = options.loop;
-    }
-    if(options.autoplay){
-        animation.autoplay = options.autoplay;
-    }
-    if(options.delay){
-        animation.delay = options.delay;
-    }
-    if(options.easing){
-        animation.easing = options.easing;
-    }
-
-    // Create list of attributes
-    for(var key in options){
-        // ignore keys
-        if(key === 'duration'|| 
-                key === 'loop'|| 
-                key === 'autoplay'||
-                key === 'delay'||
-                key === 'easing'){
-            continue;
-        }
-        keys.push(key);
-        animation[key] = options[key];
-
-        // set initial value
-        var val = this.getProperty(key);
-        if(!val) {
-            this.setProperty(key, this.getModelProperty(key));
-        }
-
-        // NOTE: if the value is empty then you have to set from values
-    }
-
-    return anime(animation);
-};
-
-/**
- * Remove animations from the widget
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.removeAnimation = function () {
-    // The animation will not add to element so there is no need to remove
-};
-
-/**
- * Sets window of the widget
- * 
- * @memberof WbAbstractWidget
- * @params window {WbWindow} of the current widget
- */
-WbAbstractWidget.prototype.setWindow = function (window) {
-    this.window = window;
-};
-
-/**
- * Gets window of the widget
- * 
- * @memberof WbAbstractWidget
- * @return window of the current widget or from the root
- */
-WbAbstractWidget.prototype.getWindow = function () {
-    return this.window || this.getRoot().getWindow() || this.$wbWindow;
-};
-
-/*******************************************************************************
- * * * * *
- ******************************************************************************/
-/**
- * @ngdoc Controllers
- * @name wbWidgetCtrl
- * @description Controller of a widget
- * 
- * 
- * @ngInject
- */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $widget, $timeout, $wbWindow) {
-    WbAbstractWidget.call(this);
-    this.setElement($element);
-    this.setScope($scope);
-    this.$wbUtil = $wbUtil;
-    this.$widget = $widget;
-    this.$timeout = $timeout;
-    this.$wbWindow = $wbWindow;
-};
-WbWidgetCtrl.prototype = new WbAbstractWidget();
-
-
-
-/*******************************************************************************
- * * * * *
- ******************************************************************************/
-/**
- * @ngdoc Controllers
- * @name WbWidgetGroupCtrl
- * @description Manages a group widget
- * 
- * This is a group controller
- * 
- * @ngInject
- */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $q, $timeout, $wbWindow) {
-    WbAbstractWidget.call(this);
-    this.setElement($element);
-    this.setScope($scope);
-
-    this.$widget = $widget;
-    this.$q = $q;
-    this.$wbUtil = $wbUtil;
-    this.$timeout = $timeout;
-    this.$wbWindow = $wbWindow;
-};
-WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
-
-/**
- * Set model to a group
- * 
- * Setting model to a group is differs from setting in widget. In group 
- * we try to load children and finally loading the group itself.
- * 
- * @memberof WbWidgetGroupCtrl
- * @param model Object to set into the group
- */
-WbWidgetGroupCtrl.prototype.setModel = function (model) {
-	this.setState('init');
-    if (model === this.wbModel) {
-        return;
-    }
-    this.wbModel = model;
-    this.fire('modelChanged');
-
-    var ctrl = this;
-    this.loadWidgets(model)
-    .finally(function () {
-        ctrl.fire('loaded');
-        ctrl.reload();
-        ctrl.setState('ready');
-    })
-};
-
-/**
- * Check if the widget is selected
- */
-WbWidgetGroupCtrl.prototype.isChildSelected = function (widget) {
-    if (this.isRoot()) {
-        return widget === this.lastSelectedItem;
-    }
-    return this.getParent().isChildSelected(widget);
-};
-
-WbWidgetGroupCtrl.prototype.getChildById = function (id) {
-    var widgets = this.childWidgets;
-    for (var i = 0; i < widgets.length; i++) {
-        if (widgets[i].getId() === id) {
-            return widgets[i];
-        }
-    }
-};
-
-/**
- * Gets all children of the group
- * 
- * @return list of all widgets
- */
-WbWidgetGroupCtrl.prototype.getChildren = function () {
-    return this.childWidgets;
-};
-
-WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
-    // destroy all children
-    angular.forEach(this.childWidgets, function (widget) {
-        widget.destroy();
-    });
-    this.childWidgets = [];
-
-    // check for new contents
-    var $q = this.$q;
-    if (!model || !angular.isArray(model.contents)) {
-        return $q.resolve();
-    }
-
-    // create contents
-    var $widget = this.$widget;
-    var parentWidget = this;
-
-    var compilesJob = [];
-    model.contents.forEach(function (item, index) {
-        var job = $widget.compile(item, parentWidget)//
-        .then(function (widget) {
-            parentWidget.childWidgets[index] = widget;
-        });
-        compilesJob.push(job);
-    });
-
-    var ctrl = this;
-    return $q.all(compilesJob)//
-    .then(function () {
-        var $element = parentWidget.getElement();
-        parentWidget.childWidgets.forEach(function (widget) {
-            widget.setEditable(ctrl.isEditable());
-            $element.append(widget.getElement());
-        });
-    });
-};
-
-
-
-WbWidgetGroupCtrl.prototype.childSelected = function (ctrl, $event) {
-    if (!this.isRoot()) {
-        return this.getRoot().childSelected(ctrl, $event);
-    }
-    $event = $event || {};
-    if (!$event.shiftKey) {
-        this.selectionLock = true;
-        angular.forEach(this.lastSelectedItems, function (widget) {
-            widget.setSelected(false);
-        });
-        this.selectionLock = false;
-        this.lastSelectedItems = [];
-    }
-
-    if (this.lastSelectedItems.indexOf(ctrl) >= 0) {
-        return;
-    }
-
-    this.lastSelectedItems.push(ctrl);
-
-    // maso, 2018: call the parent controller function
-    this.fire('select', {
-        widgets: this.lastSelectedItems
-    });
-};
-
-WbWidgetGroupCtrl.prototype.childUnSelected = function(widget, $event){
-    if (!this.isRoot()) {
-        return this.getRoot().childSelected(widget, $event);
-    }
-    if(this.selectionLock){
-        return;
-    }
-    $event = $event || {};
-    var index = this.lastSelectedItems.indexOf(widget);
-    if(index < 0)  {
-        return;
-    }
-    this.lastSelectedItems.splice(index, 1);
-    // maso, 2018: call the parent controller function
-    this.fire('select', {
-        widgets: this.lastSelectedItems
-    });
-};
-
-/**
- * Removes a widget
- * 
- * Data model and visual element related to the input model will be removed.
- */
-WbWidgetGroupCtrl.prototype.removeChild = function (widget) {
-    var index = this.indexOfChild(widget);
-
-    if (index > -1) {
-        // remove selection
-        if (widget.isSelected()) {
-            widget.setSelected(false);
-        }
-        // remove model
-        this.childWidgets.splice(index, 1);
-
-        var model = this.getModel();
-        index = model.contents.indexOf(widget.getModel());
-        model.contents.splice(index, 1);
-
-        // destroy widget
-        widget.destroy();
-    }
-    return false;
-};
-
-/**
- * Adds dragged widget
- */
-WbWidgetGroupCtrl.prototype.addChild = function (index, item) {
-    var model = this.getModel();
-    var ctrl = this;
-
-    // add widget
-    item = this.$wbUtil.clean(item);
-    this.$widget.compile(item, this)//
-    .then(function (newWidget) {
-        if (index < ctrl.childWidgets.length) {
-            newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
-        } else {
-            ctrl.getElement().append(newWidget.getElement());
-        }
-        model.contents.splice(index, 0, item);
-        ctrl.childWidgets.splice(index, 0, newWidget);
-
-        // init the widget
-        newWidget.setEditable(ctrl.isEditable());
-        ctrl.fire('newchild', {
-            widget: newWidget
-        });
-    });
-    // TODO: replace with promise
-    return true;
-};
-
-/**
- * Finds index of child element
- */
-WbWidgetGroupCtrl.prototype.moveChild = function (widget, index) {
-
-    function arraymove(arr, fromIndex, toIndex) {
-        var element = arr[fromIndex];
-        arr.splice(fromIndex, 1);
-        arr.splice(toIndex, 0, element);
-    }
-
-    if (index < 0 || index > this.getChildren().length - 1 || this.getChildren().length === 1) {
-        return;
-    }
-    if (this.getModel().contents.indexOf(widget.getModel()) === index) {
-        return;
-    }
-    var positionWidget = this.getChildren()[index];
-    // move element
-    if (this.getModel().contents.indexOf(widget.getModel()) < index) {
-        positionWidget.getElement().after(widget.getElement());
-    } else {
-        positionWidget.getElement().before(widget.getElement());
-    }
-
-    // move model
-    arraymove(this.getModel().contents, this.getModel().contents.indexOf(widget.getModel()), index);
-
-    // move controller
-    arraymove(this.getChildren(), this.indexOfChild(widget), index);
-};
-
-/**
- * Finds index of child element
- */
-WbWidgetGroupCtrl.prototype.indexOfChild = function (widget) {
-    if (!this.childWidgets || !this.childWidgets.length) {
-        return -1;
-    }
-    return this.childWidgets.indexOf(widget);
-};
-
-
-/**
- * Delete the widget
- * 
- * This function just used in edit mode
- * 
- * @memberof WbWidgetGroupCtrl
- */
-WbWidgetGroupCtrl.prototype.delete = function () {
-    // remove all children
-    var widgets = this.getChildren();
-    angular.forEach(widgets, function (widget) {
-        widget.delete();
-    });
-
-    // remove itself
-    this.fire('delete');
-    if (!this.isRoot()) {
-        this.getParent()
-        .removeChild(this);
-    }
-};
-
-/**
- * List of allowed child
- * 
- * @memeberof WbWidgetGroupCtrl
- */
-WbWidgetGroupCtrl.prototype.getAllowedTypes = function () {
-    if (!this.isRoot()) {
-        return this.getParent().getAllowedTypes();
-    }
-    return this.allowedTypes;
-};
-
-WbWidgetGroupCtrl.prototype.setAllowedTypes = function (allowedTypes) {
-    return this.allowedTypes = allowedTypes;
-};
-
-
-//submit the controller
-angular.module('am-wb-core')//
-.controller('WbWidgetCtrl', WbWidgetCtrl)//
-.controller('WbWidgetGroupCtrl', WbWidgetGroupCtrl);
-
 
 /* 
  * The MIT License (MIT)
@@ -12762,6 +12785,1185 @@ angular.module('am-wb-core')
     return nativeWindowWrapper;
 });
 
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//
+//angular.module('am-wb-core')//
+//
+///**
+// * @ngdoc Factories
+// * @name TinymcePluginCodesample
+// * @description Adding code sample to tinymce
+// * 
+// * 
+// * ## options
+// * 
+// * codesample_languages: array of languages
+// * 
+// */
+//.factory('TinymcePluginCodesample', function ($resource) {
+//	'use strict';
+//	var languages;
+//	var defaultLanguages = [{
+//		text: 'HTML/XML',
+//		value: 'markup'
+//	},
+//	{
+//		text: 'JavaScript',
+//		value: 'javascript'
+//	},
+//	{
+//		text: 'CSS',
+//		value: 'css'
+//	},
+//	{
+//		text: 'PHP',
+//		value: 'php'
+//	},
+//	{
+//		text: 'Ruby',
+//		value: 'ruby'
+//	},
+//	{
+//		text: 'Python',
+//		value: 'python'
+//	},
+//	{
+//		text: 'Java',
+//		value: 'java'
+//	},
+//	{
+//		text: 'C',
+//		value: 'c'
+//	},
+//	{
+//		text: 'C#',
+//		value: 'csharp'
+//	},
+//	{
+//		text: 'C++',
+//		value: 'cpp'
+//	}];
+//
+//	/*
+//	 * dom utils
+//	 */
+//	var tinymceDomeUtils = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+//
+//	function isCodeSample(elm) {
+//		return elm && elm.nodeName === 'PRE' && elm.className.indexOf('language-') !== -1;
+//	}
+//
+//	function trimArg(predicateFn) {
+//		return function (arg1, arg2) {
+//			return predicateFn(arg2);
+//		};
+//	}
+//
+//	/*
+//	 * Insert new code sample into the cell
+//	 */
+//	function insertCodeSample(editor, language, code, node) {
+//		editor.undoManager.transact(function () {
+////			var node = getSelectedCodeSample(editor);
+//			code = tinymceDomeUtils.DOM.encode(code);
+//			if (node) {
+//				editor.dom.setAttrib(node, 'class', 'language-' + language);
+//				node.innerHTML = code;
+//				Prism.highlightElement(node);
+//				editor.selection.select(node);
+//			} else {
+//				editor.insertContent('<pre id="__new" class="language-' + language + '">' + code + '</pre>');
+//				editor.selection.select(editor.$('#__new').removeAttr('id')[0]);
+//			}
+//		});
+//	}
+//
+//	/*
+//	 * Add to plugin manager
+//	 */
+//
+//	var tinymcePluginCodesample = function (editor, pluginUrl) {
+//		this.setEditor(editor, pluginUrl);
+//	};
+//
+//	/**
+//	 * Set editor and load the plugin
+//	 */
+//	tinymcePluginCodesample.prototype.setEditor = function(editor) {
+//		this._editor = editor;
+//		languages = editor.settings.codesample_languages || defaultLanguages;
+//		this.setup();
+//		this.register();
+//	};
+//
+//	/**
+//	 * Gets current editor
+//	 */
+//	tinymcePluginCodesample.prototype.getEditor = function(){
+//		return this._editor;
+//	};
+//
+//
+//
+//	/**
+//	 * Setups the environments and events
+//	 */
+//	tinymcePluginCodesample.prototype.setup = function () {
+//		var facotry = this;
+//		var editor = this.getEditor();
+//		var $ = editor.$;
+//		editor.on('PreProcess', function (e) {
+//			$('pre[contenteditable=false]', e.node).filter(trimArg(isCodeSample)).each(function (idx, elm) {
+//				var $elm = $(elm), code = elm.textContent;
+//				$elm.attr('class', $.trim($elm.attr('class')));
+//				$elm.removeAttr('contentEditable');
+//				$elm.empty().append($('<code></code>').each(function () {
+//					this.textContent = code;
+//				}));
+//			});
+//		});
+//		editor.on('SetContent', function () {
+//			var unprocessedCodeSamples = $('pre').filter(trimArg(isCodeSample)).filter(function (idx, elm) {
+//				return elm.contentEditable !== 'false';
+//			});
+//			if (unprocessedCodeSamples.length) {
+//				editor.undoManager.transact(function () {
+//					unprocessedCodeSamples.each(function (idx, elm) {
+//						$(elm).find('br').each(function (idx, elm) {
+//							elm.parentNode.replaceChild(editor.getDoc().createTextNode('\n'), elm);
+//						});
+//						elm.contentEditable = false;
+//						elm.innerHTML = editor.dom.encode(elm.textContent);
+//						Prism.highlightElement(elm);
+//						elm.className = $.trim(elm.className);
+//					});
+//				});
+//			}
+//		});
+//
+//		editor.on('dblclick', function (ev) {
+//			if (isCodeSample(ev.target)) {
+//				facotry.openEditor();
+//			}
+//		});
+//	};
+//
+//	/**
+//	 * Register the plugin with the editor
+//	 * 
+//	 */
+//	tinymcePluginCodesample.prototype.register = function () {
+//		var facotry = this;
+//		var editor = this.getEditor();
+//		editor.addCommand('codesample', function () {
+//			var node = editor.selection.getNode();
+//			if (editor.selection.isCollapsed() || isCodeSample(node)) {
+//				facotry.openEditor();
+//			} else {
+//				editor.formatter.toggle('code');
+//			}
+//		});
+//		editor.addButton('codesample', {
+//			cmd: 'codesample',
+//			title: 'Insert/Edit code sample'
+//		});
+//		editor.addMenuItem('codesample', {
+//			cmd: 'codesample',
+//			text: 'Code sample',
+//			icon: 'codesample'
+//		});
+//	};
+//
+//	/*
+//	 * Get selected code sample from the editor
+//	 */
+//	tinymcePluginCodesample.prototype.getSelectedCodeSample = function () {
+//		var editor = this.getEditor();
+//		var node = editor.selection.getNode();
+//		if (isCodeSample(node)) {
+//			return node;
+//		}
+//		return null;
+//	};
+//
+//	/*
+//	 * Get current code.
+//	 * 
+//	 * If the code sample is empty then an empty text is returned as
+//	 * result.
+//	 */
+//	tinymcePluginCodesample.prototype.getCurrentCode = function () {
+//		var node = this.getSelectedCodeSample();
+//		if (node) {
+//			return node.textContent;
+//		}
+//		return '';
+//	};
+//
+//
+//	/*
+//	 * Gets current language of the code sampler
+//	 */
+//	tinymcePluginCodesample.prototype.getCurrentLanguage = function (editor) {
+//		var matches;
+//		var node = this.getSelectedCodeSample();
+//		if (node) {
+//			matches = node.className.match(/language-(\w+)/);
+//			return matches ? matches[1] : '';
+//		}
+//		return '';
+//	};
+//
+//	/*
+//	 * Open editor to edit a code sample
+//	 */
+//	tinymcePluginCodesample.prototype.openEditor = function () { 
+//		var editor = this.getEditor();
+//		var node = this.getSelectedCodeSample();
+//		var factory = this;
+//		$resource.get('script', {
+//			data : {
+//				language: this.getCurrentLanguage(editor),
+//				languages: languages,
+//				// TODO: maso, 2019: get code
+//				code: this.getCurrentCode()
+//			}
+//		})
+//		.then(function(script){
+//			insertCodeSample(editor, script.language, script.code, node);
+//		});
+//	};
+//
+//
+//	return tinymcePluginCodesample;
+//});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//angular.module('am-wb-core')//
+//
+///**
+// * @ngdoc Factories
+// * @name TinymcePluginImageToolxcx
+// * @description Adding image plugin
+// * 
+// */
+//.factory('TinymcePluginImageTool', function ($resource) {
+//	'use strict';
+//
+//	var tinymcePluginImageTool = function (editor/*, pluginUrl*/) {
+//		var factory = this;
+//		this.setEditor(editor);
+//		editor.addButton('image', {
+//			icon: 'image',
+//			tooltip: 'Insert/edit image',
+//			onclick: function(url){
+//				editor.insertContent('<img src="' + url + '" >');
+//			},
+//			stateSelector: 'img:not([data-mce-object],[data-mce-placeholder]),figure.image'
+//		});
+//
+//		editor.addMenuItem('image', {
+//			icon: 'image',
+//			text: 'Image',
+//			onclick: function(){
+//				factory.insertImage();
+//			},
+//			context: 'insert',
+//			prependToContext: true
+//		});
+//
+//		editor.addCommand('mceImage', function(){
+//			factory.insertImage();
+//		});
+//	}
+//
+//	tinymcePluginImageTool.prototype.insertImage = function() {
+//		var editor = this.getEditor();
+//		$resource.get('image')//
+//		.then(function(value){
+//			editor.insertContent('<img src="' + value + '" >');
+//		});
+//	};
+//	
+//	tinymcePluginImageTool.prototype.setEditor = function(editor) {
+//		this._editor = editor;
+//	};
+//	
+//	tinymcePluginImageTool.prototype.getEditor = function() {
+//		return this._editor;
+//	};
+//
+//	return tinymcePluginImageTool;
+//});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//angular.module('am-wb-core')//
+//
+///**
+// * @ngdoc Factories
+// * @name TinymcePluginLink
+// * @description Adding image plugin
+// * 
+// * 
+// * ## Options
+// * 
+// * link_assume_external_targets: 
+// * link_context_toolbar:
+// * link_list:
+// * default_link_target: 
+// */
+//.factory('TinymcePluginLink', function ($resource) {
+//	'use strict';
+//	
+//
+//	var attachState = {};
+//
+//
+//	var global$1 = tinymce.util.Tools.resolve('tinymce.util.VK');
+//	var global$2 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+//	var global$3 = tinymce.util.Tools.resolve('tinymce.Env');
+//	var global$4 = tinymce.util.Tools.resolve('tinymce.util.Tools');
+//	var global$5 = tinymce.util.Tools.resolve('tinymce.util.Delay');
+//	var global$6 = tinymce.util.Tools.resolve('tinymce.util.XHR');
+//
+//
+//
+//	//-----------------------------------------------------------
+//	// utility
+//	//-----------------------------------------------------------
+//	var assumeExternalTargets = function (editorSettings) {
+//		return typeof editorSettings.link_assume_external_targets === 'boolean' ? editorSettings.link_assume_external_targets : false;
+//	};
+//
+//	var hasContextToolbar = function (editorSettings) {
+//		return typeof editorSettings.link_context_toolbar === 'boolean' ? editorSettings.link_context_toolbar : false;
+//	};
+//
+//	var getLinkList = function (editorSettings) {
+//		return editorSettings.link_list;
+//	};
+//
+//	function hasDefaultLinkTarget(editorSettings) {
+//		return typeof editorSettings.default_link_target === 'string';
+//	}
+//
+//	function getDefaultLinkTarget(editorSettings) {
+//		return editorSettings.default_link_target;
+//	};
+//
+//	var getTargetList = function (editorSettings) {
+//		return editorSettings.target_list;
+//	};
+//
+//	var setTargetList = function (editor, list) {
+//		editor.settings.target_list = list;
+//	};
+//
+//	var shouldShowTargetList = function (editorSettings) {
+//		return getTargetList(editorSettings) !== false;
+//	};
+//
+//	var getRelList = function (editorSettings) {
+//		return editorSettings.rel_list;
+//	};
+//
+//	var hasRelList = function (editorSettings) {
+//		return getRelList(editorSettings) !== undefined;
+//	};
+//
+//	var getLinkClassList = function (editorSettings) {
+//		return editorSettings.link_class_list;
+//	};
+//
+//	var hasLinkClassList = function (editorSettings) {
+//		return getLinkClassList(editorSettings) !== undefined;
+//	};
+//
+//	var shouldShowLinkTitle = function (editorSettings) {
+//		return editorSettings.link_title !== false;
+//	};
+//
+//	var allowUnsafeLinkTarget = function (editorSettings) {
+//		return typeof editorSettings.allow_unsafe_link_target === 'boolean' ? editorSettings.allow_unsafe_link_target : false;
+//	};
+//
+//	var isImageFigure = function (node) {
+//		return node && node.nodeName === 'FIGURE' && /\bimage\b/i.test(node.className);
+//	};
+//
+//	var appendClickRemove = function (link, evt) {
+//		document.body.appendChild(link);
+//		link.dispatchEvent(evt);
+//		document.body.removeChild(link);
+//	};
+//
+//	var isLink = function (elm) {
+//		return elm && elm.nodeName === 'A' && elm.href;
+//	};
+//	
+//	var hasLinks = function (elements) {
+//		return global$4.grep(elements, isLink).length > 0;
+//	};
+//	
+//	var getLink = function (editor, elm) {
+//		return editor.dom.getParent(elm, 'a[href]');
+//	};
+//
+//	var getSelectedLink = function (editor) {
+//		return getLink(editor, editor.selection.getStart());
+//	};
+//	
+//	var getHref = function (elm) {
+//		var href = elm.getAttribute('data-mce-href');
+//		return href ? href : elm.getAttribute('href');
+//	};
+//	
+//	var isContextMenuVisible = function (editor) {
+//		var contextmenu = editor.plugins.contextmenu;
+//		return contextmenu ? contextmenu.isContextMenuVisible() : false;
+//	};
+//	
+//	var hasOnlyAltModifier = function (e) {
+//		return e.altKey === true && e.shiftKey === false && e.ctrlKey === false && e.metaKey === false;
+//	};
+//	
+//	var trimCaretContainers = function (text) {
+//		return text.replace(/\uFEFF/g, '');
+//	};
+//
+//
+//	function getAnchorElement(editor, selectedElm) {
+//		selectedElm = selectedElm || editor.selection.getNode();
+//		if (isImageFigure(selectedElm)) {
+//			return editor.dom.select('a[href]', selectedElm)[0];
+//		} else {
+//			return editor.dom.getParent(selectedElm, 'a[href]');
+//		}
+//	}
+//	
+//	function getAnchorText(selection, anchorElm) {
+//		var text = anchorElm ? anchorElm.innerText || anchorElm.textContent : selection.getContent({ format: 'text' });
+//		return trimCaretContainers(text);
+//	}
+//	
+//	function isOnlyTextSelected(html) {
+//		if (/</.test(html) && (!/^<a [^>]+>[^<]+<\/a>$/.test(html) || html.indexOf('href=') === -1)) {
+//			return false;
+//		}
+//		return true;
+//	}
+//	
+//	function buildListItems(inputList, itemCallback, startItems) {
+//		var appendItems = function (values, output) {
+//			output = output || [];
+//			angular.forEach(values, function (item) {
+//				var menuItem = { 
+//						text: item.text || item.title 
+//				};
+//				if (item.menu) {
+//					menuItem.menu = appendItems(item.menu);
+//				} else {
+//					menuItem.value = item.value;
+//					if (itemCallback) {
+//						itemCallback(menuItem);
+//					}
+//				}
+//				output.push(menuItem);
+//			});
+//			return output;
+//		};
+//		return appendItems(inputList, startItems || []);
+//	};
+//	
+//
+//	var toggleTargetRules = function (rel, isUnsafe) {
+//		var rules = ['noopener'];
+//		var newRel = rel ? rel.split(/\s+/) : [];
+//		var toString = function (rel) {
+//			return global$4.trim(rel.sort().join(' '));
+//		};
+//		var addTargetRules = function (rel) {
+//			rel = removeTargetRules(rel);
+//			return rel.length ? rel.concat(rules) : rules;
+//		};
+//		var removeTargetRules = function (rel) {
+//			return rel.filter(function (val) {
+//				return global$4.inArray(rules, val) === -1;
+//			});
+//		};
+//		newRel = isUnsafe ? addTargetRules(newRel) : removeTargetRules(newRel);
+//		return newRel.length ? toString(newRel) : null;
+//	};
+//
+//	var link = function (editor, attachState) {
+//		return function (data) {
+//			editor.undoManager.transact(function () {
+//				var selectedElm = editor.selection.getNode();
+//				var anchorElm = getAnchorElement(editor, selectedElm);
+//				var linkAttrs = {
+//						href: data.href,
+//						target: data.target ? data.target : null,
+//								rel: data.rel ? data.rel : null,
+//										class: data.class ? data.class : null,
+//												title: data.title ? data.title : null
+//				};
+//				if (!hasRelList(editor.settings) && allowUnsafeLinkTarget(editor.settings) === false) {
+//					linkAttrs.rel = toggleTargetRules(linkAttrs.rel, linkAttrs.target === '_blank');
+//				}
+//				if (data.href === attachState.href) {
+//					attachState.attach();
+//					attachState = {};
+//				}
+//				if (anchorElm) {
+//					editor.focus();
+//					if (data.hasOwnProperty('text')) {
+//						if ('innerText' in anchorElm) {
+//							anchorElm.innerText = data.text;
+//						} else {
+//							anchorElm.textContent = data.text;
+//						}
+//					}
+//					editor.dom.setAttribs(anchorElm, linkAttrs);
+//					editor.selection.select(anchorElm);
+//					editor.undoManager.add();
+//				} else {
+//					if (isImageFigure(selectedElm)) {
+//						linkImageFigure(editor, selectedElm, linkAttrs);
+//					} else if (data.hasOwnProperty('text')) {
+//						editor.insertContent(editor.dom.createHTML('a', linkAttrs, editor.dom.encode(data.text)));
+//					} else {
+//						editor.execCommand('mceInsertLink', false, linkAttrs);
+//					}
+//				}
+//			});
+//		};
+//	};
+//	
+//	var unlink = function (editor) {
+//		return function () {
+//			editor.undoManager.transact(function () {
+//				var node = editor.selection.getNode();
+//				if (isImageFigure(node)) {
+//					unlinkImageFigure(editor, node);
+//				} else {
+//					editor.execCommand('unlink');
+//				}
+//			});
+//		};
+//	};
+//	
+//	var unlinkImageFigure = function (editor, fig) {
+//		var a, img;
+//		img = editor.dom.select('img', fig)[0];
+//		if (img) {
+//			a = editor.dom.getParents(img, 'a[href]', fig)[0];
+//			if (a) {
+//				a.parentNode.insertBefore(img, a);
+//				editor.dom.remove(a);
+//			}
+//		}
+//	};
+//	var linkImageFigure = function (editor, fig, attrs) {
+//		var a, img;
+//		img = editor.dom.select('img', fig)[0];
+//		if (img) {
+//			a = editor.dom.create('a', attrs);
+//			img.parentNode.insertBefore(a, img);
+//			a.appendChild(img);
+//		}
+//	};
+//
+//	var delayedConfirm = function (editor, message, callback) {
+//		var rng = editor.selection.getRng();
+//		global$5.setEditorTimeout(editor, function () {
+//			editor.windowManager.confirm(message, function (state) {
+//				editor.selection.setRng(rng);
+//				callback(state);
+//			});
+//		});
+//	};
+//
+//	
+//	//-----------------------------------------------------------
+//	// Factory
+//	//
+//	//
+//	//-----------------------------------------------------------
+//	var tinymcePluginLink = function (editor/*, pluginUrl*/) {
+//		this.setEditor(editor);
+//
+//		this.setupButtons();
+//		this.setupMenuItems();
+//		this.setupContextToolbars();
+//		this.setupGotoLinks();
+//		this.register();
+//	};
+//
+//	tinymcePluginLink.prototype.setEditor = function(editor) {
+//		this._editor = editor;
+//	};
+//
+//	tinymcePluginLink.prototype.getEditor = function() {
+//		return this._editor;
+//	};
+//
+//	tinymcePluginLink.prototype.setupButtons = function () {
+//		var editor = this.getEditor();
+//		var factory = this;
+//		editor.ui.registry.addSplitButton('link', {
+//			active: false,
+//			icon: 'link',
+//			tooltip: 'Insert/edit link',
+//			onclick: function(){
+//				factory.openDialog();
+//			},
+//			onpostrender: function(){
+//				factory.toggleActiveState();
+//			}
+//		});
+//		editor.ui.registry.addSplitButton('unlink', {
+//			active: false,
+//			icon: 'unlink',
+//			tooltip: 'Remove link',
+//			onclick: function(){
+//				factory.unlink();
+//			},
+//			onpostrender: function(){
+//				factory.toggleActiveState();
+//			}
+//		});
+//		if (editor.ui.registry.addContextToolbar) {
+//			editor.ui.registry.addSplitButton('openlink', {
+//				icon: 'newtab',
+//				tooltip: 'Open link',
+//				onclick: function () {
+//					gotoLink(editor, getSelectedLink(editor));
+//				}
+//			});
+//		}
+//	};
+//
+//	tinymcePluginLink.prototype.setupMenuItems = function () {
+//		var editor = this.getEditor();
+//		var factory = this;
+//		editor.ui.registry.addMenuItem('openlink', {
+//			text: 'Open link',
+//			icon: 'newtab',
+//			onclick: function () {
+//				factory.gotoLink(editor, getSelectedLink(editor));
+//			},
+//			onPostRender: function () {
+//				var self = this;
+//				var toggleVisibility = function (e) {
+//					if (hasLinks(e.parents)) {
+//						self.show();
+//					} else {
+//						self.hide();
+//					}
+//				};
+//				if (!hasLinks(editor.dom.getParents(editor.selection.getStart()))) {
+//					self.hide();
+//				}
+//				editor.on('nodechange', toggleVisibility);
+//				self.on('remove', function () {
+//					editor.off('nodechange', toggleVisibility);
+//				});
+//			},
+//			prependToContext: true
+//		});
+//		editor.ui.registry.addMenuItem('link', {
+//			icon: 'link',
+//			text: 'Link',
+//			shortcut: 'Meta+K',
+//			onclick: function(){
+//				factory.openDialog();
+//			},
+//			stateSelector: 'a[href]',
+//			context: 'insert',
+//			prependToContext: true
+//		});
+//		editor.ui.registry.addMenuItem('unlink', {
+//			icon: 'unlink',
+//			text: 'Remove link',
+//			onclick: function(){
+//				factory.unlink();
+//			},
+//			stateSelector: 'a[href]'
+//		});
+//	};
+//
+//	tinymcePluginLink.prototype.setupContextToolbars = function () {
+//		var editor = this.getEditor();
+//		if (editor.ui.registry.addContextToolbar) {
+//			editor.ui.registry.addContextToolbar(function (elm) {
+//				var sel, rng, node;
+//				if (hasContextToolbar(editor.settings) && !isContextMenuVisible(editor) && isLink(elm)) {
+//					sel = editor.selection;
+//					rng = sel.getRng();
+//					node = rng.startContainer;
+//					if (node.nodeType === 3 && sel.isCollapsed() && rng.startOffset > 0 && rng.startOffset < node.data.length) {
+//						return true;
+//					}
+//				}
+//				return false;
+//			}, 'openlink | link unlink');
+//		}
+//	};
+//
+//	tinymcePluginLink.prototype.setupGotoLinks = function () {
+//		var editor = this.getEditor();
+//		editor.on('click', function (e) {
+//			var link = getLink(editor, e.target);
+//			if (link && global$1.metaKeyPressed(e)) {
+//				e.preventDefault();
+//				gotoLink(editor, link);
+//			}
+//		});
+//		editor.on('keydown', function (e) {
+//			var link = getSelectedLink(editor);
+//			if (link && e.keyCode === 13 && hasOnlyAltModifier(e)) {
+//				e.preventDefault();
+//				gotoLink(editor, link);
+//			}
+//		});
+//	};
+//	
+//	tinymcePluginLink.prototype.toggleActiveState = function () {
+//		var editor = this.getEditor();
+//		return function () {
+//			var self = this;
+//			editor.on('nodechange', function (e) {
+//				self.active(!editor.readonly && !!$_ft5004fzjm0o6bvs.getAnchorElement(editor, e.element));
+//			});
+//		};
+//	};
+//	
+//	tinymcePluginLink.prototype.register = function () {
+//		var factory = this;
+//		var editor = this.getEditor();
+//		// commands
+//		editor.addCommand('mceLink', function(){
+//			factory.openDialog();
+//		});
+//		// shortcuts
+//		editor.addShortcut('Meta+K', '', function(){
+//			factory.openDialog();
+//		});
+//	};
+//	
+//
+//	tinymcePluginLink.prototype.openDialog = function (editor) {
+//		var editor = this.getEditor();
+//		var linkList = getLinkList(editor.settings);
+//		var factory = this;
+//		if (typeof linkList === 'string') {
+//			global$6.send({
+//				url: linkList,
+//				success: function (text) {
+//					factory.showDialog(JSON.parse(text));
+//				}
+//			});
+//		} else if (typeof linkList === 'function') {
+//			linkList(function (list) {
+//				factory.showDialog(list);
+//			});
+//		} else {
+//			factory.showDialog(linkList);
+//		}
+//	};
+//	
+//	tinymcePluginLink.prototype.unlink = function () {
+//		var editor = this.getEditor();
+//		editor.undoManager.transact(function () {
+//			var node = editor.selection.getNode();
+//			if (isImageFigure(node)) {
+//				unlinkImageFigure(editor, node);
+//			} else {
+//				editor.execCommand('unlink');
+//			}
+//		});
+//	};
+//	
+//
+//	tinymcePluginLink.prototype.showDialog = function (linkList) {
+//		var editor = this.getEditor();
+//		var data = {};
+//		var selection = editor.selection;
+//		var dom = editor.dom;
+//		var anchorElm, initialText;
+//		
+//		var win, onlyText, textListCtrl, linkListCtrl, relListCtrl, targetListCtrl, classListCtrl, linkTitleCtrl, value;
+//		
+//		var linkListChangeHandler = function (e) {
+//			var textCtrl = win.find('#text');
+//			if (!textCtrl.value() || e.lastControl && textCtrl.value() === e.lastControl.text()) {
+//				textCtrl.value(e.control.text());
+//			}
+//			win.find('#href').value(e.control.value());
+//		};
+//		
+//		var buildAnchorListControl = function (url) {
+//			var anchorList = [];
+//			global$4.each(editor.dom.select('a:not([href])'), function (anchor) {
+//				var id = anchor.name || anchor.id;
+//				if (id) {
+//					anchorList.push({
+//						text: id,
+//						value: '#' + id,
+//						selected: url.indexOf('#' + id) !== -1
+//					});
+//				}
+//			});
+//			if (anchorList.length) {
+//				anchorList.unshift({
+//					text: 'None',
+//					value: ''
+//				});
+//				return {
+//					name: 'anchor',
+//					type: 'listbox',
+//					label: 'Anchors',
+//					values: anchorList,
+//					onselect: linkListChangeHandler
+//				};
+//			}
+//		};
+//		
+//		var updateText = function () {
+//			if (!initialText && onlyText && !data.text) {
+//				this.parent().parent().find('#text')[0].value(this.value());
+//			}
+//		};
+//		
+//		var urlChange = function (e) {
+//			var meta = e.meta || {};
+//			if (linkListCtrl) {
+//				linkListCtrl.value(editor.convertURL(this.value(), 'href'));
+//			}
+//			global$4.each(e.meta, function (value, key) {
+//				var inp = win.find('#' + key);
+//				if (key === 'text') {
+//					if (initialText.length === 0) {
+//						inp.value(value);
+//						data.text = value;
+//					}
+//				} else {
+//					inp.value(value);
+//				}
+//			});
+//			if (meta.attach) {
+//				attachState = {
+//						href: this.value(),
+//						attach: meta.attach
+//				};
+//			}
+//			if (!meta.text) {
+//				updateText.call(this);
+//			}
+//		};
+//		
+//		var onBeforeCall = function (e) {
+//			e.meta = win.toJSON();
+//		};
+//		
+//		onlyText = isOnlyTextSelected(selection.getContent());
+//		anchorElm = getAnchorElement(editor);
+//		data.text = initialText = getAnchorText(editor.selection, anchorElm);
+//		data.href = anchorElm ? dom.getAttrib(anchorElm, 'href') : '';
+//		if (anchorElm) {
+//			data.target = dom.getAttrib(anchorElm, 'target');
+//		} else if (hasDefaultLinkTarget(editor.settings)) {
+//			data.target = getDefaultLinkTarget(editor.settings);
+//		}
+//		if (value = dom.getAttrib(anchorElm, 'rel')) {
+//			data.rel = value;
+//		}
+//		if (value = dom.getAttrib(anchorElm, 'class')) {
+//			data.class = value;
+//		}
+//		if (value = dom.getAttrib(anchorElm, 'title')) {
+//			data.title = value;
+//		}
+//		if (onlyText) {
+//			textListCtrl = {
+//					name: 'text',
+//					type: 'textbox',
+//					size: 40,
+//					label: 'Text to display',
+//					onchange: function () {
+//						data.text = this.value();
+//					}
+//			};
+//		}
+//		if (linkList) {
+//			linkListCtrl = {
+//					type: 'listbox',
+//					label: 'Link list',
+//					values: buildListItems(linkList, function (item) {
+//						item.value = editor.convertURL(item.value || item.url, 'href');
+//					}, [{
+//						text: 'None',
+//						value: ''
+//					}]),
+//					onselect: linkListChangeHandler,
+//					value: editor.convertURL(data.href, 'href'),
+//					onPostRender: function () {
+//						linkListCtrl = this;
+//					}
+//			};
+//		}
+//		if (shouldShowTargetList(editor.settings)) {
+//			if (getTargetList(editor.settings) === undefined) {
+//				setTargetList(editor, [{
+//						text: 'None',
+//						value: ''
+//					},{
+//						text: 'New window',
+//						value: '_blank'
+//					}]);
+//			}
+//			targetListCtrl = {
+//					name: 'target',
+//					type: 'listbox',
+//					label: 'Target',
+//					values: buildListItems(getTargetList(editor.settings))
+//			};
+//		}
+//		if (hasRelList(editor.settings)) {
+//			relListCtrl = {
+//					name: 'rel',
+//					type: 'listbox',
+//					label: 'Rel',
+//					values: buildListItems(getRelList(editor.settings), function (item) {
+//						if (allowUnsafeLinkTarget(editor.settings) === false) {
+//							item.value = toggleTargetRules(item.value, data.target === '_blank');
+//						}
+//					})
+//			};
+//		}
+//		if (hasLinkClassList(editor.settings)) {
+//			classListCtrl = {
+//					name: 'class',
+//					type: 'listbox',
+//					label: 'Class',
+//					values: buildListItems(getLinkClassList(editor.settings), function (item) {
+//						if (item.value) {
+//							item.textStyle = function () {
+//								return editor.formatter.getCssText({
+//									inline: 'a',
+//									classes: [item.value]
+//								});
+//							};
+//						}
+//					})
+//			};
+//		}
+//		if (shouldShowLinkTitle(editor.settings)) {
+//			linkTitleCtrl = {
+//					name: 'title',
+//					type: 'textbox',
+//					label: 'Title',
+//					value: data.title
+//			};
+//		}
+//		win = editor.windowManager.open({
+//			title: 'Insert link',
+//			data: data,
+//			body: [
+//				{
+//					name: 'href',
+//					type: 'filepicker',
+//					filetype: 'file',
+//					size: 40,
+//					autofocus: true,
+//					label: 'Url',
+//					onchange: urlChange,
+//					onkeyup: updateText,
+//					onpaste: updateText,
+//					onbeforecall: onBeforeCall
+//				},
+//				textListCtrl,
+//				linkTitleCtrl,
+//				buildAnchorListControl(data.href),
+//				linkListCtrl,
+//				relListCtrl,
+//				targetListCtrl,
+//				classListCtrl
+//				],
+//				onSubmit: function (e) {
+//					var assumeExternalTargetsResult = assumeExternalTargets(editor.settings);
+//					var insertLink = link(editor, attachState);
+//					var removeLink = unlink(editor);
+//					var resultData = global$4.extend({}, data, e.data);
+//					var href = resultData.href;
+//					if (!href) {
+//						removeLink();
+//						return;
+//					}
+//					if (!onlyText || resultData.text === initialText) {
+//						delete resultData.text;
+//					}
+//					if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf('mailto:') === -1) {
+//						delayedConfirm(editor, 'The URL you entered seems to be an email address. Do you want to add the required mailto: prefix?', function (state) {
+//							if (state) {
+//								resultData.href = 'mailto:' + href;
+//							}
+//							insertLink(resultData);
+//						});
+//						return;
+//					}
+//					if (assumeExternalTargetsResult === true && !/^\w+:/i.test(href) || assumeExternalTargetsResult === false && /^\s*www[\.|\d\.]/i.test(href)) {
+//						delayedConfirm(editor, 'The URL you entered seems to be an external link. Do you want to add the required http:// prefix?', function (state) {
+//							if (state) {
+//								resultData.href = 'http://' + href;
+//							}
+//							insertLink(resultData);
+//						});
+//						return;
+//					}
+//					insertLink(resultData);
+//				}
+//		});
+//	};
+//	
+//
+//
+//	var gotoLink = function (a) {
+//		var editor = this.getEditor();
+//		if (a) {
+//			var href = getHref(a);
+//			if (/^#/.test(href)) {
+//				var targetEl = editor.$(href);
+//				if (targetEl.length) {
+//					editor.selection.scrollIntoView(targetEl[0], true);
+//				}
+//			} else {
+//				var url = a.href;
+//				if (!global$3.ie || global$3.ie > 10) {
+//					var link = document.createElement('a');
+//					link.target = '_blank';
+//					link.href = url;
+//					link.rel = 'noreferrer noopener';
+//					var evt = document.createEvent('MouseEvents');
+//					evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+//					appendClickRemove(link, evt);
+//				} else {
+//					var win = window.open('', '_blank');
+//					if (win) {
+//						win.opener = null;
+//						var doc = win.document;
+//						doc.open();
+//						doc.write('<meta http-equiv="refresh" content="0; url=' + global$2.DOM.encode(url) + '">');
+//						doc.close();
+//					}
+//				}
+//			}
+//		}
+//	};
+//
+//	return tinymcePluginLink;
+//});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 /* 
  * The MIT License (MIT)
  * 
@@ -12785,1161 +13987,64 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+'use strict';
 
 angular.module('am-wb-core')//
 
 /**
  * @ngdoc Factories
- * @name TinymcePluginCodesample
- * @description Adding code sample to tinymce
- * 
- * 
- * ## options
- * 
- * codesample_languages: array of languages
+ * @name WidgetEditorFake
+ * @description Editor of a widget
  * 
  */
-.factory('TinymcePluginCodesample', function ($resource) {
-	'use strict';
-	var languages;
-	var defaultLanguages = [{
-		text: 'HTML/XML',
-		value: 'markup'
-	},
-	{
-		text: 'JavaScript',
-		value: 'javascript'
-	},
-	{
-		text: 'CSS',
-		value: 'css'
-	},
-	{
-		text: 'PHP',
-		value: 'php'
-	},
-	{
-		text: 'Ruby',
-		value: 'ruby'
-	},
-	{
-		text: 'Python',
-		value: 'python'
-	},
-	{
-		text: 'Java',
-		value: 'java'
-	},
-	{
-		text: 'C',
-		value: 'c'
-	},
-	{
-		text: 'C#',
-		value: 'csharp'
-	},
-	{
-		text: 'C++',
-		value: 'cpp'
-	}];
 
-	/*
-	 * dom utils
-	 */
-	var tinymceDomeUtils = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+.factory('WidgetEditorCode', function ($resource, WidgetEditor) {
 
-	function isCodeSample(elm) {
-		return elm && elm.nodeName === 'PRE' && elm.className.indexOf('language-') !== -1;
-	}
-
-	function trimArg(predicateFn) {
-		return function (arg1, arg2) {
-			return predicateFn(arg2);
-		};
-	}
-
-	/*
-	 * Insert new code sample into the cell
-	 */
-	function insertCodeSample(editor, language, code, node) {
-		editor.undoManager.transact(function () {
-//			var node = getSelectedCodeSample(editor);
-			code = tinymceDomeUtils.DOM.encode(code);
-			if (node) {
-				editor.dom.setAttrib(node, 'class', 'language-' + language);
-				node.innerHTML = code;
-				Prism.highlightElement(node);
-				editor.selection.select(node);
-			} else {
-				editor.insertContent('<pre id="__new" class="language-' + language + '">' + code + '</pre>');
-				editor.selection.select(editor.$('#__new').removeAttr('id')[0]);
-			}
-		});
-	}
-
-	/*
-	 * Add to plugin manager
-	 */
-
-	var tinymcePluginCodesample = function (editor, pluginUrl) {
-		this.setEditor(editor, pluginUrl);
-	};
-
-	/**
-	 * Set editor and load the plugin
-	 */
-	tinymcePluginCodesample.prototype.setEditor = function(editor) {
-		this._editor = editor;
-		languages = editor.settings.codesample_languages || defaultLanguages;
-		this.setup();
-		this.register();
-	};
-
-	/**
-	 * Gets current editor
-	 */
-	tinymcePluginCodesample.prototype.getEditor = function(){
-		return this._editor;
-	};
+    /**
+     * TODO: maso, 2019: extends WidgetEditorFake
+     * 
+     * Creates new instace of an editor
+     */
+    function editor(widget, options) {
+        options = options || {};
+        WidgetEditor.apply(this, [widget, options]);
+    }
+    
+    editor.prototype = new WidgetEditor();
 
 
-
-	/**
-	 * Setups the environments and events
-	 */
-	tinymcePluginCodesample.prototype.setup = function () {
-		var facotry = this;
-		var editor = this.getEditor();
-		var $ = editor.$;
-		editor.on('PreProcess', function (e) {
-			$('pre[contenteditable=false]', e.node).filter(trimArg(isCodeSample)).each(function (idx, elm) {
-				var $elm = $(elm), code = elm.textContent;
-				$elm.attr('class', $.trim($elm.attr('class')));
-				$elm.removeAttr('contentEditable');
-				$elm.empty().append($('<code></code>').each(function () {
-					this.textContent = code;
-				}));
-			});
-		});
-		editor.on('SetContent', function () {
-			var unprocessedCodeSamples = $('pre').filter(trimArg(isCodeSample)).filter(function (idx, elm) {
-				return elm.contentEditable !== 'false';
-			});
-			if (unprocessedCodeSamples.length) {
-				editor.undoManager.transact(function () {
-					unprocessedCodeSamples.each(function (idx, elm) {
-						$(elm).find('br').each(function (idx, elm) {
-							elm.parentNode.replaceChild(editor.getDoc().createTextNode('\n'), elm);
-						});
-						elm.contentEditable = false;
-						elm.innerHTML = editor.dom.encode(elm.textContent);
-						Prism.highlightElement(elm);
-						elm.className = $.trim(elm.className);
-					});
-				});
-			}
-		});
-
-		editor.on('dblclick', function (ev) {
-			if (isCodeSample(ev.target)) {
-				facotry.openEditor();
-			}
-		});
-	};
-
-	/**
-	 * Register the plugin with the editor
-	 * 
-	 */
-	tinymcePluginCodesample.prototype.register = function () {
-		var facotry = this;
-		var editor = this.getEditor();
-		editor.addCommand('codesample', function () {
-			var node = editor.selection.getNode();
-			if (editor.selection.isCollapsed() || isCodeSample(node)) {
-				facotry.openEditor();
-			} else {
-				editor.formatter.toggle('code');
-			}
-		});
-		editor.addButton('codesample', {
-			cmd: 'codesample',
-			title: 'Insert/Edit code sample'
-		});
-		editor.addMenuItem('codesample', {
-			cmd: 'codesample',
-			text: 'Code sample',
-			icon: 'codesample'
-		});
-	};
-
-	/*
-	 * Get selected code sample from the editor
-	 */
-	tinymcePluginCodesample.prototype.getSelectedCodeSample = function () {
-		var editor = this.getEditor();
-		var node = editor.selection.getNode();
-		if (isCodeSample(node)) {
-			return node;
-		}
-		return null;
-	};
-
-	/*
-	 * Get current code.
-	 * 
-	 * If the code sample is empty then an empty text is returned as
-	 * result.
-	 */
-	tinymcePluginCodesample.prototype.getCurrentCode = function () {
-		var node = this.getSelectedCodeSample();
-		if (node) {
-			return node.textContent;
-		}
-		return '';
-	};
-
-
-	/*
-	 * Gets current language of the code sampler
-	 */
-	tinymcePluginCodesample.prototype.getCurrentLanguage = function (editor) {
-		var matches;
-		var node = this.getSelectedCodeSample();
-		if (node) {
-			matches = node.className.match(/language-(\w+)/);
-			return matches ? matches[1] : '';
-		}
-		return '';
-	};
-
-	/*
-	 * Open editor to edit a code sample
-	 */
-	tinymcePluginCodesample.prototype.openEditor = function () { 
-		var editor = this.getEditor();
-		var node = this.getSelectedCodeSample();
-		var factory = this;
-		$resource.get('script', {
-			data : {
-				language: this.getCurrentLanguage(editor),
-				languages: languages,
-				// TODO: maso, 2019: get code
-				code: this.getCurrentCode()
-			}
-		})
-		.then(function(script){
-			insertCodeSample(editor, script.language, script.code, node);
-		});
-	};
-
-
-	return tinymcePluginCodesample;
+    editor.prototype.setActive = function(){}; 
+    editor.prototype.isActive = function(){};
+    editor.prototype.save = function(){};
+    editor.prototype.hide = function(){};
+    editor.prototype.show = function(){
+        var ctrl = this;
+        $resource.get('code', {
+            data: {
+                code: ctrl.widget.html(),
+                languages: [{
+                    text: 'HTML/XML',
+                    value: 'markup'
+                },
+                {
+                    text: 'JavaScript',
+                    value: 'javascript'
+                },
+                {
+                    text: 'CSS',
+                    value: 'css'
+                }]
+            }
+        })
+        .then(function(value){
+            ctrl.widget.html(value.code);
+        });
+    };
+    editor.prototype.isHidden = function(){};
+    
+//  the editor type
+    return editor;
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name TinymcePluginImageToolxcx
- * @description Adding image plugin
- * 
- */
-.factory('TinymcePluginImageTool', function ($resource) {
-	'use strict';
-
-	var tinymcePluginImageTool = function (editor/*, pluginUrl*/) {
-		var factory = this;
-		this.setEditor(editor);
-		editor.addButton('image', {
-			icon: 'image',
-			tooltip: 'Insert/edit image',
-			onclick: function(url){
-				editor.insertContent('<img src="' + url + '" >');
-			},
-			stateSelector: 'img:not([data-mce-object],[data-mce-placeholder]),figure.image'
-		});
-
-		editor.addMenuItem('image', {
-			icon: 'image',
-			text: 'Image',
-			onclick: function(){
-				factory.insertImage();
-			},
-			context: 'insert',
-			prependToContext: true
-		});
-
-		editor.addCommand('mceImage', function(){
-			factory.insertImage();
-		});
-	}
-
-	tinymcePluginImageTool.prototype.insertImage = function() {
-		var editor = this.getEditor();
-		$resource.get('image')//
-		.then(function(value){
-			editor.insertContent('<img src="' + value + '" >');
-		});
-	};
-	
-	tinymcePluginImageTool.prototype.setEditor = function(editor) {
-		this._editor = editor;
-	};
-	
-	tinymcePluginImageTool.prototype.getEditor = function() {
-		return this._editor;
-	};
-
-	return tinymcePluginImageTool;
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name TinymcePluginLink
- * @description Adding image plugin
- * 
- * 
- * ## Options
- * 
- * link_assume_external_targets: 
- * link_context_toolbar:
- * link_list:
- * default_link_target: 
- */
-.factory('TinymcePluginLink', function ($resource) {
-	'use strict';
-	
-
-	var attachState = {};
-
-
-	var global$1 = tinymce.util.Tools.resolve('tinymce.util.VK');
-	var global$2 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
-	var global$3 = tinymce.util.Tools.resolve('tinymce.Env');
-	var global$4 = tinymce.util.Tools.resolve('tinymce.util.Tools');
-	var global$5 = tinymce.util.Tools.resolve('tinymce.util.Delay');
-	var global$6 = tinymce.util.Tools.resolve('tinymce.util.XHR');
-
-
-
-	//-----------------------------------------------------------
-	// utility
-	//-----------------------------------------------------------
-	var assumeExternalTargets = function (editorSettings) {
-		return typeof editorSettings.link_assume_external_targets === 'boolean' ? editorSettings.link_assume_external_targets : false;
-	};
-
-	var hasContextToolbar = function (editorSettings) {
-		return typeof editorSettings.link_context_toolbar === 'boolean' ? editorSettings.link_context_toolbar : false;
-	};
-
-	var getLinkList = function (editorSettings) {
-		return editorSettings.link_list;
-	};
-
-	function hasDefaultLinkTarget(editorSettings) {
-		return typeof editorSettings.default_link_target === 'string';
-	}
-
-	function getDefaultLinkTarget(editorSettings) {
-		return editorSettings.default_link_target;
-	};
-
-	var getTargetList = function (editorSettings) {
-		return editorSettings.target_list;
-	};
-
-	var setTargetList = function (editor, list) {
-		editor.settings.target_list = list;
-	};
-
-	var shouldShowTargetList = function (editorSettings) {
-		return getTargetList(editorSettings) !== false;
-	};
-
-	var getRelList = function (editorSettings) {
-		return editorSettings.rel_list;
-	};
-
-	var hasRelList = function (editorSettings) {
-		return getRelList(editorSettings) !== undefined;
-	};
-
-	var getLinkClassList = function (editorSettings) {
-		return editorSettings.link_class_list;
-	};
-
-	var hasLinkClassList = function (editorSettings) {
-		return getLinkClassList(editorSettings) !== undefined;
-	};
-
-	var shouldShowLinkTitle = function (editorSettings) {
-		return editorSettings.link_title !== false;
-	};
-
-	var allowUnsafeLinkTarget = function (editorSettings) {
-		return typeof editorSettings.allow_unsafe_link_target === 'boolean' ? editorSettings.allow_unsafe_link_target : false;
-	};
-
-	var isImageFigure = function (node) {
-		return node && node.nodeName === 'FIGURE' && /\bimage\b/i.test(node.className);
-	};
-
-	var appendClickRemove = function (link, evt) {
-		document.body.appendChild(link);
-		link.dispatchEvent(evt);
-		document.body.removeChild(link);
-	};
-
-	var isLink = function (elm) {
-		return elm && elm.nodeName === 'A' && elm.href;
-	};
-	
-	var hasLinks = function (elements) {
-		return global$4.grep(elements, isLink).length > 0;
-	};
-	
-	var getLink = function (editor, elm) {
-		return editor.dom.getParent(elm, 'a[href]');
-	};
-
-	var getSelectedLink = function (editor) {
-		return getLink(editor, editor.selection.getStart());
-	};
-	
-	var getHref = function (elm) {
-		var href = elm.getAttribute('data-mce-href');
-		return href ? href : elm.getAttribute('href');
-	};
-	
-	var isContextMenuVisible = function (editor) {
-		var contextmenu = editor.plugins.contextmenu;
-		return contextmenu ? contextmenu.isContextMenuVisible() : false;
-	};
-	
-	var hasOnlyAltModifier = function (e) {
-		return e.altKey === true && e.shiftKey === false && e.ctrlKey === false && e.metaKey === false;
-	};
-	
-	var trimCaretContainers = function (text) {
-		return text.replace(/\uFEFF/g, '');
-	};
-
-
-	function getAnchorElement(editor, selectedElm) {
-		selectedElm = selectedElm || editor.selection.getNode();
-		if (isImageFigure(selectedElm)) {
-			return editor.dom.select('a[href]', selectedElm)[0];
-		} else {
-			return editor.dom.getParent(selectedElm, 'a[href]');
-		}
-	}
-	
-	function getAnchorText(selection, anchorElm) {
-		var text = anchorElm ? anchorElm.innerText || anchorElm.textContent : selection.getContent({ format: 'text' });
-		return trimCaretContainers(text);
-	}
-	
-	function isOnlyTextSelected(html) {
-		if (/</.test(html) && (!/^<a [^>]+>[^<]+<\/a>$/.test(html) || html.indexOf('href=') === -1)) {
-			return false;
-		}
-		return true;
-	}
-	
-	function buildListItems(inputList, itemCallback, startItems) {
-		var appendItems = function (values, output) {
-			output = output || [];
-			angular.forEach(values, function (item) {
-				var menuItem = { 
-						text: item.text || item.title 
-				};
-				if (item.menu) {
-					menuItem.menu = appendItems(item.menu);
-				} else {
-					menuItem.value = item.value;
-					if (itemCallback) {
-						itemCallback(menuItem);
-					}
-				}
-				output.push(menuItem);
-			});
-			return output;
-		};
-		return appendItems(inputList, startItems || []);
-	};
-	
-
-	var toggleTargetRules = function (rel, isUnsafe) {
-		var rules = ['noopener'];
-		var newRel = rel ? rel.split(/\s+/) : [];
-		var toString = function (rel) {
-			return global$4.trim(rel.sort().join(' '));
-		};
-		var addTargetRules = function (rel) {
-			rel = removeTargetRules(rel);
-			return rel.length ? rel.concat(rules) : rules;
-		};
-		var removeTargetRules = function (rel) {
-			return rel.filter(function (val) {
-				return global$4.inArray(rules, val) === -1;
-			});
-		};
-		newRel = isUnsafe ? addTargetRules(newRel) : removeTargetRules(newRel);
-		return newRel.length ? toString(newRel) : null;
-	};
-
-	var link = function (editor, attachState) {
-		return function (data) {
-			editor.undoManager.transact(function () {
-				var selectedElm = editor.selection.getNode();
-				var anchorElm = getAnchorElement(editor, selectedElm);
-				var linkAttrs = {
-						href: data.href,
-						target: data.target ? data.target : null,
-								rel: data.rel ? data.rel : null,
-										class: data.class ? data.class : null,
-												title: data.title ? data.title : null
-				};
-				if (!hasRelList(editor.settings) && allowUnsafeLinkTarget(editor.settings) === false) {
-					linkAttrs.rel = toggleTargetRules(linkAttrs.rel, linkAttrs.target === '_blank');
-				}
-				if (data.href === attachState.href) {
-					attachState.attach();
-					attachState = {};
-				}
-				if (anchorElm) {
-					editor.focus();
-					if (data.hasOwnProperty('text')) {
-						if ('innerText' in anchorElm) {
-							anchorElm.innerText = data.text;
-						} else {
-							anchorElm.textContent = data.text;
-						}
-					}
-					editor.dom.setAttribs(anchorElm, linkAttrs);
-					editor.selection.select(anchorElm);
-					editor.undoManager.add();
-				} else {
-					if (isImageFigure(selectedElm)) {
-						linkImageFigure(editor, selectedElm, linkAttrs);
-					} else if (data.hasOwnProperty('text')) {
-						editor.insertContent(editor.dom.createHTML('a', linkAttrs, editor.dom.encode(data.text)));
-					} else {
-						editor.execCommand('mceInsertLink', false, linkAttrs);
-					}
-				}
-			});
-		};
-	};
-	
-	var unlink = function (editor) {
-		return function () {
-			editor.undoManager.transact(function () {
-				var node = editor.selection.getNode();
-				if (isImageFigure(node)) {
-					unlinkImageFigure(editor, node);
-				} else {
-					editor.execCommand('unlink');
-				}
-			});
-		};
-	};
-	
-	var unlinkImageFigure = function (editor, fig) {
-		var a, img;
-		img = editor.dom.select('img', fig)[0];
-		if (img) {
-			a = editor.dom.getParents(img, 'a[href]', fig)[0];
-			if (a) {
-				a.parentNode.insertBefore(img, a);
-				editor.dom.remove(a);
-			}
-		}
-	};
-	var linkImageFigure = function (editor, fig, attrs) {
-		var a, img;
-		img = editor.dom.select('img', fig)[0];
-		if (img) {
-			a = editor.dom.create('a', attrs);
-			img.parentNode.insertBefore(a, img);
-			a.appendChild(img);
-		}
-	};
-
-	var delayedConfirm = function (editor, message, callback) {
-		var rng = editor.selection.getRng();
-		global$5.setEditorTimeout(editor, function () {
-			editor.windowManager.confirm(message, function (state) {
-				editor.selection.setRng(rng);
-				callback(state);
-			});
-		});
-	};
-
-	
-	//-----------------------------------------------------------
-	// Factory
-	//
-	//
-	//-----------------------------------------------------------
-	var tinymcePluginLink = function (editor/*, pluginUrl*/) {
-		this.setEditor(editor);
-
-		this.setupButtons();
-		this.setupMenuItems();
-		this.setupContextToolbars();
-		this.setupGotoLinks();
-		this.register();
-	};
-
-	tinymcePluginLink.prototype.setEditor = function(editor) {
-		this._editor = editor;
-	};
-
-	tinymcePluginLink.prototype.getEditor = function() {
-		return this._editor;
-	};
-
-	tinymcePluginLink.prototype.setupButtons = function () {
-		var editor = this.getEditor();
-		var factory = this;
-		editor.ui.registry.addSplitButton('link', {
-			active: false,
-			icon: 'link',
-			tooltip: 'Insert/edit link',
-			onclick: function(){
-				factory.openDialog();
-			},
-			onpostrender: function(){
-				factory.toggleActiveState();
-			}
-		});
-		editor.ui.registry.addSplitButton('unlink', {
-			active: false,
-			icon: 'unlink',
-			tooltip: 'Remove link',
-			onclick: function(){
-				factory.unlink();
-			},
-			onpostrender: function(){
-				factory.toggleActiveState();
-			}
-		});
-		if (editor.ui.registry.addContextToolbar) {
-			editor.ui.registry.addSplitButton('openlink', {
-				icon: 'newtab',
-				tooltip: 'Open link',
-				onclick: function () {
-					gotoLink(editor, getSelectedLink(editor));
-				}
-			});
-		}
-	};
-
-	tinymcePluginLink.prototype.setupMenuItems = function () {
-		var editor = this.getEditor();
-		var factory = this;
-		editor.ui.registry.addMenuItem('openlink', {
-			text: 'Open link',
-			icon: 'newtab',
-			onclick: function () {
-				factory.gotoLink(editor, getSelectedLink(editor));
-			},
-			onPostRender: function () {
-				var self = this;
-				var toggleVisibility = function (e) {
-					if (hasLinks(e.parents)) {
-						self.show();
-					} else {
-						self.hide();
-					}
-				};
-				if (!hasLinks(editor.dom.getParents(editor.selection.getStart()))) {
-					self.hide();
-				}
-				editor.on('nodechange', toggleVisibility);
-				self.on('remove', function () {
-					editor.off('nodechange', toggleVisibility);
-				});
-			},
-			prependToContext: true
-		});
-		editor.ui.registry.addMenuItem('link', {
-			icon: 'link',
-			text: 'Link',
-			shortcut: 'Meta+K',
-			onclick: function(){
-				factory.openDialog();
-			},
-			stateSelector: 'a[href]',
-			context: 'insert',
-			prependToContext: true
-		});
-		editor.ui.registry.addMenuItem('unlink', {
-			icon: 'unlink',
-			text: 'Remove link',
-			onclick: function(){
-				factory.unlink();
-			},
-			stateSelector: 'a[href]'
-		});
-	};
-
-	tinymcePluginLink.prototype.setupContextToolbars = function () {
-		var editor = this.getEditor();
-		if (editor.ui.registry.addContextToolbar) {
-			editor.ui.registry.addContextToolbar(function (elm) {
-				var sel, rng, node;
-				if (hasContextToolbar(editor.settings) && !isContextMenuVisible(editor) && isLink(elm)) {
-					sel = editor.selection;
-					rng = sel.getRng();
-					node = rng.startContainer;
-					if (node.nodeType === 3 && sel.isCollapsed() && rng.startOffset > 0 && rng.startOffset < node.data.length) {
-						return true;
-					}
-				}
-				return false;
-			}, 'openlink | link unlink');
-		}
-	};
-
-	tinymcePluginLink.prototype.setupGotoLinks = function () {
-		var editor = this.getEditor();
-		editor.on('click', function (e) {
-			var link = getLink(editor, e.target);
-			if (link && global$1.metaKeyPressed(e)) {
-				e.preventDefault();
-				gotoLink(editor, link);
-			}
-		});
-		editor.on('keydown', function (e) {
-			var link = getSelectedLink(editor);
-			if (link && e.keyCode === 13 && hasOnlyAltModifier(e)) {
-				e.preventDefault();
-				gotoLink(editor, link);
-			}
-		});
-	};
-	
-	tinymcePluginLink.prototype.toggleActiveState = function () {
-		var editor = this.getEditor();
-		return function () {
-			var self = this;
-			editor.on('nodechange', function (e) {
-				self.active(!editor.readonly && !!$_ft5004fzjm0o6bvs.getAnchorElement(editor, e.element));
-			});
-		};
-	};
-	
-	tinymcePluginLink.prototype.register = function () {
-		var factory = this;
-		var editor = this.getEditor();
-		// commands
-		editor.addCommand('mceLink', function(){
-			factory.openDialog();
-		});
-		// shortcuts
-		editor.addShortcut('Meta+K', '', function(){
-			factory.openDialog();
-		});
-	};
-	
-
-	tinymcePluginLink.prototype.openDialog = function (editor) {
-		var editor = this.getEditor();
-		var linkList = getLinkList(editor.settings);
-		var factory = this;
-		if (typeof linkList === 'string') {
-			global$6.send({
-				url: linkList,
-				success: function (text) {
-					factory.showDialog(JSON.parse(text));
-				}
-			});
-		} else if (typeof linkList === 'function') {
-			linkList(function (list) {
-				factory.showDialog(list);
-			});
-		} else {
-			factory.showDialog(linkList);
-		}
-	};
-	
-	tinymcePluginLink.prototype.unlink = function () {
-		var editor = this.getEditor();
-		editor.undoManager.transact(function () {
-			var node = editor.selection.getNode();
-			if (isImageFigure(node)) {
-				unlinkImageFigure(editor, node);
-			} else {
-				editor.execCommand('unlink');
-			}
-		});
-	};
-	
-
-	tinymcePluginLink.prototype.showDialog = function (linkList) {
-		var editor = this.getEditor();
-		var data = {};
-		var selection = editor.selection;
-		var dom = editor.dom;
-		var anchorElm, initialText;
-		
-		var win, onlyText, textListCtrl, linkListCtrl, relListCtrl, targetListCtrl, classListCtrl, linkTitleCtrl, value;
-		
-		var linkListChangeHandler = function (e) {
-			var textCtrl = win.find('#text');
-			if (!textCtrl.value() || e.lastControl && textCtrl.value() === e.lastControl.text()) {
-				textCtrl.value(e.control.text());
-			}
-			win.find('#href').value(e.control.value());
-		};
-		
-		var buildAnchorListControl = function (url) {
-			var anchorList = [];
-			global$4.each(editor.dom.select('a:not([href])'), function (anchor) {
-				var id = anchor.name || anchor.id;
-				if (id) {
-					anchorList.push({
-						text: id,
-						value: '#' + id,
-						selected: url.indexOf('#' + id) !== -1
-					});
-				}
-			});
-			if (anchorList.length) {
-				anchorList.unshift({
-					text: 'None',
-					value: ''
-				});
-				return {
-					name: 'anchor',
-					type: 'listbox',
-					label: 'Anchors',
-					values: anchorList,
-					onselect: linkListChangeHandler
-				};
-			}
-		};
-		
-		var updateText = function () {
-			if (!initialText && onlyText && !data.text) {
-				this.parent().parent().find('#text')[0].value(this.value());
-			}
-		};
-		
-		var urlChange = function (e) {
-			var meta = e.meta || {};
-			if (linkListCtrl) {
-				linkListCtrl.value(editor.convertURL(this.value(), 'href'));
-			}
-			global$4.each(e.meta, function (value, key) {
-				var inp = win.find('#' + key);
-				if (key === 'text') {
-					if (initialText.length === 0) {
-						inp.value(value);
-						data.text = value;
-					}
-				} else {
-					inp.value(value);
-				}
-			});
-			if (meta.attach) {
-				attachState = {
-						href: this.value(),
-						attach: meta.attach
-				};
-			}
-			if (!meta.text) {
-				updateText.call(this);
-			}
-		};
-		
-		var onBeforeCall = function (e) {
-			e.meta = win.toJSON();
-		};
-		
-		onlyText = isOnlyTextSelected(selection.getContent());
-		anchorElm = getAnchorElement(editor);
-		data.text = initialText = getAnchorText(editor.selection, anchorElm);
-		data.href = anchorElm ? dom.getAttrib(anchorElm, 'href') : '';
-		if (anchorElm) {
-			data.target = dom.getAttrib(anchorElm, 'target');
-		} else if (hasDefaultLinkTarget(editor.settings)) {
-			data.target = getDefaultLinkTarget(editor.settings);
-		}
-		if (value = dom.getAttrib(anchorElm, 'rel')) {
-			data.rel = value;
-		}
-		if (value = dom.getAttrib(anchorElm, 'class')) {
-			data.class = value;
-		}
-		if (value = dom.getAttrib(anchorElm, 'title')) {
-			data.title = value;
-		}
-		if (onlyText) {
-			textListCtrl = {
-					name: 'text',
-					type: 'textbox',
-					size: 40,
-					label: 'Text to display',
-					onchange: function () {
-						data.text = this.value();
-					}
-			};
-		}
-		if (linkList) {
-			linkListCtrl = {
-					type: 'listbox',
-					label: 'Link list',
-					values: buildListItems(linkList, function (item) {
-						item.value = editor.convertURL(item.value || item.url, 'href');
-					}, [{
-						text: 'None',
-						value: ''
-					}]),
-					onselect: linkListChangeHandler,
-					value: editor.convertURL(data.href, 'href'),
-					onPostRender: function () {
-						linkListCtrl = this;
-					}
-			};
-		}
-		if (shouldShowTargetList(editor.settings)) {
-			if (getTargetList(editor.settings) === undefined) {
-				setTargetList(editor, [{
-						text: 'None',
-						value: ''
-					},{
-						text: 'New window',
-						value: '_blank'
-					}]);
-			}
-			targetListCtrl = {
-					name: 'target',
-					type: 'listbox',
-					label: 'Target',
-					values: buildListItems(getTargetList(editor.settings))
-			};
-		}
-		if (hasRelList(editor.settings)) {
-			relListCtrl = {
-					name: 'rel',
-					type: 'listbox',
-					label: 'Rel',
-					values: buildListItems(getRelList(editor.settings), function (item) {
-						if (allowUnsafeLinkTarget(editor.settings) === false) {
-							item.value = toggleTargetRules(item.value, data.target === '_blank');
-						}
-					})
-			};
-		}
-		if (hasLinkClassList(editor.settings)) {
-			classListCtrl = {
-					name: 'class',
-					type: 'listbox',
-					label: 'Class',
-					values: buildListItems(getLinkClassList(editor.settings), function (item) {
-						if (item.value) {
-							item.textStyle = function () {
-								return editor.formatter.getCssText({
-									inline: 'a',
-									classes: [item.value]
-								});
-							};
-						}
-					})
-			};
-		}
-		if (shouldShowLinkTitle(editor.settings)) {
-			linkTitleCtrl = {
-					name: 'title',
-					type: 'textbox',
-					label: 'Title',
-					value: data.title
-			};
-		}
-		win = editor.windowManager.open({
-			title: 'Insert link',
-			data: data,
-			body: [
-				{
-					name: 'href',
-					type: 'filepicker',
-					filetype: 'file',
-					size: 40,
-					autofocus: true,
-					label: 'Url',
-					onchange: urlChange,
-					onkeyup: updateText,
-					onpaste: updateText,
-					onbeforecall: onBeforeCall
-				},
-				textListCtrl,
-				linkTitleCtrl,
-				buildAnchorListControl(data.href),
-				linkListCtrl,
-				relListCtrl,
-				targetListCtrl,
-				classListCtrl
-				],
-				onSubmit: function (e) {
-					var assumeExternalTargetsResult = assumeExternalTargets(editor.settings);
-					var insertLink = link(editor, attachState);
-					var removeLink = unlink(editor);
-					var resultData = global$4.extend({}, data, e.data);
-					var href = resultData.href;
-					if (!href) {
-						removeLink();
-						return;
-					}
-					if (!onlyText || resultData.text === initialText) {
-						delete resultData.text;
-					}
-					if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf('mailto:') === -1) {
-						delayedConfirm(editor, 'The URL you entered seems to be an email address. Do you want to add the required mailto: prefix?', function (state) {
-							if (state) {
-								resultData.href = 'mailto:' + href;
-							}
-							insertLink(resultData);
-						});
-						return;
-					}
-					if (assumeExternalTargetsResult === true && !/^\w+:/i.test(href) || assumeExternalTargetsResult === false && /^\s*www[\.|\d\.]/i.test(href)) {
-						delayedConfirm(editor, 'The URL you entered seems to be an external link. Do you want to add the required http:// prefix?', function (state) {
-							if (state) {
-								resultData.href = 'http://' + href;
-							}
-							insertLink(resultData);
-						});
-						return;
-					}
-					insertLink(resultData);
-				}
-		});
-	};
-	
-
-
-	var gotoLink = function (a) {
-		var editor = this.getEditor();
-		if (a) {
-			var href = getHref(a);
-			if (/^#/.test(href)) {
-				var targetEl = editor.$(href);
-				if (targetEl.length) {
-					editor.selection.scrollIntoView(targetEl[0], true);
-				}
-			} else {
-				var url = a.href;
-				if (!global$3.ie || global$3.ie > 10) {
-					var link = document.createElement('a');
-					link.target = '_blank';
-					link.href = url;
-					link.rel = 'noreferrer noopener';
-					var evt = document.createEvent('MouseEvents');
-					evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-					appendClickRemove(link, evt);
-				} else {
-					var win = window.open('', '_blank');
-					if (win) {
-						win.opener = null;
-						var doc = win.document;
-						doc.open();
-						doc.write('<meta http-equiv="refresh" content="0; url=' + global$2.DOM.encode(url) + '">');
-						doc.close();
-					}
-				}
-			}
-		}
-	};
-
-	return tinymcePluginLink;
-});
-
-
-
-
-
-
-
-
-
-
 
 /* 
  * The MIT License (MIT)
@@ -14921,7 +15026,7 @@ angular
 	 * Sets the root widget
 	 * 
 	 * @param rootWidget
-	 *            {WbWidgetCtrl} root widget
+	 *            {WbAbstractWidget} root widget
 	 * @memberof WidgetLocatorManager
 	 */
 	WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {
@@ -16561,7 +16666,7 @@ angular.module('am-wb-core')
 /*
  * Load default resources
  */
-.run(function($resource, TinymcePluginImageTool, TinymcePluginCodesample, TinymcePluginLink) {
+.run(function(/*$resource, TinymcePluginImageTool, TinymcePluginCodesample, TinymcePluginLink*/) {
 	var pluginManager = tinymce.PluginManager;
 	// XXX: maso, 2019: update to tinymce5
 //	pluginManager.add('codesample', TinymcePluginCodesample);
@@ -17413,6 +17518,33 @@ angular.module('am-wb-core')
         },
         controllerAs: 'ctrl',
         controller: 'MbWidgetLinkCtrl', 
+    });
+    
+    /**
+     * @ngdoc Widgets
+     * @name pre
+     * @description A widget to add Preformatted text
+     */
+    $widget.newWidget({
+        type: 'pre',
+        title: 'Preformatted',
+        label: 'preformatted',
+        icon: 'wb-widget-pre',
+        description: 'A widget to insert an Preformatted text to page.',
+        groups: ['basic'],
+        template: '<pre></pre>',
+        help: 'http://dpq.co.ir/more-information-pre',
+        model: {
+            html: 'class A {\n\tint a;\n}',
+        },
+        controller: 'MbWidgetPreCtrl', 
+        controllerAs: 'ctrl'
+    });
+    
+
+    $widget.setEditor('pre', {
+        type: 'WidgetEditorCode',
+        options: {}
     });
     
     /**
@@ -19921,23 +20053,19 @@ angular.module('am-wb-core')
 	function createWidgetController(widget, model, parentWidget, childScope, element, providers){
 		var wlocals = _.merge({
 			$scope : childScope,
-			$element : element
+			$element : element,
+			$parent: parentWidget
 		}, providers);
-		var ctrl;
-		if (model.type !== 'Group') {
-			ctrl = $controller('WbWidgetCtrl', wlocals);
-		} else {
-			ctrl = $controller('WbWidgetGroupCtrl', wlocals);
-		}
-		ctrl.setParent(parentWidget);
+		
+		var srcCtrl = (model.type === 'Group') ? 'WbWidgetGroupCtrl' : 'WbWidgetGroupCtrl';
+		var ctrl = $controller(widget.boost || srcCtrl, wlocals);
 
 		// NOTE: can inject widget controller as WidgetCtrl
 		wlocals.WidgetCtrl = ctrl;
-		wlocals.$parent = parentWidget;
+		
 		// extend element controller
 		if (angular.isDefined(widget.controller)) {
 			var wctrl = $controller(widget.controller, wlocals);
-			// extend the controller
 			angular.extend(ctrl, wctrl);
 		}
 		return ctrl;
