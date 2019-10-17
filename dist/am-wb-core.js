@@ -11547,6 +11547,67 @@ angular.module('am-wb-core')//
  * 
  */
 
+.factory('WidgetEditorDeprecated', function ($window, WidgetEditor) {
+
+    /**
+     * TODO: maso, 2019: extends WidgetEditorFake
+     * 
+     * Creates new instace of an editor
+     */
+    function editor(widget, options) {
+        options = options || {};
+        WidgetEditor.apply(this, [widget, options]);
+    }
+    editor.prototype = Object.create(WidgetEditor.prototype);
+
+
+    editor.prototype.setActive = function(){}; 
+    editor.prototype.isActive = function(){};
+    editor.prototype.save = function(){};
+    editor.prototype.hide = function(){};
+    editor.prototype.show = function(){
+        $window.alert('This widget type is deprecated. This will be removed in the next major version.')
+    };
+    editor.prototype.isHidden = function(){};
+    
+//  the editor type
+    return editor;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name WidgetEditorFake
+ * @description Editor of a widget
+ * 
+ */
+
 
 
 .factory('WidgetEditorFake', function () {
@@ -12016,24 +12077,25 @@ angular.module('am-wb-core')//
 
     abstractWidgetLocator.prototype.getAnchor = function (auncher) {
         // find custom anchor
-        if(this.anchor){
-            if(angular.isFunction(this.anchor)){
-                return this.anchor();
-            }
-            if(angular.isString(this.anchor)){
-                var list = $rootElement.find(this.anchor);
-                if(list){
-                    return list[0];
-                }
-            }
-        }
-        // find parent
+//        if(this.anchor){
+//            if(angular.isFunction(this.anchor)){
+//                return this.anchor();
+//            }
+//            if(angular.isString(this.anchor)){
+//                var list = $rootElement.find(this.anchor);
+//                if(list){
+//                    return list[0];
+//                }
+//            }
+//        }
+//        // find parent
         var widget = this.getWidget();
-        if(widget && widget.getParent()){
-            return widget.getParent().getElement();
-        }
+//        if(widget && widget.getParent()){
+//            return widget.getParent().getElement();
+//        }
         // return root
-        return $rootElement;
+//        return $rootElement;
+      return widget.getRoot().getElement();
     };
 
 
@@ -12251,372 +12313,389 @@ angular
  * 
  * For each item in selection a selection locator will be created.
  */
-.factory('WidgetLocatorManager',function ($widget, BoundWidgetLocator, SelectionWidgetLocator, $timeout) {
+.factory('WidgetLocatorManager',function ($widget, BoundWidgetLocator, SelectionWidgetLocator, $timeout, $rootElement) {
 
-	/**
-	 * Creates new instance of the manager
-	 * 
-	 * @memberof CursorWidgetLocator
-	 */
-	function WidgetLocatorManager(options) {
-		var ctrl = this;
+    /**
+     * Creates new instance of the manager
+     * 
+     * @memberof CursorWidgetLocator
+     */
+    function WidgetLocatorManager(options) {
+        var ctrl = this;
 
-		this.intersectingWidget = [];
-		this.selectedWidgets = [];
+        this.intersectingWidget = [];
+        this.selectedWidgets = [];
 
-		this.boundLocatorMap = new Map();
-		this.boundLocatorTrash = [];
+        this.boundLocatorMap = new Map();
+        this.boundLocatorTrash = [];
 
-		this.selectionLocatorMap = new Map();
-		this.selectionLocatorTrash = [];
-
-
-		// selection options
-		this.selectionLocatorOption = options.selectionLocatorOption || {};
-		this.selectionEnable = true;
-		if (angular.isDefined(options.selectionEnable)) {
-			this.selectionEnable = options.selectionEnable;
-		}
-
-		// bound options
-		this.boundLocatorOption = options.boundLocatorOption || {};
-		this.boundEnable = true;
-		if (angular.isDefined(options.boundEnable)) {
-			this.boundEnable = options.boundEnable;
-		}
-
-		this.widgetListeners = {
-				'intersection' : function ($event) {
-					var widget = $event.source;
-					ctrl.widgetIntersectingChange(widget);
-				},
-				'resize': function($event){
-					ctrl.updateLocators();
-				},
-				'loaded': function($event){
-					var widget = $event.source;
-					var children = $widget.getChildren(widget);
-					for(var i = 0; i < children.length; i++){
-						ctrl.widgetAdded(children[i]);
-					}
-				},
-				'newchild': function($event) {
-					var widget = $event.widget;
-					ctrl.widgetAdded(widget);
-				},
-				'delete': function($event) {
-					var widget = $event.source;
-					ctrl.widgetDeleted(widget);
-				},
-				'modelUpdated': function($event) {
-					ctrl.updateLocators();
-				}
-		};
-	}
+        this.selectionLocatorMap = new Map();
+        this.selectionLocatorTrash = [];
 
 
-	WidgetLocatorManager.prototype.widgetDeleted = function(widget){
-		// events
-		angular.forEach(this.widgetListeners, function (callback, type) {
-			widget.off(type, callback);
-		});
-		// locator
-		var locator = this.getBoundLocatorOf(widget);
-		locator.disconnect();
-		this.boundLocatorMap.delete(widget);
-		this.boundLocatorTrash.push(locator);
+        // selection options
+        this.selectionLocatorOption = options.selectionLocatorOption || {};
+        this.selectionEnable = true;
+        if (angular.isDefined(options.selectionEnable)) {
+            this.selectionEnable = options.selectionEnable;
+        }
 
-		// selection
-		var index = this.selectedWidgets.indexOf(widget);
-		if(index > -1){
-			this.selectedWidgets.splice(index, 1);
-			var selectionLocator = this.getSelectionLocatorOf(widget);
-			selectionLocator.disconnect(widget);
-			this.selectionLocatorMap.delete(widget);
-			this.selectionLocatorTrash.push(selectionLocator);
-		}
-		// intersection
-		index = this.intersectingWidget.indexOf(widget);
-		if(index > -1){
-			this.intersectingWidget.splice(index, 1);
-		}
-		// update view
-		this.updateLocators();
-	};
+        // bound options
+        this.boundLocatorOption = options.boundLocatorOption || {};
+        this.boundEnable = true;
+        if (angular.isDefined(options.boundEnable)) {
+            this.boundEnable = options.boundEnable;
+        }
 
-	WidgetLocatorManager.prototype.widgetAdded = function(widget){
-		// add events
-		angular.forEach(this.widgetListeners, function (callback, type) {
-			widget.on(type, callback);
-		});
-
-		// update view
-		$timeout(function(){
-			widget.setIntersecting(true,{
-				message: 'Load child in model'
-			});
-		}, 100);
-	};
-
-	/**
-	 * Sets visibility of locators
-	 * 
-	 * @param visible
-	 *            {boolean} defines the visibility of the
-	 *            locators
-	 * @memberof CursorWidgetLocator
-	 */
-	WidgetLocatorManager.prototype.setVisible = function (visible) {
-		if (this.visible === visible) {
-			return;
-		}
-		this.visible = visible;
-		this.updateLocators();
-	}
-
-	/**
-	 * Checks if the manager is in visible state
-	 * 
-	 * @return true if the manager is visible.
-	 * @memberof CursorWidgetLocator
-	 */
-	WidgetLocatorManager.prototype.isVisible = function () {
-		return this.visible;
-	};
+        this.widgetListeners = {
+//                'scroll': function(){
+//                    ctrl.updateLocators();
+//                },
+                'intersection' : function ($event) {
+                    var widget = $event.source;
+                    ctrl.widgetIntersectingChange(widget);
+                },
+//                'resize': function(){
+//                    ctrl.updateLocators();
+//                },
+                'loaded': function($event){
+                    var widget = $event.source;
+                    var children = $widget.getChildren(widget);
+                    for(var i = 0; i < children.length; i++){
+                        ctrl.widgetAdded(children[i]);
+                    }
+                },
+                'newchild': function($event) {
+                    var widget = $event.widget;
+                    ctrl.widgetAdded(widget);
+                },
+                'delete': function($event) {
+                    var widget = $event.source;
+                    ctrl.widgetDeleted(widget);
+                },
+//                'modelUpdated': function() {
+//                    ctrl.updateLocators();
+//                }
+        };
+    }
 
 
-	WidgetLocatorManager.prototype.setEnable = function (enable) {
-		if (this.enable === enable) {
-			return;
-		}
-		this.enable = enable;
+    WidgetLocatorManager.prototype.widgetDeleted = function(widget){
+        // events
+        angular.forEach(this.widgetListeners, function (callback, type) {
+            widget.off(type, callback);
+        });
+        // locator
+        var locator = this.getBoundLocatorOf(widget);
+        locator.disconnect();
+        this.boundLocatorMap.delete(widget);
+        this.boundLocatorTrash.push(locator);
 
-		var widgets = $widget.getChildren(this.getRootWidget());
-		var intersectingWidget = [];
-		// listeners
-		for(var i = 0; i < widgets.length; i ++){
-			var widget = widgets[i];
-			if(widget.isIntersecting()){
-				intersectingWidget.push(widget);
-			}
-			if(enable) {
-				angular.forEach(this.widgetListeners, function (callback, type) {
-					widget.on(type, callback);
-				});
-			} else {
-				angular.forEach(this.widgetListeners, function (callback, type) {
-					widget.off(type, callback);
-				});
-			}
-		}
-		// bound
-		if(intersectingWidget.length) {
-			this.intersectingWidget = intersectingWidget;
-		} else {
-			this.intersectingWidget = widgets;
-		}
-		for(var j = 0; j < intersectingWidget.length; j++){
-			var locator = this.getBoundLocatorOf(intersectingWidget[j]);
-			if(enable) {
-				locator.connect(intersectingWidget[j]);
-			} else {
-				locator.disconnect();
-			}
-		}
-		// XXX: maso, selection
+        // selection
+        var index = this.selectedWidgets.indexOf(widget);
+        if(index > -1){
+            this.selectedWidgets.splice(index, 1);
+            var selectionLocator = this.getSelectionLocatorOf(widget);
+            selectionLocator.disconnect(widget);
+            this.selectionLocatorMap.delete(widget);
+            this.selectionLocatorTrash.push(selectionLocator);
+        }
+        // intersection
+        index = this.intersectingWidget.indexOf(widget);
+        if(index > -1){
+            this.intersectingWidget.splice(index, 1);
+        }
+        // update view
+        this.updateLocators();
+    };
 
-		// ROOT
-		var rootWidget = this.getRootWidget();
-		if(enable) {
-			angular.forEach(this.widgetListeners, function (callback, type) {
-				rootWidget.on(type, callback);
-			});
-		} else {
-			angular.forEach(this.widgetListeners, function (callback, type) {
-				rootWidget.off(type, callback);
-			});
-		}
+    WidgetLocatorManager.prototype.widgetAdded = function(widget){
+        // add events
+        angular.forEach(this.widgetListeners, function (callback, type) {
+            widget.on(type, callback);
+        });
 
-	};
+        // update view
+        $timeout(function(){
+            widget.setIntersecting(true,{
+                message: 'Load child in model'
+            });
+        }, 100);
+    };
 
-	WidgetLocatorManager.prototype.isEnable = function () {
-		return this.enable;
-	};
+    /**
+     * Sets visibility of locators
+     * 
+     * @param visible
+     *            {boolean} defines the visibility of the
+     *            locators
+     * @memberof CursorWidgetLocator
+     */
+    WidgetLocatorManager.prototype.setVisible = function (visible) {
+        if (this.visible === visible) {
+            return;
+        }
+        this.visible = visible;
+        this.updateLocators();
+    }
 
-	/**
-	 * Sets widgets which are selected
-	 * 
-	 * @param widgets
-	 *            {WbWidgetCtr} which are selected
-	 * @memberof CursorWidgetLocator
-	 */
-	WidgetLocatorManager.prototype.setSelectedWidgets = function (widgets) {
-		if(!this.isEnable()){
-			return;
-		}
-		if(!angular.isArray(widgets)){
-			widgets = [];
-		}
-
-		// remove old
-		for(var i = 0; i < this.selectedWidgets.length; i++){
-			var widget = this.selectedWidgets[i];
-			if(widgets.indexOf(widget) < 0){
-				var locator = this.getSelectionLocatorOf(widget);
-				this.selectionLocatorTrash.push(locator);
-				this.selectionLocatorMap.delete(widget);
-				locator.disconnect();
-			}
-		}
-
-		this.selectedWidgets = widgets;
-		if(this.isEnable()){
-			this.updateLocators();
-		}
-	};
-
-	/**
-	 * Gets selected widgets
-	 * 
-	 * @return widgets
-	 * @memberof CursorWidgetLocator
-	 */
-	WidgetLocatorManager.prototype.getSelectedWidgets = function () {
-		return this.selectedWidgets;
-	};
-
-	WidgetLocatorManager.prototype.isWidgetSelected = function(widget){
-		return this.selectedWidgets.indexOf(widget) >= 0;
-	};
-
-	/**
-	 * Sets the root widget
-	 * 
-	 * @param rootWidget
-	 *            {WbAbstractWidget} root widget
-	 * @memberof WidgetLocatorManager
-	 */
-	WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {
-		if(this.rootWidget) {
-			this.destroy();
-		}
-		this.rootWidget = rootWidget;
-		if(this.rootWidget && this.isEnable()) {
-			angular.forEach(this.widgetListeners, function (callback, type) {
-				rootWidget.on(type, callback);
-			});
-		}
-		if (this.isEnable()) {
-			this.updateLocators();
-		}
-	};
-
-	/**
-	 * Gets the root widget
-	 * 
-	 * @return the root widget
-	 * @memberof WidgetLocatorManager
-	 */
-	WidgetLocatorManager.prototype.getRootWidget = function () {
-		return this.rootWidget;
-	};
-
-	WidgetLocatorManager.prototype.directUpdateLocator = function(locator, widget) {
-		try{
-			if(this.isVisible()){
-				locator.connect(widget);
-			} else {
-				locator.disconnect();
-			}
-		} catch(ex){
-			console.error(ex, 'Fail to update the locator');
-		}
-	};
-
-	/**
-	 * Update all locators
-	 * 
-	 * @memberof WidgetLocatorManager
-	 */
-	WidgetLocatorManager.prototype.updateLocators = function () {
-		if(!angular.isFunction(this.debounceUpdate)){
-			this.debounceUpdate = $widget.debounce(function(){
-				var widgets = this.getIntersectingWidgets();
-				for(var i = 0; i < widgets.length; i++){
-					var widget = widgets[i];
-
-					// update bound
-					this.directUpdateLocator(this.getBoundLocatorOf(widget), widget);
-
-					// update selection
-					if(this.isWidgetSelected(widget)){
-						this.directUpdateLocator(this.getSelectionLocatorOf(widget), widget);
-					}
-				}
-			}, 300, false);
-		}
-		this.debounceUpdate();
-	};
+    /**
+     * Checks if the manager is in visible state
+     * 
+     * @return true if the manager is visible.
+     * @memberof CursorWidgetLocator
+     */
+    WidgetLocatorManager.prototype.isVisible = function () {
+        return this.visible;
+    };
 
 
-	WidgetLocatorManager.prototype.getIntersectingWidgets = function(){
-		return this.intersectingWidget;
-	}
+    WidgetLocatorManager.prototype.setEnable = function (enable) {
+        if (this.enable === enable) {
+            return;
+        }
+        this.enable = enable;
 
-	WidgetLocatorManager.prototype.widgetIntersectingChange = function(widget){
-		if(widget.isRoot() || !this.isVisible()){
-			return;
-		}
-		var index = this.intersectingWidget.indexOf(widget);
-		var locator = this.getBoundLocatorOf(widget);
-		// widget intersects with view
-		if(widget.isIntersecting()){
-			locator.connect(widget);
-			if(index < 0){
-				this.intersectingWidget.push(widget);
-				this.updateLocators();
-			}
-		} else {
-			locator.disconnect();
-			// widget is out of view
-			if(index >= 0){
-				this.intersectingWidget.splice(index, 1);
-				this.updateLocators();
-			}
-		}
-	}
+        var widgets = $widget.getChildren(this.getRootWidget());
+        var intersectingWidget = [];
+        // listeners
+        for(var i = 0; i < widgets.length; i ++){
+            var widget = widgets[i];
+            if(widget.isIntersecting()){
+                intersectingWidget.push(widget);
+            }
+            if(enable) {
+                angular.forEach(this.widgetListeners, function (callback, type) {
+                    widget.on(type, callback);
+                });
+            } else {
+                angular.forEach(this.widgetListeners, function (callback, type) {
+                    widget.off(type, callback);
+                });
+            }
+        }
+        // bound
+        if(intersectingWidget.length) {
+            this.intersectingWidget = intersectingWidget;
+        } else {
+            this.intersectingWidget = widgets;
+        }
+        for(var j = 0; j < intersectingWidget.length; j++){
+            var locator = this.getBoundLocatorOf(intersectingWidget[j]);
+            if(enable) {
+                locator.connect(intersectingWidget[j]);
+            } else {
+                locator.disconnect();
+            }
+        }
+        // XXX: maso, selection
 
-	WidgetLocatorManager.prototype.getBoundLocatorOf = function (widget) {
-		var map = this.boundLocatorMap;
-		if(!map.has(widget)) {
-			var locator;
-			if(this.boundLocatorTrash.length > 0){
-				locator = this.boundLocatorTrash.pop();
-			} else {
-				locator = new BoundWidgetLocator(this.boundLocatorOption);
-			}
-			map.set(widget, locator);
-		}
-		return map.get(widget);
-	};
+        // ROOT
+        var rootWidget = this.getRootWidget();
+        if(enable) {
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                rootWidget.on(type, callback);
+            });
+        } else {
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                rootWidget.off(type, callback);
+            });
+        }
 
-	WidgetLocatorManager.prototype.getSelectionLocatorOf = function(widget) {
-		var map = this.selectionLocatorMap;
-		if(!map.has(widget)) {
-			var locator;
-			if(this.selectionLocatorTrash.length > 0){
-				locator = this.selectionLocatorTrash.pop();
-			} else {
-				locator = new SelectionWidgetLocator(this.selectionLocatorOption);
-			}
-			map.set(widget, locator);
-		}
-		return map.get(widget);
-	};
+        // interval
+        var ctrl = this;
+        if(enable){
+            if(!this._intervalCheck){
+                this._intervalCheck = setInterval(function(){
+                    ctrl.updateLocators();
+                }, 300);
+            }
+        } else {
+            if(this._intervalCheck){
+                clearInterval(this._intervalCheck);
+                delete this._intervalCheck;
+            }
+        }
+    };
+
+    WidgetLocatorManager.prototype.isEnable = function () {
+        return this.enable;
+    };
+
+    /**
+     * Sets widgets which are selected
+     * 
+     * @param widgets
+     *            {WbWidgetCtr} which are selected
+     * @memberof CursorWidgetLocator
+     */
+    WidgetLocatorManager.prototype.setSelectedWidgets = function (widgets) {
+        if(!this.isEnable()){
+            return;
+        }
+        if(!angular.isArray(widgets)){
+            widgets = [];
+        }
+
+        // remove old
+        for(var i = 0; i < this.selectedWidgets.length; i++){
+            var widget = this.selectedWidgets[i];
+            if(widgets.indexOf(widget) < 0){
+                var locator = this.getSelectionLocatorOf(widget);
+                this.selectionLocatorTrash.push(locator);
+                this.selectionLocatorMap.delete(widget);
+                locator.disconnect();
+            }
+        }
+
+        this.selectedWidgets = widgets;
+        if(this.isEnable()){
+            this.updateLocators();
+        }
+    };
+
+    /**
+     * Gets selected widgets
+     * 
+     * @return widgets
+     * @memberof CursorWidgetLocator
+     */
+    WidgetLocatorManager.prototype.getSelectedWidgets = function () {
+        return this.selectedWidgets;
+    };
+
+    WidgetLocatorManager.prototype.isWidgetSelected = function(widget){
+        return this.selectedWidgets.indexOf(widget) >= 0;
+    };
+
+    /**
+     * Sets the root widget
+     * 
+     * @param rootWidget
+     *            {WbAbstractWidget} root widget
+     * @memberof WidgetLocatorManager
+     */
+    WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {
+        if(this.rootWidget) {
+            this.destroy();
+        }
+        this.rootWidget = rootWidget;
+        if(this.rootWidget && this.isEnable()) {
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                rootWidget.on(type, callback);
+            });
+        }
+        if (this.isEnable()) {
+            this.updateLocators();
+        }
+    };
+
+    /**
+     * Gets the root widget
+     * 
+     * @return the root widget
+     * @memberof WidgetLocatorManager
+     */
+    WidgetLocatorManager.prototype.getRootWidget = function () {
+        return this.rootWidget;
+    };
+
+    WidgetLocatorManager.prototype.directUpdateLocator = function(locator, widget) {
+        try{
+            if(this.isVisible()){
+                locator.connect(widget);
+            } else {
+                locator.disconnect();
+            }
+        } catch(ex){
+            console.error(ex, 'Fail to update the locator');
+        }
+    };
+
+    /**
+     * Update all locators
+     * 
+     * @memberof WidgetLocatorManager
+     */
+    WidgetLocatorManager.prototype.updateLocators = function () {
+        if(!angular.isFunction(this.debounceUpdate)){
+            this.debounceUpdate = $widget.debounce(function(){
+                var widgets = this.getIntersectingWidgets();
+                for(var i = 0; i < widgets.length; i++){
+                    var widget = widgets[i];
+
+                    // update bound
+                    this.directUpdateLocator(this.getBoundLocatorOf(widget), widget);
+
+                    // update selection
+                    if(this.isWidgetSelected(widget)){
+                        this.directUpdateLocator(this.getSelectionLocatorOf(widget), widget);
+                    }
+                }
+            }, 100, false);
+        }
+        this.debounceUpdate();
+    };
+
+
+    WidgetLocatorManager.prototype.getIntersectingWidgets = function(){
+        return this.intersectingWidget;
+    }
+
+    WidgetLocatorManager.prototype.widgetIntersectingChange = function(widget){
+        if(widget.isRoot() || !this.isVisible()){
+            return;
+        }
+        var index = this.intersectingWidget.indexOf(widget);
+        var locator = this.getBoundLocatorOf(widget);
+        // widget intersects with view
+        if(widget.isIntersecting()){
+            locator.connect(widget);
+            if(index < 0){
+                this.intersectingWidget.push(widget);
+                this.updateLocators();
+            }
+        } else {
+            locator.disconnect();
+            // widget is out of view
+            if(index >= 0){
+                this.intersectingWidget.splice(index, 1);
+                this.updateLocators();
+            }
+        }
+    }
+
+    WidgetLocatorManager.prototype.getBoundLocatorOf = function (widget) {
+        var map = this.boundLocatorMap;
+        if(!map.has(widget)) {
+            var locator;
+            if(this.boundLocatorTrash.length > 0){
+                locator = this.boundLocatorTrash.pop();
+            } else {
+                locator = new BoundWidgetLocator(this.boundLocatorOption);
+            }
+            map.set(widget, locator);
+        }
+        return map.get(widget);
+    };
+
+    WidgetLocatorManager.prototype.getSelectionLocatorOf = function(widget) {
+        var map = this.selectionLocatorMap;
+        if(!map.has(widget)) {
+            var locator;
+            if(this.selectionLocatorTrash.length > 0){
+                locator = this.selectionLocatorTrash.pop();
+            } else {
+                locator = new SelectionWidgetLocator(this.selectionLocatorOption);
+            }
+            map.set(widget, locator);
+        }
+        return map.get(widget);
+    };
 
 
 
-	return WidgetLocatorManager;
+    return WidgetLocatorManager;
 });
 /* 
  * The MIT License (MIT)
@@ -14565,6 +14644,7 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-group',
         controller: 'WbWidgetGroup'
     });
+
     
     /**
      * @ngdoc Widgets
@@ -14596,28 +14676,14 @@ angular.module('am-wb-core')
     });
 
     $widget.setEditor('HtmlText', {
-        type: 'WidgetEditorTinymce',
-        options:{
-            property: 'html',
-            inline: true,
-            menubar: false,
-            plugins: [
-                'link',
-                'lists',
-                'powerpaste',
-                'autolink',
-                'tinymcespellchecker'],
-            toolbar: [
-                'undo redo | bold italic underline | fontselect fontsizeselect',
-                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
-            valid_styles: {
-                '*': 'font-size,font-family,color,text-decoration,text-align'
-            },
-            powerpaste_word_import: 'clean',
-            powerpaste_html_import: 'clean',
-        }
+        type: 'WidgetEditorDeprecated',
+        options:{}
     });
+    
+    
+    
+    
+    
     /**
      * @ngdoc Widgets
      * @name iframe
@@ -14777,9 +14843,9 @@ angular.module('am-wb-core')
             toolbar: [
                 'undo redo | bold italic underline | fontselect fontsizeselect',
                 'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
+            valid_elements: 'p[style],strong,em,span[style],a[href],img',
             valid_styles: {
-                '*': 'font-size,font-family,color,text-decoration,text-align'
+                '*': 'font-size,font-family,color,text-decoration,text-align '
             },
             powerpaste_word_import: 'clean',
             powerpaste_html_import: 'clean',
@@ -18041,6 +18107,9 @@ angular.module('am-wb-core')//
          * TODO: maso, 2019: move to event manager.
          */
         this.eventListeners = {
+                scroll: function($event){
+                    ctrl.fire('scroll', $event);
+                },
                 click: function ($event) {
                     if (ctrl.isEditable()) {
                         ctrl.setSelected(true, $event);
@@ -18054,7 +18123,7 @@ angular.module('am-wb-core')//
                         $event.stopPropagation();
                         $event.preventDefault();
                         // Open an editor 
-                        var editor = ctrl.$widget.getEditor(ctrl);
+                        var editor = $widget.getEditor(ctrl);
                         editor.show();
                     }
                     ctrl.fire('dblclick', $event);
@@ -19019,7 +19088,7 @@ angular.module('am-wb-core')//
             };
         }
 
-        var offset = element.position();
+        var offset = element.offset();
         var width = element.outerWidth();
         var height = element.outerHeight();
 
@@ -19028,8 +19097,8 @@ angular.module('am-wb-core')//
             width: width,
             height: height,
             // offset
-            top: offset.top + parseInt(element.css('marginTop'), 10) + element.scrollTop(),
-            left: offset.left + parseInt(element.css('marginLeft'), 10)
+            top: offset.top /*+ parseInt(element.css('marginTop'), 10)*/ + element.scrollTop(),
+            left: offset.left /*+ parseInt(element.css('marginLeft'), 10)*/ + element.scrollLeft()
         };
     };
 
@@ -19801,7 +19870,7 @@ angular.module('am-wb-core')//
         updateView();
     };
     // extend functionality
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
     return Widget;
 });
 
@@ -19962,7 +20031,7 @@ angular.module('am-wb-core')//
  */
 .factory('WbWidgetProgress', function (WbWidgetAbstract) {
     function Widget($scope, $element, $parent) {
-        WbWidgetAbstractHtml.apply(this, [ $scope, $element, $parent ]);
+        WbWidgetAbstract.apply(this, [ $scope, $element, $parent ]);
         this.addElementAttributes('value', 'max');
     }
     // extend functionality

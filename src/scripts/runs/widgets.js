@@ -66,6 +66,7 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-group',
         controller: 'WbWidgetGroup'
     });
+
     
     /**
      * @ngdoc Widgets
@@ -97,28 +98,14 @@ angular.module('am-wb-core')
     });
 
     $widget.setEditor('HtmlText', {
-        type: 'WidgetEditorTinymce',
-        options:{
-            property: 'html',
-            inline: true,
-            menubar: false,
-            plugins: [
-                'link',
-                'lists',
-                'powerpaste',
-                'autolink',
-                'tinymcespellchecker'],
-            toolbar: [
-                'undo redo | bold italic underline | fontselect fontsizeselect',
-                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
-            valid_styles: {
-                '*': 'font-size,font-family,color,text-decoration,text-align'
-            },
-            powerpaste_word_import: 'clean',
-            powerpaste_html_import: 'clean',
-        }
+        type: 'WidgetEditorDeprecated',
+        options:{}
     });
+    
+    
+    
+    
+    
     /**
      * @ngdoc Widgets
      * @name iframe
@@ -278,9 +265,9 @@ angular.module('am-wb-core')
             toolbar: [
                 'undo redo | bold italic underline | fontselect fontsizeselect',
                 'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
+            valid_elements: 'p[style],strong,em,span[style],a[href],img',
             valid_styles: {
-                '*': 'font-size,font-family,color,text-decoration,text-align'
+                '*': 'font-size,font-family,color,text-decoration,text-align '
             },
             powerpaste_word_import: 'clean',
             powerpaste_html_import: 'clean',

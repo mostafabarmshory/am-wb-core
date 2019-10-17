@@ -155,6 +155,9 @@ angular.module('am-wb-core')//
          * TODO: maso, 2019: move to event manager.
          */
         this.eventListeners = {
+                scroll: function($event){
+                    ctrl.fire('scroll', $event);
+                },
                 click: function ($event) {
                     if (ctrl.isEditable()) {
                         ctrl.setSelected(true, $event);
@@ -168,7 +171,7 @@ angular.module('am-wb-core')//
                         $event.stopPropagation();
                         $event.preventDefault();
                         // Open an editor 
-                        var editor = ctrl.$widget.getEditor(ctrl);
+                        var editor = $widget.getEditor(ctrl);
                         editor.show();
                     }
                     ctrl.fire('dblclick', $event);
@@ -1133,7 +1136,7 @@ angular.module('am-wb-core')//
             };
         }
 
-        var offset = element.position();
+        var offset = element.offset();
         var width = element.outerWidth();
         var height = element.outerHeight();
 
@@ -1142,8 +1145,8 @@ angular.module('am-wb-core')//
             width: width,
             height: height,
             // offset
-            top: offset.top + parseInt(element.css('marginTop'), 10) + element.scrollTop(),
-            left: offset.left + parseInt(element.css('marginLeft'), 10)
+            top: offset.top /*+ parseInt(element.css('marginTop'), 10)*/ + element.scrollTop(),
+            left: offset.left /*+ parseInt(element.css('marginLeft'), 10)*/ + element.scrollLeft()
         };
     };
 

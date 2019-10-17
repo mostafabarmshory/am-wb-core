@@ -86,24 +86,25 @@ angular.module('am-wb-core')//
 
     abstractWidgetLocator.prototype.getAnchor = function (auncher) {
         // find custom anchor
-        if(this.anchor){
-            if(angular.isFunction(this.anchor)){
-                return this.anchor();
-            }
-            if(angular.isString(this.anchor)){
-                var list = $rootElement.find(this.anchor);
-                if(list){
-                    return list[0];
-                }
-            }
-        }
-        // find parent
+//        if(this.anchor){
+//            if(angular.isFunction(this.anchor)){
+//                return this.anchor();
+//            }
+//            if(angular.isString(this.anchor)){
+//                var list = $rootElement.find(this.anchor);
+//                if(list){
+//                    return list[0];
+//                }
+//            }
+//        }
+//        // find parent
         var widget = this.getWidget();
-        if(widget && widget.getParent()){
-            return widget.getParent().getElement();
-        }
+//        if(widget && widget.getParent()){
+//            return widget.getParent().getElement();
+//        }
         // return root
-        return $rootElement;
+//        return $rootElement;
+      return widget.getRoot().getElement();
     };
 
 

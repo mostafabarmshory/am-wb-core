@@ -36,7 +36,7 @@ of a widget:
 	min-height: 32px;
 }
 
-a.wb-widget > p {
+a.wb-widget>p {
 	margin: '0px';
 	padding: '0px';
 	margin-block-start: 0px;
@@ -65,8 +65,8 @@ in the edit mode. This part of the the CSS fix basic settings of the widgets.
 ***************************************************************************************/
 .wb-widget-locator {
 	display: block;
-	position: absolute;
-	transition: all 0.3s ease;
+	position: fixed;
+/* 	transition: all 0.3s ease; */
 }
 
 /*
@@ -86,7 +86,7 @@ in the edit mode. This part of the the CSS fix basic settings of the widgets.
 }
 
 #top.wb-widget-locator.bound, #buttom.wb-widget-locator.bound {
-	height: 1px;
+	height: 2px;
 }
 
 #top.wb-widget-locator.bound.mouseover, #buttom.wb-widget-locator.bound.mouseover
@@ -95,7 +95,7 @@ in the edit mode. This part of the the CSS fix basic settings of the widgets.
 }
 
 #right.wb-widget-locator.bound, #left.wb-widget-locator.bound {
-	width: 1px;
+	width: 2px;
 }
 
 #right.wb-widget-locator.bound.mouseover, #left.wb-widget-locator.bound.mouseover
@@ -119,25 +119,25 @@ in the edit mode. This part of the the CSS fix basic settings of the widgets.
 }
 
 #top.wb-widget-locator.selection {
-	height: 1px;
+	height: 2px;
 }
 
 #right.wb-widget-locator.selection {
-	width: 1px;
+	width: 2px;
 }
 
 #buttom.wb-widget-locator.selection {
-	height: 1px;
+	height: 2px;
 }
 
 #left.wb-widget-locator.selection {
-	width: 1px;
+	width: 2px;
 }
 
 #size.wb-widget-locator.selection {
 	height: 10px;
 	width: 10px;
 	/*border-radius: 100%;*/
-        background: none;
+	background: none;
 	cursor: se-resize;
 }
