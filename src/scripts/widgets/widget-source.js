@@ -25,17 +25,38 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Widgets
- * @name video
- * @description Manage a widget with 
+ * @name source
+ * @description Manage resource
+ * 
  */
- .factory('WbWidgetVideo', function (WbWidgetGroup) {
-    function Widget($scope, $element, $parent) {
-        WbWidgetGroup.apply(this, [ $scope, $element, $parent ]);
-        this.addElementAttributes('autoplay', 'controls', 'height',
-                'loop', 'muted', 'poster', 'preload', 'src',
-                'usemap', 'width');
-        this.setAllowedTypes('source');
+.factory('WbWidgetSource', function (WbWidgetAbstract) {
+
+    /**
+     * Creates new instance of the group
+     * 
+     * @memberof WbWidgetSource
+     */
+    function Widget($scope, $element, $parent){
+        WbWidgetAbstract.apply(this, [$scope, $element, $parent]);
+        this.addElementAttributes('src', 'srcset', 'media', 'sizes', 'type');
+        
+        var ctrl = this;
+        function updateView(){
+            ctrl.getElement().html('src:' + ctrl.getProperty('src') || ctrl.getModelProperty('src'));
+        }
+
+        this.on('stateChanged', function(){
+            if(ctrl.state === 'edit'){
+                ctrl.getElement().show();
+                updateView();
+                return;
+            }
+            ctrl.getElement().hide();
+        });
+        updateView();
     };
-    Widget.prototype = Object.create(WbWidgetGroup.prototype);
+
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });

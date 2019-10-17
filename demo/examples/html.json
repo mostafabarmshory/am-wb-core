@@ -11,6 +11,50 @@
     },
 	"contents": [
 		{
+			"type": "picture",
+			"style":{
+				"size":{
+					"minHeight": "150px"
+				}
+			},
+			"contents": [{
+				"type": "source",
+				"media": "(min-width: 650px)",
+				"srcset": "https://imagevars.gulfnews.com/2017/3/27/1_16a08423afd.2001261_2713720069_16a08423afd_large.jpg"
+			}, {
+				"type": "source",
+				"media": "(min-width: 465px)",
+				"srcset": "https://imagevars.gulfnews.com/2017/12/24/1_16a08472d8f.2146078_3278251591_16a08472d8f_large.jpg"
+			}, {
+				"type": "img",
+				"src": "https://imagevars.gulfnews.com/2019/10/16/WIN-191016-Ayodhya-FILE33-1571214296034_16dd3ab83e4_large.jpg",
+				"alt":"Flowers"
+			}]
+		},{
+			"type": "audio",
+			"controls": "true",
+			"style":{
+				"size":{
+					"minHeight": "54px"
+				}
+			},
+			"contents": [{
+				"type": "source",
+				"srcset": "resources/images/content.svg"
+			}, {
+				"type": "source",
+				"srcset": "resources/images/copyright.svg"
+			}]
+		},{
+			"type": "video",
+			"contents": [{
+				"type": "source",
+				"srcset": "resources/images/content.svg"
+			}, {
+				"type": "source",
+				"srcset": "resources/images/copyright.svg"
+			}]
+		},{
 			"type": "meta",
 			"itemscope": true,
 			"itemtype": "http://maso.com",

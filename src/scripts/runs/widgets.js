@@ -26,20 +26,77 @@
 
 angular.module('am-wb-core')
 
-/*
- * Load widgets
- */
+/***********************************************************************
+ * Editors
+ ***********************************************************************/
 .run(function ($widget) {
+    var headerEditorDescription =  {
+            type: 'WidgetEditorTinymce',
+            options:{
+                property: 'html',
+                inline: true,
+                menubar: false,
+                plugins: [
+                  'lists',
+                  'powerpaste',
+                  'autolink'
+                ],
+                toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignjustify alignright alignfull ',
+                valid_elements: 'strong,em,span[style],a[href]',
+                valid_styles: {
+                  '*': 'font-size,font-family,color,text-decoration,text-align'
+                },
+                powerpaste_word_import: 'clean',
+                powerpaste_html_import: 'clean',
+            }
+    };
+    $widget.setEditor('a', headerEditorDescription);
 
+    for(var i = 1; i < 7; i++){
+        var type = 'h'+i;
+        $widget.setEditor(type, headerEditorDescription);
+    }
+    
+    $widget.setEditor('pre', {
+        type: 'WidgetEditorCode',
+        options: {}
+    });
 
-    /**
-     * @ngdoc Widgets
-     * @name Group
-     * @description Parent widget of other widgets
-     * 
-     * default setting:
-     * - margin: '1px'
-     */
+    $widget.setEditor('p', {
+        type: 'WidgetEditorTinymce',
+        options:{
+            property: 'html',
+            inline: true,
+            menubar: false,
+            plugins: [
+                'link',
+                'lists',
+                'powerpaste',
+                'autolink',
+                'tinymcespellchecker'],
+            toolbar: [
+                'undo redo | bold italic underline | fontselect fontsizeselect',
+                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+            valid_elements: 'p[style],strong,em,span[style],a[href],img,q',
+            valid_styles: {
+                '*': 'font-size,font-family,color,text-decoration,text-align '
+            },
+            powerpaste_word_import: 'clean',
+            powerpaste_html_import: 'clean',
+        }
+    });
+    
+
+    $widget.setEditor('HtmlText', {
+        type: 'WidgetEditorDeprecated',
+        options:{}
+    });
+})
+
+/***********************************************************************
+ * Widgets
+ ***********************************************************************/
+.run(function ($widget) {
     $widget.newWidget({
         // widget description
         type: 'Group',
@@ -67,15 +124,6 @@ angular.module('am-wb-core')
         controller: 'WbWidgetGroup'
     });
 
-    
-    /**
-     * @ngdoc Widgets
-     * @name Text
-     * @description Add rich text to page
-     * 
-     * This is a RTF to add to a page.
-     * 
-     */
     $widget.newWidget({
         // widget description
         type: 'HtmlText',
@@ -96,21 +144,7 @@ angular.module('am-wb-core')
         template: '<div></div>',
         controller: 'WbWidgetAbstractHtml',
     });
-
-    $widget.setEditor('HtmlText', {
-        type: 'WidgetEditorDeprecated',
-        options:{}
-    });
     
-    
-    
-    
-    
-    /**
-     * @ngdoc Widgets
-     * @name iframe
-     * @description Add inline frame to show another document within current one.
-     */
     $widget.newWidget({
         // widget description
         type: 'iframe',
@@ -136,13 +170,6 @@ angular.module('am-wb-core')
         controller: 'WbWidgetIframe',
     });
 
-    /**
-     * @ngdoc Widgets
-     * @name input
-     * @description Add input to get user value
-     * 
-     * It is used to create intractive page with users
-     */
     $widget.newWidget({
         // widget description
         type: 'input',
@@ -190,13 +217,6 @@ angular.module('am-wb-core')
         controller: 'WbWidgetTextarea',
     });
 
-    /**
-     * @ngdoc Widgets
-     * @name a
-     * @description Add a to get user value
-     * 
-     * It is used to create textarea
-     */
     $widget.newWidget({
         // widget description
         type: 'a',
@@ -219,15 +239,6 @@ angular.module('am-wb-core')
         controller: 'WbWidgetA'
     });
 
-
-
-    /**
-     * @ngdoc Widgets
-     * @name p
-     * @description Add p to get user value
-     * 
-     * It is used to create p
-     */
     $widget.newWidget({
         // widget description
         type: 'p',
@@ -248,30 +259,6 @@ angular.module('am-wb-core')
         template: '<p></p>',
         controllerAs: 'ctrl',
         controller: 'WbWidgetP'
-    });
-
-    $widget.setEditor('p', {
-        type: 'WidgetEditorTinymce',
-        options:{
-            property: 'html',
-            inline: true,
-            menubar: false,
-            plugins: [
-                'link',
-                'lists',
-                'powerpaste',
-                'autolink',
-                'tinymcespellchecker'],
-            toolbar: [
-                'undo redo | bold italic underline | fontselect fontsizeselect',
-                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-            valid_elements: 'p[style],strong,em,span[style],a[href],img',
-            valid_styles: {
-                '*': 'font-size,font-family,color,text-decoration,text-align '
-            },
-            powerpaste_word_import: 'clean',
-            powerpaste_html_import: 'clean',
-        }
     });
     
     /**
@@ -342,55 +329,8 @@ angular.module('am-wb-core')
         controller: 'WbWidgetMeta'
     });
 
-    var headerEditorDescription =  {
-            type: 'WidgetEditorTinymce',
-            options:{
-                property: 'html',
-                inline: true,
-                menubar: false,
-                plugins: [
-                  'lists',
-                  'powerpaste',
-                  'autolink'
-                ],
-                toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignjustify alignright alignfull ',
-                valid_elements: 'strong,em,span[style],a[href]',
-                valid_styles: {
-                  '*': 'font-size,font-family,color,text-decoration,text-align'
-                },
-                powerpaste_word_import: 'clean',
-                powerpaste_html_import: 'clean',
-            }
-    };
-//    menubar: true,
-//    inline: true,
-//    theme: 'modern',
-//    plugins : ['advlist','autolink','autoresize','autosave','bbcode','charmap',
-//        'code','codesample','colorpicker','contextmenu', 'directionality','emoticons',
-//        'hr','image','imagetools','importcss','insertdatetime','legacyoutput',
-//        'link','lists','media','nonbreaking','noneditable','paste','save','searchreplace',
-//        'spellchecker','tabfocus','table','template','textcolor','textpattern',
-//        'toc','visualblocks','wordcount'
-//    ],
-//    toolbar: [
-//        'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',
-//        'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'
-//    ],
-//    powerpaste_word_import: 'clean',
-//    powerpaste_html_import: 'clean',
-//    format: 'raw'
-    $widget.setEditor('a', headerEditorDescription);
-
-    /**
-     * @ngdoc Widgets
-     * @name h1
-     * @description Header of level 1
-     * 
-     * It is used to create h1
-     */
     for(var i = 1; i < 7; i++){
         var type = 'h'+i;
-        $widget.setEditor(type, headerEditorDescription);
         $widget.newWidget({
             // widget description
             type: type,
@@ -414,14 +354,6 @@ angular.module('am-wb-core')
         });
     }
     
-    
-    
-
-    /**
-     * @ngdoc Widgets
-     * @name Link
-     * @description A widget to add document link 
-     */
     $widget.newWidget({
         type: 'link',
         title: 'Link',
@@ -440,11 +372,6 @@ angular.module('am-wb-core')
         controller: 'WbWidgetLink', 
     });
     
-    /**
-     * @ngdoc Widgets
-     * @name pre
-     * @description A widget to add Preformatted text
-     */
     $widget.newWidget({
         type: 'pre',
         title: 'Preformatted',
@@ -461,19 +388,6 @@ angular.module('am-wb-core')
         controllerAs: 'ctrl'
     });
     
-
-    $widget.setEditor('pre', {
-        type: 'WidgetEditorCode',
-        options: {}
-    });
-    
-    /**
-	 * @ngdoc Widgets
-	 * @name img
-	 * @description Image widget
-	 * 
-	 * Display an image with meta tag for SEO. Here is minimal list of attributes:
-     */
     $widget.newWidget({
     	type: 'img',
     	title: 'Image',
@@ -491,111 +405,73 @@ angular.module('am-wb-core')
     	controllerAs: 'ctrl',
     	controller: 'WbWidgetImg', 
     });
-//	controller: function ($scope) {
-//		var keys = ['fit', 'url', 'description', 'label', 'keywords'];
-//		this.setUrl = function (url) {
-//			this.url = url;
-//		};
-//		/**
-//		 * Loads all parameters from model
-//		 * 
-//		 * @memberof AmWbCommonVideoCtrl
-//		 */
-//		this.fillMedia = function () {
-//			for (var i = 0; i < keys.length; i++) {
-//				var key = keys[i];
-//				this[key] = this.getModelProperty(key);
-//			}
-//		};
-//		/**
-//		 * Initialize the widget
-//		 * 
-//		 * @memberof AmWbCommonVideoCtrl
-//		 */
-//		this.initWidget = function () {
-//			var ctrl = this;
-//
-//			// pass event to setting panel if video loaded successfully
-//			this.onLoad = function () {
-//				var event = {};
-//				event.source = ctrl;
-//				event.key = 'success';
-//				ctrl.fire('success', event);
-//			};
-//
-//			// pass event to setting panel if video doesn't load successfully
-//			this.onError = function () {
-//				var event = {};
-//				event.source = ctrl;
-//				event.key = 'failure';
-//				ctrl.fire('error', event);
-//			};
-//
-//			this.on('modelUpdated', function ($event) {
-//				if (keys.indexOf($event.key) > -1) {
-//					var key = $event.key;
-//					ctrl[key] = ctrl.getModelProperty(key);
-//				}
-//			});
-//			this.on('runtimeModelUpdated', function ($event) {
-//				if (keys.indexOf($event.key) > -1) {
-//					var key = $event.key;
-//					ctrl[key] = ctrl.getProperty(key);
-//				}
-//			});
-//			this.on('modelChanged', function () {
-//				ctrl.fillMedia();
-//			});
-//			this.fillMedia();
-//		};
-//	},
-//	controllerAs: 'ctrl'
-//});
     
+    $widget.newWidget({
+        type: 'source',
+        title: 'Source',
+        label: 'source',
+        icon: 'wb-widget-source',
+        description: 'This widget is used to add source in the document.',
+        groups: ['basic'],
+        setting: ['source'],
+        template: '<source></source>',
+        help: 'http://dpq.co.ir/more-information-source',
+        model: {
+            media: '(min-width: 650px)',
+            src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+        },
+        controller: 'WbWidgetSource', 
+    });
     
+    $widget.newWidget({
+        type: 'picture',
+        title: 'Picture',
+        label: 'picture',
+        icon: 'wb-widget-picture',
+        description: 'This widget is used to add picture in the document.',
+        groups: ['basic'],
+        setting: ['picture'],
+        template: '<picture></picture>',
+        help: 'http://dpq.co.ir/more-information-picture',
+        model: {
+            media: '(min-width: 650px)',
+            src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+        },
+        controller: 'WbWidgetPicture', 
+    });
     
+    $widget.newWidget({
+        type: 'audio',
+        title: 'Audio',
+        label: 'audio',
+        icon: 'wb-widget-audio',
+        description: 'This widget is used to add audio in the document.',
+        groups: ['basic'],
+        setting: ['audio'],
+        template: '<audio></audio>',
+        help: 'http://dpq.co.ir/more-information-audio',
+        model: {
+            media: '(min-width: 650px)',
+            src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+        },
+        controller: 'WbWidgetAudio', 
+    });
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-//	$widget.newWidget({
-//		// widget
-//		type: 'CommonVideoPlayer',
-//		title: 'Video Player',
-//		description: 'A video player component.',
-//		groups: ['commons'],
-//		icon: 'wb-common-video',
-//		// help
-//		help: 'https://gitlab.com/weburger/am-wb-common/wikis/video-player',
-//		helpId: '',
-//		// page
-//		templateUrl: 'views/am-wb-common-widgets/video-player.html',
-//		controller: 'AmWbCommonVideoCtrl',
-//		controllerAs: 'ctrl',
-//		setting: ['common-video-player', 'SEO']
-//	});
-	// NOTE: audio is moved to core component
-//	$widget.newWidget({
-//		// widget
-//		type: 'CommonAudioPlayer',
-//		title: 'Audio Player',
-//		description: 'An audio player component.',
-//		groups: ['commons'],
-//		icon: 'wb-common-audio',
-//		// help
-//		help: 'https://gitlab.com/weburger/am-wb-common/wikis/audio-player',
-//		helpId: '',
-//		// page
-//		templateUrl: 'views/am-wb-common-widgets/audio-player.html',
-//		controller: 'AmWbCommonAudioCtrl',
-//		controllerAs: 'ctrl',
-//		setting: ['common-audio-player']
-//	});
+    $widget.newWidget({
+        type: 'video',
+        title: 'Video',
+        label: 'video',
+        icon: 'wb-widget-video',
+        description: 'This widget is used to add video in the document.',
+        groups: ['basic'],
+        setting: ['video'],
+        template: '<video></video>',
+        help: 'http://dpq.co.ir/more-information-audio',
+        model: {
+            media: '(min-width: 650px)',
+            src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+        },
+        controller: 'WbWidgetVideo', 
+    });
     
 });

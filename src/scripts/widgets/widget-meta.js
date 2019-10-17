@@ -34,8 +34,7 @@ angular.module('am-wb-core')//
 .factory('WbWidgetMeta', function (WbWidgetAbstractHtml) {
     function Widget($scope, $element, $parent){
         WbWidgetAbstractHtml.apply(this, [$scope, $element, $parent]);
-        this.addElementAttributes('charset', 'content',
-                'http-equiv', 'name');
+        this.addElementAttributes('charset', 'content', 'http-equiv', 'name');
 
         var ctrl = this;
         function updateView(){

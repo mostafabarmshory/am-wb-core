@@ -30,18 +30,18 @@ angular.module('am-wb-core')//
  * 
  * 
  */
-.controller('WbWidgetAudio', function (WbWidgetAbstractHtml) {
+.factory('WbWidgetAudio', function (WbWidgetGroup) {
     /**
      * Creates new instance of the widget
      * 
      * @memberof audio
      */
     function Widget($scope, $element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$scope, $element, $parent]);
-        this.addElementAttributes('alt', 'crossorigin',
-                'height', 'hspace', 'ismap', 'longdesc',
-                'sizes', 'src', 'usemap', 'width');
+        WbWidgetGroup.apply(this, [$scope, $element, $parent]);
+        this.addElementAttributes('autoplay', 'controls',
+                'loop', 'muted', 'preload', 'src');
+        this.setAllowedTypes('source');
     };
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    Widget.prototype = Object.create(WbWidgetGroup.prototype);
     return Widget;
 });

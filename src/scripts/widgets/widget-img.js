@@ -27,9 +27,9 @@ angular.module('am-wb-core')
  * @name img
  * @description Manage an image
  */
-.factory('WbWidgetImg', function (WbWidgetAbstractHtml) {
+.factory('WbWidgetImg', function (WbWidgetAbstract) {
     function Widget($scope, $element, $parent) {
-        WbWidgetAbstractHtml.apply(this, [ $scope, $element,
+        WbWidgetAbstract.apply(this, [ $scope, $element,
             $parent ]);
         this.addElementAttributes('alt', 'crossorigin',
                 'height', 'hspace', 'ismap', 'longdesc',
