@@ -603,7 +603,7 @@ module.exports = function(grunt) {
                 configFile : 'test/karma.unit.conf.js',
                 singleRun : true,
         	    preprocessors: {
-        	        'src/**/*.js': ['coverage']
+        	        'src/scripts/**/*.js': ['coverage']
         	    },
         		reporters: [
         			'progress', 

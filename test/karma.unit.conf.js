@@ -63,7 +63,7 @@ module.exports = function(config) {
 			'test/mock/**/*.js',
 			'test/spec/**/*.js'
 		],
-
+		
 		// optionally, configure the reporter
 		coverageReporter: {
 			dir : 'coverage',
@@ -71,7 +71,10 @@ module.exports = function(config) {
 				type : 'lcovonly',
 				file : 'lcov.info'
 			},{
-				type: 'text-summary'
+			    type: 'text-summary'
+			},{
+			    type: 'html',
+			    dir : 'coverage/'
 			}]
 		},
 
@@ -103,7 +106,7 @@ module.exports = function(config) {
 
 		// level of logging
 		// possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
-		logLevel: config.LOG_INFO
+		logLevel: config.LOG_WARN
 
 		// Uncomment the following lines if you are using grunt's server to run the tests
 		// proxies: {
