@@ -29,7 +29,9 @@ angular.module('am-wb-core')
 /***********************************************************************
  * Convertors
  ***********************************************************************/
-.run(function ($widget, WbConverterText) {
+.run(function ($widget, WbConverterWeburger, WbConverterDom, WbConverterText) {
+    $widget.addConverter(new WbConverterWeburger());
+    $widget.addConverter(new WbConverterDom());
     $widget.addConverter(new WbConverterText());
 })
 /***********************************************************************
@@ -113,8 +115,6 @@ angular.module('am-wb-core')
  * Widgets
  ***********************************************************************/
 .run(function ($widget) {
-
-
     $widget.newWidget({
         // widget description
         type: 'a',
@@ -315,7 +315,8 @@ angular.module('am-wb-core')
         setting: ['div'],
         template: '<div></div>',
         help: 'http://dpq.co.ir/more-information-div',
-        controller: 'WbWidgetDiv', 
+        controller: 'WbWidgetDiv',
+        isLeaf: false
     });
     $widget.newWidget({
         type: 'dl',
@@ -412,6 +413,7 @@ angular.module('am-wb-core')
         template: '<form></form>',
         help: 'http://dpq.co.ir/more-information-form',
         controller: 'WbWidgetForm', 
+        isLeaf: false
     });
     $widget.newWidget({
         type: 'frame',
@@ -436,6 +438,7 @@ angular.module('am-wb-core')
         template: '<frameset></frameset>',
         help: 'http://dpq.co.ir/more-information-frameset',
         controller: 'WbWidgetFrameset', 
+        isLeaf: false
     });
     for(var i = 1; i < 7; i++){
         var type = 'h'+i;
@@ -471,6 +474,7 @@ angular.module('am-wb-core')
         template: '<header></header>',
         help: 'http://dpq.co.ir/more-information-header',
         controller: 'WbWidgetHeader', 
+        isLeaf: false
     });
     $widget.newWidget({
         type: 'hr',
@@ -625,6 +629,7 @@ angular.module('am-wb-core')
         template: '<main></main>',
         help: 'http://dpq.co.ir/more-information-main',
         controller: 'WbWidgetMain', 
+        isLeaf: false
     });
     $widget.newWidget({
         type: 'map',
@@ -637,6 +642,7 @@ angular.module('am-wb-core')
         template: '<map></map>',
         help: 'http://dpq.co.ir/more-information-map',
         controller: 'WbWidgetMap', 
+        isLeaf: false
     });
     $widget.newWidget({
         // widget description
@@ -692,6 +698,7 @@ angular.module('am-wb-core')
         template: '<nav></nav>',
         help: 'http://dpq.co.ir/more-information-nav',
         controller: 'WbWidgetNav', 
+        isLeaf: false
     });
     $widget.newWidget({
         type: 'noscript',
@@ -716,6 +723,7 @@ angular.module('am-wb-core')
         template: '<object></object>',
         help: 'http://dpq.co.ir/more-information-object',
         controller: 'WbWidgetObject', 
+        isLeaf: false
     });
     $widget.newWidget({
         type: 'ol',
@@ -728,6 +736,7 @@ angular.module('am-wb-core')
         template: '<ol></ol>',
         help: 'http://dpq.co.ir/more-information-ol',
         controller: 'WbWidgetOl', 
+        isLeaf: false
     });
     $widget.newWidget({
         type: 'optgroup',
@@ -740,6 +749,7 @@ angular.module('am-wb-core')
         template: '<optgroup></optgroup>',
         help: 'http://dpq.co.ir/more-information-optgroup',
         controller: 'WbWidgetOptgroup', 
+        isLeaf: false
     });
     $widget.newWidget({
         type: 'option',
@@ -813,6 +823,7 @@ angular.module('am-wb-core')
             src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
         },
         controller: 'WbWidgetPicture', 
+        isLeaf: false
     });
     $widget.newWidget({
         type: 'pre',
@@ -888,6 +899,7 @@ angular.module('am-wb-core')
         template: '<section></section>',
         help: 'http://dpq.co.ir/more-information-section',
         controller: 'WbWidgetSection', 
+        isLeaf: false
     });
     $widget.newWidget({
         type: 'select',
@@ -940,6 +952,7 @@ angular.module('am-wb-core')
         template: '<summary></summary>',
         help: 'http://dpq.co.ir/more-information-summary',
         controller: 'WbWidgetSummary', 
+        isLeaf: false
     });
     $widget.newWidget({
         type: 'svg',
@@ -964,6 +977,7 @@ angular.module('am-wb-core')
         template: '<template></template>',
         help: 'http://dpq.co.ir/more-information-template',
         controller: 'WbWidgetTemplate', 
+        isLeaf: false
     });
     $widget.newWidget({
         // widget description
@@ -1009,6 +1023,7 @@ angular.module('am-wb-core')
         template: '<ul></ul>',
         help: 'http://dpq.co.ir/more-information-ul',
         controller: 'WbWidgetUl', 
+        isLeaf: false
     });
     $widget.newWidget({
         type: 'video',
@@ -1025,6 +1040,7 @@ angular.module('am-wb-core')
             src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
         },
         controller: 'WbWidgetVideo', 
+        isLeaf: false
     });
 
     /*******************************************************
@@ -1054,7 +1070,8 @@ angular.module('am-wb-core')
         template: '<div></div>',
         help: 'http://dpq.co.ir/more-information-link',
         helpId: 'wb-widget-group',
-        controller: 'WbWidgetGroup'
+        controller: 'WbWidgetGroup',
+        isLeaf: false
     });
     $widget.newWidget({
         // widget description

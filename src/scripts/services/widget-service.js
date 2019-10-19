@@ -177,6 +177,14 @@ angular.module('am-wb-core')
         return type in contentElementAsso;
     }
     this.hasWidget = hasWidget;
+    
+    function isWidgetLeaf(name){
+        if (name in contentElementAsso) {
+            return contentElementAsso[name].isLeaf;
+        }
+        return false;
+    }
+    this.isWidgetLeaf = isWidgetLeaf;
 
     /**
      * Compile element 
