@@ -77,17 +77,14 @@
 					style="margin: 0px;"
 					ng-model="examplePath"
 					ng-change="ctrl.setDocumentPath(examplePath)">
-					<md-option 
-						ng-value="'examples/empty.json'">
-						Empty
-					</md-option>
+					<md-option ng-value="'examples/empty.json'">Empty</md-option>
+					<md-option ng-value="'examples/center.json'">Center</md-option>
 				</md-select>
 			</div>
 		</md-toolbar>
-		<md-content
+		<div
 			wb-content
-			ng-model="ctrl.model"
-			flex></md-content>
+			ng-model="ctrl.model"></div>
 
 
 

@@ -241,7 +241,7 @@ angular.module('am-wb-core')//
      * @memberof WbAbstractWidget
      */
     WbWidgetAbstract.prototype.getModel = function () {
-        return this.wbModel;
+        return this.model;
     };
 
     /**
@@ -252,10 +252,10 @@ angular.module('am-wb-core')//
      */
     WbWidgetAbstract.prototype.setModel = function (model) {
         this.setState('init');
-        if (model === this.wbModel) {
+        if (model === this.model) {
             return;
         }
-        this.wbModel = model;
+        this.model = model;
         this.runtimeModel = {};
         this.fire('modelChanged');
         this.setState('ready');
@@ -679,11 +679,11 @@ angular.module('am-wb-core')//
      * 
      * NOTE: default layout direction is column.
      * 
-     * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
+     * @returns {WbAbstractWidget.model.style.flexDirection|undefined}
      * @memberof WbAbstractWidget
      */
     WbWidgetAbstract.prototype.getDirection = function () {
-        return this.getModelProperty('style.layout.direction') || 'column';
+        return this.getModelProperty('style.flexDirection') || 'column';
     };
 
     /**

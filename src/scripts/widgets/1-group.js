@@ -67,11 +67,11 @@ angular.module('am-wb-core')//
         if (model === this.wbModel) {
             return;
         }
-        this.wbModel = model;
+        this.model = model;
         this.fire('modelChanged');
 
         var ctrl = this;
-        return this.loadWidgets(model)
+        return this.loadWidgets()
         .then(function(){
             return ctrl;
         })
@@ -189,8 +189,8 @@ angular.module('am-wb-core')//
             this.childWidgets.splice(index, 1);
 
             var model = this.getModel();
-            index = model.contents.indexOf(widget.getModel());
-            model.contents.splice(index, 1);
+            index = model.children.indexOf(widget.getModel());
+            model.children.splice(index, 1);
 
             // destroy widget
             widget.destroy();
@@ -213,7 +213,7 @@ angular.module('am-wb-core')//
     };
 
 
-    WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
+    WbWidgetGroupCtrl.prototype.loadWidgets = function () {
         // destroy all children
         angular.forEach(this.childWidgets, function (widget) {
             widget.destroy();
@@ -221,7 +221,7 @@ angular.module('am-wb-core')//
         this.childWidgets = [];
 
         // check for new contents
-        if (!model || !angular.isArray(model.contents)) {
+        if (!this.model || !angular.isArray(this.model.children)) {
             return $q.resolve();
         }
 
@@ -229,7 +229,7 @@ angular.module('am-wb-core')//
         var parentWidget = this;
 
         var compilesJob = [];
-        model.contents.forEach(function (item, index) {
+        this.model.children.forEach(function (item, index) {
             var job = $widget.compile(item, parentWidget)//
             .then(function (widget) {
                 parentWidget.childWidgets[index] = widget;
@@ -270,7 +270,7 @@ angular.module('am-wb-core')//
             if(!angular.isArray(model.contents)){
                 model.contents = [];
             }
-            model.contents.splice(index, 0, item);
+            model.children.splice(index, 0, item);
             ctrl.childWidgets.splice(index, 0, newWidget);
 
             // init the widget
@@ -309,7 +309,7 @@ angular.module('am-wb-core')//
                 if(!angular.isArray(model.contents)){
                     model.contents = [];
                 }
-                model.contents.splice(j, 0, newWidget.getModel());
+                model.children.splice(j, 0, newWidget.getModel());
                 ctrl.childWidgets.splice(j, 0, newWidget);
 
                 // init the widget
@@ -384,19 +384,19 @@ angular.module('am-wb-core')//
         if (index < 0 || index > this.getChildren().length - 1 || this.getChildren().length === 1) {
             return;
         }
-        if (this.getModel().contents.indexOf(widget.getModel()) === index) {
+        if (this.getModel().children.indexOf(widget.getModel()) === index) {
             return;
         }
         var positionWidget = this.getChildren()[index];
         // move element
-        if (this.getModel().contents.indexOf(widget.getModel()) < index) {
+        if (this.getModel().children.indexOf(widget.getModel()) < index) {
             positionWidget.getElement().after(widget.getElement());
         } else {
             positionWidget.getElement().before(widget.getElement());
         }
 
         // move model
-        arraymove(this.getModel().contents, this.getModel().contents.indexOf(widget.getModel()), index);
+        arraymove(this.getModel().contents, this.getModel().children.indexOf(widget.getModel()), index);
 
         // move controller
         arraymove(this.getChildren(), this.indexOfChild(widget), index);

@@ -1,0 +1,25 @@
+{
+	"type": "div",
+	"style": {
+		"padding": "5px",
+		"margin": "0px",
+		"background": "pink",
+		"flexGrow": 2,
+		"flexShrink": 0,
+		"flexBasis": "auto",
+		"display": "flex",
+		"flexDirection": "row",
+		"justifyContent": "center",
+		"alignItems": "center"
+	},
+	"on": {
+		"click":"$widget.setProperty('style.background', 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) +')');"
+	},
+	"children": [{
+		"type": "h1",
+		"html": "Center header",
+		"style": {
+			"margin": "0px"
+		}
+	}]
+}
