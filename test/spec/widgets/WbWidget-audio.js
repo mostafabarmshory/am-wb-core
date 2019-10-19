@@ -40,7 +40,7 @@ describe('Widget audio ', function () {
         // Create new instance
         var model = {
                 type: "audio",
-                contents: [{
+                children: [{
                     type: "source",
                     srcset: "resources/images/content.svg"
                 }, {

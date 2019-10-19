@@ -47,19 +47,19 @@ describe('WbWidget converter WbConverterDom ', function () {
         expect(result[0].style.backgroundColor).toBe('blue');
         expect(result[0].style.color).toBe('red');
         
-        expect(result[0].contents.length).toBe(1);
-        expect(result[0].contents[0].type).toBe('form');
+        expect(result[0].children.length).toBe(1);
+        expect(result[0].children[0].type).toBe('form');
         
-        expect(result[0].contents[0].contents.length).toBe(1);
-        expect(result[0].contents[0].contents[0].type).toBe('img');
-        expect(result[0].contents[0].contents[0].src).toBe('test/path.svg');
+        expect(result[0].children[0].children.length).toBe(1);
+        expect(result[0].children[0].children[0].type).toBe('img');
+        expect(result[0].children[0].children[0].src).toBe('test/path.svg');
     });
 
     it('should encode lit of html widgets', function (done) {
         // Create new instance
         var model = {
                 type: 'div',
-                contents: [{
+                children: [{
                     type: 'p',
                     html: 'p1'
                 },{

@@ -29,15 +29,6 @@ describe('WbWidget a ', function () {
 	var $widget;
 	var $httpBackend;
 
-	function MockRootWidget() {
-		// TODO;
-		this.scope = $rootScope.$new();
-	};
-
-	MockRootWidget.prototype.getScope = function(){
-		return this.scope;
-	}
-
 	// load the service's module
 	beforeEach(module('am-wb-core'));
 	beforeEach(inject(function (_$rootScope_, _$widget_, _$httpBackend_) {
@@ -47,14 +38,12 @@ describe('WbWidget a ', function () {
 	}));
 
 	it('should set name from model', function (done) {
-		var root = new MockRootWidget();
-		// Create new instance
 		var model = {
 				type: 'p',
 				id: 'p',
 				href: 'http://www.viraweb123.ir',
 		};
-		$widget.compile(model, root)
+		$widget.compile(model)
 		.then(function(widget){
 			expect(widget.getElementAttribute('id')).toBe(model.id);
 			done();
@@ -63,15 +52,13 @@ describe('WbWidget a ', function () {
 	});
 	
 	it('should set html from model', function (done) {
-		var root = new MockRootWidget();
-		// Create new instance
 		var model = {
 				type: 'p',
 				id: 'p',
 				name: 'a-test',
 				html: '<h2>HTML Text In 4th group0</h2>',
 		};
-		$widget.compile(model, root)
+		$widget.compile(model)
 		.then(function(widget){
 			expect(widget.getElementAttribute('html')).toBe(model.html);
 			expect(widget.html()).toBe(model.html);

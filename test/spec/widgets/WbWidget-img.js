@@ -29,14 +29,6 @@ describe('WbWidget img ', function () {
 	var $widget;
 	var $httpBackend;
 
-	function MockRootWidget() {
-		// TODO;
-		this.scope = $rootScope.$new();
-	};
-
-	MockRootWidget.prototype.getScope = function(){
-		return this.scope;
-	}
 
 	// load the service's module
 	beforeEach(module('am-wb-core'));
@@ -47,13 +39,11 @@ describe('WbWidget img ', function () {
 	}));
 
 	it('should set name from model', function (done) {
-		var root = new MockRootWidget();
-		// Create new instance
 		var model = {
 				type: 'img',
-				src: '/test/image.svg'
+				src: 'path/test/image.svg'
 		};
-		$widget.compile(model, root)
+		$widget.compile(model)
 		.then(function(widget){
 			expect(widget.getType()).toBe('img');
 			done();

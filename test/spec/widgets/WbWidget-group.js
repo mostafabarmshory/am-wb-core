@@ -28,19 +28,6 @@ describe('WbWidget group', function () {
     var $rootScope;
     var $widget;
 
-    function MockRootWidget() {
-        // TODO;
-        this.scope = $rootScope.$new();
-    };
-
-    MockRootWidget.prototype.getScope = function(){
-        return this.scope;
-    }
-    
-    MockRootWidget.prototype.isRoot = function(){
-        return true;
-    }
-
     // load the service's module
     beforeEach(module('am-wb-core'));
     beforeEach(inject(function (_$rootScope_, _$widget_) {
@@ -49,12 +36,10 @@ describe('WbWidget group', function () {
     }));
 
     it('should implements collection api ', function (done) {
-        var root = new MockRootWidget();
-        // Create new instance
         var model = {
                 type: 'Group',
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(group){
             // model
             expect(angular.isFunction(group.setModel)).toBe(true);
@@ -93,13 +78,12 @@ describe('WbWidget group', function () {
 
 
     it('should insert a child model at the first', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             function runTest(){
@@ -126,18 +110,17 @@ describe('WbWidget group', function () {
 
 
     it('should insert a child model at the first', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'h1'
                 }, {
                     type: 'p'
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             function runTest(){
@@ -165,18 +148,17 @@ describe('WbWidget group', function () {
     });
 
     it('should insert a child model at the end', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'h1'
                 }, {
                     type: 'p'
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             function runTest(){
@@ -204,18 +186,17 @@ describe('WbWidget group', function () {
     });
 
     it('should insert a child model at the middle', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'h1'
                 }, {
                     type: 'p'
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             function runTest(){
@@ -243,13 +224,12 @@ describe('WbWidget group', function () {
     });
 
     it('should insert a children', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             function runTest(){
@@ -281,16 +261,15 @@ describe('WbWidget group', function () {
     });
 
     it('should insert a children at the start', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'meta'
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             function runTest(){
@@ -323,16 +302,15 @@ describe('WbWidget group', function () {
     });
 
     it('should insert a children at the end', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'meta'
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             function runTest(){
@@ -364,18 +342,17 @@ describe('WbWidget group', function () {
         $rootScope.$apply();
     });
     it('should insert a children at the middle', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'meta'
                 },{
                     type: 'meta'
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             function runTest(){
@@ -409,18 +386,17 @@ describe('WbWidget group', function () {
     });
 
     it('should insert a children at the end', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'meta'
                 },{
                     type: 'meta'
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             function runTest(){
@@ -454,12 +430,11 @@ describe('WbWidget group', function () {
     });
 
     it('should get child by id', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'h1',
                     id: '1'
                 },{
@@ -470,7 +445,7 @@ describe('WbWidget group', function () {
                     id: '3'
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             function runTest(){
@@ -492,12 +467,11 @@ describe('WbWidget group', function () {
     });
 
     it('should set and get allowed types', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'h1',
                     id: '1'
                 },{
@@ -508,7 +482,7 @@ describe('WbWidget group', function () {
                     id: '3'
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             group.setAllowedTypes('a', 'b');
@@ -522,12 +496,11 @@ describe('WbWidget group', function () {
     });
 
     it('should ignore data model if set agin', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'h1',
                     id: '1'
                 },{
@@ -538,7 +511,7 @@ describe('WbWidget group', function () {
                     id: '3'
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             group.on('modelChanged', function(){
@@ -562,17 +535,12 @@ describe('WbWidget group', function () {
         $rootScope.$apply();
     });
     
-    
-
-
-
     it('should get child by id', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'h1',
                     id: '1'
                 },{
@@ -583,7 +551,7 @@ describe('WbWidget group', function () {
                     id: '3'
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             function runTest(){
@@ -608,12 +576,11 @@ describe('WbWidget group', function () {
     
 
     it('should delete child group by id', function (done) {
-        var root = new MockRootWidget();
         var group;
         // Create new instance
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'Group',
                     id: '1'
                 },{
@@ -624,7 +591,7 @@ describe('WbWidget group', function () {
                     id: '3'
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
             group = widget;
             function runTest(){
@@ -651,7 +618,7 @@ describe('WbWidget group', function () {
         var group;
         var model = {
                 type: 'Group',
-                contents:[{
+                children:[{
                     type: 'Group',
                     id: '1'
                 },{

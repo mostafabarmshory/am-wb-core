@@ -29,14 +29,6 @@ describe('WbWidget input ', function () {
 	var $widget;
 	var $httpBackend;
 
-	function MockRootWidget() {
-		// TODO;
-		this.scope = $rootScope.$new();
-	};
-
-	MockRootWidget.prototype.getScope = function(){
-		return this.scope;
-	}
 
 	// load the service's module
 	beforeEach(module('am-wb-core'));
@@ -47,15 +39,13 @@ describe('WbWidget input ', function () {
 	}));
 
 	it('should set input type from model', function (done) {
-		var root = new MockRootWidget();
-		// Create new instance
 		var model = {
 				type: 'input',
 				inputType: 'text',
 				id: 'test',
 				name: 'input-test',
 		};
-		$widget.compile(model, root)
+		$widget.compile(model)
 		.then(function(widget){
 			expect(widget.getElementAttribute('inputType')).toBe(model.inputType);
 			expect(widget.getElementAttribute('type')).toBe(model.inputType);
@@ -65,14 +55,12 @@ describe('WbWidget input ', function () {
 	});
 	
 	it('should set value from model', function (done) {
-		var root = new MockRootWidget();
-		// Create new instance
 		var model = {
 				type: 'input',
 				inputType: 'text',
 				value: 'inpt-test-value',
 		};
-		$widget.compile(model, root)
+		$widget.compile(model)
 		.then(function(widget){
 			expect(widget.val()).toBe(model.value);
 			expect(widget.getElementAttribute('value')).toBe(model.value);
@@ -81,14 +69,12 @@ describe('WbWidget input ', function () {
 		$rootScope.$apply();
 	});
 	it('should set value from code model', function (done) {
-		var root = new MockRootWidget();
-		// Create new instance
 		var model = {
 				type: 'input',
 				inputType: 'text',
 				value: 'inpt-test-value',
 		};
-		$widget.compile(model, root)
+		$widget.compile(model)
 		.then(function(widget){
 			// loaded values
 			expect(widget.val()).toBe(model.value);
@@ -103,14 +89,12 @@ describe('WbWidget input ', function () {
 	});
 	
 	it('should set value null from model', function (done) {
-		var root = new MockRootWidget();
-		// Create new instance
 		var model = {
 				type: 'input',
 				inputType: 'text',
 				value: 'inpt-test-value',
 		};
-		$widget.compile(model, root)
+		$widget.compile(model)
 		.then(function(widget){
 			expect(widget.getElementAttribute('value')).toBe(model.value);
 			widget.val('');

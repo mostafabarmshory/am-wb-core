@@ -715,12 +715,12 @@ angular.module('am-wb-core')
         cleanEvetns(model);
         cleanStyle(model);
         if (model.type === 'Group' || model.type === 'Page') {
-            if (!model.contents) {
-                model.contents = [];
+            if (!model.children) {
+                model.children = [];
             }
-            if (model.contents.length) {
-                for (var i = 0; i < model.contents.length; i++) {
-                    cleanInternal(model.contents[i]);
+            if (model.children.length) {
+                for (var i = 0; i < model.children.length; i++) {
+                    cleanInternal(model.children[i]);
                 }
             }
         }

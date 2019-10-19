@@ -52,15 +52,15 @@ describe('WbWidget processor event ', function () {
                 id: 'test',
                 'class': 'a b',
                 style: {
-                    backgroundColor: 'red'
+                    background: 'red'
                 },
-                event: {
-                    init: '$widget.setProperty(\'style.backgroundColor\', \'black\');'
+                on: {
+                    init: '$widget.setProperty(\'style.background\', \'black\');'
                 }
         };
         $widget.compile(model)
         .then(function(widget){
-            expect(widget.getElement().css('background-color')).toBe('black');
+            expect(widget.getElement().css('background')).toBe('black');
             done();
         });
         $rootScope.$apply();
@@ -71,14 +71,14 @@ describe('WbWidget processor event ', function () {
         var model = {
                 type: 'div',
                 id: 'test',
-                event: {
-                    click: '$widget.setProperty(\'style.backgroundColor\', \'pink\');'
+                on: {
+                    click: '$widget.setProperty(\'style.background\', \'pink\');'
                 }
         };
         $widget.compile(model)
         .then(function(widget){
             widget.getElement().click();
-            expect(widget.getElement().css('background-color')).toBe('pink');
+            expect(widget.getElement().css('background')).toBe('pink');
             done();
         });
         $rootScope.$apply();
@@ -90,20 +90,20 @@ describe('WbWidget processor event ', function () {
                 type: 'div',
                 id: 'test',
                 style: {
-                    backgroundColor: 'red'
+                    background: 'red'
                 },
-                event: {
-                    init: '$widget2.setProperty(\'style.backgroundColor\', \'pink\');',
-                    load: '+++.setProperty(\'style.backgroundColor\', \'pink\');',
-                    click: '$widget.setProperty(\'style.backgroundColor\', \'pink\');'
+                on: {
+                    init: '$widget2.setProperty(\'style.background\', \'pink\');',
+                    load: '+++.setProperty(\'style.background\', \'pink\');',
+                    click: '$widget.setProperty(\'style.background\', \'pink\');'
                 }
         };
         $widget.compile(model)
         .then(function(widget){
-            expect(widget.getElement().css('backgroundColor')).toBe('red');
+            expect(widget.getElement().css('background')).toBe('red');
 
             widget.getElement().click();
-            expect(widget.getElement().css('backgroundColor')).toBe('pink');
+            expect(widget.getElement().css('background')).toBe('pink');
 
             done();
         });
@@ -115,25 +115,25 @@ describe('WbWidget processor event ', function () {
                 type: 'div',
                 id: 'test',
                 style: {
-                    backgroundColor: 'red'
+                    background: 'red'
                 },
-                event: {
-                    click: '$widget.setProperty(\'style.backgroundColor\', \'pink\');'
+                on: {
+                    click: '$widget.setProperty(\'style.background\', \'pink\');'
                 }
         };
         $widget.compile(model)
         .then(function(widget){
-            expect(widget.getElement().css('background-color')).toBe('red');
+            expect(widget.getElement().css('background')).toBe('red');
 
             widget.setEditable(true);
 
             widget.getElement().click();
-            expect(widget.getElement().css('background-color')).toBe('red');
+            expect(widget.getElement().css('background')).toBe('red');
 
             widget.setEditable(false);
 
             widget.getElement().click();
-            expect(widget.getElement().css('background-color')).toBe('pink');
+            expect(widget.getElement().css('background')).toBe('pink');
             done();
         });
         $rootScope.$apply();
@@ -145,14 +145,14 @@ describe('WbWidget processor event ', function () {
         var model = {
                 type: 'div',
                 id: 'test',
-                event: {
-                    dblclick: '$widget.setProperty(\'style.backgroundColor\', \'pink\');'
+                on: {
+                    dblclick: '$widget.setProperty(\'style.background\', \'pink\');'
                 }
         };
         $widget.compile(model)
         .then(function(widget){
             widget.getElement().dblclick();
-            expect(widget.getElement().css('background-color')).toBe('pink');
+            expect(widget.getElement().css('background')).toBe('pink');
             done();
         });
         $rootScope.$apply();
@@ -162,14 +162,14 @@ describe('WbWidget processor event ', function () {
         var model = {
                 type: 'div',
                 id: 'test',
-                event: {
-                    mouseout: '$widget.setProperty(\'style.backgroundColor\', \'pink\');'
+                on: {
+                    mouseout: '$widget.setProperty(\'style.background\', \'pink\');'
                 }
         };
         $widget.compile(model)
         .then(function(widget){
             widget.getElement().mouseout();
-            expect(widget.getElement().css('background-color')).toBe('pink');
+            expect(widget.getElement().css('background')).toBe('pink');
             done();
         });
         $rootScope.$apply();
@@ -179,14 +179,14 @@ describe('WbWidget processor event ', function () {
         var model = {
                 type: 'div',
                 id: 'test',
-                event: {
-                    mouseover: '$widget.setProperty(\'style.backgroundColor\', \'pink\');'
+                on: {
+                    mouseover: '$widget.setProperty(\'style.background\', \'pink\');'
                 }
         };
         $widget.compile(model)
         .then(function(widget){
             widget.getElement().mouseover();
-            expect(widget.getElement().css('background-color')).toBe('pink');
+            expect(widget.getElement().css('background')).toBe('pink');
             done();
         });
         $rootScope.$apply();
@@ -196,14 +196,14 @@ describe('WbWidget processor event ', function () {
         var model = {
                 type: 'div',
                 id: 'test',
-                event: {
-                    mousedown: '$widget.setProperty(\'style.backgroundColor\', \'pink\');'
+                on: {
+                    mousedown: '$widget.setProperty(\'style.background\', \'pink\');'
                 }
         };
         $widget.compile(model)
         .then(function(widget){
             widget.getElement().mousedown();
-            expect(widget.getElement().css('background-color')).toBe('pink');
+            expect(widget.getElement().css('background')).toBe('pink');
             done();
         });
         $rootScope.$apply();
@@ -213,14 +213,14 @@ describe('WbWidget processor event ', function () {
         var model = {
                 type: 'div',
                 id: 'test',
-                event: {
-                    mouseup: '$widget.setProperty(\'style.backgroundColor\', \'pink\');'
+                on: {
+                    mouseup: '$widget.setProperty(\'style.background\', \'pink\');'
                 }
         };
         $widget.compile(model)
         .then(function(widget){
             widget.getElement().mouseup();
-            expect(widget.getElement().css('background-color')).toBe('pink');
+            expect(widget.getElement().css('background')).toBe('pink');
             done();
         });
         $rootScope.$apply();
@@ -233,17 +233,17 @@ describe('WbWidget processor event ', function () {
                 type: 'div',
                 id: 'test',
                 style: {
-                    backgroundColor: 'red'
+                    background: 'red'
                 },
-                event: {
-                    init: '$timeout(function(){$widget.setProperty(\'style.backgroundColor\', \'pink\')}, 1000);'
+                on: {
+                    init: '$timeout(function(){$widget.setProperty(\'style.background\', \'pink\')}, 1000);'
                 }
         };
         $widget.compile(model)
         .then(function(widget){
             widget.setEditable(true);
             $timeout(function(){
-                expect(widget.getElement().css('background-color')).toBe('red');
+                expect(widget.getElement().css('background')).toBe('red');
                 done();
             }, 2000);
         });

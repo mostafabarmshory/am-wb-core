@@ -47,7 +47,7 @@ describe('Storage test', function () {
          */
         $widget.newWidget({
             type: widgetType,
-            template: '<h1>{{ctrl.text}}</h1>'
+            template: '<h1></h1>'
         });
     }));
 
@@ -58,18 +58,16 @@ describe('Storage test', function () {
             type: widgetType,
             id: 'test',
             name: 'Widget',
-            text: '<h2>Storage Test</h2>',
+            html: '<h2>Storage Test</h2>',
             style: {
-                background: {
-                    color: 'black'
-                }
+                background: 'black'
             },
-            event: {
-                init: 'if ($storage) {$widget.setProperty(\'style.background.color\',\'red\')}'
+            on: {
+                init: 'if ($storage) {$widget.setProperty(\'style.background\',\'red\')}'
             }
         }, root)
         .then(function (widget) {
-            expect(widget.getProperty('style.background.color')).toBe('red');
+            expect(widget.getProperty('style.background')).toBe('red');
             done();
         });
         $rootScope.$apply();

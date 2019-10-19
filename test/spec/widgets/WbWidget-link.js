@@ -29,15 +29,6 @@ describe('WbWidget link ', function () {
 	var $widget;
 	var $httpBackend;
 
-	function MockRootWidget() {
-		// TODO;
-		this.scope = $rootScope.$new();
-	};
-
-	MockRootWidget.prototype.getScope = function(){
-		return this.scope;
-	}
-
 	// load the service's module
 	beforeEach(module('am-wb-core'));
 	beforeEach(inject(function (_$rootScope_, _$widget_, _$httpBackend_) {
@@ -47,12 +38,10 @@ describe('WbWidget link ', function () {
 	}));
 
 	it('should set create from model', function (done) {
-		var root = new MockRootWidget();
-		// Create new instance
 		var model = {
 				type: 'link',
 		};
-		$widget.compile(model, root)
+		$widget.compile(model)
 		.then(function(widget){
 			expect(widget.getType()).toBe('link');
 			done();

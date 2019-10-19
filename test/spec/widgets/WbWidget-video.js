@@ -40,7 +40,7 @@ describe('Widget video ', function () {
         // Create new instance
         var model = {
                 type: "video",
-                contents: [{
+                children: [{
                     type: "source",
                     srcset: "resources/images/content.svg"
                 }, {

@@ -39,7 +39,7 @@ describe('Widget picture ', function () {
         // Create new instance
         var model = {
                 type: "picture",
-                contents: [{
+                children: [{
                     type: "source",
                     srcset: "resources/images/content.svg"
                 }, {

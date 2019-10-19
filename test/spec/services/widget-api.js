@@ -107,7 +107,7 @@ describe('Service $widget', function () {
         // Create new instance
         $widget.compile({
             type : 'Group',
-            contents : [ {
+            children : [ {
                 type : 'HtmlText',
                 text : '<h2>HTML Text In 4th group0</h2>',
             }, {
@@ -132,11 +132,11 @@ describe('Service $widget', function () {
         // Create new instance
         $widget.compile({
             type : 'Group',
-            contents : [ {
+            children : [ {
                 type : 'Group',
-                contents : [ {
+                children : [ {
                     type : 'Group',
-                    contents : [ {
+                    children : [ {
                         type : 'HtmlText',
                         text : '<h2>HTML Text In 4th group0</h2>',
                     }, {
@@ -171,7 +171,7 @@ describe('Service $widget', function () {
         // Create new instance
         $widget.compile({
             type : 'Group',
-            contents : []
+            children : []
         }, root).then(function (widget) {
             widget.fire('testEvent', {key: 'test'});
             expect(flag).toBe(true);
@@ -186,7 +186,7 @@ describe('Service $widget', function () {
         // Create new instance
         $widget.compile({
             type : 'BoostForm',
-            contents : [{
+            children : [{
                 type: 'input'
             }]
         }, root)

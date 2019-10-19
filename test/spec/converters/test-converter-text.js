@@ -54,7 +54,7 @@ describe('WbWidget converter WbConverterText ', function () {
         // Create new instance
         var model = {
                 type: 'div',
-                contents: [{
+                children: [{
                     type: 'p',
                     html: 'p1'
                 },{

@@ -1,22 +1,13 @@
 {
-    "contents": [
+    "type": "div",
+    "children": [
         {
-            "text": "<h2>HTML Text</h2>\n<p>این یک نمونه هست که لود شده</p>",
+            "html": "<h2>HTML Text</h2>\n<p>این یک نمونه هست که لود شده</p>",
             "type": "HtmlText",
             "name": "HTML text",
             "style": {
-                "borderColor": {
-                    "bottom": "none"
-                },
-                "margin": {},
-                "borderRadius": {},
-                "borderStyleColorWidth": {},
-                "borderStyle": {},
-                "borderWidth": {},
-                "flexAlignItem": "wb-flex-item-auto"
+                "margin": "0px"
             }
         }
-    ],
-    "type": "Page",
-    "direction": "rtl"
+    ]
 }

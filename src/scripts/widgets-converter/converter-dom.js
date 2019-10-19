@@ -75,9 +75,9 @@ angular.module('am-wb-core')//
         if($widget.isWidgetLeaf(name)){
             model['html'] = element.innerHTML;
         } else {
-            model.contents = [];
+            model.children = [];
             _.forEach(element.children, function(childelement){
-                model.contents.push(convertElementToModel(childelement));
+                model.children.push(convertElementToModel(childelement));
             })
         }
         return model;

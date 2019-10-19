@@ -46,9 +46,7 @@ describe('WbWidget processor attributes ', function () {
                 title: 'test',
                 'class': 'test',
                 style: {
-                    background: {
-                        color: 'red'
-                    }
+                    background: 'red'
                 }
         };
         $widget.compile(model)
@@ -68,9 +66,7 @@ describe('WbWidget processor attributes ', function () {
                 type: 'div',
                 id: 'red',
                 style: {
-                    background: {
-                        color: 'red'
-                    }
+                    background:  'red'
                 }
         };
         $widget.compile(model)

@@ -39,23 +39,23 @@ describe('WbWidget converter WbConverterWeburger ', function () {
 
     it('should converte multi dom text to data model', function () {
         // Create new instance
-        var data = '{"type":"div","style":{"backgroundColor":"blue","color":"red"},"contents":[{"type":"form"}]}';
+        var data = '{"type":"div","style":{"background":"blue","color":"red"},"children":[{"type":"form"}]}';
         var converter = new WbConverterWeburger();
         var result = converter.decode(data);
         expect(result.length).toBe(1);
         expect(result[0].type).toBe('div');
-        expect(result[0].style.backgroundColor).toBe('blue');
+        expect(result[0].style.background).toBe('blue');
         expect(result[0].style.color).toBe('red');
         
-        expect(result[0].contents.length).toBe(1);
-        expect(result[0].contents[0].type).toBe('form');
+        expect(result[0].children.length).toBe(1);
+        expect(result[0].children[0].type).toBe('form');
     });
 
     it('should encode lit of html widgets', function (done) {
         // Create new instance
         var model = {
                 type: 'div',
-                contents: [{
+                children: [{
                     type: 'p',
                     html: 'p1'
                 },{

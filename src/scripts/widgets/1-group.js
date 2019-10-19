@@ -64,7 +64,7 @@ angular.module('am-wb-core')//
      */
     WbWidgetGroupCtrl.prototype.setModel = function (model) {
         this.setState('init');
-        if (model === this.wbModel) {
+        if (model === this.model) {
             return;
         }
         this.model = model;
@@ -220,12 +220,12 @@ angular.module('am-wb-core')//
         });
         this.childWidgets = [];
 
-        // check for new contents
+        // check for new child
         if (!this.model || !angular.isArray(this.model.children)) {
             return $q.resolve();
         }
 
-        // create contents
+        // create child
         var parentWidget = this;
 
         var compilesJob = [];
@@ -267,8 +267,8 @@ angular.module('am-wb-core')//
             } else {
                 ctrl.getElement().append(newWidget.getElement());
             }
-            if(!angular.isArray(model.contents)){
-                model.contents = [];
+            if(!angular.isArray(model.children)){
+                model.children = [];
             }
             model.children.splice(index, 0, item);
             ctrl.childWidgets.splice(index, 0, newWidget);
@@ -306,8 +306,8 @@ angular.module('am-wb-core')//
                 } else {
                     ctrl.getElement().append(newWidget.getElement());
                 }
-                if(!angular.isArray(model.contents)){
-                    model.contents = [];
+                if(!angular.isArray(model.children)){
+                    model.children = [];
                 }
                 model.children.splice(j, 0, newWidget.getModel());
                 ctrl.childWidgets.splice(j, 0, newWidget);
@@ -396,7 +396,7 @@ angular.module('am-wb-core')//
         }
 
         // move model
-        arraymove(this.getModel().contents, this.getModel().children.indexOf(widget.getModel()), index);
+        arraymove(this.getModel().children, this.getModel().children.indexOf(widget.getModel()), index);
 
         // move controller
         arraymove(this.getChildren(), this.indexOfChild(widget), index);
