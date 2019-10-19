@@ -30,8 +30,8 @@ angular.module('am-wb-core')//
  * 
  */
  .factory('WbWidgetPicture', function (WbWidgetGroup) {
-     function Widget($scope, $element, $parent){
-         WbWidgetGroup.apply(this, [$scope, $element, $parent]);
+     function Widget($element, $parent){
+         WbWidgetGroup.apply(this, [$element, $parent]);
         this.addElementAttributes('alt', 'crossorigin', 'height',
                 'hspace', 'ismap', 'longdesc', 'sizes', 'src',
                 'usemap', 'width');

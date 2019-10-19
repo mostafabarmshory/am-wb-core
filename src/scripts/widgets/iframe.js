@@ -33,8 +33,8 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbWidgetIframe', function (WbWidgetAbstractHtml) {
-    function Widget($scope, $element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$scope, $element, $parent]);
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
         this.addElementAttributes('name', 'src', 'srcdoc', 'sandbox');
     };
     // extend functionality

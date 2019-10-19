@@ -29,8 +29,8 @@ angular.module('am-wb-core')//
  * @description Manage a widget with 
  */
  .factory('WbWidgetVideo', function (WbWidgetGroup) {
-    function Widget($scope, $element, $parent) {
-        WbWidgetGroup.apply(this, [ $scope, $element, $parent ]);
+    function Widget($element, $parent) {
+        WbWidgetGroup.apply(this, [$element, $parent ]);
         this.addElementAttributes('autoplay', 'controls', 'height',
                 'loop', 'muted', 'poster', 'preload', 'src',
                 'usemap', 'width');

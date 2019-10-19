@@ -77,9 +77,6 @@ angular.module('am-wb-core')//
 .factory('WbWidgetAbstract', function($wbUtil, $widget, $timeout, $wbWindow ){
     'use strict';
 
-
-
-
     function debounce(func, wait) {
         var timeout;
         return function() {
@@ -94,9 +91,7 @@ angular.module('am-wb-core')//
         };
     }
 
-
-
-    function WbWidgetAbstract ($scope, $element, $parent){
+    function WbWidgetAbstract ($element, $parent){
         this.elementAttributes = [
             // identification
             'id',
@@ -117,10 +112,9 @@ angular.module('am-wb-core')//
              * NOTE: We must manage D&D internally to mange user D&D codes
              * TODO: maso, 2019: move dnd into a processor
              */
-            //  'draggable',
-            //  'dropzone',
+              'draggable',
+              'dropzone',
             ];
-        this.$scope = $scope;
         this.$element = $element;
         this.$parent = $parent;
         /**
@@ -233,134 +227,6 @@ angular.module('am-wb-core')//
         this.connect();
     }
 
-
-
-    /**
-     * Loads all basic elements attributes.
-     * 
-     * TODO: move to processor
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.loadBasicProperties = function () {
-        var model = this.getModel();
-        if (!model) {
-            return;
-        }
-        var $element = this.getElement();
-        for(var i =0; i < this.elementAttributes.length; i++){
-            var key = this.elementAttributes[i];
-            var value = this.getProperty(key) || this.getModelProperty(key);
-            if(value){
-                $element.attr(key, value);
-            } else {
-                $element.removeAttr(key);
-            }
-            // NOTE: html is special value
-            if(key === 'html'){
-                $element.html(value);
-            }
-            if(key === 'inputType'){
-                this.setElementAttribute('type', value);
-            }
-            if(key === 'inputType'){
-                this.setElementAttribute('type', value);
-            }
-            if(key === 'value'){
-                $element.val(value);
-            }
-        }
-    };
-
-    /**
-     * Loads style from the input model.
-     * 
-     * The style is a part of widget data model.
-     * 
-     * NOTE: this is an internal function and supposed not to call from outside.
-     * 
-     * @param style
-     *            {object} part of widget model
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.loadStyle = function () {
-        var model = this.getModel();
-        var runtimeModel = this.getRuntimeModel();
-        if (!model) {
-            return;
-        }
-        var computedStyle = angular.merge({}, model.style, runtimeModel.style);
-        if(angular.equals(computedStyle, this.computedStyle)){
-            return;
-        }
-        // TODO: maso, 2018:Create event
-        var $event = {}
-        $event.source = this;
-        $event.oldValue = this.computedStyle;
-        $event.newValue = computedStyle;
-
-        // save computedStyle
-        this.computedStyle = computedStyle;
-
-        // load style
-        var css;
-        if(model.type == 'Group' || model.type == 'ObjectCollection'){
-            css = $wbUtil.convertToGroupCss(this.computedStyle || {});
-        } else {
-            css = $wbUtil.convertToWidgetCss(this.computedStyle || {});
-        }
-        this.$element.css(css);
-        this.fire('styleChanged', $event);
-    };
-
-    /**
-     * Refreshes the view based on the current data
-     * 
-     * It used runtime and model data to update the view.
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.refresh = function($event) {
-        if(this.isSilent()) {
-            return;
-        }
-        // to support old widget
-        var model = this.getModel();
-        this.getScope().wbModel = model;
-
-        if($event){
-            var key = $event.key || 'xxx';
-            // update event
-            if(key.startsWith('event')){
-                this.eventFunctions = {};
-            } else if(key.startsWith('style')) {
-                this.loadStyle();
-            } else if(_.includes(this.elementAttributes, key)){
-                var value = this.getProperty(key) || this.getModelProperty(key);
-                this.setElementAttribute(key, value);
-            }
-            return;
-        } 
-        this.eventFunctions = {};
-        this.loadStyle();
-        this.loadBasicProperties();
-    };
-
-    /**
-     * Reload all data to run the widget from the start
-     * 
-     * This function clean the runtime data and refresh the widget. On the other
-     * hand the init event will be fired.
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.reload = function(){
-        this.runtimeModel = {};
-        this.refresh();
-    };
-
-
     /**
      * Returns model of the widget
      * 
@@ -390,8 +256,8 @@ angular.module('am-wb-core')//
             return;
         }
         this.wbModel = model;
+        this.runtimeModel = {};
         this.fire('modelChanged');
-        this.reload();
         this.setState('ready');
     };
 
@@ -421,11 +287,13 @@ angular.module('am-wb-core')//
      */
     WbWidgetAbstract.prototype.setModelProperty = function (key, value){
         // create the event
-        var $event = {};
-        $event.source = this;
-        $event.key = key;
-        $event.oldValue = this.getModelProperty(key);
-        $event.newValue =  value;
+        var $event = {
+                source: this,
+                key: key,
+                keys: [key],
+                oldValue: this.getModelProperty(key),
+                value: value
+        };
 
         // check if value changed
         if(angular.equals($event.oldValue, $event.newValue)){
@@ -438,9 +306,6 @@ angular.module('am-wb-core')//
         } else {
             objectPath.del(this.getModel(), key);
         }
-
-        // refresh the view
-        this.refresh($event);
         this.fire('modelUpdated', $event);
     };
 
@@ -495,12 +360,13 @@ angular.module('am-wb-core')//
      */
     WbWidgetAbstract.prototype.setProperty = function (key, value){
         // create the event
-        var $event = {};
-        $event.source = this;
-        $event.key = key;
-        $event.oldValue = this.getProperty(key);
-        $event.newValue =  value;
-        $event.value =  value;
+        var $event = {
+                source: this,
+                key: key,
+                keys: [key],
+                oldValue: this.getProperty(key),
+                value: value
+        };
 
         // check if value changed
         if(angular.equals($event.oldValue, $event.value)){
@@ -514,22 +380,7 @@ angular.module('am-wb-core')//
         } else {
             objectPath.del(model, key);
         }
-
-
-        // refresh the view
-        this.refresh($event);
-        this.fire('runtimeModelUpdated', $event);
-        //To change the view in runtime
-        var ctrl = this;
-        // Update angular
-        // TODO: maso, 2019: replace with this model
-//      if (!$rootScope.$$phase) {
-//      scope.$digest();
-//      }
-        $timeout( function() {
-            ctrl.getScope().$digest();
-        });
-
+        this.fire('modelUpdated', $event);
     };
 
     /**
@@ -635,8 +486,6 @@ angular.module('am-wb-core')//
         $element = null;
 
         // remove scope
-        var $scope = this.getScope();
-        $scope.$destroy();
         this.fire('destroy', $event);
     };
 
@@ -890,16 +739,6 @@ angular.module('am-wb-core')//
     };
 
     /**
-     * Gets Scope data
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getScope = function () {
-        return this.$scope;
-    };
-
-    /**
      * Sets the state of the widget
      * 
      * @memberof WbAbstractWidget
@@ -944,19 +783,11 @@ angular.module('am-wb-core')//
             widget.setEditable(editable);
         });
 
-        // TODO: maso, 2019: add event data
         if (editable) {
             this.setState('edit');
-            this.fire('editable'); // depricated
         } else {
             this.setState('ready');
-            this.fire('noneditable'); // depricated
         }
-        // TODO: no need to reload?!!
-        var ctrl = this;
-        $timeout(function(){
-            ctrl.reload();
-        }, 100);
     };
 
     /**
@@ -1155,14 +986,8 @@ angular.module('am-wb-core')//
      * @memberof WbAbstractWidget
      */
     WbWidgetAbstract.prototype.animate = function (options) {
-        var ctrl = this;
-        var keys = [];
         var animation = {
                 targets: this.getRuntimeModel(),
-                update: function(/* anim */) {
-                    // XXX: maso, 2019: support multiple key in event
-                    ctrl.refresh();
-                }
         };
 
         // copy animation properties
@@ -1183,26 +1008,28 @@ angular.module('am-wb-core')//
         }
 
         // Create list of attributes
+        var ctrl = this;
+        var keys = [];
         for(var key in options){
             // ignore keys
-            if(key === 'duration'|| 
-                    key === 'loop'|| 
-                    key === 'autoplay'||
-                    key === 'delay'||
-                    key === 'easing'){
+            if(_.includes(['duration','loop','autoplay','delay','easing'], key)){
                 continue;
             }
             keys.push(key);
             animation[key] = options[key];
-
             // set initial value
             var val = this.getProperty(key);
             if(!val) {
                 this.setProperty(key, this.getModelProperty(key));
             }
-
-            // NOTE: if the value is empty then you have to set from values
         }
+        animation.update = function() {
+            ctrl.fire('modelUpdated', {
+                keys: keys,
+                value: null,
+                oldValue: null
+            });
+        };
 
         return anime(animation);
     };

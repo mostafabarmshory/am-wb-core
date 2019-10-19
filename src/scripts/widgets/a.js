@@ -37,9 +37,9 @@ angular.module('am-wb-core')//
      * @memberof WbWidgetGroupCtrl
      * @ngInject
      */
-    function Widget($scope, $element, $parent){
+    function Widget($element, $parent){
         // call super constractor
-        WbWidgetAbstractHtml.apply(this, [$scope, $element, $parent]);
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
         this.addElementAttributes('download', 'href',
                 'hreflang', 'media', 'ping', 'referrerpolicy',
                 'rel', 'target', 'type');

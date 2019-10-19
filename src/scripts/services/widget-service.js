@@ -207,80 +207,30 @@ angular.module('am-wb-core')
 	 * @param preElement {Element} pre build element
 	 * @return promise A promise that resolve created element
 	 */
-	function compile(model, parentWidget, preElement){
-		var widget = _widget(model);
-		var childScope = null;
-
-		// 1- create scope
-		var parentScope;
-		if(parentWidget){
-			parentScope = parentWidget.getScope();
-		} else {
-			// this is a root widget
-			parentScope = $rootScope;
-		}
-		childScope = parentScope.$new(false, parentScope);
-
-		// 2- create element
-		var service = this;
+	function compile(model, $parent, preElement){
+		var widgetDescription = _widget(model);
 		var gettingTemplatePromisse;
 		if(preElement){
 			gettingTemplatePromisse = $q.resolve(preElement);
 		} else {
-			gettingTemplatePromisse = $wbUtil.getTemplateFor(widget)
+			gettingTemplatePromisse = $wbUtil.getTemplateFor(widgetDescription)
 			.then(function(template) {
 				// 3- bind controller
+			    // TODO: maso, 2019: replace with JQuery 
 				return angular.element(template);
 			});
 		}
-		return gettingTemplatePromisse.then(function(element){
-			// init widget
-			element.attr('dnd-disable-if','!ctrl.isEditable()');
-			element.attr('dnd-draggable','wbModel');
-			element.attr('dnd-type','wbModel.type');
-			element.attr('dnd-effect-allowed','copyMove');
-			element.attr('dnd-moved','ctrl.delete()');
-			element.attr('md-theme-watch','true');
-			if (model.type == 'Group'){
-				element.addClass('wb-group');
-				element.attr('dnd-list','wbModel.contents');
-				element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
-				element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
-				element.attr('dnd-external-sources','true');
-				element.attr('dnd-drop','ctrl.addChild(index, item)');
-				element.attr('dnd-horizontal-list','wbModel.style.layout.direction==="row"');
-			}else {
-				element.addClass('wb-widget');
-				element.attr('dnd-callback','1');
-			}
-			var link = $compile(element);
-			var ctrl = createWidgetController(widget, model, parentWidget, childScope, element, service.providers);
-
-			ctrl.setModel(model);
-			
-			// deprecated
-			childScope[widget.controllerAs || 'ctrl'] = ctrl;
-			element.data('$ngControllerController', ctrl);
-			link(childScope);
-			$mdTheming(element);
-			if(angular.isFunction(ctrl.initWidget)){
-			    ctrl.initWidget();
-			}
-
-			return ctrl;
+		return gettingTemplatePromisse
+		.then(function($element){
+		    var srcCtrl = (model.type === 'Group') ? 'WbWidgetGroup' : 'WbWidgetAbstract';
+		    srcCtrl = widgetDescription.controller || srcCtrl;
+		    var Widget = $injector.get(srcCtrl);
+		    var widget = new Widget($element, $parent);
+			widget.setModel(model);
+			return widget;
 		});
 	}
 
-	function createWidgetController(widget, model, parentWidget, childScope, element, providers){
-		var srcCtrl = (model.type === 'Group') ? 'WbWidgetGroup' : 'WbWidgetAbstract';
-		srcCtrl = widget.controller || srcCtrl;
-		var wlocals = _.merge({
-			$scope : childScope,
-			$element : element,
-			$parent: parentWidget
-		}, providers);
-		return $injector.instantiate($injector.get(srcCtrl), wlocals);
-	}
 
 	/**
 	 * Creates new serialized data of widget
@@ -474,7 +424,7 @@ angular.module('am-wb-core')
 		event = event || {};
 		angular.forEach(processors, function(processor){
 			try{
-				processor.apply(processor, [widget, event]);
+				processor.process(widget, event);
 			} catch (ex){
 				console.error('Fail to run the processor');
 				console.error(ex);

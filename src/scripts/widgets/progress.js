@@ -30,8 +30,8 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbWidgetProgress', function (WbWidgetAbstract) {
-    function Widget($scope, $element, $parent) {
-        WbWidgetAbstract.apply(this, [ $scope, $element, $parent ]);
+    function Widget($element, $parent) {
+        WbWidgetAbstract.apply(this, [$element, $parent ]);
         this.addElementAttributes('value', 'max');
     }
     // extend functionality

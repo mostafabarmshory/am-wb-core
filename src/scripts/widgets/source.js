@@ -36,8 +36,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbWidgetSource
      */
-    function Widget($scope, $element, $parent){
-        WbWidgetAbstract.apply(this, [$scope, $element, $parent]);
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes('src', 'srcset', 'media', 'sizes', 'type');
         
         var ctrl = this;

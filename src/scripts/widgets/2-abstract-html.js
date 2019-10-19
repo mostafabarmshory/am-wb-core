@@ -40,10 +40,10 @@ angular.module('am-wb-core')//
      * 
      * @memberof WbWidgetGroupCtrl
      */
-    function Widget($scope, $element, $parent){
+    function Widget($element, $parent){
 
         // call super constractor
-        WbWidgetAbstract.apply(this, [$scope, $element, $parent]);
+        WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes('html');
         var ctrl = this;
 

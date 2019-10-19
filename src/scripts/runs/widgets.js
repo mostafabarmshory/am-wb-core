@@ -29,7 +29,14 @@ angular.module('am-wb-core')
 /***********************************************************************
  * Editors
  ***********************************************************************/
-.run(function ($widget) {
+.run(function ($widget, WbProcessorMicrodata, WbProcessorStyle, WbProcessorEvent, WbProcessorAttribute) {
+    // Widget processors
+    $widget.setProcessor('microdata', new WbProcessorMicrodata());
+    $widget.setProcessor('style', new WbProcessorStyle());
+    $widget.setProcessor('event', new WbProcessorEvent());
+    $widget.setProcessor('attribut', new WbProcessorAttribute());
+    
+    // Editors
     var headerEditorDescription =  {
             type: 'WidgetEditorTinymce',
             options:{

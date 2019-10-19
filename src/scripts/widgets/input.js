@@ -40,8 +40,8 @@ angular.module('am-wb-core')//
      * @memberof WbWidgetGroupCtrl
      * @ngInject
      */
-    function Widget($scope, $element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$scope, $element, $parent]);
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
         this.addElementAttributes('accept', 'alt',
                 'autocomplete', 'autofocus', 'checked',
                 'dirname', 'disabled', 'form', 'max',

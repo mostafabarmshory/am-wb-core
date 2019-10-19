@@ -33,8 +33,8 @@ angular.module('am-wb-core')//
  * 
  */
  .factory('WbWidgetTextarea', function (WbWidgetAbstract) {
-     function Widget($scope, $element, $parent) {
-         WbWidgetAbstract.apply(this, [ $scope, $element, $parent ]);
+     function Widget($element, $parent) {
+         WbWidgetAbstract.apply(this, [$element, $parent]);
          this.addElementAttributes('autofocus',
                  'cols',
                  'dirname',

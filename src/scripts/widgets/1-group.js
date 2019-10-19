@@ -42,9 +42,9 @@ angular.module('am-wb-core')//
      * @memberof WbWidgetGroupCtrl
      * @ngInject
      */
-    function WbWidgetGroupCtrl($scope, $element, $parent){
+    function WbWidgetGroupCtrl($element, $parent){
         // call super constractor
-        WbWidgetAbstract.apply(this, [$scope, $element, $parent]);
+        WbWidgetAbstract.apply(this, [$element, $parent]);
 
         // init group
     }
@@ -74,7 +74,6 @@ angular.module('am-wb-core')//
         this.loadWidgets(model)
         .finally(function () {
             ctrl.fire('loaded');
-            ctrl.reload();
             ctrl.setState('ready');
         })
     };

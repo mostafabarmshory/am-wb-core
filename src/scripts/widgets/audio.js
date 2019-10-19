@@ -36,8 +36,8 @@ angular.module('am-wb-core')//
      * 
      * @memberof audio
      */
-    function Widget($scope, $element, $parent){
-        WbWidgetGroup.apply(this, [$scope, $element, $parent]);
+    function Widget($element, $parent){
+        WbWidgetGroup.apply(this, [$element, $parent]);
         this.addElementAttributes('autoplay', 'controls',
                 'loop', 'muted', 'preload', 'src');
         this.setAllowedTypes('source');

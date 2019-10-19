@@ -29,8 +29,8 @@ angular.module('am-wb-core')//
  */
 .factory('WbWidgetDialog', function (WbWidgetAbstract) {
     'use strict';
-    function Widget($scope, $element, $parent){
-        WbWidgetAbstract.apply(this, [$scope, $element, $parent]);
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
     };
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);

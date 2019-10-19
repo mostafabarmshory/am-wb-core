@@ -29,8 +29,8 @@ angular.module('am-wb-core')//
  * @description Manage a widget link
  */
 .factory('WbWidgetLink', function (WbWidgetAbstract) {
-    function Widget($scope, $element, $parent){
-        WbWidgetAbstract.apply(this, [$scope, $element, $parent]);
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes('crossorigin', 'href',
                 'hreflang', 'media', 'rel', 'size', 'type');
     };
