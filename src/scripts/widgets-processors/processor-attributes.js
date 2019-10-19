@@ -33,6 +33,10 @@ angular.module('am-wb-core')
     'use strict';
 
     function setWidgetElementAttribute(widget, key, value){
+        if(widget.isEditable() && (key === 'draggable' || key === 'dropzone')){
+            // are handled by processors in edit mode
+            return;
+        }
         var $element = widget.getElement();
         if(value){
             $element.attr(key, value);

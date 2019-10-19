@@ -198,4 +198,9 @@ describe('Service $widget', function () {
         $rootScope.$apply();
         $timeout.flush();
     });
+    
+    it('should manages widget converters ', function () {
+        expect($widget.getConverters().length>0).toBe(true);
+        expect($widget.getConverter('text/plain')).not.toBe(null);
+    });
 });

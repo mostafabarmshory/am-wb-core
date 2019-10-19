@@ -27,27 +27,16 @@ describe('Widget audio ', function () {
     // instantiate service
     var $rootScope;
     var $widget;
-    var $httpBackend;
 
-    function MockRootWidget() {
-        // TODO;
-        this.scope = $rootScope.$new();
-    };
-
-    MockRootWidget.prototype.getScope = function(){
-        return this.scope;
-    }
 
     // load the service's module
     beforeEach(module('am-wb-core'));
-    beforeEach(inject(function (_$rootScope_, _$widget_, _$httpBackend_) {
+    beforeEach(inject(function (_$rootScope_, _$widget_) {
         $rootScope = _$rootScope_;
         $widget = _$widget_;
-        $httpBackend = _$httpBackend_;
     }));
 
     it('should support source', function (done) {
-        var root = new MockRootWidget();
         // Create new instance
         var model = {
                 type: "audio",
@@ -59,16 +48,11 @@ describe('Widget audio ', function () {
                     srcset: "resources/images/copyright.svg"
                 }]
         };
-        $widget.compile(model, root)
+        $widget.compile(model)
         .then(function(widget){
-            widget.on('stateChanged', function(){
-                if(widget.state !== 'ready'){
-                    return;
-                }
-                expect(widget.getChildren().length).toBe(2);
-                expect(widget.getChildren()[0].getType()).toBe('source');
-                done();
-            })
+            expect(widget.getChildren().length).toBe(2);
+            expect(widget.getChildren()[0].getType()).toBe('source');
+            done();
         });
         $rootScope.$apply();
     });

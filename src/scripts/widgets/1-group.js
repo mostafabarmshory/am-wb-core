@@ -71,11 +71,14 @@ angular.module('am-wb-core')//
         this.fire('modelChanged');
 
         var ctrl = this;
-        this.loadWidgets(model)
+        return this.loadWidgets(model)
+        .then(function(){
+            return ctrl;
+        })
         .finally(function () {
             ctrl.fire('loaded');
             ctrl.setState('ready');
-        })
+        });
     };
 
     /**
@@ -430,6 +433,11 @@ angular.module('am-wb-core')//
     WbWidgetGroupCtrl.prototype.setAllowedTypes = function () {
         this.allowedTypes = arguments;
     };
+    
+
+    WbWidgetGroupCtrl.prototype.isLeaf = function(){
+        return false;
+    }
 
     return WbWidgetGroupCtrl;
 });

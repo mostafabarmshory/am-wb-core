@@ -27,15 +27,24 @@
 angular.module('am-wb-core')
 
 /***********************************************************************
- * Editors
+ * Convertors
+ ***********************************************************************/
+.run(function ($widget, WbConverterText) {
+    $widget.addConverter(new WbConverterText());
+})
+/***********************************************************************
+ * Processors
  ***********************************************************************/
 .run(function ($widget, WbProcessorMicrodata, WbProcessorStyle, WbProcessorEvent, WbProcessorAttribute) {
-    // Widget processors
     $widget.setProcessor('microdata', new WbProcessorMicrodata());
     $widget.setProcessor('style', new WbProcessorStyle());
     $widget.setProcessor('event', new WbProcessorEvent());
     $widget.setProcessor('attribut', new WbProcessorAttribute());
-    
+})
+/***********************************************************************
+ * Editors
+ ***********************************************************************/
+.run(function ($widget) {
     // Editors
     var headerEditorDescription =  {
             type: 'WidgetEditorTinymce',
@@ -306,7 +315,7 @@ angular.module('am-wb-core')
         setting: ['div'],
         template: '<div></div>',
         help: 'http://dpq.co.ir/more-information-div',
-        controller: 'WbWidgetDialog', 
+        controller: 'WbWidgetDiv', 
     });
     $widget.newWidget({
         type: 'dl',

@@ -23,35 +23,54 @@
  */
 'use strict';
 
-describe('Widget video ', function () {
+describe('WbWidget converter WbConverterText ', function () {
     // instantiate service
-    var $rootScope;
     var $widget;
-
+    var processor;
+    var $rootScope;
+    var WbConverterText;
 
     // load the service's module
     beforeEach(module('am-wb-core'));
-    beforeEach(inject(function (_$rootScope_, _$widget_) {
-        $rootScope = _$rootScope_;
+    beforeEach(inject(function (_$widget_, _WbProcessorStyle_, _$rootScope_, _WbConverterText_) {
         $widget = _$widget_;
+        processor = new _WbProcessorStyle_();
+        $rootScope = _$rootScope_;
+        WbConverterText = _WbConverterText_;
     }));
 
-    it('should support source', function (done) {
+    it('should converte multi line text to paragraph', function () {
+        // Create new instance
+        var data = 'p1\np2\np3\n\n\np4';
+        var converter = new WbConverterText();
+        var result = converter.decode(data);
+        expect(result.length).toBe(4);
+        _.forEach(result, function(item){
+            expect(item.type).toBe('p');
+        });
+    });
+
+    it('should encode lit of html widgets', function (done) {
         // Create new instance
         var model = {
-                type: "video",
+                type: 'div',
                 contents: [{
-                    type: "source",
-                    srcset: "resources/images/content.svg"
-                }, {
-                    type: "source",
-                    srcset: "resources/images/copyright.svg"
+                    type: 'p',
+                    html: 'p1'
+                },{
+                    type: 'p',
+                    html: 'p2'
+                },{
+                    type: 'img',
+                    src: 'images/path.svg'
                 }]
         };
         $widget.compile(model)
         .then(function(widget){
-            expect(widget.getChildren().length).toBe(2);
-            expect(widget.getChildren()[0].getType()).toBe('source');
+            var converter = new WbConverterText();
+            var result = converter.encode(widget);
+            expect(result.match(/p1/).length).toBe(1);
+            expect(result.match(/p2/).length).toBe(1);
             done();
         });
         $rootScope.$apply();
