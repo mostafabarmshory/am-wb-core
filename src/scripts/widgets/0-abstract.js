@@ -693,7 +693,7 @@ angular.module('am-wb-core')//
      * @memberof WbAbstractWidget
      */
     WbWidgetAbstract.prototype.getEvent = function () {
-        return this.getModelProperty('event') || {};
+        return this.getModelProperty('on') || {};
     };
 
     /**

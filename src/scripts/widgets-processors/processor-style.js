@@ -31,19 +31,15 @@ angular.module('am-wb-core')//
 .factory('WbProcessorStyle', function ($wbUtil, WbProcessorAbstract) {
     'use strict';
     
-    function loadStyle(widget) {
+    function loadStyle(widget, keys) {
+        var element = widget.getElement();
+        if(!keys){
+            element.attr('style', '');
+        }
         var model = widget.getModel() || {};
         var runtimeModel = widget.getRuntimeModel() || {};
         var computedStyle = angular.merge({}, model.style, runtimeModel.style);
-        
-        // load style
-        var css;
-        if(angular.isArray(model.contents)){
-            css = $wbUtil.convertToGroupCss(computedStyle || {});
-        } else {
-            css = $wbUtil.convertToWidgetCss(computedStyle || {});
-        }
-        widget.getElement().css(css);
+        widget.getElement().css(computedStyle);
     }
 
     function Processor(){

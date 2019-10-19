@@ -49,19 +49,22 @@ jQuery.fn.extend({
 });
 
 angular.module('am-wb-core', [
+    // base
 	'ngMessages',
 	'ngAnimate',
 	'ngAria',
-	'ngMaterial',
 	'ngSanitize',
 	'ngRoute', 
-
-	'pascalprecht.translate',
-	'mdColorPicker',
-	'ui.tinymce',
-	'dndLists',
-//	'material.components.expansionPanels',
+	
+	// editor
+	'ngMaterial',
 	'ngMdIcons',
-	'ngHandsontable',
-	'ngStorage' // https://github.com/gsklee/ngStorage
+	'mdColorPicker',
+	'pascalprecht.translate',
+
+//	'ui.tinymce',
+//	'dndLists',
+//	'material.components.expansionPanels',
+//	'ngHandsontable',
+	'ngStorage', // https://github.com/gsklee/ngStorage
 	]);

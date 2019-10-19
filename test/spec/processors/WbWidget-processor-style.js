@@ -43,9 +43,7 @@ describe('WbWidget processor style ', function () {
                 type: 'div',
                 id: 'test',
                 style: {
-                    background: {
-                        color: 'red'
-                    }
+                    backgroundColor: 'red'
                 }
         };
         $widget.compile(model)
@@ -62,19 +60,18 @@ describe('WbWidget processor style ', function () {
                 type: 'div',
                 id: 'test',
                 style: {
-                    background: {
-                        color: 'red'
-                    }
+                    backgroundColor: 'red'
                 }
         };
         $widget.compile(model)
         .then(function(widget){
             expect(widget.getElement().css('background-color')).toBe('red');
             
-            widget.setModelProperty('style.background.color', 'black');
+            widget.setModelProperty('style.backgroundColor', 'black');
+            expect(widget.getElement().css('backgroundColor')).toBe('black');
             expect(widget.getElement().css('background-color')).toBe('black');
             
-            widget.setProperty('style.background.color', 'pink');
+            widget.setProperty('style.backgroundColor', 'pink');
             expect(widget.getElement().css('background-color')).toBe('pink');
             
             done();

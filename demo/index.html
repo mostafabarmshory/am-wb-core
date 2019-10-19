@@ -1,6 +1,6 @@
 <!doctype html>
 <html
-    ng-controller="MyTestCtrl"
+    ng-controller="MyTestCtrl as ctrl"
     ng-app="am-wb-coreTest">
     <head>
         <meta charset="utf-8">
@@ -19,10 +19,8 @@
         <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
         <!-- bower:css -->
         <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
-        <link rel="stylesheet" href="bower_components/pikaday/css/pikaday.css" />
-        <link rel="stylesheet" href="bower_components/handsontable/dist/handsontable.css" />
-        <link rel="stylesheet" href="bower_components/md-color-picker/dist/md-color-picker.css" />
         <link rel="stylesheet" href="bower_components/jspanel4x/dist/jspanel.css" />
+        <link rel="stylesheet" href="bower_components/md-color-picker/dist/md-color-picker.css" />
         <link rel="stylesheet" href="bower_components/json-formatter/dist/json-formatter.css" />
         <!-- endbower -->
         <!-- endbuild -->
@@ -54,48 +52,42 @@
         <!-- endbuild -->
     </head>
     <body
-    	layout="row">
-        <div style="width: 200px;background: black">
-        </div>
-        <div
-        	layout="column"
-        	flex>
-       		<section 
-       			layout="row" 
-       			layout-align="center center">
-                <md-button
-                    class="wb-group-button left"
-                    ng-click="editable = !editable">
-                    <wb-icon wb-icon-name="{{action.icon || 'edit'}}"></wb-icon>
-                </md-button>
-                <md-button
-                    ng-repeat="action in actions"
-                    ng-click="runAction(action)">
-                    <wb-icon icon="{{action.icon}}"></wb-icon>
-                </md-button>
-                <md-button
-                    ng-repeat="action in actions"
-                    ng-click="runAction(action)">
-                    <wb-icon size="48">{{action.icon}}</wb-icon>
-                </md-button>
-                <md-button
-                    ng-repeat="action in actions"
-                    ng-click="runAction(action)">
-                    <wb-icon size="48" style="fill: red;">{{action.icon}}</wb-icon>
-                </md-button>
-            </section>
-	        <md-content
-	            flex>
-	            <wb-group
-	            	wb-on-model-under-cursor="widgetUnderCursor($event)"
-	                wb-on-model-select="loadSettings($event)"
-	                wb-editable="editable"
-	                ng-model="model"
-	                flex>
-	            </wb-group>
-	        </md-content>
-        </div>
-        <div style="width: 200px;background: black"></div>
+		layout="column">
+		<md-toolbar>
+			<div layout-align="center center" layout="row">
+				<md-toolbar-filler layout="row" layout-align="center center">
+					<wb-icon>list</wb-icon>
+				</md-toolbar-filler>
+				<h2 class="md-toolbar-tools">
+					<span>Weburger Demo</span>
+				</h2>
+				<md-button
+					class="md-icon-button"
+					ng-click="editable = !editable">
+					<wb-icon>edit</wb-icon>
+				</md-button>
+				<md-button
+					class="md-icon-button"
+					ng-repeat="action in actions"
+					ng-click="runAction(action)">
+					<wb-icon icon="{{action.icon}}"></wb-icon>
+				</md-button>
+				<span flex></span>
+				<md-select 
+					style="margin: 0px;"
+					ng-model="examplePath"
+					ng-change="ctrl.setDocumentPath(examplePath)">
+					<md-option 
+						ng-value="'examples/empty.json'">
+						Empty
+					</md-option>
+				</md-select>
+			</div>
+		</md-toolbar>
+		<md-content
+			wb-content
+			ng-model="ctrl.model"
+			flex></md-content>
 
 
 
@@ -107,26 +99,20 @@
         <script src="bower_components/angular-aria/angular-aria.js"></script>
         <script src="bower_components/angular-messages/angular-messages.js"></script>
         <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-        <script src="bower_components/angular-material/angular-material.js"></script>
-        <script src="bower_components/angular-translate/angular-translate.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
+        <script src="bower_components/lodash/lodash.js"></script>
+        <script src="bower_components/flux/dist/Flux.js"></script>
+        <script src="bower_components/object-path/index.js"></script>
+        <script src="bower_components/angular-material/angular-material.js"></script>
+        <script src="bower_components/tinymce/tinymce.js"></script>
+        <script src="bower_components/angular-translate/angular-translate.js"></script>
+        <script src="bower_components/jspanel4x/dist/jspanel.js"></script>
         <script src="bower_components/weakmap-polyfill/weakmap-polyfill.js"></script>
-        <script src="bower_components/moment/moment.js"></script>
-        <script src="bower_components/numbro/numbro.js"></script>
-        <script src="bower_components/pikaday/pikaday.js"></script>
-        <script src="bower_components/zeroclipboard/dist/ZeroClipboard.js"></script>
-        <script src="bower_components/handsontable/dist/handsontable.js"></script>
-        <script src="bower_components/ngHandsontable/dist/ngHandsontable.js"></script>
         <script src="bower_components/tinycolor/tinycolor.js"></script>
         <script src="bower_components/md-color-picker/dist/md-color-picker.js"></script>
-        <script src="bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js"></script>
-        <script src="bower_components/jspanel4x/dist/jspanel.js"></script>
-        <script src="bower_components/lodash/lodash.js"></script>
-        <script src="bower_components/tinymce/tinymce.js"></script>
-        <script src="bower_components/object-path/index.js"></script>
-        <script src="bower_components/flux/dist/Flux.js"></script>
         <script src="bower_components/mustache.js/mustache.js"></script>
         <script src="bower_components/ngstorage/ngStorage.js"></script>
+        <script src="bower_components/moment/moment.js"></script>
         <script src="bower_components/angular-mocks/angular-mocks.js"></script>
         <script src="bower_components/json-formatter/dist/json-formatter.js"></script>
         <!-- endbower -->
@@ -147,8 +133,8 @@
         <script src="scripts/controllers/setting-style-text.js"></script>
         <script src="scripts/directives/ng-src-error.js"></script>
         <script src="scripts/directives/tinymce.js"></script>
+        <script src="scripts/directives/wb-content.js"></script>
         <script src="scripts/directives/wb-event-panel.js"></script>
-        <script src="scripts/directives/wb-group.js"></script>
         <script src="scripts/directives/wb-icon.js"></script>
         <script src="scripts/directives/wb-on-enter.js"></script>
         <script src="scripts/directives/wb-on-error.js"></script>
