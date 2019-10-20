@@ -153,21 +153,9 @@ angular.module('am-wb-core')//
                     ctrl.fire('scroll', $event);
                 },
                 click: function ($event) {
-                    if (ctrl.isEditable()) {
-                        ctrl.setSelected(true, $event);
-                        $event.stopPropagation();
-                    }
                     ctrl.fire('click', $event);
                 },
                 dblclick: function ($event) {
-                    if (ctrl.isEditable()) {
-                        ctrl.setSelected(true, $event);
-                        $event.stopPropagation();
-                        $event.preventDefault();
-                        // Open an editor 
-                        var editor = $widget.getEditor(ctrl);
-                        editor.show();
-                    }
                     ctrl.fire('dblclick', $event);
                 },
                 mouseout: function ($event) {
@@ -220,11 +208,15 @@ angular.module('am-wb-core')//
             if(angular.isArray($event)){
                 $event = $event[0];
             }
+            if(!$event.isVisible){
+                return;
+            }
             ctrl.setIntersecting($event.isIntersecting, $event);
         }, options);
 
         // Init the widget
         this.connect();
+        this.setIntersecting(true, {});
     }
 
     /**
@@ -775,20 +767,15 @@ angular.module('am-wb-core')//
             return;
         }
         this.editable = editable;
-        if (this.isRoot()) {
-            delete this.lastSelectedItem;
-            this.setSelected(true);
-        }
-        // propagate to child
-        angular.forEach(this.childWidgets, function (widget) {
-            widget.setEditable(editable);
-        });
-
         if (editable) {
             this.setState('edit');
         } else {
             this.setState('ready');
         }
+        // propagate to child
+        angular.forEach(this.childWidgets, function (widget) {
+            widget.setEditable(editable);
+        });
     };
 
     /**
@@ -908,25 +895,16 @@ angular.module('am-wb-core')//
         return this.selected;
     };
 
-    WbWidgetAbstract.prototype.setSelected = function (flag, $event) {
-        if (this.isRoot()) {
-            return;
-        }
+    WbWidgetAbstract.prototype.setSelected = function (flag) {
         if (this.selected === flag) {
             return;
         }
-
         // fire events
         this.selected = flag;
         if (flag) {
-            this.getRoot().childSelected(this, $event);
             this.fire('select');
         } else {
-            this.getRoot().childUnSelected(this, {});
             this.fire('unselect');
-            // Open an editor 
-            var editor = $widget.getEditor(this);
-            editor.hide();
         }
     };
 
@@ -947,7 +925,6 @@ angular.module('am-wb-core')//
     WbWidgetAbstract.prototype.getActions = function () {
         return this.actions;
     };
-
 
     /**
      * Returns bounding client rectangle to parent

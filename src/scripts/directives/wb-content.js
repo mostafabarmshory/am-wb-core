@@ -42,9 +42,9 @@ angular.module('am-wb-core')
     /*
      * Link widget view
      */
-    function wbGroupLink($scope, $element, $attrs, ngModelCtrl) {
+    function wbGroupLink($scope, $element, $attrs, ctrls) {
         var rootWidget;
-
+        var ngModelCtrl = ctrls[0];
         // Load ngModel
         ngModelCtrl.$render = function() {
             var model = ngModelCtrl.$viewValue;
@@ -61,6 +61,9 @@ angular.module('am-wb-core')
             $widget.compile(model, null, $element)
             .then(function(widget){
                 rootWidget = widget;
+                $element.trigger('load', widget);
+            }, function(error){
+                $element.error(error);
             });
         };
     }
@@ -69,7 +72,6 @@ angular.module('am-wb-core')
         restrict : 'EA',
         scope : true,
         link : wbGroupLink,
-        require : 'ngModel',
-        replace: true
+        require: ['?ngModel']
     };
 });

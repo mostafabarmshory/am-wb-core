@@ -63,13 +63,8 @@
 				</h2>
 				<md-button
 					class="md-icon-button"
-					ng-click="editable = !editable">
-					<wb-icon>edit</wb-icon>
-				</md-button>
-				<md-button
-					class="md-icon-button"
 					ng-repeat="action in actions"
-					ng-click="runAction(action)">
+					ng-click="action.run()">
 					<wb-icon icon="{{action.icon}}"></wb-icon>
 				</md-button>
 				<span flex></span>
@@ -79,12 +74,61 @@
 					ng-change="ctrl.setDocumentPath(examplePath)">
 					<md-option ng-value="'examples/empty.json'">Empty</md-option>
 					<md-option ng-value="'examples/center.json'">Center</md-option>
+					<md-option ng-value="'examples/larg-text.json'">Larg text</md-option>
 				</md-select>
 			</div>
 		</md-toolbar>
 		<div
-			wb-content
-			ng-model="ctrl.model"></div>
+			layout="row"
+			flex>
+			<md-toolbar
+				ng-show="ctrl.editable"
+				flex="5">
+				<div layout="column" layout-align="center center">
+					<md-button
+						style="padding: 0px; margin: 0px;"
+						class="md-icon-button"
+						ng-click="showWidgets = !showWidgets">
+						<wb-icon>add</wb-icon>
+					</md-button>
+					<md-button
+						style="padding: 0px; margin: 0px;"
+						class="md-icon-button"
+						ng-click="showSettings = !showSettings">
+						<wb-icon>settings</wb-icon>
+					</md-button>
+					<md-button
+						style="padding: 0px; margin: 0px;"
+						class="md-icon-button"
+						ng-click="showEvents = !showEvents">
+						<wb-icon>event</wb-icon>
+					</md-button>
+				</div>
+			</md-toolbar>
+			<md-content
+				ng-show="ctrl.editable && (showWidgets || showSettings || showSettings)"
+				flex="25">
+				<wb-widgets-explorer 
+					ng-show="showWidgets"
+					ng-model="ctrl.widgets">
+				</wb-widgets-explorer>
+				<wb-setting-panel-group 
+					ng-show="showSettings"
+					ng-model="ctrl.selectedWidgets">
+				</wb-setting-panel-group>
+				<wb-event-panel 
+					ng-show="showSettings"
+					ng-model="ctrl.selectedWidgets">
+				</wb-event-panel>
+			</md-content>
+			<div
+				wb-content
+				wb-on-load="ctrl.setRootWidget($data)"
+				wb-on-error="alert('fail to load the model')"
+				ng-model="ctrl.model"
+				ng-model-options="{ debounce: 100 }"
+				ng-change="ctrl.setDerty(true)"></div>
+		</div>
 
 
 
@@ -211,7 +255,9 @@
         <script src="scripts/widgets-processors/processor-attributes.js"></script>
         <script src="scripts/widgets-processors/processor-dnd.js"></script>
         <script src="scripts/widgets-processors/processor-event.js"></script>
+        <script src="scripts/widgets-processors/processor-locator.js"></script>
         <script src="scripts/widgets-processors/processor-microdata.js"></script>
+        <script src="scripts/widgets-processors/processor-select.js"></script>
         <script src="scripts/widgets-processors/processor-style.js"></script>
         <script src="scripts/widgets/0-abstract.js"></script>
         <script src="scripts/widgets/1-group.js"></script>

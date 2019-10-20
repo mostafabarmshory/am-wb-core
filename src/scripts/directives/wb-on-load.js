@@ -41,10 +41,14 @@ angular.module('am-wb-core')
 	return {
 		restrict : 'A',
 		link : function(scope, element, attrs) {
-			element.bind('load', function() {
+			element.bind('load', function(event, data) {
 				// call the function that was passed
 				if (attrs.wbOnLoad) {
-					scope.$apply(attrs.wbOnLoad);
+					scope.$eval(attrs.wbOnLoad, {
+					    $event: event,
+					    $element: element,
+					    $data: data
+					});
 				}
 			});
 		}

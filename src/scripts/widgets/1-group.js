@@ -97,16 +97,6 @@ angular.module('am-wb-core')//
         }
     };
 
-    /**
-     * Check if the widget is selected
-     */
-    WbWidgetGroupCtrl.prototype.isChildSelected = function (widget) {
-        if (this.isRoot()) {
-            return _.indexOf(this.lastSelectedItems, widget) > -1;
-        }
-        return this.getParent().isChildSelected(widget);
-    };
-
     WbWidgetGroupCtrl.prototype.getChildById = function (id) {
         var widgets = this.childWidgets;
         for (var i = 0; i < widgets.length; i++) {
@@ -114,51 +104,6 @@ angular.module('am-wb-core')//
                 return widgets[i];
             }
         }
-    };
-
-    WbWidgetGroupCtrl.prototype.childSelected = function (ctrl, $event) {
-        if (!this.isRoot()) {
-            return this.getRoot().childSelected(ctrl, $event);
-        }
-        $event = $event || {};
-        if (!$event.shiftKey) {
-            this.selectionLock = true;
-            angular.forEach(this.lastSelectedItems, function (widget) {
-                widget.setSelected(false);
-            });
-            this.selectionLock = false;
-            this.lastSelectedItems = [];
-        }
-
-        if (this.lastSelectedItems.indexOf(ctrl) >= 0) {
-            return;
-        }
-
-        this.lastSelectedItems.push(ctrl);
-
-        // maso, 2018: call the parent controller function
-        this.fire('select', {
-            widgets: this.lastSelectedItems
-        });
-    };
-
-    WbWidgetGroupCtrl.prototype.childUnSelected = function(widget, $event){
-        if (!this.isRoot()) {
-            return this.getRoot().childSelected(widget, $event);
-        }
-        if(this.selectionLock){
-            return;
-        }
-        $event = $event || {};
-        var index = this.lastSelectedItems.indexOf(widget);
-        if(index < 0)  {
-            return;
-        }
-        this.lastSelectedItems.splice(index, 1);
-        // maso, 2018: call the parent controller function
-        this.fire('select', {
-            widgets: this.lastSelectedItems
-        });
     };
 
     /**
@@ -181,10 +126,6 @@ angular.module('am-wb-core')//
         var index = this.indexOfChild(widget);
 
         if (index > -1) {
-            // remove selection
-            if (widget.isSelected()) {
-                widget.setSelected(false);
-            }
             // remove model
             this.childWidgets.splice(index, 1);
 

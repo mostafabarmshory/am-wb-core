@@ -48,6 +48,7 @@ angular
      */
     function WidgetLocatorManager(options) {
         var ctrl = this;
+        options = options || {};
 
         this.intersectingWidget = [];
         this.selectedWidgets = [];
@@ -74,16 +75,10 @@ angular
         }
 
         this.widgetListeners = {
-//                'scroll': function(){
-//                    ctrl.updateLocators();
-//                },
                 'intersection' : function ($event) {
                     var widget = $event.source;
                     ctrl.widgetIntersectingChange(widget);
                 },
-//                'resize': function(){
-//                    ctrl.updateLocators();
-//                },
                 'loaded': function($event){
                     var widget = $event.source;
                     var children = $widget.getChildren(widget);
@@ -99,9 +94,6 @@ angular
                     var widget = $event.source;
                     ctrl.widgetDeleted(widget);
                 },
-//                'modelUpdated': function() {
-//                    ctrl.updateLocators();
-//                }
         };
     }
 
@@ -181,66 +173,10 @@ angular
             return;
         }
         this.enable = enable;
-
-        var widgets = $widget.getChildren(this.getRootWidget());
-        var intersectingWidget = [];
-        // listeners
-        for(var i = 0; i < widgets.length; i ++){
-            var widget = widgets[i];
-            if(widget.isIntersecting()){
-                intersectingWidget.push(widget);
-            }
-            if(enable) {
-                angular.forEach(this.widgetListeners, function (callback, type) {
-                    widget.on(type, callback);
-                });
-            } else {
-                angular.forEach(this.widgetListeners, function (callback, type) {
-                    widget.off(type, callback);
-                });
-            }
-        }
-        // bound
-        if(intersectingWidget.length) {
-            this.intersectingWidget = intersectingWidget;
+        if(this.enable){
+            this.connect();
         } else {
-            this.intersectingWidget = widgets;
-        }
-        for(var j = 0; j < intersectingWidget.length; j++){
-            var locator = this.getBoundLocatorOf(intersectingWidget[j]);
-            if(enable) {
-                locator.connect(intersectingWidget[j]);
-            } else {
-                locator.disconnect();
-            }
-        }
-        // XXX: maso, selection
-
-        // ROOT
-        var rootWidget = this.getRootWidget();
-        if(enable) {
-            angular.forEach(this.widgetListeners, function (callback, type) {
-                rootWidget.on(type, callback);
-            });
-        } else {
-            angular.forEach(this.widgetListeners, function (callback, type) {
-                rootWidget.off(type, callback);
-            });
-        }
-
-        // interval
-        var ctrl = this;
-        if(enable){
-            if(!this._intervalCheck){
-                this._intervalCheck = setInterval(function(){
-                    ctrl.updateLocators();
-                }, 300);
-            }
-        } else {
-            if(this._intervalCheck){
-                clearInterval(this._intervalCheck);
-                delete this._intervalCheck;
-            }
+            this.disconnect();
         }
     };
 
@@ -302,17 +238,91 @@ angular
      * @memberof WidgetLocatorManager
      */
     WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {
-        if(this.rootWidget) {
-            this.destroy();
+        if(this.rootWidget === rootWidget) {
+            return;
         }
+        var enable = this.isEnable();
+        this.setEnable(false);
         this.rootWidget = rootWidget;
-        if(this.rootWidget && this.isEnable()) {
+        this.setEnable(enable);
+    };
+
+    WidgetLocatorManager.prototype.disconnect = function(){
+        var rootWidget = this.getRootWidget();
+        if(!rootWidget) {
+            return;
+        }
+        
+        var widgets = $widget.getChildren(rootWidget);
+        // ROOT
+        angular.forEach(this.widgetListeners, function (callback, type) {
+            rootWidget.off(type, callback);
+        });
+
+        // listeners
+        for(var i = 0; i < widgets.length; i ++){
+            var widget = widgets[i];
             angular.forEach(this.widgetListeners, function (callback, type) {
-                rootWidget.on(type, callback);
+                widget.off(type, callback);
             });
         }
-        if (this.isEnable()) {
-            this.updateLocators();
+
+        // bound
+        for(var j = 0; j < this.intersectingWidget.length; j++){
+            var locator = this.getBoundLocatorOf(this.intersectingWidget[j]);
+            locator.disconnect();
+        }
+
+        // interval
+        if(this._intervalCheck){
+            clearInterval(this._intervalCheck);
+            delete this._intervalCheck;
+        }
+    }
+
+    WidgetLocatorManager.prototype.connect = function(){
+        var rootWidget = this.getRootWidget();
+        if(!rootWidget){
+            return;
+        }
+
+        var widgets = $widget.getChildren(rootWidget);
+        var intersectingWidget = [];
+
+        // enable true
+        // ROOT
+        angular.forEach(this.widgetListeners, function (callback, type) {
+            rootWidget.on(type, callback);
+        });
+
+        // listeners
+        for(var i = 0; i < widgets.length; i ++){
+            var widget = widgets[i];
+            if(widget.isIntersecting()){
+                intersectingWidget.push(widget);
+            }
+            angular.forEach(this.widgetListeners, function (callback, type) {
+                widget.on(type, callback);
+            });
+        }
+
+        // bound
+        if(intersectingWidget.length) {
+            this.intersectingWidget = intersectingWidget;
+        } else {
+            this.intersectingWidget = widgets;
+        }
+        for(var j = 0; j < intersectingWidget.length; j++){
+            var locator = this.getBoundLocatorOf(intersectingWidget[j]);
+            locator.connect(intersectingWidget[j]);
+        }
+
+        // interval
+        var ctrl = this;
+        if(!this._intervalCheck){
+            this._intervalCheck = setInterval(function(){
+                ctrl.updateLocators();
+            }, 300);
         }
     };
 
@@ -328,7 +338,7 @@ angular
 
     WidgetLocatorManager.prototype.directUpdateLocator = function(locator, widget) {
         try{
-            if(this.isVisible()){
+            if(this.isVisible() && !widget.isRoot()){
                 locator.connect(widget);
             } else {
                 locator.disconnect();
@@ -345,7 +355,7 @@ angular
      */
     WidgetLocatorManager.prototype.updateLocators = function () {
         if(!angular.isFunction(this.debounceUpdate)){
-            this.debounceUpdate = $widget.debounce(function(){
+            this.debounceUpdate = /*$widget.debounce(*/function(){
                 var widgets = this.getIntersectingWidgets();
                 for(var i = 0; i < widgets.length; i++){
                     var widget = widgets[i];
@@ -358,7 +368,7 @@ angular
                         this.directUpdateLocator(this.getSelectionLocatorOf(widget), widget);
                     }
                 }
-            }, 100, false);
+            }/*, 100, false)*/;
         }
         this.debounceUpdate();
     };
