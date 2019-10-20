@@ -46,15 +46,13 @@ describe('WbWidget a ', function () {
 		$httpBackend = _$httpBackend_;
 	}));
 
-	it('should set name from model', function (done) {
-		var root = new MockRootWidget();
-		// Create new instance
+	it('should set href, id from model', function (done) {
 		var model = {
 				type: 'a',
 				id: 'a',
 				href: 'http://www.viraweb123.ir',
 		};
-		$widget.compile(model, root)
+		$widget.compile(model)
 		.then(function(widget){
 			expect(widget.getElementAttribute('href')).toBe(model.href);
 			expect(widget.getElementAttribute('id')).toBe(model.id);

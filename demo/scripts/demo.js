@@ -314,7 +314,6 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 //  openContent();
 //  openEvents();
 //  }
-//  widgetLocator.setVisible(value);
 //  });
 
 })

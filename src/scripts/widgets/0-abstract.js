@@ -208,9 +208,6 @@ angular.module('am-wb-core')//
             if(angular.isArray($event)){
                 $event = $event[0];
             }
-            if(!$event.isVisible){
-                return;
-            }
             ctrl.setIntersecting($event.isIntersecting, $event);
         }, options);
 

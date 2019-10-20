@@ -219,6 +219,7 @@ angular.module('am-wb-core')//
             ctrl.fire('newchild', {
                 widget: newWidget
             });
+            return newWidget;
         });
     };
 

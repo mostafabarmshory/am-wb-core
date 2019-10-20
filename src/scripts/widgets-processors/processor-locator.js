@@ -47,7 +47,7 @@ angular.module('am-wb-core')//
          */
         this.widgetLocator.setRootWidget(widget);
         if(this.autoVisible){
-            this.widgetLocator.setVisible(widget.state === 'edit');
+            this.widgetLocator.setEnable(widget.state === 'edit');
         }
     };
 
@@ -57,12 +57,7 @@ angular.module('am-wb-core')//
     Processor.prototype.setEnable = function(enable){
         this.enable = enable;
         var widgetLocator = this.widgetLocator;
-        if(!widgetLocator.isEnable()){
-            widgetLocator.setEnable(true);
-        }
-        if(!this.autoVisible){
-            widgetLocator.setVisible(enable);
-        }
+        widgetLocator.setEnable(enable);
     };
 
     /**

@@ -294,10 +294,15 @@ angular.module('am-wb-core')
     this.getChildren = function(widget) {
         // Check if it is group
         var widgets = [];
-
+        if(widget.isLeaf()){
+            return widgets;
+        }
+        
         // load list of widgets
         var groups = [];
-        groups.push(widget);
+        _.forEach(widget.getChildren(), function(child){
+            groups.push(child);
+        });
         while(groups.length) {
             widget = groups.pop();
             widgets.push(widget);

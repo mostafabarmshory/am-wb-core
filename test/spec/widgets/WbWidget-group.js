@@ -60,10 +60,10 @@ describe('WbWidget group', function () {
             expect(angular.isFunction(group.removeChild)).toBe(true);
             expect(angular.isFunction(group.removeChildren)).toBe(true);
 
-            // select
-            expect(angular.isFunction(group.isChildSelected)).toBe(true);
-            expect(angular.isFunction(group.childSelected)).toBe(true);
-            expect(angular.isFunction(group.childUnSelected)).toBe(true);
+            // select: moved into processor
+//            expect(angular.isFunction(group.isChildSelected)).toBe(true);
+//            expect(angular.isFunction(group.childSelected)).toBe(true);
+//            expect(angular.isFunction(group.childUnSelected)).toBe(true);
 
             // manage D&D
             expect(angular.isFunction(group.getAllowedTypes)).toBe(true);
@@ -637,10 +637,10 @@ describe('WbWidget group', function () {
                 var child = group.getChildById('1');
                 
                 child.setSelected(true);
-                expect(child.getRoot().isChildSelected(child)).toBe(true);
+                expect(child.isSelected()).toBe(true);
                 
                 child.setSelected(false);
-                expect(child.getRoot().isChildSelected(child)).toBe(false);
+                expect(child.isSelected()).toBe(false);
                 done();
             }
             group.on('stateChanged', function(){
