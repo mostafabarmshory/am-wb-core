@@ -1,0 +1,37 @@
+{
+	"type": "div",
+	"style": {
+		"padding": "16px",
+		"margin": "0px",
+		"background": "pink",
+		"display": "flex",
+		"flexGrow": 1,
+		"flexShrink": 0,
+		"flexBasis": "0px",
+		"flexDirection": "column",
+		"overflowY": "auto",
+		"maxWidth": "100vw"
+	},
+	"children": [{
+		"type": "h1",
+		"html": "Add a Signup Form to Your Website"
+	},{
+		"type": "div",
+		"class": "wbDndPlaceholder"
+	},{
+		"type": "h2",
+		"html": "Add a Signup Form to Your Website"
+	},{
+		"type": "h3",
+		"html": "Add a Signup Form to Your Website"
+	},{
+		"type": "h4",
+		"html": "Add a Signup Form to Your Website"
+	},{
+		"type": "h5",
+		"html": "Add a Signup Form to Your Website"
+	},{
+		"type": "h6",
+		"html": "Add a Signup Form to Your Website"
+	}]
+}

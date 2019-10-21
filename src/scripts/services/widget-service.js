@@ -238,6 +238,7 @@ angular.module('am-wb-core')
             srcCtrl = widgetDescription.controller || srcCtrl;
             var Widget = $injector.get(srcCtrl);
             var widget = new Widget($element, $parent);
+            $element[0].$$wbController = widget;
             return widget.setModel(model);
         });
     }
@@ -448,11 +449,11 @@ angular.module('am-wb-core')
 
     this.addConverter = function(converter){
         converters.push(converter);
-    }
+    };
 
     this.getConverters = function(){
         return converters;
-    }
+    };
     
     this.getConverter = function(mimetype){
         for(var i = 0; i < converters.length; i++){
@@ -460,6 +461,22 @@ angular.module('am-wb-core')
                 return converters[i];
             }
         }
-    }
+    };
+    
+    this.widgetFromPoint = function(x, y){
+        return this.widgetFromElement(document.elementFromPoint(x, y));
+    };
+    
+    this.widgetFromElement = function(element){
+        if(!element){
+            return;
+        }
+        do{
+            if(element.$$wbController){
+                return element.$$wbController;
+            }
+            element = element.parentNode;
+        } while(element);
+    };
 
 });

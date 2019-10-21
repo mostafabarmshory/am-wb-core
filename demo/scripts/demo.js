@@ -31,10 +31,12 @@
 angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 .controller('MyTestCtrl', function($scope, $http, $widget, $wbUtil,
         // new model
-        WbProcessorLocator, WbProcessorSelect) {
+        WbProcessorLocator, WbProcessorSelect, WbProcessorDnd) {
     'use strict';
+    
     var locatorProcessor;
     var selectProcessor;
+    var dndProcessor;
 
     /*
      * Set data model
@@ -72,11 +74,15 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
         if(!selectProcessor){
             selectProcessor = new WbProcessorSelect();
             $widget.setProcessor('select', selectProcessor);
-            selectProcessor.setEnable(true);
             var ctrl = this;
             selectProcessor.on('selectionChange', function(){
                 ctrl.selectedWidgets = selectProcessor.getSelectedWidgets();
             });
+        }
+        
+        if(!dndProcessor){
+            dndProcessor = new WbProcessorDnd();
+            $widget.setProcessor('dnd', dndProcessor);
         }
     }
 
@@ -116,205 +122,6 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
     
     this.init();
     
-//  var dialogs = {};
-//  /*
-//  * Display an area of a widget with extra informations. It must be set to
-//  * visible.
-//  */
-//  var widgetLocator = new WidgetLocatorManager({
-//  anchor: '#demo-anchor'
-//  });
-//  this.widgetLocator = widgetLocator;
-
-
-
-//  // load setting of model
-//  $scope.loadSettings = function($event){
-//  widgetLocator.setSelectedWidgets($event.widgets || []);
-//  // TODO: maso, 2018: support list of widget in settings too
-//  var widgets = $event.widgets;
-//  if(widgets.length) {
-//  var widget =  widgets[0];
-//  if(widget.isRoot()){
-//  widgetLocator.setRootWidget(widget);
-//  }
-//  $scope.selectedWidget = widget;
-//  } else {
-//  $scope.selectedWidget = null;
-//  }
-//  $scope.selectedWidgets = widgets;
-//  };
-
-
-//  $scope.runAction= function(action){
-//  action.action();
-//  };
-
-
-
-//  function openWidgets(){
-//  if(dialogs.widgets){
-//  return;
-//  }
-//  dialogs.widgets = $wbWindow.open({
-//  type: 'view',
-//  title: 'Widgets',
-//  template:'<wb-widgets-explorer ng-model="widgets" flex></wb-widgets-explorer>',
-//  parent: $scope,
-//  controller: function($scope, $wbFloat){
-//  $scope.$watch('editable', function(value){
-//  if(value === false) {
-//  $wbFloat.hide();
-//  }
-//  });
-//  },
-//  }, 'Widgets', {
-//  internal: true,
-//  // Extera options
-//  panelSize: '400 600',
-//  position: {
-//  my: 'right-top',
-//  at: 'right-top',
-//  autoposition: 'down',
-//  offsetX: -5,
-//  offsetY: 5
-//  }
-//  });
-//  }
-
-//  function openSettings(){
-//  if(dialogs.settings){
-//  return;
-//  }
-//  dialogs.settings = $wbWindow.open({
-//  type: 'view',
-//  title: 'Settings',
-//  template:'<wb-setting-panel-group wb-tab-mode ng-model="model" flex></wb-setting-panel-group>',
-//  parent: $scope,
-//  controller: function($scope, $wbFloat){
-//  $scope.$watch('editable', function(value){
-//  if(value === false) {
-//  $wbFloat.hide();
-//  }
-//  });
-//  $scope.$watch('selectedWidget', function(value){
-//  $scope.model = value;
-//  });
-//  }
-//  }, 'Settings', {
-//  internal: true,
-//  // Extera options
-//  position: {
-//  my: 'left-top',
-//  at: 'left-top',
-//  autoposition: 'down',
-//  offsetX: -5,
-//  offsetY: 5
-//  }
-//  });
-//  dialogs.settings1 = $wbWindow.open({
-//  type: 'view',
-//  title: 'Settings (tabs)',
-//  template:'<wb-setting-panel-group ng-model="model" flex></wb-setting-panel-group>',
-//  parent: $scope,
-//  controller: function($scope, $wbFloat){
-//  $scope.$watch('editable', function(value){
-//  if(value === false) {
-//  $wbFloat.hide();
-//  }
-//  });
-//  $scope.$watch('selectedWidget', function(value){
-//  $scope.model = value;
-//  });
-//  }
-//  }, 'Settings', {
-//  internal: true,
-//  // Extera options
-//  position: {
-//  my: 'left-top',
-//  at: 'left-top',
-//  autoposition: 'down',
-//  offsetX: -5,
-//  offsetY: 5
-//  }
-//  });
-
-
-//  }
-
-//  function openEvents(){
-//  if(dialogs.events){
-//  return;
-//  }
-//  dialogs.events = $wbWindow.open({
-//  type: 'view',
-//  title: 'Events',
-//  template:'<wb-event-panel ng-model="model"></wb-event-panel>',
-//  parent: $scope,
-//  controller: function($scope, $wbFloat){
-//  $scope.$watch('editable', function(value){
-//  if(value === false) {
-//  $wbFloat.hide();
-//  }
-//  });
-//  $scope.$watch('selectedWidget', function(value){
-//  $scope.model = value;
-//  });
-//  }
-//  }, 'Events', {
-//  internal: true,
-//  // Extera options
-//  position: {
-//  my: 'left-top',
-//  at: 'left-top',
-//  autoposition: 'down',
-//  offsetX: -5,
-//  offsetY: 5
-//  }
-//  });
-//  }
-
-//  function openContent(){
-//  if(dialogs.content){
-//  return;
-//  }
-//  dialogs.content = $wbWindow.open({
-//  type: 'view',
-//  title: 'Content',
-//  template:'<json-formatter json="model" open="1"></json-formatter>',
-//  parent: $scope,
-//  controller: function($scope, $wbFloat){
-//  $scope.$watch('editable', function(value){
-//  if(value === false) {
-//  $wbFloat.hide();
-//  }
-//  });
-//  $scope.$watch('selectedWidget', function(value){
-//  $scope.model = value;
-//  });
-//  },
-//  }, 'Content', {
-//  internal: true,
-//  // Extera options
-//  position: {
-//  my: 'left-top',
-//  at: 'left-top',
-//  autoposition: 'down',
-//  offsetX: -5,
-//  offsetY: 5
-//  }
-//  });
-//  }
-
-//  $scope.$watch('editable', function(value) {
-//  if(value && !widgetLocator.isEnable()){
-//  widgetLocator.setEnable(true);
-//  openWidgets();
-//  openSettings();
-//  openContent();
-//  openEvents();
-//  }
-//  });
 
 })
 

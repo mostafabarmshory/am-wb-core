@@ -362,7 +362,7 @@ angular.module('am-wb-core')//
      * @memeberof WbWidgetGroupCtrl
      */
     WbWidgetGroupCtrl.prototype.getAllowedTypes = function () {
-        return this.allowedTypes || this.getParent().getAllowedTypes();
+        return this.allowedTypes;
     };
 
     /**
@@ -378,6 +378,11 @@ angular.module('am-wb-core')//
     
 
     WbWidgetGroupCtrl.prototype.isLeaf = function(){
+        return false;
+    }
+    
+    WbWidgetGroupCtrl.prototype.isHorizontal = function(){
+        // is row??
         return false;
     }
 

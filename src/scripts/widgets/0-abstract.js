@@ -186,7 +186,28 @@ angular.module('am-wb-core')//
                 },
                 load: function ($event) {
                     ctrl.fire('load', $event);
-                }
+                },
+                
+                // DND
+                dragstart: function ($event) {
+                    ctrl.fire('dragstart', $event);
+                },
+                dragend: function ($event) {
+                    ctrl.fire('dragend', $event);
+                },
+                dragenter: function ($event) {
+                    ctrl.fire('dragenter', $event);
+                },
+                dragover: function ($event) {
+                    ctrl.fire('dragover', $event);
+                },
+                dragleave: function ($event) {
+                    ctrl.fire('dragleave', $event);
+                },
+                drop: function ($event) {
+                    ctrl.fire('drop', $event);
+                },
+                
         };
 
         /*
@@ -634,6 +655,8 @@ angular.module('am-wb-core')//
      * @memberof WbAbstractWidget
      */
     WbWidgetAbstract.prototype.fire = function (type, params) {
+        params = params || {};
+        
         // 1- Call processors
         var event = _.merge({
             source: this,
