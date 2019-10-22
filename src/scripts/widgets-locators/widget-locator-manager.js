@@ -79,10 +79,14 @@ angular
                     ctrl.widgetSelectionChanged($event.source);
                 },
                 'delete': function($event) {
-                    ctrl.untrackWidget($event.source);
+                    _.forEach($event.widgets, function(widget){
+                        ctrl.trackWidget(widget);
+                    });
                 },
                 'newchild': function($event) {
-                    ctrl.trackWidget($event.widget);
+                    _.forEach($event.widgets, function(widget){
+                        ctrl.trackWidget(widget);
+                    });
                 },
                 'loaded': function($event){
                     ctrl.disconnect();
@@ -92,7 +96,9 @@ angular
         };
         this.rootListeners = {
                 'newchild': function($event) {
-                    ctrl.trackWidget($event.widget);
+                    _.forEach($event.widgets, function(widget){
+                        ctrl.trackWidget(widget);
+                    });
                 },
                 'loaded': function($event){
                     ctrl.disconnect();

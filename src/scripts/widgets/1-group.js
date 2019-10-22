@@ -382,8 +382,8 @@ angular.module('am-wb-core')//
     }
     
     WbWidgetGroupCtrl.prototype.isHorizontal = function(){
-        // is row??
-        return false;
+        var direction = this.getModelProperty('style.flexDirection') || this.getProperty('style.flexDirection');
+        return direction === 'row';
     }
 
     return WbWidgetGroupCtrl;
