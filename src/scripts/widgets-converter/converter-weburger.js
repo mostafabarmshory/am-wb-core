@@ -34,7 +34,7 @@ angular.module('am-wb-core')//
     'use strict';
 
     function Converter(){
-        WbConverterAbstract.apply(this, ['text/html']);
+        WbConverterAbstract.apply(this, ['text/json']);
     };
     Converter.prototype = new WbConverterAbstract();
 

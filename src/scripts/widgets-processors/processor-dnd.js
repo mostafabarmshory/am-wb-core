@@ -211,6 +211,20 @@ angular.module('am-wb-core')//
         var widget = $widget.widgetFromElement(event.currentTarget);
         widget.$$dndState.isDragging = false;
         widget.$$dndState.callback = undefined;
+
+        // do action
+        var effect = event.dataTransfer.dropEffect;
+        switch(effect) {
+        case 'move':
+            widget.delete();
+            break;
+        case 'copy':
+        case 'link':
+        case 'canceled':
+            console.log('not supported');
+            break;
+        }
+
         event.stopPropagation();
     }
 
@@ -366,6 +380,9 @@ angular.module('am-wb-core')//
         var listNode = widget.getElement()[0];
 
         var newWidget = $widget.widgetFromPoint(event.clientX, event.clientY);
+        if(!newWidget){
+            return;
+        }
         var newTarget = newWidget.getElement()[0];
         if (!event._dndPhShown && listNode.contains(newTarget) && newWidget.isLeaf()) {
             // Signalize to potential parent lists that a placeholder is already shown.
