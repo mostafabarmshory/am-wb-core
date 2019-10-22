@@ -77,6 +77,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
             var ctrl = this;
             selectProcessor.on('selectionChange', function(){
                 ctrl.selectedWidgets = selectProcessor.getSelectedWidgets();
+                $scope.$digest();
             });
         }
         

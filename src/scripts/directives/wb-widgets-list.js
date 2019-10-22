@@ -33,24 +33,29 @@ angular.module('am-wb-core')
  * This is widgets explorer list.
  * 
  */
-.directive('wbWidgetsList', function($window) {
+.directive('wbWidgetsList', function($window, $widget) {
 
-	return {
-		templateUrl : 'views/directives/wb-widgets-list.html',
-		restrict : 'E',
-		replace : true,
-		scope : {
-			widgets : '<'
-		},
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			if (angular.isFunction($window.openHelp)) {
-				$scope.openHelp = function(widget, $event) {
-					$window.openHelp(widget, $event);
-				};
-			}
-		}
-	};
+    return {
+        templateUrl : 'views/directives/wb-widgets-list.html',
+        restrict : 'E',
+        replace : true,
+        scope : {
+            widgets : '<'
+        },
+        /*
+         * @ngInject
+         */
+        controller : function($scope) {
+            if (angular.isFunction($window.openHelp)) {
+                $scope.openHelp = function(widget, $event) {
+                    $window.openHelp(widget, $event);
+                };
+            }
+
+            $scope.putDragdata = function(event, widget){
+                event = event.originalEvent || event;
+                event.dataTransfer.setData('application/json', JSON.stringify(widget.model));
+            };
+        }
+    };
 });

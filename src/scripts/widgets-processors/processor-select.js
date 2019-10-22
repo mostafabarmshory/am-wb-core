@@ -34,7 +34,7 @@ angular.module('am-wb-core')//
     function Processor(){
         WbProcessorAbstract.apply(this);
         this.selectedWidgets = [];
-        this.listeners = {
+        this.callbacks = {
                 'selectionChange':[]
         };
 
@@ -53,6 +53,9 @@ angular.module('am-wb-core')//
             }
             $event.stopPropagation();
             $event.preventDefault();
+            
+            $event.widgets = ctrl.selectedWidgets;
+            ctrl.fire('selectionChange', $event);
         }
 
         this.dblclickListener = function($event){
@@ -71,6 +74,9 @@ angular.module('am-wb-core')//
             // Open an editor 
             var editor = $widget.getEditor(widget);
             editor.show();
+            
+            $event.widgets = ctrl.selectedWidgets;
+            ctrl.fire('selectionChange', $event);
         }
     };
     Processor.prototype = new WbProcessorAbstract();
@@ -92,14 +98,42 @@ angular.module('am-wb-core')//
     };
 
     Processor.prototype.on = function(event, callback){
-        this.listeners[event].push(callback);
+        this.callbacks[event].push(callback);
     };
 
     Processor.prototype.off = function(event, callback){
-        var index = this.listeners[event].indexOf(callback);
+        var index = this.callbacks[event].indexOf(callback);
         if(index > -1){
-            this.listeners[event].slice(index, 1);
+            this.callbacks[event].slice(index, 1);
         }
+    };
+    
+
+    Processor.prototype.fire = function (type, params) {
+        params = params || {};
+        
+        // 1- Call processors
+        var event = _.merge({
+            source: this,
+            type: type
+        }, params || {});
+
+        // 2- call listeners
+        if (!angular.isDefined(this.callbacks[type])) {
+            return;
+        }
+        var callbacks = this.callbacks[type];
+        var resultData = null;
+        for(var i = 0; i < callbacks.length; i++){
+            // TODO: maso, 2018: check if the event is stopped to propagate
+            try {
+                resultData = callbacks[i](event) || resultData;
+            } catch (error) {
+                // NOTE: remove on release
+                console.log(error);
+            }
+        }
+        return resultData;
     };
 
     return Processor;

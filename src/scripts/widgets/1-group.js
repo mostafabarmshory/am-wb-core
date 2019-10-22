@@ -217,7 +217,7 @@ angular.module('am-wb-core')//
             // init the widget
             newWidget.setEditable(ctrl.isEditable());
             ctrl.fire('newchild', {
-                widget: newWidget
+                widgets: [newWidget]
             });
             return newWidget;
         });

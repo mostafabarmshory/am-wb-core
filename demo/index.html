@@ -108,18 +108,18 @@
 				</div>
 			</md-toolbar>
 			<md-content
-				ng-show="ctrl.editable && (showWidgets || showSettings || showSettings)"
+				ng-show="ctrl.editable && (showWidgets || showSettings || showEvents)"
 				flex="25">
 				<wb-widgets-explorer 
 					ng-show="showWidgets"
 					ng-model="ctrl.widgets">
 				</wb-widgets-explorer>
-				<wb-setting-panel-group 
+				<wb-setting-panel-group
 					ng-show="showSettings"
 					ng-model="ctrl.selectedWidgets">
 				</wb-setting-panel-group>
 				<wb-event-panel 
-					ng-show="showSettings"
+					ng-show="showEvents"
 					ng-model="ctrl.selectedWidgets">
 				</wb-event-panel>
 			</md-content>
@@ -179,6 +179,7 @@
         <script src="scripts/directives/wb-content.js"></script>
         <script src="scripts/directives/wb-event-panel.js"></script>
         <script src="scripts/directives/wb-icon.js"></script>
+        <script src="scripts/directives/wb-on-dragstart.js"></script>
         <script src="scripts/directives/wb-on-enter.js"></script>
         <script src="scripts/directives/wb-on-error.js"></script>
         <script src="scripts/directives/wb-on-esc.js"></script>

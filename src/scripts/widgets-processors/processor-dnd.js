@@ -62,6 +62,7 @@ angular.module('am-wb-core')//
      */
     function stopDragover() {
         placeholder.remove();
+        return true;
     }
 
     /**
@@ -164,7 +165,7 @@ angular.module('am-wb-core')//
                 event.dataTransfer.setData(converter.getMimetype(), converter.encode(widget));
             } catch (e) {
                 // TODO: maso, 2019: log errors
-                console.log('fail to convert to :' + convertor.getMimetype(), e);
+                console.log('fail to convert to :' + converter.getMimetype(), e);
             }
         });
 
@@ -193,13 +194,6 @@ angular.module('am-wb-core')//
         if (event._dndHandle && event.dataTransfer.setDragImage) {
             event.dataTransfer.setDragImage(widget.getElement()[0], 0, 0);
         }
-
-////    // Invoke dragstart callback and prepare extra callback for dropzone.
-////    $parse(attr.dndDragstart)(scope, {event: event});
-////    if (attr.dndCallback) {
-////    var callback = $parse(attr.dndCallback);
-////    dndState.callback = function(params) { return callback(scope, params || {}); };
-////    }
 
         event.stopPropagation();
     }
@@ -350,7 +344,7 @@ angular.module('am-wb-core')//
             return false;
         }
 
-//      // Drops with invalid types from external sources might not have been filtered out yet.
+        // Drops with invalid types from external sources might not have been filtered out yet.
 //      if (mimeType == MSIE_MIME_TYPE || mimeType == EDGE_MIME_TYPE) {
 //      itemType = data.type || undefined;
 //      data = data.item;
@@ -358,16 +352,18 @@ angular.module('am-wb-core')//
 //      }
 
         // Special handling for internal IE drops, see dragover handler.
-//      var ignoreDataTransfer = mimeType == MSIE_MIME_TYPE;
-//      var dropEffect = getDropEffect(event, ignoreDataTransfer);
-//      if (dropEffect == 'none') return stopDragover();
+        var ignoreDataTransfer = mimeType == MSIE_MIME_TYPE;
+        var dropEffect = getDropEffect(event, ignoreDataTransfer);
+        if (dropEffect == 'none') {
+            return stopDragover();
+        }
 
         // Invoke the callback, which can transform the transferredObject and even abort the drop.
         var widget = $widget.widgetFromElement(event.currentTarget);
         var index = getPlaceholderIndex(widget);
         widget.addChildrenModel(index, data);
 
-//      // Clean up
+        // Clean up
         placeholder.remove();
         event.stopPropagation();
         return false;
@@ -409,23 +405,31 @@ angular.module('am-wb-core')//
         }
         var element = widget.getElement();
         if(widget.state === 'edit') {
-            /*
-             * Set the HTML5 draggable attribute on the element.
-             */
-            element.attr('draggable', 'true');
 
             /*
-             * When the drag operation is started we have to prepare the dataTransfer object,
-             * which is the primary way we communicate with the target element
+             * Groups must handle:
+             * - dragstart
+             * - dragend
              */
-            element.on('dragstart', dragstart);
+            if(!widget.isRoot()) {
+                /*
+                 * Set the HTML5 draggable attribute on the element.
+                 */
+                element.attr('draggable', 'true');
 
-            /*
-             * The dragend event is triggered when the element was dropped or when the drag
-             * operation was aborted (e.g. hit escape button). Depending on the executed action
-             * we will invoke the callbacks specified with the dnd-moved or dnd-copied attribute.
-             */
-            element.on('dragend', dragend);
+                /*
+                 * When the drag operation is started we have to prepare the dataTransfer object,
+                 * which is the primary way we communicate with the target element
+                 */
+                element.on('dragstart', dragstart);
+
+                /*
+                 * The dragend event is triggered when the element was dropped or when the drag
+                 * operation was aborted (e.g. hit escape button). Depending on the executed action
+                 * we will invoke the callbacks specified with the dnd-moved or dnd-copied attribute.
+                 */
+                element.on('dragend', dragend);
+            }
 
             /*
              * Groups must handle:

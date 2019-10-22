@@ -1,7 +1,5 @@
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,35 +25,24 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wb-widgets-module
- * @description Widgets explorers
- * 
- * This is widgets explorer list.
+ * @name wb-on-dragstart
+ * @description Call an action on dragstart
  * 
  */
-.directive('wbWidgetsModule', function($window, $widget) {
-
+.directive('wbOnDragstart', function() {
     return {
-        templateUrl : 'views/directives/wb-widgets-module.html',
-        restrict : 'E',
-        replace : true,
-        scope: {
-            widgets: '<'
-        },
-        /*
-         * @ngInject
-         */
-        controller: function($scope){
-            if(angular.isFunction($window.openHelp)){
-                $scope.openHelp = function(widget, $event){
-                    $window.openHelp(widget, $event);
-                };
-            }
-
-            $scope.putDragdata = function(event, widget){
-                event = event.originalEvent || event;
-                event.dataTransfer.setData('application/json', JSON.stringify(widget.model));
-            };
+        restrict : 'A',
+        link : function(scope, element, attrs) {
+            element.bind('dragstart', function(event, data) {
+                // call the function that was passed
+                if (attrs.wbOnDragstart) {
+                    scope.$eval(attrs.wbOnDragstart, {
+                        $event: event,
+                        $element: element,
+                        $data: data
+                    });
+                }
+            });
         }
     };
 });

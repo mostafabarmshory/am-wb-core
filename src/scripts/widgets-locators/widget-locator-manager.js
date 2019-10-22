@@ -79,9 +79,7 @@ angular
                     ctrl.widgetSelectionChanged($event.source);
                 },
                 'delete': function($event) {
-                    _.forEach($event.widgets, function(widget){
-                        ctrl.trackWidget(widget);
-                    });
+                    ctrl.untrackWidget($event.source);
                 },
                 'newchild': function($event) {
                     _.forEach($event.widgets, function(widget){

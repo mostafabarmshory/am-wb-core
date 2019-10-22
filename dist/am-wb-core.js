@@ -5946,6 +5946,55 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
+ * @name wb-on-dragstart
+ * @description Call an action on dragstart
+ * 
+ */
+.directive('wbOnDragstart', function() {
+    return {
+        restrict : 'A',
+        link : function(scope, element, attrs) {
+            element.bind('dragstart', function(event, data) {
+                // call the function that was passed
+                if (attrs.wbOnDragstart) {
+                    scope.$eval(attrs.wbOnDragstart, {
+                        $event: event,
+                        $element: element,
+                        $data: data
+                    });
+                }
+            });
+        }
+    };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
  * @name wb-on-enter
  * @description Call an action on ENTER
  * 
@@ -7912,26 +7961,31 @@ angular.module('am-wb-core')
  * This is widgets explorer list.
  * 
  */
-.directive('wbWidgetsList', function($window) {
+.directive('wbWidgetsList', function($window, $widget) {
 
-	return {
-		templateUrl : 'views/directives/wb-widgets-list.html',
-		restrict : 'E',
-		replace : true,
-		scope : {
-			widgets : '<'
-		},
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			if (angular.isFunction($window.openHelp)) {
-				$scope.openHelp = function(widget, $event) {
-					$window.openHelp(widget, $event);
-				};
-			}
-		}
-	};
+    return {
+        templateUrl : 'views/directives/wb-widgets-list.html',
+        restrict : 'E',
+        replace : true,
+        scope : {
+            widgets : '<'
+        },
+        /*
+         * @ngInject
+         */
+        controller : function($scope) {
+            if (angular.isFunction($window.openHelp)) {
+                $scope.openHelp = function(widget, $event) {
+                    $window.openHelp(widget, $event);
+                };
+            }
+
+            $scope.putDragdata = function(event, widget){
+                event = event.originalEvent || event;
+                event.dataTransfer.setData('application/json', JSON.stringify(widget.model));
+            };
+        }
+    };
 });
 /* 
  * The MIT License (MIT)
@@ -7968,26 +8022,31 @@ angular.module('am-wb-core')
  * This is widgets explorer list.
  * 
  */
-.directive('wbWidgetsModule', function($window) {
+.directive('wbWidgetsModule', function($window, $widget) {
 
-	return {
-		templateUrl : 'views/directives/wb-widgets-module.html',
-		restrict : 'E',
-		replace : true,
-		scope: {
-			widgets: '<'
-		},
-		/*
-		 * @ngInject
-		 */
-		controller: function($scope){
-			if(angular.isFunction($window.openHelp)){
-				$scope.openHelp = function(widget, $event){
-					$window.openHelp(widget, $event);
-				};
-			}
-		}
-	};
+    return {
+        templateUrl : 'views/directives/wb-widgets-module.html',
+        restrict : 'E',
+        replace : true,
+        scope: {
+            widgets: '<'
+        },
+        /*
+         * @ngInject
+         */
+        controller: function($scope){
+            if(angular.isFunction($window.openHelp)){
+                $scope.openHelp = function(widget, $event){
+                    $window.openHelp(widget, $event);
+                };
+            }
+
+            $scope.putDragdata = function(event, widget){
+                event = event.originalEvent || event;
+                event.dataTransfer.setData('application/json', JSON.stringify(widget.model));
+            };
+        }
+    };
 });
 
 
@@ -12830,6 +12889,9 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-a',
         // functional properties
         template: '<a></a>',
+        model: {
+            html: 'Link title'
+        },
         setting: ['a'],
         controller: 'WbWidgetA'
     });
@@ -16783,7 +16845,7 @@ angular.module('am-wb-core')//
     'use strict';
 
     function Converter(){
-        WbConverterAbstract.apply(this, ['text/html']);
+        WbConverterAbstract.apply(this, ['application/json']);
     };
     Converter.prototype = new WbConverterAbstract();
 
@@ -17745,7 +17807,9 @@ angular
                     ctrl.untrackWidget($event.source);
                 },
                 'newchild': function($event) {
-                    ctrl.trackWidget($event.widget);
+                    _.forEach($event.widgets, function(widget){
+                        ctrl.trackWidget(widget);
+                    });
                 },
                 'loaded': function($event){
                     ctrl.disconnect();
@@ -17755,7 +17819,9 @@ angular
         };
         this.rootListeners = {
                 'newchild': function($event) {
-                    ctrl.trackWidget($event.widget);
+                    _.forEach($event.widgets, function(widget){
+                        ctrl.trackWidget(widget);
+                    });
                 },
                 'loaded': function($event){
                     ctrl.disconnect();
@@ -17882,10 +17948,12 @@ angular
      * @memberof WidgetLocatorManager
      */
     WidgetLocatorManager.prototype.updateLocators = function () {
+        var intersectingCount = 0;
         function handleWidget(bound, widget){
             if(widget.isIntersecting()){
                 bound.connect(widget);
                 bound.updateView();
+                intersectingCount++;
             } else {
                 bound.disconnect();
             }
@@ -17894,6 +17962,12 @@ angular
         this.boundLocatorMap.forEach(handleWidget);
         // selector
         this.selectionLocatorMap.forEach(handleWidget);
+        if(intersectingCount === 0){
+            // somethint is not correct?? try to correct
+            this.boundLocatorMap.forEach(function(bound, widget){
+                widget.setIntersecting(true);
+            });
+        }
     };
 
 
@@ -18356,6 +18430,7 @@ angular.module('am-wb-core')//
      */
     function stopDragover() {
         placeholder.remove();
+        return true;
     }
 
     /**
@@ -18458,7 +18533,7 @@ angular.module('am-wb-core')//
                 event.dataTransfer.setData(converter.getMimetype(), converter.encode(widget));
             } catch (e) {
                 // TODO: maso, 2019: log errors
-                console.log('fail to convert to :' + convertor.getMimetype(), e);
+                console.log('fail to convert to :' + converter.getMimetype(), e);
             }
         });
 
@@ -18488,13 +18563,6 @@ angular.module('am-wb-core')//
             event.dataTransfer.setDragImage(widget.getElement()[0], 0, 0);
         }
 
-////    // Invoke dragstart callback and prepare extra callback for dropzone.
-////    $parse(attr.dndDragstart)(scope, {event: event});
-////    if (attr.dndCallback) {
-////    var callback = $parse(attr.dndCallback);
-////    dndState.callback = function(params) { return callback(scope, params || {}); };
-////    }
-
         event.stopPropagation();
     }
 
@@ -18505,6 +18573,20 @@ angular.module('am-wb-core')//
         var widget = $widget.widgetFromElement(event.currentTarget);
         widget.$$dndState.isDragging = false;
         widget.$$dndState.callback = undefined;
+
+        // do action
+        var effect = event.dataTransfer.dropEffect;
+        switch(effect) {
+        case 'move':
+            widget.delete();
+            break;
+        case 'copy':
+        case 'link':
+        case 'canceled':
+            console.log('not supported');
+            break;
+        }
+
         event.stopPropagation();
     }
 
@@ -18630,7 +18712,7 @@ angular.module('am-wb-core')//
             return false;
         }
 
-//      // Drops with invalid types from external sources might not have been filtered out yet.
+        // Drops with invalid types from external sources might not have been filtered out yet.
 //      if (mimeType == MSIE_MIME_TYPE || mimeType == EDGE_MIME_TYPE) {
 //      itemType = data.type || undefined;
 //      data = data.item;
@@ -18638,16 +18720,18 @@ angular.module('am-wb-core')//
 //      }
 
         // Special handling for internal IE drops, see dragover handler.
-//      var ignoreDataTransfer = mimeType == MSIE_MIME_TYPE;
-//      var dropEffect = getDropEffect(event, ignoreDataTransfer);
-//      if (dropEffect == 'none') return stopDragover();
+        var ignoreDataTransfer = mimeType == MSIE_MIME_TYPE;
+        var dropEffect = getDropEffect(event, ignoreDataTransfer);
+        if (dropEffect == 'none') {
+            return stopDragover();
+        }
 
         // Invoke the callback, which can transform the transferredObject and even abort the drop.
         var widget = $widget.widgetFromElement(event.currentTarget);
         var index = getPlaceholderIndex(widget);
         widget.addChildrenModel(index, data);
 
-//      // Clean up
+        // Clean up
         placeholder.remove();
         event.stopPropagation();
         return false;
@@ -18660,6 +18744,9 @@ angular.module('am-wb-core')//
         var listNode = widget.getElement()[0];
 
         var newWidget = $widget.widgetFromPoint(event.clientX, event.clientY);
+        if(!newWidget){
+            return;
+        }
         var newTarget = newWidget.getElement()[0];
         if (!event._dndPhShown && listNode.contains(newTarget) && newWidget.isLeaf()) {
             // Signalize to potential parent lists that a placeholder is already shown.
@@ -18686,23 +18773,31 @@ angular.module('am-wb-core')//
         }
         var element = widget.getElement();
         if(widget.state === 'edit') {
-            /*
-             * Set the HTML5 draggable attribute on the element.
-             */
-            element.attr('draggable', 'true');
 
             /*
-             * When the drag operation is started we have to prepare the dataTransfer object,
-             * which is the primary way we communicate with the target element
+             * Groups must handle:
+             * - dragstart
+             * - dragend
              */
-            element.on('dragstart', dragstart);
+            if(!widget.isRoot()) {
+                /*
+                 * Set the HTML5 draggable attribute on the element.
+                 */
+                element.attr('draggable', 'true');
 
-            /*
-             * The dragend event is triggered when the element was dropped or when the drag
-             * operation was aborted (e.g. hit escape button). Depending on the executed action
-             * we will invoke the callbacks specified with the dnd-moved or dnd-copied attribute.
-             */
-            element.on('dragend', dragend);
+                /*
+                 * When the drag operation is started we have to prepare the dataTransfer object,
+                 * which is the primary way we communicate with the target element
+                 */
+                element.on('dragstart', dragstart);
+
+                /*
+                 * The dragend event is triggered when the element was dropped or when the drag
+                 * operation was aborted (e.g. hit escape button). Depending on the executed action
+                 * we will invoke the callbacks specified with the dnd-moved or dnd-copied attribute.
+                 */
+                element.on('dragend', dragend);
+            }
 
             /*
              * Groups must handle:
@@ -19216,8 +19311,7 @@ angular.module('am-wb-core')//
 
         var ctrl = this;
         this.clickListener = function($event){
-            event = event.originalEvent || event;
-            var widget = $widget.widgetFromElement(event.toElement);
+            var widget = $event.source;
 
             widget.setSelected(true);
             if($event.shiftKey){
@@ -19233,8 +19327,7 @@ angular.module('am-wb-core')//
         }
 
         this.dblclickListener = function($event){
-            event = event.originalEvent || event;
-            var widget = $widget.widgetFromElement(event.toElement);
+            var widget = $event.source;
             
             widget.setSelected(true, $event);
             $event.stopPropagation();
@@ -19256,13 +19349,12 @@ angular.module('am-wb-core')//
         if(event.type !== 'stateChanged') {
             return;
         }
-        var element = widget.getElement();
         if(widget.state === 'edit') {
-            element.on('click', this.clickListener);
-            element.on('dblclick', this.dblclickListener);
+            widget.on('click', this.clickListener);
+            widget.on('dblclick', this.dblclickListener);
         } else {
-            element.off('click', this.clickListener);
-            element.off('dblclick', this.dblclickListener);
+            widget.off('click', this.clickListener);
+            widget.off('dblclick', this.dblclickListener);
         }
     };
 
@@ -20008,7 +20100,6 @@ angular.module('am-wb-core')//
      */
     WbWidgetAbstract.prototype.fire = function (type, params) {
         params = params || {};
-        params = params.originalEvent || params;
         
         // 1- Call processors
         var event = _.merge({
@@ -20663,7 +20754,7 @@ angular.module('am-wb-core')//
             // init the widget
             newWidget.setEditable(ctrl.isEditable());
             ctrl.fire('newchild', {
-                widget: newWidget
+                widgets: [newWidget]
             });
             return newWidget;
         });
@@ -20828,8 +20919,8 @@ angular.module('am-wb-core')//
     }
     
     WbWidgetGroupCtrl.prototype.isHorizontal = function(){
-        // is row??
-        return false;
+        var direction = this.getModelProperty('style.flexDirection') || this.getProperty('style.flexDirection');
+        return direction === 'row';
     }
 
     return WbWidgetGroupCtrl;
@@ -23961,12 +24052,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widgets-list.html',
-    "<md-list flex> <md-list-item class=md-2-line ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy> <wb-icon>{{widget.icon}}</wb-icon> <div class=md-list-item-text layout=column> <h3 translate>{{widget.title}}</h3> <p translate>{{widget.description}}</p> </div> <wb-icon ng-if=openHelp class=md-secondary ng-click=\"openHelp(widget, $event)\" aria-label=\"Show help\">help</wb-icon> </md-list-item> </md-list>"
+    "<md-list flex> <md-list-item class=md-2-line ng-repeat=\"widget in widgets\" wb-on-dragstart=\"putDragdata($event, widget)\" draggable=true> <wb-icon>{{widget.icon}}</wb-icon> <div class=md-list-item-text layout=column> <h3 translate>{{widget.title}}</h3> <p translate>{{widget.description}}</p> </div> <wb-icon ng-if=openHelp class=md-secondary ng-click=\"openHelp(widget, $event)\" aria-label=\"Show help\">help</wb-icon> </md-list-item> </md-list>"
   );
 
 
   $templateCache.put('views/directives/wb-widgets-module.html',
-    "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy flex=none flex-gt-sm=30 layout=column layout-align=\"start center\" layout-padding> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <p flex class=wb-text-truncate translate=\"\">{{widget.title}}</p> <md-tooltip md-delay=1500>{{widget.description | translate}}</md-tooltip> </div> </div>"
+    "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" flex=none flex-gt-sm=30 layout=column layout-align=\"start center\" layout-padding wb-on-dragstart=\"putDragdata($event, widget)\" draggable=true> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <p flex class=wb-text-truncate translate=\"\">{{widget.title}}</p> <md-tooltip md-delay=1500>{{widget.description | translate}}</md-tooltip> </div> </div>"
   );
 
 

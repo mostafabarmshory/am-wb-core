@@ -127,6 +127,9 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-a',
         // functional properties
         template: '<a></a>',
+        model: {
+            html: 'Link title'
+        },
         setting: ['a'],
         controller: 'WbWidgetA'
     });
