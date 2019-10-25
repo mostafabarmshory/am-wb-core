@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')
 
@@ -36,9 +35,8 @@ angular.module('am-wb-core')
         $wbUtil, 
         $q, $injector,
         WidgetEditorFake) {
+    'use strict';
 
-
-    this.providers =  {};
     var _group_repo = [];
     var contentElementAsso = [];
     var elementKey = [];
@@ -53,7 +51,7 @@ angular.module('am-wb-core')
      * 
      */
     var processors = {};
-    
+
     /*
      * List of converters
      */
@@ -177,7 +175,7 @@ angular.module('am-wb-core')
         return type in contentElementAsso;
     }
     this.hasWidget = hasWidget;
-    
+
     function isWidgetLeaf(name){
         if (name in contentElementAsso) {
             return contentElementAsso[name].isLeaf;
@@ -298,7 +296,7 @@ angular.module('am-wb-core')
         if(widget.isLeaf()){
             return widgets;
         }
-        
+
         // load list of widgets
         var groups = [];
         _.forEach(widget.getChildren(), function(child){
@@ -315,16 +313,9 @@ angular.module('am-wb-core')
                 }
             }
         }
-
         //return the list
         return widgets;
     };
-
-
-    this.addProvider = function(key, value) {
-        this.providers[key] = value;
-    };
-
 
     // Returns a function, that, as long as it continues to be invoked, will not
     // be triggered. The function will be called after it stops being called for
@@ -351,7 +342,80 @@ angular.module('am-wb-core')
     };
 
 
-    /***********************************************Editors***************************************/
+    /***********************************************
+     * providers
+     ***********************************************/
+
+    var providers =  {};
+    
+    /**
+     * Removes a provider by its key
+     * 
+     * @memberof $widget
+     * @param key {string} of the provider
+     * @return the provider or null
+     */
+    this.removeProvider = function(key){
+        var provider = providers[key];
+        providers[key] = undefined;
+        return provider;
+    };
+    
+    /**
+     * Gets a provider by its key
+     * 
+     * @memberof $widget
+     * @param key {string} of the provider
+     * @return the provider or null
+     */
+    this.getProvider = function(key){
+        return providers[key];
+    };
+    
+    /**
+     * Sets a provider for the specified key
+     * 
+     * @memberof $widget
+     * @para key {string} of the provider
+     */
+    this.setProvider = function(key, provider){
+        providers[key] = provider;
+        return this;
+    }
+    
+    /**
+     * Gets the list of providers
+     * 
+     * @memberof $widget
+     * @return list of providers
+     */
+    this.getProviders = function(){
+        return providers;
+    };
+
+    /**
+     * Sets a provider
+     * 
+     * @deprecated use setprovider insted
+     */
+    this.addProvider = function(key, provider){
+        console.logs('$widget.addProvider is deprecated and will be removed in the next version');
+        return this.setProvider(key, provider)
+    };
+    
+    /**
+     * Gets list of providers keys
+     * 
+     * @memberof $widget
+     * @return list of keys
+     */
+    this.getProvidersKey = function(){
+        return _.keys(providers);
+    };
+    
+    /***********************************************
+     * Editors
+     ***********************************************/
     var editors = {};
     var fakeEditor = new WidgetEditorFake();
 
@@ -401,6 +465,9 @@ angular.module('am-wb-core')
 //  this.getActiveEditor = function(){};
 
 
+    /***********************************************
+     * Processors
+     ***********************************************/
     /**
      * set a processor of the type
      * 
@@ -447,6 +514,9 @@ angular.module('am-wb-core')
     }
 
 
+    /***********************************************
+     * Convertors
+     ***********************************************/
     this.addConverter = function(converter){
         converters.push(converter);
     };
@@ -454,7 +524,7 @@ angular.module('am-wb-core')
     this.getConverters = function(){
         return converters;
     };
-    
+
     this.getConverter = function(mimetype){
         for(var i = 0; i < converters.length; i++){
             if(converters[i].getMimetype() === mimetype){
@@ -462,11 +532,11 @@ angular.module('am-wb-core')
             }
         }
     };
-    
+
     this.widgetFromPoint = function(x, y){
         return this.widgetFromElement(document.elementFromPoint(x, y));
     };
-    
+
     this.widgetFromElement = function(element){
         if(!element){
             return;

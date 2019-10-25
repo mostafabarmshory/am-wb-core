@@ -1,5 +1,7 @@
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,52 +23,47 @@
  */
 'use strict';
 
-angular.module('am-wb-core')//
-
 /**
- * @ngdoc Controllers
- * @name MbSettingStyleTextCtrl
- * @description Edit text style of a widget
+ * @ngdoc Services
+ * @name $WbProviderTimeout
+ * @description UI utilities management
  * 
  */
-.controller('MbSettingStyleTextCtrl', function () {
-    var attrs = [{
-        key: 'style.text.align',
-        ctrlKey: 'align'
-    },{
-        key: 'style.text.alignLast',
-        ctrlKey: 'alignLast'
-    },{
-        key: 'style.text.decoration',
-        ctrlKey: 'decoration'
-    },{
-        key: 'style.text.indent',
-        ctrlKey: 'indent'
-    },{
-        key: 'style.text.justify',
-        ctrlKey: 'justify'
-    },{
-        key: 'style.text.overflow',
-        ctrlKey: 'overflow'
-    },{
-        key: 'style.text.shadow',
-        ctrlKey: 'shadow'
-    },{
-        key: 'style.text.transform',
-        ctrlKey: 'transform'
-    }];
+angular.module('am-wb-core')
+.factory('$WbProviderTimeout', function($timeout) {
+
+    var promisses = [];
 
     /*
-     * Initial the setting editor
+     * remove promise from list
      */
-    this.init = function () {
-        /*
-         * Load data of the widget
-         */
-        var ctrl = this;
-        angular.forEach(attrs, function(attr){
-            ctrl[attr.ctrlKey] = ctrl.getProperty(attr.key);
+    function remove(promise){
+        _.remove(promisses, function(prom){
+            return prom == promise;
         });
-    };
+    }
 
+    /*
+     * Simulates $timeout for widgets
+     */
+    function $WbProviderTimeout(fn, delay, invokeApply, pass){
+        var promiss = $timeout(fn, delay, invokeApply, pass)
+        .finally(function(){
+            remove(promiss);
+        });
+        return promiss;
+    }    
+    /**
+     * Clean the provider
+     * 
+     * @memberof $WbProviderTimeout
+     */
+    $WbProviderTimeout.clean = function(){
+        _.forEach(promisses, function(promiss){
+            $timeout.cancel(promiss);
+        });
+        promisses = [];
+    };
+    
+    return $WbProviderTimeout;
 });

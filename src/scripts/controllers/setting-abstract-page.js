@@ -30,9 +30,11 @@ angular.module('am-wb-core')//
  * 
  * Manages settings pages.
  * 
+ * This is an abstract implementation of a setting page and contains list of 
+ * utilities.
+ * 
  */
 .controller('AmWbSettingPageCtrl', function ($scope, $element) {
-
 
     this.setWidget = function (widget) {
         var oldWidget = this.widget;
@@ -125,7 +127,7 @@ angular.module('am-wb-core')//
         }
         var rkey = 'style.layout.' + key;
         if(!this.widget.hasModelProperty(rkey)){
-        	return defaultValue;
+            return defaultValue;
         }
         return this.widget.getModelProperty(rkey);
     };

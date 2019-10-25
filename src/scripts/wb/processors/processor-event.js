@@ -28,58 +28,8 @@ angular.module('am-wb-core')//
  * @description Widget processor
  * 
  */
-.factory('WbProcessorEvent', function (WbProcessorAbstract, $http, $mdMedia, $wbWindow,
-        $wbLocal, $timeout, $dispatcher, $storage, $routeParams) {
+.factory('WbProcessorEvent', function (WbProcessorAbstract, $widget, $injector) {
     'use strict';
-    
-
-    /*
-     * Simulates $timeout for widgets
-     */
-    function createTimeoutService(widget){
-        if(!angular.isArray(widget.__timeoutPromise)){
-            widget.__timeoutPromise = [];
-        }
-
-        function remove(promise){
-            if(!widget.__timeoutPromise){
-                return;
-            }
-            var index = widget.__timeoutPromise.indexOf(promise);
-            if (index > -1) {
-                widget.__timeoutPromise.splice(index, 1);
-            }
-        }
-    
-        var timeoutService = function (fn, delay, invokeApply, Pass){
-            var promise = $timeout(fn,delay,invokeApply, Pass);
-            promise.finally(function(){
-                remove(promise);
-            });
-            widget.__timeoutPromise.push(promise);
-        };
-        
-        /*
-         * cancel job
-         */
-        timeoutService.cancel = function(promise){
-            remove(promise);
-            $timeout.cancel(promise);
-        }
-        /*
-         * remove all jobs
-         */
-        timeoutService.distroy = function(){
-            var ctrl = this;
-            angular.forEach(widget.__timeoutPromise, function(promise){
-                ctrl.cancel(promise);
-            });
-            delete widget.__timeoutPromise;
-        };
-        
-        
-        return timeoutService;
-    }
 
     /**
      * Loads events for the widget
@@ -96,50 +46,33 @@ angular.module('am-wb-core')//
                 if(!ucode){
                     return;
                 }
-                var body = '\'use strict\';\n'+
-                'var $event = arguments[0],' + 
-                '$widget = arguments[1],' + 
-                '$http = arguments[2],' + 
-                '$media =  arguments[3],' + 
-                '$window =  arguments[4],' + 
-                '$local =  arguments[5],' + 
-                '$timeout = arguments[6],' + 
-                '$dispatcher = arguments[7],' + 
-                '$storage = arguments[8],' + 
-                '$routeParams = arguments[9];\n' + ucode;
-                widget.eventFunctions[type] = new Function(body);
+                ucode += '\n//@ sourceURL=wb-widget-'+ widget.getId() + '-' + type + '.js';
+                var params = _.join(_.concat(
+                        ['$widget', '$event'], // dynamic data
+                        $widget.getProvidersKey()));
+                widget.eventFunctions[type] = new Function(params, ucode);// code
             }catch(ex){
-                console.log(ex);
+                console.error({
+                    message: 'Fail to load user function',
+                    original: ex
+                });
             }
         }
         eventFunction = widget.eventFunctions[type];
         if (eventFunction) {
             try{
-                // check timeout service of widget
-                if(!widget.__$timeoutSeervice) {
-                    widget.__$timeoutSeervice = createTimeoutService(widget);
-                }
-                return eventFunction.apply(widget, [
-                    event, // -> $event
-                    widget, // -> $widget
-                    $http, // -> $http
-                    $mdMedia, // -> $mdMedia
-                    $wbWindow, // -> $wbWindow
-                    $wbLocal, // -> $wbLocal
-                    // FIXME: wratp timeout and remove timers on edit mode (or distroy)
-                    widget.__$timeoutSeervice,// -> $timeout
-                    // FIXME: wratp dispatcher and remove listeners
-                    $dispatcher, // -> $dispatcher
-                    $storage, // -> $storage
-                    $routeParams// -> $routeParams
-                    ]);
+                var locals = _.merge({
+                    $event: event, // -> $event
+                    $widget: widget, // -> $widget
+                }, $widget.getProviders());
+                return $injector.invoke(eventFunction, widget, locals);
             } catch(ex){
-                console.log('Fail to run event code');
-                console.log({
+                console.error({
+                    original: ex,
+                    message: 'faile to run the event code of the widget',
                     type: type,
                     event: event
                 });
-                console.log(ex);
             }
         }
     };
@@ -176,7 +109,7 @@ angular.module('am-wb-core')//
                 intersection: function ($event) {
                     return evalWidgetEvent(widget, 'intersection', $event);
                 },
-                
+
                 //
                 // Common media events
                 //
@@ -198,8 +131,8 @@ angular.module('am-wb-core')//
                 unload: function ($event) {
                     return evalWidgetEvent(widget, 'unload', $event);
                 },
-                
-                
+
+
         };
         angular.forEach(widget.__eventListeners, function (listener, key) {
             widget.on(key, listener);
@@ -213,11 +146,12 @@ angular.module('am-wb-core')//
             });
             delete widget.__eventListeners;
         }
-        // remove timeout service
-        if(widget.__$timeoutSeervice) {
-            widget.__$timeoutSeervice.distroy();
-            delete widget.__$timeoutSeervice;
-        }
+        // clean all providers
+        _.forEach($widget.getProviders(), function(provider){
+            if(_.isFunction(provider.clean)){
+                provider.clean();
+            }
+        });
     }
 
     function Processor(){
@@ -226,7 +160,7 @@ angular.module('am-wb-core')//
 
     // extend functionality
     Processor.prototype = new WbProcessorAbstract();
-    
+
     Processor.prototype.process = function (widget, event){
         if(event.type !== 'stateChanged') {
             return;
@@ -243,6 +177,6 @@ angular.module('am-wb-core')//
             removeWidgetEventsHandlers(widget);
         }
     };
-    
+
     return Processor;
 });

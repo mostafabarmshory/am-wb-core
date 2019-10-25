@@ -25,48 +25,57 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
- * @name MbSettingStyleTextCtrl
- * @description Edit text style of a widget
+ * @name MbSettingStyleGeneralCtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
  * 
  */
-.controller('MbSettingStyleTextCtrl', function () {
-    var attrs = [{
-        key: 'style.text.align',
-        ctrlKey: 'align'
-    },{
-        key: 'style.text.alignLast',
-        ctrlKey: 'alignLast'
-    },{
-        key: 'style.text.decoration',
-        ctrlKey: 'decoration'
-    },{
-        key: 'style.text.indent',
-        ctrlKey: 'indent'
-    },{
-        key: 'style.text.justify',
-        ctrlKey: 'justify'
-    },{
-        key: 'style.text.overflow',
-        ctrlKey: 'overflow'
-    },{
-        key: 'style.text.shadow',
-        ctrlKey: 'shadow'
-    },{
-        key: 'style.text.transform',
-        ctrlKey: 'transform'
-    }];
+.controller('MbSettingStyleGeneralCtrl', function () {
+	
+	var attrs = [
+		// id
+		'id',
+		'name',
+		'title',
+		'class',
+		
+		// language
+		'dir',
+		'lang',
+		'translate',
+		'spellcheck',
 
-    /*
-     * Initial the setting editor
-     */
-    this.init = function () {
-        /*
-         * Load data of the widget
-         */
-        var ctrl = this;
-        angular.forEach(attrs, function(attr){
-            ctrl[attr.ctrlKey] = ctrl.getProperty(attr.key);
-        });
-    };
+		// access
+		'accesskey',
+		'contenteditable',
+		'tabindex',
+		'hidden',
+		
+		// General style
+		'style.direction',
+		'style.visibility',
+		'style.color',
+		'style.cursor',
+		'style.opacity',
+		
+		// overflow
+		'style.overflow.x',
+		'style.overflow.y',
+		];
 
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		/*
+		 * Load data of the widget
+		 */
+		var ctrl = this;
+		angular.forEach(attrs, function(attr){
+			ctrl[attr] = ctrl.getProperty(attr);
+		});
+	};
 });

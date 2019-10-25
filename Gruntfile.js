@@ -421,7 +421,7 @@ module.exports = function(grunt) {
             tmp : {
                 src : [ 
                 	'<%= yeoman.app %>/libs/*.js',
-                	'<%= yeoman.app %>/scripts/{,*/}*.js' 
+                	'<%= yeoman.app %>/scripts/**/*.js' 
                 ],
                 dest : '.tmp/<%= yeoman.pkg.name %>.js'
             },

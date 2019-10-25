@@ -236,14 +236,14 @@ describe('WbWidget processor event ', function () {
                     background: 'red'
                 },
                 on: {
-                    init: '$timeout(function(){$widget.setProperty(\'style.background\', \'pink\')}, 1000);'
+                    init: '$timeout(function(){\n\t$widget.setProperty(\'style.background\', \'pink\')\n}, 1);'
                 }
         };
         $widget.compile(model)
         .then(function(widget){
             widget.setEditable(true);
             $timeout(function(){
-                expect(widget.getElement().css('background')).toBe('red');
+                expect(widget.getElement().css('background')).toBe('pink');
                 done();
             }, 2000);
         });

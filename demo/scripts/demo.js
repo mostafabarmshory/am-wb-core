@@ -29,7 +29,9 @@
  * 
  */
 angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
-.controller('MyTestCtrl', function($scope, $http, $widget, $wbUtil,
+
+
+.controller('MyTestEditorCtrl', function($scope, $http, $widget, $wbUtil,
         // new model
         WbProcessorLocator, WbProcessorSelect, WbProcessorDnd) {
     'use strict';
@@ -122,160 +124,313 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
     };
     
     this.init();
-    
-
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * Load widgets
- */
-.run(function($wbUi, $widget, $window) {
-    // Page
-    $wbUi
-    .newTemplate({
-        name : 'Blank page',
-        thumbnail : 'images/html.svg',
-        template: '{}',
-        priority: 1000
-    })
-    .newTemplate({
-        name : 'Test template2',
-        thumbnail : 'images/brandaction.svg',
-        templateUrl: 'resources/templates/test-en.json',
-        language: 'en',
-        priority: 100
-    })
-    .newTemplate({
-        name : 'Test template3',
-        thumbnail : 'images/brandaction.svg',
-        templateUrl: 'resources/templates/test-fa.json',
-        language: 'fa',
-        priority: 100
-    });
-
-    $widget.newWidget({
-        type: 'hello-button',
-        title: 'Hello button',
-        description : 'An HTML block which is used to test widgets explorer. Do not use in real usage   .',
-        icon : 'wb-widget-html',
-        template: '<md-button ng-click="ctrl.hi()">Say Hello</md-button>',
-        controller: function(){
-            this.hi = function(){
-                alert("Hello");
-            }
-        },
-        controllerAs: 'ctrl'
-    });
-
-    for(var i = 0; i < 5; i++){
-        // HTML text
-        $widget.newWidget({
-            // widget description
-            type: 'HtmlText-'+i,
-            title : 'HTML text witloooooooooooong title',
-            description : 'An HTML block which is used to test widgets explorer. Do not use in real usage	.',
-            icon : 'wb-widget-html',
-            groups: ['test', 'test'+i],
-            model : {
-                text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>'
-            },
-            // functional properties
-            templateUrl : 'views/widgets/wb-html.html',
-            help : 'http://dpq.co.ir',
-            setting:['text'],
-            helpId: 'test'+i
-        });
-    }
-    for(i = 0; i < 5; i++){
-        // HTML text
-        $widget.newWidget({
-            // widget description
-            type: 'HtmlText-'+i+5,
-            title : 'HTML text ',
-            description : 'An HTML block which<br/> is used to test widgets explorer. Do not use in<br/> real usage,real usagereal usagereal<br/> usagereal usagereal usagereal <br/>usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal usagereal <br/>usagereal usagereal<br/> usagereal<br/> usagereal usagereal usage	.',
-            icon : 'wb-widget-html',
-            groups: ['test', 'test'+i],
-            model : {
-                text : '<h2>HTML Text</h2><p>Insert HTML text heare</p>'
-            },
-            // functional properties
-            templateUrl : 'views/widgets/wb-html.html',
-            help : 'http://dpq.co.ir',
-            setting:['text'],
-            helpId: 'test'+i
-        });
-    }
-
-    /**
-     * Show help
-     * 
-     * By adding a function into the $window service, you can display help of an
-     * widget
-     */
-    $window.openHelp = function (object){
-        alert('Adding openHelp to $window to display help:'+object.helpId);
-    };
-})
-
-
-.controller('ConstSheetTestCtrl', function($scope){
-    function answer(){
-        var values = [];
-        for(var i = 0; i < $scope.x; i ++){
-            var data = [];
-            for(var j = 0; j < $scope.y; j++){
-                data.push(Math.random());
-            }
-            values.push(data);
-        }
-        return {
-            key: 'constant sheet',
-            values:values
-        };
-    }
-
-    $scope.x = 4; 
-    $scope.y = 4;
-    $scope.answer = answer;
-})
-/**
- * Load default resources
- */
-.run(function($resource) {
-    $resource.newPage({
-        type : 'wb-sheet2',
-        icon: 'border_all',
-        label : 'Cunstant sheet',
-        template : '<div>Random sheet: ({{x}}, {{y}})</div>',
-        controller : 'ConstSheetTestCtrl',
-        tags : [ 'data' ]
-    });
-    for(var i = 0; i < 100; i++){
-        $resource.newPage({
-            type : 'wb-sheet-'+i,
-            icon: 'face',
-            label : 'Cunstant sheet#3',
-            template : '<div layout="column"><md-button ng-repeat="i in [1,2,3,4,5,6,7,8,9,10, 11,12,13,14,15,16,17,18,19,20,21]">Random sheet: ({{x}}, {{y}})</md-button></div>',
-            controller : 'ConstSheetTestCtrl',
-            tags : [ 'data' ]
-        });
-    }
 });
 
 
+
+
+
+
+/*
+ * # Animation
+ * 
+ * - animation
+ * - animation-name
+ * - animation-duration
+ * - animation-timing-function
+ * - animation-delay
+ * - animation-iteration-count
+ * - animation-direction
+ * - animation-fill-mode
+ * - animation-play-state
+ */
+
+/*
+ * ??
+ * 
+ * - caption-side
+ * - backface-visibility
+ * - caret-color
+ * - hanging-punctuation
+ * - table-layout
+ */
+
+
+/*
+ * background
+ * background-color
+ * background-image
+ * background-position
+ * background-size
+ * background-repeat
+ * background-origin
+ * background-clip
+ * background-attachment
+ */
+
+/*
+ * outline
+ * outline-offset
+ * outline-width
+ * outline-style (required)
+ * outline-color
+ * 
+ * box-decoration-break
+ * box-shadow
+ * box-sizing
+
+ * - border
+ * - border-width
+ * - border-style (required)
+ * - border-color
+ * - border-collapse
+ * - border-spacing
+ * 
+ * - border-radius
+ * - border-top-right-radius
+ * - border-top-left-radius
+ * - border-bottom-left-radius
+ * - border-bottom-right-radius
+ * 
+ * - border-image
+ * - border-image-source
+ * - border-image-slice
+ * - border-image-width
+ * - border-image-outset
+ * - border-image-repeat
+ * 
+ * - border-bottom
+ * - border-bottom-width
+ * - border-bottom-style
+ * - border-bottom-color
+ *
+ * - border-left
+ * - border-left-width
+ * - border-left-style (required)
+ * - border-left-color
+ *
+ * - border-right
+ * - border-right-width
+ * - border-right-style (required)
+ * - border-right-color
+ *
+ * - border-top
+ * - border-top-width
+ * - border-top-style (required)
+ * - border-top-color
+ */
+
+
+
+
+
+/*
+ * layout
+ * 
+ * - display
+ * - position
+ * - order
+ * - z-index
+ * - clear
+ * 
+ * - bottom
+ * - left
+ * - right
+ * - top
+ * 
+ * ## float layout
+ * 
+ * - float
+ * 
+ * ## Flex
+ * 
+ * align-content
+ * align-items
+ * align-self
+ * justify-content
+ * flex
+ * flex-basis
+ * flex-direction
+ * flex-grow
+ * flex-shrink
+ * flex-basis
+ * flex-wrap
+ * 
+ * 
+ * ## grid
+ * 
+ * - grid
+ * - grid-area
+ * - grid-auto-columns
+ * - grid-auto-flow
+ * - grid-auto-rows
+ * - grid-column
+ * - grid-column-end
+ * - grid-column-gap
+ * - grid-column-start
+ * - grid-gap
+ * - grid-row
+ * - grid-row-end
+ * - grid-row-gap
+ * - grid-row-start
+ * - grid-template
+ * - grid-template-areas
+ * - grid-template-columns
+ * - grid-template-rows
+ * 
+ * ## overflow
+ * 
+ * - overflow
+ * - overflow-x
+ * - overflow-y
+ * - scroll-behavior
+ * 
+ * ## 
+ * 
+ * - page-break-after
+ * - page-break-before
+ * - page-break-inside
+ * 
+ * 
+ * ## column view
+ *
+ * - columns
+ * - column-width
+ * - column-count
+ * - column-span
+ * - column-fill
+ * - column-gap
+ * - column-rule
+ * - column-rule-color
+ * - column-rule-style
+ * - column-rule-width
+ */
+
+/*
+ * Size
+ * 
+ * - margin
+ * - margin-top
+ * - margin-right
+ * - margin-bottom
+ * - margin-left
+ * 
+ * - padding
+ * - padding-top
+ * - padding-right
+ * - padding-bottom
+ * - padding-left
+ * 
+ * - resize
+ * - height
+ * - max-height
+ * - min-height
+ * - width
+ * - max-width
+ * - min-width
+ */
+
+
+/*
+ * img, video
+ * 
+ * - clip
+ * - clip-path
+ * - filter
+ * - object-fit
+ * - object-position
+ */
+
+/*
+ * General?
+ * 
+ * ## view
+ * 
+ * - opacity
+ * - visibility
+ * - color
+ * - mix-blend-mode
+ * - isolation
+ * 
+ * # mouse
+ * 
+ * - cursor
+ * - pointer-events
+ */
+
+
+
+/*
+ * # Text
+ * 
+ * - hyphens
+ * - letter-spacing
+ * - line-height
+ * - quotes
+ * - tab-size
+ * - vertical-align
+ * - white-space
+ * - word-break
+ * - word-spacing
+ * - word-wrap
+ * - writing-mode
+ * - user-select
+ * 
+ * ## Text
+ * 
+ * - text-align-last
+ * - text-decoration
+ * - text-decoration-color
+ * - text-decoration-line
+ * - text-decoration-style
+ * - text-indent
+ * - text-justify
+ * - text-overflow
+ * - text-shadow
+ * - text-transform
+ * 
+ * ## Local
+ * 
+ * - @charset
+ * - direction
+ * - unicode-bidi
+ * 
+ * ## font
+ * 
+ * - font
+ * - font-family
+ * - font-kerning
+ * - font-size
+ * - font-size-adjust
+ * - font-stretch
+ * - font-style
+ * - font-variant
+ * - font-weight
+ */
+
+/*
+ * # list (ul, ol)
+ * 
+ * - list-style
+ * - list-style-type
+ * - list-style-position
+ * - list-style-image
+ * 
+ */
+
+/*
+ *#  Transformation
+ * 
+ * - perspective
+ * - perspective-origin
+ * 
+ * - transform
+ * - transform-origin
+ * - transform-style
+ * 
+ * - transition
+ * - transition-delay
+ * - transition-duration
+ * - transition-property
+ * - transition-timing-function
+ */

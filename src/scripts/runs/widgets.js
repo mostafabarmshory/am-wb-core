@@ -44,6 +44,20 @@ angular.module('am-wb-core')
     $widget.setProcessor('attribut', new WbProcessorAttribute());
 })
 /***********************************************************************
+ * Providers
+ ***********************************************************************/
+.run(function ($widget, $http, $mdMedia, $wbWindow, $wbLocal, $WbProviderTimeout, $dispatcher, $storage, $routeParams) {
+    $widget//
+    .setProvider('$http', $http)
+    .setProvider('$wbWindow', $wbWindow)
+    .setProvider('$dispatcher', $dispatcher)
+    .setProvider('$routeParams', $routeParams)
+    .setProvider('$storage', $storage)
+    .setProvider('$timeout', $WbProviderTimeout)
+    .setProvider('$wbLocal', $wbLocal)
+    .setProvider('$mdMedia', $mdMedia);
+})
+/***********************************************************************
  * Editors
  ***********************************************************************/
 .run(function ($widget) {
@@ -130,7 +144,6 @@ angular.module('am-wb-core')
         model: {
             html: 'Link title'
         },
-        setting: ['a'],
         controller: 'WbWidgetA'
     });
     $widget.newWidget({
@@ -145,7 +158,6 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-address',
         // functional properties
         template: '<address></address>',
-        setting: ['address'],
         controller: 'WbWidgetAddress'
     });
     $widget.newWidget({
@@ -160,7 +172,6 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-applet',
         // functional properties
         template: '<applet></applet>',
-        setting: ['applet'],
         controller: 'WbWidgetApplet'
     });
     $widget.newWidget({
@@ -175,7 +186,6 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-area',
         // functional properties
         template: '<area></area>',
-        setting: ['area'],
         controller: 'WbWidgetArea'
     });
     $widget.newWidget({
@@ -190,7 +200,6 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-article',
         // functional properties
         template: '<article></article>',
-        setting: ['article'],
         controller: 'WbWidgetArticle'
     });
     $widget.newWidget({
@@ -205,7 +214,6 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-aside',
         // functional properties
         template: '<aside></aside>',
-        setting: ['aside'],
         controller: 'WbWidgetAside'
     });
     $widget.newWidget({
@@ -215,7 +223,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-audio',
         description: 'This widget is used to add audio in the document.',
         groups: ['basic'],
-        setting: ['audio'],
         template: '<audio></audio>',
         help: 'http://dpq.co.ir/more-information-audio',
         model: {
@@ -231,7 +238,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-blockquote',
         description: 'description',
         groups: ['basic'],
-        setting: ['blockquote'],
         template: '<blockquote></blockquote>',
         help: 'http://dpq.co.ir/more-information-blockquote',
         controller: 'WbWidgetBlockquote', 
@@ -243,7 +249,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-button',
         description: 'description',
         groups: ['basic'],
-        setting: ['button'],
         template: '<button></button>',
         help: 'http://dpq.co.ir/more-information-button',
         controller: 'WbWidgetButton', 
@@ -255,7 +260,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-canvas',
         description: 'description',
         groups: ['basic'],
-        setting: ['canvas'],
         template: '<canvas></canvas>',
         help: 'http://dpq.co.ir/more-information-canvas',
         controller: 'WbWidgetCanvas', 
@@ -267,7 +271,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-datalist',
         description: 'description',
         groups: ['basic'],
-        setting: ['datalist'],
         template: '<datalist></datalist>',
         help: 'http://dpq.co.ir/more-information-datalist',
         controller: 'WbWidgetDatalist', 
@@ -279,7 +282,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-dd',
         description: 'description',
         groups: ['basic'],
-        setting: ['dd'],
         template: '<dd></dd>',
         help: 'http://dpq.co.ir/more-information-dd',
         controller: 'WbWidgetDd', 
@@ -291,7 +293,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-details',
         description: 'description',
         groups: ['basic'],
-        setting: ['details'],
         template: '<details></details>',
         help: 'http://dpq.co.ir/more-information-details',
         controller: 'WbWidgetDetails', 
@@ -303,7 +304,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-dialog',
         description: 'description',
         groups: ['basic'],
-        setting: ['dialog'],
         template: '<dialog></dialog>',
         help: 'http://dpq.co.ir/more-information-dialog',
         controller: 'WbWidgetDialog', 
@@ -315,7 +315,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-div',
         description: 'description',
         groups: ['basic'],
-        setting: ['div'],
         template: '<div></div>',
         help: 'http://dpq.co.ir/more-information-div',
         controller: 'WbWidgetDiv',
@@ -328,7 +327,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-dl',
         description: 'description',
         groups: ['basic'],
-        setting: ['dl'],
         template: '<dl></dl>',
         help: 'http://dpq.co.ir/more-information-dl',
         controller: 'WbWidgetDl', 
@@ -340,7 +338,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-dt',
         description: 'description',
         groups: ['basic'],
-        setting: ['dt'],
         template: '<dt></dt>',
         help: 'http://dpq.co.ir/more-information-dt',
         controller: 'WbWidgetDt', 
@@ -352,7 +349,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-embed',
         description: 'description',
         groups: ['basic'],
-        setting: ['embed'],
         template: '<embed></embed>',
         help: 'http://dpq.co.ir/more-information-embed',
         controller: 'WbWidgetEmbed', 
@@ -364,7 +360,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-fieldset',
         description: 'description',
         groups: ['basic'],
-        setting: ['fieldset'],
         template: '<fieldset></fieldset>',
         help: 'http://dpq.co.ir/more-information-fieldset',
         controller: 'WbWidgetFieldset', 
@@ -376,7 +371,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-figcaption',
         description: 'description',
         groups: ['basic'],
-        setting: ['figcaption'],
         template: '<figcaption></figcaption>',
         help: 'http://dpq.co.ir/more-information-figcaption',
         controller: 'WbWidgetFigcaption', 
@@ -388,7 +382,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-figure',
         description: 'description',
         groups: ['basic'],
-        setting: ['figure'],
         template: '<figure></figure>',
         help: 'http://dpq.co.ir/more-information-figure',
         controller: 'WbWidgetFigure', 
@@ -400,7 +393,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-footer',
         description: 'description',
         groups: ['basic'],
-        setting: ['footer'],
         template: '<footer></footer>',
         help: 'http://dpq.co.ir/more-information-footer',
         controller: 'WbWidgetFooter', 
@@ -412,7 +404,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-form',
         description: 'description',
         groups: ['basic'],
-        setting: ['form'],
         template: '<form></form>',
         help: 'http://dpq.co.ir/more-information-form',
         controller: 'WbWidgetForm', 
@@ -425,7 +416,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-form',
         description: 'description',
         groups: ['basic'],
-        setting: ['frame'],
         template: '<frame></frame>',
         help: 'http://dpq.co.ir/more-information-frame',
         controller: 'WbWidgetFrame', 
@@ -437,7 +427,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-frameset',
         description: 'description',
         groups: ['basic'],
-        setting: ['frameset'],
         template: '<frameset></frameset>',
         help: 'http://dpq.co.ir/more-information-frameset',
         controller: 'WbWidgetFrameset', 
@@ -473,7 +462,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-header',
         description: 'description',
         groups: ['basic'],
-        setting: ['header'],
         template: '<header></header>',
         help: 'http://dpq.co.ir/more-information-header',
         controller: 'WbWidgetHeader', 
@@ -486,7 +474,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-hr',
         description: 'description',
         groups: ['basic'],
-        setting: ['hr'],
         template: '<hr></hr>',
         help: 'http://dpq.co.ir/more-information-hr',
         controller: 'WbWidgetHr', 
@@ -511,7 +498,6 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-iframe',
         // functional properties
         template: '<iframe>Frame Not Supported?!</iframe>',
-        setting: ['iframe'],
         controllerAs: 'ctrl',
         controller: 'WbWidgetIframe',
     });
@@ -522,7 +508,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-img',
         description: 'A widget to insert an link to page.',
         groups: ['basic'],
-        setting: ['img'],
         template: '<img></img>',
         help: 'http://dpq.co.ir/more-information-img',
         model: {
@@ -552,7 +537,6 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-input',
         // functional properties
         template: '<input></input>',
-        setting: ['input'],
         controller: 'WbWidgetInput',
         controllerAs: 'ctrl',
     });
@@ -563,7 +547,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-kbd',
         description: 'description',
         groups: ['basic'],
-        setting: ['kbd'],
         template: '<kbd></kbd>',
         help: 'http://dpq.co.ir/more-information-kbd',
         controller: 'WbWidgetKbd', 
@@ -575,7 +558,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-label',
         description: 'description',
         groups: ['basic'],
-        setting: ['label'],
         template: '<label></label>',
         help: 'http://dpq.co.ir/more-information-label',
         controller: 'WbWidgetLabel', 
@@ -587,7 +569,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-legend',
         description: 'description',
         groups: ['basic'],
-        setting: ['legend'],
         template: '<legend></legend>',
         help: 'http://dpq.co.ir/more-information-label',
         controller: 'WbWidgetLegend', 
@@ -599,7 +580,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-li',
         description: 'description',
         groups: ['basic'],
-        setting: ['legend'],
         template: '<li></li>',
         help: 'http://dpq.co.ir/more-information-li',
         controller: 'WbWidgetLi', 
@@ -611,7 +591,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-link',
         description: 'A widget to insert an link to page.',
         groups: ['basic'],
-        setting: ['link'],
         template: '<link></link>',
         help: 'http://dpq.co.ir/more-information-link',
         model: {
@@ -628,7 +607,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-main',
         description: 'A widget to insert an link to page.',
         groups: ['basic'],
-        setting: ['main'],
         template: '<main></main>',
         help: 'http://dpq.co.ir/more-information-main',
         controller: 'WbWidgetMain', 
@@ -641,7 +619,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-map',
         description: 'description',
         groups: ['basic'],
-        setting: ['map'],
         template: '<map></map>',
         help: 'http://dpq.co.ir/more-information-map',
         controller: 'WbWidgetMap', 
@@ -685,7 +662,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-meter',
         description: 'description',
         groups: ['basic'],
-        setting: ['meter'],
         template: '<meter></meter>',
         help: 'http://dpq.co.ir/more-information-meter',
         controller: 'WbWidgetMeter', 
@@ -697,7 +673,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-nav',
         description: 'description',
         groups: ['basic'],
-        setting: ['nav'],
         template: '<nav></nav>',
         help: 'http://dpq.co.ir/more-information-nav',
         controller: 'WbWidgetNav', 
@@ -710,7 +685,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-noscript',
         description: 'description',
         groups: ['basic'],
-        setting: ['noscript'],
         template: '<noscript></noscript>',
         help: 'http://dpq.co.ir/more-information-noscript',
         controller: 'WbWidgetNoscript', 
@@ -722,7 +696,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-object',
         description: 'description',
         groups: ['basic'],
-        setting: ['object'],
         template: '<object></object>',
         help: 'http://dpq.co.ir/more-information-object',
         controller: 'WbWidgetObject', 
@@ -735,7 +708,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-ol',
         description: 'description',
         groups: ['basic'],
-        setting: ['ol'],
         template: '<ol></ol>',
         help: 'http://dpq.co.ir/more-information-ol',
         controller: 'WbWidgetOl', 
@@ -748,7 +720,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-optgroup',
         description: 'description',
         groups: ['basic'],
-        setting: ['optgroup'],
         template: '<optgroup></optgroup>',
         help: 'http://dpq.co.ir/more-information-optgroup',
         controller: 'WbWidgetOptgroup', 
@@ -761,7 +732,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-option',
         description: 'description',
         groups: ['basic'],
-        setting: ['option'],
         template: '<option></option>',
         help: 'http://dpq.co.ir/more-information-option',
         controller: 'WbWidgetOption', 
@@ -773,7 +743,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-output',
         description: 'description',
         groups: ['basic'],
-        setting: ['output'],
         template: '<output></output>',
         help: 'http://dpq.co.ir/more-information-output',
         controller: 'WbWidgetOutput', 
@@ -806,7 +775,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-param',
         description: 'description',
         groups: ['basic'],
-        setting: ['param'],
         template: '<param></param>',
         help: 'http://dpq.co.ir/more-information-param',
         controller: 'WbWidgetParam', 
@@ -818,7 +786,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-picture',
         description: 'This widget is used to add picture in the document.',
         groups: ['basic'],
-        setting: ['picture'],
         template: '<picture></picture>',
         help: 'http://dpq.co.ir/more-information-picture',
         model: {
@@ -874,7 +841,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-q',
         description: 'description',
         groups: ['basic'],
-        setting: ['q'],
         template: '<q></q>',
         help: 'http://dpq.co.ir/more-information-q',
         controller: 'WbWidgetQ', 
@@ -886,7 +852,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-script',
         description: 'description',
         groups: ['basic'],
-        setting: ['script'],
         template: '<script></script>',
         help: 'http://dpq.co.ir/more-information-script',
         controller: 'WbWidgetScript', 
@@ -898,7 +863,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-section',
         description: 'description',
         groups: ['basic'],
-        setting: ['section'],
         template: '<section></section>',
         help: 'http://dpq.co.ir/more-information-section',
         controller: 'WbWidgetSection', 
@@ -911,7 +875,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-select',
         description: 'description',
         groups: ['basic'],
-        setting: ['select'],
         template: '<select></select>',
         help: 'http://dpq.co.ir/more-information-select',
         controller: 'WbWidgetSelect', 
@@ -923,7 +886,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-source',
         description: 'This widget is used to add source in the document.',
         groups: ['basic'],
-        setting: ['source'],
         template: '<source></source>',
         help: 'http://dpq.co.ir/more-information-source',
         model: {
@@ -939,7 +901,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-style',
         description: 'description',
         groups: ['basic'],
-        setting: ['style'],
         template: '<style></style>',
         help: 'http://dpq.co.ir/more-information-style',
         controller: 'WbWidgetStyle', 
@@ -951,7 +912,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-summary',
         description: 'description',
         groups: ['basic'],
-        setting: ['summary'],
         template: '<summary></summary>',
         help: 'http://dpq.co.ir/more-information-summary',
         controller: 'WbWidgetSummary', 
@@ -964,7 +924,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-svg',
         description: 'description',
         groups: ['basic'],
-        setting: ['svg'],
         template: '<svg></svg>',
         help: 'http://dpq.co.ir/more-information-svg',
         controller: 'WbWidgetSvg', 
@@ -976,7 +935,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-template',
         description: 'description',
         groups: ['basic'],
-        setting: ['template'],
         template: '<template></template>',
         help: 'http://dpq.co.ir/more-information-template',
         controller: 'WbWidgetTemplate', 
@@ -1000,7 +958,6 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-textarea',
         // functional properties
         template: '<textarea></textarea>',
-        setting: ['textarea'],
         controller: 'WbWidgetTextarea',
     });
     $widget.newWidget({
@@ -1010,7 +967,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-track',
         description: 'description',
         groups: ['basic'],
-        setting: ['track'],
         template: '<track></track>',
         help: 'http://dpq.co.ir/more-information-track',
         controller: 'WbWidgetTrack', 
@@ -1022,7 +978,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-ul',
         description: 'description',
         groups: ['basic'],
-        setting: ['ul'],
         template: '<ul></ul>',
         help: 'http://dpq.co.ir/more-information-ul',
         controller: 'WbWidgetUl', 
@@ -1035,7 +990,6 @@ angular.module('am-wb-core')
         icon: 'wb-widget-video',
         description: 'This widget is used to add video in the document.',
         groups: ['basic'],
-        setting: ['video'],
         template: '<video></video>',
         help: 'http://dpq.co.ir/more-information-audio',
         model: {
@@ -1046,54 +1000,4 @@ angular.module('am-wb-core')
         isLeaf: false
     });
 
-    /*******************************************************
-     * Deprecated
-     *******************************************************/
-    $widget.newWidget({
-        // widget description
-        type: 'Group',
-        title: 'Group',
-        description: 'Panel contains list of widgets.',
-        icon: 'wb-widget-group',
-        groups: ['basic'],
-        model: {
-            style: {
-                margin: '1px',
-                padding: '1px',
-                layout: {
-                    direction: 'column'
-                },
-                size: {
-                    minHeight: '16px',
-                    minWidth: '16px'
-                }
-            }
-        },
-        // functional properties
-        template: '<div></div>',
-        help: 'http://dpq.co.ir/more-information-link',
-        helpId: 'wb-widget-group',
-        controller: 'WbWidgetGroup',
-        isLeaf: false
-    });
-    $widget.newWidget({
-        // widget description
-        type: 'HtmlText',
-        title: 'Text',
-        description: 'An text block.',
-        icon: 'wb-widget-html',
-        groups: ['basic'],
-        model: {
-            text: '<h2>Text element</h2><p>Click on the text box to edit.</p>',
-            style: {
-                padding: '8px'
-            }
-        },
-        // help id
-        help: 'http://dpq.co.ir',
-        helpId: 'wb-widget-html',
-        // functional properties
-        template: '<div></div>',
-        controller: 'WbWidgetAbstractHtml',
-    });
 });

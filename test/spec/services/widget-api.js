@@ -203,4 +203,43 @@ describe('Service $widget', function () {
         expect($widget.getConverters().length>0).toBe(true);
         expect($widget.getConverter('text/plain')).not.toBe(null);
     });
+    
+    
+
+    /**************************************************************************************
+     *  Providers
+     * 
+     * Default providers:
+     * 
+     **************************************************************************************/
+    it('should support providers api ', function () {
+        expect(_.isFunction($widget.setProvider)).toBe(true);
+        expect(_.isFunction($widget.getProviders)).toBe(true);
+        expect(_.isFunction($widget.getProvider)).toBe(true);
+        expect(_.isFunction($widget.removeProvider)).toBe(true);
+        expect(_.isFunction($widget.getProvidersKey)).toBe(true);
+    });
+    
+    it('should support providers api ', function () {
+        function provider(){};
+        
+        var pks = $widget.getProvidersKey();
+        
+        $widget.setProvider('xxx', provider);
+        expect($widget.getProvider('xxx')).toBe(provider);
+        
+        $widget.removeProvider('xxx', provider);
+        expect($widget.getProvider('xxx')).toBe(undefined);
+        
+        function provider2 (){};
+        $widget.setProvider('xxx', provider);
+        expect($widget.getProvider('xxx')).toBe(provider);
+        $widget.setProvider('xxx', provider2);
+        expect($widget.getProvider('xxx')).not.toBe(provider);
+        expect($widget.getProvider('xxx')).toBe(provider2);
+        expect($widget.getProvidersKey().length).toBe(pks.length+1);
+        expect($widget.getProvidersKey()).toEqual(_.concat(pks,['xxx']));
+        
+        expect($widget.getProviders()).not.toBe(undefined);
+    });
 });

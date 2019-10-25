@@ -33,84 +33,98 @@ angular.module('am-wb-core')
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 .service('$settings',function() {
-	/*
-	 * Default settings
-	 */
-	var WB_SETTINGS_GROUP_DEFAULT = [ 'general', 'transform', 'border',
-		'background', 'layout', 'layout-self', 'marginPadding',
-		'size', 'shadow', 'microdata', 'style.text' ];
-	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'transform',
-		'border', 'background', 'marginPadding', 'layout-self',
-		'size', 'shadow', 'microdata', 'style.text' ];
+    /**
+     * Setting page storage
+     * 
+     */
+    var settingPages = [];
 
-	/**
-	 * Setting page storage
-	 * 
-	 */
-	var settingPages = {};
-	var notFound = {
-			label : 'Settings not found',
-			templateUrl : 'views/settings/wb-notfound.html'
-	};
+    var notFound = {
+            label : 'Settings not found',
+            templateUrl : 'views/settings/wb-notfound.html'
+    };
 
-	/**
-	 * Fetchs a setting page.
-	 * 
-	 * @param model
-	 * @returns
-	 */
-	function page(type) {
-		var pageResult = notFound;
-		if (type in settingPages) {
-			pageResult = settingPages[type];
-		}
-		return pageResult;
-	}
+    /**
+     * Fetchs a setting page with the given type
+     * 
+     * @param model
+     * @returns
+     */
+    this.getPage = function (type) {
+        var pageResult = notFound;
+        _.forEach(settingPages, function(settingPage){
+            if (type === settingPage.type) {
+                pageResult = settingPage;
+            }
+        });
+        return pageResult;
+    }
 
-	/**
-	 * Adds new setting page.
-	 * 
-	 * @returns
-	 */
-	function newPage(page) {
-		settingPages[page.type] = page;
-	}
+    /**
+     * 
+     * @param page type
+     * @returns
+     */
+    this.removePage = function (type) {
+        settingPages=  _.remove(settingPages, function(page) {
+            return type === page.type;
+        });
+        return this;
+    }
 
-	/**
-	 * Finds and lists all setting pages.
-	 * 
-	 * @returns
-	 */
-	function pages() {
-		// TODO: maso, 1395:
-	}
+    /**
+     * Adds new setting page.
+     * 
+     * @returns
+     */
+    this.addPage = function (page) {
+        settingPages.push(page);
+        return this;
+    }
+    
+    /**
+     * Set new setting page.
+     * 
+     * @returns
+     */
+    this.setPage = function (page) {
+        this.remvoePage(page.type);
+        return this.addPage(page);
+    }
 
-	/**
-	 * Defines default settings for widget
-	 * 
-	 * @param widget
-	 * @returns
-	 */
-	function getSettingsFor(widget) {
-		var widgetSettings = [];
-		if (widget.type === 'Group') {
-			widgetSettings = widgetSettings
-			.concat(WB_SETTINGS_GROUP_DEFAULT);
-		} else {
-			widgetSettings = widgetSettings
-			.concat(WB_SETTINGS_WIDGET_DEFAULT);
-		}
+    /**
+     * Finds and lists all setting pages.
+     * 
+     * @returns
+     */
+    this.pages = function () {
+        return settingPages;
+    }
 
-		if (angular.isArray(widget.setting)) {
-			widgetSettings = widgetSettings.concat(widget.setting);
-		}
-		return widgetSettings;
-	}
+    /**
+     * Defines default settings for widget
+     * 
+     * @param widget
+     * @returns
+     */
+    this.getSettingsFor = function (widgetDescription) {
+        // if it was cached before
+        this.settingPagesCach = this.settingPagesCach || {};
+        if(_.has(this.settingPagesCach, widgetDescription.type)){
+            return this.settingPagesCach[widgetDescription.type];
+        }
 
-	// تعیین سرویس‌ها
-	this.page = page;
-	this.getPage = page;
-	this.getPages = pages;
-	this.newPage = newPage;
-	this.getSettingsFor = getSettingsFor;
+        // create list
+        var widgetSettings = [];
+        _.forEach(settingPages, function(page){
+            if(pageMatchWith(page, widgetDescription)){
+                widgetSettings.push(page);
+            }
+        });
+
+        // put into cache
+        this.settingPagesCach[widgetDescription.type] =  widgetSettings;
+
+        return widgetSettings;
+    }
 });

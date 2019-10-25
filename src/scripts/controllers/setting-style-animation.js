@@ -25,45 +25,23 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
- * @name MbWidgetACtrl
- * @description Manage a widget with html text.
- * 
- * Most of textual widgets (such as h1..h6, p, a, html) just used html
- * text in view. This controller are about to manage html attribute of
- * a widget.
+ * @name MbSettingStyleAnimationCtrl
+ * @description Manage style animations
  * 
  */
-.controller('MbSettingGeneralCtrl', function () {
+.controller('MbSettingStyleAnimationCtrl', function () {
 	
 	var attrs = [
 		// id
-		'id',
-		'name',
-		'title',
-		'class',
-		
-		// language
-		'dir',
-		'lang',
-		'translate',
-		'spellcheck',
-
-		// access
-		'accesskey',
-		'contenteditable',
-		'tabindex',
-		'hidden',
-		
-		// General style
-		'style.direction',
-		'style.visibility',
-		'style.color',
-		'style.cursor',
-		'style.opacity',
-		
-		// overflow
-		'style.overflow.x',
-		'style.overflow.y',
+		'download',
+		'href',
+		'hreflang',
+		'media',
+		'ping',
+		'referrerpolicy',
+		'rel',
+		'target',
+		'type',
 		];
 
 	/*

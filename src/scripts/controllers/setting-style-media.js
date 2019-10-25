@@ -25,48 +25,48 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
- * @name MbSettingStyleTextCtrl
+ * @name MbSettingStyleMediaCtrl
  * @description Edit text style of a widget
  * 
  */
-.controller('MbSettingStyleTextCtrl', function () {
-    var attrs = [{
-        key: 'style.text.align',
-        ctrlKey: 'align'
-    },{
-        key: 'style.text.alignLast',
-        ctrlKey: 'alignLast'
-    },{
-        key: 'style.text.decoration',
-        ctrlKey: 'decoration'
-    },{
-        key: 'style.text.indent',
-        ctrlKey: 'indent'
-    },{
-        key: 'style.text.justify',
-        ctrlKey: 'justify'
-    },{
-        key: 'style.text.overflow',
-        ctrlKey: 'overflow'
-    },{
-        key: 'style.text.shadow',
-        ctrlKey: 'shadow'
-    },{
-        key: 'style.text.transform',
-        ctrlKey: 'transform'
-    }];
+.controller('MbSettingStyleMediaCtrl', function () {
+	var attrs = [{
+		key: 'style.text.align',
+		ctrlKey: 'align'
+	},{
+		key: 'style.text.alignLast',
+		ctrlKey: 'alignLast'
+	},{
+		key: 'style.text.decoration',
+		ctrlKey: 'decoration'
+	},{
+		key: 'style.text.indent',
+		ctrlKey: 'indent'
+	},{
+		key: 'style.text.justify',
+		ctrlKey: 'justify'
+	},{
+		key: 'style.text.overflow',
+		ctrlKey: 'overflow'
+	},{
+		key: 'style.text.shadow',
+		ctrlKey: 'shadow'
+	},{
+		key: 'style.text.transform',
+		ctrlKey: 'transform'
+	}];
 
-    /*
-     * Initial the setting editor
-     */
-    this.init = function () {
-        /*
-         * Load data of the widget
-         */
-        var ctrl = this;
-        angular.forEach(attrs, function(attr){
-            ctrl[attr.ctrlKey] = ctrl.getProperty(attr.key);
-        });
-    };
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		/*
+		 * Load data of the widget
+		 */
+		var ctrl = this;
+		angular.forEach(attrs, function(attr){
+			ctrl[attr.ctrlKey] = ctrl.getProperty(attr.key);
+		});
+	};
 
 });

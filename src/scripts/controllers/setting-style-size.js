@@ -25,36 +25,24 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
- * @name MbSettingStyleTextCtrl
- * @description Edit text style of a widget
+ * @name MbSettingStyleSizeCtrl
+ * @description Manage Widget A 
  * 
  */
-.controller('MbSettingStyleTextCtrl', function () {
-    var attrs = [{
-        key: 'style.text.align',
-        ctrlKey: 'align'
-    },{
-        key: 'style.text.alignLast',
-        ctrlKey: 'alignLast'
-    },{
-        key: 'style.text.decoration',
-        ctrlKey: 'decoration'
-    },{
-        key: 'style.text.indent',
-        ctrlKey: 'indent'
-    },{
-        key: 'style.text.justify',
-        ctrlKey: 'justify'
-    },{
-        key: 'style.text.overflow',
-        ctrlKey: 'overflow'
-    },{
-        key: 'style.text.shadow',
-        ctrlKey: 'shadow'
-    },{
-        key: 'style.text.transform',
-        ctrlKey: 'transform'
-    }];
+.controller('MbSettingStyleSizeCtrl', function () {
+
+    var attrs = [
+        // id
+        'download',
+        'href',
+        'hreflang',
+        'media',
+        'ping',
+        'referrerpolicy',
+        'rel',
+        'target',
+        'type',
+        ];
 
     /*
      * Initial the setting editor
@@ -65,8 +53,7 @@ angular.module('am-wb-core')//
          */
         var ctrl = this;
         angular.forEach(attrs, function(attr){
-            ctrl[attr.ctrlKey] = ctrl.getProperty(attr.key);
+            ctrl[attr] = ctrl.getProperty(attr);
         });
     };
-
 });
