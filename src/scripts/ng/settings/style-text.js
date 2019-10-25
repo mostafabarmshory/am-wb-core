@@ -25,35 +25,10 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
- * @name MbSettingStyleSizeCtrl
- * @description Manage Widget A 
+ * @name WbSettingStyleTextCtrl
+ * @description Edit text style of a widget
  * 
  */
-.controller('MbSettingStyleSizeCtrl', function () {
+.controller('WbSettingStyleTextCtrl', function () {
 
-    var attrs = [
-        // id
-        'download',
-        'href',
-        'hreflang',
-        'media',
-        'ping',
-        'referrerpolicy',
-        'rel',
-        'target',
-        'type',
-        ];
-
-    /*
-     * Initial the setting editor
-     */
-    this.init = function () {
-        /*
-         * Load data of the widget
-         */
-        var ctrl = this;
-        angular.forEach(attrs, function(attr){
-            ctrl[attr] = ctrl.getProperty(attr);
-        });
-    };
 });

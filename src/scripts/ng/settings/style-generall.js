@@ -25,7 +25,7 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
- * @name MbSettingStyleGeneralCtrl
+ * @name WbSettingStyleGeneralCtrl
  * @description Manage a widget with html text.
  * 
  * Most of textual widgets (such as h1..h6, p, a, html) just used html
@@ -33,49 +33,5 @@ angular.module('am-wb-core')//
  * a widget.
  * 
  */
-.controller('MbSettingStyleGeneralCtrl', function () {
-	
-	var attrs = [
-		// id
-		'id',
-		'name',
-		'title',
-		'class',
-		
-		// language
-		'dir',
-		'lang',
-		'translate',
-		'spellcheck',
-
-		// access
-		'accesskey',
-		'contenteditable',
-		'tabindex',
-		'hidden',
-		
-		// General style
-		'style.direction',
-		'style.visibility',
-		'style.color',
-		'style.cursor',
-		'style.opacity',
-		
-		// overflow
-		'style.overflow.x',
-		'style.overflow.y',
-		];
-
-	/*
-	 * Initial the setting editor
-	 */
-	this.init = function () {
-		/*
-		 * Load data of the widget
-		 */
-		var ctrl = this;
-		angular.forEach(attrs, function(attr){
-			ctrl[attr] = ctrl.getProperty(attr);
-		});
-	};
+.controller('WbSettingStyleGeneralCtrl', function () {
 });

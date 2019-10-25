@@ -34,7 +34,7 @@ angular.module('am-wb-core')//
  * utilities.
  * 
  */
-.controller('AmWbSettingPageCtrl', function ($scope, $element) {
+.controller('WbSettingPageCtrl', function ($scope, $element) {
 
     this.setWidget = function (widget) {
         var oldWidget = this.widget;

@@ -1,0 +1,15 @@
+{
+	"type": "div",
+	"title": "Groups of widgets",
+	"description": "In this help page you can learn how to use a group",
+	"children": [
+		{
+			"type": "h2",
+			"text": "Help not found!"
+		},
+		{
+			"type": "p",
+			"text": "Help content for requested page not found."
+		}
+	]
+}

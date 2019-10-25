@@ -21,18 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')
 
 /**
  * @ngdoc Services
- * @name $widget
- * @description مدیریت ویجت‌های سیستم
+ * @name $settings
+ * @description Manage settings panel 
  * 
- * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
+ * 
  */
-.service('$settings',function() {
+.service('$settings', function() {
+    'use strict';
     /**
      * Setting page storage
      * 
@@ -43,10 +43,24 @@ angular.module('am-wb-core')
             label : 'Settings not found',
             templateUrl : 'views/settings/wb-notfound.html'
     };
+    
+    function pageMatchWith(page, widgetDescription){
+        if(_.isUndefined(page.targets) || page.targets.length === 0){
+            return true;
+        }
+        for(var i = 0; i < page.targets.length; i++){
+            var patt = new RegExp(page.targets[i]);
+            if(patt.test(widgetDescription.type)){
+                return true;
+            }
+        }
+        return false;
+    };
 
     /**
      * Fetchs a setting page with the given type
      * 
+     * @memberof $settings
      * @param model
      * @returns
      */
@@ -58,10 +72,11 @@ angular.module('am-wb-core')
             }
         });
         return pageResult;
-    }
+    };
 
     /**
      * 
+     * @memberof $settings
      * @param page type
      * @returns
      */
@@ -69,41 +84,56 @@ angular.module('am-wb-core')
         settingPages=  _.remove(settingPages, function(page) {
             return type === page.type;
         });
+        this.settingPagesCach = [];
         return this;
-    }
+    };
 
     /**
      * Adds new setting page.
      * 
+     * @memberof $settings
      * @returns
      */
     this.addPage = function (page) {
         settingPages.push(page);
+        this.settingPagesCach = [];
         return this;
-    }
+    };
     
     /**
      * Set new setting page.
      * 
+     * @memberof $settings
      * @returns
      */
     this.setPage = function (page) {
         this.remvoePage(page.type);
         return this.addPage(page);
-    }
+    };
 
     /**
      * Finds and lists all setting pages.
      * 
+     * @memberof $settings
      * @returns
      */
-    this.pages = function () {
-        return settingPages;
-    }
+    this.getPages = function () {
+        return _.clone(settingPages);
+    };
+
+    /**
+     * Finds and lists all setting pages.
+     * 
+     * @deprecated
+     * @memberof $settings
+     * @returns
+     */
+    this.pages = this.getPages;
 
     /**
      * Defines default settings for widget
      * 
+     * @memberof $settings
      * @param widget
      * @returns
      */
@@ -126,5 +156,5 @@ angular.module('am-wb-core')
         this.settingPagesCach[widgetDescription.type] =  widgetSettings;
 
         return widgetSettings;
-    }
+    };
 });

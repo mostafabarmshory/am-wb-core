@@ -36,18 +36,18 @@ angular.module('am-wb-core')
         type: 'general',
         label: 'Model',
         icon: 'opacity',
-        templateUrl: 'views/settings/wb-general.html',
+        templateUrl: 'views/settings/wb-widget-general.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingStyleGeneralCtrl',
+        controller: 'WbSettingStyleGeneralCtrl',
     })
     .addPage({
         type: 'a',
         label: 'Link',
         description: 'Manage link in the current widget.',
         icon: 'settings',
-        templateUrl: 'views/settings/wb-a.html',
+        templateUrl: 'views/settings/wb-widget-a.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingACtrl',
+        controller: 'WbSettingACtrl',
         targets: ['a']
     })
     .addPage({
@@ -55,17 +55,17 @@ angular.module('am-wb-core')
         label: 'Image',
         description: 'Manage image widget settings.',
         icon: 'settings',
-        templateUrl: 'views/settings/wb-img.html',
+        templateUrl: 'views/settings/wb-widget-img.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingImgCtrl',
+        controller: 'WbSettingWidgetImgCtrl',
         targets: ['img']
     })
     .addPage({
         type: 'microdata',
         label: 'Widget Microdata',
-        templateUrl: 'views/settings/wb-microdata.html',
+        templateUrl: 'views/settings/wb-widget-microdata.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingMicrodataCtrl'
+        controller: 'WbSettingWidgetMicrodataCtrl'
     });
         
     
@@ -76,56 +76,64 @@ angular.module('am-wb-core')
         type: 'style.animation',
         label: 'Animation',
         icon: 'opacity',
-        templateUrl: 'views/settings/wb-general.html',
+        templateUrl: 'views/settings/wb-style-animation.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingStyleGeneralCtrl',
+        controller: 'WbSettingStyleAnimationCtrl',
     })
     .addPage({
         type: 'style.background',
         label: 'Background',
         icon: 'opacity',
-        templateUrl: 'views/settings/wb-general.html',
+        templateUrl: 'views/settings/wb-style-background.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingStyleGeneralCtrl',
+        controller: 'WbSettingStyleBackgroundCtrl',
     })
     .addPage({
-        type: 'style.boarder',
-        label: 'Boarder',
+        type: 'style.border',
+        label: 'Border',
         icon: 'opacity',
-        templateUrl: 'views/settings/wb-general.html',
+        templateUrl: 'views/settings/wb-style-border.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingStyleGeneralCtrl',
+        controller: 'WbSettingStyleBorderCtrl',
     })
     .addPage({
         type: 'style.general',
         label: 'General',
         icon: 'opacity',
-        templateUrl: 'views/settings/wb-general.html',
+        templateUrl: 'views/settings/wb-style-general.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingStyleGeneralCtrl',
+        controller: 'WbSettingStyleGeneralCtrl',
     })
     .addPage({
         type: 'style.layout',
         label: 'Layout',
         icon: 'opacity',
-        templateUrl: 'views/settings/wb-general.html',
+        templateUrl: 'views/settings/wb-style-layout.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingStyleGeneralCtrl',
+        controller: 'WbSettingStyleLayoutCtrl',
     })
     .addPage({
         type: 'style.media',
         label: 'Medai',
         icon: 'opacity',
-        templateUrl: 'views/settings/wb-general.html',
+        templateUrl: 'views/settings/wb-style-media.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingStyleGeneralCtrl',
+        controller: 'WbSettingStyleMediaCtrl',
     })
     .addPage({
         type: 'style.size',
         label: 'Size',
         icon: 'opacity',
-        templateUrl: 'views/settings/wb-general.html',
+        templateUrl: 'views/settings/wb-style-size.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingStyleGeneralCtrl',
+        controller: 'WbSettingStyleSizeCtrl',
+    })
+    .addPage({
+        type: 'style.text',
+        label: 'Text',
+        icon: 'opacity',
+        templateUrl: 'views/settings/wb-style-text.html',
+        controllerAs: 'ctrl',
+        controller: 'WbSettingStyleTextCtrl',
     });
 });

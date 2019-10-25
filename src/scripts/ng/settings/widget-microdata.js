@@ -25,7 +25,7 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
- * @name MbSettingWidgetMicrodataCtrl
+ * @name WbSettingWidgetMicrodataCtrl
  * @description Manage a widget with html text.
  * 
  * Most of textual widgets (such as h1..h6, p, a, html) just used html
@@ -33,7 +33,7 @@ angular.module('am-wb-core')//
  * a widget.
  * 
  */
-.controller('MbSettingWidgetMicrodataCtrl', function () {
+.controller('WbSettingWidgetMicrodataCtrl', function () {
 	var attrs = [
 		'itemscope',
 		'itemtype',

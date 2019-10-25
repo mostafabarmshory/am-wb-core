@@ -42,7 +42,7 @@ angular.module('am-wb-core')
 			.then(function (templateSrc) {
 				var element = angular.element(templateSrc);
 				var scope = $scope.$new();
-				var controller = $controller('AmWbSettingPageCtrl',{
+				var controller = $controller('WbSettingPageCtrl',{
 					$scope: scope,
 					$element: element
 				});
@@ -68,7 +68,7 @@ angular.module('am-wb-core')
 			if (!type) {
 				return;
 			}
-			var setting = $settings.page(type);
+			var setting = $settings.getPage(type);
 			loadSetting(setting)//
 			.then(function(ctrl){
 				settingCtrl = ctrl;

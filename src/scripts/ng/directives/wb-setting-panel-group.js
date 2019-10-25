@@ -69,9 +69,9 @@ angular.module('am-wb-core')
 
 			// visible new ones
 			for(i = 0; i < settingKeys.length; i++){
-				var key = settingKeys[i];
+				var key = settingKeys[i].type;
 				if(!settingMap[key]){
-					var setting = $settings.getPage(key);
+					var setting = settingKeys[i];
 					settingMap[key] = angular.copy(setting);
 					$scope.settings.push(settingMap[key]);
 				}
