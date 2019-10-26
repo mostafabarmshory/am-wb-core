@@ -14,7 +14,10 @@
 	},
 	"children": [{
 		"type": "h1",
-		"html": "Add a Signup Form to Your Website"
+		"html": "Add a Signup Form to Your Website",
+		"on": {
+			"click": "alert('hi');"
+		}
 	},{
 		"type": "h2",
 		"html": "Add a Signup Form to Your Website"

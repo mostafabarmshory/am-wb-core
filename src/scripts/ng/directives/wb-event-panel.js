@@ -114,7 +114,7 @@ angular.module('am-wb-core')
 			}
 			for (var i = 0; i < eventTypes.length; i++) {
 				var event = eventTypes[i];
-				event.code = widget.getModelProperty('event.' + event.key);
+				event.code = widget.getModelProperty('on.' + event.key);
 				$scope.events.push(event);
 			}
 		}
@@ -126,10 +126,10 @@ angular.module('am-wb-core')
 			for (var i = 0; i < $scope.events.length; i++) {
 				var event = $scope.events[i];
 				if (event.code) {
-					widget.setModelProperty('event.'
+					widget.setModelProperty('on.'
 							+ event.key, event.code);
 				} else {
-					widget.setModelProperty('event.'
+					widget.setModelProperty('on.'
 							+ event.key, undefined);
 				}
 			}
