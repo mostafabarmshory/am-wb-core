@@ -307,7 +307,7 @@ angular.module('am-wb-core')//
         };
 
         // check if value changed
-        if(angular.equals($event.oldValue, $event.newValue)){
+        if(angular.equals($event.oldValue, $event.value)){
             return;
         }
 

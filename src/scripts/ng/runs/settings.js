@@ -38,7 +38,7 @@ angular.module('am-wb-core')
         icon: 'opacity',
         templateUrl: 'views/settings/wb-widget-general.html',
         controllerAs: 'ctrl',
-        controller: 'WbSettingStyleGeneralCtrl',
+        controller: 'WbSettingGeneralCtrl',
     })
     .addPage({
         type: 'a',
@@ -62,7 +62,7 @@ angular.module('am-wb-core')
     })
     .addPage({
         type: 'microdata',
-        label: 'Widget Microdata',
+        label: 'Microdata',
         templateUrl: 'views/settings/wb-widget-microdata.html',
         controllerAs: 'ctrl',
         controller: 'WbSettingWidgetMicrodataCtrl'
