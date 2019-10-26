@@ -99,6 +99,8 @@ describe('Abstract WbSettingPageCtrl controller', function () {
             $element: element
         });
         controller.trackAttributes(['id', 'name', 'html']);
+        expect(controller.isRootWidget()).toBe(false);
+        expect(controller.isContainerWidget()).toBe(false);
         var model = {
                 type: 'div',
                 children: [{
@@ -109,9 +111,16 @@ describe('Abstract WbSettingPageCtrl controller', function () {
         .then(function(widget){
             controller.setWidget(widget);
             expect(controller.isRootWidget()).toBe(true);
+            expect(controller.isContainerWidget()).toBe(true);
             
             controller.setWidget(widget.getChildren()[0]);
             expect(controller.isRootWidget()).toBe(false);
+            expect(controller.isContainerWidget()).toBe(false);
+            
+
+            controller.setWidget();
+            expect(controller.isRootWidget()).toBe(false);
+            expect(controller.isContainerWidget()).toBe(false);
             
             done();
         });
@@ -207,6 +216,11 @@ describe('Abstract WbSettingPageCtrl controller', function () {
         };
         $widget.compile(model)
         .then(function(widget){
+            controller.setStyle('color', 'a');
+            controller.setAttribute('id', 'yyy');
+            expect(controller.getStyle('color')).toBe(undefined);
+            expect(controller.getAttribute('id')).toBe(undefined);
+            
             controller.setWidget(widget);
             expect(controller.stylesValue.color).toBe(model.style.color);
             expect(controller.attributesValue.id).toBe(model.id);
@@ -215,10 +229,33 @@ describe('Abstract WbSettingPageCtrl controller', function () {
             widget.setModelProperty('style.color', 'red');
             
             expect(controller.stylesValue.color).toBe('red');
+            expect(controller.getStyle('color')).toBe('red');
             expect(controller.attributesValue.id).toBe('xxx');
+            expect(controller.getAttribute('id')).toBe('xxx');
             
             done();
         });
         $rootScope.$apply();
+    });
+    
+    it('should fire changes', function () {
+        var controller = $controller('WbSettingPageCtrl',{
+            $scope: {},
+            $element: {}
+        });
+        controller.trackAttributes(['id', 'name', 'html']);
+        controller.trackStyles(['background', 'color']);
+        var flag = false;
+        function listener(){
+            flag = true;
+        }
+        controller.on('widgetChanged', listener);
+        controller.setWidget();
+        expect(flag).toBe(true);
+        
+        flag = false;
+        controller.off('widgetChanged', listener);
+        controller.setWidget();
+        expect(flag).toBe(false);
     });
 });

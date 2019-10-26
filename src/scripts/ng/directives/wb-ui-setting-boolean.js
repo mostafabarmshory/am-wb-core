@@ -25,56 +25,31 @@
 
 angular.module('am-wb-core')
 
-/**
- * @ngdoc Directives
- * @name wbUiSettingChoose
- * @description a setting section for choosing values.
- *
- */
-.directive('wbUiSettingChoose', function ($mdTheming, $mdUtil) {
-
-	function postLink(scope, element, attr, ctrls) {
-		var ngModelCtrl = ctrls[0] || $mdUtil.fakeNgModel();
-		$mdTheming(element);
-
-		/*
-		 * convert to index
-		 */
-		function toIndex (value){
-			for (var index = 0; index < scope.xitems.length; index++) {
-				if (scope.xitems[index].value === value){
-					return index;
-				}
-			}
-			// TODO: maso, 2017: update default value.
-			return 0;
-		}
-
-		/*
-		 * render the data
-		 */
-		ngModelCtrl.$render  = function() {
-			scope.selectedIndex = toIndex(ngModelCtrl.$modelValue);
-		}
-
-		scope.selectionChanged = function(){
-		    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
-		};
-	}
-
-	/*
-	 * Directive info
+	/**
+	 * @ngdoc Directives
+	 * @name wbUiSettingOnOffSwitch
+	 * @description a setting section for on/off switch.
+	 *
 	 */
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-choose.html',
+	.directive('wbUiSettingOnOffSwitch', function () {
+	    return {
+		templateUrl: 'views/directives/wb-ui-setting-boolean.html',
 		restrict: 'E',
 		scope: {
-			icon: '@',
-			title: '@',
-			xitems: '<items'
+		    title: '@title',
+		    icon: '@icon'
 		},
-		require: ['?ngModel'],
-		priority: 210, // Run before ngAria
-		link: postLink
-	};
-});
+		require: ['ngModel'],
+		link: function (scope, element, attr, ctrls) {
+		    var ngModelCtrl = ctrls[0];
+
+		    ngModelCtrl.$render = function () {
+			scope.value = ngModelCtrl.$modelValue;
+		    };
+
+		    scope.valueChanged = function (value) {
+			ngModelCtrl.$setViewValue(value);
+		    };
+		}
+	    };
+	});

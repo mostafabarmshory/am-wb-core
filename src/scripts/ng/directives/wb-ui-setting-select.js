@@ -25,50 +25,33 @@
 
 angular.module('am-wb-core')
 
-	/**
-	 * @ngdoc Directives
-	 * @name wbUiSettingColor
-	 * @description a setting section to set color.
-	 *
-	 */
-	.directive('wbUiSettingBackgroundRepeat', function () {
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingDropdown
+ * @description a setting section for choosing values.
+ *
+ */
+.directive('wbUiSettingDropdown', function () {
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-select.html',
+        restrict: 'E',
+        scope: {
+            title: '@title',
+            icon: '@icon',
+            items:'=items'
+        },
+        require: ['ngModel'],
+        link: function (scope, element, attr, ctrls) {
+            var ngModelCtrl = ctrls[0];
 
-	    function postLink(scope, element, attr, ctrls) {
-		var ngModelCtrl = ctrls[0];
+            ngModelCtrl.$render = function () {
+                scope.value = ngModelCtrl.$modelValue;
+            };
 
-		ngModelCtrl.$render = function () {
-		    scope.repeat = ngModelCtrl.$modelValue;
-		};
-
-		scope.repeatChanged = function (newRepeat) {
-		    ngModelCtrl.$setViewValue(newRepeat);
-		};
-	    }
-
-	    return {
-		templateUrl: 'views/directives/wb-ui-setting-background-repeat.html',
-		restrict: 'E',
-		replace: true,
-		scope: {},
-		require: ['ngModel'],
-		link: postLink,
-        /*
-         * @ngInject
-         */
-		controller: function ($scope) {
-		    $scope.items = [
-			{name: 'Repeat', value: 'repeat'},
-			{name: 'Repeat-x', value: 'repeat-x'},
-			{name: 'Repeat-y', value: 'repeat-y'},
-			{name: 'No-repeat', value: 'no-repeat'},
-			{name: 'Space', value: 'space'},
-			{name: 'Round', value: 'round'},
-			{name: 'Initial', value: 'initial'},
-			{name: 'Inherit', value: 'inherit'},
-			{name: 'Nothing', value: ''}
-
-		    ];
-
-		}
-	    };
-	});
+            scope.valueChanged = function (value) {
+                scope.value = value;
+                ngModelCtrl.$setViewValue(value);
+            };
+        }
+    };
+});

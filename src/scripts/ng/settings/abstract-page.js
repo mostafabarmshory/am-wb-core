@@ -105,7 +105,11 @@ angular.module('am-wb-core')//
      * @return true if the widget is a container
      */
     this.isContainerWidget = function(){
-        return !this.widget.isLeaf();
+        var widget = this.getWidget();
+        if (!widget) {
+            return false;
+        }
+        return !widget.isLeaf();
     };
 
     /**
@@ -118,7 +122,7 @@ angular.module('am-wb-core')//
      */
     this.disconnect = function(){
         var widget = this.getWidget();
-        if(_.isEmpty(widget) || _.isEmpty(this.widgetListener)){
+        if(_.isEmpty(widget) || !_.isFunction(this.widgetListener)){
             return;
         }
         widget.off('modelUpdated', this.widgetListener);
@@ -181,7 +185,7 @@ angular.module('am-wb-core')//
      * @param callback {Function} to call on event
      */
     this.on = function(key, callback){
-        this.calbacks[key].push(callback);
+        this.callbacks[key].push(callback);
     };
 
     /**

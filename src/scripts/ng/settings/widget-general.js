@@ -19,69 +19,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Controllers
- * @name MbSettingACtrl
- * @description Manage Widget A 
+ * @ngdoc Settings
+ * @name WbSettingGeneralCtrl
+ * @description Manage Widget general attributes
  * 
  */
 .controller('WbSettingGeneralCtrl', function () {
-
-    var attributes= [
-        /*
-         * Access
-         */
-        //Specifies a unique id for an element
-        'id',  
-        // Specifies a shortcut key to activate/focus an element
-        'accesskey', 
-        // Specifies extra information about an element
-        'title',   
-        // Specifies a unique id for an element
-        'name',
-        //Specifies the tabbing order of an element
-        'tabindex',  
-
-
-        /*
-         * View
-         */
-        //Specifies one or more classnames for an element (refers to a class in a style sheet)
-        'class',  
-        //Specifies that an element is not yet, or is no longer, relevant
-        'hidden',  
-
-        /*
-         * Edit
-         */
-        //Specifies whether the content of an element is editable or not
-        'contenteditable', 
-        //Specifies whether an element is draggable or not
-        'draggable',   
-        // Specifies whether the dragged data is copied, moved, or linked, when dropped
-        'dropzone',
-
-        /*
-         * Local
-         */
-        //Specifies the text direction for the content in an element
-        'dir', 
-        //Specifies the language of the element's content
-        'lang',
-        //Specifies whether the element is to have its spelling and grammar checked or not
-        'spellcheck',   
-        //Specifies whether the content of an element should be translated or not
-        'translate',  
-        ];
-
+    'use strict';
     /*
      * Initial the setting editor
      */
     this.init = function () {
-        this.trackAttributes(attributes);
+        this.trackAttributes([
+            'id',  
+            'accesskey', 
+            'title',   
+            'name',
+            'tabindex',  
+            'class',  
+            'hidden',  
+            'contenteditable', 
+            'draggable',   
+            'dropzone',
+            'dir', 
+            'lang',
+            'spellcheck',   
+            'translate',  
+            ]);
     };
 });
