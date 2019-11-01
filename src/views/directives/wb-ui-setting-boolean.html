@@ -1,7 +1,13 @@
-<div
-	ng-cloak>
-	<md-switch 
+<field
+	layout="row"
+	layout-align="start center">
+	<field-description flex>
+		<label translate>{{::title}}</label>
+		<wb-icon size="1em">info</wb-icon>
+	</field-description>
+	<input 
+		aria-label="set {{::title}} true or false"
 		ng-model="value"
-		aria-label="boolean value"
-		translate>{{::title}}</md-switch>
-</div>
+		ng-change="valueChanged(value)"
+		type="checkbox">
+</field>

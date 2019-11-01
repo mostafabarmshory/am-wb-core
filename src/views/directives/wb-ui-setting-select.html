@@ -1,14 +1,17 @@
-<md-input-container 
-	class="md-icon-float md-icon-right md-block">
-	<label>{{::title}}</label>
-	<wb-icon
-		ng-click="ctrl.selectValue()">wb-object-video</wb-icon>
-	<input 
-		aria-label="video"
-		ng-model="value"
-        ng-model-options="{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}"
-		ng-change="ctrl.changeValue(value)"
-		type="text">
-	<wb-icon
-		ng-click="ctrl.clearValue()">close</wb-icon>
-</md-input-container>
+<field
+	layout="row"
+	layout-align="start center">
+	<field-description flex>
+		<label translate>{{::title}}</label>
+		<wb-icon size="1em">info</wb-icon>
+	</field-description>
+	<div
+		class="select"
+		layout="row">
+		<input 
+			aria-label="set {{::title}} true or false"
+			ng-model="value"
+			ng-change="valueChanged(value)"
+			type="text">
+	</div>
+</field>

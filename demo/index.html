@@ -41,8 +41,8 @@
         <link rel="stylesheet" href="styles/wb-icon.css">
         <link rel="stylesheet" href="styles/wb-text.css">
         <link rel="stylesheet" href="styles/wb-ui-choose.css">
-        <link rel="stylesheet" href="styles/wb-ui-setting-color.css">
         <link rel="stylesheet" href="styles/wb-ui-setting-image.css">
+        <link rel="stylesheet" href="styles/wb-ui-setting.css">
         <link rel="stylesheet" href="styles/wb-widget.css">
         <link rel="stylesheet" href="styles/wb-widgets-module.css">
         <link rel="stylesheet" href="styles/widget-text.css">
@@ -80,6 +80,34 @@
 				</md-select>
 			</div>
 		</md-toolbar>
+		<div
+			layout="column"
+			style="max-width: 150px; background: black; color: white; font-size: 10px;">
+			<wb-ui-setting-boolean
+				wb-title="Boolean setting"
+				wb-description="You can edit boolean valus">
+			</wb-ui-setting-boolean>
+			<wb-ui-setting-color
+				wb-title="Color picker"
+				wb-description="Select a color value">
+			</wb-ui-setting-color>
+			<wb-ui-setting-length
+				wb-title="Leng value"
+				wb-description="Select a length">
+			</wb-ui-setting-length>
+			<wb-ui-setting-number
+				wb-title="Number value"
+				wb-description="Sets a number value">
+			</wb-ui-setting-number>
+			<wb-ui-setting-select
+				wb-title="Select value"
+				wb-description="Select an item from list">
+			</wb-ui-setting-select>
+			<wb-ui-setting-text
+				wb-title="Text value"
+				wb-description="Text value to set from client">
+			</wb-ui-setting-text>
+		</div>
 		<div
 			layout="row"
 			flex>
@@ -180,12 +208,7 @@
         <script src="scripts/ng/directives/wb-on-load.js"></script>
         <script src="scripts/ng/directives/wb-setting-page.js"></script>
         <script src="scripts/ng/directives/wb-setting-panel-group.js"></script>
-        <script src="scripts/ng/directives/wb-ui-setting-boolean.js"></script>
-        <script src="scripts/ng/directives/wb-ui-setting-color.js"></script>
-        <script src="scripts/ng/directives/wb-ui-setting-length.js"></script>
-        <script src="scripts/ng/directives/wb-ui-setting-number.js"></script>
-        <script src="scripts/ng/directives/wb-ui-setting-select.js"></script>
-        <script src="scripts/ng/directives/wb-ui-setting-text.js"></script>
+        <script src="scripts/ng/directives/wb-ui-setting.js"></script>
         <script src="scripts/ng/directives/wb-widgets-explorer.js"></script>
         <script src="scripts/ng/directives/wb-widgets-list.js"></script>
         <script src="scripts/ng/directives/wb-widgets-module.js"></script>

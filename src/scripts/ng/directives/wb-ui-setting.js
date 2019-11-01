@@ -28,7 +28,7 @@
 function wbUiSettingLinkFunction($scope, $element, $attrs, ctrls) {
     var ngModel = ctrls[0];
 
-    $scope.wbActionClean = ! _.isUndefined($attrs['wbActionClean']);
+    $scope.wbActionClean = ! _.isUndefined($attrs.wbActionClean);
 
     ngModel.$render = function () {
         $scope.value = ngModel.$modelValue;
@@ -127,8 +127,8 @@ angular.module('am-wb-core')
         templateUrl: 'views/directives/wb-ui-setting-boolean.html',
         restrict: 'E',
         scope: {
-            title: '@title',
-            description: '@description',
+            title: '@wbTitle',
+            description: '@wbDescription',
         },
         require: ['ngModel'],
         link: wbUiSettingLinkFunction
@@ -145,8 +145,8 @@ angular.module('am-wb-core')
         templateUrl: 'views/directives/wb-ui-setting-text.html',
         restrict: 'E',
         scope: {
-            title: '@title',
-            description: '@description'
+            title: '@wbTitle',
+            description: '@wbDescription',
         },
         require: ['ngModel'],
         link: wbUiSettingLinkFunction
@@ -164,8 +164,8 @@ angular.module('am-wb-core')
         templateUrl: 'views/directives/wb-ui-setting-select.html',
         restrict: 'E',
         scope: {
-            title: '@title',
-            description: '@description'
+            title: '@wbTitle',
+            description: '@wbDescription',
         },
         require: ['ngModel'],
         link: wbUiSettingLinkFunction
@@ -184,9 +184,8 @@ angular.module('am-wb-core')
         templateUrl: 'views/directives/wb-ui-setting-number.html',
         restrict: 'E',
         scope: {
-            title: '@title',
-            icon: '@icon',
-            slider:'@slider'
+            title: '@wbTitle',
+            description: '@wbDescription',
         },
         require: ['ngModel'],
         link: wbUiSettingLinkFunction
@@ -204,10 +203,8 @@ angular.module('am-wb-core')
         restrict: 'E',
         replace: true,
         scope: {
-            title: '@title',
-            icon: '@?',
-            description: '@?',
-            extraValues: '<?'
+            title: '@wbTitle',
+            description: '@wbDescription',
         },
         require: ['ngModel'],
         link: wbUiSettingLinkFunction
@@ -225,8 +222,8 @@ angular.module('am-wb-core')
         templateUrl: 'views/directives/wb-ui-setting-color.html',
         restrict: 'E',
         scope: {
-            title: '@title',
-            icon: '@icon'
+            title: '@wbTitle',
+            description: '@wbDescription',
         },
         require: ['ngModel'],
         link: wbUiSettingLinkFunction

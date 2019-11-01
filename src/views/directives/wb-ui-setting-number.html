@@ -1,25 +1,17 @@
-<md-list-item ng-show="slider==undefined">
-    <wb-icon ng-hide="icon==undefined || icon==null || icon==''">{{icon}}</wb-icon>
-    <p ng-hide="title==undefined || title==null  || title==''">{{title}}</p>
-    <md-input-container
-        style="margin: 0px">
-        <input
-        	aria-label="number value"
-            style="width: 50px"
-            type="number"
-            ng-model="value"
-            ng-change="valueChanged(value)"
-            flex>
-    </md-input-container>
-</md-list-item>
-<md-list-item ng-show="slider!=undefined">
-    <wb-icon ng-hide="icon==undefined || icon==null || icon=='' || icon=='wb-blank'">{{icon}}</wb-icon>
-    <div ng-show="icon=='wb-blank'" style="display: inline-block; width: 32px; opacity: 0.0"></div>
-    <p ng-hide="title==undefined || title==null || title==''">{{title}}</p>
-    <md-slider
-        min="0"
-        max="100"
-        ng-model="value"
-        ng-change="valueChanged(value)"
-        flex></md-slider>
-</md-list-item>
+<field
+	layout="row"
+	layout-align="start center">
+	<field-description flex>
+		<label translate>{{::title}}</label>
+		<wb-icon size="1em">info</wb-icon>
+	</field-description>
+	<div
+		class="number"
+		layout="row">
+		<input 
+			aria-label="set {{::title}} true or false"
+			ng-model="value"
+			ng-change="valueChanged(value)"
+			type="text">
+	</div>
+</field>

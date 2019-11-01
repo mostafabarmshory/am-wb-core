@@ -1,7 +1,17 @@
-<md-input-container>
-	<input
-		aria-label="text value"
-		type="text"
-		ng-model="value"
-		ng-change="valueChanged(value)">
-</md-input-container>
+<field
+	layout="row"
+	layout-align="start center">
+	<field-description flex>
+		<label translate>{{::title}}</label>
+		<wb-icon size="1em">info</wb-icon>
+	</field-description>
+	<div
+		class="text"
+		layout="row">
+		<input 
+			aria-label="set {{::title}} true or false"
+			ng-model="value"
+			ng-change="valueChanged(value)"
+			type="text">
+	</div>
+</field>

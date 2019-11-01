@@ -1,11 +1,17 @@
-<md-list-item>
-    <wb-icon 
-    	ng-show="icon">{{icon}}</wb-icon>
-    <p 
-    	ng-show="title">{{title}}</p>
-    <md-switch 
-    	class="md-secondary" 
-    	ng-model="value"
-    	ng-change="valueChanged(value)">
-    </md-switch>
-</md-list-item>
+<field
+	layout="row"
+	layout-align="start center">
+	<field-description flex>
+		<label translate>{{::title}}</label>
+		<wb-icon size="1em">info</wb-icon>
+	</field-description>
+	<div
+		class="length"
+		layout="row">
+		<input 
+			aria-label="set {{::title}} true or false"
+			ng-model="value"
+			ng-change="valueChanged(value)"
+			type="text">
+	</div>
+</field>
