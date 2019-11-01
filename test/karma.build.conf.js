@@ -59,7 +59,8 @@ module.exports = function(config) {
 			// endbower
 			'dist/**/*.min.js',
 			'test/mock/**/*.js',
-			'test/spec/**/*.js'
+			'test/spec/**/*.js',
+			'.tmp/templateCache.js'
 		],
 
 		// coverage reporter generates the coverage

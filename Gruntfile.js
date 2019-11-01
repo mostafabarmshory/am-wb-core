@@ -689,6 +689,7 @@ module.exports = function(grunt) {
         'injector', //
         'concurrent:test', //
         'postcss:server', //
+        'ngtemplates', //
         'karma:unit' //
         ]);
 
@@ -698,6 +699,7 @@ module.exports = function(grunt) {
         'injector', //
         'concurrent:server', //
         'postcss', //
+        'ngtemplates', //
         'karma:debug' //
         ]);
 

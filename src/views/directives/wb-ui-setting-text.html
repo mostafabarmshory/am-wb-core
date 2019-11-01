@@ -1,13 +1,7 @@
-<md-list-item>
-    <wb-icon ng-hide="icon==undefined || icon==null || icon==''">{{icon}}</wb-icon>
-    <p ng-hide="title==undefined || title==null  || title==''">{{title}}</p>
-    <md-input-container
-            style="margin: 0px">
-        <input
-        	aria-label="value"
-            style="width: 200px"
-            type="text"
-            ng-model="value"
-            flex>
-    </md-input-container>
-</md-list-item>
+<md-input-container>
+	<input
+		aria-label="text value"
+		type="text"
+		ng-model="value"
+		ng-change="valueChanged(value)">
+</md-input-container>

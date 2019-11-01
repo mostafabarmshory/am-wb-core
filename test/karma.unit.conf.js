@@ -55,7 +55,8 @@ module.exports = function(config) {
 			'src/libs/*.js',
 			'src/scripts/**/*.js',
 			'test/mock/**/*.js',
-			'test/spec/**/*.js'
+			'test/spec/**/*.js',
+            '.tmp/templateCache.js'
 		],
 		
 		// optionally, configure the reporter

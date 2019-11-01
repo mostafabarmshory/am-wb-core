@@ -1,15 +1,7 @@
-<md-list-item>
-    <md-button 
-    	class="md-icon-button" 
-    	aria-label="Edit" 
-    	ng-click="ctrl.editValue(value)">
-		<wb-icon>wb-object-audio</wb-icon>
-    </md-button>
-	<md-input-container>
-		<input
-			aria-label="field value"
-			type="text"
-			ng-model="value"
-			ng-change="ctrl.updateValue(value)">
-	</md-input-container>
-</md-list-item>
+<div
+	ng-cloak>
+	<md-switch 
+		ng-model="value"
+		aria-label="boolean value"
+		translate>{{::title}}</md-switch>
+</div>
