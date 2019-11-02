@@ -34,17 +34,16 @@ function wbUiSettingLinkFunction($scope, $element, $attrs, ctrls) {
         $scope.value = ngModel.$modelValue;
     };
 
-    $scope.$watch('value', function(newValue){
-        ngModel.$setViewValue(newValue);
-    });
+    $scope.cleanValue = function () {
+        setValue(undefined);
+    };
+    
+    $scope.setValue = setValue;
 
-    scope.valueChanged = function (value) {
+    function setValue(value){
+        // TODO: validate and set
         ngModel.$setViewValue(value);
-    };
-
-    scope.cleanValue = function () {
-        ngModel.$setViewValue(undefined);
-    };
+    }
 }
 
 /*
@@ -53,7 +52,7 @@ function wbUiSettingLinkFunction($scope, $element, $attrs, ctrls) {
 function wbUiSettingNumberLinkFunction($scope, $element, $attrs, ctrls) {
     wbUiSettingLinkFunction($scope, $element, $attrs, ctrls);
     var ngModel = ctrls[0];
-    
+
     ngModel.$render = function () {
         pars(ngModel.$modelValue);
     };
@@ -126,6 +125,7 @@ angular.module('am-wb-core')
     return {
         templateUrl: 'views/directives/wb-ui-setting-boolean.html',
         restrict: 'E',
+        replace: true,
         scope: {
             title: '@wbTitle',
             description: '@wbDescription',
@@ -217,7 +217,7 @@ angular.module('am-wb-core')
  * @description a setting section to set color.
  *
  */
-.directive('wbUiSettingColor', function ($mdTheming){
+.directive('wbUiSettingColor', function (){
     return {
         templateUrl: 'views/directives/wb-ui-setting-color.html',
         restrict: 'E',
@@ -226,7 +226,17 @@ angular.module('am-wb-core')
             description: '@wbDescription',
         },
         require: ['ngModel'],
-        link: wbUiSettingLinkFunction
+        link: wbUiSettingLinkFunction,
+        /*
+         * @ngInject
+         */
+        controller: function($scope, $element) {
+            var preview = $element.find('.preview');
+            $scope.$watch('value', function(color){
+                preview.css({background: color});
+            });
+        },
+        controllerAs: 'ctrl'
     };
 });
 

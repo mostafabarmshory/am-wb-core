@@ -10,9 +10,9 @@
 		class="color"
 		layout="row">
 		<input 
-			aria-label="color of {{::title}}"
 			ng-model="value"
-			ng-change="valueChanged(value)"
+			ng-change="setValue(value)"
+			aria-label="color of {{::title}}"
 			type="text"
 			flex>
 		<div

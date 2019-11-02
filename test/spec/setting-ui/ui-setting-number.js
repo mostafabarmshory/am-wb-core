@@ -78,5 +78,10 @@ describe('wb-ui-setting-number directive ', function () {
     fit('should applied template', function () {
         expect(directiveElem.html()).not.toEqual('');
     });
+    fit('should have md-switch element', function () {
+        var inputElement = directiveElem.find('input');
+        expect(inputElement).toBeDefined();
+    });
+
 
 });

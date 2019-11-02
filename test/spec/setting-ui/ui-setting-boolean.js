@@ -53,12 +53,9 @@ describe('wb-ui-setting-ui directive ', function () {
             scope = $rootScope.$new();
             scope.title = 'title';
             scope.description = 'description';
-
-            // spay events
-            scope.onChange = jasmine.createSpy('onChange');
+            scope.value = 'true';
+            directiveElem = getCompiledElement();
         });
-
-        directiveElem = getCompiledElement();
     });
 
 
@@ -66,9 +63,10 @@ describe('wb-ui-setting-ui directive ', function () {
         var element = angular.element('<wb-ui-setting-boolean '+
                 'wb-title="{{title}}" '+
                 'wb-description="{{description}}" '+
+                'ng-value="value"' + 
         '></wb-ui-setting-boolean>');
         var compiledElement = $compile(element)(scope);
-        scope.$digest();
+        $rootScope.$digest();
         return compiledElement;
     }
 
@@ -80,15 +78,7 @@ describe('wb-ui-setting-ui directive ', function () {
     });
 
     fit('should have md-switch element', function () {
-        var spanElement = directiveElem.find('md-switch');
-        expect(spanElement).toBeDefined();
+        var inputElement = directiveElem.find('input');
+        expect(inputElement).toBeDefined();
     });
-
-//    it('config on isolated scope should be two-way bound', function(){
-//        var isolatedScope = directiveElem.isolateScope();
-//
-//        isolatedScope.value = "value-xxx";
-//
-//        expect(scope.value).toEqual('value-xx');
-//    });
 });
