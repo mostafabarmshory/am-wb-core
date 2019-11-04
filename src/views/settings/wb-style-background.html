@@ -1,59 +1,68 @@
-<!--
-background setting page
-
-a panel for background settings and opacity of a widget. these css-attributes are affected:
-
-- color
-- image
-- size
-- repeat
-- attachment
-- origin
-
-@author mgh.
-@author maso(mostafa.barmshory@dpq.co.ir)
-@author Ali Abdolahi
-@author Masood Zareh
--->
-<!-- background -->
-<wb-ui-setting-image
-    title="Background image" 
-    wb-ui-setting-clear-button="true"
-    wb-ui-setting-preview="true"
-    ng-model="ctrl.image"
-    ng-change="ctrl.setStyleBackground('image', ctrl.image)">
-</wb-ui-setting-image>
-
-<wb-ui-setting-color 
-    title="Background Color" 
-    wb-ui-setting-clear-button="true"
-    wb-ui-setting-preview="true"
-    ng-model="ctrl.color"
-    ng-change="ctrl.setStyleBackground('color', ctrl.color)">
-</wb-ui-setting-color>
-
-<wb-ui-setting-background-size
-    ng-model="ctrl.size"
-    ng-change="ctrl.setStyleBackground('size', ctrl.size)">
-</wb-ui-setting-background-size>
-
-<wb-ui-setting-background-repeat
-    ng-model="ctrl.repeat"
-    ng-change="ctrl.setStyleBackground('repeat', ctrl.repeat)">
-</wb-ui-setting-background-repeat>
-
-<wb-ui-setting-background-attachment
-    ng-model="ctrl.attachment"
-    ng-change="ctrl.setStyleBackground('attachment', ctrl.attachment)">
-</wb-ui-setting-background-attachment>
-
-<wb-ui-setting-background-origin
-    ng-model="ctrl.origin"
-    ng-change="ctrl.setStyleBackground('origin', ctrl.origin)">
-</wb-ui-setting-background-origin>
-
-<wb-ui-setting-background-position
-    ng-model="ctrl.position"
-    ng-change="ctrl.setStyleBackground('position', ctrl.position)">
-</wb-ui-setting-background-position>
+<fieldset
+	layout="column">
+	<legend translate>Background</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.background"
+		ng-model-change="ctrl.setStyle('style.background', ctrl.style.background)"
+		wb-title="Background"
+		wb-description=""
+		wb-action-clean>
+	</wb-ui-setting-text>
+	<wb-ui-setting-color
+		ng-model="ctrl.style.backgroundColor"
+		ng-model-change="ctrl.setStyle('style.backgroundColor', ctrl.style.backgroundColor)"
+		wb-title="Color"
+		wb-description=""
+		wb-action-clean>
+	</wb-ui-setting-color>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.backgroundImage"
+		ng-model-change="ctrl.setStyle('style.backgroundImage', ctrl.style.backgroundImage)"
+		wb-title="Image"
+		wb-description=""
+		wb-action-clean>
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.backgroundPosition"
+		ng-model-change="ctrl.setStyle('style.backgroundPosition', ctrl.style.backgroundPosition)"
+		wb-title="Position"
+		wb-description=""
+		wb-action-clean>
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.backgroundSize"
+		ng-model-change="ctrl.setStyle('style.backgroundSize', ctrl.style.backgroundSize)"
+		wb-title="Size"
+		wb-description=""
+		wb-action-clean>
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.backgroundRepeat"
+		ng-model-change="ctrl.setStyle('style.backgroundRepeat', ctrl.style.backgroundRepeat)"
+		wb-title="Repeat"
+		wb-description=""
+		wb-action-clean>
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.backgroundOrigin"
+		ng-model-change="ctrl.setStyle('style.backgroundOrigin', ctrl.style.backgroundOrigin)"
+		wb-title="Origin"
+		wb-description=""
+		wb-action-clean>
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.backgroundClip"
+		ng-model-change="ctrl.setStyle('style.backgroundClip', ctrl.style.backgroundClip)"
+		wb-title="Clip"
+		wb-description=""
+		wb-action-clean>
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.backgroundAttachment"
+		ng-model-change="ctrl.setStyle('style.backgroundAttachment', ctrl.style.backgroundAttachment)"
+		wb-title="Attachment"
+		wb-description=""
+		wb-action-clean>
+	</wb-ui-setting-text>
+</fieldset>
 

@@ -1,136 +1,296 @@
-<!--
-border setting page
-
-a panel for setting a border for a widget. for each left/right/top/bottom properties. these css-attributes are affected:
-- border-style
-- border-width
-- border-color
-- border-radius
-
-Created by masood.
-@author masood(masoodzarei64@gmail.com)
-
-@version 2.x All settings are rewrite based on new data model of the border
--->
-<!--STYLE AND COLOR SECTION-->
 <fieldset
 	layout="column">
-    <legend translate>Style and Color</legend>
-	<!--STYLE SECTION-->
-	<md-input-container class="md-block">
-	    <label translate>Style</label>
-	    <md-select 
-	    	aria-label="style"
-	        ng-model="ctrl.style"
-	        ng-change="ctrl.setStyleBorder('style', ctrl.style)">
-	        <md-option 
-	        	ng-repeat="style in ::ctrl.styles" 
-	        	value="{{::style.value}}"> 
-	            <span translate>{{::style.title}}</span>
-	        </md-option>
-	    </md-select>
-	</md-input-container>
-	<!--COLOR SECTION-->
-	<wb-ui-setting-color 
-	    title="Color" 
-	    wb-ui-setting-clear-button="true"
-	    wb-ui-setting-preview="true"
-	    wb-ui-setting-icon="format_color_fill"
-	    ng-model="ctrl.color"
-	    ng-change="ctrl.setStyleBorder('color', ctrl.color)">
+	<legend translate>Border</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.border"
+		ng-model-change="ctrl.setStyle('style.border', ctrl.style.border)"
+		wb-title="Boarder"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderWidth"
+		ng-model-change="ctrl.setStyle('style.borderWidth', ctrl.style.borderWidth)"
+		wb-title="Width"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderStyle"
+		ng-model-change="ctrl.setStyle('style.borderStyle', ctrl.style.borderStyle)"
+		wb-title="Style"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderColor"
+		ng-model-change="ctrl.setStyle('style.borderColor', ctrl.style.borderColor)"
+		wb-title="Color"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderCollapse"
+		ng-model-change="ctrl.setStyle('style.borderCollapse', ctrl.style.borderCollapse)"
+		wb-title="Collapse"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderSpacing"
+		ng-model-change="ctrl.setStyle('style.borderSpacing', ctrl.style.borderSpacing)"
+		wb-title="Spacing"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Top</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderTop"
+		ng-model-change="ctrl.setStyle('style.borderTop', ctrl.style.borderTop)"
+		wb-title="Top"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderTopWidth"
+		ng-model-change="ctrl.setStyle('style.borderTopWidth', ctrl.style.borderTopWidth)"
+		wb-title="Width"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderTopStyle"
+		ng-model-change="ctrl.setStyle('style.borderTopStyle', ctrl.style.borderTopStyle)"
+		wb-title="Style"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderTopColor"
+		ng-model-change="ctrl.setStyle('style.borderTopColor', ctrl.style.borderTopColor)"
+		wb-title="Color"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Right</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderRight"
+		ng-model-change="ctrl.setStyle('style.borderRight', ctrl.style.borderRight)"
+		wb-title="Right"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderRightWidth"
+		ng-model-change="ctrl.setStyle('style.borderRightWidth', ctrl.style.borderRightWidth)"
+		wb-title="Width"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderRightStyle"
+		ng-model-change="ctrl.setStyle('style.borderRightStyle', ctrl.style.borderRightStyle)"
+		wb-title="Style"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderRightColor"
+		ng-model-change="ctrl.setStyle('style.borderRightColor', ctrl.style.borderRightColor)"
+		wb-title="Color"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Bottom</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderBttom"
+		ng-model-change="ctrl.setStyle('style.borderBttom', ctrl.style.borderBttom)"
+		wb-title="Bttom"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderBttomWidth"
+		ng-model-change="ctrl.setStyle('style.borderBttomWidth', ctrl.style.borderBttomWidth)"
+		wb-title="Width"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderBttomStyle"
+		ng-model-change="ctrl.setStyle('style.borderBttomStyle', ctrl.style.borderBttomStyle)"
+		wb-title="Style"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderBttomColor"
+		ng-model-change="ctrl.setStyle('style.borderBttomColor', ctrl.style.borderBttomColor)"
+		wb-title="Color"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Left</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderLeft"
+		ng-model-change="ctrl.setStyle('style.borderLeft', ctrl.style.borderLeft)"
+		wb-title="Left"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderLeftWidth"
+		ng-model-change="ctrl.setStyle('style.borderLeftWidth', ctrl.style.borderLeftWidth)"
+		wb-title="Width"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderLeftStyle"
+		ng-model-change="ctrl.setStyle('style.borderLeftStyle', ctrl.style.borderLeftStyle)"
+		wb-title="Style"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderLeftColor"
+		ng-model-change="ctrl.setStyle('style.borderLeftColor', ctrl.style.borderLeftColor)"
+		wb-title="Color"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Radius</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderRadius"
+		ng-model-change="ctrl.setStyle('style.borderRadius', ctrl.style.borderRadius)"
+		wb-title="Radius"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderTopRightRadius"
+		ng-model-change="ctrl.setStyle('style.borderTopRightRadius', ctrl.style.borderTopRightRadius)"
+		wb-title="Top Right"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderTopLeftRadius"
+		ng-model-change="ctrl.setStyle('style.borderTopLeftRadius', ctrl.style.borderTopLeftRadius)"
+		wb-title="Top Left"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderBottomLeftRadius"
+		ng-model-change="ctrl.setStyle('style.borderBottomLeftRadius', ctrl.style.borderBottomLeftRadius)"
+		wb-title="Bottom Left"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderBottomRightRadius"
+		ng-model-change="ctrl.setStyle('style.borderBottomRightRadius', ctrl.style.borderBottomRightRadius)"
+		wb-title="Bottom Right"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Image</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderImage"
+		ng-model-change="ctrl.setStyle('style.borderImage', ctrl.style.borderImage)"
+		wb-title="Image"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderImageSource"
+		ng-model-change="ctrl.setStyle('style.borderImageSource', ctrl.style.borderImageSource)"
+		wb-title="Source"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderImageSlice"
+		ng-model-change="ctrl.setStyle('style.borderImageSlice', ctrl.style.borderImageSlice)"
+		wb-title="Slice"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderImageWidth"
+		ng-model-change="ctrl.setStyle('style.borderImageWidth', ctrl.style.borderImageWidth)"
+		wb-title="Width"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderImageOutset"
+		ng-model-change="ctrl.setStyle('style.borderImageOutset', ctrl.style.borderImageOutset)"
+		wb-title="Outset"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.borderImageRepeat"
+		ng-model-change="ctrl.setStyle('style.borderImageRepeat', ctrl.style.borderImageRepeat)"
+		wb-title="Repeat"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Outline</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.outline"
+		ng-model-change="ctrl.setStyle('style.outline', ctrl.style.outline)"
+		wb-title="Outline"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.outlineOffset"
+		ng-model-change="ctrl.setStyle('style.outlineOffset', ctrl.style.outlineOffset)"
+		wb-title="Offset"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.outlineWidth"
+		ng-model-change="ctrl.setStyle('style.outlineWidth', ctrl.style.outlineWidth)"
+		wb-title="Width"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.outlineStyle"
+		ng-model-change="ctrl.setStyle('style.outlineStyle', ctrl.style.outlineStyle)"
+		wb-title="Style"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-color
+		ng-model="ctrl.style.outlineColor"
+		ng-model-change="ctrl.setStyle('style.outlineColor', ctrl.style.outlineColor)"
+		wb-title="Color"
+		wb-description="">
 	</wb-ui-setting-color>
 </fieldset>
 
-<!--WIDTH SECTION-->
 <fieldset
 	layout="column">
-    <legend translate>Width</legend>
-	<wb-ui-setting-length
-	    title="All"
-	    icon="border_all"
-	    description="Set all sides width"
-	    ng-model="ctrl.widthAll"
-	    ng-change="ctrl.widthAllChanged(ctrl.widthAll)"
-	    extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
-	</wb-ui-setting-length>
-	
-	<md-divider></md-divider>
-	
-	<wb-ui-setting-length
-	    title="Top"
-	    icon="border_top"
-	    ng-model="ctrl.width.top"
-	    ng-change="ctrl.widthChanged()"
-	    extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
-	</wb-ui-setting-length>
-	<wb-ui-setting-length
-	    title="Right"
-	    icon="border_right"
-	    ng-model="ctrl.width.right"
-	    ng-change="ctrl.widthChanged()"
-	    extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
-	</wb-ui-setting-length>
-	<wb-ui-setting-length
-	    title="Bottom"
-	    icon="border_bottom"
-	    ng-model="ctrl.width.bottom"
-	    ng-change="ctrl.widthChanged()"
-	    extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
-	</wb-ui-setting-length>
-	<wb-ui-setting-length
-	    title="Left"
-	    icon="border_left"
-	    ng-model="ctrl.width.left"
-	    ng-change="ctrl.widthChanged()"
-	    extra-values="['medium', 'thin', 'thick', 'length', 'initial', 'inherit']">
-	</wb-ui-setting-length>
+	<legend translate>Box</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.boxDecorationBreak"
+		ng-model-change="ctrl.setStyle('style.boxDecorationBreak', ctrl.style.boxDecorationBreak)"
+		wb-title="Decoration Break"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.boxShadow"
+		ng-model-change="ctrl.setStyle('style.boxShadow', ctrl.style.boxShadow)"
+		wb-title="Shadow"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.boSizing"
+		ng-model-change="ctrl.setStyle('style.boxSizing', ctrl.style.boxSizing)"
+		wb-title="Sizing"
+		wb-description="">
+	</wb-ui-setting-text>
 </fieldset>
 
 
-<!--RADIUS SECTION-->
-<fieldset
-	layout="column">
-    <legend translate>Radius</legend>
-	<wb-ui-setting-length
-	    title="All"
-	    icon="full_rounded"
-	    description="Set all sides radius"
-	    ng-model="ctrl.radiusAll"
-	    ng-change="ctrl.radiusAllChanged(ctrl.radiusAll)"
-	    extra-values="['length', 'initial', 'inherit']">
-	</wb-ui-setting-length>
-	
-	<md-divider></md-divider>
-	
-	<wb-ui-setting-length
-	    title="Top left"
-	    icon="corner_top_left"
-	    ng-model="ctrl.radius.topLeft"
-	    ng-change="ctrl.radiusChanged()"
-	    extra-values="['length', 'initial', 'inherit']">
-	</wb-ui-setting-length>
-	<wb-ui-setting-length
-	    title="Top right"
-	    icon="corner_top_right"
-	    ng-model="ctrl.radius.topRight"
-	    ng-change="ctrl.radiusChanged()"
-	    extra-values="['length', 'initial', 'inherit']">
-	</wb-ui-setting-length>
-	<wb-ui-setting-length
-	    title="Bottom right"
-	    icon="corner_bottom_right"
-	    ng-model="ctrl.radius.bottomRight"
-	    ng-change="ctrl.radiusChanged()"
-	    extra-values="['length', 'initial', 'inherit']">
-	</wb-ui-setting-length>
-	<wb-ui-setting-length
-	    title="Bottom left"
-	    icon="corner_bottom_left"
-	    ng-model="ctrl.radius.bottomLeft"
-	    ng-change="ctrl.radiusChanged()"
-	    extra-values="['length', 'initial', 'inherit']">
-	</wb-ui-setting-length>
-</fieldset>
+
 
 
 
