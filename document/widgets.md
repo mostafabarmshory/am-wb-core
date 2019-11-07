@@ -23,8 +23,6 @@ If the state of the widget is going to change then a event of stateChanged will 
 - hanging-punctuation
 - table-layout
 
-
-
 ### Animation
 
 - animation
@@ -114,37 +112,47 @@ If the state of the widget is going to change then a event of stateChanged will 
 
 ### layout
 
-
-layout
-
 - display
-- position
 - order
 - z-index
 - clear
+- float
 
+#### Position
+
+- position
 - bottom
 - left
 - right
 - top
+ 
+#### overflow
 
-#### float layout
+- overflow
+- overflow-x
+- overflow-y
+- scroll-behavior
+ 
+#### Print
 
-- float
+- page-break-after
+- page-break-before
+- page-break-inside
+ 
 
 #### Flex
 
-align-content
-align-items
-align-self
-justify-content
-flex
-flex-basis
-flex-direction
-flex-grow
-flex-shrink
-flex-basis
-flex-wrap
+- align-content
+- align-items
+- align-self
+- justify-content
+- flex
+- flex-basis
+- flex-direction
+- flex-grow
+- flex-shrink
+- flex-basis
+- flex-wrap
 
 
 #### grid
@@ -168,21 +176,8 @@ flex-wrap
 - grid-template-columns
 - grid-template-rows
 
-#### overflow
 
-- overflow
-- overflow-x
-- overflow-y
-- scroll-behavior
-
-####
-
-- page-break-after
-- page-break-before
-- page-break-inside
-
-
-## column view
+#### column view
 
 - columns
 - column-width
@@ -194,6 +189,7 @@ flex-wrap
 - column-rule-color
 - column-rule-style
 - column-rule-width
+
 
 
 ### Size
@@ -217,18 +213,14 @@ flex-wrap
  - width
  - max-width
  - min-width
-/
-
+ 
 ### multimedia
 
- img, video
- 
  - clip
  - clip-path
  - filter
  - object-fit
  - object-position
-
 
 ### General?
 

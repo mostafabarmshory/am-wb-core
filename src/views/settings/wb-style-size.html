@@ -1,105 +1,115 @@
-<!-- Margin and Padding setting -->
-
 <fieldset
+	layout="column">
+	<legend translate>Size</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.resize"
+		ng-model-change="ctrl.setStyle('style.resize', ctrl.style.resize)"
+		wb-title="resize"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.height"
+		ng-model-change="ctrl.setStyle('style.height', ctrl.style.height)"
+		wb-title="height"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.maxHeight"
+		ng-model-change="ctrl.setStyle('style.maxHeight', ctrl.style.maxHeight)"
+		wb-title="maxHeight"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.minHeight"
+		ng-model-change="ctrl.setStyle('style.minHeight', ctrl.style.minHeight)"
+		wb-title="minHeight"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.width"
+		ng-model-change="ctrl.setStyle('style.width', ctrl.style.width)"
+		wb-title="width"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.maxWidth"
+		ng-model-change="ctrl.setStyle('style.maxWidth', ctrl.style.maxWidth)"
+		wb-title="maxWidth"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.minWidth"
+		ng-model-change="ctrl.setStyle('style.minWidth', ctrl.style.minWidth)"
+		wb-title="minWidth"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+ <fieldset
 	layout="column">
 	<legend translate>Margin</legend>
-
-	<!--All equal-->
-	<wb-ui-setting-length
-	    title="All"
-	    icon="select_all"
-	    description="Set all margins"
-	    ng-model="ctrl.marginAll"
-	    ng-change="ctrl.updateAllMargin(ctrl.marginAll)"
-	    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
-	</wb-ui-setting-length>
-	<md-divider></md-divider>
-	<!--top left-->
-	<wb-ui-setting-length
-	    title="Top"
-	    icon="border_top"
-	    ng-model="ctrl.margin.top"
-	    ng-change="ctrl.updateMargin(ctrl.margin)"
-	    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
-	</wb-ui-setting-length>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.margin"
+		ng-model-change="ctrl.setStyle('style.margin', ctrl.style.margin)"
+		wb-title="margin"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.marginTop"
+		ng-model-change="ctrl.setStyle('style.marginTop', ctrl.style.marginTop)"
+		wb-title="Margin Top"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.marginRight"
+		ng-model-change="ctrl.setStyle('style.marginRight', ctrl.style.marginRight)"
+		wb-title="margin Right"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.marginBottom"
+		ng-model-change="ctrl.setStyle('style.marginBottom', ctrl.style.marginBottom)"
+		wb-title="margin Bottom"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.marginLeft"
+		ng-model-change="ctrl.setStyle('style.marginLeft', ctrl.style.marginLeft)"
+		wb-title="margin left"
+		wb-description="">
+	</wb-ui-setting-text>
 	
-	<!--top right-->
-	<wb-ui-setting-length
-	    title="Right"
-	    icon="border_right"
-	    ng-model="ctrl.margin.right"
-	    ng-change="ctrl.updateMargin(ctrl.margin)"
-	    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
-	</wb-ui-setting-length>
-	
-	<!--bottom right-->
-	<wb-ui-setting-length
-	    title="Bottom"
-	    icon="border_bottom"
-	    ng-model="ctrl.margin.bottom"
-	    ng-change="ctrl.updateMargin(ctrl.margin)"
-	    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
-	</wb-ui-setting-length>
-	
-	<!--bottom left-->
-	<wb-ui-setting-length
-	    title="Left"
-	    icon="border_left"
-	    ng-model="ctrl.margin.left"
-	    ng-change="ctrl.updateMargin(ctrl.margin)"
-	    extra-values = "['length' , 'auto' , 'initial', 'inherit']">
-	</wb-ui-setting-length>
 </fieldset>
-
-
-<fieldset
+ <fieldset
 	layout="column">
 	<legend translate>Padding</legend>
-	
-	<!--All equal-->
-	<wb-ui-setting-length
-	    title="All"
-	    icon="select_all"
-	    description="Set all paddings"
-	    ng-model="ctrl.paddingAll"
-	    ng-change="ctrl.updateAllPadding(ctrl.paddingAll)"
-	    extra-values = "['inherit']">
-	</wb-ui-setting-length>
-	
-	<!--top left-->
-	<wb-ui-setting-length
-	    title="Top"
-	    icon="border_top"
-	    ng-model="ctrl.padding.top"
-	    ng-change="ctrl.updatePadding(ctrl.padding)"
-	    extra-values = "['inherit']">
-	</wb-ui-setting-length>
-	
-	<!--top right-->
-	<wb-ui-setting-length
-	    title="Right"
-	    icon="border_right"
-	    ng-model="ctrl.padding.right"
-	    ng-change="ctrl.updatePadding(ctrl.padding)"
-	    extra-values = "['inherit']">
-	</wb-ui-setting-length>
-	
-	<!--bottom right-->
-	<wb-ui-setting-length
-	    title="Bottom"
-	    icon="border_bottom"
-	    ng-model="ctrl.padding.bottom"
-	    ng-change="ctrl.updatePadding(ctrl.padding)"
-	    extra-values = "['inherit']">
-	</wb-ui-setting-length>
-	
-	<!--bottom left-->
-	<wb-ui-setting-length
-	    title="Left"
-	    icon="border_left"
-	    ng-model="ctrl.padding.left"
-	    ng-change="ctrl.updatePadding(ctrl.padding)"
-	    extra-values = "['inherit']">
-	</wb-ui-setting-length>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.padding"
+		ng-model-change="ctrl.setStyle('style.padding', ctrl.style.padding)"
+		wb-title="padding"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.paddingTop"
+		ng-model-change="ctrl.setStyle('style.paddingTop', ctrl.style.paddingTop)"
+		wb-title="padding Top"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.paddingRight"
+		ng-model-change="ctrl.setStyle('style.paddingRight', ctrl.style.paddingRight)"
+		wb-title="padding Right"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.paddingBottom"
+		ng-model-change="ctrl.setStyle('style.paddingBottom', ctrl.style.paddingBottom)"
+		wb-title="padding Bottom"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.paddingLeft"
+		ng-model-change="ctrl.setStyle('style.paddingLeft', ctrl.style.paddingLeft)"
+		wb-title="padding left"
+		wb-description="">
+	</wb-ui-setting-text>
 </fieldset>
-
