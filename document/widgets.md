@@ -243,6 +243,7 @@ If the state of the widget is going to change then a event of stateChanged will 
 ### Text
 
 #### writing
+
 hyphens
 letter-spacing
 line-height
@@ -271,7 +272,6 @@ text-transform
 
 #### Local
 
-@charset
 direction
 unicode-bidi
 
