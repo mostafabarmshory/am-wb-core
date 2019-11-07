@@ -33,13 +33,19 @@ angular.module('am-wb-core')//
     
     function loadStyle(widget, keys) {
         var element = widget.getElement();
+        
+        var computedStyle = {};
+        var style = widget.getModelProperty('style') || {};
+        var runtimeModel = widget.getRuntimeModel() || {};
         if(!keys){
             element.attr('style', '');
+            computedStyle = angular.merge({}, style, runtimeModel.style);
+        } else {
+            _.forEach(keys, function(key){
+                computedStyle[key] = runtimeModel.style[key] || style[key] || '';
+            });
         }
-        var model = widget.getModel() || {};
-        var runtimeModel = widget.getRuntimeModel() || {};
-        var computedStyle = angular.merge({}, model.style, runtimeModel.style);
-        widget.getElement().css(computedStyle);
+        element.css(computedStyle);
     }
 
     function Processor(){
@@ -54,11 +60,13 @@ angular.module('am-wb-core')//
             var keys = [];
             var evKeys = event.keys || [event.key];
             for(var i = 0; i < evKeys.length; i++){
-                if(evKeys[i].startsWith('style')){
-                    keys.push(evKeys[i]);
+                if(evKeys[i].startsWith('style.')){
+                    keys.push(evKeys[i].substring(6));
                 }
             }
-            loadStyle(widget, keys);
+            if(!_.isEmpty(keys)){
+                loadStyle(widget, keys);
+            }
         }
     }
     return Processor;

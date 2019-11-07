@@ -75,10 +75,10 @@ describe('wb-ui-setting-select directive ', function () {
     /**************************************************************************************
      *  Providers
      **************************************************************************************/
-    fit('should applied template', function () {
+    it('should applied template', function () {
         expect(directiveElem.html()).not.toEqual('');
     });
-    fit('should have md-switch element', function () {
+    it('should have md-switch element', function () {
         var inputElement = directiveElem.find('input');
         expect(inputElement).toBeDefined();
     });

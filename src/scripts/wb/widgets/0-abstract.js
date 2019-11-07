@@ -112,8 +112,8 @@ angular.module('am-wb-core')//
              * NOTE: We must manage D&D internally to mange user D&D codes
              * TODO: maso, 2019: move dnd into a processor
              */
-              'draggable',
-              'dropzone',
+            'draggable',
+            'dropzone',
             ];
         this.$element = $element;
         this.$parent = $parent;
@@ -141,7 +141,10 @@ angular.module('am-wb-core')//
         this.computedStyle = {};
 
         // models
-        this.runtimeModel = {};
+        this.runtimeModel =  {
+                style:{},
+                on: {},
+        };
         this.model = {};
         // event listeners
         var ctrl = this;
@@ -187,7 +190,7 @@ angular.module('am-wb-core')//
                 load: function ($event) {
                     ctrl.fire('load', $event);
                 },
-                
+
                 // DND
                 dragstart: function ($event) {
                     ctrl.fire('dragstart', $event);
@@ -207,7 +210,7 @@ angular.module('am-wb-core')//
                 drop: function ($event) {
                     ctrl.fire('drop', $event);
                 },
-                
+
         };
 
         /*
@@ -266,7 +269,10 @@ angular.module('am-wb-core')//
             return;
         }
         this.model = model;
-        this.runtimeModel = {};
+        this.runtimeModel =  {
+                style:{},
+                on: {},
+        };
         this.fire('modelChanged');
         this.setState('ready');
         return this;
@@ -656,7 +662,7 @@ angular.module('am-wb-core')//
      */
     WbWidgetAbstract.prototype.fire = function (type, params) {
         params = params || {};
-        
+
         // 1- Call processors
         var event = _.merge({
             source: this,
@@ -1081,7 +1087,7 @@ angular.module('am-wb-core')//
     WbWidgetAbstract.prototype.getElementAttributes = function(){
         return this.elementAttributes;
     }
-    
+
     WbWidgetAbstract.prototype.isLeaf = function(){
         return true;
     }

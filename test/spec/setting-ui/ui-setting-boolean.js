@@ -77,7 +77,7 @@ describe('wb-ui-setting-ui directive ', function () {
         expect(directiveElem.html()).not.toEqual('');
     });
 
-    fit('should have md-switch element', function () {
+    it('should have md-switch element', function () {
         var inputElement = directiveElem.find('input');
         expect(inputElement).toBeDefined();
     });
