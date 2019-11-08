@@ -19093,7 +19093,7 @@ angular.module('am-wb-core')//
      */
     WbWidgetGroupCtrl.prototype.removeChildren = function(){
         // remove all children
-        var widgets = this.getChildren();
+        var widgets = _.clone(this.getChildren());
         angular.forEach(widgets, function (widget) {
             widget.delete();
         });
