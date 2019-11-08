@@ -421,7 +421,7 @@ module.exports = function(grunt) {
             tmp : {
                 src : [ 
                 	'<%= yeoman.app %>/libs/*.js',
-                	'<%= yeoman.app %>/scripts/{,*/}*.js' 
+                	'<%= yeoman.app %>/scripts/**/*.js' 
                 ],
                 dest : '.tmp/<%= yeoman.pkg.name %>.js'
             },
@@ -603,7 +603,7 @@ module.exports = function(grunt) {
                 configFile : 'test/karma.unit.conf.js',
                 singleRun : true,
         	    preprocessors: {
-        	        'src/**/*.js': ['coverage']
+        	        'src/scripts/**/*.js': ['coverage']
         	    },
         		reporters: [
         			'progress', 
@@ -689,6 +689,7 @@ module.exports = function(grunt) {
         'injector', //
         'concurrent:test', //
         'postcss:server', //
+        'ngtemplates', //
         'karma:unit' //
         ]);
 
@@ -698,6 +699,7 @@ module.exports = function(grunt) {
         'injector', //
         'concurrent:server', //
         'postcss', //
+        'ngtemplates', //
         'karma:debug' //
         ]);
 

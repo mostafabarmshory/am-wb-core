@@ -23,7 +23,7 @@
  */
 'use strict';
 
-describe('WbWidgetCtrl ', function () {
+describe('WbAbstractWidget ', function () {
 	// instantiate service
 	var $rootScope;
 	var $widget;
@@ -50,16 +50,7 @@ describe('WbWidgetCtrl ', function () {
 		 */
 		$widget.newWidget({
 		    type: widgetType,
-		    controller: function(){
-		        this.testFunction = function(){
-		            return true;
-		        };
-		        this.initWidget = function() {
-		            // TODO;
-		        };
-		    },
-		    controllerAs: 'ctrl',
-		    template: '<h1>{{ctrl.text}}</h1>'
+		    template: '<h1></h1>'
 		});
 	}));
 
@@ -70,7 +61,6 @@ describe('WbWidgetCtrl ', function () {
 			type: widgetType,
 			id: 'test',
 			name: 'Widget',
-			text: '<h2>HTML Text In 4th group0</h2>',
 		}, root)
 		.then(function(widget){
 			expect(widget).not.toBe(null);
@@ -103,35 +93,34 @@ describe('WbWidgetCtrl ', function () {
             type: widgetType,
             id: 'test',
             name: 'Widget',
-            text: '<h2>HTML Text In 4th group0</h2>',
         }, root)
         .then(function(widget){
             expect(widget).not.toBe(null);
             expect(widget.getId()).toBe('test');
             
             var randomValue = Math.floor(Math.random() * 1000) + 'px';
-            widget.setProperty('style.size.width', randomValue);
+            widget.setProperty('style.width', randomValue);
             expect(widget.getElement().css('width')).toBe(randomValue);
             
             randomValue = Math.floor(Math.random() * 1000) + 'px';
-            widget.setProperty('style.size.minWidth', randomValue);
+            widget.setProperty('style.minWidth', randomValue);
             expect(widget.getElement().css('min-width')).toBe(randomValue);
             
             randomValue = Math.floor(Math.random() * 1000) + 'px';
-            widget.setProperty('style.size.maxWidth', randomValue);
+            widget.setProperty('style.maxWidth', randomValue);
             expect(widget.getElement().css('max-width')).toBe(randomValue);
             
             
             var randomValue = Math.floor(Math.random() * 1000) + 'px';
-            widget.setProperty('style.size.height', randomValue);
+            widget.setProperty('style.height', randomValue);
             expect(widget.getElement().css('height')).toBe(randomValue);
             
             randomValue = Math.floor(Math.random() * 1000) + 'px';
-            widget.setProperty('style.size.minHeight', randomValue);
+            widget.setProperty('style.minHeight', randomValue);
             expect(widget.getElement().css('min-height')).toBe(randomValue);
             
             randomValue = Math.floor(Math.random() * 1000) + 'px';
-            widget.setProperty('style.size.maxHeight', randomValue);
+            widget.setProperty('style.maxHeight', randomValue);
             expect(widget.getElement().css('max-height')).toBe(randomValue);
             
             done();

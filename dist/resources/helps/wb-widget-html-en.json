@@ -13,7 +13,7 @@
 		"padding": {},
 		"margin": {}
 	},
-	"contents": [
+	"children": [
 		{
 			"text": "<h2>Help not found!</h2><p>Help content for requested page not found.</p>",
 			"type": "HtmlText",

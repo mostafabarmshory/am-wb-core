@@ -29,51 +29,47 @@ describe('Storage test', function () {
     var widgetType = 'TestWidget-' + Math.random();
 
     function MockRootWidget() {
-	// TODO;
-	this.scope = $rootScope.$new();
+        // TODO;
+        this.scope = $rootScope.$new();
     };
 
     MockRootWidget.prototype.getScope = function () {
-	return this.scope;
+        return this.scope;
     };
 
     // load the service's module
     beforeEach(module('am-wb-core'));
     beforeEach(inject(function (_$rootScope_, _$widget_) {
-	$rootScope = _$rootScope_;
-	$widget = _$widget_;
-	/*
-	 * Register a test widget
-	 */
-	$widget.newWidget({
-	    type: widgetType,
-	    controller: function () {},
-	    controllerAs: 'ctrl',
-	    template: '<h1>{{ctrl.text}}</h1>'
-	});
+        $rootScope = _$rootScope_;
+        $widget = _$widget_;
+        /*
+         * Register a test widget
+         */
+        $widget.newWidget({
+            type: widgetType,
+            template: '<h1></h1>'
+        });
     }));
 
     it('should define $storage service', function (done) {
-	var root = new MockRootWidget();
-	// Create new instance
-	$widget.compile({
-	    type: widgetType,
-	    id: 'test',
-	    name: 'Widget',
-	    text: '<h2>Storage Test</h2>',
-	    style: {
-		background: {
-		    color: 'black'
-		}
-	    },
-	    event: {
-		init: 'if ($storage) {$widget.setProperty(\'style.background.color\',\'red\')}'
-	    }
-	}, root)
-		.then(function (widget) {
-		    expect(widget.getProperty('style.background.color')).toBe('red');
-		    done();
-		});
-	$rootScope.$apply();
+        var root = new MockRootWidget();
+        // Create new instance
+        $widget.compile({
+            type: widgetType,
+            id: 'test',
+            name: 'Widget',
+            html: '<h2>Storage Test</h2>',
+            style: {
+                background: 'black'
+            },
+            on: {
+                init: 'if ($storage) {$widget.setProperty(\'style.background\',\'red\')}'
+            }
+        }, root)
+        .then(function (widget) {
+            expect(widget.getProperty('style.background')).toBe('red');
+            done();
+        });
+        $rootScope.$apply();
     });
 });

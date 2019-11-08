@@ -3331,265 +3331,6 @@ Prism.languages.js = Prism.languages.javascript;
  */
 'use strict';
 
-/**
- * Binds a TinyMCE widget to <textarea> elements.
- */
-angular.module('ui.tinymce', [])
-.value('uiTinymceConfig', {})
-.directive('uiTinymce', function($rootScope, $compile, $timeout, $window, $sce, uiTinymceConfig, uiTinymceService) {
-	uiTinymceConfig = uiTinymceConfig || {};
-
-	if (uiTinymceConfig.baseUrl) {
-		tinymce.baseURL = uiTinymceConfig.baseUrl;
-	}
-
-	return {
-		require: ['ngModel', '^?form'],
-		priority: 599,
-		link: function(scope, element, attrs, ctrls) {
-			if (!$window.tinymce) {
-				return;
-			}
-
-			var ngModel = ctrls[0],
-			form = ctrls[1] || null;
-
-			var expression, options = {
-					debounce: true
-			}, tinyInstance,
-			updateView = function(editor) {
-				var content = editor.getContent({format: options.format}).trim();
-				content = $sce.trustAsHtml(content);
-
-				ngModel.$setViewValue(content);
-				if (!$rootScope.$$phase) {
-					scope.$digest();
-				}
-			};
-
-			function toggleDisable(disabled) {
-				if (disabled) {
-					ensureInstance();
-
-					if (tinyInstance) {
-						tinyInstance.getBody().setAttribute('contenteditable', false);
-					}
-				} else {
-					ensureInstance();
-
-					if (tinyInstance && !tinyInstance.settings.readonly && tinyInstance.getDoc()) {
-						tinyInstance.getBody().setAttribute('contenteditable', true);
-					}
-				}
-			}
-
-			// fetch a unique ID from the service
-			var uniqueId = uiTinymceService.getUniqueId();
-			attrs.$set('id', uniqueId);
-
-			expression = {};
-
-			angular.extend(expression, scope.$eval(attrs.uiTinymce));
-
-			//Debounce update and save action
-			var debouncedUpdate = (function(debouncedUpdateDelay) {
-				var debouncedUpdateTimer;
-				return function(ed) {
-					$timeout.cancel(debouncedUpdateTimer);
-					debouncedUpdateTimer = $timeout(function() {
-						return (function(ed) {
-							if (ed.isDirty()) {
-								ed.save();
-								updateView(ed);
-							}
-						})(ed);
-					}, debouncedUpdateDelay);
-				};
-			})(400);
-
-			var setupOptions = {
-					// Update model when calling setContent
-					// (such as from the source editor popup)
-					setup: function(ed) {
-						ed.on('init', function() {
-							ngModel.$render();
-							ngModel.$setPristine();
-							ngModel.$setUntouched();
-							if (form) {
-								form.$setPristine();
-							}
-						});
-
-						// Update model when:
-						// - a button has been clicked [ExecCommand]
-						// - the editor content has been modified [change]
-						// - the node has changed [NodeChange]
-						// - an object has been resized (table, image) [ObjectResized]
-						ed.on('ExecCommand change NodeChange ObjectResized', function() {
-							if (!options.debounce) {
-								ed.save();
-								updateView(ed);
-								return;
-							}
-							debouncedUpdate(ed);
-						});
-
-						ed.on('blur', function() {
-							element[0].blur();
-							ngModel.$setTouched();
-							if (!$rootScope.$$phase) {
-								scope.$digest();
-							}
-						});
-
-						ed.on('remove', function() {
-							element.remove();
-						});
-
-						if (uiTinymceConfig.setup) {
-							uiTinymceConfig.setup(ed, {
-								updateView: updateView
-							});
-						}
-
-						if (expression.setup) {
-							expression.setup(ed, {
-								updateView: updateView
-							});
-						}
-					},
-					format: expression.format || 'html',
-					selector: '#' + attrs.id
-			};
-			// extend options with initial uiTinymceConfig and
-			// options from directive attribute value
-			angular.extend(options, uiTinymceConfig, expression, setupOptions);
-			// Wrapped in $timeout due to $tinymce:refresh implementation, requires
-			// element to be present in DOM before instantiating editor when
-			// re-rendering directive
-			$timeout(function() {
-				if (options.baseURL){
-					tinymce.baseURL = options.baseURL;
-				}
-				var maybeInitPromise = tinymce.init(options);
-				if(maybeInitPromise && typeof maybeInitPromise.then === 'function') {
-					maybeInitPromise.then(function() {
-						toggleDisable(scope.$eval(attrs.ngDisabled));
-					});
-				} else {
-					toggleDisable(scope.$eval(attrs.ngDisabled));
-				}
-			});
-
-			ngModel.$formatters.unshift(function(modelValue) {
-				return modelValue ? $sce.trustAsHtml(modelValue) : '';
-			});
-
-			ngModel.$parsers.unshift(function(viewValue) {
-				return viewValue ? $sce.getTrustedHtml(viewValue) : '';
-			});
-
-			ngModel.$render = function() {
-				ensureInstance();
-
-				var viewValue = ngModel.$viewValue ?
-						$sce.getTrustedHtml(ngModel.$viewValue) : '';
-
-						// instance.getDoc() check is a guard against null value
-						// when destruction & recreation of instances happen
-						if (tinyInstance &&
-								tinyInstance.getDoc()
-						) {
-							tinyInstance.setContent(viewValue);
-							// Triggering change event due to TinyMCE not firing event &
-							// becoming out of sync for change callbacks
-							tinyInstance.fire('change');
-						}
-			};
-
-			attrs.$observe('disabled', toggleDisable);
-
-			// This block is because of TinyMCE not playing well with removal and
-			// recreation of instances, requiring instances to have different
-			// selectors in order to render new instances properly
-			var unbindEventListener = scope.$on('$tinymce:refresh', function(e, id) {
-				var eid = attrs.id;
-				if (angular.isUndefined(id) || id === eid) {
-					var parentElement = element.parent();
-					var clonedElement = element.clone();
-					clonedElement.removeAttr('id');
-					clonedElement.removeAttr('style');
-					clonedElement.removeAttr('aria-hidden');
-					tinymce.execCommand('mceRemoveEditor', false, eid);
-					parentElement.append($compile(clonedElement)(scope));
-					unbindEventListener();
-				}
-			});
-
-			scope.$on('$destroy', function() {
-				ensureInstance();
-
-				if (tinyInstance) {
-					tinyInstance.remove();
-					tinyInstance = null;
-				}
-			});
-
-			function ensureInstance() {
-				if (!tinyInstance) {
-					tinyInstance = tinymce.get(attrs.id);
-				}
-			}
-		}
-	};
-})
-
-/**
- * A service is used to create unique ID's, this prevents duplicate ID's if there are multiple editors on screen.
- */
-.service('uiTinymceService', function() {
-	var UITinymceService = function() {
-		var ID_ATTR = 'ui-tinymce';
-		// uniqueId keeps track of the latest assigned ID
-		var uniqueId = 0;
-		// getUniqueId returns a unique ID
-		var getUniqueId = function() {
-			uniqueId ++;
-			return ID_ATTR + '-' + uniqueId;
-		};
-		// return the function as a public method of the service
-		return {
-			getUniqueId: getUniqueId
-		};
-	};
-	// return a new instance of the service
-	return new UITinymceService();
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
 jQuery.fn.extend({
 	getPath: function () {
 		var path, node = this;
@@ -3616,21 +3357,24 @@ jQuery.fn.extend({
 });
 
 angular.module('am-wb-core', [
+    // base
 	'ngMessages',
 	'ngAnimate',
 	'ngAria',
-	'ngMaterial',
 	'ngSanitize',
 	'ngRoute', 
-
-	'pascalprecht.translate',
-	'mdColorPicker',
-	'ui.tinymce',
-	'dndLists',
-//	'material.components.expansionPanels',
+	
+	// editor
+	'ngMaterial',
 	'ngMdIcons',
-	'ngHandsontable',
-	'ngStorage' // https://github.com/gsklee/ngStorage
+	'mdColorPicker',
+	'pascalprecht.translate',
+
+//	'ui.tinymce',
+//	'dndLists',
+//	'material.components.expansionPanels',
+//	'ngHandsontable',
+	'ngStorage', // https://github.com/gsklee/ngStorage
 	]);
 
 /* 
@@ -4768,3165 +4512,6 @@ angular.module('am-wb-core')
 
 });
 
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbSettingACtrl
- * @description Manage Widget A 
- * 
- */
-.controller('MbSettingACtrl', function () {
-	
-	var attrs = [
-		// id
-		'download',
-		'href',
-		'hreflang',
-		'media',
-		'ping',
-		'referrerpolicy',
-		'rel',
-		'target',
-		'type',
-		];
-
-	/*
-	 * Initial the setting editor
-	 */
-	this.init = function () {
-		/*
-		 * Load data of the widget
-		 */
-		var ctrl = this;
-		angular.forEach(attrs, function(attr){
-			ctrl[attr] = ctrl.getProperty(attr);
-		});
-	};
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetACtrl
- * @description Manage a widget with html text.
- * 
- * Most of textual widgets (such as h1..h6, p, a, html) just used html
- * text in view. This controller are about to manage html attribute of
- * a widget.
- * 
- */
-.controller('MbSettingGeneralCtrl', function () {
-	
-	var attrs = [
-		// id
-		'id',
-		'name',
-		'title',
-		
-		// language
-		'dir',
-		'lang',
-		'translate',
-		'spellcheck',
-
-		// access
-		'accesskey',
-		'contenteditable',
-		'tabindex',
-		'hidden',
-		
-		// General style
-		'style.direction',
-		'style.visibility',
-		'style.color',
-		'style.cursor',
-		'style.opacity',
-		
-		// overflow
-		'style.overflow.x',
-		'style.overflow.y',
-		];
-
-	/*
-	 * Initial the setting editor
-	 */
-	this.init = function () {
-		/*
-		 * Load data of the widget
-		 */
-		var ctrl = this;
-		angular.forEach(attrs, function(attr){
-			ctrl[attr] = ctrl.getProperty(attr);
-		});
-	};
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbSettingImgCtrl
- * @description Manage Widget img 
- * 
- */
-.controller('MbSettingImgCtrl', function () {
-	
-	var attrs = [
-		// id
-		'alg',
-		'crossorigin',
-		'height',
-		'ismap',
-		'longdesc',
-		'src',
-		'srcset',
-		'usemap',
-		'width',
-		];
-
-	/*
-	 * Initial the setting editor
-	 */
-	this.init = function () {
-		/*
-		 * Load data of the widget
-		 */
-		var ctrl = this;
-		angular.forEach(attrs, function(attr){
-			ctrl[attr] = ctrl.getProperty(attr);
-		});
-	};
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetACtrl
- * @description Manage a widget with html text.
- * 
- * Most of textual widgets (such as h1..h6, p, a, html) just used html
- * text in view. This controller are about to manage html attribute of
- * a widget.
- * 
- */
-.controller('MbSettingMicrodataCtrl', function () {
-	var attrs = [
-		'itemscope',
-		'itemtype',
-		'itemprop',
-		'itemid',
-		'itemref',
-		// extra attributes
-		'value',
-		'content',
-		];
-
-	/*
-	 * Initial the setting editor
-	 */
-	this.init = function () {
-		/*
-		 * Load data of the widget
-		 */
-		var ctrl = this;
-		angular.forEach(attrs, function(attr){
-			ctrl[attr] = ctrl.getProperty(attr);
-		});
-	};
-
-
-
-//	/*
-//	* Supported Schema Types:
-//	* Article, Book, Image, Person, Product, Service, Text, Thing, WebPage
-//	*/
-//	this.schemaTypes = [
-//	{
-//	key: 'Article',
-//	value: 'http://schema.org/Article'
-
-//	}, {
-//	key: 'Book',
-//	value: 'http://schema.org/Book'
-
-//	}, {
-//	key: 'Image',
-//	value: 'http://schema.org/ImageObject'
-
-//	}, {
-//	key: 'Movie',
-//	value: 'http://schema.org/Movie'
-//	}, {
-//	key: 'Person',
-//	value: 'http://schema.org/Person'
-//	}, {
-//	key: 'Product',
-//	value: 'http://schema.org/Product'
-
-//	}, {
-//	key: 'Service',
-//	value: 'http://schema.org/Service'
-
-//	}, {
-//	key: 'Text',
-//	value: 'http://schema.org/Text'
-//	}, {
-//	key: 'Thing',
-//	value: 'http://schema.org/Thing'
-//	}, {
-//	key: 'WebPage',
-//	value: 'http://schema.org/WebPage'
-
-//	}
-//	];
-
-//	this.getParentCategory = function () {
-//	var widget = this.getWidget();
-//	while (!widget.isRoot() && !widget.getModelProperty('category')) {
-//	widget = widget.getParent();
-//	}
-//	this.parentCategory = widget.getModelProperty('category');
-//	};
-
-//	this.setProperties = function () {
-//	if (!this.parentCategory) {
-//	this.alert = 'No parent type is defined.';
-//	} else {
-//	this.setType(this.parentCategory);
-//	}
-//	};
-
-//	this.setType = function (type) {
-//	switch (type) {
-//	case 'http://schema.org/Article':
-//	this.properties =
-//	[
-//	'articleBody', 'articleSection', 'about', 'author', 'comment',
-//	'commentCount', 'contributor', 'creator', 'description', 'editor',
-//	'genre', 'headline', 'keywords', 'publisher', 'text', 'translator',
-//	'video'
-//	];
-//	break;
-
-//	case 'http://schema.org/Book':
-//	this.properties =
-//	[
-//	'about', 'author', 'bookFormat', 'comment', 'creator', 'genre',
-//	'headline', 'image', 'keywords', 'name', 'publisher', 'text',
-//	'translator', 'video'
-//	];
-//	break;
-
-//	case 'http://schema.org/Image':
-//	this.properties =
-//	[
-//	'about', 'description', 'caption', 'comment', 'thumbnail',
-//	'keywords', 'image', 'name', 'url'
-//	];
-//	break;
-
-//	case 'http://schema.org/Movie':
-//	this.properties =
-//	[
-//	'about', 'actor', 'comment', 'commentCount', 'copyrightYear',
-//	'countryOfOrigin', 'creator', 'dateCreated', 'description',
-//	'director', 'duration', 'genre', 'headline', 'isBasedOn',
-//	'image', 'keywords', 'musicBy', 'name', 'provider', 'productionCompany',
-//	'sponsor', 'subtitleLanguage', 'text', 'thumbnailUrl', 'trailer'
-//	];
-//	break;
-
-//	case 'http://schema.org/Person':
-//	this.properties =
-//	[
-//	'additionalName', 'address', 'birthDate', 'birthPlace',
-//	'children', 'deathDate', 'daethPlace', 'email', 'familyName',
-//	'gender', 'homeLocation', 'parent', 'telephone', 'description',
-//	'image', 'spouse'
-//	];
-//	break;
-
-//	case 'http://schema.org/Product':
-//	this.properties =
-//	[
-//	'brand', 'category', 'color', 'description', 'height',
-//	'isConsumableFor', 'genre', 'headline', 'image', 'name'
-//	];
-//	break;
-
-//	case 'http://schema.org/Service':
-//	this.properties =
-//	[
-//	'areaServed', 'brand', 'category', 'logo', 'serviceType',
-//	'description', 'image', 'name'
-//	];
-//	break;
-
-//	case 'http://schema.org/Thing':
-//	this.properties = ['description', 'image', 'name'];
-//	break;
-
-//	case 'http://schema.org/Text':
-//	this.properties = ['description', 'image', 'keywords', 'name'];
-//	break;
-
-//	case 'http://schema.org/WebPage':
-//	this.properties =
-//	[
-//	'about', 'author', 'comment', 'description', 'image', 'headline',
-//	'keywords', 'commentCount', 'mainContentOfPage', 'primaryImageOfPage',
-//	'video'
-//	];
-//	break;
-//	}
-//	};
-
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbSettingsCtrl
- * @description Manages settings page
- * 
- * Manages settings pages.
- * 
- */
-.controller('AmWbSettingPageCtrl', function ($scope, $element) {
-
-
-    this.setWidget = function (widget) {
-        var oldWidget = this.widget;
-        this.widget = widget;
-        if (angular.isFunction(this.init)) {
-            this.init(this.widget, oldWidget);
-        }
-    };
-
-    this.getWidget = function () {
-        return this.widget;
-    };
-
-    this.setElement = function (element) {
-        this.element = element;
-    };
-
-    this.getElement = function () {
-        return this.element;
-    };
-
-    this.setScope = function (scope) {
-        this.scope = scope;
-    };
-
-    this.getScope = function () {
-        return this.scope;
-    };
-
-    this.isRoot = function () {
-        var widget = this.getWidget();
-        if (!widget) {
-            return false;
-        }
-        return widget.isRoot();
-    };
-
-    this.setStyleBackground = function (key, value) {
-        if (!this.widget) {
-            return;
-        }
-        this.widget.setModelProperty('style.background.' + key, value);
-    };
-
-    this.getStyleBackground = function (key) {
-        if (!this.widget) {
-            return;
-        }
-        return this.widget.getModelProperty('style.background.' + key);
-    };
-
-    this.setStyleSize = function (key, value) {
-        if (!this.widget) {
-            return;
-        }
-        this.widget.setModelProperty('style.size.' + key, value);
-    };
-
-    this.getStyleSize = function (key) {
-        if (!this.widget) {
-            return;
-        }
-        return this.widget.getModelProperty('style.size.' + key);
-    };
-
-    this.setStyleBorder = function (key, value) {
-        if (!this.widget) {
-            return;
-        }
-        this.widget.setModelProperty('style.border.' + key, value);
-    };
-
-    this.getStyleBorder = function (key) {
-        if (!this.widget) {
-            return;
-        }
-        return this.widget.getModelProperty('style.border.' + key);
-    };
-
-    this.setStyleLayout = function (key, value) {
-        if (!this.widget) {
-            return;
-        }
-        this.widget.setModelProperty('style.layout.' + key, value);
-    };
-
-    this.getStyleLayout = function (key, defaultValue) {
-        if (!this.widget) {
-            return;
-        }
-        var rkey = 'style.layout.' + key;
-        if(!this.widget.hasModelProperty(rkey)){
-        	return defaultValue;
-        }
-        return this.widget.getModelProperty(rkey);
-    };
-
-    this.setStyle = function (key, value) {
-        if (!this.widget) {
-            return;
-        }
-        this.widget.setModelProperty('style.' + key, value);
-    };
-
-    this.getStyle = function (key) {
-        if (!this.widget) {
-            return;
-        }
-        return this.widget.getModelProperty('style.' + key);
-    };
-
-    this.setProperty = function (key, value) {
-        if (!this.widget) {
-            return;
-        }
-        this.widget.setModelProperty(key, value);
-    };
-
-    this.getProperty = function (key) {
-        if (!this.widget) {
-            return;
-        }
-        return this.widget.getModelProperty(key);
-    };
-
-
-    this.setElement($element);
-    this.setScope($scope);
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbSettingStyleTextCtrl
- * @description Edit text style of a widget
- * 
- */
-.controller('MbSettingStyleTextCtrl', function () {
-	var attrs = [{
-		key: 'style.text.align',
-		ctrlKey: 'align'
-	},{
-		key: 'style.text.alignLast',
-		ctrlKey: 'alignLast'
-	},{
-		key: 'style.text.decoration',
-		ctrlKey: 'decoration'
-	},{
-		key: 'style.text.indent',
-		ctrlKey: 'indent'
-	},{
-		key: 'style.text.justify',
-		ctrlKey: 'justify'
-	},{
-		key: 'style.text.overflow',
-		ctrlKey: 'overflow'
-	},{
-		key: 'style.text.shadow',
-		ctrlKey: 'shadow'
-	},{
-		key: 'style.text.transform',
-		ctrlKey: 'transform'
-	}];
-
-	/*
-	 * Initial the setting editor
-	 */
-	this.init = function () {
-		/*
-		 * Load data of the widget
-		 */
-		var ctrl = this;
-		angular.forEach(attrs, function(attr){
-			ctrl[attr.ctrlKey] = ctrl.getProperty(attr.key);
-		});
-	};
-
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetACtrl
- * @description Manage a widget with html text.
- * 
- * Most of textual widgets (such as h1..h6, p, a, html) just used html
- * text in view. This controller are about to manage html attribute of
- * a widget.
- * 
- */
-.controller('MbWidgetACtrl', function () {
-	// list of element attributes
-	var elementAttributes = [
-		'download',
-		'href',
-		'hreflang',
-		'media',
-		'ping',
-		'referrerpolicy',
-		'rel',
-		'target',
-		'type',
-		'html'
-		];
-
-	this.initWidget = function(){
-		var ctrl = this;
-		function elementAttribute(key, value){
-			if(key === 'html'){
-				ctrl.getElement().html(value) || '..';
-			}
-			ctrl.setElementAttribute(key, value);
-		}
-		function eventHandler(event){
-			if(elementAttributes.includes(event.key)){
-				var key = event.key;
-				var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-				elementAttribute(key, value);
-			}
-		}
-		// listen on change
-		this.on('modelUpdated', eventHandler);
-		this.on('runtimeModelUpdated', eventHandler);
-		// load initial data
-		for(var i =0; i < elementAttributes.length;i++){
-			var key = elementAttributes[i];
-			elementAttribute(key, ctrl.getModelProperty(key));
-		}
-		
-		function removeDefaultAction($event){
-			$event.preventDefault();
-		}
-		this.on('stateChanged', function(event){
-			if(event.value === 'edit'){
-				ctrl.getElement().on('click dblclick', removeDefaultAction);
-			} else {
-				ctrl.getElement().off('click dblclick', removeDefaultAction);
-			}
-		});
-	};
-
-	/**
-	 * Gets value of the input
-	 */
-	this.html = function(){
-		var value = arguments[0];
-		if(value){
-			this.setElementAttribute('html', value);
-		}
-		var element = this.getElement();
-		return element.html.apply(element, arguments);
-	};
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetAudioCtrl
- * @description Manage a widget with audio.
- * 
- * 
- */
-.controller('MbWidgetAudioCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'alt',
-        'crossorigin',
-        'height',
-        'hspace',
-        'ismap',
-        'longdesc',
-        'sizes',
-        'src',
-        'usemap',
-        'width',
-        ];
-
-    this.initWidget = function(){
-        var ctrl = this;
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                ctrl.setElementAttribute(key, value);
-            }
-            // support legacy image
-            if(event.key === 'url'){
-            	ctrl.setElementAttribute('src', value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-        }
-    };
-
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetHtmlCtrl
- * @description Manage a widget with html text.
- * 
- * Most of textual widgets (such as h1..h6, p, a, html) just used html
- * text in view. This controller are about to manage html attribute of
- * a widget.
- * 
- */
-.controller('MbWidgetHtmlCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'html'
-        ];
-
-    this.initWidget = function(){
-        var ctrl = this;
-        function elementAttribute(key, value){
-            if(key === 'html'){
-                ctrl.getElement().html(value);
-            }
-            ctrl.setElementAttribute(key, value);
-        }
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                elementAttribute(key, value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            elementAttribute(key, ctrl.getModelProperty(key));
-        }
-    };
-
-    /**
-     * Gets value of the input
-     */
-    this.html = function(){
-        var value = arguments[0];
-        if(value){
-            this.setElementAttribute('html', value);
-        }
-        var element = this.getElement();
-        return element.html.apply(element, arguments);
-    };
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetIframeCtrl
- * @description Manage an iframe
- * 
- * Iframe is a widget to incloud other pages as a part of current page. This widget is
- * used as Iframe manager.
- * 
- */
-.controller('MbWidgetIframeCtrl', function () {
-    // list of element attributes
-    // NOTE: maso, 2019: the width and height of the iframe is set from 
-    // the style section.
-    //
-    // 'width', 'height'
-    var iframeElementAttribute = [
-        'name',
-        'src', 
-        'srcdoc', 
-        'sandbox', 
-        ];
-
-    this.initWidget = function(){
-        var ctrl = this;
-        function elementAttribute(key, value){
-            ctrl.setElementAttribute(key, value);
-        }
-        function eventHandler(event){
-            if(iframeElementAttribute.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                elementAttribute(key, value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < iframeElementAttribute.length;i++){
-            var key = iframeElementAttribute[i];
-            elementAttribute(key, ctrl.getModelProperty(key));
-        }
-    };
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetACtrl
- * @description Manage a widget with html text.
- * 
- * Most of textual widgets (such as h1..h6, p, a, html) just used html
- * text in view. This controller are about to manage html attribute of
- * a widget.
- * 
- */
-.controller('MbWidgetImgCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'alt',
-        'crossorigin',
-        'height',
-        'hspace',
-        'ismap',
-        'longdesc',
-        'sizes',
-        'src',
-        'usemap',
-        'width',
-        ];
-
-    this.initWidget = function(){
-        var ctrl = this;
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                ctrl.setElementAttribute(key, value);
-            }
-            // support legacy image
-            if(event.key === 'url'){
-            	ctrl.setElementAttribute('src', value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-        }
-    };
-
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetInputCtrl
- * @description Manage an input field
- * 
- * The most used widget to get information from clients is an input. The input
- * are responsible to get most of data types (email, text, number, ex.) from
- * clients.
- * 
- */
-.controller('MbWidgetInputCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'accept',
-        'alt', 
-        'autocomplete', 
-        'autofocus', 
-        'checked', 
-        'dirname', 
-        'disabled', 
-        'form',
-        'max', 
-        'maxlength', 
-        'min', 
-        'multiple', 
-        'name', 
-        'pattern', 
-        'placeholder', 
-        'readonly', 
-        'required', 
-        'size', 
-        'src', 
-        'step',
-        'inputType',
-        'value',
-        ];
-
-    this.initWidget = function(){
-        var ctrl = this;
-        function elementAttribute(key, value){
-            ctrl.setElementAttribute(key, value);
-            if(key === 'inputType'){
-                ctrl.setElementAttribute('type', value);
-            }
-        }
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                elementAttribute(key, value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            elementAttribute(key, ctrl.getModelProperty(key));
-        }
-    };
-
-    /**
-     * Gets value of the input
-     */
-    this.val = function(){
-        var value = arguments[0];
-        if(value){
-            this.setElementAttribute('value', value);
-        }
-        var element = this.getElement();
-        return element.val.apply(element, arguments);
-    };
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetACtrl
- * @description Manage a widget with html text.
- * 
- * Most of textual widgets (such as h1..h6, p, a, html) just used html
- * text in view. This controller are about to manage html attribute of
- * a widget.
- * 
- */
-.controller('MbWidgetLinkCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'crossorigin',
-        'href',
-        'hreflang',
-        'media',
-        'rel',
-        'size',
-        'type',
-        ];
-
-    this.initWidget = function(){
-        var ctrl = this;
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                ctrl.setElementAttribute(key, value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-        }
-    };
-
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetMetaCtrl
- * @description Manage a meta data 
- * 
- * In seo (or equivalient usecase) 
- * 
- */
-.controller('MbWidgetMetaCtrl', function () {
-	// list of element attributes
-	var elementAttributes = [
-		'charset',
-		'content',
-		'http-equiv',
-		'name',
-		];
-
-	this.initWidget = function(){
-		var ctrl = this;
-		function updateView(){
-			var name = ctrl.getProperty('name') || ctrl.getModelProperty('name');
-			var content = ctrl.getProperty('content') || ctrl.getModelProperty('content');
-			ctrl.getElement().html(name + ':' + content);
-		}
-		function eventHandler(event){
-			if(elementAttributes.includes(event.key)){
-				var key = event.key;
-				var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-				ctrl.setElementAttribute(key, value);
-			}
-			updateView();
-		}
-		// listen on change
-		this.on('modelUpdated', eventHandler);
-		this.on('runtimeModelUpdated', eventHandler);
-		this.on('stateChanged', function(){
-			if(ctrl.state === 'edit'){
-				ctrl.getElement().show();
-				return;
-			}
-			ctrl.getElement().hide();
-		});
-		// load initial data
-		for(var i =0; i < elementAttributes.length;i++){
-			var key = elementAttributes[i];
-			ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-		}
-		updateView();
-	};
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetPictureCtrl
- * @description Manage a widget with audio.
- * 
- * 
- */
-.controller('MbWidgetPictureCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'alt',
-        'crossorigin',
-        'height',
-        'hspace',
-        'ismap',
-        'longdesc',
-        'sizes',
-        'src',
-        'usemap',
-        'width',
-        ];
-
-    this.initWidget = function(){
-        var ctrl = this;
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                ctrl.setElementAttribute(key, value);
-            }
-            // support legacy image
-            if(event.key === 'url'){
-            	ctrl.setElementAttribute('src', value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-        }
-    };
-
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetHeaderCtrl
- * @description Manage a header
- * 
- */
-.controller('MbWidgetProgressCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [ 'value', 'max' ];
-
-    /*
-     * This method will be call from the parent to initialize the widget
-     */
-    this.initWidget = function () {
-        var ctrl = this;
-        function eventHandler(event) {
-            // Get an event and update the view if the event key is one of element attributes
-            if (elementAttributes.includes(event.key)) {
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                ctrl.setElementAttribute(key, value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data from the model
-        for (var i = 0; i < elementAttributes.length; i++) {
-            var key = elementAttributes[i];
-            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-        }
-    };
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetTextareaCtrl
- * @description Manage a textarea
- * 
- * Textarea is one of input widgets used to get textual information from clients.
- * This controller is about to manage a textarea.
- * 
- */
-.controller('MbWidgetTextareaCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'autofocus',
-        'cols',
-        'dirname',
-        'disabled',
-        'form',
-        'maxlength',
-        'name',
-        'placeholder',
-        'readonly',
-        'required',
-        'rows',
-        'wrap',
-        'value'
-        ];
-
-    this.initWidget = function(){
-        var ctrl = this;
-        function elementAttribute(key, value){
-            ctrl.setElementAttribute(key, value);
-            if(key === 'value'){
-                ctrl.val(value);
-            }
-        }
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                elementAttribute(key, value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            elementAttribute(key, ctrl.getModelProperty(key));
-        }
-    };
-
-    /**
-     * Gets value of the input
-     */
-    this.val = function(){
-        var value = arguments[0];
-        if(value){
-            this.setElementAttribute('value', value);
-        }
-        var element = this.getElement();
-        return element.val.apply(element, arguments);
-    };
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Controllers
- * @name MbWidgetVideoCtrl
- * @description Manage a widget with audio.
- * 
- * 
- */
-.controller('MbWidgetVideoCtrl', function () {
-    // list of element attributes
-    var elementAttributes = [
-        'alt',
-        'crossorigin',
-        'height',
-        'hspace',
-        'ismap',
-        'longdesc',
-        'sizes',
-        'src',
-        'usemap',
-        'width',
-        ];
-
-    this.initWidget = function(){
-        var ctrl = this;
-        function eventHandler(event){
-            if(elementAttributes.includes(event.key)){
-                var key = event.key;
-                var value = ctrl.getProperty(key) || ctrl.getModelProperty(key);
-                ctrl.setElementAttribute(key, value);
-            }
-            // support legacy image
-            if(event.key === 'url'){
-            	ctrl.setElementAttribute('src', value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-        // load initial data
-        for(var i =0; i < elementAttributes.length;i++){
-            var key = elementAttributes[i];
-            ctrl.setElementAttribute(key, ctrl.getModelProperty(key));
-        }
-    };
-
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-var widgetBasicWidgetAttributes = [
-    'accesskey',
-    'contenteditable',
-    'dir',
-    /*
-     * NOTE: We must manage D&D internally to mange user D&D codes
-     * TODO: maso, 2019: move dnd into a processor
-     */
-//  'draggable',
-//  'dropzone',
-    'hidden',
-    'id',
-    'lang',
-    'spellcheck',
-    'tabindex',
-    'title',
-    'translate',
-    ];
-/**
- * @ngdoc Controllers
- * @name WbAbstractWidget
- * @class
- * @descreption root of the widgets
- * 
- * This is an abstract implementation of the widgets. ## Models
- * 
- * The model of the widget is consist of two main part:
- * 
- * <ul>
- * <li>User data</li>
- * <li>Runtime data</li>
- * </ul>
- * 
- * User data is set as input data model and the runtime data is managed by
- * events and user functions.
- * 
- * Finally the combination of user and runtime data is used to update the view.
- * 
- * The setModelProperty changes the user data model.
- * 
- * The setProperty changes the runtime properties.
- *  ## Events
- * 
- * 
- * Here is list of allowed types:
- * 
- * <ul>
- * <li>modelChanged: some properties of the model is changed.</li>
- * <li>modelUpdated: A new data model is replaced with the current one.</li>
- * <li>styleChanged: Computed style of the current widget is update.</li>
- * <li>widgetIsEditable: Widget is in editable state (so the result of
- * isEditable() is true)</li>
- * <li>widgetIsNotEditable: widget is not in editable mode any more(so the
- * result of isEditable() is false)</li>
- * <li>widgetDeleted: the widgets is removed.</li>
- * <li>widgetUnderCursor: The widget is under the mouse</li>
- * <li>widgetSelected: the widget is selected</li>
- * <li>widgetUnselected: the widget is unselected</li>
- * </ul>
- * 
- * Following event propagate on the root too
- * 
- * <ul>
- * <li>widgetUnderCursor</li>
- * <li>widgetSelected</li>
- * </ul>
- */
-
-var WbAbstractWidget = function () {
-    'use strict';
-
-    function debounce(func, wait) {
-        var timeout;
-        return function() {
-            var context = this;
-            var args = arguments;
-            var later = function() {
-                timeout = null;
-                func.apply(context, args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-    
-    /**
-     * State of the widget
-     * 
-     * - init
-     * - edit
-     * - ready
-     * - deleted
-     * 
-     * @memberof WbAbstractWidget
-     */
-    this.state = 'init';
-
-    this.actions = [];
-    this.callbacks = [];
-    this.childWidgets = [];
-
-    /**
-     * AngularJS scope of the widget. This field is used in our old pattern and
-     * will be removed in our next major version.
-     * 
-     * @deprecated This will be removed in the next major version.
-     * @memberof WbAbstractWidget
-     */
-    this.$scope = null;
-
-    /**
-     * View element of the widget
-     * 
-     * This element is used to draw and managed view widget.
-     * 
-     * @memberof WbAbstractWidget
-     */
-    this.$element = null;
-    
-    /*
-     * This is a cache of customer function
-     * 
-     */
-    this.eventFunctions = {};
-    this.computedStyle = {};
-
-    // models
-    this.runtimeModel = {};
-    this.model = {};
-
-    // event listeners
-    var ctrl = this;
-    /*
-     * TODO: maso, 2019: move to event manager.
-     */
-    this.eventListeners = {
-            click: function ($event) {
-                if (ctrl.isEditable()) {
-                    ctrl.setSelected(true, $event);
-                    $event.stopPropagation();
-                }
-                ctrl.fire('click', $event);
-            },
-            dblclick: function ($event) {
-                if (ctrl.isEditable()) {
-                    ctrl.setSelected(true, $event);
-                    $event.stopPropagation();
-                    $event.preventDefault();
-                    // Open an editor 
-                    var editor = ctrl.$widget.getEditor(ctrl);
-                    editor.show();
-                }
-                ctrl.fire('dblclick', $event);
-            },
-            mouseout: function ($event) {
-                ctrl.fire('mouseout', $event);
-            },
-            mouseover: function ($event) {
-                ctrl.fire('mouseover', $event);
-            },
-            mousedown: function ($event) {
-                ctrl.fire('mousedown', $event);
-            },
-            mouseup: function ($event) {
-                ctrl.fire('mouseup', $event);
-            },
-            mouseenter: function ($event) {
-                ctrl.fire('mouseenter', $event);
-            },
-            mouseleave: function ($event) {
-                ctrl.fire('mouseleave', $event);
-            },
-            
-            // Media events
-            error: function ($event) {
-                ctrl.fire('error', $event);
-            },
-            success: function ($event) {
-                ctrl.fire('success', $event);
-            },
-            load: function ($event) {
-                ctrl.fire('load', $event);
-            }
-    };
-
-    /*
-     * Add resize observer to the element
-     */
-    this.resizeObserver = new ResizeObserver(debounce(function ($event) {
-        if(angular.isArray($event)){
-            $event = $event[0];
-        }
-        ctrl.fire('resize', $event);
-    }, 300));
-
-    var options = {
-            root: null,
-            rootMargin: '0px',
-    };
-    this.intersectionObserver = new IntersectionObserver(function ($event) {
-        if(angular.isArray($event)){
-            $event = $event[0];
-        }
-        ctrl.setIntersecting($event.isIntersecting, $event);
-    }, options);
-};
-
-
-/**
- * Loads all basic elements attributes.
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.loadBasicProperties = function () {
-    var model = this.getModel();
-    if (!model) {
-        return;
-    }
-    var $element = this.getElement();
-    for(var i =0; i < widgetBasicWidgetAttributes.length; i++){
-        var key = widgetBasicWidgetAttributes[i];
-        var value = this.getProperty(key) || this.getModelProperty(key);
-        if(value){
-            $element.attr(key, value);
-        } else {
-            $element.removeAttr(key);
-        }
-    }
-};
-
-/**
- * Loads style from the input model.
- * 
- * The style is a part of widget data model.
- * 
- * NOTE: this is an internal function and supposed not to call from outside.
- * 
- * @param style
- *            {object} part of widget model
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.loadStyle = function () {
-    var model = this.getModel();
-    var runtimeModel = this.getRuntimeModel();
-    if (!model) {
-        return;
-    }
-    var computedStyle = angular.merge({}, model.style, runtimeModel.style);
-    if(angular.equals(computedStyle, this.computedStyle)){
-        return;
-    }
-    // TODO: maso, 2018:Create event
-    var $event = {}
-    $event.source = this;
-    $event.oldValue = this.computedStyle;
-    $event.newValue = computedStyle;
-
-    // save computedStyle
-    this.computedStyle = computedStyle;
-
-    // load style
-    var css;
-    if(model.type == 'Group' || model.type == 'ObjectCollection'){
-        css = this.$wbUtil.convertToGroupCss(this.computedStyle || {});
-    } else {
-        css = this.$wbUtil.convertToWidgetCss(this.computedStyle || {});
-    }
-    this.$element.css(css);
-    this.fire('styleChanged', $event);
-};
-
-/**
- * Refreshes the view based on the current data
- * 
- * It used runtime and model data to update the view.
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.refresh = function($event) {
-    if(this.isSilent()) {
-        return;
-    }
-    // to support old widget
-    var model = this.getModel();
-    this.getScope().wbModel = model;
-
-    if($event){
-        var key = $event.key || 'xxx';
-        // update event
-        if(key.startsWith('event')){
-            this.eventFunctions = {};
-        } else if(key.startsWith('style')) {
-            this.loadStyle();
-        } else if(_.includes(widgetBasicWidgetAttributes, key)){
-            var value = this.getProperty(key) || this.getModelProperty(key);
-            this.setElementAttribute(key, value);
-        }
-        return;
-    } 
-    this.eventFunctions = {};
-    this.loadStyle();
-    this.loadBasicProperties();
-};
-
-/**
- * Reload all data to run the widget from the start
- * 
- * This function clean the runtime data and refresh the widget. On the other
- * hand the init event will be fired.
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.reload = function(){
-    this.runtimeModel = {};
-    this.refresh();
-};
-
-
-/**
- * Returns model of the widget
- * 
- * The model is managed by other entity and used as read only part in the
- * widget.
- * 
- * By the way it is supposed that the model is used just in a widget and to
- * modify the model, a method of the widget is called. In this case the widget
- * fire the changes of the model.
- * 
- * @see #setModelProperty(key, value)
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getModel = function () {
-    return this.wbModel;
-};
-
-/**
- * Sets model of the widget
- * 
- * @see #getModel()
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setModel = function (model) {
-	this.setState('init');
-    if (model === this.wbModel) {
-        return;
-    }
-    this.wbModel = model;
-    this.fire('modelChanged');
-    this.reload();
-    this.setState('ready');
-};
-
-/**
- * Checks if the key exist in the widget model
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.hasModelProperty = function(key){
-    return objectPath.has(this.getModel(), key);
-};
-
-/**
- * Get model property
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getModelProperty = function(key){
-    return objectPath.get(this.getModel(), key);
-};
-
-/**
- * Sets new model property value
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setModelProperty = function (key, value){
-    // create the event
-    var $event = {};
-    $event.source = this;
-    $event.key = key;
-    $event.oldValue = this.getModelProperty(key);
-    $event.newValue =  value;
-
-    // check if value changed
-    if(angular.equals($event.oldValue, $event.newValue)){
-        return;
-    }
-
-    // Set the address
-    if(value){
-        objectPath.set(this.getModel(), key, value);
-    } else {
-        objectPath.del(this.getModel(), key);
-    }
-
-    // refresh the view
-    this.refresh($event);
-    this.fire('modelUpdated', $event);
-};
-
-/**
- * Gets runtime model
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getRuntimeModel = function () {
-    return this.runtimeModel;
-};
-
-/**
- * Checks if property exist
- * 
- * NOTE: just look for runtime property
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.hasProperty = function (key){
-    return objectPath.has(this.getRuntimeModel(), key);
-};
-
-/**
- * Gets property of the model
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getProperty = function (key){
-    return objectPath.get(this.getRuntimeModel(), key);
-};
-
-/**
- * Remove property
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.removeProperty = function (key){
-    var model = this.getRuntimeModel();
-    objectPath.del(model, key);
-};
-
-/**
- * Changes property value
- * 
- * If the change cause the view to update then this function will update and
- * render the view.
- * 
- * @memberof WbAbstractWidget
- * @name setProperty
- */
-WbAbstractWidget.prototype.setProperty = function (key, value){
-    // create the event
-    var $event = {};
-    $event.source = this;
-    $event.key = key;
-    $event.oldValue = this.getProperty(key);
-    $event.newValue =  value;
-    $event.value =  value;
-
-    // check if value changed
-    if(angular.equals($event.oldValue, $event.value)){
-        return;
-    }
-
-    // Set the address
-    var model = this.getRuntimeModel();
-    if(angular.isDefined(value)){
-        objectPath.set(model, key, value);
-    } else {
-        objectPath.del(model, key);
-    }
-
-
-    // refresh the view
-    this.refresh($event);
-    this.fire('runtimeModelUpdated', $event);
-    //To change the view in runtime
-    var ctrl = this;
-    // Update angular
-    // TODO: maso, 2019: replace with this model
-//    if (!$rootScope.$$phase) {
-//        scope.$digest();
-//    }
-    this.$timeout( function() {
-        ctrl.getScope().$digest();
-    });
-
-};
-
-/**
- * Sets or gets style of the widget
- * 
- * The function effect on runtime style not the model. To change the model use
- * #setModelProperty(key,value).
- * 
- * NOTE: this function is part of widget API.
- * 
- * Set style by key:
- * 
- * widget.style('background.color', '#ff00aa');
- * 
- * Get style by key:
- * 
- * var color = widget.style('background.color');
- * 
- * Remove style by key:
- * 
- * widget.style('background.color', null);
- * 
- * Set style by object:
- * 
- * widgt.style({ background: { color: 'red', image: null } });
- * 
- * The style object is read only and you can get it as follow:
- * 
- * var style = widget.style();
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.style = function (style, value) {
-    // there is no argument so act as get
-    if(!angular.isDefined(style)){
-        return angular.copy(this.getProperty('style'));
-    }
-    // style is a key
-    if(angular.isString(style)){
-        if(angular.isDefined(value)){
-            return this.setStyle(style, value);
-        } else {
-            return this.getStyle(style);
-        }
-    }
-};
-
-/**
- * Sets style of the widget
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setStyle = function(key, value) {
-    this.setProperty('style.' + key, value);
-};
-
-/**
- * Get style from widget
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getStyle = function(key) {
-    return this.getProperty('style.' + key);
-};
-
-/**
- * Remove the widgets
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.destroy = function ($event) {
-    // remove callbacks
-    this.callbacks = [];
-    this.actions = [];
-
-    // destroy children
-    angular.forEach(this.childWidgets, function (widget) {
-        widget.destroy();
-    });
-    this.childWidgets = [];
-
-    // destroy view
-    this.$element.remove();
-    this.$element = null;
-
-    // remove scope
-    this.$scope.$destroy();
-    this.$scope = null;
-    this.fire('destroy', $event);
-};
-
-/**
- * Set widget element
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setElement = function ($element) {
-    try{
-        this.disconnect();
-    } finally{
-        this.$element = $element;
-        this.connect();
-    }
-};
-
-/**
- * Disconnect view with the widget
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.disconnect = function () {
-    var $element = this.getElement();
-    if (!$element) {
-        return;
-    }
-    this.resizeObserver.unobserve($element[0]);
-    this.intersectionObserver.unobserve($element[0]);
-    angular.forEach(this.eventListeners, function (listener, key) {
-        $element.off(key, listener);
-    });
-};
-
-/**
- * Connects view with widget
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.connect = function () {
-    var $element = this.getElement();
-    if (!$element) {
-        return;
-    }
-    angular.forEach(this.eventListeners, function (listener, key) {
-        $element.on(key, listener);
-    });
-    this.resizeObserver.observe($element[0]);
-    this.intersectionObserver.observe($element[0]);
-};
-
-/**
- * Get elements of the widget
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getElement = function () {
-    return this.$element;
-};
-
-/**
- * Sets element attributes
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setElementAttribute = function(key, value){
-    if(value){
-        this.$element.attr(key, value);
-    } else {
-        this.$element.removeAttr(key);
-    }
-};
-
-/**
- * Get element attribute
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getElementAttribute = function(key){
-    return this.$element.attr(key);
-};
-
-/**
- * Remove element attribute
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.removeElementAttribute = function(key){
-    this.$element.removeAttr(key);
-};
-
-/**
- * Set widget silent
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setSilent = function(silent) {
-    this.silent = silent;
-};
-
-/**
- * Checks if the element is silent
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.isSilent = function() {
-    return this.silent;
-};
-
-/**
- * Adds new callback of type
- * 
- * @param typeof
- *            the event
- * @param callback
- *            to call on the event
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.on = function (type, callback) {
-    if (!angular.isFunction(callback)) {
-        throw {
-            message: 'Callback must be a function'
-        };
-    }
-    if (!angular.isArray(this.callbacks[type])) {
-        this.callbacks[type] = [];
-    }
-    if(this.callbacks[type].includes(callback)){
-        return;
-    }
-    this.callbacks[type].push(callback);
-};
-
-/**
- * Remove the callback
- * 
- * @param type
- *            of the event
- * @param callback
- *            to remove
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.off = function (type, callback) {
-    if (!angular.isArray(this.callbacks[type])) {
-        return;
-    }
-    // remove callback
-    var callbacks = this.callbacks[type];
-    var index = callbacks.indexOf(callback);
-    if (index > -1) {
-        callbacks.splice(index, 1);
-    }
-};
-
-/**
- * Call all callbacks on the given event type.
- * 
- * Before callbacks, widget processors will process the widget and event.
- * 
- * @param type
- *            of the event
- * @param params
- *            to add to the event
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.fire = function (type, params) {
-	// 1- Call processors
-	var event = _.merge({
-		source: this,
-		type: type
-	}, params || {});
-	this.$widget.applyProcessors(this, event);
-
-	// 2- call listeners
-	if (this.isSilent() || !angular.isDefined(this.callbacks[type])) {
-        return;
-    }
-    var callbacks = this.callbacks[type];
-    var resultData = null;
-    for(var i = 0; i < callbacks.length; i++){
-        // TODO: maso, 2018: check if the event is stopped to propagate
-        try {
-        	resultData = callbacks[i](event) || resultData;
-        } catch (error) {
-            // NOTE: remove on release
-            console.log(error);
-        }
-    }
-    return resultData;
-};
-
-/**
- * Gets direction of the widget
- * 
- * This function get direction from user model and is equals to:
- * 
- * widget.getModelProperty('style.layout.direction');
- * 
- * NOTE: default layout direction is column.
- * 
- * @returns {WbAbstractWidget.wbModel.style.layout.direction|undefined}
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getDirection = function () {
-    return this.getModelProperty('style.layout.direction') || 'column';
-};
-
-/**
- * Get events of the widget
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getEvent = function () {
-    return this.getModelProperty('event') || {};
-};
-
-/**
- * Get title of the widget
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getTitle = function () {
-    return this.getModelProperty('label');
-};
-
-/**
- * Gets type
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getType = function () {
-    return this.getModelProperty('type');
-};
-
-/**
- * Gets Id of the model
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getId = function () {
-    return this.getModelProperty('id');
-};
-
-/**
- * Get parent widget
- * 
- * Parent widget is called container in this model. It is attached dynamically
- * on the render phease.
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getParent = function () {
-    return this.parent;
-};
-
-/**
- * Sets parent
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setParent = function (widget) {
-    return this.parent = widget;
-};
-
-/**
- * Set scope data
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setScope = function ($scope) {
-    this.$scope = $scope;
-};
-
-/**
- * Gets Scope data
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getScope = function () {
-    return this.$scope;
-};
-
-/**
- * Sets the state of the widget
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setState = function (state) {
-	var oldState = this.state;
-	this.state = state;
-	this.fire('stateChanged', {
-		oldValue: oldState,
-		value: state
-	});
-};
-
-
-
-/**
- * Checks if the editable mode is enable
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.isEditable = function () {
-    return this.editable;
-};
-
-/**
- * Set edit mode
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setEditable = function (editable) {
-    if (this.editable === editable) {
-        return;
-    }
-    this.editable = editable;
-    if (this.isRoot()) {
-        delete this.lastSelectedItem;
-        this.setSelected(true);
-    }
-    // propagate to child
-    angular.forEach(this.childWidgets, function (widget) {
-        widget.setEditable(editable);
-    });
-
-    // TODO: maso, 2019: add event data
-    if (editable) {
-    	this.setState('edit');
-        this.fire('editable'); // depricated
-    } else {
-    	this.setState('ready');
-        this.fire('noneditable'); // depricated
-    }
-    // TODO: no need to reload?!!
-    var ctrl = this;
-    this.$timeout(function(){
-        ctrl.reload();
-    }, 100);
-};
-
-/**
- * Check if intersecting
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.isIntersecting = function(){
-    return this.intersecting;
-};
-
-/**
- * Set intersecting true
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.setIntersecting = function(intersecting, $event){
-    this.intersecting = intersecting;
-    this.fire('intersection', $event);
-};
-
-
-/**
- * Delete the widget
- * 
- * This function just used in edit mode
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.delete = function () {
-    // remove itself
-    this.fire('delete');
-    this.getParent()
-    .removeChild(this);
-};
-
-/**
- * Clone current widget This method works in edit mode only.
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.clone = function () {
-    var index = this.getParent().indexOfChild(this);
-    this.getParent()//
-    .addChild(index, angular.copy(this.getModel()));
-};
-
-/**
- * This method moves widget one to next.
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.moveNext = function () {
-    this.getParent().moveChild(this, this.getParent().indexOfChild(this) + 1);
-};
-
-/**
- * This method moves widget one to before
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.moveBefore = function () {
-    this.getParent().moveChild(this, this.getParent().indexOfChild(this) - 1);
-};
-
-/**
- * This method moves widget to the first of it's parent
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.moveFirst = function () {
-    this.getParent().moveChild(this, 0);
-};
-
-/**
- * This method moves widget to the last of it's parent
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.moveLast = function () {
-    this.getParent().moveChild(this, this.getParent().getChildren().length - 1);
-};
-
-/**
- * Checks if the widget is root
- * 
- * If there is no parent controller then this is a root one.
- * 
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.isRoot = function () {
-    var parent = this.getParent();
-    return angular.isUndefined(parent) || parent === null;
-};
-
-/**
- * Gets root widgets of the widget
- * 
- * @return the root widget
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getRoot = function () {
-    // check if the root is set
-    if (this.rootWidget) {
-        return this.rootWidget;
-    }
-    // find root if is empty
-    this.rootWidget = this;
-    while (!this.rootWidget.isRoot()) {
-        this.rootWidget = this.rootWidget.getParent();
-    }
-    return this.rootWidget;
-};
-
-
-/**
- * Checks if the widget is selected.
- * 
- * NOTE: it is not possible to select root widget
- * 
- * @return true if the widget is selected.
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.isSelected = function () {
-    return this.selected;
-};
-
-WbAbstractWidget.prototype.setSelected = function (flag, $event) {
-    if (this.isRoot()) {
-        return;
-    }
-    if (this.selected === flag) {
-        return;
-    }
-
-    // fire events
-    this.selected = flag;
-    if (flag) {
-        this.getRoot().childSelected(this, $event);
-        this.fire('select');
-    } else {
-        this.getRoot().childUnSelected(this, {});
-        this.fire('unselect');
-        // Open an editor 
-        var editor = this.$widget.getEditor(this);
-        editor.hide();
-    }
-};
-
-/**
- * Add new action in actions list
- * 
- * @memberof WbWidgetCtrl
- */
-WbAbstractWidget.prototype.addAction = function (action) {
-    this.actions.push(action);
-};
-
-/**
- * Gets widget actions
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getActions = function () {
-    return this.actions;
-};
-
-
-/**
- * Returns bounding client rectangle to parent
- * 
- * @return bounding rectangle
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.getBoundingClientRect = function () {
-    var element = this.getElement();
-    if(!element){
-        return {
-            width: 0,
-            height: 0,
-            top: 0,
-            left: 0
-        };
-    }
-
-    var offset = element.position();
-    var width = element.outerWidth();
-    var height = element.outerHeight();
-
-    return {
-        // rect
-        width: width,
-        height: height,
-        // offset
-        top: offset.top + parseInt(element.css('marginTop'), 10) + element.scrollTop(),
-        left: offset.left + parseInt(element.css('marginLeft'), 10)
-    };
-};
-
-
-/**
- * Adds animation to the page
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.animate = function (options) {
-    var ctrl = this;
-    var keys = [];
-    var animation = {
-            targets: this.getRuntimeModel(),
-            update: function(/* anim */) {
-                // XXX: maso, 2019: support multiple key in event
-                ctrl.refresh();
-            }
-    };
-
-    // copy animation properties
-    if(options.duration){
-        animation.duration = options.duration;
-    }
-    if(options.loop){
-        animation.loop = options.loop;
-    }
-    if(options.autoplay){
-        animation.autoplay = options.autoplay;
-    }
-    if(options.delay){
-        animation.delay = options.delay;
-    }
-    if(options.easing){
-        animation.easing = options.easing;
-    }
-
-    // Create list of attributes
-    for(var key in options){
-        // ignore keys
-        if(key === 'duration'|| 
-                key === 'loop'|| 
-                key === 'autoplay'||
-                key === 'delay'||
-                key === 'easing'){
-            continue;
-        }
-        keys.push(key);
-        animation[key] = options[key];
-
-        // set initial value
-        var val = this.getProperty(key);
-        if(!val) {
-            this.setProperty(key, this.getModelProperty(key));
-        }
-
-        // NOTE: if the value is empty then you have to set from values
-    }
-
-    return anime(animation);
-};
-
-/**
- * Remove animations from the widget
- * 
- * @memberof WbAbstractWidget
- */
-WbAbstractWidget.prototype.removeAnimation = function () {
-    // The animation will not add to element so there is no need to remove
-};
-
-/**
- * Sets window of the widget
- * 
- * @memberof WbAbstractWidget
- * @params window {WbWindow} of the current widget
- */
-WbAbstractWidget.prototype.setWindow = function (window) {
-    this.window = window;
-};
-
-/**
- * Gets window of the widget
- * 
- * @memberof WbAbstractWidget
- * @return window of the current widget or from the root
- */
-WbAbstractWidget.prototype.getWindow = function () {
-    return this.window || this.getRoot().getWindow() || this.$wbWindow;
-};
-
-/*******************************************************************************
- * * * * *
- ******************************************************************************/
-/**
- * @ngdoc Controllers
- * @name wbWidgetCtrl
- * @description Controller of a widget
- * 
- * 
- * @ngInject
- */
-var WbWidgetCtrl = function ($scope, $element, $wbUtil, $widget, $timeout, $wbWindow) {
-    WbAbstractWidget.call(this);
-    this.setElement($element);
-    this.setScope($scope);
-    this.$wbUtil = $wbUtil;
-    this.$widget = $widget;
-    this.$timeout = $timeout;
-    this.$wbWindow = $wbWindow;
-};
-WbWidgetCtrl.prototype = new WbAbstractWidget();
-
-
-
-/*******************************************************************************
- * * * * *
- ******************************************************************************/
-/**
- * @ngdoc Controllers
- * @name WbWidgetGroupCtrl
- * @description Manages a group widget
- * 
- * This is a group controller
- * 
- * @ngInject
- */
-var WbWidgetGroupCtrl = function ($scope, $element, $wbUtil, $widget, $q, $timeout, $wbWindow) {
-    WbAbstractWidget.call(this);
-    this.setElement($element);
-    this.setScope($scope);
-
-    this.$widget = $widget;
-    this.$q = $q;
-    this.$wbUtil = $wbUtil;
-    this.$timeout = $timeout;
-    this.$wbWindow = $wbWindow;
-};
-WbWidgetGroupCtrl.prototype = new WbAbstractWidget();
-
-/**
- * Set model to a group
- * 
- * Setting model to a group is differs from setting in widget. In group 
- * we try to load children and finally loading the group itself.
- * 
- * @memberof WbWidgetGroupCtrl
- * @param model Object to set into the group
- */
-WbWidgetGroupCtrl.prototype.setModel = function (model) {
-	this.setState('init');
-    if (model === this.wbModel) {
-        return;
-    }
-    this.wbModel = model;
-    this.fire('modelChanged');
-
-    var ctrl = this;
-    this.loadWidgets(model)
-    .finally(function () {
-        ctrl.fire('loaded');
-        ctrl.reload();
-        ctrl.setState('ready');
-    })
-};
-
-/**
- * Check if the widget is selected
- */
-WbWidgetGroupCtrl.prototype.isChildSelected = function (widget) {
-    if (this.isRoot()) {
-        return widget === this.lastSelectedItem;
-    }
-    return this.getParent().isChildSelected(widget);
-};
-
-WbWidgetGroupCtrl.prototype.getChildById = function (id) {
-    var widgets = this.childWidgets;
-    for (var i = 0; i < widgets.length; i++) {
-        if (widgets[i].getId() === id) {
-            return widgets[i];
-        }
-    }
-};
-
-/**
- * Gets all children of the group
- * 
- * @return list of all widgets
- */
-WbWidgetGroupCtrl.prototype.getChildren = function () {
-    return this.childWidgets;
-};
-
-WbWidgetGroupCtrl.prototype.loadWidgets = function (model) {
-    // destroy all children
-    angular.forEach(this.childWidgets, function (widget) {
-        widget.destroy();
-    });
-    this.childWidgets = [];
-
-    // check for new contents
-    var $q = this.$q;
-    if (!model || !angular.isArray(model.contents)) {
-        return $q.resolve();
-    }
-
-    // create contents
-    var $widget = this.$widget;
-    var parentWidget = this;
-
-    var compilesJob = [];
-    model.contents.forEach(function (item, index) {
-        var job = $widget.compile(item, parentWidget)//
-        .then(function (widget) {
-            parentWidget.childWidgets[index] = widget;
-        });
-        compilesJob.push(job);
-    });
-
-    var ctrl = this;
-    return $q.all(compilesJob)//
-    .then(function () {
-        var $element = parentWidget.getElement();
-        parentWidget.childWidgets.forEach(function (widget) {
-            widget.setEditable(ctrl.isEditable());
-            $element.append(widget.getElement());
-        });
-    });
-};
-
-
-
-WbWidgetGroupCtrl.prototype.childSelected = function (ctrl, $event) {
-    if (!this.isRoot()) {
-        return this.getRoot().childSelected(ctrl, $event);
-    }
-    $event = $event || {};
-    if (!$event.shiftKey) {
-        this.selectionLock = true;
-        angular.forEach(this.lastSelectedItems, function (widget) {
-            widget.setSelected(false);
-        });
-        this.selectionLock = false;
-        this.lastSelectedItems = [];
-    }
-
-    if (this.lastSelectedItems.indexOf(ctrl) >= 0) {
-        return;
-    }
-
-    this.lastSelectedItems.push(ctrl);
-
-    // maso, 2018: call the parent controller function
-    this.fire('select', {
-        widgets: this.lastSelectedItems
-    });
-};
-
-WbWidgetGroupCtrl.prototype.childUnSelected = function(widget, $event){
-    if (!this.isRoot()) {
-        return this.getRoot().childSelected(widget, $event);
-    }
-    if(this.selectionLock){
-        return;
-    }
-    $event = $event || {};
-    var index = this.lastSelectedItems.indexOf(widget);
-    if(index < 0)  {
-        return;
-    }
-    this.lastSelectedItems.splice(index, 1);
-    // maso, 2018: call the parent controller function
-    this.fire('select', {
-        widgets: this.lastSelectedItems
-    });
-};
-
-/**
- * Removes a widget
- * 
- * Data model and visual element related to the input model will be removed.
- */
-WbWidgetGroupCtrl.prototype.removeChild = function (widget) {
-    var index = this.indexOfChild(widget);
-
-    if (index > -1) {
-        // remove selection
-        if (widget.isSelected()) {
-            widget.setSelected(false);
-        }
-        // remove model
-        this.childWidgets.splice(index, 1);
-
-        var model = this.getModel();
-        index = model.contents.indexOf(widget.getModel());
-        model.contents.splice(index, 1);
-
-        // destroy widget
-        widget.destroy();
-    }
-    return false;
-};
-
-/**
- * Adds dragged widget
- */
-WbWidgetGroupCtrl.prototype.addChild = function (index, item) {
-    var model = this.getModel();
-    var ctrl = this;
-
-    // add widget
-    item = this.$wbUtil.clean(item);
-    this.$widget.compile(item, this)//
-    .then(function (newWidget) {
-        if (index < ctrl.childWidgets.length) {
-            newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
-        } else {
-            ctrl.getElement().append(newWidget.getElement());
-        }
-        model.contents.splice(index, 0, item);
-        ctrl.childWidgets.splice(index, 0, newWidget);
-
-        // init the widget
-        newWidget.setEditable(ctrl.isEditable());
-        ctrl.fire('newchild', {
-            widget: newWidget
-        });
-    });
-    // TODO: replace with promise
-    return true;
-};
-
-/**
- * Finds index of child element
- */
-WbWidgetGroupCtrl.prototype.moveChild = function (widget, index) {
-
-    function arraymove(arr, fromIndex, toIndex) {
-        var element = arr[fromIndex];
-        arr.splice(fromIndex, 1);
-        arr.splice(toIndex, 0, element);
-    }
-
-    if (index < 0 || index > this.getChildren().length - 1 || this.getChildren().length === 1) {
-        return;
-    }
-    if (this.getModel().contents.indexOf(widget.getModel()) === index) {
-        return;
-    }
-    var positionWidget = this.getChildren()[index];
-    // move element
-    if (this.getModel().contents.indexOf(widget.getModel()) < index) {
-        positionWidget.getElement().after(widget.getElement());
-    } else {
-        positionWidget.getElement().before(widget.getElement());
-    }
-
-    // move model
-    arraymove(this.getModel().contents, this.getModel().contents.indexOf(widget.getModel()), index);
-
-    // move controller
-    arraymove(this.getChildren(), this.indexOfChild(widget), index);
-};
-
-/**
- * Finds index of child element
- */
-WbWidgetGroupCtrl.prototype.indexOfChild = function (widget) {
-    if (!this.childWidgets || !this.childWidgets.length) {
-        return -1;
-    }
-    return this.childWidgets.indexOf(widget);
-};
-
-
-/**
- * Delete the widget
- * 
- * This function just used in edit mode
- * 
- * @memberof WbWidgetGroupCtrl
- */
-WbWidgetGroupCtrl.prototype.delete = function () {
-    // remove all children
-    var widgets = this.getChildren();
-    angular.forEach(widgets, function (widget) {
-        widget.delete();
-    });
-
-    // remove itself
-    this.fire('delete');
-    if (!this.isRoot()) {
-        this.getParent()
-        .removeChild(this);
-    }
-};
-
-/**
- * List of allowed child
- * 
- * @memeberof WbWidgetGroupCtrl
- */
-WbWidgetGroupCtrl.prototype.getAllowedTypes = function () {
-    if (!this.isRoot()) {
-        return this.getParent().getAllowedTypes();
-    }
-    return this.allowedTypes;
-};
-
-WbWidgetGroupCtrl.prototype.setAllowedTypes = function (allowedTypes) {
-    return this.allowedTypes = allowedTypes;
-};
-
-
-//submit the controller
-angular.module('am-wb-core')//
-.controller('WbWidgetCtrl', WbWidgetCtrl)//
-.controller('WbWidgetGroupCtrl', WbWidgetGroupCtrl);
-
-
 /* 
  * The MIT License (MIT)
  * 
@@ -7988,6 +4573,322 @@ angular.module('am-wb-core')
         }
     }
 });
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * Binds a TinyMCE widget to <textarea> elements.
+ */
+angular.module('ui.tinymce', [])
+.value('uiTinymceConfig', {})
+.directive('uiTinymce', function($rootScope, $compile, $timeout, $window, $sce, uiTinymceConfig, uiTinymceService) {
+    'use strict';
+	uiTinymceConfig = uiTinymceConfig || {};
+
+	if (uiTinymceConfig.baseUrl) {
+		tinymce.baseURL = uiTinymceConfig.baseUrl;
+	}
+
+	return {
+		require: ['ngModel', '^?form'],
+		priority: 599,
+		link: function(scope, element, attrs, ctrls) {
+			if (!$window.tinymce) {
+				return;
+			}
+
+			var ngModel = ctrls[0],
+			form = ctrls[1] || null;
+
+			var expression, options = {
+					debounce: true
+			}, tinyInstance,
+			updateView = function(editor) {
+				var content = editor.getContent({format: options.format}).trim();
+				content = $sce.trustAsHtml(content);
+
+				ngModel.$setViewValue(content);
+				if (!$rootScope.$$phase) {
+					scope.$digest();
+				}
+			};
+
+			function toggleDisable(disabled) {
+				if (disabled) {
+					ensureInstance();
+
+					if (tinyInstance) {
+						tinyInstance.getBody().setAttribute('contenteditable', false);
+					}
+				} else {
+					ensureInstance();
+
+					if (tinyInstance && !tinyInstance.settings.readonly && tinyInstance.getDoc()) {
+						tinyInstance.getBody().setAttribute('contenteditable', true);
+					}
+				}
+			}
+
+			// fetch a unique ID from the service
+			var uniqueId = uiTinymceService.getUniqueId();
+			attrs.$set('id', uniqueId);
+
+			expression = {};
+
+			angular.extend(expression, scope.$eval(attrs.uiTinymce));
+
+			//Debounce update and save action
+			var debouncedUpdate = (function(debouncedUpdateDelay) {
+				var debouncedUpdateTimer;
+				return function(ed) {
+					$timeout.cancel(debouncedUpdateTimer);
+					debouncedUpdateTimer = $timeout(function() {
+						return (function(ed) {
+							if (ed.isDirty()) {
+								ed.save();
+								updateView(ed);
+							}
+						})(ed);
+					}, debouncedUpdateDelay);
+				};
+			})(400);
+
+			var setupOptions = {
+					// Update model when calling setContent
+					// (such as from the source editor popup)
+					setup: function(ed) {
+						ed.on('init', function() {
+							ngModel.$render();
+							ngModel.$setPristine();
+							ngModel.$setUntouched();
+							if (form) {
+								form.$setPristine();
+							}
+						});
+
+						// Update model when:
+						// - a button has been clicked [ExecCommand]
+						// - the editor content has been modified [change]
+						// - the node has changed [NodeChange]
+						// - an object has been resized (table, image) [ObjectResized]
+						ed.on('ExecCommand change NodeChange ObjectResized', function() {
+							if (!options.debounce) {
+								ed.save();
+								updateView(ed);
+								return;
+							}
+							debouncedUpdate(ed);
+						});
+
+						ed.on('blur', function() {
+							element[0].blur();
+							ngModel.$setTouched();
+							if (!$rootScope.$$phase) {
+								scope.$digest();
+							}
+						});
+
+						ed.on('remove', function() {
+							element.remove();
+						});
+
+						if (uiTinymceConfig.setup) {
+							uiTinymceConfig.setup(ed, {
+								updateView: updateView
+							});
+						}
+
+						if (expression.setup) {
+							expression.setup(ed, {
+								updateView: updateView
+							});
+						}
+					},
+					format: expression.format || 'html',
+					selector: '#' + attrs.id
+			};
+			// extend options with initial uiTinymceConfig and
+			// options from directive attribute value
+			angular.extend(options, uiTinymceConfig, expression, setupOptions);
+			// Wrapped in $timeout due to $tinymce:refresh implementation, requires
+			// element to be present in DOM before instantiating editor when
+			// re-rendering directive
+			$timeout(function() {
+				if (options.baseURL){
+					tinymce.baseURL = options.baseURL;
+				}
+				var maybeInitPromise = tinymce.init(options);
+				if(maybeInitPromise && typeof maybeInitPromise.then === 'function') {
+					maybeInitPromise.then(function() {
+						toggleDisable(scope.$eval(attrs.ngDisabled));
+					});
+				} else {
+					toggleDisable(scope.$eval(attrs.ngDisabled));
+				}
+			});
+
+			ngModel.$formatters.unshift(function(modelValue) {
+				return modelValue ? $sce.trustAsHtml(modelValue) : '';
+			});
+
+			ngModel.$parsers.unshift(function(viewValue) {
+				return viewValue ? $sce.getTrustedHtml(viewValue) : '';
+			});
+
+			ngModel.$render = function() {
+				ensureInstance();
+
+				var viewValue = ngModel.$viewValue ?
+						$sce.getTrustedHtml(ngModel.$viewValue) : '';
+
+						// instance.getDoc() check is a guard against null value
+						// when destruction & recreation of instances happen
+						if (tinyInstance &&
+								tinyInstance.getDoc()
+						) {
+							tinyInstance.setContent(viewValue);
+							// Triggering change event due to TinyMCE not firing event &
+							// becoming out of sync for change callbacks
+							tinyInstance.fire('change');
+						}
+			};
+
+			attrs.$observe('disabled', toggleDisable);
+
+			// This block is because of TinyMCE not playing well with removal and
+			// recreation of instances, requiring instances to have different
+			// selectors in order to render new instances properly
+			var unbindEventListener = scope.$on('$tinymce:refresh', function(e, id) {
+				var eid = attrs.id;
+				if (angular.isUndefined(id) || id === eid) {
+					var parentElement = element.parent();
+					var clonedElement = element.clone();
+					clonedElement.removeAttr('id');
+					clonedElement.removeAttr('style');
+					clonedElement.removeAttr('aria-hidden');
+					tinymce.execCommand('mceRemoveEditor', false, eid);
+					parentElement.append($compile(clonedElement)(scope));
+					unbindEventListener();
+				}
+			});
+
+			scope.$on('$destroy', function() {
+				ensureInstance();
+
+				if (tinyInstance) {
+					tinyInstance.remove();
+					tinyInstance = null;
+				}
+			});
+
+			function ensureInstance() {
+				if (!tinyInstance) {
+					tinyInstance = tinymce.get(attrs.id);
+				}
+			}
+		}
+	};
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc Directives
+ * @name wb-content
+ * @description Render a list of widget
+ *  ## wbOnModelSelect
+ * 
+ * If a widget select with in the group then the wbOnModelSelect parameter will
+ * be evaluated with the following attributes:
+ *  - $event : the related event - $ctrl : the widget (to support legacy) -
+ * $model: the model (to support legace)
+ * 
+ * NOTE: The root widget will be passed as first selected item. The function
+ * will be evaluated in non edit mode.
+ */
+.directive('wbContent', function($widget) {
+    /*
+     * Link widget view
+     */
+    function wbGroupLink($scope, $element, $attrs, ctrls) {
+        var rootWidget;
+        var ngModelCtrl = ctrls[0];
+        // Load ngModel
+        ngModelCtrl.$render = function() {
+            var model = ngModelCtrl.$viewValue;
+            if (!model) {
+                return;
+            }
+
+            // 0- remove old
+            if(rootWidget){
+                rootWidget.delete();
+            }
+
+            // 1- create widget
+            $widget.compile(model, null, $element)
+            .then(function(widget){
+                rootWidget = widget;
+                $element.trigger('load', widget);
+            }, function(error){
+                $element.error(error);
+            });
+        };
+    }
+
+    return {
+        restrict : 'EA',
+        scope : true,
+        link : wbGroupLink,
+        require: ['?ngModel']
+    };
+});
+
 /* 
  * The MIT License (MIT)
  * 
@@ -8104,7 +5005,7 @@ angular.module('am-wb-core')
 			}
 			for (var i = 0; i < eventTypes.length; i++) {
 				var event = eventTypes[i];
-				event.code = widget.getModelProperty('event.' + event.key);
+				event.code = widget.getModelProperty('on.' + event.key);
 				$scope.events.push(event);
 			}
 		}
@@ -8116,10 +5017,10 @@ angular.module('am-wb-core')
 			for (var i = 0; i < $scope.events.length; i++) {
 				var event = $scope.events[i];
 				if (event.code) {
-					widget.setModelProperty('event.'
+					widget.setModelProperty('on.'
 							+ event.key, event.code);
 				} else {
-					widget.setModelProperty('event.'
+					widget.setModelProperty('on.'
 							+ event.key, undefined);
 				}
 			}
@@ -8175,143 +5076,6 @@ angular.module('am-wb-core')
 				$scope.saveEvents();
 			};
 		}
-	};
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-/**
- * @ngdoc Directives
- * @name wb-group
- * @description Render a list of widget
- *  ## wbOnModelSelect
- * 
- * If a widget select with in the group then the wbOnModelSelect parameter will
- * be evaluated with the following attributes:
- *  - $event : the related event - $ctrl : the widget (to support legacy) -
- * $model: the model (to support legace)
- * 
- * NOTE: The root widget will be passed as first selected item. The function
- * will be evaluated in non edit mode.
- */
-.directive('wbGroup', function($widget, $parse, $timeout) {
-
-	/*
-	 * Link widget view
-	 */
-	function wbGroupLink($scope, $element, $attrs, ngModelCtrl) {
-
-		var model;
-		var rootWidget;
-		var onSelectionFuction;
-
-		if ($scope.wbOnModelSelect) {
-			onSelectionFuction = $parse($scope.wbOnModelSelect);
-		}
-
-		/*
-		 * Fire if a widget is selected
-		 */
-		function fireSelection($event) {
-			if(!onSelectionFuction) {
-				return;
-			}
-			var widgets = $event.widgets;
-			var locals = {
-					'$event' : $event,
-					'widgets' : widgets
-			};
-			if (angular.isArray(widgets) && widgets.length) {
-				locals.$model = rootWidget.getModel();
-				locals.$ctrl = rootWidget;
-			}
-			$scope.$eval(function() {
-				onSelectionFuction($scope.$parent, locals);
-			});
-			$timeout(function(){
-				try{$scope.$digest();} catch(ex){};
-			});
-		}
-
-		// Load ngModel
-		ngModelCtrl.$render = function() {
-			model = ngModelCtrl.$viewValue;
-			if (!model) {
-				if (rootWidget) {
-					rootWidget.setModel({
-						type : 'Group'
-					});
-				}
-				return;
-			}
-			// set new model to the group
-			if (rootWidget) {
-				rootWidget.setModel(model);
-			} else {
-				$widget.compile(model, null, $element)
-				.then(function(widget) {
-					rootWidget = widget;
-					// load
-					rootWidget.on('select', fireSelection);
-					fireSelection({
-						widgets : [ widget ]
-					});
-				});
-			}
-		};
-
-		/*
-		 * Watch for editable in root element
-		 */
-		$scope.$watch('wbEditable', function(editable) {
-			if (rootWidget) {
-				rootWidget.setEditable(editable);
-			}
-		});
-
-		$scope.$watch('wbAllowedTypes', function(wbAllowedTypes) {
-			if (rootWidget) {
-				rootWidget.setAllowedTypes(wbAllowedTypes);
-			}
-		});
-
-	}
-
-	return {
-		restrict : 'E',
-		template: '<div></div>',
-		scope : {
-			wbEditable : '=?',
-			wbOnModelSelect : '@?',
-			wbAllowedTypes : '<?'
-		},
-		link : wbGroupLink,
-		require : 'ngModel',
-		replace: true
 	};
 });
 
@@ -8533,6 +5297,55 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
+ * @name wb-on-dragstart
+ * @description Call an action on dragstart
+ * 
+ */
+.directive('wbOnDragstart', function() {
+    return {
+        restrict : 'A',
+        link : function(scope, element, attrs) {
+            element.bind('dragstart', function(event, data) {
+                // call the function that was passed
+                if (attrs.wbOnDragstart) {
+                    scope.$eval(attrs.wbOnDragstart, {
+                        $event: event,
+                        $element: element,
+                        $data: data
+                    });
+                }
+            });
+        }
+    };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
  * @name wb-on-enter
  * @description Call an action on ENTER
  * 
@@ -8691,10 +5504,14 @@ angular.module('am-wb-core')
 	return {
 		restrict : 'A',
 		link : function(scope, element, attrs) {
-			element.bind('load', function() {
+			element.bind('load', function(event, data) {
 				// call the function that was passed
 				if (attrs.wbOnLoad) {
-					scope.$apply(attrs.wbOnLoad);
+					scope.$eval(attrs.wbOnLoad, {
+					    $event: event,
+					    $element: element,
+					    $data: data
+					});
 				}
 			});
 		}
@@ -8745,7 +5562,7 @@ angular.module('am-wb-core')
 			.then(function (templateSrc) {
 				var element = angular.element(templateSrc);
 				var scope = $scope.$new();
-				var controller = $controller('AmWbSettingPageCtrl',{
+				var controller = $controller('WbSettingPageCtrl',{
 					$scope: scope,
 					$element: element
 				});
@@ -8771,7 +5588,7 @@ angular.module('am-wb-core')
 			if (!type) {
 				return;
 			}
-			var setting = $settings.page(type);
+			var setting = $settings.getPage(type);
 			loadSetting(setting)//
 			.then(function(ctrl){
 				settingCtrl = ctrl;
@@ -8875,9 +5692,9 @@ angular.module('am-wb-core')
 
 			// visible new ones
 			for(i = 0; i < settingKeys.length; i++){
-				var key = settingKeys[i];
+				var key = settingKeys[i].type;
 				if(!settingMap[key]){
-					var setting = $settings.getPage(key);
+					var setting = settingKeys[i];
 					settingMap[key] = angular.copy(setting);
 					$scope.settings.push(settingMap[key]);
 				}
@@ -8946,1174 +5763,157 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbWidget
- * @description Widgets container
- * 
- * This is widget containers.
- * 
- * All primary actions of a widget are supported (such as remove and setting).
+/*
+ * link setting widgets
  */
-.directive('wbUiChoose', function() {
-	return {
-		templateUrl : 'views/directives/wb-ui-choose.html',
-		restrict : 'E',
-		controllerAs: 'ctrl',
-		scope : {
-			items : '=items',
-			selected : '=selected'
-		},
-		controller : function($scope) {
-			this.selectedIndex = 0;
-			if ($scope.selected !== null) {
-				for ( var item in $scope.items) {
-					if (item.value === $scope.selected) {
-						this.selectedIndex = $scope.items.indexOf(item);
-					}
-				}
-			} else {
-				$scope.selected = $scope.items[0].value;
-			}
+function wbUiSettingLinkFunction($scope, $element, $attrs, ctrls) {
+    var ngModel = ctrls[0];
 
-			// listen to active tab and update selected attribute.
-			// $scope.$watch('selectedIndex', function(current) {
-			//	$scope.selected = $scope.items[current].value;
-			// });
-			
-			
-			// listen to active tab and update selected attribute.
-			this.tabChanged = function (current) {
-			    $scope.selected = $scope.items[current].value;
-			};
-		}
-	};
-});
+    $scope.wbActionClean = ! _.isUndefined($attrs.wbActionClean);
 
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingAudio
- * @author maso<mostafa.barmshory@dpq.co.ir>
- * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
- * @description a setting section to select audio file.
- *
- */
-.directive('wbUiSettingAudio', function () {
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-audio.html',
-        restrict: 'E',
-        scope: {
-            title: '@title',
-            icon: '@icon'
-        },
-        require: ['ngModel'],
-        link: function (scope, element, attr, ctrls) {
-            var ngModelCtrl = ctrls[0];
-
-            ngModelCtrl.$render = function () {
-                scope.value = ngModelCtrl.$modelValue;
-            };
-
-            scope.valueChanged = function (value) {
-                ngModelCtrl.$setViewValue(value);
-            };
-        },
-        controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function($scope, $resource){
-            this.editValue = function(value){
-                var ctrl = this;
-                return $resource.get('audio', {
-                    style: {
-                        title: 'Select Audio'
-                    },
-                    data: value
-                })//
-                .then(function(newValue){
-                    ctrl.updateValue(newValue);
-                });
-            };
-            this.updateValue = function(newValue) {
-                $scope.value = newValue;
-                $scope.valueChanged(newValue);
-            }
-        }
+    ngModel.$render = function () {
+        $scope.value = ngModel.$modelValue;
     };
-});
 
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
+    $scope.cleanValue = function () {
+        setValue(undefined);
+    };
+    
+    $scope.setValue = setValue;
 
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingBackgroundAttachment', function () {
-
-    function postLink(scope, element, attr, ctrls) {
-        var ngModelCtrl = ctrls[0];
-
-        ngModelCtrl.$render = function () {
-            scope.attachment = ngModelCtrl.$modelValue;
-        };
-
-        scope.attachmentChanged = function (newAttachment) {
-            ngModelCtrl.$setViewValue(newAttachment);
-        };
+    function setValue(value){
+        // TODO: validate and set
+        ngModel.$setViewValue(value);
     }
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-background-attachment.html',
-        restrict: 'E',
-        replace: true,
-        scope: {},
-        require: ['ngModel'],
-        link: postLink,
-        /*
-         * @ngInject
-         */
-        controller: function ($scope) {
-            $scope.items = [
-                {name: 'Scroll', value: 'scroll'},
-                {name: 'Fixed', value: 'fixed'},
-                {name: 'Local', value: 'local'},
-                {name: 'Initial', value: 'initial'},
-                {name: 'Inherit', value: 'inherit'},
-                {name: 'Nothing', value: ''}
-                ];
+}
 
-        }
+/*
+ * link function of the number
+ */
+function wbUiSettingNumberLinkFunction($scope, $element, $attrs, ctrls) {
+    wbUiSettingLinkFunction($scope, $element, $attrs, ctrls);
+    var ngModel = ctrls[0];
+
+    ngModel.$render = function () {
+        pars(ngModel.$modelValue);
     };
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
 
-
-angular.module('am-wb-core')
-
-	/**
-	 * @ngdoc Directives
-	 * @name wbUiSettingColor
-	 * @description a setting section to set color.
-	 *
-	 */
-	.directive('wbUiSettingBackgroundOrigin', function () {
-	    function postLink(scope, element, attr, ctrls) {
-		var ngModelCtrl = ctrls[0];
-
-		ngModelCtrl.$render = function () {
-		    scope.origin = ngModelCtrl.$modelValue;
-		};
-
-		scope.originChanged = function (newOrigin) {
-		    ngModelCtrl.$setViewValue(newOrigin);
-		};
-	    }
-
-	    return {
-		templateUrl: 'views/directives/wb-ui-setting-background-origin.html',
-		restrict: 'E',
-		replace: true,
-		scope: {},
-		require: ['ngModel'],
-		link: postLink,
-        /*
-         * @ngInject
-         */
-		controller: function ($scope) {
-		    $scope.items = [
-			{name: 'Padding-box', value: 'padding-box'},
-			{name: 'Border-box', value: 'border-box'},
-			{name: 'Content-box', value: 'content-box'},
-			{name: 'No-repeat', value: 'no-repeat'},
-			{name: 'Initial', value: 'initial'},
-			{name: 'Inherit', value: 'inherit'},
-			{name: 'Nothing', value: ''}
-		    ];
-
-		}
-	    };
-	});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingBackgroundPosition', function () {
-
-	function postLink(scope, element, attr, ctrls) {
-		var ngModelCtrl = ctrls[0];
-
-		ngModelCtrl.$render = function () {
-			scope.position = ngModelCtrl.$modelValue;
-		};
-
-		scope.positionChanged = function (newPosition) {
-			ngModelCtrl.$setViewValue(newPosition);
-		};
-	}
-
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-background-position.html',
-		restrict: 'E',
-		scope: {},
-		controllerAs: 'ctrl',
-		require: ['ngModel'],
-		link: postLink,
-		/*
-		 * 
-		 * @ngInject
-		 */
-		controller: function ($scope) {
-			$scope.items = [
-				{title: 'Left top', value: 'left top'},
-				{title: 'Left center', value: 'left center'},
-				{title: 'Left bottom', value: 'left bottom'},
-				{title: 'Right top', value: 'right top'},
-				{title: 'Right center', value: 'right center'},
-				{title: 'Right center', value: 'right bottom'},
-				{title: 'Center top', value: 'center top'},
-				{title: 'Center center', value: 'center center'},
-				{title: 'Center bottom', value: 'center bottom'},
-				{title: 'Initial', value: 'initial'},
-				{title: 'Inherit', value: 'inherit'},
-				{title: 'Nothing', value: ''}
-				];
-
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-	/**
-	 * @ngdoc Directives
-	 * @name wbUiSettingColor
-	 * @description a setting section to set color.
-	 *
-	 */
-	.directive('wbUiSettingBackgroundRepeat', function () {
-
-	    function postLink(scope, element, attr, ctrls) {
-		var ngModelCtrl = ctrls[0];
-
-		ngModelCtrl.$render = function () {
-		    scope.repeat = ngModelCtrl.$modelValue;
-		};
-
-		scope.repeatChanged = function (newRepeat) {
-		    ngModelCtrl.$setViewValue(newRepeat);
-		};
-	    }
-
-	    return {
-		templateUrl: 'views/directives/wb-ui-setting-background-repeat.html',
-		restrict: 'E',
-		replace: true,
-		scope: {},
-		require: ['ngModel'],
-		link: postLink,
-        /*
-         * @ngInject
-         */
-		controller: function ($scope) {
-		    $scope.items = [
-			{name: 'Repeat', value: 'repeat'},
-			{name: 'Repeat-x', value: 'repeat-x'},
-			{name: 'Repeat-y', value: 'repeat-y'},
-			{name: 'No-repeat', value: 'no-repeat'},
-			{name: 'Space', value: 'space'},
-			{name: 'Round', value: 'round'},
-			{name: 'Initial', value: 'initial'},
-			{name: 'Inherit', value: 'inherit'},
-			{name: 'Nothing', value: ''}
-
-		    ];
-
-		}
-	    };
-	});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-	/**
-	 * @ngdoc Directives
-	 * @name wbUiSettingColor
-	 * @description a setting section to set color.
-	 * 
-	 */
-	.directive('wbUiSettingBackgroundSize', function () {
-
-	    function postLink(scope, element, attr, ctrls) {
-		var ngModelCtrl = ctrls[0];
-		//  $mdTheming(element);
-
-		/*
-		 * convert to index
-		 */
-
-		ngModelCtrl.$render = function () {
-		    scope.size = ngModelCtrl.$modelValue;
-		};
-
-		scope.sizeChanged = function (newSize) {
-		    ngModelCtrl.$setViewValue(newSize);
-		};
-	    }
-
-	    return {
-		templateUrl: 'views/directives/wb-ui-setting-background-size.html',
-		restrict: 'E',
-		replace: true,
-		scope: {},
-		require: ['ngModel'],
-		link: postLink,
-		/*
-		 * @ngInject
-		 */
-		controller: function ($scope) {
-		    $scope.items = [{
-			    name: 'Automatic',
-			    value: 'auto'
-			}, {
-			    name: 'Length',
-			    value: 'length'
-			}, {
-			    name: 'Cover',
-			    value: 'cover'
-			}, {
-			    name: 'Contain',
-			    value: 'contain'
-			}, {
-			    name: 'Initial',
-			    value: 'initial'
-			}, {
-			    name: 'Inherit',
-			    value: 'inherit'
-			}, {
-			    name: 'Nothing',
-			    value: ''
-			}];
-
-		}
-	    };
-	});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingChoose
- * @description a setting section for choosing values.
- *
- */
-.directive('wbUiSettingChoose', function ($mdTheming, $mdUtil) {
-
-	function postLink(scope, element, attr, ctrls) {
-		var ngModelCtrl = ctrls[0] || $mdUtil.fakeNgModel();
-		$mdTheming(element);
-
-		/*
-		 * convert to index
-		 */
-		function toIndex (value){
-			for (var index = 0; index < scope.xitems.length; index++) {
-				if (scope.xitems[index].value === value){
-					return index;
-				}
-			}
-			// TODO: maso, 2017: update default value.
-			return 0;
-		}
-
-		/*
-		 * render the data
-		 */
-		ngModelCtrl.$render  = function() {
-			scope.selectedIndex = toIndex(ngModelCtrl.$modelValue);
-		}
-
-		scope.selectionChanged = function(){
-		    ngModelCtrl.$setViewValue(scope.xitems[scope.selectedIndex].value);
-		};
-	}
-
-	/*
-	 * Directive info
-	 */
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-choose.html',
-		restrict: 'E',
-		scope: {
-			icon: '@',
-			title: '@',
-			xitems: '<items'
-		},
-		require: ['?ngModel'],
-		priority: 210, // Run before ngAria
-		link: postLink
-	};
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingColor
- * @description a setting section to set color.
- *
- */
-.directive('wbUiSettingColor', function ($mdTheming){
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-color.html',
-        restrict: 'E',
-        scope: {
-            title: '@title',
-            icon: '@icon'
-        },
-        require: ['ngModel'],
-        link: function(scope, element, attr, ctrls) {
-            var ngModelCtrl = ctrls[0];
-            /*
-             * convert to index
-             */
-            ngModelCtrl.$render = function () {
-                scope.valueColor = ngModelCtrl.$modelValue;
-            };
-
-            scope.colorChanged = function (newColor) {
-                ngModelCtrl.$setViewValue(newColor); 
-            };
+    // Add all length by default
+    $scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
+    $scope.extraValues = $scope.extraValues || [];
+    var types = $scope.extraValues;
+    if (types) { 
+        types = types.concat($scope.lengthValues);
+        if (types.includes('length')) {
+            var index = types.indexOf('length');
+            types.splice(index, 1);
         }
-    };
-});
+    } else {
+        types = $scope.lengthValues;
+    }
 
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
+    $scope.types = types;
 
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingData
- * @author maso<mostafa.barmshory@dpq.co.ir>
- * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
- * @description a setting section to manage data.
- *
- */
-.directive('wbUiSettingData', function() {
-	return {
-		templateUrl : 'views/directives/wb-ui-setting-data.html',
-		restrict : 'E',
-		scope : {
-			title : '@title',
-			icon : '@icon'
-		},
-        /*
-         * @ngInject
-         */
-		controller : function($scope, $resource) {
-			this.editValue = function(value) {
-				return $resource.get('data', {
-					style : {
-						icon: 'insert_chart',
-						title : 'Data sheet',
-						description: 'Edit data of the current sheet'
-					},
-					data : value
-				}) //
-				.then(function(data) {
-					if(!angular.isDefined($scope.value)){
-						$scope.value = {};
-					}
-					// Just copy data values
-					$scope.value.key = data.key;
-					$scope.value.values = data.values;
-				});
-			};
-		}
-	};
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wb-ui-setting-dropdown
- * @description a setting section for choosing values.
- *
- */
-.directive('wbUiSettingDropdownValue', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-dropdown-value.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon',
-			items:'=items'
-		}
-	};
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingDropdown
- * @description a setting section for choosing values.
- *
- */
-.directive('wbUiSettingDropdown', function () {
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-dropdown.html',
-        restrict: 'E',
-        scope: {
-            title: '@title',
-            icon: '@icon',
-            items:'=items'
-        },
-        require: ['ngModel'],
-        link: function (scope, element, attr, ctrls) {
-            var ngModelCtrl = ctrls[0];
-
-            ngModelCtrl.$render = function () {
-                scope.value = ngModelCtrl.$modelValue;
-            };
-
-            scope.valueChanged = function (value) {
-                scope.value = value;
-                ngModelCtrl.$setViewValue(value);
-            };
-        }
-    };
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-
-
-
-//General options
-//- wbUiSettingClearButton 
-//- wbUiSettingPreview
-
-angular.module('am-wb-core')
-	.controller('wbUiSettingGeneralCtrl', function ($scope) {
-
-	    // TODO: maso, 2018:load from user config
-	    $scope.wbUiSettingClearButton = true;
-	    $scope.wbUiSettingPreview = true;
-
-	    this.clearValue = function (/*$event*/){
-	        // General option
-	        this.value = null;
-	        this.valueChanged(null);
-	    }
-	    
-	    this.setValue = function(value){
-	        this.value = value;
-	        this.valueChanged(value);
-	    }
-	    
-	    this.getValue = function(){
-	        this.value;
-	    }
-
-	})
-	.controller('wbUiSettingImageCtrl', function ($scope, $resource, $controller){
-	    var ctrl = this;
-
-	    angular.extend(ctrl, $controller('wbUiSettingGeneralCtrl', {
-	        $scope : $scope
-	    }));
-
-	    function showImagePicker(){
-	        return $resource.get('image', {
-	            style: {
-	                icon: 'image',
-	                title: 'Select image',
-	                description: 'Select image from resources.'
-	            },
-	            data: ctrl.getValue()
-	        })//
-	        .then(function(value){
-	            ctrl.setValue(value);
-	        });
-	    }
-
-	    ctrl.showImagePicker = showImagePicker;
-	})
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingImage
- * @author maso(mostafa.barmshory@dpq.co.ir)
- * @description Set an image into a value
- * 
- * URL of the image is set as result.
- *
- */
-.directive('wbUiSettingImage', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-image.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			icon: '@icon'
-		},
-		require:['wbUiSettingImage', 'ngModel'],
-		link: function ($scope, $element, $attrs, $ctrl){
-			var ctrl = $ctrl[0];
-			var ngModelCtrl = $ctrl[1];
-			var lock = false;
-			ngModelCtrl.$render = function(){
-				lock = true;
-				ctrl.setValue(ngModelCtrl.$viewValue);
-				lock = false;
-			};
-			ctrl.valueChanged = function (newValue) {
-				if(lock){
-					return;
-				}
-				ngModelCtrl.$setViewValue(newValue);
-			};
-		},
-		controller: 'wbUiSettingImageCtrl',
-		controllerAs: 'ctrl'
-	};
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Directives
- * @name wbUiSettingLength
- */
-.directive('wbUiSettingLength', function () {
-
-    function postLink($scope, $element, $attrs, ngModel) {
-        ngModel.$render = function () {
-            pars(ngModel.$modelValue);
-        };
-
-        // Add all length by default
-        $scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
-        $scope.extraValues = $scope.extraValues || [];
-        var types = $scope.extraValues;
-        if (types) { 
-            types = types.concat($scope.lengthValues);
-            if (types.includes('length')) {
-                var index = types.indexOf('length');
-                types.splice(index, 1);
-            }
+    function pars(value) {
+        if (!value) {
+            $scope.internalUnit = types[0];
+            $scope.internalValue = 0;
         } else {
-            types = $scope.lengthValues;
-        }
-
-        $scope.types = types;
-
-        function pars(value) {
-            if (!value) {
-                $scope.internalUnit = types[0];
-                $scope.internalValue = 0;
-            } else {
-                split(value);
-            }
-        }
-
-        $scope.updateLength = function(unit, value) {
-            if ($scope.lengthValues.includes(unit)) {
-                ngModel.$setViewValue(value+unit);
-            } else {
-                ngModel.$setViewValue(unit);
-            }
-        };
-
-        /*
-         * @param {type} val
-         * @returns {undefined}
-         * decsription  Splite value to 'unit' and 'value'
-         */
-        function split(val) {
-            if ($scope.extraValues.includes(val)) {
-                $scope.internalUnit = val;
-            } else {
-                /*
-                 * A regex which groups the val into the value and unit(such as 10px -> 10 , px).
-                 * This regex also support signed float format such as (+10.75%, -100.76em)
-                 */
-                var regex = /^([+-]?\d+\.?\d*)([a-zA-Z%]*)$/;
-                var matches = regex.exec(val);
-                if(angular.isArray(matches)){
-                    $scope.internalValue = Number(matches[1]);
-                    $scope.internalUnit = matches[2];
-                }
-            }
+            split(value);
         }
     }
 
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-length.html',
-        restrict: 'E',
-        replace: true,
-        scope: {
-            title: '@title',
-            icon: '@?',
-            description: '@?',
-            extraValues: '<?'
-        },
-        /*
-         * @ngInject
-         */
-        controller: function ($scope) {
-            /**
-             * Check if the current unit is numerical
-             */
-            this.isNumerical = function () {
-                return $scope.lengthValues.includes($scope.internalUnit);
-            };
-
-        },
-        controllerAs: 'ctrl',
-        link: postLink,
-        require: 'ngModel'
+    $scope.updateLength = function(unit, value) {
+        if ($scope.lengthValues.includes(unit)) {
+            ngModel.$setViewValue(value+unit);
+        } else {
+            ngModel.$setViewValue(unit);
+        }
     };
-});
 
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
+    /*
+     * @param {type} val
+     * @returns {undefined}
+     * decsription  Splite value to 'unit' and 'value'
+     */
+    function split(val) {
+        if ($scope.extraValues.includes(val)) {
+            $scope.internalUnit = val;
+        } else {
+            /*
+             * A regex which groups the val into the value and unit(such as 10px -> 10 , px).
+             * This regex also support signed float format such as (+10.75%, -100.76em)
+             */
+            var regex = /^([+-]?\d+\.?\d*)([a-zA-Z%]*)$/;
+            var matches = regex.exec(val);
+            if(angular.isArray(matches)){
+                $scope.internalValue = Number(matches[1]);
+                $scope.internalUnit = matches[2];
+            }
+        }
+    }
+}
 
 angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wbUiSettingColor
- * @author maso<mostafa.barmshory@dpq.co.ir>
- * @description a setting section to set color.
+ * @name wb-ui-settingn-boolean
+ * @description a setting section for on/off switch.
  *
  */
-.directive('wbUiSettingLink', function ($resource) {
-
-    function postLink(scope, element, attr, ctrls) {
-        var ngModelCtrl = ctrls[0];
-
-        ngModelCtrl.$render = function () {
-            scope.url = ngModelCtrl.$modelValue;
-        };
-
-        scope.urlChanged = function (url) {
-            ngModelCtrl.$setViewValue(url);
-        };
-    }
-
+.directive('wbUiSettingBoolean', function () {
     return {
-        templateUrl: 'views/directives/wb-ui-setting-link.html',
+        templateUrl: 'views/directives/wb-ui-setting-boolean.html',
         restrict: 'E',
         replace: true,
         scope: {
-            title: '@title',
-            icon: '@icon'
+            title: '@wbTitle',
+            description: '@wbDescription',
         },
         require: ['ngModel'],
-        link: postLink,
-        controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function($scope){
-            this.selectlink = function(){
-                $resource.get('url', {
-                    style: {
-                        icon: 'link',
-                        title: 'Link',
-                        description: 'Select url'
-                    },
-                    data: $scope.url
-                })//
-                .then(function(value){
-                    $scope.url = value;
-                    $scope.urlChanged(value);
-                });
-            };
-        }
+        link: wbUiSettingLinkFunction
     };
-});
+})
 
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+/**
+ * @ngdoc Directives
+ * @name wb-ui-setting-text
+ * @description Setting for a text
  */
-'use strict';
+.directive('wbUiSettingText', function () {
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-text.html',
+        restrict: 'E',
+        scope: {
+            title: '@wbTitle',
+            description: '@wbDescription',
+        },
+        require: ['ngModel'],
+        link: wbUiSettingLinkFunction
+    };
+})
 
-angular.module('am-wb-core')
+
+/**
+ * @ngdoc Directives
+ * @name wbUiSettingSelect
+ * @description a setting section for choosing values.
+ */
+.directive('wbUiSettingSelect', function () {
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-select.html',
+        restrict: 'E',
+        scope: {
+            title: '@wbTitle',
+            description: '@wbDescription',
+        },
+        require: ['ngModel'],
+        link: wbUiSettingLinkFunction
+    };
+})
+
 
 /**
  * @ngdoc Directives
@@ -10122,221 +5922,66 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingNumber', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-number.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			icon: '@icon',
-			slider:'@slider'
-		},
-		require: ['ngModel'],
-		link: function (scope, element, attr, ctrls) {
-		    var ngModelCtrl = ctrls[0];
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-number.html',
+        restrict: 'E',
+        scope: {
+            title: '@wbTitle',
+            description: '@wbDescription',
+        },
+        require: ['ngModel'],
+        link: wbUiSettingLinkFunction
+    };
+})
 
-		    ngModelCtrl.$render = function () {
-			scope.value = ngModelCtrl.$modelValue;
-		    };
-
-		    scope.valueChanged = function (value) {
-			ngModelCtrl.$setViewValue(value);
-		    };
-		}
-	};
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-	/**
-	 * @ngdoc Directives
-	 * @name wbUiSettingOnOffSwitch
-	 * @description a setting section for on/off switch.
-	 *
-	 */
-	.directive('wbUiSettingOnOffSwitch', function () {
-	    return {
-		templateUrl: 'views/directives/wb-ui-setting-on-off-switch.html',
-		restrict: 'E',
-		scope: {
-		    title: '@title',
-		    icon: '@icon'
-		},
-		require: ['ngModel'],
-		link: function (scope, element, attr, ctrls) {
-		    var ngModelCtrl = ctrls[0];
-
-		    ngModelCtrl.$render = function () {
-			scope.value = ngModelCtrl.$modelValue;
-		    };
-
-		    scope.valueChanged = function (value) {
-			ngModelCtrl.$setViewValue(value);
-		    };
-		}
-	    };
-	});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
 
 /**
  * @ngdoc Directives
- * @name wb-ui-setting-text
- * @description Setting for a text
- *
+ * @name wbUiSettingLength
  */
-.directive('wbUiSettingText', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-text.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-			value: '=value',
-			icon: '@icon'
-		}
-	};
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
+.directive('wbUiSettingLength', function () {
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-length.html',
+        restrict: 'E',
+        replace: true,
+        scope: {
+            title: '@wbTitle',
+            description: '@wbDescription',
+        },
+        require: ['ngModel'],
+        link: wbUiSettingLinkFunction
+    };
+})
 
 /**
  * @ngdoc Directives
- * @name wbUiSettingVideo
- * @author maso<mostafa.barmshory@dpq.co.ir>
- * @author hadi<mohammad.hadi.mansouri@dpq.co.ir>
- * @description a setting section to select audio file.
+ * @name wbUiSettingColor
+ * @description a setting section to set color.
  *
  */
-.directive('wbUiSettingVideo', function () {
-	return {
-		templateUrl: 'views/directives/wb-ui-setting-video.html',
-		restrict: 'E',
-		scope: {
-			title: '@title',
-            lable: '@lable',
-			icon: '@icon'
-		},
+.directive('wbUiSettingColor', function (){
+    return {
+        templateUrl: 'views/directives/wb-ui-setting-color.html',
+        restrict: 'E',
+        scope: {
+            title: '@wbTitle',
+            description: '@wbDescription',
+        },
+        require: ['ngModel'],
+        link: wbUiSettingLinkFunction,
         /*
          * @ngInject
          */
-		controller: function($scope, $resource){
-			this.selectValue = function(){
-			    var ctrl = this;
-				return $resource.get('vedio', {
-					style: {
-						title: 'Select video'
-					},
-					data: $scope.value
-				})//
-				.then(function(value){
-					ctrl.changeValue(value);
-				});
-			};
-			/*
-			 * Set new value
-			 */
-			this.changeValue = function(newValue){
-			    $scope.valueChanged(newValue);
-			};
-			
-			this.clearValue = function() {
-                this.changeValue(null);
-			};
-		},
-		controllerAs: 'ctrl',
-		require: 'ngModel',
-        link: function(scope, element, attr, ngModelCtrl) {
-            /*
-             * Set in scope
-             */
-            ngModelCtrl.$render = function () {
-                scope.value = ngModelCtrl.$modelValue;
-            };
-            
-            /*
-             * Change the model
-             */
-            scope.valueChanged = function (newValue) {
-                scope.value = newValue;
-                ngModelCtrl.$setViewValue(newValue); 
-            };
-        }
-	};
+        controller: function($scope, $element) {
+            var preview = $element.find('.preview');
+            $scope.$watch('value', function(color){
+                preview.css({background: color});
+            });
+        },
+        controllerAs: 'ctrl'
+    };
 });
+
 
 /* 
  * The MIT License (MIT)
@@ -10495,26 +6140,31 @@ angular.module('am-wb-core')
  * This is widgets explorer list.
  * 
  */
-.directive('wbWidgetsList', function($window) {
+.directive('wbWidgetsList', function($window, $widget) {
 
-	return {
-		templateUrl : 'views/directives/wb-widgets-list.html',
-		restrict : 'E',
-		replace : true,
-		scope : {
-			widgets : '<'
-		},
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			if (angular.isFunction($window.openHelp)) {
-				$scope.openHelp = function(widget, $event) {
-					$window.openHelp(widget, $event);
-				};
-			}
-		}
-	};
+    return {
+        templateUrl : 'views/directives/wb-widgets-list.html',
+        restrict : 'E',
+        replace : true,
+        scope : {
+            widgets : '<'
+        },
+        /*
+         * @ngInject
+         */
+        controller : function($scope) {
+            if (angular.isFunction($window.openHelp)) {
+                $scope.openHelp = function(widget, $event) {
+                    $window.openHelp(widget, $event);
+                };
+            }
+
+            $scope.putDragdata = function(event, widget){
+                event = event.originalEvent || event;
+                event.dataTransfer.setData('application/json', JSON.stringify(widget.model));
+            };
+        }
+    };
 });
 /* 
  * The MIT License (MIT)
@@ -10551,26 +6201,31 @@ angular.module('am-wb-core')
  * This is widgets explorer list.
  * 
  */
-.directive('wbWidgetsModule', function($window) {
+.directive('wbWidgetsModule', function($window, $widget) {
 
-	return {
-		templateUrl : 'views/directives/wb-widgets-module.html',
-		restrict : 'E',
-		replace : true,
-		scope: {
-			widgets: '<'
-		},
-		/*
-		 * @ngInject
-		 */
-		controller: function($scope){
-			if(angular.isFunction($window.openHelp)){
-				$scope.openHelp = function(widget, $event){
-					$window.openHelp(widget, $event);
-				};
-			}
-		}
-	};
+    return {
+        templateUrl : 'views/directives/wb-widgets-module.html',
+        restrict : 'E',
+        replace : true,
+        scope: {
+            widgets: '<'
+        },
+        /*
+         * @ngInject
+         */
+        controller: function($scope){
+            if(angular.isFunction($window.openHelp)){
+                $scope.openHelp = function(widget, $event){
+                    $window.openHelp(widget, $event);
+                };
+            }
+
+            $scope.putDragdata = function(event, widget){
+                event = event.originalEvent || event;
+                event.dataTransfer.setData('application/json', JSON.stringify(widget.model));
+            };
+        }
+    };
 });
 
 
@@ -12762,2469 +8417,1184 @@ angular.module('am-wb-core')
     return nativeWindowWrapper;
 });
 
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name TinymcePluginCodesample
- * @description Adding code sample to tinymce
- * 
- * 
- * ## options
- * 
- * codesample_languages: array of languages
- * 
- */
-.factory('TinymcePluginCodesample', function ($resource) {
-	'use strict';
-	var languages;
-	var defaultLanguages = [{
-		text: 'HTML/XML',
-		value: 'markup'
-	},
-	{
-		text: 'JavaScript',
-		value: 'javascript'
-	},
-	{
-		text: 'CSS',
-		value: 'css'
-	},
-	{
-		text: 'PHP',
-		value: 'php'
-	},
-	{
-		text: 'Ruby',
-		value: 'ruby'
-	},
-	{
-		text: 'Python',
-		value: 'python'
-	},
-	{
-		text: 'Java',
-		value: 'java'
-	},
-	{
-		text: 'C',
-		value: 'c'
-	},
-	{
-		text: 'C#',
-		value: 'csharp'
-	},
-	{
-		text: 'C++',
-		value: 'cpp'
-	}];
-
-	/*
-	 * dom utils
-	 */
-	var tinymceDomeUtils = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
-
-	function isCodeSample(elm) {
-		return elm && elm.nodeName === 'PRE' && elm.className.indexOf('language-') !== -1;
-	}
-
-	function trimArg(predicateFn) {
-		return function (arg1, arg2) {
-			return predicateFn(arg2);
-		};
-	}
-
-	/*
-	 * Insert new code sample into the cell
-	 */
-	function insertCodeSample(editor, language, code, node) {
-		editor.undoManager.transact(function () {
-//			var node = getSelectedCodeSample(editor);
-			code = tinymceDomeUtils.DOM.encode(code);
-			if (node) {
-				editor.dom.setAttrib(node, 'class', 'language-' + language);
-				node.innerHTML = code;
-				Prism.highlightElement(node);
-				editor.selection.select(node);
-			} else {
-				editor.insertContent('<pre id="__new" class="language-' + language + '">' + code + '</pre>');
-				editor.selection.select(editor.$('#__new').removeAttr('id')[0]);
-			}
-		});
-	}
-
-	/*
-	 * Add to plugin manager
-	 */
-
-	var tinymcePluginCodesample = function (editor, pluginUrl) {
-		this.setEditor(editor, pluginUrl);
-	};
-
-	/**
-	 * Set editor and load the plugin
-	 */
-	tinymcePluginCodesample.prototype.setEditor = function(editor) {
-		this._editor = editor;
-		languages = editor.settings.codesample_languages || defaultLanguages;
-		this.setup();
-		this.register();
-	};
-
-	/**
-	 * Gets current editor
-	 */
-	tinymcePluginCodesample.prototype.getEditor = function(){
-		return this._editor;
-	};
-
-
-
-	/**
-	 * Setups the environments and events
-	 */
-	tinymcePluginCodesample.prototype.setup = function () {
-		var facotry = this;
-		var editor = this.getEditor();
-		var $ = editor.$;
-		editor.on('PreProcess', function (e) {
-			$('pre[contenteditable=false]', e.node).filter(trimArg(isCodeSample)).each(function (idx, elm) {
-				var $elm = $(elm), code = elm.textContent;
-				$elm.attr('class', $.trim($elm.attr('class')));
-				$elm.removeAttr('contentEditable');
-				$elm.empty().append($('<code></code>').each(function () {
-					this.textContent = code;
-				}));
-			});
-		});
-		editor.on('SetContent', function () {
-			var unprocessedCodeSamples = $('pre').filter(trimArg(isCodeSample)).filter(function (idx, elm) {
-				return elm.contentEditable !== 'false';
-			});
-			if (unprocessedCodeSamples.length) {
-				editor.undoManager.transact(function () {
-					unprocessedCodeSamples.each(function (idx, elm) {
-						$(elm).find('br').each(function (idx, elm) {
-							elm.parentNode.replaceChild(editor.getDoc().createTextNode('\n'), elm);
-						});
-						elm.contentEditable = false;
-						elm.innerHTML = editor.dom.encode(elm.textContent);
-						Prism.highlightElement(elm);
-						elm.className = $.trim(elm.className);
-					});
-				});
-			}
-		});
-
-		editor.on('dblclick', function (ev) {
-			if (isCodeSample(ev.target)) {
-				facotry.openEditor();
-			}
-		});
-	};
-
-	/**
-	 * Register the plugin with the editor
-	 * 
-	 */
-	tinymcePluginCodesample.prototype.register = function () {
-		var facotry = this;
-		var editor = this.getEditor();
-		editor.addCommand('codesample', function () {
-			var node = editor.selection.getNode();
-			if (editor.selection.isCollapsed() || isCodeSample(node)) {
-				facotry.openEditor();
-			} else {
-				editor.formatter.toggle('code');
-			}
-		});
-		editor.addButton('codesample', {
-			cmd: 'codesample',
-			title: 'Insert/Edit code sample'
-		});
-		editor.addMenuItem('codesample', {
-			cmd: 'codesample',
-			text: 'Code sample',
-			icon: 'codesample'
-		});
-	};
-
-	/*
-	 * Get selected code sample from the editor
-	 */
-	tinymcePluginCodesample.prototype.getSelectedCodeSample = function () {
-		var editor = this.getEditor();
-		var node = editor.selection.getNode();
-		if (isCodeSample(node)) {
-			return node;
-		}
-		return null;
-	};
-
-	/*
-	 * Get current code.
-	 * 
-	 * If the code sample is empty then an empty text is returned as
-	 * result.
-	 */
-	tinymcePluginCodesample.prototype.getCurrentCode = function () {
-		var node = this.getSelectedCodeSample();
-		if (node) {
-			return node.textContent;
-		}
-		return '';
-	};
-
-
-	/*
-	 * Gets current language of the code sampler
-	 */
-	tinymcePluginCodesample.prototype.getCurrentLanguage = function (editor) {
-		var matches;
-		var node = this.getSelectedCodeSample();
-		if (node) {
-			matches = node.className.match(/language-(\w+)/);
-			return matches ? matches[1] : '';
-		}
-		return '';
-	};
-
-	/*
-	 * Open editor to edit a code sample
-	 */
-	tinymcePluginCodesample.prototype.openEditor = function () { 
-		var editor = this.getEditor();
-		var node = this.getSelectedCodeSample();
-		var factory = this;
-		$resource.get('script', {
-			data : {
-				language: this.getCurrentLanguage(editor),
-				languages: languages,
-				// TODO: maso, 2019: get code
-				code: this.getCurrentCode()
-			}
-		})
-		.then(function(script){
-			insertCodeSample(editor, script.language, script.code, node);
-		});
-	};
-
-
-	return tinymcePluginCodesample;
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name TinymcePluginImageToolxcx
- * @description Adding image plugin
- * 
- */
-.factory('TinymcePluginImageTool', function ($resource) {
-	'use strict';
-
-	var tinymcePluginImageTool = function (editor/*, pluginUrl*/) {
-		var factory = this;
-		this.setEditor(editor);
-		editor.addButton('image', {
-			icon: 'image',
-			tooltip: 'Insert/edit image',
-			onclick: function(url){
-				editor.insertContent('<img src="' + url + '" >');
-			},
-			stateSelector: 'img:not([data-mce-object],[data-mce-placeholder]),figure.image'
-		});
-
-		editor.addMenuItem('image', {
-			icon: 'image',
-			text: 'Image',
-			onclick: function(){
-				factory.insertImage();
-			},
-			context: 'insert',
-			prependToContext: true
-		});
-
-		editor.addCommand('mceImage', function(){
-			factory.insertImage();
-		});
-	}
-
-	tinymcePluginImageTool.prototype.insertImage = function() {
-		var editor = this.getEditor();
-		$resource.get('image')//
-		.then(function(value){
-			editor.insertContent('<img src="' + value + '" >');
-		});
-	};
-	
-	tinymcePluginImageTool.prototype.setEditor = function(editor) {
-		this._editor = editor;
-	};
-	
-	tinymcePluginImageTool.prototype.getEditor = function() {
-		return this._editor;
-	};
-
-	return tinymcePluginImageTool;
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name TinymcePluginLink
- * @description Adding image plugin
- * 
- * 
- * ## Options
- * 
- * link_assume_external_targets: 
- * link_context_toolbar:
- * link_list:
- * default_link_target: 
- */
-.factory('TinymcePluginLink', function ($resource) {
-	'use strict';
-	
-
-	var attachState = {};
-
-
-	var global$1 = tinymce.util.Tools.resolve('tinymce.util.VK');
-	var global$2 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
-	var global$3 = tinymce.util.Tools.resolve('tinymce.Env');
-	var global$4 = tinymce.util.Tools.resolve('tinymce.util.Tools');
-	var global$5 = tinymce.util.Tools.resolve('tinymce.util.Delay');
-	var global$6 = tinymce.util.Tools.resolve('tinymce.util.XHR');
-
-
-
-	//-----------------------------------------------------------
-	// utility
-	//-----------------------------------------------------------
-	var assumeExternalTargets = function (editorSettings) {
-		return typeof editorSettings.link_assume_external_targets === 'boolean' ? editorSettings.link_assume_external_targets : false;
-	};
-
-	var hasContextToolbar = function (editorSettings) {
-		return typeof editorSettings.link_context_toolbar === 'boolean' ? editorSettings.link_context_toolbar : false;
-	};
-
-	var getLinkList = function (editorSettings) {
-		return editorSettings.link_list;
-	};
-
-	function hasDefaultLinkTarget(editorSettings) {
-		return typeof editorSettings.default_link_target === 'string';
-	}
-
-	function getDefaultLinkTarget(editorSettings) {
-		return editorSettings.default_link_target;
-	};
-
-	var getTargetList = function (editorSettings) {
-		return editorSettings.target_list;
-	};
-
-	var setTargetList = function (editor, list) {
-		editor.settings.target_list = list;
-	};
-
-	var shouldShowTargetList = function (editorSettings) {
-		return getTargetList(editorSettings) !== false;
-	};
-
-	var getRelList = function (editorSettings) {
-		return editorSettings.rel_list;
-	};
-
-	var hasRelList = function (editorSettings) {
-		return getRelList(editorSettings) !== undefined;
-	};
-
-	var getLinkClassList = function (editorSettings) {
-		return editorSettings.link_class_list;
-	};
-
-	var hasLinkClassList = function (editorSettings) {
-		return getLinkClassList(editorSettings) !== undefined;
-	};
-
-	var shouldShowLinkTitle = function (editorSettings) {
-		return editorSettings.link_title !== false;
-	};
-
-	var allowUnsafeLinkTarget = function (editorSettings) {
-		return typeof editorSettings.allow_unsafe_link_target === 'boolean' ? editorSettings.allow_unsafe_link_target : false;
-	};
-
-	var isImageFigure = function (node) {
-		return node && node.nodeName === 'FIGURE' && /\bimage\b/i.test(node.className);
-	};
-
-	var appendClickRemove = function (link, evt) {
-		document.body.appendChild(link);
-		link.dispatchEvent(evt);
-		document.body.removeChild(link);
-	};
-
-	var isLink = function (elm) {
-		return elm && elm.nodeName === 'A' && elm.href;
-	};
-	
-	var hasLinks = function (elements) {
-		return global$4.grep(elements, isLink).length > 0;
-	};
-	
-	var getLink = function (editor, elm) {
-		return editor.dom.getParent(elm, 'a[href]');
-	};
-
-	var getSelectedLink = function (editor) {
-		return getLink(editor, editor.selection.getStart());
-	};
-	
-	var getHref = function (elm) {
-		var href = elm.getAttribute('data-mce-href');
-		return href ? href : elm.getAttribute('href');
-	};
-	
-	var isContextMenuVisible = function (editor) {
-		var contextmenu = editor.plugins.contextmenu;
-		return contextmenu ? contextmenu.isContextMenuVisible() : false;
-	};
-	
-	var hasOnlyAltModifier = function (e) {
-		return e.altKey === true && e.shiftKey === false && e.ctrlKey === false && e.metaKey === false;
-	};
-	
-	var trimCaretContainers = function (text) {
-		return text.replace(/\uFEFF/g, '');
-	};
-
-
-	function getAnchorElement(editor, selectedElm) {
-		selectedElm = selectedElm || editor.selection.getNode();
-		if (isImageFigure(selectedElm)) {
-			return editor.dom.select('a[href]', selectedElm)[0];
-		} else {
-			return editor.dom.getParent(selectedElm, 'a[href]');
-		}
-	}
-	
-	function getAnchorText(selection, anchorElm) {
-		var text = anchorElm ? anchorElm.innerText || anchorElm.textContent : selection.getContent({ format: 'text' });
-		return trimCaretContainers(text);
-	}
-	
-	function isOnlyTextSelected(html) {
-		if (/</.test(html) && (!/^<a [^>]+>[^<]+<\/a>$/.test(html) || html.indexOf('href=') === -1)) {
-			return false;
-		}
-		return true;
-	}
-	
-	function buildListItems(inputList, itemCallback, startItems) {
-		var appendItems = function (values, output) {
-			output = output || [];
-			angular.forEach(values, function (item) {
-				var menuItem = { 
-						text: item.text || item.title 
-				};
-				if (item.menu) {
-					menuItem.menu = appendItems(item.menu);
-				} else {
-					menuItem.value = item.value;
-					if (itemCallback) {
-						itemCallback(menuItem);
-					}
-				}
-				output.push(menuItem);
-			});
-			return output;
-		};
-		return appendItems(inputList, startItems || []);
-	};
-	
-
-	var toggleTargetRules = function (rel, isUnsafe) {
-		var rules = ['noopener'];
-		var newRel = rel ? rel.split(/\s+/) : [];
-		var toString = function (rel) {
-			return global$4.trim(rel.sort().join(' '));
-		};
-		var addTargetRules = function (rel) {
-			rel = removeTargetRules(rel);
-			return rel.length ? rel.concat(rules) : rules;
-		};
-		var removeTargetRules = function (rel) {
-			return rel.filter(function (val) {
-				return global$4.inArray(rules, val) === -1;
-			});
-		};
-		newRel = isUnsafe ? addTargetRules(newRel) : removeTargetRules(newRel);
-		return newRel.length ? toString(newRel) : null;
-	};
-
-	var link = function (editor, attachState) {
-		return function (data) {
-			editor.undoManager.transact(function () {
-				var selectedElm = editor.selection.getNode();
-				var anchorElm = getAnchorElement(editor, selectedElm);
-				var linkAttrs = {
-						href: data.href,
-						target: data.target ? data.target : null,
-								rel: data.rel ? data.rel : null,
-										class: data.class ? data.class : null,
-												title: data.title ? data.title : null
-				};
-				if (!hasRelList(editor.settings) && allowUnsafeLinkTarget(editor.settings) === false) {
-					linkAttrs.rel = toggleTargetRules(linkAttrs.rel, linkAttrs.target === '_blank');
-				}
-				if (data.href === attachState.href) {
-					attachState.attach();
-					attachState = {};
-				}
-				if (anchorElm) {
-					editor.focus();
-					if (data.hasOwnProperty('text')) {
-						if ('innerText' in anchorElm) {
-							anchorElm.innerText = data.text;
-						} else {
-							anchorElm.textContent = data.text;
-						}
-					}
-					editor.dom.setAttribs(anchorElm, linkAttrs);
-					editor.selection.select(anchorElm);
-					editor.undoManager.add();
-				} else {
-					if (isImageFigure(selectedElm)) {
-						linkImageFigure(editor, selectedElm, linkAttrs);
-					} else if (data.hasOwnProperty('text')) {
-						editor.insertContent(editor.dom.createHTML('a', linkAttrs, editor.dom.encode(data.text)));
-					} else {
-						editor.execCommand('mceInsertLink', false, linkAttrs);
-					}
-				}
-			});
-		};
-	};
-	
-	var unlink = function (editor) {
-		return function () {
-			editor.undoManager.transact(function () {
-				var node = editor.selection.getNode();
-				if (isImageFigure(node)) {
-					unlinkImageFigure(editor, node);
-				} else {
-					editor.execCommand('unlink');
-				}
-			});
-		};
-	};
-	
-	var unlinkImageFigure = function (editor, fig) {
-		var a, img;
-		img = editor.dom.select('img', fig)[0];
-		if (img) {
-			a = editor.dom.getParents(img, 'a[href]', fig)[0];
-			if (a) {
-				a.parentNode.insertBefore(img, a);
-				editor.dom.remove(a);
-			}
-		}
-	};
-	var linkImageFigure = function (editor, fig, attrs) {
-		var a, img;
-		img = editor.dom.select('img', fig)[0];
-		if (img) {
-			a = editor.dom.create('a', attrs);
-			img.parentNode.insertBefore(a, img);
-			a.appendChild(img);
-		}
-	};
-
-	var delayedConfirm = function (editor, message, callback) {
-		var rng = editor.selection.getRng();
-		global$5.setEditorTimeout(editor, function () {
-			editor.windowManager.confirm(message, function (state) {
-				editor.selection.setRng(rng);
-				callback(state);
-			});
-		});
-	};
-
-	
-	//-----------------------------------------------------------
-	// Factory
-	//
-	//
-	//-----------------------------------------------------------
-	var tinymcePluginLink = function (editor/*, pluginUrl*/) {
-		this.setEditor(editor);
-
-		this.setupButtons();
-		this.setupMenuItems();
-		this.setupContextToolbars();
-		this.setupGotoLinks();
-		this.register();
-	};
-
-	tinymcePluginLink.prototype.setEditor = function(editor) {
-		this._editor = editor;
-	};
-
-	tinymcePluginLink.prototype.getEditor = function() {
-		return this._editor;
-	};
-
-	tinymcePluginLink.prototype.setupButtons = function () {
-		var editor = this.getEditor();
-		var factory = this;
-		editor.ui.registry.addSplitButton('link', {
-			active: false,
-			icon: 'link',
-			tooltip: 'Insert/edit link',
-			onclick: function(){
-				factory.openDialog();
-			},
-			onpostrender: function(){
-				factory.toggleActiveState();
-			}
-		});
-		editor.ui.registry.addSplitButton('unlink', {
-			active: false,
-			icon: 'unlink',
-			tooltip: 'Remove link',
-			onclick: function(){
-				factory.unlink();
-			},
-			onpostrender: function(){
-				factory.toggleActiveState();
-			}
-		});
-		if (editor.ui.registry.addContextToolbar) {
-			editor.ui.registry.addSplitButton('openlink', {
-				icon: 'newtab',
-				tooltip: 'Open link',
-				onclick: function () {
-					gotoLink(editor, getSelectedLink(editor));
-				}
-			});
-		}
-	};
-
-	tinymcePluginLink.prototype.setupMenuItems = function () {
-		var editor = this.getEditor();
-		var factory = this;
-		editor.ui.registry.addMenuItem('openlink', {
-			text: 'Open link',
-			icon: 'newtab',
-			onclick: function () {
-				factory.gotoLink(editor, getSelectedLink(editor));
-			},
-			onPostRender: function () {
-				var self = this;
-				var toggleVisibility = function (e) {
-					if (hasLinks(e.parents)) {
-						self.show();
-					} else {
-						self.hide();
-					}
-				};
-				if (!hasLinks(editor.dom.getParents(editor.selection.getStart()))) {
-					self.hide();
-				}
-				editor.on('nodechange', toggleVisibility);
-				self.on('remove', function () {
-					editor.off('nodechange', toggleVisibility);
-				});
-			},
-			prependToContext: true
-		});
-		editor.ui.registry.addMenuItem('link', {
-			icon: 'link',
-			text: 'Link',
-			shortcut: 'Meta+K',
-			onclick: function(){
-				factory.openDialog();
-			},
-			stateSelector: 'a[href]',
-			context: 'insert',
-			prependToContext: true
-		});
-		editor.ui.registry.addMenuItem('unlink', {
-			icon: 'unlink',
-			text: 'Remove link',
-			onclick: function(){
-				factory.unlink();
-			},
-			stateSelector: 'a[href]'
-		});
-	};
-
-	tinymcePluginLink.prototype.setupContextToolbars = function () {
-		var editor = this.getEditor();
-		if (editor.ui.registry.addContextToolbar) {
-			editor.ui.registry.addContextToolbar(function (elm) {
-				var sel, rng, node;
-				if (hasContextToolbar(editor.settings) && !isContextMenuVisible(editor) && isLink(elm)) {
-					sel = editor.selection;
-					rng = sel.getRng();
-					node = rng.startContainer;
-					if (node.nodeType === 3 && sel.isCollapsed() && rng.startOffset > 0 && rng.startOffset < node.data.length) {
-						return true;
-					}
-				}
-				return false;
-			}, 'openlink | link unlink');
-		}
-	};
-
-	tinymcePluginLink.prototype.setupGotoLinks = function () {
-		var editor = this.getEditor();
-		editor.on('click', function (e) {
-			var link = getLink(editor, e.target);
-			if (link && global$1.metaKeyPressed(e)) {
-				e.preventDefault();
-				gotoLink(editor, link);
-			}
-		});
-		editor.on('keydown', function (e) {
-			var link = getSelectedLink(editor);
-			if (link && e.keyCode === 13 && hasOnlyAltModifier(e)) {
-				e.preventDefault();
-				gotoLink(editor, link);
-			}
-		});
-	};
-	
-	tinymcePluginLink.prototype.toggleActiveState = function () {
-		var editor = this.getEditor();
-		return function () {
-			var self = this;
-			editor.on('nodechange', function (e) {
-				self.active(!editor.readonly && !!$_ft5004fzjm0o6bvs.getAnchorElement(editor, e.element));
-			});
-		};
-	};
-	
-	tinymcePluginLink.prototype.register = function () {
-		var factory = this;
-		var editor = this.getEditor();
-		// commands
-		editor.addCommand('mceLink', function(){
-			factory.openDialog();
-		});
-		// shortcuts
-		editor.addShortcut('Meta+K', '', function(){
-			factory.openDialog();
-		});
-	};
-	
-
-	tinymcePluginLink.prototype.openDialog = function (editor) {
-		var editor = this.getEditor();
-		var linkList = getLinkList(editor.settings);
-		var factory = this;
-		if (typeof linkList === 'string') {
-			global$6.send({
-				url: linkList,
-				success: function (text) {
-					factory.showDialog(JSON.parse(text));
-				}
-			});
-		} else if (typeof linkList === 'function') {
-			linkList(function (list) {
-				factory.showDialog(list);
-			});
-		} else {
-			factory.showDialog(linkList);
-		}
-	};
-	
-	tinymcePluginLink.prototype.unlink = function () {
-		var editor = this.getEditor();
-		editor.undoManager.transact(function () {
-			var node = editor.selection.getNode();
-			if (isImageFigure(node)) {
-				unlinkImageFigure(editor, node);
-			} else {
-				editor.execCommand('unlink');
-			}
-		});
-	};
-	
-
-	tinymcePluginLink.prototype.showDialog = function (linkList) {
-		var editor = this.getEditor();
-		var data = {};
-		var selection = editor.selection;
-		var dom = editor.dom;
-		var anchorElm, initialText;
-		
-		var win, onlyText, textListCtrl, linkListCtrl, relListCtrl, targetListCtrl, classListCtrl, linkTitleCtrl, value;
-		
-		var linkListChangeHandler = function (e) {
-			var textCtrl = win.find('#text');
-			if (!textCtrl.value() || e.lastControl && textCtrl.value() === e.lastControl.text()) {
-				textCtrl.value(e.control.text());
-			}
-			win.find('#href').value(e.control.value());
-		};
-		
-		var buildAnchorListControl = function (url) {
-			var anchorList = [];
-			global$4.each(editor.dom.select('a:not([href])'), function (anchor) {
-				var id = anchor.name || anchor.id;
-				if (id) {
-					anchorList.push({
-						text: id,
-						value: '#' + id,
-						selected: url.indexOf('#' + id) !== -1
-					});
-				}
-			});
-			if (anchorList.length) {
-				anchorList.unshift({
-					text: 'None',
-					value: ''
-				});
-				return {
-					name: 'anchor',
-					type: 'listbox',
-					label: 'Anchors',
-					values: anchorList,
-					onselect: linkListChangeHandler
-				};
-			}
-		};
-		
-		var updateText = function () {
-			if (!initialText && onlyText && !data.text) {
-				this.parent().parent().find('#text')[0].value(this.value());
-			}
-		};
-		
-		var urlChange = function (e) {
-			var meta = e.meta || {};
-			if (linkListCtrl) {
-				linkListCtrl.value(editor.convertURL(this.value(), 'href'));
-			}
-			global$4.each(e.meta, function (value, key) {
-				var inp = win.find('#' + key);
-				if (key === 'text') {
-					if (initialText.length === 0) {
-						inp.value(value);
-						data.text = value;
-					}
-				} else {
-					inp.value(value);
-				}
-			});
-			if (meta.attach) {
-				attachState = {
-						href: this.value(),
-						attach: meta.attach
-				};
-			}
-			if (!meta.text) {
-				updateText.call(this);
-			}
-		};
-		
-		var onBeforeCall = function (e) {
-			e.meta = win.toJSON();
-		};
-		
-		onlyText = isOnlyTextSelected(selection.getContent());
-		anchorElm = getAnchorElement(editor);
-		data.text = initialText = getAnchorText(editor.selection, anchorElm);
-		data.href = anchorElm ? dom.getAttrib(anchorElm, 'href') : '';
-		if (anchorElm) {
-			data.target = dom.getAttrib(anchorElm, 'target');
-		} else if (hasDefaultLinkTarget(editor.settings)) {
-			data.target = getDefaultLinkTarget(editor.settings);
-		}
-		if (value = dom.getAttrib(anchorElm, 'rel')) {
-			data.rel = value;
-		}
-		if (value = dom.getAttrib(anchorElm, 'class')) {
-			data.class = value;
-		}
-		if (value = dom.getAttrib(anchorElm, 'title')) {
-			data.title = value;
-		}
-		if (onlyText) {
-			textListCtrl = {
-					name: 'text',
-					type: 'textbox',
-					size: 40,
-					label: 'Text to display',
-					onchange: function () {
-						data.text = this.value();
-					}
-			};
-		}
-		if (linkList) {
-			linkListCtrl = {
-					type: 'listbox',
-					label: 'Link list',
-					values: buildListItems(linkList, function (item) {
-						item.value = editor.convertURL(item.value || item.url, 'href');
-					}, [{
-						text: 'None',
-						value: ''
-					}]),
-					onselect: linkListChangeHandler,
-					value: editor.convertURL(data.href, 'href'),
-					onPostRender: function () {
-						linkListCtrl = this;
-					}
-			};
-		}
-		if (shouldShowTargetList(editor.settings)) {
-			if (getTargetList(editor.settings) === undefined) {
-				setTargetList(editor, [{
-						text: 'None',
-						value: ''
-					},{
-						text: 'New window',
-						value: '_blank'
-					}]);
-			}
-			targetListCtrl = {
-					name: 'target',
-					type: 'listbox',
-					label: 'Target',
-					values: buildListItems(getTargetList(editor.settings))
-			};
-		}
-		if (hasRelList(editor.settings)) {
-			relListCtrl = {
-					name: 'rel',
-					type: 'listbox',
-					label: 'Rel',
-					values: buildListItems(getRelList(editor.settings), function (item) {
-						if (allowUnsafeLinkTarget(editor.settings) === false) {
-							item.value = toggleTargetRules(item.value, data.target === '_blank');
-						}
-					})
-			};
-		}
-		if (hasLinkClassList(editor.settings)) {
-			classListCtrl = {
-					name: 'class',
-					type: 'listbox',
-					label: 'Class',
-					values: buildListItems(getLinkClassList(editor.settings), function (item) {
-						if (item.value) {
-							item.textStyle = function () {
-								return editor.formatter.getCssText({
-									inline: 'a',
-									classes: [item.value]
-								});
-							};
-						}
-					})
-			};
-		}
-		if (shouldShowLinkTitle(editor.settings)) {
-			linkTitleCtrl = {
-					name: 'title',
-					type: 'textbox',
-					label: 'Title',
-					value: data.title
-			};
-		}
-		win = editor.windowManager.open({
-			title: 'Insert link',
-			data: data,
-			body: [
-				{
-					name: 'href',
-					type: 'filepicker',
-					filetype: 'file',
-					size: 40,
-					autofocus: true,
-					label: 'Url',
-					onchange: urlChange,
-					onkeyup: updateText,
-					onpaste: updateText,
-					onbeforecall: onBeforeCall
-				},
-				textListCtrl,
-				linkTitleCtrl,
-				buildAnchorListControl(data.href),
-				linkListCtrl,
-				relListCtrl,
-				targetListCtrl,
-				classListCtrl
-				],
-				onSubmit: function (e) {
-					var assumeExternalTargetsResult = assumeExternalTargets(editor.settings);
-					var insertLink = link(editor, attachState);
-					var removeLink = unlink(editor);
-					var resultData = global$4.extend({}, data, e.data);
-					var href = resultData.href;
-					if (!href) {
-						removeLink();
-						return;
-					}
-					if (!onlyText || resultData.text === initialText) {
-						delete resultData.text;
-					}
-					if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf('mailto:') === -1) {
-						delayedConfirm(editor, 'The URL you entered seems to be an email address. Do you want to add the required mailto: prefix?', function (state) {
-							if (state) {
-								resultData.href = 'mailto:' + href;
-							}
-							insertLink(resultData);
-						});
-						return;
-					}
-					if (assumeExternalTargetsResult === true && !/^\w+:/i.test(href) || assumeExternalTargetsResult === false && /^\s*www[\.|\d\.]/i.test(href)) {
-						delayedConfirm(editor, 'The URL you entered seems to be an external link. Do you want to add the required http:// prefix?', function (state) {
-							if (state) {
-								resultData.href = 'http://' + href;
-							}
-							insertLink(resultData);
-						});
-						return;
-					}
-					insertLink(resultData);
-				}
-		});
-	};
-	
-
-
-	var gotoLink = function (a) {
-		var editor = this.getEditor();
-		if (a) {
-			var href = getHref(a);
-			if (/^#/.test(href)) {
-				var targetEl = editor.$(href);
-				if (targetEl.length) {
-					editor.selection.scrollIntoView(targetEl[0], true);
-				}
-			} else {
-				var url = a.href;
-				if (!global$3.ie || global$3.ie > 10) {
-					var link = document.createElement('a');
-					link.target = '_blank';
-					link.href = url;
-					link.rel = 'noreferrer noopener';
-					var evt = document.createEvent('MouseEvents');
-					evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-					appendClickRemove(link, evt);
-				} else {
-					var win = window.open('', '_blank');
-					if (win) {
-						win.opener = null;
-						var doc = win.document;
-						doc.open();
-						doc.write('<meta http-equiv="refresh" content="0; url=' + global$2.DOM.encode(url) + '">');
-						doc.close();
-					}
-				}
-			}
-		}
-	};
-
-	return tinymcePluginLink;
-});
-
-
-
-
-
-
-
-
-
-
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name WidgetEditorFake
- * @description Editor of a widget
- * 
- */
-
-
-
-.factory('WidgetEditorFake', function () {
-
-    /**
-     * TODO: maso, 2019: extends WidgetEditorFake
-     * 
-     * Creates new instace of an editor
-     */
-    function editor() {}
-    
-    editor.prototype.destroy = function(){};
-    editor.prototype.fire = function(){}; // internal
-    editor.prototype.setActive = function(){}; // focus|skipFocuse
-    editor.prototype.isActive = function(){};
-    editor.prototype.getWidget = function(){};
-    editor.prototype.setDirty = function(){};
-    editor.prototype.isDirty = function(){};
-    editor.prototype.save = function(){};
-    editor.prototype.hide = function(){};
-    editor.prototype.show = function(){};
-    editor.prototype.isHidden = function(){};
-    editor.prototype.Off = function(){};
-    editor.prototype.On = function(){};
-
-    // the editor type
-    return editor;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name WidgetEditorFake
- * @description Editor of a widget
- * 
- */
-
-.factory('WidgetEditorTinymce', function ($sce, WidgetEditor) {
-
-    /**
-     * TODO: maso, 2019: extends WidgetEditorFake
-     * 
-     * Creates new instace of an editor
-     */
-    function editor(widget, options) {
-        options = options || {};
-        WidgetEditor.apply(this, [widget, options]);
-    }
-    
-    editor.prototype = new WidgetEditor();
-
-    /**
-     * remove all resources
-     * 
-     * @memberof WidgetEditorTinymce
-     */
-    editor.prototype.destroy = function () {
-        this.hide();
-        WidgetEditor.prototype.destroy.call(this);
-    };
-    
-    /**
-     * Remove editor
-     */
-    editor.prototype.hide = function () {
-        if (this.isHidden()) {
-            return;
-        }
-        this._hide = true;
-        // remove editor
-        if(this.isDirty()){
-            this.widget.setModelProperty(this.options.property, this._content);
-        }
-        tinymce.remove(this.widget.getElement().getPath())
-    };
-
-    /**
-     * Run and display editor for the current widget
-     */
-    editor.prototype.show = function () {
-        this._hide = false;
-        var ctrl = this;
-        var widget = this.getWidget();
-        var element = widget.getElement();
-        var selectorPath = element.getPath();
-        tinymce.init(_.merge(this.options, {
-            selector : selectorPath,
-            themes : 'modern',
-            setup: function (editor) {
-                editor.on('keydown', function(e) {
-                    if (e.keyCode === 27) { // escape
-                        ctrl.closeWithoutSave();
-                    }
-                    if (e.keyCode === 13){
-                        ctrl.saveAndClose();
-                    }
-                });
-                
-                editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
-                	event.stopPropagation();
-                	editor.save();
-                });
-
-                // Update model when:
-                // - a button has been clicked [ExecCommand]
-                // - the editor content has been modified [change]
-                // - the node has changed [NodeChange]
-                // - an object has been resized (table, image) [ObjectResized]
-                editor.on('ExecCommand change NodeChange ObjectResized', function() {
-                    editor.save();
-                    ctrl.updateView(editor);
-                    return;
-                });
-            }
-        }))
-        .then(function () {
-            element.focus();
-        });
-    };
-
-    editor.prototype.isHidden = function () {
-        return this._hide;
-    };
-
-    /**
-     * Read value from element and set into the element
-     */
-    editor.prototype.updateView = function (editor) {
-        var content = editor.getContent({
-            format : this.options.format || 'html'
-        }).trim();
-        this._content = content;
-        this.setDirty(true);
-    };
-
-    
-    editor.prototype.closeWithoutSave = function(){
-        this.setDirty(false);
-        this.hide();
-        // reset old value
-        var widget = this.widget;
-        widget.fire('modelUpdated', {
-            key: this.options.property,
-            oldValue: '',
-            value: this.widget.getModelProperty(this.options.property)
-        });
-    }
-    
-    editor.prototype.saveAndClose = function(){
-        this.hide();
-    }
-    
-//  the editor type
-    return editor;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name WidgetEditor
- * @description Editor of a widget
- * 
- * 
- * ## Events
- * 
- * - Click    native  Fires when the editor is clicked.
- * - DblClick    native  Fires when the editor is double-clicked.
- * - MouseDown   native  Fires when the mouse button is pressed down inside the editor.
- * - MouseUp native  Fires when a mouse button is released inside the editor.
- * - MouseMove   native  Fires when the mouse is moved within the editor.
- * - MouseOver   native  Fires when a new element is being hovered within the editor.
- * - MouseOut    native  Fires when an element is no longer being hovered within the editor.
- * - MouseEnter  native  Fires when the mouse enters the editor.
- * - MouseLeave  native  Fires when the mouse leaves the editor.
- * - KeyDown native  Fires when a key is pressed within the editor.
- * - KeyPress    native  Fires when a key is pressed within the editor.
- * - KeyUp   native  Fires when a key is released within the editor.
- * - ContextMenu native  Fires when the context menu is invoked within the editor.
- * - Paste   native  Fires when a paste is done within the editor.
- * - Init    core    Fires when the editor is initialized.
- * - Focus   core    Fires when the editor is focused.
- * - Blur    core    Fires when the editor is blurred.
- * - BeforeSetContent    core    Fires before the content is set to the editor.
- * - SetContent  core    Fires after the content is set to the editor.
- * - GetContent  core    Fires after the content is extracted from the editor.
- * - PreProcess  core    Fires when the contents in the editor are being serialized.
- * - PostProcess core    Fires when the contents in the editor are being serialized.
- * - NodeChange  core    Fires when selection inside the editor is changed.
- * - Undo    core    Fires when the contents have been reverted to a previous state.
- * - Redo    core    Fires to revert the effects of an Undo event.
- * - Change  core    Fires when undo level is added to the editor.
- * - Dirty   core    Fires when editor contents are being considered dirty.
- * - Remove  core    Fires when the editor is removed.
- * - ExecCommand core    Fires after a command has been executed.
- * - PastePreProcess paste   Fires when contents are pasted into the editor.
- * - PastePostProcess    paste   Fires when contents are pasted into the editor.
- */
-
-
-
-.factory('WidgetEditor', function () {
-
-    /**
-     * Creates new instace of an editor
-     */
-    function widgetEditor(widget, options) {
-        this.callbacks = [];
-        this.widget = widget;
-        this.options = options;
-    }
-
-    /**
-     * Remove all resources
-     * 
-     * @mrmberof WidgetEditor
-     */
-    widgetEditor.prototype.destroy = function(){
-        this.callbacks = [];
-        delete this.widget;
-        delete this.options;
-    };
-
-    /**
-     * Get the widget of the editor
-     * 
-     * @mrmberof WidgetEditor
-     */
-    widgetEditor.prototype.getWidget = function(){
-        return this.widget;
-    };
-
-    /**
-     * Set the widget as dirty widget
-     * 
-     * @mrmberof WidgetEditor
-     */
-    widgetEditor.prototype.setDirty = function(dirty){
-        if(typeof(dirty) !== 'undefined'){
-            this.dirty = dirty;
-        } else {
-            this.dirty = true;
-        }
-    };
-
-    /**
-     * Check if the widget is dirty
-     * 
-     * @mrmberof WidgetEditor
-     */
-    widgetEditor.prototype.isDirty = function(){
-        return this.dirty;
-    };
-
-    /**
-     * Remove callbak from specific type
-     * 
-     * @param type {string} the event name
-     * @param callback {function} the function
-     * @mrmberof WidgetEditor
-     */
-    widgetEditor.prototype.off = function(type, callback){
-        if (!angular.isArray(this.callbacks[type])) {
-            return;
-        }
-        var callbacks = this.callbacks[type];
-        var index = callbacks.indexOf(callback);
-        if (index > -1) {
-            callbacks.splice(index, 1);
-        }
-    };
-
-    /**
-     * Add a callback function to the editor
-     * 
-     * @param type {string} the event name
-     * @param callback {function} the function
-     * @mrmberof WidgetEditor
-     */
-    widgetEditor.prototype.on = function(type, callback){
-        if (!angular.isArray(this.callbacks[type])) {
-            this.callbacks[type] = [];
-        }
-        if(!_.includes(this.callbacks[type], callback)){
-            this.callbacks[type].push(callback);
-        }
-    };
-
-    /**
-     * Fire the event
-     * 
-     * @param type {string} the event name
-     * @param param {object} event params
-     * @mrmberof WidgetEditor
-     */
-    widgetEditor.prototype.fire = function(type, params){
-        // TODO: maso, 2018: create event object
-        var event = _.merge({
-            source: this,
-            type: type
-        }, params || {});
-
-        // fire
-        var callbacks = this.callbacks[type] || [];
-        for(var i = 0; i < callbacks.length; i++){
-            // TODO: maso, 2018: check if the event is stopped to propagate
-            try {
-                callbacks[i](event);
-            } catch (error) {
-                // NOTE: remove on release
-                console.log(error);
-            }
-        }
-    }; // internal
-
-
-
-
-
-    widgetEditor.prototype.setActive = function(){}; // focus|skipFocuse
-    widgetEditor.prototype.isActive = function(){};
-    widgetEditor.prototype.save = function(){};
-    widgetEditor.prototype.hide = function(){};
-    widgetEditor.prototype.show = function(){};
-    widgetEditor.prototype.isHidden = function(){};
-
-    // the editor type
-    return widgetEditor;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name AbstractWidgetLocator
- * @description Locates a widget on the view
- * 
- * It is used to display extra information about a widget on the screen. For
- * example it is used to show widget actions on the fly.
- * 
- */
-.factory('AbstractWidgetLocator', function ($rootElement, $widget) {
-
-    /**
-     * Creates new instance of the widget locator
-     * 
-     * @memberof AbstractWidgetLocator
-     */
-    function abstractWidgetLocator() {
-        this.callbacks = [];
-        this.elements = [];
-        this.observedWidgets = [];
-
-        // Creates listeners
-        var ctrl = this;
-        this.widgetListeners = {
-                'select' : function ($event) {
-                    ctrl.addClass('selected');
-                    ctrl.removeClass('mouseover');
-                },
-                'unselect' : function ($event) {
-                    ctrl.removeClass('selected');
-                    if (ctrl.mouseover) {
-                        ctrl.addClass('mouseover');
-                    }
-                },
-                'mouseover' : function ($event) {
-                    ctrl.addClass('mouseover');
-                    ctrl.mouseover = true;
-                },
-                'mouseout' : function ($event) {
-                    ctrl.removeClass('mouseover');
-                    ctrl.mouseover = false;
-                },
-        };
-    }
-
-    /**
-     * Defines anchor 
-     */
-    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
-        this.anchor = anchor;
-    };
-
-    /**
-     * Update the view
-     */
-    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
-        this.anchor = anchor;
-    };
-
-    abstractWidgetLocator.prototype.getAnchor = function (auncher) {
-        // find custom anchor
-        if(this.anchor){
-            if(angular.isFunction(this.anchor)){
-                return this.anchor();
-            }
-            if(angular.isString(this.anchor)){
-                var list = $rootElement.find(this.anchor);
-                if(list){
-                    return list[0];
-                }
-            }
-        }
-        // find parent
-        var widget = this.getWidget();
-        if(widget && widget.getParent()){
-            return widget.getParent().getElement();
-        }
-        // return root
-        return $rootElement;
-    };
-
-
-    /**
-     * Sets new widget
-     */
-    abstractWidgetLocator.prototype.setWidget = function (widget) {
-        this.widget = widget;
-    };
-
-    abstractWidgetLocator.prototype.getWidget = function () {
-        return this.widget;
-    };
-
-    abstractWidgetLocator.prototype.setElements = function (elements) {
-        this.elements = elements;
-    };
-
-    abstractWidgetLocator.prototype.getElements = function () {
-        return this.elements;
-    };
-
-    abstractWidgetLocator.prototype.addClass = function (value) {
-        var elements = this.getElements();
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].addClass(value);
-        }
-    };
-
-    abstractWidgetLocator.prototype.removeClass = function (value) {
-        var elements = this.getElements();
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].removeClass(value);
-        }
-    };
-
-    /**
-     * Remove connection the the current widget
-     */
-    abstractWidgetLocator.prototype.disconnect = function () {
-        this.connect(null);
-        this.connected = false;
-    };
-
-    abstractWidgetLocator.prototype.connect = function (widget) {
-        this.connected = true;
-        if (this.widget !==  widget) {
-            var elements = this.getElements();
-            if(this.widget){
-                var oldWidget = this.widget;
-                angular.forEach(this.widgetListeners, function (listener, type) {
-                    oldWidget.off(type, listener);
-                });
-                for (var i = 0; i < elements.length; i++) {
-                    elements[i].detach();
-                }
-            }
-            this.setWidget(widget);
-            if(widget){
-                angular.forEach(this.widgetListeners, function (listener, type) {
-                    widget.on(type, listener);
-                });
-                var anchor = this.getAnchor();
-                angular.forEach(elements, function (element) {
-                    anchor.append(element);
-                });
-            }
-        }
-        if(this.getWidget()){
-            this.updateView();
-        }
-    };
-
-
-    abstractWidgetLocator.prototype.isConnected = function () {
-        return this.connected;
-    };
-
-    return abstractWidgetLocator;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name BoundWidgetLocator
- * @description Locates a widget bound
- * 
- */
-.factory('BoundWidgetLocator', function (AbstractWidgetLocator, $rootScope) {
-
-	var boundWidgetLocator = function (options) {
-		options = options || {};
-		AbstractWidgetLocator.apply(this, options);
-
-        // set anchor
-        this.setAnchor(options.anchor);
-
-		// load templates
-		var template = options.template 
-		|| '<div class="wb-widget-locator bound"></div>';
-
-		// load elements
-		this.topElement = angular.element(template);
-		this.topElement.attr('id', 'top');
-
-		this.rightElement = angular.element(template);
-		this.rightElement.attr('id', 'right');
-
-		this.buttomElement = angular.element(template);
-		this.buttomElement.attr('id', 'buttom');
-
-		this.leftElement = angular.element(template);
-		this.leftElement.attr('id', 'left');
-
-		// init controller
-		this.setElements([this.topElement, this.rightElement,
-			this.buttomElement, this.leftElement]);
-	};
-	boundWidgetLocator.prototype = new AbstractWidgetLocator();
-
-	boundWidgetLocator.prototype.updateView = function () {
-        var widget = this.getWidget();
-	    var bound = widget.getBoundingClientRect();
-	    var space = 2;
-		this.topElement.css({
-			top: bound.top + space,
-			left: bound.left + space,
-			width: bound.width - 2*space
-		});
-		this.rightElement.css({
-			top: bound.top + space,
-			left: bound.left + bound.width - 2*space,
-			height: bound.height - 2*space
-		});
-		this.buttomElement.css({
-			top: bound.top + bound.height - space,
-			left: bound.left + space,
-			width: bound.width - 2*space
-		});
-		this.leftElement.css({
-			top: bound.top + space,
-			left: bound.left + space,
-			height: bound.height - 2*space
-		});
-
-	};
-	return boundWidgetLocator;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular
-.module('am-wb-core')
-
-
-/**
- * @ngdoc Factories
- * @name CursorWidgetLocator
- * @description Manages list of locators
- * 
- * 
- * There are two type of widgets locator: selection and bound.
- * 
- * For each widget a bound locator will be created.
- * 
- * For each item in selection a selection locator will be created.
- */
-.factory('WidgetLocatorManager',function ($widget, BoundWidgetLocator, SelectionWidgetLocator, $timeout) {
-
-	/**
-	 * Creates new instance of the manager
-	 * 
-	 * @memberof CursorWidgetLocator
-	 */
-	function WidgetLocatorManager(options) {
-		var ctrl = this;
-
-		this.intersectingWidget = [];
-		this.selectedWidgets = [];
-
-		this.boundLocatorMap = new Map();
-		this.boundLocatorTrash = [];
-
-		this.selectionLocatorMap = new Map();
-		this.selectionLocatorTrash = [];
-
-
-		// selection options
-		this.selectionLocatorOption = options.selectionLocatorOption || {};
-		this.selectionEnable = true;
-		if (angular.isDefined(options.selectionEnable)) {
-			this.selectionEnable = options.selectionEnable;
-		}
-
-		// bound options
-		this.boundLocatorOption = options.boundLocatorOption || {};
-		this.boundEnable = true;
-		if (angular.isDefined(options.boundEnable)) {
-			this.boundEnable = options.boundEnable;
-		}
-
-		this.widgetListeners = {
-				'intersection' : function ($event) {
-					var widget = $event.source;
-					ctrl.widgetIntersectingChange(widget);
-				},
-				'resize': function($event){
-					ctrl.updateLocators();
-				},
-				'loaded': function($event){
-					var widget = $event.source;
-					var children = $widget.getChildren(widget);
-					for(var i = 0; i < children.length; i++){
-						ctrl.widgetAdded(children[i]);
-					}
-				},
-				'newchild': function($event) {
-					var widget = $event.widget;
-					ctrl.widgetAdded(widget);
-				},
-				'delete': function($event) {
-					var widget = $event.source;
-					ctrl.widgetDeleted(widget);
-				},
-				'modelUpdated': function($event) {
-					ctrl.updateLocators();
-				}
-		};
-	}
-
-
-	WidgetLocatorManager.prototype.widgetDeleted = function(widget){
-		// events
-		angular.forEach(this.widgetListeners, function (callback, type) {
-			widget.off(type, callback);
-		});
-		// locator
-		var locator = this.getBoundLocatorOf(widget);
-		locator.disconnect();
-		this.boundLocatorMap.delete(widget);
-		this.boundLocatorTrash.push(locator);
-
-		// selection
-		var index = this.selectedWidgets.indexOf(widget);
-		if(index > -1){
-			this.selectedWidgets.splice(index, 1);
-			var selectionLocator = this.getSelectionLocatorOf(widget);
-			selectionLocator.disconnect(widget);
-			this.selectionLocatorMap.delete(widget);
-			this.selectionLocatorTrash.push(selectionLocator);
-		}
-		// intersection
-		index = this.intersectingWidget.indexOf(widget);
-		if(index > -1){
-			this.intersectingWidget.splice(index, 1);
-		}
-		// update view
-		this.updateLocators();
-	};
-
-	WidgetLocatorManager.prototype.widgetAdded = function(widget){
-		// add events
-		angular.forEach(this.widgetListeners, function (callback, type) {
-			widget.on(type, callback);
-		});
-
-		// update view
-		$timeout(function(){
-			widget.setIntersecting(true,{
-				message: 'Load child in model'
-			});
-		}, 100);
-	};
-
-	/**
-	 * Sets visibility of locators
-	 * 
-	 * @param visible
-	 *            {boolean} defines the visibility of the
-	 *            locators
-	 * @memberof CursorWidgetLocator
-	 */
-	WidgetLocatorManager.prototype.setVisible = function (visible) {
-		if (this.visible === visible) {
-			return;
-		}
-		this.visible = visible;
-		this.updateLocators();
-	}
-
-	/**
-	 * Checks if the manager is in visible state
-	 * 
-	 * @return true if the manager is visible.
-	 * @memberof CursorWidgetLocator
-	 */
-	WidgetLocatorManager.prototype.isVisible = function () {
-		return this.visible;
-	};
-
-
-	WidgetLocatorManager.prototype.setEnable = function (enable) {
-		if (this.enable === enable) {
-			return;
-		}
-		this.enable = enable;
-
-		var widgets = $widget.getChildren(this.getRootWidget());
-		var intersectingWidget = [];
-		// listeners
-		for(var i = 0; i < widgets.length; i ++){
-			var widget = widgets[i];
-			if(widget.isIntersecting()){
-				intersectingWidget.push(widget);
-			}
-			if(enable) {
-				angular.forEach(this.widgetListeners, function (callback, type) {
-					widget.on(type, callback);
-				});
-			} else {
-				angular.forEach(this.widgetListeners, function (callback, type) {
-					widget.off(type, callback);
-				});
-			}
-		}
-		// bound
-		if(intersectingWidget.length) {
-			this.intersectingWidget = intersectingWidget;
-		} else {
-			this.intersectingWidget = widgets;
-		}
-		for(var j = 0; j < intersectingWidget.length; j++){
-			var locator = this.getBoundLocatorOf(intersectingWidget[j]);
-			if(enable) {
-				locator.connect(intersectingWidget[j]);
-			} else {
-				locator.disconnect();
-			}
-		}
-		// XXX: maso, selection
-
-		// ROOT
-		var rootWidget = this.getRootWidget();
-		if(enable) {
-			angular.forEach(this.widgetListeners, function (callback, type) {
-				rootWidget.on(type, callback);
-			});
-		} else {
-			angular.forEach(this.widgetListeners, function (callback, type) {
-				rootWidget.off(type, callback);
-			});
-		}
-
-	};
-
-	WidgetLocatorManager.prototype.isEnable = function () {
-		return this.enable;
-	};
-
-	/**
-	 * Sets widgets which are selected
-	 * 
-	 * @param widgets
-	 *            {WbWidgetCtr} which are selected
-	 * @memberof CursorWidgetLocator
-	 */
-	WidgetLocatorManager.prototype.setSelectedWidgets = function (widgets) {
-		if(!this.isEnable()){
-			return;
-		}
-		if(!angular.isArray(widgets)){
-			widgets = [];
-		}
-
-		// remove old
-		for(var i = 0; i < this.selectedWidgets.length; i++){
-			var widget = this.selectedWidgets[i];
-			if(widgets.indexOf(widget) < 0){
-				var locator = this.getSelectionLocatorOf(widget);
-				this.selectionLocatorTrash.push(locator);
-				this.selectionLocatorMap.delete(widget);
-				locator.disconnect();
-			}
-		}
-
-		this.selectedWidgets = widgets;
-		if(this.isEnable()){
-			this.updateLocators();
-		}
-	};
-
-	/**
-	 * Gets selected widgets
-	 * 
-	 * @return widgets
-	 * @memberof CursorWidgetLocator
-	 */
-	WidgetLocatorManager.prototype.getSelectedWidgets = function () {
-		return this.selectedWidgets;
-	};
-
-	WidgetLocatorManager.prototype.isWidgetSelected = function(widget){
-		return this.selectedWidgets.indexOf(widget) >= 0;
-	};
-
-	/**
-	 * Sets the root widget
-	 * 
-	 * @param rootWidget
-	 *            {WbWidgetCtrl} root widget
-	 * @memberof WidgetLocatorManager
-	 */
-	WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {
-		if(this.rootWidget) {
-			this.destroy();
-		}
-		this.rootWidget = rootWidget;
-		if(this.rootWidget && this.isEnable()) {
-			angular.forEach(this.widgetListeners, function (callback, type) {
-				rootWidget.on(type, callback);
-			});
-		}
-		if (this.isEnable()) {
-			this.updateLocators();
-		}
-	};
-
-	/**
-	 * Gets the root widget
-	 * 
-	 * @return the root widget
-	 * @memberof WidgetLocatorManager
-	 */
-	WidgetLocatorManager.prototype.getRootWidget = function () {
-		return this.rootWidget;
-	};
-
-	WidgetLocatorManager.prototype.directUpdateLocator = function(locator, widget) {
-		try{
-			if(this.isVisible()){
-				locator.connect(widget);
-			} else {
-				locator.disconnect();
-			}
-		} catch(ex){
-			console.error(ex, 'Fail to update the locator');
-		}
-	};
-
-	/**
-	 * Update all locators
-	 * 
-	 * @memberof WidgetLocatorManager
-	 */
-	WidgetLocatorManager.prototype.updateLocators = function () {
-		if(!angular.isFunction(this.debounceUpdate)){
-			this.debounceUpdate = $widget.debounce(function(){
-				var widgets = this.getIntersectingWidgets();
-				for(var i = 0; i < widgets.length; i++){
-					var widget = widgets[i];
-
-					// update bound
-					this.directUpdateLocator(this.getBoundLocatorOf(widget), widget);
-
-					// update selection
-					if(this.isWidgetSelected(widget)){
-						this.directUpdateLocator(this.getSelectionLocatorOf(widget), widget);
-					}
-				}
-			}, 300, false);
-		}
-		this.debounceUpdate();
-	};
-
-
-	WidgetLocatorManager.prototype.getIntersectingWidgets = function(){
-		return this.intersectingWidget;
-	}
-
-	WidgetLocatorManager.prototype.widgetIntersectingChange = function(widget){
-		if(widget.isRoot() || !this.isVisible()){
-			return;
-		}
-		var index = this.intersectingWidget.indexOf(widget);
-		var locator = this.getBoundLocatorOf(widget);
-		// widget intersects with view
-		if(widget.isIntersecting()){
-			locator.connect(widget);
-			if(index < 0){
-				this.intersectingWidget.push(widget);
-				this.updateLocators();
-			}
-		} else {
-			locator.disconnect();
-			// widget is out of view
-			if(index >= 0){
-				this.intersectingWidget.splice(index, 1);
-				this.updateLocators();
-			}
-		}
-	}
-
-	WidgetLocatorManager.prototype.getBoundLocatorOf = function (widget) {
-		var map = this.boundLocatorMap;
-		if(!map.has(widget)) {
-			var locator;
-			if(this.boundLocatorTrash.length > 0){
-				locator = this.boundLocatorTrash.pop();
-			} else {
-				locator = new BoundWidgetLocator(this.boundLocatorOption);
-			}
-			map.set(widget, locator);
-		}
-		return map.get(widget);
-	};
-
-	WidgetLocatorManager.prototype.getSelectionLocatorOf = function(widget) {
-		var map = this.selectionLocatorMap;
-		if(!map.has(widget)) {
-			var locator;
-			if(this.selectionLocatorTrash.length > 0){
-				locator = this.selectionLocatorTrash.pop();
-			} else {
-				locator = new SelectionWidgetLocator(this.selectionLocatorOption);
-			}
-			map.set(widget, locator);
-		}
-		return map.get(widget);
-	};
-
-
-
-	return WidgetLocatorManager;
-});
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name AbstractWidgetLocator
- * @description Locates a widget on the view
- * 
- * It is used to display extra information about a widget on the screen. For
- * example it is used to show widget actions on the fly.
- * 
- */
-.factory('SelectionWidgetLocator', function (AbstractWidgetLocator, $document) {
-
-    var selectionWidgetLocator = function (options) {
-        options = options || {};
-        AbstractWidgetLocator.apply(this, options);
-
-        // set anchor
-        this.setAnchor(options.anchor);
-
-        // load templates
-        var template = options.template
-        || '<div class="wb-widget-locator selection"></div>';
-
-        this.titleElement = angular.element(template);
-        this.titleElement.attr('id', 'header');
-
-        // load elements
-        this.topElement = angular.element(template);
-        this.topElement.attr('id', 'top');
-
-        this.rightElement = angular.element(template);
-        this.rightElement.attr('id', 'right');
-
-        this.buttomElement = angular.element(template);
-        this.buttomElement.attr('id', 'buttom');
-
-        this.leftElement = angular.element(template);
-        this.leftElement.attr('id', 'left');
-
-        this.sizeElement = angular.element('<img class="wb-widget-locator selection" src="resources/corner-handle.png">');
-        this.sizeElement.attr('id', 'size');
-
-        // init controller
-        this.setElements([this.titleElement, this.topElement, this.rightElement,
-            this.buttomElement, this.leftElement, this.sizeElement]);
-        
-        
-        
-        var position = {};
-        var lock = false;
-        var dimension = {};
-        var ctrl = this;
-        
-
-        function mousemove($event) {
-            var deltaWidth = dimension.width - (position.x - $event.clientX);
-            var deltaHeight = dimension.height - (position.y - $event.clientY);
-            var newDimensions = {
-                    width: deltaWidth + 'px',
-                    height: deltaHeight + 'px'
-            };
-            
-            var widget = ctrl.getWidget();
-            var model = widget.getModel();
-            var $element = widget.getElement();
-            var $scope = widget.getScope();
-            
-            if (model.style.size.height === 'auto') {
-                newDimensions.height = 'auto';
-            }
-            $element.css(newDimensions);
-            
-            model.style.size.width = newDimensions.width;
-            model.style.size.height = newDimensions.height;
-
-            $scope.$apply();
-            return false;
-        }
-
-        function mouseup() {
-            $document.unbind('mousemove', mousemove);
-            $document.unbind('mouseup', mouseup);
-            lock = false;
-        }
-
-        function mousedown($event) {
-            $event.stopImmediatePropagation();
-            position.x = $event.clientX;
-            position.y = $event.clientY;
-            lock = true;
-            var $element = ctrl.getWidget().getElement();
-            dimension.width = $element.prop('offsetWidth');
-            dimension.height = $element.prop('offsetHeight');
-            $document.bind('mousemove', mousemove);
-            $document.bind('mouseup', mouseup);
-            return false;
-        }
-
-
-        this.sizeElement.on('mousedown', mousedown);
-    };
-    selectionWidgetLocator.prototype = new AbstractWidgetLocator();
-
-    selectionWidgetLocator.prototype.updateView = function () {
-        var widget = this.getWidget();
-        var bound = widget.getBoundingClientRect();
-        var space = 2;
-        this.topElement.css({
-            top: bound.top + space,
-            left: bound.left + space,
-            width: bound.width - 2*space
-        });
-        this.rightElement.css({
-            top: bound.top + space,
-            left: bound.left + bound.width - 2*space,
-            height: bound.height - 2*space
-        });
-        this.buttomElement.css({
-            top: bound.top + bound.height - space,
-            left: bound.left + space,
-            width: bound.width - 2*space
-        });
-        this.leftElement.css({
-            top: bound.top + space,
-            left: bound.left + space,
-            height: bound.height - 2*space
-        });
-        if (bound.top < 32) {
-            this.titleElement.css({
-                top: bound.top + bound.height,
-                left: bound.left + bound.width/2 - this.titleElement.width()/2
-            });
-        } else {
-            this.titleElement.css({
-                top: bound.top -  this.titleElement.height(),
-                left: bound.left + bound.width/2 - this.titleElement.width()/2
-            });
-        }
-        var widget = this.getWidget();
-        this.titleElement[0].innerHTML = '<span>'+ (widget.getTitle() || widget.getId() || widget.getType()) + '</span>'
-        
-        
-        this.sizeElement.css({
-
-            top: bound.top + bound.height -13 ,
-            left: bound.left + bound.width -15 ,
-
-        })
-    };
-    return selectionWidgetLocator;
-});
-
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//
+//angular.module('am-wb-core')//
+//
+///**
+// * @ngdoc Factories
+// * @name TinymcePluginCodesample
+// * @description Adding code sample to tinymce
+// * 
+// * 
+// * ## options
+// * 
+// * codesample_languages: array of languages
+// * 
+// */
+//.factory('TinymcePluginCodesample', function ($resource) {
+//	'use strict';
+//	var languages;
+//	var defaultLanguages = [{
+//		text: 'HTML/XML',
+//		value: 'markup'
+//	},
+//	{
+//		text: 'JavaScript',
+//		value: 'javascript'
+//	},
+//	{
+//		text: 'CSS',
+//		value: 'css'
+//	},
+//	{
+//		text: 'PHP',
+//		value: 'php'
+//	},
+//	{
+//		text: 'Ruby',
+//		value: 'ruby'
+//	},
+//	{
+//		text: 'Python',
+//		value: 'python'
+//	},
+//	{
+//		text: 'Java',
+//		value: 'java'
+//	},
+//	{
+//		text: 'C',
+//		value: 'c'
+//	},
+//	{
+//		text: 'C#',
+//		value: 'csharp'
+//	},
+//	{
+//		text: 'C++',
+//		value: 'cpp'
+//	}];
+//
+//	/*
+//	 * dom utils
+//	 */
+//	var tinymceDomeUtils = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+//
+//	function isCodeSample(elm) {
+//		return elm && elm.nodeName === 'PRE' && elm.className.indexOf('language-') !== -1;
+//	}
+//
+//	function trimArg(predicateFn) {
+//		return function (arg1, arg2) {
+//			return predicateFn(arg2);
+//		};
+//	}
+//
+//	/*
+//	 * Insert new code sample into the cell
+//	 */
+//	function insertCodeSample(editor, language, code, node) {
+//		editor.undoManager.transact(function () {
+////			var node = getSelectedCodeSample(editor);
+//			code = tinymceDomeUtils.DOM.encode(code);
+//			if (node) {
+//				editor.dom.setAttrib(node, 'class', 'language-' + language);
+//				node.innerHTML = code;
+//				Prism.highlightElement(node);
+//				editor.selection.select(node);
+//			} else {
+//				editor.insertContent('<pre id="__new" class="language-' + language + '">' + code + '</pre>');
+//				editor.selection.select(editor.$('#__new').removeAttr('id')[0]);
+//			}
+//		});
+//	}
+//
+//	/*
+//	 * Add to plugin manager
+//	 */
+//
+//	var tinymcePluginCodesample = function (editor, pluginUrl) {
+//		this.setEditor(editor, pluginUrl);
+//	};
+//
+//	/**
+//	 * Set editor and load the plugin
+//	 */
+//	tinymcePluginCodesample.prototype.setEditor = function(editor) {
+//		this._editor = editor;
+//		languages = editor.settings.codesample_languages || defaultLanguages;
+//		this.setup();
+//		this.register();
+//	};
+//
+//	/**
+//	 * Gets current editor
+//	 */
+//	tinymcePluginCodesample.prototype.getEditor = function(){
+//		return this._editor;
+//	};
+//
+//
+//
+//	/**
+//	 * Setups the environments and events
+//	 */
+//	tinymcePluginCodesample.prototype.setup = function () {
+//		var facotry = this;
+//		var editor = this.getEditor();
+//		var $ = editor.$;
+//		editor.on('PreProcess', function (e) {
+//			$('pre[contenteditable=false]', e.node).filter(trimArg(isCodeSample)).each(function (idx, elm) {
+//				var $elm = $(elm), code = elm.textContent;
+//				$elm.attr('class', $.trim($elm.attr('class')));
+//				$elm.removeAttr('contentEditable');
+//				$elm.empty().append($('<code></code>').each(function () {
+//					this.textContent = code;
+//				}));
+//			});
+//		});
+//		editor.on('SetContent', function () {
+//			var unprocessedCodeSamples = $('pre').filter(trimArg(isCodeSample)).filter(function (idx, elm) {
+//				return elm.contentEditable !== 'false';
+//			});
+//			if (unprocessedCodeSamples.length) {
+//				editor.undoManager.transact(function () {
+//					unprocessedCodeSamples.each(function (idx, elm) {
+//						$(elm).find('br').each(function (idx, elm) {
+//							elm.parentNode.replaceChild(editor.getDoc().createTextNode('\n'), elm);
+//						});
+//						elm.contentEditable = false;
+//						elm.innerHTML = editor.dom.encode(elm.textContent);
+//						Prism.highlightElement(elm);
+//						elm.className = $.trim(elm.className);
+//					});
+//				});
+//			}
+//		});
+//
+//		editor.on('dblclick', function (ev) {
+//			if (isCodeSample(ev.target)) {
+//				facotry.openEditor();
+//			}
+//		});
+//	};
+//
+//	/**
+//	 * Register the plugin with the editor
+//	 * 
+//	 */
+//	tinymcePluginCodesample.prototype.register = function () {
+//		var facotry = this;
+//		var editor = this.getEditor();
+//		editor.addCommand('codesample', function () {
+//			var node = editor.selection.getNode();
+//			if (editor.selection.isCollapsed() || isCodeSample(node)) {
+//				facotry.openEditor();
+//			} else {
+//				editor.formatter.toggle('code');
+//			}
+//		});
+//		editor.addButton('codesample', {
+//			cmd: 'codesample',
+//			title: 'Insert/Edit code sample'
+//		});
+//		editor.addMenuItem('codesample', {
+//			cmd: 'codesample',
+//			text: 'Code sample',
+//			icon: 'codesample'
+//		});
+//	};
+//
+//	/*
+//	 * Get selected code sample from the editor
+//	 */
+//	tinymcePluginCodesample.prototype.getSelectedCodeSample = function () {
+//		var editor = this.getEditor();
+//		var node = editor.selection.getNode();
+//		if (isCodeSample(node)) {
+//			return node;
+//		}
+//		return null;
+//	};
+//
+//	/*
+//	 * Get current code.
+//	 * 
+//	 * If the code sample is empty then an empty text is returned as
+//	 * result.
+//	 */
+//	tinymcePluginCodesample.prototype.getCurrentCode = function () {
+//		var node = this.getSelectedCodeSample();
+//		if (node) {
+//			return node.textContent;
+//		}
+//		return '';
+//	};
+//
+//
+//	/*
+//	 * Gets current language of the code sampler
+//	 */
+//	tinymcePluginCodesample.prototype.getCurrentLanguage = function (editor) {
+//		var matches;
+//		var node = this.getSelectedCodeSample();
+//		if (node) {
+//			matches = node.className.match(/language-(\w+)/);
+//			return matches ? matches[1] : '';
+//		}
+//		return '';
+//	};
+//
+//	/*
+//	 * Open editor to edit a code sample
+//	 */
+//	tinymcePluginCodesample.prototype.openEditor = function () { 
+//		var editor = this.getEditor();
+//		var node = this.getSelectedCodeSample();
+//		var factory = this;
+//		$resource.get('script', {
+//			data : {
+//				language: this.getCurrentLanguage(editor),
+//				languages: languages,
+//				// TODO: maso, 2019: get code
+//				code: this.getCurrentCode()
+//			}
+//		})
+//		.then(function(script){
+//			insertCodeSample(editor, script.language, script.code, node);
+//		});
+//	};
+//
+//
+//	return tinymcePluginCodesample;
+//});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//angular.module('am-wb-core')//
+//
+///**
+// * @ngdoc Factories
+// * @name TinymcePluginImageToolxcx
+// * @description Adding image plugin
+// * 
+// */
+//.factory('TinymcePluginImageTool', function ($resource) {
+//	'use strict';
+//
+//	var tinymcePluginImageTool = function (editor/*, pluginUrl*/) {
+//		var factory = this;
+//		this.setEditor(editor);
+//		editor.addButton('image', {
+//			icon: 'image',
+//			tooltip: 'Insert/edit image',
+//			onclick: function(url){
+//				editor.insertContent('<img src="' + url + '" >');
+//			},
+//			stateSelector: 'img:not([data-mce-object],[data-mce-placeholder]),figure.image'
+//		});
+//
+//		editor.addMenuItem('image', {
+//			icon: 'image',
+//			text: 'Image',
+//			onclick: function(){
+//				factory.insertImage();
+//			},
+//			context: 'insert',
+//			prependToContext: true
+//		});
+//
+//		editor.addCommand('mceImage', function(){
+//			factory.insertImage();
+//		});
+//	}
+//
+//	tinymcePluginImageTool.prototype.insertImage = function() {
+//		var editor = this.getEditor();
+//		$resource.get('image')//
+//		.then(function(value){
+//			editor.insertContent('<img src="' + value + '" >');
+//		});
+//	};
+//	
+//	tinymcePluginImageTool.prototype.setEditor = function(editor) {
+//		this._editor = editor;
+//	};
+//	
+//	tinymcePluginImageTool.prototype.getEditor = function() {
+//		return this._editor;
+//	};
+//
+//	return tinymcePluginImageTool;
+//});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//angular.module('am-wb-core')//
+//
+///**
+// * @ngdoc Factories
+// * @name TinymcePluginLink
+// * @description Adding image plugin
+// * 
+// * 
+// * ## Options
+// * 
+// * link_assume_external_targets: 
+// * link_context_toolbar:
+// * link_list:
+// * default_link_target: 
+// */
+//.factory('TinymcePluginLink', function ($resource) {
+//	'use strict';
+//	
+//
+//	var attachState = {};
+//
+//
+//	var global$1 = tinymce.util.Tools.resolve('tinymce.util.VK');
+//	var global$2 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+//	var global$3 = tinymce.util.Tools.resolve('tinymce.Env');
+//	var global$4 = tinymce.util.Tools.resolve('tinymce.util.Tools');
+//	var global$5 = tinymce.util.Tools.resolve('tinymce.util.Delay');
+//	var global$6 = tinymce.util.Tools.resolve('tinymce.util.XHR');
+//
+//
+//
+//	//-----------------------------------------------------------
+//	// utility
+//	//-----------------------------------------------------------
+//	var assumeExternalTargets = function (editorSettings) {
+//		return typeof editorSettings.link_assume_external_targets === 'boolean' ? editorSettings.link_assume_external_targets : false;
+//	};
+//
+//	var hasContextToolbar = function (editorSettings) {
+//		return typeof editorSettings.link_context_toolbar === 'boolean' ? editorSettings.link_context_toolbar : false;
+//	};
+//
+//	var getLinkList = function (editorSettings) {
+//		return editorSettings.link_list;
+//	};
+//
+//	function hasDefaultLinkTarget(editorSettings) {
+//		return typeof editorSettings.default_link_target === 'string';
+//	}
+//
+//	function getDefaultLinkTarget(editorSettings) {
+//		return editorSettings.default_link_target;
+//	};
+//
+//	var getTargetList = function (editorSettings) {
+//		return editorSettings.target_list;
+//	};
+//
+//	var setTargetList = function (editor, list) {
+//		editor.settings.target_list = list;
+//	};
+//
+//	var shouldShowTargetList = function (editorSettings) {
+//		return getTargetList(editorSettings) !== false;
+//	};
+//
+//	var getRelList = function (editorSettings) {
+//		return editorSettings.rel_list;
+//	};
+//
+//	var hasRelList = function (editorSettings) {
+//		return getRelList(editorSettings) !== undefined;
+//	};
+//
+//	var getLinkClassList = function (editorSettings) {
+//		return editorSettings.link_class_list;
+//	};
+//
+//	var hasLinkClassList = function (editorSettings) {
+//		return getLinkClassList(editorSettings) !== undefined;
+//	};
+//
+//	var shouldShowLinkTitle = function (editorSettings) {
+//		return editorSettings.link_title !== false;
+//	};
+//
+//	var allowUnsafeLinkTarget = function (editorSettings) {
+//		return typeof editorSettings.allow_unsafe_link_target === 'boolean' ? editorSettings.allow_unsafe_link_target : false;
+//	};
+//
+//	var isImageFigure = function (node) {
+//		return node && node.nodeName === 'FIGURE' && /\bimage\b/i.test(node.className);
+//	};
+//
+//	var appendClickRemove = function (link, evt) {
+//		document.body.appendChild(link);
+//		link.dispatchEvent(evt);
+//		document.body.removeChild(link);
+//	};
+//
+//	var isLink = function (elm) {
+//		return elm && elm.nodeName === 'A' && elm.href;
+//	};
+//	
+//	var hasLinks = function (elements) {
+//		return global$4.grep(elements, isLink).length > 0;
+//	};
+//	
+//	var getLink = function (editor, elm) {
+//		return editor.dom.getParent(elm, 'a[href]');
+//	};
+//
+//	var getSelectedLink = function (editor) {
+//		return getLink(editor, editor.selection.getStart());
+//	};
+//	
+//	var getHref = function (elm) {
+//		var href = elm.getAttribute('data-mce-href');
+//		return href ? href : elm.getAttribute('href');
+//	};
+//	
+//	var isContextMenuVisible = function (editor) {
+//		var contextmenu = editor.plugins.contextmenu;
+//		return contextmenu ? contextmenu.isContextMenuVisible() : false;
+//	};
+//	
+//	var hasOnlyAltModifier = function (e) {
+//		return e.altKey === true && e.shiftKey === false && e.ctrlKey === false && e.metaKey === false;
+//	};
+//	
+//	var trimCaretContainers = function (text) {
+//		return text.replace(/\uFEFF/g, '');
+//	};
+//
+//
+//	function getAnchorElement(editor, selectedElm) {
+//		selectedElm = selectedElm || editor.selection.getNode();
+//		if (isImageFigure(selectedElm)) {
+//			return editor.dom.select('a[href]', selectedElm)[0];
+//		} else {
+//			return editor.dom.getParent(selectedElm, 'a[href]');
+//		}
+//	}
+//	
+//	function getAnchorText(selection, anchorElm) {
+//		var text = anchorElm ? anchorElm.innerText || anchorElm.textContent : selection.getContent({ format: 'text' });
+//		return trimCaretContainers(text);
+//	}
+//	
+//	function isOnlyTextSelected(html) {
+//		if (/</.test(html) && (!/^<a [^>]+>[^<]+<\/a>$/.test(html) || html.indexOf('href=') === -1)) {
+//			return false;
+//		}
+//		return true;
+//	}
+//	
+//	function buildListItems(inputList, itemCallback, startItems) {
+//		var appendItems = function (values, output) {
+//			output = output || [];
+//			angular.forEach(values, function (item) {
+//				var menuItem = { 
+//						text: item.text || item.title 
+//				};
+//				if (item.menu) {
+//					menuItem.menu = appendItems(item.menu);
+//				} else {
+//					menuItem.value = item.value;
+//					if (itemCallback) {
+//						itemCallback(menuItem);
+//					}
+//				}
+//				output.push(menuItem);
+//			});
+//			return output;
+//		};
+//		return appendItems(inputList, startItems || []);
+//	};
+//	
+//
+//	var toggleTargetRules = function (rel, isUnsafe) {
+//		var rules = ['noopener'];
+//		var newRel = rel ? rel.split(/\s+/) : [];
+//		var toString = function (rel) {
+//			return global$4.trim(rel.sort().join(' '));
+//		};
+//		var addTargetRules = function (rel) {
+//			rel = removeTargetRules(rel);
+//			return rel.length ? rel.concat(rules) : rules;
+//		};
+//		var removeTargetRules = function (rel) {
+//			return rel.filter(function (val) {
+//				return global$4.inArray(rules, val) === -1;
+//			});
+//		};
+//		newRel = isUnsafe ? addTargetRules(newRel) : removeTargetRules(newRel);
+//		return newRel.length ? toString(newRel) : null;
+//	};
+//
+//	var link = function (editor, attachState) {
+//		return function (data) {
+//			editor.undoManager.transact(function () {
+//				var selectedElm = editor.selection.getNode();
+//				var anchorElm = getAnchorElement(editor, selectedElm);
+//				var linkAttrs = {
+//						href: data.href,
+//						target: data.target ? data.target : null,
+//								rel: data.rel ? data.rel : null,
+//										class: data.class ? data.class : null,
+//												title: data.title ? data.title : null
+//				};
+//				if (!hasRelList(editor.settings) && allowUnsafeLinkTarget(editor.settings) === false) {
+//					linkAttrs.rel = toggleTargetRules(linkAttrs.rel, linkAttrs.target === '_blank');
+//				}
+//				if (data.href === attachState.href) {
+//					attachState.attach();
+//					attachState = {};
+//				}
+//				if (anchorElm) {
+//					editor.focus();
+//					if (data.hasOwnProperty('text')) {
+//						if ('innerText' in anchorElm) {
+//							anchorElm.innerText = data.text;
+//						} else {
+//							anchorElm.textContent = data.text;
+//						}
+//					}
+//					editor.dom.setAttribs(anchorElm, linkAttrs);
+//					editor.selection.select(anchorElm);
+//					editor.undoManager.add();
+//				} else {
+//					if (isImageFigure(selectedElm)) {
+//						linkImageFigure(editor, selectedElm, linkAttrs);
+//					} else if (data.hasOwnProperty('text')) {
+//						editor.insertContent(editor.dom.createHTML('a', linkAttrs, editor.dom.encode(data.text)));
+//					} else {
+//						editor.execCommand('mceInsertLink', false, linkAttrs);
+//					}
+//				}
+//			});
+//		};
+//	};
+//	
+//	var unlink = function (editor) {
+//		return function () {
+//			editor.undoManager.transact(function () {
+//				var node = editor.selection.getNode();
+//				if (isImageFigure(node)) {
+//					unlinkImageFigure(editor, node);
+//				} else {
+//					editor.execCommand('unlink');
+//				}
+//			});
+//		};
+//	};
+//	
+//	var unlinkImageFigure = function (editor, fig) {
+//		var a, img;
+//		img = editor.dom.select('img', fig)[0];
+//		if (img) {
+//			a = editor.dom.getParents(img, 'a[href]', fig)[0];
+//			if (a) {
+//				a.parentNode.insertBefore(img, a);
+//				editor.dom.remove(a);
+//			}
+//		}
+//	};
+//	var linkImageFigure = function (editor, fig, attrs) {
+//		var a, img;
+//		img = editor.dom.select('img', fig)[0];
+//		if (img) {
+//			a = editor.dom.create('a', attrs);
+//			img.parentNode.insertBefore(a, img);
+//			a.appendChild(img);
+//		}
+//	};
+//
+//	var delayedConfirm = function (editor, message, callback) {
+//		var rng = editor.selection.getRng();
+//		global$5.setEditorTimeout(editor, function () {
+//			editor.windowManager.confirm(message, function (state) {
+//				editor.selection.setRng(rng);
+//				callback(state);
+//			});
+//		});
+//	};
+//
+//	
+//	//-----------------------------------------------------------
+//	// Factory
+//	//
+//	//
+//	//-----------------------------------------------------------
+//	var tinymcePluginLink = function (editor/*, pluginUrl*/) {
+//		this.setEditor(editor);
+//
+//		this.setupButtons();
+//		this.setupMenuItems();
+//		this.setupContextToolbars();
+//		this.setupGotoLinks();
+//		this.register();
+//	};
+//
+//	tinymcePluginLink.prototype.setEditor = function(editor) {
+//		this._editor = editor;
+//	};
+//
+//	tinymcePluginLink.prototype.getEditor = function() {
+//		return this._editor;
+//	};
+//
+//	tinymcePluginLink.prototype.setupButtons = function () {
+//		var editor = this.getEditor();
+//		var factory = this;
+//		editor.ui.registry.addSplitButton('link', {
+//			active: false,
+//			icon: 'link',
+//			tooltip: 'Insert/edit link',
+//			onclick: function(){
+//				factory.openDialog();
+//			},
+//			onpostrender: function(){
+//				factory.toggleActiveState();
+//			}
+//		});
+//		editor.ui.registry.addSplitButton('unlink', {
+//			active: false,
+//			icon: 'unlink',
+//			tooltip: 'Remove link',
+//			onclick: function(){
+//				factory.unlink();
+//			},
+//			onpostrender: function(){
+//				factory.toggleActiveState();
+//			}
+//		});
+//		if (editor.ui.registry.addContextToolbar) {
+//			editor.ui.registry.addSplitButton('openlink', {
+//				icon: 'newtab',
+//				tooltip: 'Open link',
+//				onclick: function () {
+//					gotoLink(editor, getSelectedLink(editor));
+//				}
+//			});
+//		}
+//	};
+//
+//	tinymcePluginLink.prototype.setupMenuItems = function () {
+//		var editor = this.getEditor();
+//		var factory = this;
+//		editor.ui.registry.addMenuItem('openlink', {
+//			text: 'Open link',
+//			icon: 'newtab',
+//			onclick: function () {
+//				factory.gotoLink(editor, getSelectedLink(editor));
+//			},
+//			onPostRender: function () {
+//				var self = this;
+//				var toggleVisibility = function (e) {
+//					if (hasLinks(e.parents)) {
+//						self.show();
+//					} else {
+//						self.hide();
+//					}
+//				};
+//				if (!hasLinks(editor.dom.getParents(editor.selection.getStart()))) {
+//					self.hide();
+//				}
+//				editor.on('nodechange', toggleVisibility);
+//				self.on('remove', function () {
+//					editor.off('nodechange', toggleVisibility);
+//				});
+//			},
+//			prependToContext: true
+//		});
+//		editor.ui.registry.addMenuItem('link', {
+//			icon: 'link',
+//			text: 'Link',
+//			shortcut: 'Meta+K',
+//			onclick: function(){
+//				factory.openDialog();
+//			},
+//			stateSelector: 'a[href]',
+//			context: 'insert',
+//			prependToContext: true
+//		});
+//		editor.ui.registry.addMenuItem('unlink', {
+//			icon: 'unlink',
+//			text: 'Remove link',
+//			onclick: function(){
+//				factory.unlink();
+//			},
+//			stateSelector: 'a[href]'
+//		});
+//	};
+//
+//	tinymcePluginLink.prototype.setupContextToolbars = function () {
+//		var editor = this.getEditor();
+//		if (editor.ui.registry.addContextToolbar) {
+//			editor.ui.registry.addContextToolbar(function (elm) {
+//				var sel, rng, node;
+//				if (hasContextToolbar(editor.settings) && !isContextMenuVisible(editor) && isLink(elm)) {
+//					sel = editor.selection;
+//					rng = sel.getRng();
+//					node = rng.startContainer;
+//					if (node.nodeType === 3 && sel.isCollapsed() && rng.startOffset > 0 && rng.startOffset < node.data.length) {
+//						return true;
+//					}
+//				}
+//				return false;
+//			}, 'openlink | link unlink');
+//		}
+//	};
+//
+//	tinymcePluginLink.prototype.setupGotoLinks = function () {
+//		var editor = this.getEditor();
+//		editor.on('click', function (e) {
+//			var link = getLink(editor, e.target);
+//			if (link && global$1.metaKeyPressed(e)) {
+//				e.preventDefault();
+//				gotoLink(editor, link);
+//			}
+//		});
+//		editor.on('keydown', function (e) {
+//			var link = getSelectedLink(editor);
+//			if (link && e.keyCode === 13 && hasOnlyAltModifier(e)) {
+//				e.preventDefault();
+//				gotoLink(editor, link);
+//			}
+//		});
+//	};
+//	
+//	tinymcePluginLink.prototype.toggleActiveState = function () {
+//		var editor = this.getEditor();
+//		return function () {
+//			var self = this;
+//			editor.on('nodechange', function (e) {
+//				self.active(!editor.readonly && !!$_ft5004fzjm0o6bvs.getAnchorElement(editor, e.element));
+//			});
+//		};
+//	};
+//	
+//	tinymcePluginLink.prototype.register = function () {
+//		var factory = this;
+//		var editor = this.getEditor();
+//		// commands
+//		editor.addCommand('mceLink', function(){
+//			factory.openDialog();
+//		});
+//		// shortcuts
+//		editor.addShortcut('Meta+K', '', function(){
+//			factory.openDialog();
+//		});
+//	};
+//	
+//
+//	tinymcePluginLink.prototype.openDialog = function (editor) {
+//		var editor = this.getEditor();
+//		var linkList = getLinkList(editor.settings);
+//		var factory = this;
+//		if (typeof linkList === 'string') {
+//			global$6.send({
+//				url: linkList,
+//				success: function (text) {
+//					factory.showDialog(JSON.parse(text));
+//				}
+//			});
+//		} else if (typeof linkList === 'function') {
+//			linkList(function (list) {
+//				factory.showDialog(list);
+//			});
+//		} else {
+//			factory.showDialog(linkList);
+//		}
+//	};
+//	
+//	tinymcePluginLink.prototype.unlink = function () {
+//		var editor = this.getEditor();
+//		editor.undoManager.transact(function () {
+//			var node = editor.selection.getNode();
+//			if (isImageFigure(node)) {
+//				unlinkImageFigure(editor, node);
+//			} else {
+//				editor.execCommand('unlink');
+//			}
+//		});
+//	};
+//	
+//
+//	tinymcePluginLink.prototype.showDialog = function (linkList) {
+//		var editor = this.getEditor();
+//		var data = {};
+//		var selection = editor.selection;
+//		var dom = editor.dom;
+//		var anchorElm, initialText;
+//		
+//		var win, onlyText, textListCtrl, linkListCtrl, relListCtrl, targetListCtrl, classListCtrl, linkTitleCtrl, value;
+//		
+//		var linkListChangeHandler = function (e) {
+//			var textCtrl = win.find('#text');
+//			if (!textCtrl.value() || e.lastControl && textCtrl.value() === e.lastControl.text()) {
+//				textCtrl.value(e.control.text());
+//			}
+//			win.find('#href').value(e.control.value());
+//		};
+//		
+//		var buildAnchorListControl = function (url) {
+//			var anchorList = [];
+//			global$4.each(editor.dom.select('a:not([href])'), function (anchor) {
+//				var id = anchor.name || anchor.id;
+//				if (id) {
+//					anchorList.push({
+//						text: id,
+//						value: '#' + id,
+//						selected: url.indexOf('#' + id) !== -1
+//					});
+//				}
+//			});
+//			if (anchorList.length) {
+//				anchorList.unshift({
+//					text: 'None',
+//					value: ''
+//				});
+//				return {
+//					name: 'anchor',
+//					type: 'listbox',
+//					label: 'Anchors',
+//					values: anchorList,
+//					onselect: linkListChangeHandler
+//				};
+//			}
+//		};
+//		
+//		var updateText = function () {
+//			if (!initialText && onlyText && !data.text) {
+//				this.parent().parent().find('#text')[0].value(this.value());
+//			}
+//		};
+//		
+//		var urlChange = function (e) {
+//			var meta = e.meta || {};
+//			if (linkListCtrl) {
+//				linkListCtrl.value(editor.convertURL(this.value(), 'href'));
+//			}
+//			global$4.each(e.meta, function (value, key) {
+//				var inp = win.find('#' + key);
+//				if (key === 'text') {
+//					if (initialText.length === 0) {
+//						inp.value(value);
+//						data.text = value;
+//					}
+//				} else {
+//					inp.value(value);
+//				}
+//			});
+//			if (meta.attach) {
+//				attachState = {
+//						href: this.value(),
+//						attach: meta.attach
+//				};
+//			}
+//			if (!meta.text) {
+//				updateText.call(this);
+//			}
+//		};
+//		
+//		var onBeforeCall = function (e) {
+//			e.meta = win.toJSON();
+//		};
+//		
+//		onlyText = isOnlyTextSelected(selection.getContent());
+//		anchorElm = getAnchorElement(editor);
+//		data.text = initialText = getAnchorText(editor.selection, anchorElm);
+//		data.href = anchorElm ? dom.getAttrib(anchorElm, 'href') : '';
+//		if (anchorElm) {
+//			data.target = dom.getAttrib(anchorElm, 'target');
+//		} else if (hasDefaultLinkTarget(editor.settings)) {
+//			data.target = getDefaultLinkTarget(editor.settings);
+//		}
+//		if (value = dom.getAttrib(anchorElm, 'rel')) {
+//			data.rel = value;
+//		}
+//		if (value = dom.getAttrib(anchorElm, 'class')) {
+//			data.class = value;
+//		}
+//		if (value = dom.getAttrib(anchorElm, 'title')) {
+//			data.title = value;
+//		}
+//		if (onlyText) {
+//			textListCtrl = {
+//					name: 'text',
+//					type: 'textbox',
+//					size: 40,
+//					label: 'Text to display',
+//					onchange: function () {
+//						data.text = this.value();
+//					}
+//			};
+//		}
+//		if (linkList) {
+//			linkListCtrl = {
+//					type: 'listbox',
+//					label: 'Link list',
+//					values: buildListItems(linkList, function (item) {
+//						item.value = editor.convertURL(item.value || item.url, 'href');
+//					}, [{
+//						text: 'None',
+//						value: ''
+//					}]),
+//					onselect: linkListChangeHandler,
+//					value: editor.convertURL(data.href, 'href'),
+//					onPostRender: function () {
+//						linkListCtrl = this;
+//					}
+//			};
+//		}
+//		if (shouldShowTargetList(editor.settings)) {
+//			if (getTargetList(editor.settings) === undefined) {
+//				setTargetList(editor, [{
+//						text: 'None',
+//						value: ''
+//					},{
+//						text: 'New window',
+//						value: '_blank'
+//					}]);
+//			}
+//			targetListCtrl = {
+//					name: 'target',
+//					type: 'listbox',
+//					label: 'Target',
+//					values: buildListItems(getTargetList(editor.settings))
+//			};
+//		}
+//		if (hasRelList(editor.settings)) {
+//			relListCtrl = {
+//					name: 'rel',
+//					type: 'listbox',
+//					label: 'Rel',
+//					values: buildListItems(getRelList(editor.settings), function (item) {
+//						if (allowUnsafeLinkTarget(editor.settings) === false) {
+//							item.value = toggleTargetRules(item.value, data.target === '_blank');
+//						}
+//					})
+//			};
+//		}
+//		if (hasLinkClassList(editor.settings)) {
+//			classListCtrl = {
+//					name: 'class',
+//					type: 'listbox',
+//					label: 'Class',
+//					values: buildListItems(getLinkClassList(editor.settings), function (item) {
+//						if (item.value) {
+//							item.textStyle = function () {
+//								return editor.formatter.getCssText({
+//									inline: 'a',
+//									classes: [item.value]
+//								});
+//							};
+//						}
+//					})
+//			};
+//		}
+//		if (shouldShowLinkTitle(editor.settings)) {
+//			linkTitleCtrl = {
+//					name: 'title',
+//					type: 'textbox',
+//					label: 'Title',
+//					value: data.title
+//			};
+//		}
+//		win = editor.windowManager.open({
+//			title: 'Insert link',
+//			data: data,
+//			body: [
+//				{
+//					name: 'href',
+//					type: 'filepicker',
+//					filetype: 'file',
+//					size: 40,
+//					autofocus: true,
+//					label: 'Url',
+//					onchange: urlChange,
+//					onkeyup: updateText,
+//					onpaste: updateText,
+//					onbeforecall: onBeforeCall
+//				},
+//				textListCtrl,
+//				linkTitleCtrl,
+//				buildAnchorListControl(data.href),
+//				linkListCtrl,
+//				relListCtrl,
+//				targetListCtrl,
+//				classListCtrl
+//				],
+//				onSubmit: function (e) {
+//					var assumeExternalTargetsResult = assumeExternalTargets(editor.settings);
+//					var insertLink = link(editor, attachState);
+//					var removeLink = unlink(editor);
+//					var resultData = global$4.extend({}, data, e.data);
+//					var href = resultData.href;
+//					if (!href) {
+//						removeLink();
+//						return;
+//					}
+//					if (!onlyText || resultData.text === initialText) {
+//						delete resultData.text;
+//					}
+//					if (href.indexOf('@') > 0 && href.indexOf('//') === -1 && href.indexOf('mailto:') === -1) {
+//						delayedConfirm(editor, 'The URL you entered seems to be an email address. Do you want to add the required mailto: prefix?', function (state) {
+//							if (state) {
+//								resultData.href = 'mailto:' + href;
+//							}
+//							insertLink(resultData);
+//						});
+//						return;
+//					}
+//					if (assumeExternalTargetsResult === true && !/^\w+:/i.test(href) || assumeExternalTargetsResult === false && /^\s*www[\.|\d\.]/i.test(href)) {
+//						delayedConfirm(editor, 'The URL you entered seems to be an external link. Do you want to add the required http:// prefix?', function (state) {
+//							if (state) {
+//								resultData.href = 'http://' + href;
+//							}
+//							insertLink(resultData);
+//						});
+//						return;
+//					}
+//					insertLink(resultData);
+//				}
+//		});
+//	};
+//	
+//
+//
+//	var gotoLink = function (a) {
+//		var editor = this.getEditor();
+//		if (a) {
+//			var href = getHref(a);
+//			if (/^#/.test(href)) {
+//				var targetEl = editor.$(href);
+//				if (targetEl.length) {
+//					editor.selection.scrollIntoView(targetEl[0], true);
+//				}
+//			} else {
+//				var url = a.href;
+//				if (!global$3.ie || global$3.ie > 10) {
+//					var link = document.createElement('a');
+//					link.target = '_blank';
+//					link.href = url;
+//					link.rel = 'noreferrer noopener';
+//					var evt = document.createEvent('MouseEvents');
+//					evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+//					appendClickRemove(link, evt);
+//				} else {
+//					var win = window.open('', '_blank');
+//					if (win) {
+//						win.opener = null;
+//						var doc = win.document;
+//						doc.open();
+//						doc.write('<meta http-equiv="refresh" content="0; url=' + global$2.DOM.encode(url) + '">');
+//						doc.close();
+//					}
+//				}
+//			}
+//		}
+//	};
+//
+//	return tinymcePluginLink;
+//});
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* 
  * The MIT License (MIT)
@@ -15584,952 +9954,112 @@ angular.module('am-wb-core')
  * Load widgets
  */
 .run(function ($settings) {
-    // utilities
-    function setAllDim(dim, val) {
-        dim.top = val;
-        dim.right = val;
-        dim.bottom = val;
-        dim.left = val;
-    }
-
-    function createDimeStr(dim) {
-        var output =
-            dim.top + ' ' +
-            dim.right + ' ' +
-            dim.bottom + ' ' +
-            dim.left;
-        return output;
-    }
-
-
-    /*
-     * splite margin/padding to its components
-     * check different state Based on CSS rules. see for example:
-     * https://www.w3schools.com/cssref/pr_margin.asp
-     * https://www.w3schools.com/cssref/pr_padding.asp
-     */
-    function fillDimFromString(dim, str) {
-        str = str || '';
-        var dimAll;
-        var dimsArray = str.split(' ');
-
-        // 0px is selected
-        if (dimsArray.length === 1) {
-            dimAll = str;
-        }
-
-        //All 4 items is equal
-        else if (dimsArray.length === 4 && _.uniq(dimsArray).length === 1) {
-            dimAll = dimsArray[0];
-        }
-
-        //Items are 4 and different
-        else if (dimsArray.length === 4 && _.uniq(dimsArray).length > 1) {
-            dim.top = dimsArray[0];
-            dim.right = dimsArray[1];
-            dim.bottom = dimsArray[2];
-            dim.left = dimsArray[3];
-        }
-
-        //Items are 3
-        else if (dimsArray.length === 3) {
-            dim.top = dimsArray[0];
-            dim.right = dimsArray[1];
-            dim.left = dimsArray[1];
-            dim.bottom = dimsArray[2];
-        }
-
-        //Items are 2
-        else if (dimsArray.length === 2) {
-            dim.top = dimsArray[0];
-            dim.bottom = dimsArray[0];
-            dim.right = dimsArray[1];
-            dim.left = dimsArray[1];
-        }
-
-        //Items are 1
-        else if (dimsArray.length === 1) {
-            dim.top = dimsArray[0];
-            dim.right = dimsArray[0];
-            dim.bottom = dimsArray[0];
-            dim.left = dimsArray[0];
-        }
-
-        //All items are undefined. In this case default value is 0px.
-        else if (!dimsArray.length) {
-            dimAll = '0px';
-        }
-
-        // check dimAll
-        if (dimAll) {
-            setAllDim(dim, dimAll);
-        }
-    }
-
-    function setAllCorner(dim, val) {
-        dim.topLeft = val;
-        dim.topRight = val;
-        dim.bottomRight = val;
-        dim.bottomLeft = val;
-    }
-
-    function createCornerStr(dim) {
-        return dim.topLeft + ' ' + dim.topRight + ' ' + dim.bottomRight + ' ' + dim.bottomLeft;
-    }
-
-    /*
-     * splite 'radius' to its components
-     * check different state Based on CSS rules. see for example:
-     * https://www.w3schools.com/CSSref/css3_pr_border-radius.asp
-     */
-    function fillCornerFromString(dim, str) {
-        var newDom = {};
-        fillDimFromString(newDom, str);
-
-        dim.topLeft = newDom.topLeft;
-        dim.topRight = newDom.topRight;
-        dim.bottomRight = newDom.bottomRight;
-        dim.bottomLeft = newDom.bottomLeft;
-    }
-
-    $settings.newPage({
+    /************************************************************************
+     * Model and Widgets
+     ************************************************************************/
+    $settings.addPage({
         type: 'general',
-        label: 'General',
+        label: 'Model',
         icon: 'opacity',
-        templateUrl: 'views/settings/wb-general.html',
+        templateUrl: 'views/settings/wb-widget-general.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingGeneralCtrl',
-    });
-
-    $settings.newPage({
-        type: 'background',
-        label: 'Background',
-        icon: 'image',
-        description: '',
-        templateUrl: 'views/settings/wb-background.html',
-        controllerAs: 'ctrl',
-
-        /*
-         * @ngInject
-         * @description This controller controls the background attribute. If the user choose an image for 
-         * the background then sets a default values to the background property. These values are used to show 
-         * the image in a suitable form; and if the user remove the background image then remove those values 
-         * from the background.
-         */
-        controller: function () {
-            this.init = function (newWidget, oldWidget) {
-                this.image = this.getStyleBackground('image');
-                this.color = this.getStyleBackground('color');
-                this.size = this.getStyleBackground('size');
-                this.repeat = this.getStyleBackground('repeat');
-                this.position = this.getStyleBackground('position');
-            };
-
-            this.setBackgroundImage = function (image) {
-                this.image = image;
-                if (!this.size) {
-                    this.size = 'cover';
-                }
-                if (!this.repeat) {
-                    this.repeat = 'no-repeat';
-                }
-                if (!this.position) {
-                    this.position = 'center center';
-                }
-                this.updateBackground();
-            };
-
-            this.updateBackground = function () {
-                this.setStyleBackground('image', this.image);
-                this.setStyleBackground('color', this.color);
-                this.setStyleBackground('size', this.size);
-                this.setStyleBackground('repeat', this.image);
-                this.setStyleBackground('position', this.position);
-            };
-        }
-    });
-
-    /**
-     * Widget Microdata Editor
-     * 
-     * Manages widget microdata editor.
-     */
-    $settings.newPage({
-        type: 'microdata',
-        label: 'Widget Microdata',
-        templateUrl: 'views/settings/wb-microdata.html',
-        controllerAs: 'ctrl',
-        controller: 'MbSettingMicrodataCtrl'
-    });
-
-    $settings.newPage({
-        type: 'border',
-        label: 'Border',
-        icon: 'border_all',
-        templateUrl: 'views/settings/wb-border.html',
-        controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function () {
-            this.width = {};
-            this.radius = {};
-
-            this.styles = [{
-                title: 'None',
-                value: 'none'
-            }, {
-                title: 'Solid',
-                value: 'solid'
-            }, {
-                title: 'Dotted',
-                value: 'dotted'
-            }, {
-                title: 'Dashed',
-                value: 'dashed'
-            }, {
-                title: 'Double',
-                value: 'double'
-            }, {
-                title: 'Groove',
-                value: 'groove'
-            }, {
-                title: 'Ridge',
-                value: 'ridge'
-            }, {
-                title: 'Inset',
-                value: 'inset'
-            }, {
-                title: 'Outset',
-                value: 'outset'
-            }];
-
-            /*
-             * watch 'wbModel' and apply the changes into setting panel
-             */
-            this.init = function () {
-                this.style = this.getStyleBorder('style');
-                this.color = this.getStyleBorder('color');
-                /*
-                 * Set width
-                 * width is a string such as '10px 25% 2vh 4px'
-                 */
-                fillDimFromString(this.width, this.getStyleBorder('width') || 'medium');
-                /*
-                 * Set radius
-                 * radius is a string such as '10px 25% 2vh 4px'
-                 */
-                fillCornerFromString(this.radius, this.getStyleBorder('radius') || '0px');
-            };
-
-            /*
-             * Settings about border width
-             */
-            this.widthAllChanged = function (val) {
-                //medium is default value of width
-                setAllDim(this.width, val || 'medium');
-                this.widthChanged();
-            };
-
-            this.widthChanged = function () {
-                this.setStyleBorder('width', createDimeStr(this.width));
-            };
-
-            /*
-             * Settings about border radius
-             */
-            this.radiusAllChanged = function (val) {
-                //0px is default value of radius
-                setAllCorner(this.radius, val || '0px');
-                this.radiusChanged();
-            };
-
-            this.radiusChanged = function () {
-                this.setStyleBorder('radius', createCornerStr(this.radius))
-            };
-        }
-    });
-
-    /**
-     * @ngdoc Widget Settings
-     * @name layout
-     * @description Manages element layout
-     * 
-     * Layout is consists of the following attributes for a group:
-     * 
-     * <ul>
-     *     <li>direction</li>
-     *     <li>direction-inverse</li>
-     *     <li>wrap</li>
-     *     <li>wrap-inverse</li>
-     *     <li>align</li>
-     *     <li>justify</li>
-     * </ul>
-     * 
-     * and following ones for a widget (or group):
-     * 
-     * <ul>
-     *     <li>grow</li>
-     *     <li>shrink</li>
-     *     <li>order</li>
-     * </ul>
-     * 
-     * See the layout documents for more details.
-     * 
-     * @see wb-layout
-     */
-    $settings.newPage({
-        type: 'layout',
-        label: 'Layout',
-        icon: 'dashboard',
-        description: 'Manages layout of the current item.',
-        templateUrl: 'views/settings/wb-layout.html',
-        controllerAs: 'ctrl',
-        /*
-         * Manages setting page 
-         * 
-         * @ngInject
-         */
-        controller: function () {
-            this.direction_ = [{
-                title: 'column',
-                icon: 'wb-horizontal-boxes',
-                value: 'column'
-            }, {
-                title: 'row',
-                icon: 'wb-vertical-boxes',
-                value: 'row'
-            }];
-
-            this.justify_ = {
-                    'row': [{
-                        title: 'Start',
-                        icon: 'sort_start_horiz',
-                        value: 'start'
-                    }, {
-                        title: 'End',
-                        icon: 'sort_end_horiz',
-                        value: 'end'
-                    }, {
-                        title: 'Center',
-                        icon: 'sort_center_horiz',
-                        value: 'center'
-                    }, {
-                        title: 'Space Around',
-                        icon: 'sort_space_around_horiz',
-                        value: 'space-around'
-                    }, {
-                        title: 'Space Between',
-                        icon: 'sort_space_between_horiz',
-                        value: 'space-between'
-                    }],
-                    'column': [{
-                        title: 'Start',
-                        icon: 'sort_start_vert',
-                        value: 'start'
-                    }, {
-                        title: 'End',
-                        icon: 'sort_end_vert',
-                        value: 'end'
-                    }, {
-                        title: 'Center',
-                        icon: 'sort_center_vert',
-                        value: 'center'
-                    }, {
-                        title: 'Space Around',
-                        icon: 'sort_space_around_vert',
-                        value: 'space-around'
-                    }, {
-                        title: 'Space Between',
-                        icon: 'sort_space_between_vert',
-                        value: 'space-between'
-                    }]
-            };
-
-            this.align_ = {
-                    'column': [{
-                        title: 'Stretch',
-                        icon: 'format_align_justify',
-                        value: 'stretch'
-                    }, {
-                        title: 'Start',
-                        icon: 'format_align_left',
-                        value: 'start'
-                    }, {
-                        title: 'End',
-                        icon: 'format_align_right',
-                        value: 'end'
-                    }, {
-                        title: 'Center',
-                        icon: 'format_align_center',
-                        value: 'center'
-                    }],
-                    'row': [{
-                        title: 'Stretch',
-                        icon: 'align_justify_vertical',
-                        value: 'stretch'
-                    }, {
-                        title: 'Start',
-                        icon: 'align_start_vertical',
-                        value: 'start'
-                    }, {
-                        title: 'End',
-                        icon: 'align_end_vertical',
-                        value: 'end'
-                    }, {
-                        title: 'Center',
-                        icon: 'align_center_vertical',
-                        value: 'center'
-                    }]
-            };
-            /*
-             * watch 'wbModel' and apply the changes in setting panel
-             */
-            this.init = function () {
-                this.direction = this.getStyleLayout('direction') || 'column';
-                this.align = this.getStyleLayout('align');
-                this.wrap = this.getStyleLayout('wrap');
-                this.justify = this.getStyleLayout('justify');
-            };
-
-            /*
-             * This part updates the wbModel whenever the layout properties are changed in view
-             */
-            this.directionChanged = function () {
-                this.setStyleLayout('direction', this.direction);
-            };
-
-            this.wrapChanged = function () {
-                this.setStyleLayout('wrap', this.wrap);
-            };
-
-            this.alignChanged = function () {
-                this.setStyleLayout('align', this.align);
-            };
-
-            this.justifyChanged = function () {
-                this.setStyleLayout('justify', this.justify);
-            };
-        }
-    });
-
-    $settings.newPage({
-        type: 'layout-self',
-        label: 'Self Layout',
-        icon: 'dashboard',
-        description: 'Manages layout of the current item.',
-        templateUrl: 'views/settings/wb-layout-self.html',
-        controllerAs: 'ctrl',
-        /*
-         * Manages setting page 
-         * 
-         * @ngInject
-         */
-        controller: function () {
-            this.selfAlign_ = {
-                    'column': [{
-                        title: 'Stretch',
-                        icon: 'format_align_justify',
-                        value: 'stretch'
-                    }, {
-                        title: 'Start',
-                        icon: 'format_align_left',
-                        value: 'start'
-                    }, {
-                        title: 'End',
-                        icon: 'format_align_right',
-                        value: 'end'
-                    }, {
-                        title: 'Center',
-                        icon: 'format_align_center',
-                        value: 'center'
-                    }, {
-                        title: 'Automatic',
-                        icon: 'brightness_auto',
-                        value: 'auto'
-                    }],
-                    'row': [{
-                        title: 'Stretch',
-                        icon: 'align_justify_vertical',
-                        value: 'stretch'
-                    }, {
-                        title: 'Start',
-                        icon: 'align_start_vertical',
-                        value: 'start'
-                    }, {
-                        title: 'End',
-                        icon: 'align_end_vertical',
-                        value: 'end'
-                    }, {
-                        title: 'Center',
-                        icon: 'align_center_vertical',
-                        value: 'center'
-                    }, {
-                        title: 'Automatic',
-                        icon: 'brightness_auto',
-                        value: 'auto'
-                    }]
-            };
-
-            /*
-             * watch 'wbModel' and apply the changes in setting panel
-             */
-            this.init = function () {
-                this.alignSelf = this.getStyleLayout('align_self', 'auto');
-                this.order = this.getStyleLayout('order', 0);
-                // SEE: https://www.w3schools.com/cssreF/css3_pr_flex-basis.asp
-                this.basis = this.getStyleLayout('basis', 'auto');
-                this.grow = this.getStyleLayout('grow', 0);
-                this.shrink = this.getStyleLayout('shrink', 1);
-            };
-
-            /*
-             * Fetchs parent direction
-             */
-            this.getParentDirection = function () {
-                var widget = this.getWidget();
-                if (!widget || !widget.getParent()) {
-                    return;
-                }
-                return widget.getParent().getDirection();
-            };
-
-            /*
-             * This part updates the wbModel whenever the layout-self property is changed in view
-             */
-            this.alignSelfChanged = function () {
-                this.setStyleLayout('align_self', this.alignSelf);
-            };
-            this.updateOrder = function (order) {
-                this.setStyleLayout('order', order);
-            };
-            this.updateBasis = function (basis) {
-                this.setStyleLayout('basis', basis);
-            };
-            this.updateGrow = function (grow) {
-                this.setStyleLayout('grow', grow);
-            };
-            this.updateShrink = function (shrink) {
-                this.setStyleLayout('shrink', shrink);
-            };
-        }
-    });
-
-    //TODO: Masood, 2018: Move this controller to a separated controller.
-    $settings.newPage({
-        type: 'marginPadding',
-        label: 'Margin/Padding',
-        icon: 'border_clear',
-        templateUrl: 'views/settings/wb-margin-padding.html',
-        controllerAs: 'ctrl',
-        /** 
-         * @ngInject
-         * @ngDoc Controllers
-         * @name marginPaddingCtrl
-         * @description manages settings view of margin and padding
-         * 
-         * Manage view with multiple editor of margin elements.
-         */
-        controller: function () {
-            this.margin = {};
-            this.padding = {};
-
-            /**
-             * All settings about margin and padding
-             * 
-             * Note: we normally add JSDoc to the global functions.
-             * 
-             * @memberof marginPaddingCtrl
-             */
-            this.updateAllMargin = function (val) {
-                // default value of margin is 0px
-                setAllDim(this.margin, val || '0px');
-                this.updateMargin(this.margin);
-            };
-
-            /**
-             * Sets all padding to the equal value
-             * 
-             * @memberof marginPaddingCtrl
-             */
-            this.updateAllPadding = function (val) {
-                //default value of padding is 0px
-                setAllDim(this.padding, val);
-                this.updatePadding(this.padding)
-            };
-
-            this.updateMargin = function (newMargin) {
-                this.setStyle('margin', createDimeStr(newMargin));
-            };
-
-            this.updatePadding = function (newPadding) {
-                this.setStyle('padding', createDimeStr(newPadding));
-            };
-
-            this.init = function () {
-                //margin is a string such as '10px 25% 2vh 4px'
-                fillDimFromString(this.margin, this.getStyle('margin'));
-                fillDimFromString(this.padding, this.getStyle('padding'));
-            };
-        }
-    });
-
-    $settings.newPage({
-        type: 'size',
-        label: 'Size',
-        icon: 'photo_size_select_large',
-        templateUrl: 'views/settings/wb-size.html',
-        controllerAs: 'ctrl',
-
-        /*
-         * @ngInject
-         */
-        controller: function () {
-            /*
-             * watch 'wbModel' and apply the changes in setting panel
-             */
-            this.init = function () {
-                this.width = this.getStyleSize('width');
-                this.height = this.getStyleSize('height');
-                this.minWidth = this.getStyleSize('minWidth');
-                this.minHeight = this.getStyleSize('minHeight');
-                this.maxWidth = this.getStyleSize('maxWidth');
-                this.maxHeight = this.getStyleSize('maxHeight');
-            };
-
-            /*
-             * This part updates the wbModel whenever the size properties are changed in view
-             */
-            this.widthChanged = function () {
-                this.setStyleSize('width', this.width);
-            };
-
-            this.heightChanged = function () {
-                this.setStyleSize('height', this.height);
-            };
-
-            this.minWidthChanged = function () {
-                this.setStyleSize('minWidth', this.minWidth);
-            };
-
-            this.minHeightChanged = function () {
-                this.setStyleSize('minHeight', this.minHeight);
-            };
-
-            this.maxWidthChanged = function () {
-                this.setStyleSize('maxWidth', this.maxWidth);
-            };
-
-            this.maxHeightChanged = function () {
-                this.setStyleSize('maxHeight', this.maxHeight);
-            };
-        }
-    });
-
-    $settings.newPage({
-        type: 'shadow',
-        label: 'Shadow',
-        icon: 'brightness_low',
-        description: 'Show different shadows (zero or more) around the widget',
-        templateUrl: 'views/settings/wb-shadow.html',
-        controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function () {
-
-            /*
-             * watch 'wbModel' and apply the changes in setting panel
-             */
-            this.init = function () {
-                var shadows = this.getProperty('style.shadows');
-                // this is an object we have to make a clone.
-                this.shadows = _.cloneDeep(shadows);
-            };
-
-            this.updateShadows = function () {
-                this.setProperty('style.shadows', this.shadows);
-                this.init();
-            };
-
-            this.remove = function (index) {
-                this.shadows.splice(index, 1);
-                this.updateShadows();
-            };
-
-            this.addShadow = function () {
-                if (!this.shadows) {
-                    this.shadows = [];
-                }
-                this.shadows.push({
-                    hShift: '0px',
-                    vShift: '0px',
-                    blur: '0px',
-                    spread: '0px',
-                    color: 'rgb(0,0,0)'
-                });
-                this.updateShadows();
-            };
-
-        }
-    });
-    $settings.newPage({
-        type: 'transform',
-        label: 'Transform',
-        icon: 'brightness_low',
-        description: 'Transform widget shape',
-        templateUrl: 'views/settings/wb-transform.html',
-        controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function () {
-
-            /*
-             * watch 'wbModel' and apply the changes in setting panel
-             */
-            this.init = function () {
-                this.origin = this.getProperty('style.transform.origin');
-                this.style = this.getProperty('style.transform.style');
-                this.perspective = this.getProperty('style.transform.perspective');
-
-                // X:2D
-                this.translateX = this.getProperty('style.transform.x.translate');
-                this.scaleX = this.getProperty('style.transform.x.scale');
-                this.rotateX = this.getProperty('style.transform.x.rotate');
-                this.skewX = this.getProperty('style.transform.x.skew');
-
-                // Y:2D
-                this.translateY = this.getProperty('style.transform.y.translate');
-                this.scaleY = this.getProperty('style.transform.y.scale');
-                this.rotateY = this.getProperty('style.transform.y.rotate');
-                this.skewY = this.getProperty('style.transform.y.skew');
-
-                // Z:3D
-                this.translateZ = this.getProperty('style.transform.z.translate');
-                this.scaleZ = this.getProperty('style.transform.z.scale');
-                this.rotateZ = this.getProperty('style.transform.z.rotate');
-            };
-
-            this.updateOrigin = function () {
-                this.setProperty('style.transform.origin', this.origin);
-            };
-
-//          flat: Specifies that child elements will NOT preserve its 3D position. This is default
-//          preserve-3d: Specifies that child elements will preserve its 3D position
-//          initial: Sets this property to its default value. Read about initial
-//          inherit: Inherits this property from its parent element. Read about inherit
-            this.updateStyle = function () {
-                this.setProperty('style.transform.style', this.style);
-            };
-            this.updatePerspective = function () {
-                this.setProperty('style.transform.perspective', this.perspective);
-            };
-
-            // X
-            this.updateTranslateX = function () {
-                this.setProperty('style.transform.x.translate', this.translateX);
-            };
-            this.updateScaleX = function () {
-                this.setProperty('style.transform.x.scale', this.scaleX);
-            };
-            this.updateRotateX = function () {
-                this.setProperty('style.transform.x.rotate', this.rotateX);
-            };
-            this.updateSkewX = function () {
-                this.setProperty('style.transform.x.skew', this.skewX);
-            };
-
-            // Y
-            this.updateTranslateY = function () {
-                this.setProperty('style.transform.y.translate', this.translateY);
-            };
-            this.updateScaleY = function () {
-                this.setProperty('style.transform.y.scale', this.scaleY);
-            };
-            this.updateRotateY = function () {
-                this.setProperty('style.transform.y.rotate', this.rotateY);
-            };
-            this.updateSkewY = function () {
-                this.setProperty('style.transform.y.skew', this.skewY);
-            };
-
-            // Z
-            this.updateTranslateZ = function () {
-                this.setProperty('style.transform.z.translate', this.translateZ);
-            };
-            this.updateScaleZ = function () {
-                this.setProperty('style.transform.z.scale', this.scaleZ);
-            };
-            this.updateRotateZ = function () {
-                this.setProperty('style.transform.z.rotate', this.rotateZ);
-            };
-        }
-    });
-
-
-
-    $settings.newPage({
-        type: 'iframe',
-        label: 'Inline Frame',
-        icon: 'wb-setting-iframe',
-        description: 'Inline Frame settings',
-        templateUrl: 'views/settings/wb-iframe.html',
-        controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function ($scope) {
-            var iframeElementAttribute = [
-                'name',
-                'src', 
-                'srcdoc', 
-                'sandbox', 
-                ];
-            /*
-             * watch 'wbModel' and apply the changes in setting panel
-             */
-            this.init = function () {
-                for(var i =0; i < iframeElementAttribute.length;i++){
-                    var key = iframeElementAttribute[i];
-                    $scope[key] =  this.getProperty(key);
-                }
-                // TODO: whatch changes of the model
-            };
-        }
-    });
-    $settings.newPage({
-        type: 'input',
-        label: 'Input',
-        icon: 'wb-setting-input',
-        description: 'Input settings',
-        templateUrl: 'views/settings/wb-input.html',
-        controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function ($scope) {
-            // list of element attributes
-            var elementAttributes = [
-                'accept',
-                'alt', 
-                'autocomplete', 
-                'autofocus', 
-                'checked', 
-                'dirname', 
-                'disabled', 
-                'form',
-                'max', 
-                'maxlength', 
-                'min', 
-                'multiple', 
-                'name', 
-                'pattern', 
-                'placeholder', 
-                'readonly', 
-                'required', 
-                'size', 
-                'src', 
-                'step',
-                'inputType',
-                'value',
-                ];
-
-            /*
-             * watch 'wbModel' and apply the changes in setting panel
-             */
-            this.init = function () {
-                for(var i =0; i < elementAttributes.length;i++){
-                    var key = elementAttributes[i];
-                    this[key] =  this.getProperty(key);
-                }
-                // TODO:
-            };
-        }
-    });
-    $settings.newPage({
-        type: 'textarea',
-        label: 'Text Area',
-        icon: 'wb-setting-textarea',
-        description: 'Text Area Settings',
-        templateUrl: 'views/settings/wb-textarea.html',
-        controllerAs: 'ctrl',
-        /*
-         * @ngInject
-         */
-        controller: function () {
-            var elementAttributes = [
-                'autofocus',
-                'cols',
-                'dirname',
-                'disabled',
-                'form',
-                'maxlength',
-                'name',
-                'placeholder',
-                'readonly',
-                'required',
-                'rows',
-                'wrap',
-                'value',
-                ];
-
-            /*
-             * watch 'wbModel' and apply the changes in setting panel
-             */
-            this.init = function () {
-                for(var i =0; i < elementAttributes.length;i++){
-                    var key = elementAttributes[i];
-                    this[key] =  this.getProperty(key);
-                }
-                // TODO:
-            };
-        }
-    });
-
-    /**
-     * @ngDoc Settings
-     * @name a
-     * @description Link setting page
-     */
-    $settings.newPage({
+        controller: 'WbSettingGeneralCtrl',
+    })
+    .addPage({
         type: 'a',
         label: 'Link',
         description: 'Manage link in the current widget.',
         icon: 'settings',
-        templateUrl: 'views/settings/wb-a.html',
+        templateUrl: 'views/settings/wb-widget-a.html',
         controllerAs: 'ctrl',
-        controller: 'MbSettingACtrl'
+        controller: 'WbSettingACtrl',
+        targets: ['a']
+    })
+    .addPage({
+        type: 'img',
+        label: 'Image',
+        description: 'Manage image widget settings.',
+        icon: 'settings',
+        templateUrl: 'views/settings/wb-widget-img.html',
+        controllerAs: 'ctrl',
+        controller: 'WbSettingWidgetImgCtrl',
+        targets: ['img']
+    })
+    .addPage({
+        type: 'microdata',
+        label: 'Microdata',
+        templateUrl: 'views/settings/wb-widget-microdata.html',
+        controllerAs: 'ctrl',
+        controller: 'WbSettingWidgetMicrodataCtrl'
     });
+        
     
-    /**
-     * @ngDoc Settings
-     * @name img
-     * @description Image settings
-     */
-    $settings.newPage({
-    	type: 'img',
-    	label: 'Image',
-    	description: 'Manage image widget settings.',
-    	icon: 'settings',
-    	templateUrl: 'views/settings/wb-img.html',
-    	controllerAs: 'ctrl',
-    	controller: 'MbSettingImgCtrl'
-    });
-    
-    /**
-     * @ngDoc Settings
-     * @name style.text
-     * @description Text setting
-     */
-    $settings.newPage({
-    	type: 'style.text',
-    	label: 'Text',
-    	description: 'Text style.',
-    	icon: 'settings',
-    	templateUrl: 'views/settings/wb-style-text.html',
-    	controllerAs: 'ctrl',
-    	controller: 'MbSettingStyleTextCtrl'
+    /************************************************************************
+     * Style
+     ************************************************************************/
+    $settings.addPage({
+        type: 'style.animation',
+        label: 'Animation',
+        icon: 'opacity',
+        templateUrl: 'views/settings/wb-style-animation.html',
+        controllerAs: 'ctrl',
+        controller: 'WbSettingStyleAnimationCtrl',
+    })
+    .addPage({
+        type: 'style.background',
+        label: 'Background',
+        icon: 'opacity',
+        templateUrl: 'views/settings/wb-style-background.html',
+        controllerAs: 'ctrl',
+        controller: 'WbSettingStyleBackgroundCtrl',
+    })
+    .addPage({
+        type: 'style.border',
+        label: 'Border',
+        icon: 'opacity',
+        templateUrl: 'views/settings/wb-style-border.html',
+        controllerAs: 'ctrl',
+        controller: 'WbSettingStyleBorderCtrl',
+    })
+    .addPage({
+        type: 'style.general',
+        label: 'General',
+        icon: 'opacity',
+        templateUrl: 'views/settings/wb-style-general.html',
+        controllerAs: 'ctrl',
+        controller: 'WbSettingStyleGeneralCtrl',
+    })
+    .addPage({
+        type: 'style.layout',
+        label: 'Layout',
+        icon: 'opacity',
+        templateUrl: 'views/settings/wb-style-layout.html',
+        controllerAs: 'ctrl',
+        controller: 'WbSettingStyleLayoutCtrl',
+    })
+    .addPage({
+        type: 'style.media',
+        label: 'Medai',
+        icon: 'opacity',
+        templateUrl: 'views/settings/wb-style-media.html',
+        controllerAs: 'ctrl',
+        controller: 'WbSettingStyleMediaCtrl',
+    })
+    .addPage({
+        type: 'style.size',
+        label: 'Size',
+        icon: 'opacity',
+        templateUrl: 'views/settings/wb-style-size.html',
+        controllerAs: 'ctrl',
+        controller: 'WbSettingStyleSizeCtrl',
+    })
+    .addPage({
+        type: 'style.text',
+        label: 'Text',
+        icon: 'opacity',
+        templateUrl: 'views/settings/wb-style-text.html',
+        controllerAs: 'ctrl',
+        controller: 'WbSettingStyleTextCtrl',
     });
 });
 
@@ -16561,7 +10091,7 @@ angular.module('am-wb-core')
 /*
  * Load default resources
  */
-.run(function($resource, TinymcePluginImageTool, TinymcePluginCodesample, TinymcePluginLink) {
+.run(function(/*$resource, TinymcePluginImageTool, TinymcePluginCodesample, TinymcePluginLink*/) {
 	var pluginManager = tinymce.PluginManager;
 	// XXX: maso, 2019: update to tinymce5
 //	pluginManager.add('codesample', TinymcePluginCodesample);
@@ -16593,462 +10123,79 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-/**
- * @ngdoc Widget Processors
- * @name events
- * @description Handle widget events specification
- * 
- * There is many event where the widget must handle. This processor enable/disable
- * event handling with widget. In the other hand, this processor manage scripting
- * of a widget.
- * 
- * Event processor works on the state change event. If the state of a widget is
- * edit, then all events handlers will be removed from the widget. When the state
- * is changed to ready all events will be loaded.
- */
-angular.module('am-wb-core').run(function ($widget, $http, $mdMedia, $wbWindow,
-		$wbLocal, $timeout, $dispatcher, $storage, $routeParams) {
-	'use strict';
-
-	/*
-	 * Simulates $timeout for widgets
-	 */
-	function createTimeoutService(widget){
-		if(!angular.isArray(widget.__timeoutPromise)){
-			widget.__timeoutPromise = [];
-		}
-
-		function remove(promise){
-			if(!widget.__timeoutPromise){
-				return;
-			}
-			var index = widget.__timeoutPromise.indexOf(promise);
-			if (index > -1) {
-				widget.__timeoutPromise.splice(index, 1);
-			}
-		}
-	
-		var timeoutService = function (fn, delay, invokeApply, Pass){
-			var promise = $timeout(fn,delay,invokeApply, Pass);
-			promise.finally(function(){
-				remove(promise);
-			});
-			widget.__timeoutPromise.push(promise);
-		};
-		
-		/*
-		 * cancel job
-		 */
-		timeoutService.cancel = function(promise){
-			remove(promise);
-			$timeout.cancel(promise);
-		}
-		/*
-		 * remove all jobs
-		 */
-		timeoutService.distroy = function(){
-			angular.forEach(widget.__timeoutPromise, function(promise){
-				$timeout.cancel(promise);
-			});
-			delete widget.__timeoutPromise;
-		};
-		
-		
-		return timeoutService;
-	}
-
-	/**
-	 * Loads events for the widget
-	 * 
-	 * @param event
-	 *            {object} part of the widget data model
-	 * @memberof WbAbstractWidget
-	 */
-	function evalWidgetEvent(widget, type, event) {
-		var eventFunction;
-		if (!widget.eventFunctions.hasOwnProperty(type)) {
-			try{
-				var ucode = widget.getEvent()[type];
-				if(!ucode){
-					return;
-				}
-				var body = '\'use strict\';\n'+
-				'var $event = arguments[0],' + 
-				'$widget = arguments[1],' + 
-				'$http = arguments[2],' + 
-				'$media =  arguments[3],' + 
-				'$window =  arguments[4],' + 
-				'$local =  arguments[5],' + 
-				'$timeout = arguments[6],' + 
-				'$dispatcher = arguments[7],' + 
-				'$storage = arguments[8],' + 
-				'$routeParams = arguments[9];\n' + ucode;
-				widget.eventFunctions[type] = new Function(body);
-			}catch(ex){
-				console.log(ex);
-			}
-		}
-		eventFunction = widget.eventFunctions[type];
-		if (eventFunction) {
-			try{
-				// check timeout service of widget
-				if(!widget.__$timeoutSeervice) {
-					widget.__$timeoutSeervice = createTimeoutService(widget);
-				}
-				return eventFunction.apply(widget, [
-					event, // -> $event
-					widget, // -> $widget
-					$http, // -> $http
-					$mdMedia, // -> $mdMedia
-					$wbWindow, // -> $wbWindow
-					$wbLocal, // -> $wbLocal
-					// FIXME: wratp timeout and remove timers on edit mode (or distroy)
-					widget.__$timeoutSeervice,// -> $timeout
-					// FIXME: wratp dispatcher and remove listeners
-					$dispatcher, // -> $dispatcher
-					$storage, // -> $storage
-					$routeParams// -> $routeParams
-					]);
-			} catch(ex){
-				console.log('Fail to run event code');
-				console.log({
-					type: type,
-					event: event
-				});
-				console.log(ex);
-			}
-		}
-	};
-
-	function loadWidgetEventsHandlers(widget){
-		widget.__eventListeners = {
-				click: function ($event) {
-					return evalWidgetEvent(widget, 'click', $event);
-				},
-				dblclick: function ($event) {
-					return evalWidgetEvent(widget, 'dblclick', $event);
-				},
-				mouseout: function ($event) {
-					return evalWidgetEvent(widget, 'mouseout', $event);
-				},
-				mouseover: function ($event) {
-					return evalWidgetEvent(widget, 'mouseover', $event);
-				},
-				mousedown: function ($event) {
-					return evalWidgetEvent(widget, 'mousedown', $event);
-				},
-				mouseup: function ($event) {
-					return evalWidgetEvent(widget, 'mouseup', $event);
-				},
-				mouseenter: function ($event) {
-					return evalWidgetEvent(widget, 'mouseenter', $event);
-				},
-				mouseleave: function ($event) {
-					return evalWidgetEvent(widget, 'mouseleave', $event);
-				},
-				resize: function ($event) {
-					return evalWidgetEvent(widget, 'resize', $event);
-				},
-				intersection: function ($event) {
-					return evalWidgetEvent(widget, 'intersection', $event);
-				},
-				
-				//
-				// Common media events
-				//
-				success: function ($event) {
-					return evalWidgetEvent(widget, 'success', $event);
-				},
-				error: function ($event) {
-					return evalWidgetEvent(widget, 'error', $event);
-				},
-				abort: function ($event) {
-					return evalWidgetEvent(widget, 'abort', $event);
-				},
-				load: function ($event) {
-					return evalWidgetEvent(widget, 'load', $event);
-				},
-				beforeunload: function ($event) {
-					return evalWidgetEvent(widget, 'beforeunload', $event);
-				},
-				unload: function ($event) {
-				    return evalWidgetEvent(widget, 'unload', $event);
-				},
-				
-				
-		};
-		angular.forEach(widget.__eventListeners, function (listener, key) {
-			widget.on(key, listener);
-		});
-	}
-
-	function removeWidgetEventsHandlers(widget){
-		if(!angular.isDefined(widget.__eventListeners)){
-			return;
-		}
-		angular.forEach(widget.__eventListeners, function (listener, key) {
-			widget.off(key, listener);
-		});
-		delete widget.__eventListeners;
-		// remove timeout service
-		if(widget.__$timeoutSeervice) {
-			widget.__$timeoutSeervice.distroy();
-			delete widget.__$timeoutSeervice;
-		}
-	}
-
-	/*
-	 * manages events handler
-	 */
-	function eventProcessor(widget, event){
-		if(event.type !== 'stateChanged') {
-			return;
-		}
-		if(widget.state === 'ready') {
-			loadWidgetEventsHandlers(widget);
-			evalWidgetEvent(widget, 'stateChanged', event);
-			// TODO: maso, 2019: remove in next major version
-			// support legecy
-			var newEvent = _.clone(event);
-			newEvent.type = 'init';
-			evalWidgetEvent(widget, newEvent.type, newEvent);
-		} else {
-			removeWidgetEventsHandlers(widget);
-		}
-	}
-
-	// register the processor
-	$widget.setProcessor('event', eventProcessor);
-});
-
-/* 
-
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core').run(function ($widget) {
-
-	function loadWidgetAttributes(widget, attributes){
-		var $element = widget.getElement();
-		angular.forEach(attributes, function(key){
-			var value = widget.getProperty(key) || widget.getModelProperty(key);
-			if(value){
-				$element.attr(key, value);
-			} else {
-				$element.removeAttr(key);
-			}
-		});
-	}
-
-	var microdataAttributes = [
-		'itemscope', // groups list of item properties
-		'itemtype', // can use if it is item scope
-		'itemprop',
-		'itemref',
-		'itemid',
-		// extera properties
-		'content',
-		'value',
-		];
-
-	/**
-	 * @ngdoc Widget Processors
-	 * @name microdata
-	 * @description Handle widget microdata specification
-	 * 
-	 * Widget microdata is an specification which makes the widget readable by
-	 * search engines. This processor just run in ready mode. 
-	 * 
-	 * @see document/widgets-microdata.md
-	 */
-	$widget.setProcessor('microdata', function(widget, event){
-		if(widget.state !== 'ready') {
-			return;
-		}
-
-		// 1- Handle model load
-		if(event.type === 'modelChanged' || event.type === 'stateChanged'){
-			loadWidgetAttributes(widget, microdataAttributes);
-			return;
-		}
-
-		// 2- Handle model update
-		if(event.key === 'modelUpdate'){
-			loadWidgetAttributes(widget, microdataAttributes);
-			return;
-		}
-	});
-
-	/**
-	 * @ngdoc Widget Processors
-	 * @name microdata
-	 * @description Handle widget microdata specification
-	 * 
-	 * Widget microdata is an specification which makes the widget readable by
-	 * search engines. This processor just run in ready mode.
-	 */
-	$widget.setProcessor('style', function(widget, event){});
-
-	/**
-	 * @ngdoc Widget Processors
-	 * @name microdata
-	 * @description Handle widget microdata specification
-	 * 
-	 * Widget microdata is an specification which makes the widget readable by
-	 * search engines. This processor just run in ready mode.
-	 * 
-	 */
-	$widget.setProcessor('dnd', function(widget, event){});
-
-
-});
-
-/* 
-
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 'use strict';
 
 angular.module('am-wb-core')
 
-/*
- * Load widgets
- */
+/***********************************************************************
+ * Convertors
+ ***********************************************************************/
+.run(function ($widget, WbConverterWeburger, WbConverterDom, WbConverterText) {
+    $widget.addConverter(new WbConverterWeburger());
+    $widget.addConverter(new WbConverterDom());
+    $widget.addConverter(new WbConverterText());
+})
+/***********************************************************************
+ * Processors
+ ***********************************************************************/
+.run(function ($widget, WbProcessorMicrodata, WbProcessorStyle, WbProcessorEvent, WbProcessorAttribute) {
+    $widget.setProcessor('microdata', new WbProcessorMicrodata());
+    $widget.setProcessor('style', new WbProcessorStyle());
+    $widget.setProcessor('event', new WbProcessorEvent());
+    $widget.setProcessor('attribut', new WbProcessorAttribute());
+})
+/***********************************************************************
+ * Providers
+ ***********************************************************************/
+.run(function ($widget, $http, $mdMedia, $wbWindow, $wbLocal, $WbProviderTimeout, $dispatcher, $storage, $routeParams) {
+    $widget//
+    .setProvider('$http', $http)
+    .setProvider('$wbWindow', $wbWindow)
+    .setProvider('$dispatcher', $dispatcher)
+    .setProvider('$routeParams', $routeParams)
+    .setProvider('$storage', $storage)
+    .setProvider('$timeout', $WbProviderTimeout)
+    .setProvider('$wbLocal', $wbLocal)
+    .setProvider('$mdMedia', $mdMedia);
+})
+/***********************************************************************
+ * Editors
+ ***********************************************************************/
 .run(function ($widget) {
+    // Editors
+    var headerEditorDescription =  {
+            type: 'WidgetEditorTinymce',
+            options:{
+                property: 'html',
+                inline: true,
+                menubar: false,
+                plugins: [
+                    'lists',
+                    'powerpaste',
+                    'autolink'
+                    ],
+                    toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignjustify alignright alignfull ',
+                    valid_elements: 'strong,em,span[style],a[href]',
+                    valid_styles: {
+                        '*': 'font-size,font-family,color,text-decoration,text-align'
+                    },
+                    powerpaste_word_import: 'clean',
+                    powerpaste_html_import: 'clean',
+            }
+    };
+    $widget.setEditor('a', headerEditorDescription);
 
+    for(var i = 1; i < 7; i++){
+        var type = 'h'+i;
+        $widget.setEditor(type, headerEditorDescription);
+    }
 
-    /**
-     * @ngdoc Widgets
-     * @name Group
-     * @description Parent widget of other widgets
-     * 
-     * default setting:
-     * - margin: '1px'
-     */
-    $widget.newWidget({
-        // widget description
-        type: 'Group',
-        title: 'Group',
-        description: 'Panel contains list of widgets.',
-        icon: 'wb-widget-group',
-        groups: ['basic'],
-        model: {
-            style: {
-                margin: '1px',
-                padding: '1px',
-                layout: {
-                    direction: 'column'
-                },
-                size: {
-                    minHeight: '16px',
-                    minWidth: '16px'
-                }
-            }
-        },
-        // functional properties
-        template: function(model){
-            var groupType = model.groupType | 'div';
-            if(groupType === 'form'){
-                return '<form></form>';
-            }
-            if(groupType === 'section'){
-                return '<section></section>';
-            }
-            return '<div></div>';
-        },
-        help: 'http://dpq.co.ir/more-information-link',
-        helpId: 'wb-widget-group'
-    });
-    /**
-     * @ngdoc Widgets
-     * @name Text
-     * @description Add rich text to page
-     * 
-     * This is a RTF to add to a page.
-     * 
-     */
-    $widget.newWidget({
-        // widget description
-        type: 'HtmlText',
-        title: 'Text',
-        description: 'An text block.',
-        icon: 'wb-widget-html',
-        groups: ['basic'],
-        model: {
-            text: '<h2>Text element</h2><p>Click on the text box to edit.</p>',
-            style: {
-                padding: '8px'
-            }
-        },
-        // help id
-        help: 'http://dpq.co.ir',
-        helpId: 'wb-widget-html',
-        // functional properties
-        template: '<div ng-bind-html="ctrl.text | wbunsafe" class="wb-widget-fill wb-widget-text"></div>',
-        /*
-         * @ngInject
-         */
-        controller: function(){
-            this.text = '';
-            this.setText = function(text){
-                this.text = text;
-            };
-            this.initWidget = function(){
-                var ctrl = this;
-                this.on('modelUpdated', function($event){
-                    if($event.key === 'text'){
-                        ctrl.setText($event.newValue);
-                    }
-                });
-                this.setText(this.getModelProperty('text'));
-            };
-        },
-        controllerAs: 'ctrl'
+    $widget.setEditor('pre', {
+        type: 'WidgetEditorCode',
+        options: {}
     });
 
-    $widget.setEditor('HtmlText', {
+    $widget.setEditor('p', {
         type: 'WidgetEditorTinymce',
         options:{
             property: 'html',
@@ -17060,22 +10207,378 @@ angular.module('am-wb-core')
                 'powerpaste',
                 'autolink',
                 'tinymcespellchecker'],
-            toolbar: [
-                'undo redo | bold italic underline | fontselect fontsizeselect',
-                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
-            valid_styles: {
-                '*': 'font-size,font-family,color,text-decoration,text-align'
-            },
-            powerpaste_word_import: 'clean',
-            powerpaste_html_import: 'clean',
+                toolbar: [
+                    'undo redo | bold italic underline | fontselect fontsizeselect',
+                    'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+                    valid_elements: 'p[style],strong,em,span[style],a[href],img,q',
+                    valid_styles: {
+                        '*': 'font-size,font-family,color,text-decoration,text-align '
+                    },
+                    powerpaste_word_import: 'clean',
+                    powerpaste_html_import: 'clean',
         }
     });
-    /**
-     * @ngdoc Widgets
-     * @name iframe
-     * @description Add inline frame to show another document within current one.
-     */
+
+
+    $widget.setEditor('HtmlText', {
+        type: 'WidgetEditorDeprecated',
+        options:{}
+    });
+})
+
+/***********************************************************************
+ * Widgets
+ ***********************************************************************/
+.run(function ($widget) {
+    $widget.newWidget({
+        // widget description
+        type: 'a',
+        title: 'A link',
+        description: 'A widget to add external link. It is used as block item.',
+        icon: 'wb-widget-a',
+        groups: ['basic'],
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-a',
+        // functional properties
+        template: '<a></a>',
+        model: {
+            html: 'Link title'
+        },
+        controller: 'WbWidgetA'
+    });
+    $widget.newWidget({
+        // widget description
+        type: 'address',
+        title: 'address',
+        description: 'description.',
+        icon: 'wb-widget-address',
+        groups: ['basic'],
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-address',
+        // functional properties
+        template: '<address></address>',
+        controller: 'WbWidgetAddress'
+    });
+    $widget.newWidget({
+        // widget description
+        type: 'applet',
+        title: 'applet',
+        description: 'applet.',
+        icon: 'wb-widget-applet',
+        groups: ['basic'],
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-applet',
+        // functional properties
+        template: '<applet></applet>',
+        controller: 'WbWidgetApplet'
+    });
+    $widget.newWidget({
+        // widget description
+        type: 'area',
+        title: 'area',
+        description: 'area',
+        icon: 'wb-widget-area',
+        groups: ['basic'],
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-area',
+        // functional properties
+        template: '<area></area>',
+        controller: 'WbWidgetArea'
+    });
+    $widget.newWidget({
+        // widget description
+        type: 'article',
+        title: 'article',
+        description: 'article',
+        icon: 'wb-widget-article',
+        groups: ['basic'],
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-article',
+        // functional properties
+        template: '<article></article>',
+        controller: 'WbWidgetArticle'
+    });
+    $widget.newWidget({
+        // widget description
+        type: 'aside',
+        title: 'aside',
+        description: 'aside',
+        icon: 'wb-widget-aside',
+        groups: ['basic'],
+        // help id
+        help: 'http://dpq.co.ir',
+        helpId: 'wb-widget-aside',
+        // functional properties
+        template: '<aside></aside>',
+        controller: 'WbWidgetAside'
+    });
+    $widget.newWidget({
+        type: 'audio',
+        title: 'Audio',
+        label: 'audio',
+        icon: 'wb-widget-audio',
+        description: 'This widget is used to add audio in the document.',
+        groups: ['basic'],
+        template: '<audio></audio>',
+        help: 'http://dpq.co.ir/more-information-audio',
+        model: {
+            media: '(min-width: 650px)',
+            src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+        },
+        controller: 'WbWidgetAudio', 
+    });
+    $widget.newWidget({
+        type: 'blockquote',
+        title: 'blockquote',
+        label: 'blockquote',
+        icon: 'wb-widget-blockquote',
+        description: 'description',
+        groups: ['basic'],
+        template: '<blockquote></blockquote>',
+        help: 'http://dpq.co.ir/more-information-blockquote',
+        controller: 'WbWidgetBlockquote', 
+    });
+    $widget.newWidget({
+        type: 'button',
+        title: 'button',
+        label: 'button',
+        icon: 'wb-widget-button',
+        description: 'description',
+        groups: ['basic'],
+        template: '<button></button>',
+        help: 'http://dpq.co.ir/more-information-button',
+        controller: 'WbWidgetButton', 
+    });
+    $widget.newWidget({
+        type: 'canvas',
+        title: 'canvas',
+        label: 'canvas',
+        icon: 'wb-widget-canvas',
+        description: 'description',
+        groups: ['basic'],
+        template: '<canvas></canvas>',
+        help: 'http://dpq.co.ir/more-information-canvas',
+        controller: 'WbWidgetCanvas', 
+    });
+    $widget.newWidget({
+        type: 'datalist',
+        title: 'datalist',
+        label: 'datalist',
+        icon: 'wb-widget-datalist',
+        description: 'description',
+        groups: ['basic'],
+        template: '<datalist></datalist>',
+        help: 'http://dpq.co.ir/more-information-datalist',
+        controller: 'WbWidgetDatalist', 
+    });
+    $widget.newWidget({
+        type: 'dd',
+        title: 'dd',
+        label: 'dd',
+        icon: 'wb-widget-dd',
+        description: 'description',
+        groups: ['basic'],
+        template: '<dd></dd>',
+        help: 'http://dpq.co.ir/more-information-dd',
+        controller: 'WbWidgetDd', 
+    });
+    $widget.newWidget({
+        type: 'details',
+        title: 'details',
+        label: 'details',
+        icon: 'wb-widget-details',
+        description: 'description',
+        groups: ['basic'],
+        template: '<details></details>',
+        help: 'http://dpq.co.ir/more-information-details',
+        controller: 'WbWidgetDetails', 
+    });
+    $widget.newWidget({
+        type: 'dialog',
+        title: 'dialog',
+        label: 'dialog',
+        icon: 'wb-widget-dialog',
+        description: 'description',
+        groups: ['basic'],
+        template: '<dialog></dialog>',
+        help: 'http://dpq.co.ir/more-information-dialog',
+        controller: 'WbWidgetDialog', 
+    });
+    $widget.newWidget({
+        type: 'div',
+        title: 'div',
+        label: 'div',
+        icon: 'wb-widget-div',
+        description: 'description',
+        groups: ['basic'],
+        template: '<div></div>',
+        help: 'http://dpq.co.ir/more-information-div',
+        controller: 'WbWidgetDiv',
+        isLeaf: false
+    });
+    $widget.newWidget({
+        type: 'dl',
+        title: 'dl',
+        label: 'dl',
+        icon: 'wb-widget-dl',
+        description: 'description',
+        groups: ['basic'],
+        template: '<dl></dl>',
+        help: 'http://dpq.co.ir/more-information-dl',
+        controller: 'WbWidgetDl', 
+    });
+    $widget.newWidget({
+        type: 'dt',
+        title: 'dt',
+        label: 'dt',
+        icon: 'wb-widget-dt',
+        description: 'description',
+        groups: ['basic'],
+        template: '<dt></dt>',
+        help: 'http://dpq.co.ir/more-information-dt',
+        controller: 'WbWidgetDt', 
+    });
+    $widget.newWidget({
+        type: 'embed',
+        title: 'embed',
+        label: 'embed',
+        icon: 'wb-widget-embed',
+        description: 'description',
+        groups: ['basic'],
+        template: '<embed></embed>',
+        help: 'http://dpq.co.ir/more-information-embed',
+        controller: 'WbWidgetEmbed', 
+    });
+    $widget.newWidget({
+        type: 'fieldset',
+        title: 'fieldset',
+        label: 'fieldset',
+        icon: 'wb-widget-fieldset',
+        description: 'description',
+        groups: ['basic'],
+        template: '<fieldset></fieldset>',
+        help: 'http://dpq.co.ir/more-information-fieldset',
+        controller: 'WbWidgetFieldset', 
+    });
+    $widget.newWidget({
+        type: 'figcaption',
+        title: 'figcaption',
+        label: 'figcaption',
+        icon: 'wb-widget-figcaption',
+        description: 'description',
+        groups: ['basic'],
+        template: '<figcaption></figcaption>',
+        help: 'http://dpq.co.ir/more-information-figcaption',
+        controller: 'WbWidgetFigcaption', 
+    });
+    $widget.newWidget({
+        type: 'figure',
+        title: 'figure',
+        label: 'figure',
+        icon: 'wb-widget-figure',
+        description: 'description',
+        groups: ['basic'],
+        template: '<figure></figure>',
+        help: 'http://dpq.co.ir/more-information-figure',
+        controller: 'WbWidgetFigure', 
+    });
+    $widget.newWidget({
+        type: 'footer',
+        title: 'footer',
+        label: 'footer',
+        icon: 'wb-widget-footer',
+        description: 'description',
+        groups: ['basic'],
+        template: '<footer></footer>',
+        help: 'http://dpq.co.ir/more-information-footer',
+        controller: 'WbWidgetFooter', 
+    });
+    $widget.newWidget({
+        type: 'form',
+        title: 'form',
+        label: 'form',
+        icon: 'wb-widget-form',
+        description: 'description',
+        groups: ['basic'],
+        template: '<form></form>',
+        help: 'http://dpq.co.ir/more-information-form',
+        controller: 'WbWidgetForm', 
+        isLeaf: false
+    });
+    $widget.newWidget({
+        type: 'frame',
+        title: 'frame',
+        label: 'frame',
+        icon: 'wb-widget-form',
+        description: 'description',
+        groups: ['basic'],
+        template: '<frame></frame>',
+        help: 'http://dpq.co.ir/more-information-frame',
+        controller: 'WbWidgetFrame', 
+    });
+    $widget.newWidget({
+        type: 'frameset',
+        title: 'frameset',
+        label: 'frameset',
+        icon: 'wb-widget-frameset',
+        description: 'description',
+        groups: ['basic'],
+        template: '<frameset></frameset>',
+        help: 'http://dpq.co.ir/more-information-frameset',
+        controller: 'WbWidgetFrameset', 
+        isLeaf: false
+    });
+    for(var i = 1; i < 7; i++){
+        var type = 'h'+i;
+        $widget.newWidget({
+            // widget description
+            type: type,
+            title: 'Header Level '+i,
+            description: 'A header widget',
+            icon: 'wb-widget-h'+i,
+            groups: ['basic'],
+            model: {
+                name: 'Header-'+i,
+                style: {
+                    padding: '8px'
+                }
+            },
+            // help id
+            help: 'http://dpq.co.ir',
+            helpId: 'wb-widget-hx',
+            // functional properties
+            template: '<h' +i +'></h' + i + '>',
+            controller:'WbWidgetH'+i
+        });
+    }
+    $widget.newWidget({
+        type: 'header',
+        title: 'header',
+        label: 'header',
+        icon: 'wb-widget-header',
+        description: 'description',
+        groups: ['basic'],
+        template: '<header></header>',
+        help: 'http://dpq.co.ir/more-information-header',
+        controller: 'WbWidgetHeader', 
+        isLeaf: false
+    });
+    $widget.newWidget({
+        type: 'hr',
+        title: 'hr',
+        label: 'hr',
+        icon: 'wb-widget-hr',
+        description: 'description',
+        groups: ['basic'],
+        template: '<hr></hr>',
+        help: 'http://dpq.co.ir/more-information-hr',
+        controller: 'WbWidgetHr', 
+    });
     $widget.newWidget({
         // widget description
         type: 'iframe',
@@ -17096,18 +10599,25 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-iframe',
         // functional properties
         template: '<iframe>Frame Not Supported?!</iframe>',
-        setting: ['iframe'],
         controllerAs: 'ctrl',
-        controller: 'MbWidgetIframeCtrl',
+        controller: 'WbWidgetIframe',
     });
-
-    /**
-     * @ngdoc Widgets
-     * @name input
-     * @description Add input to get user value
-     * 
-     * It is used to create intractive page with users
-     */
+    $widget.newWidget({
+        type: 'img',
+        title: 'Image',
+        label: 'image',
+        icon: 'wb-widget-img',
+        description: 'A widget to insert an link to page.',
+        groups: ['basic'],
+        template: '<img></img>',
+        help: 'http://dpq.co.ir/more-information-img',
+        model: {
+            html: 'img',
+            src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+        },
+        controllerAs: 'ctrl',
+        controller: 'WbWidgetImg', 
+    });
     $widget.newWidget({
         // widget description
         type: 'input',
@@ -17128,80 +10638,216 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-input',
         // functional properties
         template: '<input></input>',
-        setting: ['input'],
+        controller: 'WbWidgetInput',
         controllerAs: 'ctrl',
-        controller: 'MbWidgetInputCtrl',
     });
-
-    /**
-     * @ngdoc Widgets
-     * @name textarea
-     * @description Add textarea to get user value
-     * 
-     * It is used to create textarea
-     */
+    $widget.newWidget({
+        type: 'kbd',
+        title: 'kbd',
+        label: 'kbd',
+        icon: 'wb-widget-kbd',
+        description: 'description',
+        groups: ['basic'],
+        template: '<kbd></kbd>',
+        help: 'http://dpq.co.ir/more-information-kbd',
+        controller: 'WbWidgetKbd', 
+    });
+    $widget.newWidget({
+        type: 'label',
+        title: 'label',
+        label: 'label',
+        icon: 'wb-widget-label',
+        description: 'description',
+        groups: ['basic'],
+        template: '<label></label>',
+        help: 'http://dpq.co.ir/more-information-label',
+        controller: 'WbWidgetLabel', 
+    });
+    $widget.newWidget({
+        type: 'legend',
+        title: 'legend',
+        label: 'legend',
+        icon: 'wb-widget-legend',
+        description: 'description',
+        groups: ['basic'],
+        template: '<legend></legend>',
+        help: 'http://dpq.co.ir/more-information-label',
+        controller: 'WbWidgetLegend', 
+    });
+    $widget.newWidget({
+        type: 'li',
+        title: 'li',
+        label: 'li',
+        icon: 'wb-widget-li',
+        description: 'description',
+        groups: ['basic'],
+        template: '<li></li>',
+        help: 'http://dpq.co.ir/more-information-li',
+        controller: 'WbWidgetLi', 
+    });
+    $widget.newWidget({
+        type: 'link',
+        title: 'Link',
+        label: 'link',
+        icon: 'wb-widget-link',
+        description: 'A widget to insert an link to page.',
+        groups: ['basic'],
+        template: '<link></link>',
+        help: 'http://dpq.co.ir/more-information-link',
+        model: {
+            html: 'Link',
+            url: 'http://www.gitlab.com/am-wb/am-wb-common'
+        },
+        controllerAs: 'ctrl',
+        controller: 'WbWidgetLink', 
+    });
+    $widget.newWidget({
+        type: 'main',
+        title: 'main',
+        label: 'main',
+        icon: 'wb-widget-main',
+        description: 'A widget to insert an link to page.',
+        groups: ['basic'],
+        template: '<main></main>',
+        help: 'http://dpq.co.ir/more-information-main',
+        controller: 'WbWidgetMain', 
+        isLeaf: false
+    });
+    $widget.newWidget({
+        type: 'map',
+        title: 'map',
+        label: 'map',
+        icon: 'wb-widget-map',
+        description: 'description',
+        groups: ['basic'],
+        template: '<map></map>',
+        help: 'http://dpq.co.ir/more-information-map',
+        controller: 'WbWidgetMap', 
+        isLeaf: false
+    });
     $widget.newWidget({
         // widget description
-        type: 'textarea',
-        title: 'Text Area field',
-        description: 'A widget to get data from users.',
-        icon: 'wb-widget-textarea',
+        type: 'meta',
+        title: 'Meta',
+        description: 'A widget to add meta data.',
+        icon: 'wb-widget-meta',
         groups: ['basic'],
         model: {
-            name: 'textarea',
+            name: 'name',
+            content: 'content',
             style: {
-                padding: '8px'
+                margin: '8px',
+                background: {
+                    color: '#313131',
+                },
+                border: {
+                    style:  "dotted",
+                    color:  "#afafaf"
+                },
+                color:  "#ffffff",
+                padding:  "8px"
             }
         },
         // help id
         help: 'http://dpq.co.ir',
-        helpId: 'wb-widget-textarea',
+        helpId: 'wb-widget-meta',
         // functional properties
-        template: '<textarea></textarea>',
-        setting: ['textarea'],
+        template: '<meta></meta>',
         controllerAs: 'ctrl',
-        controller: 'MbWidgetTextareaCtrl',
+        controller: 'WbWidgetMeta'
     });
-
-    /**
-     * @ngdoc Widgets
-     * @name a
-     * @description Add a to get user value
-     * 
-     * It is used to create textarea
-     */
     $widget.newWidget({
-        // widget description
-        type: 'a',
-        title: 'A link',
-        description: 'A widget to add external link. It is used as block item.',
-        icon: 'wb-widget-a',
+        type: 'meter',
+        title: 'meter',
+        label: 'meter',
+        icon: 'wb-widget-meter',
+        description: 'description',
         groups: ['basic'],
-        model: {
-            name: 'Link',
-            style: {
-                padding: '8px'
-            }
-        },
-        // help id
-        help: 'http://dpq.co.ir',
-        helpId: 'wb-widget-a',
-        // functional properties
-        template: '<a></a>',
-        setting: ['a'],
-        controllerAs: 'ctrl',
-        controller: 'MbWidgetACtrl'
+        template: '<meter></meter>',
+        help: 'http://dpq.co.ir/more-information-meter',
+        controller: 'WbWidgetMeter', 
     });
-
-
-
-    /**
-     * @ngdoc Widgets
-     * @name p
-     * @description Add p to get user value
-     * 
-     * It is used to create p
-     */
+    $widget.newWidget({
+        type: 'nav',
+        title: 'nav',
+        label: 'nav',
+        icon: 'wb-widget-nav',
+        description: 'description',
+        groups: ['basic'],
+        template: '<nav></nav>',
+        help: 'http://dpq.co.ir/more-information-nav',
+        controller: 'WbWidgetNav', 
+        isLeaf: false
+    });
+    $widget.newWidget({
+        type: 'noscript',
+        title: 'noscript',
+        label: 'noscript',
+        icon: 'wb-widget-noscript',
+        description: 'description',
+        groups: ['basic'],
+        template: '<noscript></noscript>',
+        help: 'http://dpq.co.ir/more-information-noscript',
+        controller: 'WbWidgetNoscript', 
+    });
+    $widget.newWidget({
+        type: 'object',
+        title: 'object',
+        label: 'object',
+        icon: 'wb-widget-object',
+        description: 'description',
+        groups: ['basic'],
+        template: '<object></object>',
+        help: 'http://dpq.co.ir/more-information-object',
+        controller: 'WbWidgetObject', 
+        isLeaf: false
+    });
+    $widget.newWidget({
+        type: 'ol',
+        title: 'ol',
+        label: 'ol',
+        icon: 'wb-widget-ol',
+        description: 'description',
+        groups: ['basic'],
+        template: '<ol></ol>',
+        help: 'http://dpq.co.ir/more-information-ol',
+        controller: 'WbWidgetOl', 
+        isLeaf: false
+    });
+    $widget.newWidget({
+        type: 'optgroup',
+        title: 'optgroup',
+        label: 'optgroup',
+        icon: 'wb-widget-optgroup',
+        description: 'description',
+        groups: ['basic'],
+        template: '<optgroup></optgroup>',
+        help: 'http://dpq.co.ir/more-information-optgroup',
+        controller: 'WbWidgetOptgroup', 
+        isLeaf: false
+    });
+    $widget.newWidget({
+        type: 'option',
+        title: 'option',
+        label: 'option',
+        icon: 'wb-widget-option',
+        description: 'description',
+        groups: ['basic'],
+        template: '<option></option>',
+        help: 'http://dpq.co.ir/more-information-option',
+        controller: 'WbWidgetOption', 
+    });
+    $widget.newWidget({
+        type: 'output',
+        title: 'output',
+        label: 'output',
+        icon: 'wb-widget-output',
+        description: 'description',
+        groups: ['basic'],
+        template: '<output></output>',
+        help: 'http://dpq.co.ir/more-information-output',
+        controller: 'WbWidgetOutput', 
+    });
     $widget.newWidget({
         // widget description
         type: 'p',
@@ -17221,38 +10867,50 @@ angular.module('am-wb-core')
         // functional properties
         template: '<p></p>',
         controllerAs: 'ctrl',
-        controller: 'MbWidgetHtmlCtrl'
+        controller: 'WbWidgetP'
     });
-
-    $widget.setEditor('p', {
-        type: 'WidgetEditorTinymce',
-        options:{
-            property: 'html',
-            inline: true,
-            menubar: false,
-            plugins: [
-                'link',
-                'lists',
-                'powerpaste',
-                'autolink',
-                'tinymcespellchecker'],
-            toolbar: [
-                'undo redo | bold italic underline | fontselect fontsizeselect',
-                'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-            valid_elements: 'p[style],strong,em,span[style],a[href],ul,ol,li',
-            valid_styles: {
-                '*': 'font-size,font-family,color,text-decoration,text-align'
-            },
-            powerpaste_word_import: 'clean',
-            powerpaste_html_import: 'clean',
-        }
+    $widget.newWidget({
+        type: 'param',
+        title: 'param',
+        label: 'param',
+        icon: 'wb-widget-param',
+        description: 'description',
+        groups: ['basic'],
+        template: '<param></param>',
+        help: 'http://dpq.co.ir/more-information-param',
+        controller: 'WbWidgetParam', 
     });
-    
-    /**
-     * @ngdoc Widgets
-     * @name progress
-     * @description Add Progress into the page
-     */
+    $widget.newWidget({
+        type: 'picture',
+        title: 'Picture',
+        label: 'picture',
+        icon: 'wb-widget-picture',
+        description: 'This widget is used to add picture in the document.',
+        groups: ['basic'],
+        template: '<picture></picture>',
+        help: 'http://dpq.co.ir/more-information-picture',
+        model: {
+            media: '(min-width: 650px)',
+            src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+        },
+        controller: 'WbWidgetPicture', 
+        isLeaf: false
+    });
+    $widget.newWidget({
+        type: 'pre',
+        title: 'Preformatted',
+        label: 'preformatted',
+        icon: 'wb-widget-pre',
+        description: 'A widget to insert an Preformatted text to page.',
+        groups: ['basic'],
+        template: '<pre></pre>',
+        help: 'http://dpq.co.ir/more-information-pre',
+        model: {
+            html: 'class A {\n\tint a;\n}',
+        },
+        controller: 'WbWidgetPre', 
+        controllerAs: 'ctrl'
+    });
     $widget.newWidget({
         // widget description
         type: 'progress',
@@ -17275,278 +10933,174 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-progress',
         // functional properties
         template: '<progress value="22" max="100"></progress>',
-        controllerAs: 'ctrl',
-        controller: 'MbWidgetProgressCtrl'
+        controller: 'WbWidgetProgress'
     });
-
-    
-    /**
-     * @ngdoc Widgets
-     * @name progress
-     * @description Add Progress into the page
-     */
+    $widget.newWidget({
+        type: 'q',
+        title: 'q',
+        label: 'q',
+        icon: 'wb-widget-q',
+        description: 'description',
+        groups: ['basic'],
+        template: '<q></q>',
+        help: 'http://dpq.co.ir/more-information-q',
+        controller: 'WbWidgetQ', 
+    });
+    $widget.newWidget({
+        type: 'script',
+        title: 'script',
+        label: 'script',
+        icon: 'wb-widget-script',
+        description: 'description',
+        groups: ['basic'],
+        template: '<script></script>',
+        help: 'http://dpq.co.ir/more-information-script',
+        controller: 'WbWidgetScript', 
+    });
+    $widget.newWidget({
+        type: 'section',
+        title: 'section',
+        label: 'section',
+        icon: 'wb-widget-section',
+        description: 'description',
+        groups: ['basic'],
+        template: '<section></section>',
+        help: 'http://dpq.co.ir/more-information-section',
+        controller: 'WbWidgetSection', 
+        isLeaf: false
+    });
+    $widget.newWidget({
+        type: 'select',
+        title: 'select',
+        label: 'select',
+        icon: 'wb-widget-select',
+        description: 'description',
+        groups: ['basic'],
+        template: '<select></select>',
+        help: 'http://dpq.co.ir/more-information-select',
+        controller: 'WbWidgetSelect', 
+    });
+    $widget.newWidget({
+        type: 'source',
+        title: 'Source',
+        label: 'source',
+        icon: 'wb-widget-source',
+        description: 'This widget is used to add source in the document.',
+        groups: ['basic'],
+        template: '<source></source>',
+        help: 'http://dpq.co.ir/more-information-source',
+        model: {
+            media: '(min-width: 650px)',
+            src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+        },
+        controller: 'WbWidgetSource', 
+    });
+    $widget.newWidget({
+        type: 'style',
+        title: 'style',
+        label: 'style',
+        icon: 'wb-widget-style',
+        description: 'description',
+        groups: ['basic'],
+        template: '<style></style>',
+        help: 'http://dpq.co.ir/more-information-style',
+        controller: 'WbWidgetStyle', 
+    });
+    $widget.newWidget({
+        type: 'summary',
+        title: 'summary',
+        label: 'summary',
+        icon: 'wb-widget-summary',
+        description: 'description',
+        groups: ['basic'],
+        template: '<summary></summary>',
+        help: 'http://dpq.co.ir/more-information-summary',
+        controller: 'WbWidgetSummary', 
+        isLeaf: false
+    });
+    $widget.newWidget({
+        type: 'svg',
+        title: 'svg',
+        label: 'svg',
+        icon: 'wb-widget-svg',
+        description: 'description',
+        groups: ['basic'],
+        template: '<svg></svg>',
+        help: 'http://dpq.co.ir/more-information-svg',
+        controller: 'WbWidgetSvg', 
+    });
+    $widget.newWidget({
+        type: 'template',
+        title: 'template',
+        label: 'template',
+        icon: 'wb-widget-template',
+        description: 'description',
+        groups: ['basic'],
+        template: '<template></template>',
+        help: 'http://dpq.co.ir/more-information-template',
+        controller: 'WbWidgetTemplate', 
+        isLeaf: false
+    });
     $widget.newWidget({
         // widget description
-        type: 'meta',
-        title: 'Meta',
-        description: 'A widget to add meta data.',
-        icon: 'wb-widget-meta',
+        type: 'textarea',
+        title: 'Text Area field',
+        description: 'A widget to get data from users.',
+        icon: 'wb-widget-textarea',
         groups: ['basic'],
         model: {
-            name: 'name',
-            content: 'content',
+            name: 'textarea',
             style: {
-                margin: '8px',
-                background: {
-                	color: '#313131',
-                },
-                border: {
-	                style:  "dotted",
-	                color:  "#afafaf"
-                },
-                color:  "#ffffff",
-            	padding:  "8px"
+                padding: '8px'
             }
         },
         // help id
         help: 'http://dpq.co.ir',
-        helpId: 'wb-widget-meta',
+        helpId: 'wb-widget-textarea',
         // functional properties
-        template: '<meta></meta>',
-        controllerAs: 'ctrl',
-        controller: 'MbWidgetMetaCtrl'
+        template: '<textarea></textarea>',
+        controller: 'WbWidgetTextarea',
     });
-
-    var headerEditorDescription =  {
-            type: 'WidgetEditorTinymce',
-            options:{
-                property: 'html',
-                inline: true,
-                menubar: false,
-                plugins: [
-                  'lists',
-                  'powerpaste',
-                  'autolink'
-                ],
-                toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignjustify alignright alignfull ',
-                valid_elements: 'strong,em,span[style],a[href]',
-                valid_styles: {
-                  '*': 'font-size,font-family,color,text-decoration,text-align'
-                },
-                powerpaste_word_import: 'clean',
-                powerpaste_html_import: 'clean',
-            }
-    };
-//    menubar: true,
-//    inline: true,
-//    theme: 'modern',
-//    plugins : ['advlist','autolink','autoresize','autosave','bbcode','charmap',
-//        'code','codesample','colorpicker','contextmenu', 'directionality','emoticons',
-//        'hr','image','imagetools','importcss','insertdatetime','legacyoutput',
-//        'link','lists','media','nonbreaking','noneditable','paste','save','searchreplace',
-//        'spellchecker','tabfocus','table','template','textcolor','textpattern',
-//        'toc','visualblocks','wordcount'
-//    ],
-//    toolbar: [
-//        'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',
-//        'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'
-//    ],
-//    powerpaste_word_import: 'clean',
-//    powerpaste_html_import: 'clean',
-//    format: 'raw'
-    $widget.setEditor('a', headerEditorDescription);
-
-    /**
-     * @ngdoc Widgets
-     * @name h1
-     * @description Header of level 1
-     * 
-     * It is used to create h1
-     */
-    for(var i = 1; i < 7; i++){
-        var type = 'h'+i;
-        $widget.setEditor(type, headerEditorDescription);
-        $widget.newWidget({
-            // widget description
-            type: type,
-            title: 'Header Level '+i,
-            description: 'A header widget',
-            icon: 'wb-widget-h'+i,
-            groups: ['basic'],
-            model: {
-                name: 'Header-'+i,
-                style: {
-                    padding: '8px'
-                }
-            },
-            // help id
-            help: 'http://dpq.co.ir',
-            helpId: 'wb-widget-hx',
-            // functional properties
-            template: '<h' +i +'></h' + i + '>',
-            controllerAs: 'ctrl',
-            controller:'MbWidgetHtmlCtrl'
-        });
-    }
-    
-    
-    
-
-    /**
-     * @ngdoc Widgets
-     * @name Link
-     * @description A widget to add document link 
-     */
     $widget.newWidget({
-        type: 'link',
-        title: 'Link',
-        label: 'link',
-        icon: 'wb-widget-link',
-        description: 'A widget to insert an link to page.',
+        type: 'track',
+        title: 'track',
+        label: 'track',
+        icon: 'wb-widget-track',
+        description: 'description',
         groups: ['basic'],
-        setting: ['link'],
-        template: '<link></link>',
-        help: 'http://dpq.co.ir/more-information-link',
-        model: {
-            html: 'Link',
-            url: 'http://www.gitlab.com/am-wb/am-wb-common'
-        },
-        controllerAs: 'ctrl',
-        controller: 'MbWidgetLinkCtrl', 
+        template: '<track></track>',
+        help: 'http://dpq.co.ir/more-information-track',
+        controller: 'WbWidgetTrack', 
     });
-    
-    /**
-	 * @ngdoc Widgets
-	 * @name img
-	 * @description Image widget
-	 * 
-	 * Display an image with meta tag for SEO. Here is minimal list of attributes:
-     */
     $widget.newWidget({
-    	type: 'img',
-    	title: 'Image',
-    	label: 'image',
-    	icon: 'wb-widget-img',
-    	description: 'A widget to insert an link to page.',
-    	groups: ['basic'],
-    	setting: ['img'],
-    	template: '<img></img>',
-    	help: 'http://dpq.co.ir/more-information-img',
-    	model: {
-    		html: 'img',
-    		src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
-    	},
-    	controllerAs: 'ctrl',
-    	controller: 'MbWidgetImgCtrl', 
+        type: 'ul',
+        title: 'ul',
+        label: 'ul',
+        icon: 'wb-widget-ul',
+        description: 'description',
+        groups: ['basic'],
+        template: '<ul></ul>',
+        help: 'http://dpq.co.ir/more-information-ul',
+        controller: 'WbWidgetUl', 
+        isLeaf: false
     });
-//	controller: function ($scope) {
-//		var keys = ['fit', 'url', 'description', 'label', 'keywords'];
-//		this.setUrl = function (url) {
-//			this.url = url;
-//		};
-//		/**
-//		 * Loads all parameters from model
-//		 * 
-//		 * @memberof AmWbCommonVideoCtrl
-//		 */
-//		this.fillMedia = function () {
-//			for (var i = 0; i < keys.length; i++) {
-//				var key = keys[i];
-//				this[key] = this.getModelProperty(key);
-//			}
-//		};
-//		/**
-//		 * Initialize the widget
-//		 * 
-//		 * @memberof AmWbCommonVideoCtrl
-//		 */
-//		this.initWidget = function () {
-//			var ctrl = this;
-//
-//			// pass event to setting panel if video loaded successfully
-//			this.onLoad = function () {
-//				var event = {};
-//				event.source = ctrl;
-//				event.key = 'success';
-//				ctrl.fire('success', event);
-//			};
-//
-//			// pass event to setting panel if video doesn't load successfully
-//			this.onError = function () {
-//				var event = {};
-//				event.source = ctrl;
-//				event.key = 'failure';
-//				ctrl.fire('error', event);
-//			};
-//
-//			this.on('modelUpdated', function ($event) {
-//				if (keys.indexOf($event.key) > -1) {
-//					var key = $event.key;
-//					ctrl[key] = ctrl.getModelProperty(key);
-//				}
-//			});
-//			this.on('runtimeModelUpdated', function ($event) {
-//				if (keys.indexOf($event.key) > -1) {
-//					var key = $event.key;
-//					ctrl[key] = ctrl.getProperty(key);
-//				}
-//			});
-//			this.on('modelChanged', function () {
-//				ctrl.fillMedia();
-//			});
-//			this.fillMedia();
-//		};
-//	},
-//	controllerAs: 'ctrl'
-//});
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    $widget.newWidget({
+        type: 'video',
+        title: 'Video',
+        label: 'video',
+        icon: 'wb-widget-video',
+        description: 'This widget is used to add video in the document.',
+        groups: ['basic'],
+        template: '<video></video>',
+        help: 'http://dpq.co.ir/more-information-audio',
+        model: {
+            media: '(min-width: 650px)',
+            src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+        },
+        controller: 'WbWidgetVideo', 
+        isLeaf: false
+    });
 
-//	$widget.newWidget({
-//		// widget
-//		type: 'CommonVideoPlayer',
-//		title: 'Video Player',
-//		description: 'A video player component.',
-//		groups: ['commons'],
-//		icon: 'wb-common-video',
-//		// help
-//		help: 'https://gitlab.com/weburger/am-wb-common/wikis/video-player',
-//		helpId: '',
-//		// page
-//		templateUrl: 'views/am-wb-common-widgets/video-player.html',
-//		controller: 'AmWbCommonVideoCtrl',
-//		controllerAs: 'ctrl',
-//		setting: ['common-video-player', 'SEO']
-//	});
-	// NOTE: audio is moved to core component
-//	$widget.newWidget({
-//		// widget
-//		type: 'CommonAudioPlayer',
-//		title: 'Audio Player',
-//		description: 'An audio player component.',
-//		groups: ['commons'],
-//		icon: 'wb-common-audio',
-//		// help
-//		help: 'https://gitlab.com/weburger/am-wb-common/wikis/audio-player',
-//		helpId: '',
-//		// page
-//		templateUrl: 'views/am-wb-common-widgets/audio-player.html',
-//		controller: 'AmWbCommonAudioCtrl',
-//		controllerAs: 'ctrl',
-//		setting: ['common-audio-player']
-//	});
-    
 });
 
 /* 
@@ -18618,98 +12172,142 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')
 
 /**
  * @ngdoc Services
- * @name $widget
- * @description مدیریت ویجت‌های سیستم
+ * @name $settings
+ * @description Manage settings panel 
  * 
- * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
+ * 
  */
-.service('$settings',function() {
-	/*
-	 * Default settings
-	 */
-	var WB_SETTINGS_GROUP_DEFAULT = [ 'general', 'transform', 'border',
-		'background', 'layout', 'layout-self', 'marginPadding',
-		'size', 'shadow', 'microdata', 'style.text' ];
-	var WB_SETTINGS_WIDGET_DEFAULT = [ 'general', 'transform',
-		'border', 'background', 'marginPadding', 'layout-self',
-		'size', 'shadow', 'microdata', 'style.text' ];
+.service('$settings', function() {
+    'use strict';
+    /**
+     * Setting page storage
+     * 
+     */
+    var settingPages = [];
 
-	/**
-	 * Setting page storage
-	 * 
-	 */
-	var settingPages = {};
-	var notFound = {
-			label : 'Settings not found',
-			templateUrl : 'views/settings/wb-notfound.html'
-	};
+    var notFound = {
+            label : 'Settings not found',
+            templateUrl : 'views/settings/wb-notfound.html'
+    };
+    
+    function pageMatchWith(page, widgetDescription){
+        if(_.isUndefined(page.targets) || page.targets.length === 0){
+            return true;
+        }
+        for(var i = 0; i < page.targets.length; i++){
+            var patt = new RegExp(page.targets[i]);
+            if(patt.test(widgetDescription.type)){
+                return true;
+            }
+        }
+        return false;
+    };
 
-	/**
-	 * Fetchs a setting page.
-	 * 
-	 * @param model
-	 * @returns
-	 */
-	function page(type) {
-		var pageResult = notFound;
-		if (type in settingPages) {
-			pageResult = settingPages[type];
-		}
-		return pageResult;
-	}
+    /**
+     * Fetchs a setting page with the given type
+     * 
+     * @memberof $settings
+     * @param model
+     * @returns
+     */
+    this.getPage = function (type) {
+        var pageResult = notFound;
+        _.forEach(settingPages, function(settingPage){
+            if (type === settingPage.type) {
+                pageResult = settingPage;
+            }
+        });
+        return pageResult;
+    };
 
-	/**
-	 * Adds new setting page.
-	 * 
-	 * @returns
-	 */
-	function newPage(page) {
-		settingPages[page.type] = page;
-	}
+    /**
+     * 
+     * @memberof $settings
+     * @param page type
+     * @returns
+     */
+    this.removePage = function (type) {
+        settingPages=  _.remove(settingPages, function(page) {
+            return type === page.type;
+        });
+        this.settingPagesCach = [];
+        return this;
+    };
 
-	/**
-	 * Finds and lists all setting pages.
-	 * 
-	 * @returns
-	 */
-	function pages() {
-		// TODO: maso, 1395:
-	}
+    /**
+     * Adds new setting page.
+     * 
+     * @memberof $settings
+     * @returns
+     */
+    this.addPage = function (page) {
+        settingPages.push(page);
+        this.settingPagesCach = [];
+        return this;
+    };
+    
+    /**
+     * Set new setting page.
+     * 
+     * @memberof $settings
+     * @returns
+     */
+    this.setPage = function (page) {
+        this.remvoePage(page.type);
+        return this.addPage(page);
+    };
 
-	/**
-	 * Defines default settings for widget
-	 * 
-	 * @param widget
-	 * @returns
-	 */
-	function getSettingsFor(widget) {
-		var widgetSettings = [];
-		if (widget.type === 'Group') {
-			widgetSettings = widgetSettings
-			.concat(WB_SETTINGS_GROUP_DEFAULT);
-		} else {
-			widgetSettings = widgetSettings
-			.concat(WB_SETTINGS_WIDGET_DEFAULT);
-		}
+    /**
+     * Finds and lists all setting pages.
+     * 
+     * @memberof $settings
+     * @returns
+     */
+    this.getPages = function () {
+        return _.clone(settingPages);
+    };
 
-		if (angular.isArray(widget.setting)) {
-			widgetSettings = widgetSettings.concat(widget.setting);
-		}
-		return widgetSettings;
-	}
+    /**
+     * Finds and lists all setting pages.
+     * 
+     * @deprecated
+     * @memberof $settings
+     * @returns
+     */
+    this.pages = this.getPages;
 
-	// تعیین سرویس‌ها
-	this.page = page;
-	this.getPage = page;
-	this.getPages = pages;
-	this.newPage = newPage;
-	this.getSettingsFor = getSettingsFor;
+    /**
+     * Defines default settings for widget
+     * 
+     * @memberof $settings
+     * @param widget
+     * @returns
+     */
+    this.getSettingsFor = function (widgetDescription) {
+        // if it was cached before
+        this.settingPagesCach = this.settingPagesCach || {};
+        if(_.has(this.settingPagesCach, widgetDescription.type)){
+            return this.settingPagesCach[widgetDescription.type];
+        }
+
+        // create list
+        var widgetSettings = [];
+        _.forEach(settingPages, function(page){
+            if(pageMatchWith(page, widgetDescription)){
+                widgetSettings.push(page);
+            }
+        });
+
+        // put into cache
+        this.settingPagesCach[widgetDescription.type] =  widgetSettings;
+
+        return widgetSettings;
+    };
 });
 
 /* 
@@ -18781,6 +12379,53 @@ angular.module('am-wb-core')
 	    this.has = has;
 	});
 
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')
+/**
+ * A service is used to create unique ID's, this prevents duplicate ID's if there are multiple editors on screen.
+ */
+.service('uiTinymceService', function() {
+    'use strict';
+    var UITinymceService = function() {
+        var ID_ATTR = 'ui-tinymce';
+        // uniqueId keeps track of the latest assigned ID
+        var uniqueId = 0;
+        // getUniqueId returns a unique ID
+        var getUniqueId = function() {
+            uniqueId ++;
+            return ID_ATTR + '-' + uniqueId;
+        };
+        // return the function as a public method of the service
+        return {
+            getUniqueId: getUniqueId
+        };
+    };
+    // return a new instance of the service
+    return new UITinymceService();
+});
 /* 
  * The MIT License (MIT)
  * 
@@ -18909,1240 +12554,743 @@ angular.module('am-wb-core')
  */
 angular.module('am-wb-core')
 .service('$wbUtil', function ($q, $templateRequest, $sce) {
-	'use strict';
-	var REGEX_BACKGROUND_IMAGE_SPEC = RegExp('(repeating\-)?(linear|radial)\-(gradient)');
-
-	var styleMap = [
-		//==============================================
-		// Text
-		//==============================================
-	{
-		cssKey: 'text-align',
-		key: 'text.align',
-		defaultValue: 'none'
-	},{
-		cssKey: 'text-align-last',
-		key: 'text.alignLast', 
-		defaultValue: 'auto'
-	},{
-		cssKey: 'text-decoration',
-		key: 'text.decoration',
-		defaultValue: 'none'
-	},{
-		cssKey: 'text-shadow',
-		key: 'text.shadow',
-		defaultValue: 'none'
-	},{
-		cssKey: 'text-transform',
-		key: 'text.transform',
-		defaultValue: 'none'
-	},{
-		cssKey: 'text-overflow',
-		key: 'text.overflow',
-		defaultValue: 'clip'
-	},{
-		cssKey: 'text-justify',
-		key: 'text.justify',
-		defaultValue: 'auto'
-	},{
-		cssKey: 'text-indent',
-		key: 'text.indent',
-		defaultValue: ''
-	},
-
-	//==============================================
-	// general
-	//==============================================
-	{
-		cssKey: 'padding',
-		key: 'padding', 
-		defaultValue: ''
-	},{
-		cssKey: 'margin',
-		key: 'margin', 
-		defaultValue: ''
-	},{
-		cssKey: 'direction',
-		key: 'direction', 
-		defaultValue: 'ltr'
-	},{
-		cssKey: 'color',
-		key: 'color', 
-		defaultValue: 'initial'
-	},{
-		cssKey: 'cursor',
-		key: 'cursor', 
-		defaultValue: 'auto'
-	},{
-		cssKey: 'opacity',
-		key: 'opacity', 
-		defaultValue: ''
-	},{
-		cssKey: 'overflow-x',
-		key: 'overflow.x', 
-		defaultValue: 'visible'
-	},{
-		cssKey: 'overflow-y',
-		key: 'overflow.y', 
-		defaultValue: 'visible'
-	}];
-	
-	var service = this;
-
-	function cleanMap(oldStyle, newStyle, map) {
-		for (var i = 0; i < map.length; i++) {
-			if (oldStyle[map[i][0]]) {
-				newStyle[map[i][1]] = oldStyle[map[i][0]];
-				delete oldStyle[map[i][0]];
-			}
-		}
-	}
-
-	function getTemplateOf(page)
-	{
-		var template = page.template;
-		var templateUrl = page.templateUrl;
-		if (angular.isDefined(template)) {
-			if (angular.isFunction(template)) {
-				template = template(page.params | page);
-			}
-		} else if (angular.isDefined(templateUrl)) {
-			if (angular.isFunction(templateUrl)) {
-				templateUrl = templateUrl(page.params);
-			}
-			if (angular.isDefined(templateUrl)) {
-				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
-				template = $templateRequest(templateUrl);
-			}
-		}
-		return template;
-	}
-
-	/**
-	 * Loading template of the page
-	 * 
-	 * @name getTemplateFor
-	 * @memberof $wbUtil
-	 * @param page
-	 *            {object} properties of a page, widget , ..
-	 * @return promise to load template on resolve.
-	 */
-	function getTemplateFor(page)
-	{
-		return $q.when(getTemplateOf(page));
-	}
-
-	/**
-	 * Converts data into a valid CSS attributes
-	 */
-	function convertToGroupCss(style) {
-		var style = style || {};
-		var css = convertToWidgetCss(style);
-
-		if(style.visibility === 'hidden'){
-			css.display = 'none';
-		} else {
-			/*
-			 * Group
-			 * 
-			 * check if is group apply flex flow
-			 */
-			css.display = 'flex';
-			var layout = style.layout || {};
-			// row
-			if (layout.direction === 'row') {
-				css['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
-				if(!style.overflow){
-					css['overflow-x'] = layout.wrap ? 'visible' : 'auto';
-					css['overflow-y'] = 'visible';
-				}
-			} else {
-				css['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
-				if(!style.overflow){
-					css['overflow-x'] = 'visible';
-					css['overflow-y'] = layout.wrap ? 'visible' : 'auto';
-				}
-			}
-
-
-			// wrap
-			if (layout.wrap) {
-				css['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
-				// wrap align
-				var alignContent;
-				switch (layout.wrap_align) {
-				case 'start':
-					alignContent = 'flex-start';
-					break;
-				case 'end':
-					alignContent = 'flex-end';
-					break;
-				case 'center':
-					alignContent = 'center';
-					break;
-				case 'space-between':
-					alignContent = 'space-between';
-					break;
-				case 'space-around':
-					alignContent = 'space-around';
-					break;
-				case 'stretch':
-					alignContent = 'stretch';
-					break;
-				default:
-					alignContent = 'stretch';
-				}
-				css['align-content'] = alignContent;
-			} else {
-				css['flex-wrap'] = 'nowrap';
-			}
-
-
-			// justify
-			var justify;
-			switch (layout.justify) {
-			case 'start':
-				justify = 'flex-start';
-				break;
-			case 'end':
-				justify = 'flex-end';
-				break;
-			case 'center':
-				justify = 'center';
-				break;
-			case 'space-between':
-				justify = 'space-between';
-				break;
-			case 'space-around':
-				justify = 'space-around';
-				break;
-			case 'space-evenly':
-				justify = 'space-evenly';
-				break;
-			default:
-				justify = 'flex-start';
-			}
-			css['justify-content'] = justify;
-
-			// align
-			var align;
-			switch (layout.align) {
-			case 'start':
-				align = 'flex-start';
-				break;
-			case 'end':
-				align = 'flex-end';
-				break;
-			case 'center':
-				align = 'center';
-				break;
-			case 'baseline':
-				align = 'baseline';
-				break;
-			case 'stretch':
-				align = 'stretch';
-				break;
-			default:
-				align = 'stretch';
-			}
-			css['align-items'] = align;
-		}
-
-		return css;
-	}
-
-	/**
-	 * Converts data into a valid CSS attributes
-	 */
-	function convertToWidgetCss(style) {
-		var style = style || {};
-		var css = {};
-
-		// layout
-		if(style.visibility === 'hidden'){
-			css.display = 'none';
-		} else {
-			css.display = '';
-		}
-
-		css = _.merge(css, 
-				// layout
-				convertToWidgetCssLayout(style.layout || {}),
-				// size
-				convertToWidgetCssSize(style.size || {}),
-				// background
-				convertToWidgetCssBackground(style.background || {}),
-				// border
-				convertToWidgetCssBoarder(style.border || {}),
-				// shadows
-				convertToWidgetCssShadows(style.shadows || {}),
-				// transform
-				convertToWidgetCssTransfrom(style.transform || {}));		
-		
-		for(var i = 0; i < styleMap.length; i++){
-			var cssItem = styleMap[i];
-			var value = objectPath.get(style, cssItem.key) || cssItem.defaultValue;
-			objectPath.set(css, cssItem.cssKey, value);
-		}
-		return css;
-	}
-
-
-
-
-	function convertToWidgetCssTransfrom(transformOptions) {
-		var transform = '';
-
-		if(transformOptions.x){
-			var x = transformOptions.x;
-			if(x.rotate){
-				transform += ' rotateX('+x.rotate+')';
-			}
-			if(x.translate){
-				transform  += ' translateX('+x.translate+')';
-			}
-			if(x.scale){
-				transform += ' scaleX('+ x.scale+')';
-			}
-			if(x.skew){
-				transform += ' skewX('+ x.skew+')';
-			}
-		}
-		if(transformOptions.y){
-			var y = transformOptions.y;
-			if(y.rotate){
-				transform += ' rotateY('+y.rotate+')';
-			}
-			if(y.translate){
-				transform += ' translateY('+y.translate+')';
-			}
-			if(y.scale){
-				transform += ' scaleY('+y.scale+')';
-			}
-			if(y.skew){
-				transform += ' skewY('+y.skew+')';
-			}
-		}
-		if(transformOptions.z){
-			var z = transformOptions.z;
-			if(z.rotate){
-				transform += ' rotateZ('+z.rotate+')';
-			}
-			if(z.translate){
-				transform += ' translateZ('+z.translate+')';
-			}
-			if(z.scale){
-				transform += ' scaleZ('+z.scale+')';
-			}
-		}
-
-		if(transformOptions.perspective){
-			transform += ' perspective('+transformOptions.perspective+')';
-		}
-
-		if(!transform) {
-			return {
-				transform: 'none'
-			};
-		}
-
-		return {
-			transform: transform,
-			'transform-origin': transformOptions.origin || 'center',
-			'transform-style': transformOptions.style || 'flat'
-		};
-	};
-
-	function createShadowStr(shadow) {
-		var hShift = shadow.hShift || '0px';
-		var vShift = shadow.vShift || '0px';
-		var blur = shadow.blur || '0px';
-		var spread = shadow.spread || '0px';
-		var color = shadow.color || 'black';
-
-		var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
-
-		if(shadow.inset) {
-			boxShadow = boxShadow.concat(' ' + 'inset');
-		}
-
-		return boxShadow;
-	}
-
-	function convertToWidgetCssShadows(shadows) {
-		var shadowStr = '';
-
-		if (!angular.isArray(shadows) || shadows.length === 0) {
-			shadowStr = 'none';
-		} else {
-			angular.forEach(shadows, function (shadow, index) {
-				shadowStr += createShadowStr(shadow);
-				if(index + 1 < shadows.length){
-					shadowStr += ', ';
-				}
-			});
-		}
-
-		return {
-			'box-shadow': shadowStr
-		};
-	}
-
-	function convertToWidgetCssBoarder(style) {
-		var conf = {};
-		if (style.style) {
-			conf['border-style'] = style.style;
-		}
-		if (style.width) {
-			conf['border-width'] = style.width;
-		}
-		if (style.color) {
-			conf['border-color'] = style.color;
-		}
-		if (style.radius) {
-			conf['border-radius'] = style.radius;
-		}
-
-		return conf;
-	}
-
-	function convertToWidgetCssBackground(style){
-		var cssValue = {};
-		if(style.background){
-			cssValue.background = style.background;
-			return;
-		}
-		// image
-		var image = 'none';
-		if(style.image){
-			if(REGEX_BACKGROUND_IMAGE_SPEC.test(style.image)){
-				image = style.image;
-			} else {
-				image = 'url(\''+style.image+'\')';
-			}
-		}
-
-		cssValue['background-image'] = image;
-		cssValue['background-color'] = style.color || 'initial';
-		cssValue['background-size'] = style.size || 'auto';
-		cssValue['background-repeat'] = style.repeat || 'repeat';
-		cssValue['background-position'] = style.position || '0px 0px';
-		cssValue['background-attachment'] = style.attachment || 'scroll';
-		cssValue['background-origin'] = style.origin || 'padding-box';
-		cssValue['background-clip'] = style.clip || 'border-box';
-
-		return cssValue;
-	}
-
-	/**
-	 * Converts data into a layout CSS3
-	 */
-	function convertToWidgetCssLayout(layout){
-		var flexLayout = {};
-		/*
-		 * Widget
-		 */
-		flexLayout.order = layout.order >= 0 ? layout.order : 0;
-		flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
-		flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
-		flexLayout['flex-basis'] = layout.basis || 'auto';
-
-		// align-self
-		// auto | flex-start | flex-end | center | baseline | stretch;
-		var alignSelf;
-		switch (layout.align_self) {
-		case 'start':
-			alignSelf = 'flex-start';
-			break;
-		case 'end':
-			alignSelf = 'flex-end';
-			break;
-		case 'center':
-			alignSelf = 'center';
-			break;
-		case 'baseline':
-			alignSelf = 'baseline';
-			break;
-		case 'stretch':
-			alignSelf = 'stretch';
-			break;
-		default:
-			alignSelf = 'auto';
-		}
-		flexLayout['align-self'] = alignSelf;
-
-		return flexLayout;
-	}
-
-	/*
-	 * Convert size object to valid CSS size
-	 */
-	function convertToWidgetCssSize(size) {
-		return {
-			'width': size.width || 'auto',
-			'min-width': size.minWidth || '0',
-			'max-width': size.maxWidth || 'none',
-
-			'height': size.height || 'auto',
-			'min-height': size.minHeight || '0',
-			'max-height': size.maxHeight || 'none',
-		};
-	}
-
-	function cleanEvetns(model)
-	{
-		// event
-		if (!model.event) {
-			model.event = {};
-		}
-
-		// load legecy events
-		if(model.event.failure){
-			model.event.error = model.event.failure;
-			delete model.event.failure;
-		}
-	}
-
-	function cleanLayout(model)
-	{
-		if (!model.style.layout) {
-			model.style.layout = {};
-		}
-		if (model.type === 'Group' || model.type === 'Page') {
-			// convert
-			var newStyle = model.style.layout;
-			var oldStyle = model.style;
-
-			if (oldStyle.flexDirection) {
-				if (oldStyle.flexDirection === 'wb-flex-row') {
-					newStyle.direction = 'row';
-				} else {
-					newStyle.direction = 'column';
-				}
-				delete oldStyle.flexDirection;
-			}
-			if (!newStyle.direction) {
-				newStyle.direction = 'column';
-			}
-
-			switch (oldStyle.flexAlignItem) {
-			case 'wb-flex-align-items-center':
-				newStyle.align = 'center';
-				break;
-			case 'wb-flex-align-items-end':
-				newStyle.align = 'end';
-				break;
-			case 'wb-flex-align-items-start':
-				newStyle.align = 'start';
-				break;
-			case 'wb-flex-align-items-stretch':
-				newStyle.align = 'stretch';
-				break;
-			default:
-				newStyle.align = 'stretch';
-			}
-			delete oldStyle.flexAlignItem;
-
-			switch (oldStyle.justifyContent) {
-			case 'wb-flex-justify-content-center':
-				newStyle.justify = 'center';
-				break;
-			case 'wb-flex-justify-content-end':
-				newStyle.justify = 'end';
-				break;
-			case 'wb-flex-justify-content-start':
-				newStyle.justify = 'start';
-				break;
-			case 'wb-flex-justify-content-space-between':
-				newStyle.justify = 'space-between';
-				break;
-			case 'wb-flex-justify-content-space-around':
-				newStyle.justify = 'space-around';
-				break;
-			default:
-				newStyle.justify = 'center';
-			}
-			delete oldStyle.justifyContent;
-		}
-	}
-
-	function cleanSize(model)
-	{
-		if (!model.style.size) {
-			model.style.size = {};
-		}
-		var newStyle = model.style.size;
-		var oldStyle = model.style;
-		var map = [['width', 'width'],
-			['height', 'height']];
-		cleanMap(oldStyle, newStyle, map);
-	}
-
-	function cleanBackground(model)
-	{
-		if (!model.style.background) {
-			model.style.background = {};
-		}
-		var newStyle = model.style.background;
-		var oldStyle = model.style;
-		var map = [['backgroundImage', 'image'],
-			['backgroundColor', 'color'],
-			['backgroundSize', 'size'],
-			['backgroundRepeat', 'repeat'],
-			['backgroundPosition', 'position']];
-		cleanMap(oldStyle, newStyle, map);
-	}
-
-	function cleanBorder(model)
-	{
-		if (!model.style.border) {
-			model.style.border = {};
-		}
-		var oldStyle = model.style;
-		var newStyle = model.style.border;
-
-		if (oldStyle.borderRadius) {
-			if (oldStyle.borderRadius.uniform) {
-				newStyle.radius = oldStyle.borderRadius.all + 'px';
-			}
-			// TODO: maso, 2018: support other models
-		}
-		// delete old values
-		delete model.style.borderColor;
-		delete model.style.borderRadius;
-		delete model.style.borderStyleColorWidth;
-		delete model.style.borderStyle;
-		delete model.style.borderWidth;
-	}
-
-	function cleanSpace(model)
-	{
-		// Margin and padding
-		if (model.style.padding && angular.isObject(model.style.padding)) {
-			var padding = '';
-			if (model.style.padding.isUniform) {
-				padding = model.style.padding.uniform;
-			} else {
-				padding = model.style.padding.top || '0px' + ' ' +
-				model.style.padding.right || '0px' + ' ' +
-				model.style.padding.bottom || '0px' + ' ' +
-				model.style.padding.left || '0px' + ' ';
-			}
-			model.style.padding = padding;
-		}
-
-		if (model.style.margin && angular.isObject(model.style.margin)) {
-			var margin = '';
-			if (model.style.margin.isUniform) {
-				margin = model.style.margin.uniform;
-			} else {
-				margin = model.style.margin.top || '0px' + ' ' +
-				model.style.margin.right || '0px' + ' ' +
-				model.style.margin.bottom || '0px' + ' ' +
-				model.style.margin.left || '0px' + ' ';
-			}
-			model.style.margin = margin;
-		}
-
-	}
-
-	function cleanAlign(model)
-	{
-		if (!model.style.align) {
-			model.style.align = {};
-		}
-	}
-
-	function cleanStyle(model)
-	{
-		if (!angular.isObject(model.style)) {
-			model.style = {};
-		}
-		cleanLayout(model);
-		cleanSize(model);
-		cleanBackground(model);
-		cleanBorder(model);
-		cleanSpace(model);
-		cleanAlign(model);
-	}
-
-
-	function cleanType(model){
-		if(model.type === 'Link') {
-			model.type = 'a';
-			model.html = model.title;
-			model.href = model.url;
-			model.style.text = {
-					align: 'center'
-			};
-			model.style.cursor = 'pointer';
-
-			delete model.title;
-			delete model.url;
-		}
-		if(model.type === 'Image'){
-			model.type = 'img';
-			model.src = model.url;
-			
-			delete model.url;
-		}
-	}
-
-	function cleanInternal(model)
-	{
-		cleanEvetns(model);
-		cleanStyle(model);
-		if (model.type === 'Group' || model.type === 'Page') {
-			if (!model.contents) {
-				model.contents = [];
-			}
-			if (model.contents.length) {
-				for (var i = 0; i < model.contents.length; i++) {
-					cleanInternal(model.contents[i]);
-				}
-			}
-		}
-		cleanType(model);
-		return model;
-	}
-
-	/**
-	 * Clean data model
-	 * @name clean 
-	 * @param {object} model 
-	 * @param {type} force
-	 */
-	function clean(model, force)
-	{
-		if (!model.type || model.type === 'Page') {
-			model.type = 'Group';
-		}
-		if (model.version === 'wb2' && !force) {
-			return model;
-		}
-		var newModel = cleanInternal(model);
-		newModel.version = 'wb2';
-		return newModel;
-	}
-
-	service.cleanMap = cleanMap;
-	service.clean = clean;
-	service.cleanInternal = cleanInternal;
-	service.cleanStyle = cleanStyle;
-	service.cleanAlign = cleanAlign;
-	service.cleanSpace = cleanSpace;
-	service.cleanBorder = cleanBorder;
-	service.cleanBackground = cleanBackground;
-	service.cleanSize = cleanSize;
-	service.cleanLayout = cleanLayout;
-	service.cleanEvetns = cleanEvetns;
-
-	service.getTemplateFor = getTemplateFor;
-	service.getTemplateOf = getTemplateOf;
-	service.convertToGroupCss = convertToGroupCss;
-	service.convertToWidgetCss = convertToWidgetCss;
-	service.convertToWidgetCssLayout = convertToWidgetCssLayout;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Services
- * @name $widget
- * @description مدیریت ویجت‌های سیستم
- * 
- * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
- */
-.service('$widget', function(
-		$wbUtil, $rootScope,
-		$q, $compile, $controller, $mdTheming, $injector,
-		WidgetEditorFake) {
-
-
-	this.providers =  {};
-	var _group_repo = [];
-	var contentElementAsso = [];
-	var elementKey = [];
-	var service = this;
-
-	/**
-	 * List of all widget processor
-	 * 
-	 * A processor is a function which accepts widget and event then 
-	 * update widget based on the event. There are many predefined processor
-	 * such as style, microdata, and DND processors.
-	 * 
-	 * @memberof $widget
-	 */
-	var processors = {};
-
-	var notFoundWidget = {
-			template : '<div ng-show="wbEditable">Unsuported widget?!</div>',
-			label : 'Not found',
-			description : 'Element not found'
-	};
-	var container = {
-			type : 'Page',
-			label : 'Page',
-			description : 'Panel contains list of widgets.',
-			image : 'images/wb/content.svg'
-	};
-
-	function _group(groupId){
-		for(var i = 0; i < _group_repo.length; i++){
-			if(_group_repo[i].id === groupId){
-				return _group_repo[i];
-			}
-		}
-		var group = {
-				id: groupId
-		};
-		_group_repo.push(group);
-		return group;
-	}
-
-	function _newGroup(group){
-		var g = _group(group.id);
-		angular.extend(g, group);
-	}
-
-	function _groups(){
-		return _group_repo;
-	}
-
-	function _widget(model){
-		if (model.type in contentElementAsso) {
-			return contentElementAsso[model.type];
-		}
-		if (model.type === 'Page') {
-			return container;
-		}
-		return notFoundWidget;
-	}
-	/**
-	 * Finds a widget related to the input model.
-	 * 
-	 * Widget type is stored in the widget data model. This function get the
-	 * model type from the input data type and return related widget.
-	 * 
-	 * NotFoundElement widget is returned if the widget type is not found.
-	 * 
-	 * @memberof $widget
-	 * @param model to find a widget
-	 * @returns promise to find a widget
-	 */
-	function widget(model) {
-		return $q.when(_widget(model));
-	}
-
-	/**
-	 * Returns list of all registerd widgets.
-	 * 
-	 * @memberof $widget
-	 * @returns promise to load all widgets
-	 */
-	function widgets() {
-		var widgets = {};
-		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-		widgets.items = [];
-		elementKey.forEach(function(type) {
-			widgets.items.push(contentElementAsso[type]);
-		});
-		return $q.when(widgets);
-	}
-
-	/**
-	 * List of all registered widgets
-	 * 
-	 * @memberof $widget
-	 * @returns keys {array} list of all keys
-	 */
-	function getWidgetsKey(){
-		return elementKey;
-	}
-
-	/**
-	 * Registers new widget
-	 * 
-	 * The old widget will be override if a new widget with the same type is registered.
-	 * 
-	 * @See the following page for more information:
-	 * 
-	 *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
-	 *    
-	 * 
-	 * @memberof $widget
-	 * @param widget to add
-	 * @return the service
-	 */
-	function newWidget(widget) {
-		if (hasWidget(widget.type)) {
-			// TODO: maso, 2017: Add log for duplication
-		}
-		// fix widget data
-		widget.model = widget.model || {style:{}};
-		widget.model.type = widget.type;
-		widget.model.name = widget.model.name || widget.title; 
-
-		contentElementAsso[widget.type] = widget;
-		elementKey.push(widget.type);
-		return service;
-	}
-
-
-	function hasWidget(type) {
-		return type in contentElementAsso;
-	}
-	this.hasWidget = hasWidget;
-
-	/**
-	 * Compile element 
-	 * 
-	 * @name show
-	 * @memberof $widget
-	 * @param model
-	 *            {object}
-	 *            <ul>
-	 *            <li>templateUrl - {string=}: The URL of a template that will
-	 *            be used as the content of the dialog.</li>
-	 *            <li>template- {string=}: HTML template to show in the dialog.
-	 *            This must be trusted HTML with respect to Angular's $sce
-	 *            service. This template should never be constructed with any
-	 *            kind of user input or user data.</li>
-	 *            <li>contentElement:</li>
-	 *            <li>scope - {object=}: the scope to link the template
-	 *            controller to. If none is specified, it will create a new
-	 *            isolate scope. This scope will be destroyed when the dialog is
-	 *            removed unless preserveScope is set to true.</li>
-	 *            <li>controller - {function|string=}: The controller to
-	 *            associate with the dialog. The controller will be injected
-	 *            with the local $mdDialog, which passes along a scope for the
-	 *            dialog.</li>
-	 *            <li>controllerAs - {string=}: An alias to assign the
-	 *            controller to on the scope.</li>
-	 *            <li>parent - {element=}: The element to append the dialog to.
-	 *            Defaults to appending to the root element of the application.</li>
-	 *            </ul>
-	 * @param parentWidget
-	 *     {WbWidget} the parent
-	 * @param preElement {Element} pre build element
-	 * @return promise A promise that resolve created element
-	 */
-	function compile(model, parentWidget, preElement){
-		var widget = _widget(model);
-		var childScope = null;
-
-		// 1- create scope
-		var parentScope;
-		if(parentWidget){
-			parentScope = parentWidget.getScope();
-		} else {
-			// this is a root widget
-			parentScope = $rootScope;
-		}
-		childScope = parentScope.$new(false, parentScope);
-
-		// 2- create element
-		var service = this;
-		var gettingTemplatePromisse;
-		if(preElement){
-			gettingTemplatePromisse = $q.resolve(preElement);
-		} else {
-			gettingTemplatePromisse = $wbUtil.getTemplateFor(widget)
-			.then(function(template) {
-				// 3- bind controller
-				return angular.element(template);
-			});
-		}
-		return gettingTemplatePromisse.then(function(element){
-			// init widget
-			element.attr('dnd-disable-if','!ctrl.isEditable()');
-			element.attr('dnd-draggable','wbModel');
-			element.attr('dnd-type','wbModel.type');
-			element.attr('dnd-effect-allowed','copyMove');
-			element.attr('dnd-moved','ctrl.delete()');
-			element.attr('md-theme-watch','true');
-			if (model.type == 'Group'){
-				element.addClass('wb-group');
-				element.attr('dnd-list','wbModel.contents');
-				element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
-				element.attr('dnd-allowed-types','ctrl.getAllowedTypes()');
-				element.attr('dnd-external-sources','true');
-				element.attr('dnd-drop','ctrl.addChild(index, item)');
-				element.attr('dnd-horizontal-list','wbModel.style.layout.direction==="row"');
-			}else {
-				element.addClass('wb-widget');
-				element.attr('dnd-callback','1');
-			}
-			var link = $compile(element);
-			var ctrl = createWidgetController(widget, model, parentWidget, childScope, element, service.providers);
-
-			ctrl.setModel(model);
-			childScope[widget.controllerAs || 'ctrl'] = ctrl;
-
-			// bind ctrl
-			element.data('$ngControllerController', ctrl);
-			link(childScope);
-			$mdTheming(element);
-
-			// return widget
-			if(angular.isFunction(ctrl.initWidget)){
-				ctrl.initWidget();
-			}
-			return ctrl;
-		});
-	}
-
-	function createWidgetController(widget, model, parentWidget, childScope, element, providers){
-		var wlocals = _.merge({
-			$scope : childScope,
-			$element : element
-		}, providers);
-		var ctrl;
-		if (model.type !== 'Group') {
-			ctrl = $controller('WbWidgetCtrl', wlocals);
-		} else {
-			ctrl = $controller('WbWidgetGroupCtrl', wlocals);
-		}
-		ctrl.setParent(parentWidget);
-
-		// NOTE: can inject widget controller as WidgetCtrl
-		wlocals.WidgetCtrl = ctrl;
-		wlocals.$parent = parentWidget;
-		// extend element controller
-		if (angular.isDefined(widget.controller)) {
-			var wctrl = $controller(widget.controller, wlocals);
-			// extend the controller
-			angular.extend(ctrl, wctrl);
-		}
-		return ctrl;
-	}
-
-	/**
-	 * Creates new serialized data of widget
-	 * 
-	 * @memberof $widget
-	 * @param widget
-	 * @returns
-	 */
-	function widgetData(widget){
-		return angular.copy(widget.model);
-	}
-
-	// widgets
-	service.newWidget = newWidget;
-	service.widget = widget;
-	service.widgets = widgets;
-	service.widgetData = widgetData;
-	service.getWidgetsKey = getWidgetsKey;
-
-	// new api
-	service.getWidget = _widget;
-	service.getWidgets =  function(){
-		var widgets = {};
-		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-		widgets.items = [];
-		elementKey.forEach(function(type) {
-			widgets.items.push(contentElementAsso[type]);
-		});
-		return widgets;
-	};
-
-	// widget groups
-	service.group = _group;
-	service.groups = _groups;
-	service.newGroup = _newGroup;
-
-	// utils
-	service.compile = compile;
-
-	/**
-	 * Gets list of all children from the widget
-	 * 
-	 * The list is consist of all children and sub-children from the given 
-	 * widget.
-	 * 
-	 * @params widget {AbstractWidgetCtrl} the widget
-	 * @return List of widgets
-	 * @memberof $widget
-	 */
-	this.getChildren = function(widget) {
-		// Check if it is group
-		var widgets = [];
-		if(!angular.isDefined(widget) || widget.getType() !== 'Group') {
-			return widgets;
-		}
-
-		// load list of widgets
-		var groups = [];
-		groups.push(widget);
-		while(groups.length) {
-			widget = groups.pop();
-			var children = widget.getChildren();
-			for(var i = 0; i < children.length; i++) {
-				var child = children[i];
-				widgets.push(child);
-				if(child.getType() === 'Group') {
-					groups.push(child);
-				}
-			}
-		}
-
-		//return the list
-		return widgets;
-	};
-
-
-	this.addProvider = function(key, value) {
-		this.providers[key] = value;
-	};
-
-
-	// Returns a function, that, as long as it continues to be invoked, will not
-	// be triggered. The function will be called after it stops being called for
-	// N milliseconds. If `immediate` is passed, trigger the function on the
-	// leading edge, instead of the trailing.
-	this.debounce = function (func, wait, immediate) {
-		var timeout;
-		return function() {
-			var context = this;
-			var args = arguments;
-			var later = function() {
-				timeout = null;
-				if (!immediate) {
-					func.apply(context, args);
-				}
-			};
-			var callNow = immediate && !timeout;
-			clearTimeout(timeout);
-			timeout = setTimeout(later, wait);
-			if (callNow) {
-				func.apply(context, args);
-			}
-		};
-	};
-
-
-	/***********************************************Editors***************************************/
-	var editors = {};
-	var fakeEditor = new WidgetEditorFake();
-
-
-
-	/**
-	 * Set editor of a widgets
-	 * 
-	 * on double click editors are used to edit the widget.
-	 * 
-	 * @params type {string} type of the widget
-	 * @params editor {Editor} editor
-	 * @memberof $widget
-	 */
-	this.setEditor = function(type, editor){
-		editors[type] = editor;
-	};
-
-	/**
-	 * Find editor for the given widget
-	 * 
-	 * @params widget {WbWidget} the widget
-	 * @return the editor or fake editor
-	 * @memberof $widget
-	 */
-	this.getEditor = function(widget){
-		if(widget.$$wbEditor){
-			// return old editor
-			return widget.$$wbEditor;
-		}
-		if(editors[widget.getType()] == undefined){
-			return fakeEditor;
-		}
-		var register = editors[widget.getType()];
-		// create editor
-		var Editor = $injector.get(register.type);
-		var editor = new Editor(widget, register.options || {});
-		var ctrl = this;
-		widget.$$wbEditor = editor;
-		editor.on('destroy', function(){
-			ctrl.removeEditorFromList(editor);
-		});
-		return editor;
-	};
-
-//	this.getEditors = function(){};
-//	this.getActiveEditor = function(){};
-
-
-	/**
-	 * set a processor of the type
-	 * 
-	 * @memberof $widget
-	 */
-	this.setProcessor = function(type, processor){
-		processors[type] = processor;
-	};
-
-	/**
-	 * gets processor of the type
-	 * 
-	 * @memberof $widget
-	 */
-	this.getProcessor = function(type) {
-		return processors[type];
-	};
-
-	/**
-	 * gets list of processors
-	 * 
-	 * @memberof $widget
-	 */
-	this.getProcessors = function(){
-		return processors;
-	};
-
-
-	/**
-	 * Apply processor on the given widget
-	 * 
-	 * @memberof $widget
-	 */
-	this.applyProcessors = function(widget, event){
-		event = event || {};
-		angular.forEach(processors, function(processor){
-			try{
-				processor.apply(processor, [widget, event]);
-			} catch (ex){
-				console.error('Fail to run the processor');
-				console.error(ex);
-			}
-		});
-	}
-
+    'use strict';
+    var REGEX_BACKGROUND_IMAGE_SPEC = RegExp('(repeating\-)?(linear|radial)\-(gradient)');
+
+    var styleMap = [
+        //==============================================
+        // Text
+        //==============================================
+        {
+            cssKey: 'text-align',
+            key: 'text.align',
+            defaultValue: 'none'
+        },{
+            cssKey: 'text-align-last',
+            key: 'text.alignLast', 
+            defaultValue: 'auto'
+        },{
+            cssKey: 'text-decoration',
+            key: 'text.decoration',
+            defaultValue: 'none'
+        },{
+            cssKey: 'text-shadow',
+            key: 'text.shadow',
+            defaultValue: 'none'
+        },{
+            cssKey: 'text-transform',
+            key: 'text.transform',
+            defaultValue: 'none'
+        },{
+            cssKey: 'text-overflow',
+            key: 'text.overflow',
+            defaultValue: 'clip'
+        },{
+            cssKey: 'text-justify',
+            key: 'text.justify',
+            defaultValue: 'auto'
+        },{
+            cssKey: 'text-indent',
+            key: 'text.indent',
+            defaultValue: ''
+        },
+
+        //==============================================
+        // general
+        //==============================================
+        {
+            cssKey: 'padding',
+            key: 'padding', 
+            defaultValue: ''
+        },{
+            cssKey: 'margin',
+            key: 'margin', 
+            defaultValue: ''
+        },{
+            cssKey: 'direction',
+            key: 'direction', 
+            defaultValue: 'ltr'
+        },{
+            cssKey: 'color',
+            key: 'color', 
+            defaultValue: 'initial'
+        },{
+            cssKey: 'cursor',
+            key: 'cursor', 
+            defaultValue: 'auto'
+        },{
+            cssKey: 'opacity',
+            key: 'opacity', 
+            defaultValue: ''
+        },{
+            cssKey: 'overflow-x',
+            key: 'overflow.x', 
+            defaultValue: 'visible'
+        },{
+            cssKey: 'overflow-y',
+            key: 'overflow.y', 
+            defaultValue: 'visible'
+        }];
+
+    var service = this;
+
+    function cleanMap(oldStyle, newStyle, map) {
+        for (var i = 0; i < map.length; i++) {
+            if (oldStyle[map[i][0]]) {
+                newStyle[map[i][1]] = oldStyle[map[i][0]];
+                delete oldStyle[map[i][0]];
+            }
+        }
+    }
+
+    function getTemplateOf(page)
+    {
+        var template = page.template;
+        var templateUrl = page.templateUrl;
+        if (angular.isDefined(template)) {
+            if (angular.isFunction(template)) {
+                template = template(page.params | page);
+            }
+        } else if (angular.isDefined(templateUrl)) {
+            if (angular.isFunction(templateUrl)) {
+                templateUrl = templateUrl(page.params);
+            }
+            if (angular.isDefined(templateUrl)) {
+                page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+                template = $templateRequest(templateUrl);
+            }
+        }
+        return template;
+    }
+
+    /**
+     * Loading template of the page
+     * 
+     * @name getTemplateFor
+     * @memberof $wbUtil
+     * @param page
+     *            {object} properties of a page, widget , ..
+     * @return promise to load template on resolve.
+     */
+    function getTemplateFor(page)
+    {
+        return $q.when(getTemplateOf(page));
+    }
+
+    /**
+     * Converts data into a valid CSS attributes
+     */
+    function convertToGroupCss(style) {
+        var style = style || {};
+        var css = convertToWidgetCss(style);
+
+        if(style.visibility === 'hidden'){
+            css.display = 'none';
+        } else {
+            /*
+             * Group
+             * 
+             * check if is group apply flex flow
+             */
+            css.display = 'flex';
+            var layout = style.layout || {};
+            // row
+            if (layout.direction === 'row') {
+                css['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
+                if(!style.overflow){
+                    css['overflow-x'] = layout.wrap ? 'visible' : 'auto';
+                    css['overflow-y'] = 'visible';
+                }
+            } else {
+                css['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
+                if(!style.overflow){
+                    css['overflow-x'] = 'visible';
+                    css['overflow-y'] = layout.wrap ? 'visible' : 'auto';
+                }
+            }
+
+
+            // wrap
+            if (layout.wrap) {
+                css['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
+                // wrap align
+                var alignContent;
+                switch (layout.wrap_align) {
+                case 'start':
+                    alignContent = 'flex-start';
+                    break;
+                case 'end':
+                    alignContent = 'flex-end';
+                    break;
+                case 'center':
+                    alignContent = 'center';
+                    break;
+                case 'space-between':
+                    alignContent = 'space-between';
+                    break;
+                case 'space-around':
+                    alignContent = 'space-around';
+                    break;
+                case 'stretch':
+                    alignContent = 'stretch';
+                    break;
+                default:
+                    alignContent = 'stretch';
+                }
+                css['align-content'] = alignContent;
+            } else {
+                css['flex-wrap'] = 'nowrap';
+            }
+
+
+            // justify
+            var justify;
+            switch (layout.justify) {
+            case 'start':
+                justify = 'flex-start';
+                break;
+            case 'end':
+                justify = 'flex-end';
+                break;
+            case 'center':
+                justify = 'center';
+                break;
+            case 'space-between':
+                justify = 'space-between';
+                break;
+            case 'space-around':
+                justify = 'space-around';
+                break;
+            case 'space-evenly':
+                justify = 'space-evenly';
+                break;
+            default:
+                justify = 'flex-start';
+            }
+            css['justify-content'] = justify;
+
+            // align
+            var align;
+            switch (layout.align) {
+            case 'start':
+                align = 'flex-start';
+                break;
+            case 'end':
+                align = 'flex-end';
+                break;
+            case 'center':
+                align = 'center';
+                break;
+            case 'baseline':
+                align = 'baseline';
+                break;
+            case 'stretch':
+                align = 'stretch';
+                break;
+            default:
+                align = 'stretch';
+            }
+            css['align-items'] = align;
+        }
+
+        return css;
+    }
+
+    /**
+     * Converts data into a valid CSS attributes
+     */
+    function convertToWidgetCss(style) {
+        var style = style || {};
+        var css = {};
+
+        // layout
+        if(style.visibility === 'hidden'){
+            css.display = 'none';
+        } else {
+            css.display = '';
+        }
+
+        css = _.merge(css, 
+                // layout
+                convertToWidgetCssLayout(style.layout || {}),
+                // size
+                convertToWidgetCssSize(style.size || {}),
+                // background
+                convertToWidgetCssBackground(style.background || {}),
+                // border
+                convertToWidgetCssBoarder(style.border || {}),
+                // shadows
+                convertToWidgetCssShadows(style.shadows || {}),
+                // transform
+                convertToWidgetCssTransfrom(style.transform || {}));		
+
+        for(var i = 0; i < styleMap.length; i++){
+            var cssItem = styleMap[i];
+            var value = objectPath.get(style, cssItem.key) || cssItem.defaultValue;
+            objectPath.set(css, cssItem.cssKey, value);
+        }
+        return css;
+    }
+
+
+
+
+    function convertToWidgetCssTransfrom(transformOptions) {
+        var transform = '';
+
+        if(transformOptions.x){
+            var x = transformOptions.x;
+            if(x.rotate){
+                transform += ' rotateX('+x.rotate+')';
+            }
+            if(x.translate){
+                transform  += ' translateX('+x.translate+')';
+            }
+            if(x.scale){
+                transform += ' scaleX('+ x.scale+')';
+            }
+            if(x.skew){
+                transform += ' skewX('+ x.skew+')';
+            }
+        }
+        if(transformOptions.y){
+            var y = transformOptions.y;
+            if(y.rotate){
+                transform += ' rotateY('+y.rotate+')';
+            }
+            if(y.translate){
+                transform += ' translateY('+y.translate+')';
+            }
+            if(y.scale){
+                transform += ' scaleY('+y.scale+')';
+            }
+            if(y.skew){
+                transform += ' skewY('+y.skew+')';
+            }
+        }
+        if(transformOptions.z){
+            var z = transformOptions.z;
+            if(z.rotate){
+                transform += ' rotateZ('+z.rotate+')';
+            }
+            if(z.translate){
+                transform += ' translateZ('+z.translate+')';
+            }
+            if(z.scale){
+                transform += ' scaleZ('+z.scale+')';
+            }
+        }
+
+        if(transformOptions.perspective){
+            transform += ' perspective('+transformOptions.perspective+')';
+        }
+
+        if(!transform) {
+            return {
+                transform: 'none'
+            };
+        }
+
+        return {
+            transform: transform,
+            'transform-origin': transformOptions.origin || 'center',
+            'transform-style': transformOptions.style || 'flat'
+        };
+    };
+
+    function createShadowStr(shadow) {
+        var hShift = shadow.hShift || '0px';
+        var vShift = shadow.vShift || '0px';
+        var blur = shadow.blur || '0px';
+        var spread = shadow.spread || '0px';
+        var color = shadow.color || 'black';
+
+        var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
+
+        if(shadow.inset) {
+            boxShadow = boxShadow.concat(' ' + 'inset');
+        }
+
+        return boxShadow;
+    }
+
+    function convertToWidgetCssShadows(shadows) {
+        var shadowStr = '';
+
+        if (!angular.isArray(shadows) || shadows.length === 0) {
+            shadowStr = 'none';
+        } else {
+            angular.forEach(shadows, function (shadow, index) {
+                shadowStr += createShadowStr(shadow);
+                if(index + 1 < shadows.length){
+                    shadowStr += ', ';
+                }
+            });
+        }
+
+        return {
+            'box-shadow': shadowStr
+        };
+    }
+
+    function convertToWidgetCssBoarder(style) {
+        var conf = {};
+        if (style.style) {
+            conf['border-style'] = style.style;
+        }
+        if (style.width) {
+            conf['border-width'] = style.width;
+        }
+        if (style.color) {
+            conf['border-color'] = style.color;
+        }
+        if (style.radius) {
+            conf['border-radius'] = style.radius;
+        }
+
+        return conf;
+    }
+
+    function convertToWidgetCssBackground(style){
+        var cssValue = {};
+        if(style.background){
+            cssValue.background = style.background;
+            return;
+        }
+        // image
+        var image = 'none';
+        if(style.image){
+            if(REGEX_BACKGROUND_IMAGE_SPEC.test(style.image)){
+                image = style.image;
+            } else {
+                image = 'url(\''+style.image+'\')';
+            }
+        }
+
+        cssValue['background-image'] = image;
+        cssValue['background-color'] = style.color || 'initial';
+        cssValue['background-size'] = style.size || 'auto';
+        cssValue['background-repeat'] = style.repeat || 'repeat';
+        cssValue['background-position'] = style.position || '0px 0px';
+        cssValue['background-attachment'] = style.attachment || 'scroll';
+        cssValue['background-origin'] = style.origin || 'padding-box';
+        cssValue['background-clip'] = style.clip || 'border-box';
+
+        return cssValue;
+    }
+
+    /**
+     * Converts data into a layout CSS3
+     */
+    function convertToWidgetCssLayout(layout){
+        var flexLayout = {};
+        /*
+         * Widget
+         */
+        flexLayout.order = layout.order >= 0 ? layout.order : 0;
+        flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
+        flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
+        flexLayout['flex-basis'] = layout.basis || 'auto';
+
+        // align-self
+        // auto | flex-start | flex-end | center | baseline | stretch;
+        var alignSelf;
+        switch (layout.align_self) {
+        case 'start':
+            alignSelf = 'flex-start';
+            break;
+        case 'end':
+            alignSelf = 'flex-end';
+            break;
+        case 'center':
+            alignSelf = 'center';
+            break;
+        case 'baseline':
+            alignSelf = 'baseline';
+            break;
+        case 'stretch':
+            alignSelf = 'stretch';
+            break;
+        default:
+            alignSelf = 'auto';
+        }
+        flexLayout['align-self'] = alignSelf;
+
+        return flexLayout;
+    }
+
+    /*
+     * Convert size object to valid CSS size
+     */
+    function convertToWidgetCssSize(size) {
+        return {
+            'width': size.width || 'auto',
+            'min-width': size.minWidth || '0',
+            'max-width': size.maxWidth || 'none',
+
+            'height': size.height || 'auto',
+            'min-height': size.minHeight || '0',
+            'max-height': size.maxHeight || 'none',
+        };
+    }
+
+    function cleanEvetns(model)
+    {
+        // event
+        if (!model.event) {
+            model.event = {};
+        }
+
+        // load legecy events
+        if(model.event.failure){
+            model.event.error = model.event.failure;
+            delete model.event.failure;
+        }
+    }
+
+    function cleanLayout(model)
+    {
+        if (!model.style.layout) {
+            model.style.layout = {};
+        }
+        if (model.type === 'Group' || model.type === 'Page') {
+            // convert
+            var newStyle = model.style.layout;
+            var oldStyle = model.style;
+
+            if (oldStyle.flexDirection) {
+                if (oldStyle.flexDirection === 'wb-flex-row') {
+                    newStyle.direction = 'row';
+                } else {
+                    newStyle.direction = 'column';
+                }
+                delete oldStyle.flexDirection;
+            }
+            if (!newStyle.direction) {
+                newStyle.direction = 'column';
+            }
+
+            switch (oldStyle.flexAlignItem) {
+            case 'wb-flex-align-items-center':
+                newStyle.align = 'center';
+                break;
+            case 'wb-flex-align-items-end':
+                newStyle.align = 'end';
+                break;
+            case 'wb-flex-align-items-start':
+                newStyle.align = 'start';
+                break;
+            case 'wb-flex-align-items-stretch':
+                newStyle.align = 'stretch';
+                break;
+            default:
+                newStyle.align = 'stretch';
+            }
+            delete oldStyle.flexAlignItem;
+
+            switch (oldStyle.justifyContent) {
+            case 'wb-flex-justify-content-center':
+                newStyle.justify = 'center';
+                break;
+            case 'wb-flex-justify-content-end':
+                newStyle.justify = 'end';
+                break;
+            case 'wb-flex-justify-content-start':
+                newStyle.justify = 'start';
+                break;
+            case 'wb-flex-justify-content-space-between':
+                newStyle.justify = 'space-between';
+                break;
+            case 'wb-flex-justify-content-space-around':
+                newStyle.justify = 'space-around';
+                break;
+            default:
+                newStyle.justify = 'center';
+            }
+            delete oldStyle.justifyContent;
+        }
+    }
+
+    function cleanSize(model)
+    {
+        if (!model.style.size) {
+            model.style.size = {};
+        }
+        var newStyle = model.style.size;
+        var oldStyle = model.style;
+        var map = [['width', 'width'],
+            ['height', 'height']];
+        cleanMap(oldStyle, newStyle, map);
+    }
+
+    function cleanBackground(model)
+    {
+        if (!model.style.background) {
+            model.style.background = {};
+        }
+        var newStyle = model.style.background;
+        var oldStyle = model.style;
+        var map = [['backgroundImage', 'image'],
+            ['backgroundColor', 'color'],
+            ['backgroundSize', 'size'],
+            ['backgroundRepeat', 'repeat'],
+            ['backgroundPosition', 'position']];
+        cleanMap(oldStyle, newStyle, map);
+    }
+
+    function cleanBorder(model)
+    {
+        if (!model.style.border) {
+            model.style.border = {};
+        }
+        var oldStyle = model.style;
+        var newStyle = model.style.border;
+
+        if (oldStyle.borderRadius) {
+            if (oldStyle.borderRadius.uniform) {
+                newStyle.radius = oldStyle.borderRadius.all + 'px';
+            }
+            // TODO: maso, 2018: support other models
+        }
+        // delete old values
+        delete model.style.borderColor;
+        delete model.style.borderRadius;
+        delete model.style.borderStyleColorWidth;
+        delete model.style.borderStyle;
+        delete model.style.borderWidth;
+    }
+
+    function cleanSpace(model)
+    {
+        // Margin and padding
+        if (model.style.padding && angular.isObject(model.style.padding)) {
+            var padding = '';
+            if (model.style.padding.isUniform) {
+                padding = model.style.padding.uniform;
+            } else {
+                padding = model.style.padding.top || '0px' + ' ' +
+                model.style.padding.right || '0px' + ' ' +
+                model.style.padding.bottom || '0px' + ' ' +
+                model.style.padding.left || '0px' + ' ';
+            }
+            model.style.padding = padding;
+        }
+
+        if (model.style.margin && angular.isObject(model.style.margin)) {
+            var margin = '';
+            if (model.style.margin.isUniform) {
+                margin = model.style.margin.uniform;
+            } else {
+                margin = model.style.margin.top || '0px' + ' ' +
+                model.style.margin.right || '0px' + ' ' +
+                model.style.margin.bottom || '0px' + ' ' +
+                model.style.margin.left || '0px' + ' ';
+            }
+            model.style.margin = margin;
+        }
+
+    }
+
+    function cleanAlign(model)
+    {
+        if (!model.style.align) {
+            model.style.align = {};
+        }
+    }
+
+    function cleanStyle(model)
+    {
+        if (!angular.isObject(model.style)) {
+            model.style = {};
+        }
+        cleanLayout(model);
+        cleanSize(model);
+        cleanBackground(model);
+        cleanBorder(model);
+        cleanSpace(model);
+        cleanAlign(model);
+    }
+
+
+    function cleanType(model){
+        if(model.type === 'Link') {
+            model.type = 'a';
+            model.html = model.title;
+            model.href = model.url;
+            model.style.text = {
+                    align: 'center'
+            };
+            model.style.cursor = 'pointer';
+
+            delete model.title;
+            delete model.url;
+        }
+        if(model.type === 'Image'){
+            model.type = 'img';
+            model.src = model.url;
+
+            delete model.url;
+        }
+        if(model.type === 'HtmlText'){
+            model.html = model.text;
+            delete model.text;
+        }
+    }
+
+    function cleanInternal(model)
+    {
+        cleanEvetns(model);
+        cleanStyle(model);
+        if (model.type === 'Group' || model.type === 'Page') {
+            if (!model.children) {
+                model.children = [];
+            }
+            if (model.children.length) {
+                for (var i = 0; i < model.children.length; i++) {
+                    cleanInternal(model.children[i]);
+                }
+            }
+        }
+        cleanType(model);
+        return model;
+    }
+
+    /**
+     * Clean data model
+     * @name clean 
+     * @param {object} model 
+     * @param {type} force
+     */
+    function clean(model, force)
+    {
+        if (!model.type || model.type === 'Page') {
+            model.type = 'Group';
+        }
+        if (model.version === 'wb3' && !force) {
+            return model;
+        }
+        var newModel = cleanInternal(model);
+        newModel.version = 'wb3';
+        return newModel;
+    }
+
+    service.cleanMap = cleanMap;
+    service.clean = clean;
+    service.cleanInternal = cleanInternal;
+    service.cleanStyle = cleanStyle;
+    service.cleanAlign = cleanAlign;
+    service.cleanSpace = cleanSpace;
+    service.cleanBorder = cleanBorder;
+    service.cleanBackground = cleanBackground;
+    service.cleanSize = cleanSize;
+    service.cleanLayout = cleanLayout;
+    service.cleanEvetns = cleanEvetns;
+
+    service.getTemplateFor = getTemplateFor;
+    service.getTemplateOf = getTemplateOf;
+    service.convertToGroupCss = convertToGroupCss;
+    service.convertToWidgetCss = convertToWidgetCss;
+    service.convertToWidgetCssLayout = convertToWidgetCssLayout;
 });
 
 /* 
@@ -20182,6 +13330,9003 @@ angular.module('am-wb-core')
     return currentWindow;
 });
 
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name WbSettingPageCtrl
+ * @description Manages settings page
+ * 
+ * Manages settings pages.
+ * 
+ * This is an abstract implementation of a setting page and contains list of 
+ * utilities.
+ * 
+ */
+.controller('WbSettingPageCtrl', function () {
+    /*
+     * Attributes
+     */
+    this.widget = null;
+    this.attributes = [];
+    this.attributesValue = {};
+    this.styles = [];
+    this.stylesValue = {};
+    this.callbacks = {
+            widgetChanged: []
+    };
+
+    /********************************************************
+     * Widget management
+     ********************************************************/
+    /**
+     * Sets new widget into the setting page
+     * 
+     * Note: the old widget will be removed from the view and the
+     * new one is connect.
+     * 
+     * @memberof WbSettingPageCtrl
+     * @param widget {Widget} to track
+     */
+    this.setWidget = function (widget) {
+        var oldWidget = this.widget;
+        this.disconnect();
+        this.widget = widget;
+        this.connect();
+        // load values
+        this.loadAttributes();
+        this.loadStyles();
+        // propagate the change
+        this.fire('widgetChanged', {
+            value: widget,
+            oldValue: oldWidget
+        });
+    };
+
+    /**
+     * Gets the current widget 
+     * 
+     * @memberof WbSettingPageCtrl
+     * @return the current widget
+     */
+    this.getWidget = function () {
+        return this.widget;
+    };
+
+    /**
+     * Checks if the current widget is the root
+     * 
+     * @memberof WbSettingPageCtrl
+     * @return true if the widget is root
+     */
+    this.isRootWidget = function () {
+        var widget = this.getWidget();
+        if (!widget) {
+            return false;
+        }
+        return widget.isRoot();
+    };
+
+    /**
+     * Checks if the current widget can contain others
+     * 
+     * @memberof WbSettingPageCtrl
+     * @return true if the widget is a container
+     */
+    this.isContainerWidget = function(){
+        var widget = this.getWidget();
+        if (!widget) {
+            return false;
+        }
+        return !widget.isLeaf();
+    };
+
+    /**
+     * Removes listeners to the widget
+     * 
+     * The controller track the widget changes by adding listener into it. This
+     * function removes all listener.
+     * 
+     * @memberof WbSettingPageCtrl
+     */
+    this.disconnect = function(){
+        var widget = this.getWidget();
+        if(_.isEmpty(widget) || !_.isFunction(this.widgetListener)){
+            return;
+        }
+        widget.off('modelUpdated', this.widgetListener);
+    };
+
+    /**
+     * Adds listeners to the widget
+     * 
+     * @memberof WbSettingPageCtrl
+     */
+    this.connect= function(){
+        var widget = this.getWidget();
+        if(_.isEmpty(widget)){
+            return;
+        }
+        if(_.isEmpty(this.widgetListener)){
+            var ctrl = this;
+            this.widgetListener = function($event) {
+                var widget = ctrl.widget;
+                if($event.type === 'modelUpdated'){
+                    var key = $event.key;
+                    // load property
+                    if(_.includes(ctrl.attributes, key)){
+                        ctrl.attributesValue[key] = widget.getModelProperty(key);
+                        return;
+                    }
+                    
+                    // load style
+                    if(key.startsWith('style.')){
+                        var styleKey =  key.substring(6);
+                        if(_.includes(ctrl.styles, styleKey)){
+                            ctrl.stylesValue[styleKey] = widget.getModelProperty(key);
+                        }
+                        return;
+                    }
+                }
+            };
+        }
+        widget.on('modelUpdated', this.widgetListener);
+    };
+
+    /*
+     * INTERNAL
+     */
+    this.fire = function (key, event){
+        _.forEach(this.callbacks[key], function(callback){
+            try{
+                callback.apply(callback, [event]);
+            } catch(ex){
+                console.error(ex);
+            }
+        });
+    };
+
+    /**
+     * Adds listeners to the widget
+     * 
+     * @memberof WbSettingPageCtrl
+     * @param key {string} of the event
+     * @param callback {Function} to call on event
+     */
+    this.on = function(key, callback){
+        this.callbacks[key].push(callback);
+    };
+
+    /**
+     * Adds listeners to the widget
+     * 
+     * @memberof WbSettingPageCtrl
+     * @param key {string} of the event
+     * @param callback {Function} to call on event
+     */
+    this.off = function(key, callback) {
+        _.remove(this.callbacks[key], function(cl){
+            return cl === callback;
+        });
+    };
+
+    /***************************************************************
+     * Track widget changes
+     ***************************************************************/
+
+    /*
+     * INTERNAL
+     */
+    this.loadAttributes= function(){
+        // 0- clean
+        this.attributesValue = {};
+
+        // 1- check
+        var widget = this.getWidget();
+        if(_.isEmpty(widget)){
+            return;
+        }
+
+        // 2- load
+        var ctrl = this;
+        var widget = this.widget;
+        _.forEach(this.attributes, function(attrKey){
+            ctrl.attributesValue[attrKey] = widget.getModelProperty(attrKey);
+        });
+    };
+
+    /*
+     * INTERNAL
+     */
+    this.loadStyles= function(){
+        // 0- clean
+        this.stylesValue = {};
+
+        // 1- check
+        var widget = this.getWidget();
+        if(_.isEmpty(widget)){
+            return;
+        }
+
+        // 2- load
+        var ctrl = this;
+        _.forEach(this.styles, function(styleKey){
+            ctrl.stylesValue[styleKey] = widget.getModelProperty('style.'+styleKey);
+        });
+    };
+    /***************************************************************
+     * attribute utilities
+     ***************************************************************/
+    /**
+     * Adds list of attributes to track
+     * 
+     * @memberof WbSettingPageCtrl
+     * @param attributes {[string]} to track
+     */
+    this.trackAttributes = function(attributes){
+        this.attributes = attributes || [];
+        this.loadAttributes();
+    };
+
+    this.setAttribute = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.attributesValue[key] = value;
+        this.widget.setModelProperty(key, value);
+    };
+
+    this.getAttribute = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty(key);
+    };
+    /***************************************************************
+     * style utilities
+     ***************************************************************/
+    /**
+     * Adds list of styles to track
+     * 
+     * @memberof WbSettingPageCtrl
+     * @param styles {[string]} to track
+     */
+    this.trackStyles = function(styles){
+        this.styles = styles || [];
+        this.loadStyles();
+    };
+    
+    this.setStyle = function (key, value) {
+        if (!this.widget) {
+            return;
+        }
+        this.stylesValue[key] = value;
+        this.widget.setModelProperty('style.' + key, value);
+    };
+
+    this.getStyle = function (key) {
+        if (!this.widget) {
+            return;
+        }
+        return this.widget.getModelProperty('style.' + key);
+    };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name WbSettingStyleAnimationCtrl
+ * @description Manage style animations
+ * 
+ */
+.controller('WbSettingStyleAnimationCtrl', function () {
+	
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name WbSettingStyleBackgroundCtrl
+ * @description Manage general settings of a widget
+ * 
+ *  This controller controls the background attribute. If the user choose an image for 
+ * the background then sets a default values to the background property. These values are used to show 
+ * the image in a suitable form; and if the user remove the background image then remove those values 
+ * from the background.
+ * 
+ */
+.controller('WbSettingStyleBackgroundCtrl', function () {
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name WbSettingStyleBorderCtrl
+ * @description Manage Widget img 
+ * 
+ */
+.controller('WbSettingStyleBorderCtrl', function () {
+	
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name WbSettingStyleGeneralCtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
+ * 
+ */
+.controller('WbSettingStyleGeneralCtrl', function () {
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * 
+ * @ngdoc Widget Settings
+ * @name WbSettingStyleLayoutCtrl
+ * @description Manages element layout
+ * 
+ * Layout is consists of the following attributes for a group:
+ * 
+ * <ul>
+ *     <li>direction</li>
+ *     <li>direction-inverse</li>
+ *     <li>wrap</li>
+ *     <li>wrap-inverse</li>
+ *     <li>align</li>
+ *     <li>justify</li>
+ * </ul>
+ * 
+ * and following ones for a widget (or group):
+ * 
+ * <ul>
+ *     <li>grow</li>
+ *     <li>shrink</li>
+ *     <li>order</li>
+ * </ul>
+ * 
+ * See the layout documents for more details.
+ * 
+ * @see wb-layout
+ */
+.controller('WbSettingStyleLayoutCtrl', function ($scope, $element) {
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name WbSettingStyleMediaCtrl
+ * @description Edit text style of a widget
+ * 
+ */
+.controller('WbSettingStyleMediaCtrl', function () {
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name WbSettingStyleSizeCtrl
+ * @description Manage Widget 
+ * 
+ */
+.controller('WbSettingStyleSizeCtrl', function () {
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name WbSettingStyleTextCtrl
+ * @description Edit text style of a widget
+ * 
+ */
+.controller('WbSettingStyleTextCtrl', function () {
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name MbSettingACtrl
+ * @description Manage Widget A 
+ * 
+ */
+.controller('MbSettingACtrl', function () {
+	
+	var attrs = [
+		// id
+		'download',
+		'href',
+		'hreflang',
+		'media',
+		'ping',
+		'referrerpolicy',
+		'rel',
+		'target',
+		'type',
+		];
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		/*
+		 * Load data of the widget
+		 */
+		var ctrl = this;
+		angular.forEach(attrs, function(attr){
+			ctrl[attr] = ctrl.getProperty(attr);
+		});
+	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Settings
+ * @name WbSettingGeneralCtrl
+ * @description Manage Widget general attributes
+ * 
+ */
+.controller('WbSettingGeneralCtrl', function () {
+    'use strict';
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackAttributes([
+            'id',  
+            'accesskey', 
+            'title',   
+            'name',
+            'tabindex',  
+            'class',  
+            'hidden',  
+            'contenteditable', 
+            'draggable',   
+            'dropzone',
+            'dir', 
+            'lang',
+            'spellcheck',   
+            'translate',  
+            ]);
+    };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name MbSettingImgCtrl
+ * @description Manage Widget img 
+ * 
+ */
+.controller('MbSettingImgCtrl', function () {
+	
+	var attrs = [
+		// id
+		'alg',
+		'crossorigin',
+		'height',
+		'ismap',
+		'longdesc',
+		'src',
+		'srcset',
+		'usemap',
+		'width',
+		];
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		/*
+		 * Load data of the widget
+		 */
+		var ctrl = this;
+		angular.forEach(attrs, function(attr){
+			ctrl[attr] = ctrl.getProperty(attr);
+		});
+	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name WbSettingWidgetMicrodataCtrl
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
+ * 
+ */
+.controller('WbSettingWidgetMicrodataCtrl', function () {
+	var attrs = [
+		'itemscope',
+		'itemtype',
+		'itemprop',
+		'itemid',
+		'itemref',
+		// extra attributes
+		'value',
+		'content',
+		];
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		/*
+		 * Load data of the widget
+		 */
+		var ctrl = this;
+		angular.forEach(attrs, function(attr){
+			ctrl[attr] = ctrl.getProperty(attr);
+		});
+	};
+
+
+
+//	/*
+//	* Supported Schema Types:
+//	* Article, Book, Image, Person, Product, Service, Text, Thing, WebPage
+//	*/
+//	this.schemaTypes = [
+//	{
+//	key: 'Article',
+//	value: 'http://schema.org/Article'
+
+//	}, {
+//	key: 'Book',
+//	value: 'http://schema.org/Book'
+
+//	}, {
+//	key: 'Image',
+//	value: 'http://schema.org/ImageObject'
+
+//	}, {
+//	key: 'Movie',
+//	value: 'http://schema.org/Movie'
+//	}, {
+//	key: 'Person',
+//	value: 'http://schema.org/Person'
+//	}, {
+//	key: 'Product',
+//	value: 'http://schema.org/Product'
+
+//	}, {
+//	key: 'Service',
+//	value: 'http://schema.org/Service'
+
+//	}, {
+//	key: 'Text',
+//	value: 'http://schema.org/Text'
+//	}, {
+//	key: 'Thing',
+//	value: 'http://schema.org/Thing'
+//	}, {
+//	key: 'WebPage',
+//	value: 'http://schema.org/WebPage'
+
+//	}
+//	];
+
+//	this.getParentCategory = function () {
+//	var widget = this.getWidget();
+//	while (!widget.isRoot() && !widget.getModelProperty('category')) {
+//	widget = widget.getParent();
+//	}
+//	this.parentCategory = widget.getModelProperty('category');
+//	};
+
+//	this.setProperties = function () {
+//	if (!this.parentCategory) {
+//	this.alert = 'No parent type is defined.';
+//	} else {
+//	this.setType(this.parentCategory);
+//	}
+//	};
+
+//	this.setType = function (type) {
+//	switch (type) {
+//	case 'http://schema.org/Article':
+//	this.properties =
+//	[
+//	'articleBody', 'articleSection', 'about', 'author', 'comment',
+//	'commentCount', 'contributor', 'creator', 'description', 'editor',
+//	'genre', 'headline', 'keywords', 'publisher', 'text', 'translator',
+//	'video'
+//	];
+//	break;
+
+//	case 'http://schema.org/Book':
+//	this.properties =
+//	[
+//	'about', 'author', 'bookFormat', 'comment', 'creator', 'genre',
+//	'headline', 'image', 'keywords', 'name', 'publisher', 'text',
+//	'translator', 'video'
+//	];
+//	break;
+
+//	case 'http://schema.org/Image':
+//	this.properties =
+//	[
+//	'about', 'description', 'caption', 'comment', 'thumbnail',
+//	'keywords', 'image', 'name', 'url'
+//	];
+//	break;
+
+//	case 'http://schema.org/Movie':
+//	this.properties =
+//	[
+//	'about', 'actor', 'comment', 'commentCount', 'copyrightYear',
+//	'countryOfOrigin', 'creator', 'dateCreated', 'description',
+//	'director', 'duration', 'genre', 'headline', 'isBasedOn',
+//	'image', 'keywords', 'musicBy', 'name', 'provider', 'productionCompany',
+//	'sponsor', 'subtitleLanguage', 'text', 'thumbnailUrl', 'trailer'
+//	];
+//	break;
+
+//	case 'http://schema.org/Person':
+//	this.properties =
+//	[
+//	'additionalName', 'address', 'birthDate', 'birthPlace',
+//	'children', 'deathDate', 'daethPlace', 'email', 'familyName',
+//	'gender', 'homeLocation', 'parent', 'telephone', 'description',
+//	'image', 'spouse'
+//	];
+//	break;
+
+//	case 'http://schema.org/Product':
+//	this.properties =
+//	[
+//	'brand', 'category', 'color', 'description', 'height',
+//	'isConsumableFor', 'genre', 'headline', 'image', 'name'
+//	];
+//	break;
+
+//	case 'http://schema.org/Service':
+//	this.properties =
+//	[
+//	'areaServed', 'brand', 'category', 'logo', 'serviceType',
+//	'description', 'image', 'name'
+//	];
+//	break;
+
+//	case 'http://schema.org/Thing':
+//	this.properties = ['description', 'image', 'name'];
+//	break;
+
+//	case 'http://schema.org/Text':
+//	this.properties = ['description', 'image', 'keywords', 'name'];
+//	break;
+
+//	case 'http://schema.org/WebPage':
+//	this.properties =
+//	[
+//	'about', 'author', 'comment', 'description', 'image', 'headline',
+//	'keywords', 'commentCount', 'mainContentOfPage', 'primaryImageOfPage',
+//	'video'
+//	];
+//	break;
+//	}
+//	};
+
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Converter
+ * @name WbConverter
+ * @description Widget converter
+ * 
+ * A converter are responsible to encode and decode a widget.
+ * 
+ */
+.factory('WbConverterAbstract', function () {
+    'use strict';
+
+    /**
+     * Creates new instance of the converter
+     * 
+     * @memberof WbConverter
+     */
+    function Converter(mimetype){
+        this.mimetype = mimetype || 'text/plain';
+    };
+    
+    /**
+     * Convert widgets into data
+     * 
+     * @param widget {Widget} to convert
+     * @return string of data
+     * @memberof WbConverter
+     */
+    Converter.prototype.encode = function(){};
+    
+    /**
+     * Converts the input data into list of widgets
+     * 
+     * @param data {string} to convert
+     * @returns list of widgets
+     * @memberof WbConverter
+     */
+    Converter.prototype.decode = function(){};
+    
+    /**
+     * Get the data mimetype
+     * 
+     * When widgets are converted into data, then the data can transfer anywhere, but
+     * data type is very important to recover. 
+     * 
+     * @memberof WbConverter
+     */
+    Converter.prototype.getMimetype = function(){
+        return this.mimetype;
+    };
+
+    /**
+     * Sets the data mimetype
+     * 
+     * NOTE: this is not global
+     * 
+     * @memberof WbConverter
+     */
+    Converter.prototype.setMimetype = function(mimetype){
+        this.mimetype = mimetype;
+    };
+    
+    return Converter;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Converter
+ * @name WbConverterDom
+ * @description Widget converter
+ * 
+ * A converter are responsible to encode and decode a widget.
+ * 
+ */
+.factory('WbConverterDom', function (WbConverterAbstract, $widget) {
+    'use strict';
+    function cssNameToJsName(name)
+    {
+        var split = name.split("-");
+        var output = "";
+        for(var i = 0; i < split.length; i++)
+        {
+            if (i > 0 && split[i].length > 0 && !(i == 1 && split[i] == "ms"))
+            {
+                split[i] = split[i].substr(0, 1).toUpperCase() + split[i].substr(1);
+            }
+            output += split[i];
+        }
+        return output;
+    }
+
+    function convertElementToModel(element){
+        var name = element.tagName;
+        if(!name){
+            return null;
+        }
+        name = name.toLowerCase();
+        if(!$widget.hasWidget(name)){
+            return null;
+        }
+        var model = {
+                style:{}
+        };
+        model.type = name;
+        // attributes
+        _.forEach(element.attributes, function(attr){
+            if(attr.name !== 'style'){
+                model[attr.name] = attr.value;
+            }
+        })
+        //style
+        for(var i = 0; i < element.style.length; i++){
+            var sname = element.style.item(i);
+            model.style[cssNameToJsName(sname)] = element.style.getPropertyValue(sname);
+        }
+        // html
+        if($widget.isWidgetLeaf(name)){
+            model['html'] = element.innerHTML;
+        } else {
+            model.children = [];
+            _.forEach(element.children, function(childelement){
+                model.children.push(convertElementToModel(childelement));
+            })
+        }
+        return model;
+    }
+
+    function Converter(){
+        WbConverterAbstract.apply(this, ['text/html']);
+    };
+    Converter.prototype = new WbConverterAbstract();
+
+    Converter.prototype.encode = function(){
+        var widgets = Array.prototype.slice.call(arguments) || [];
+        var data = '';
+        while(widgets.length){
+            var widget = widgets.pop();
+            data += widget.getElement().prop('outerHTML'); + '\n';
+        }
+        return data;
+    };
+
+    Converter.prototype.decode = function(data){
+        var widgets = [];
+        try{
+            var element = angular.element(data);
+            for(var i = 0; i < element.length; i++){
+                var model = convertElementToModel(element[i]);
+                if(model){
+                    widgets.push(model);
+                }
+            }
+        } catch(ex){
+            console.error(ex);
+        }
+        return widgets;
+    };
+
+
+    return Converter;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Converter
+ * @name WbConverter
+ * @description Widget converter
+ * 
+ * A converter are responsible to encode and decode a widget.
+ * 
+ */
+.factory('WbConverterText', function (WbConverterAbstract) {
+    'use strict';
+
+    function Converter(){
+        WbConverterAbstract.apply(this, ['text/plain']);
+    };
+    Converter.prototype = new WbConverterAbstract();
+
+    Converter.prototype.encode = function(){
+        var widgets = Array.prototype.slice.call(arguments) || [];
+        var data = '';
+        while(widgets.length){
+            var widget = widgets.pop();
+            if(widget.isLeaf()){
+                if(widget.html){
+                    data += widget.html() + '\n';
+                }
+            } else {
+                widgets.push.apply(widgets, widget.getChildren());
+            }
+        }
+        return data;
+    };
+
+    Converter.prototype.decode = function(data){
+        var widgets = [];
+        data = data.split('\n');
+        _.forEach(data, function(item){
+            item = _.trim(item);
+            if(item.length){ 
+                widgets.push({
+                    type: 'p',
+                    html: item
+                });
+            }
+        });
+        return widgets;
+    };
+
+
+    return Converter;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Converter
+ * @name WbConverterWeburger
+ * @description Widget converter
+ * 
+ * A converter are responsible to encode and decode a widget.
+ * 
+ */
+.factory('WbConverterWeburger', function (WbConverterAbstract, $widget) {
+    'use strict';
+
+    function Converter(){
+        WbConverterAbstract.apply(this, ['application/json']);
+    };
+    Converter.prototype = new WbConverterAbstract();
+
+    Converter.prototype.encode = function(){
+        var widgets = Array.prototype.slice.call(arguments) || [];
+        if(widgets.length === 1){
+            return JSON.stringify(widgets[0].getModel());
+        }
+        var models = [];
+        _.forEach(widgets, function(widget){
+            models.push(widget.getModel());
+        });
+        return JSON.stringify(models);
+    };
+
+    Converter.prototype.decode = function(data){
+        var widgets = [];
+        try{
+            var model = JSON.parse(data);
+            if(angular.isArray(model)){
+                widgets = model;
+            } else {
+                widgets = [];
+                widgets.push(model);
+            }
+            // TODO: clean each item
+        } catch(ex){
+            // TODO:
+        }
+        return widgets;
+    };
+
+
+    return Converter;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name WidgetEditorFake
+ * @description Editor of a widget
+ * 
+ */
+
+.factory('WidgetEditorCode', function ($resource, WidgetEditor) {
+
+    /**
+     * TODO: maso, 2019: extends WidgetEditorFake
+     * 
+     * Creates new instace of an editor
+     */
+    function editor(widget, options) {
+        options = options || {};
+        WidgetEditor.apply(this, [widget, options]);
+    }
+    
+    editor.prototype = new WidgetEditor();
+
+
+    editor.prototype.setActive = function(){}; 
+    editor.prototype.isActive = function(){};
+    editor.prototype.save = function(){};
+    editor.prototype.hide = function(){};
+    editor.prototype.show = function(){
+        var ctrl = this;
+        $resource.get('code', {
+            data: {
+                code: ctrl.widget.html(),
+                languages: [{
+                    text: 'HTML/XML',
+                    value: 'markup'
+                },
+                {
+                    text: 'JavaScript',
+                    value: 'javascript'
+                },
+                {
+                    text: 'CSS',
+                    value: 'css'
+                }]
+            }
+        })
+        .then(function(value){
+            ctrl.widget.html(value.code);
+        });
+    };
+    editor.prototype.isHidden = function(){};
+    
+//  the editor type
+    return editor;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name WidgetEditorFake
+ * @description Editor of a widget
+ * 
+ */
+
+.factory('WidgetEditorDeprecated', function ($window, WidgetEditor) {
+
+    /**
+     * TODO: maso, 2019: extends WidgetEditorFake
+     * 
+     * Creates new instace of an editor
+     */
+    function editor(widget, options) {
+        options = options || {};
+        WidgetEditor.apply(this, [widget, options]);
+    }
+    editor.prototype = Object.create(WidgetEditor.prototype);
+
+
+    editor.prototype.setActive = function(){}; 
+    editor.prototype.isActive = function(){};
+    editor.prototype.save = function(){};
+    editor.prototype.hide = function(){};
+    editor.prototype.show = function(){
+        $window.alert('This widget type is deprecated. This will be removed in the next major version.')
+    };
+    editor.prototype.isHidden = function(){};
+    
+//  the editor type
+    return editor;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name WidgetEditorFake
+ * @description Editor of a widget
+ * 
+ */
+
+
+
+.factory('WidgetEditorFake', function () {
+
+    /**
+     * TODO: maso, 2019: extends WidgetEditorFake
+     * 
+     * Creates new instace of an editor
+     */
+    function editor() {}
+    
+    editor.prototype.destroy = function(){};
+    editor.prototype.fire = function(){}; // internal
+    editor.prototype.setActive = function(){}; // focus|skipFocuse
+    editor.prototype.isActive = function(){};
+    editor.prototype.getWidget = function(){};
+    editor.prototype.setDirty = function(){};
+    editor.prototype.isDirty = function(){};
+    editor.prototype.save = function(){};
+    editor.prototype.hide = function(){};
+    editor.prototype.show = function(){};
+    editor.prototype.isHidden = function(){};
+    editor.prototype.Off = function(){};
+    editor.prototype.On = function(){};
+
+    // the editor type
+    return editor;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name WidgetEditorFake
+ * @description Editor of a widget
+ * 
+ */
+
+.factory('WidgetEditorTinymce', function ($sce, WidgetEditor) {
+
+    /**
+     * TODO: maso, 2019: extends WidgetEditorFake
+     * 
+     * Creates new instace of an editor
+     */
+    function editor(widget, options) {
+        options = options || {};
+        WidgetEditor.apply(this, [widget, options]);
+    }
+    
+    editor.prototype = new WidgetEditor();
+
+    /**
+     * remove all resources
+     * 
+     * @memberof WidgetEditorTinymce
+     */
+    editor.prototype.destroy = function () {
+        this.hide();
+        WidgetEditor.prototype.destroy.call(this);
+    };
+    
+    /**
+     * Remove editor
+     */
+    editor.prototype.hide = function () {
+        if (this.isHidden()) {
+            return;
+        }
+        this._hide = true;
+        // remove editor
+        if(this.isDirty()){
+            this.widget.setModelProperty(this.options.property, this._content);
+        }
+        tinymce.remove(this.widget.getElement().getPath())
+    };
+
+    /**
+     * Run and display editor for the current widget
+     */
+    editor.prototype.show = function () {
+        this._hide = false;
+        var ctrl = this;
+        var widget = this.getWidget();
+        var element = widget.getElement();
+        var selectorPath = element.getPath();
+        tinymce.init(_.merge(this.options, {
+            selector : selectorPath,
+            themes : 'modern',
+            setup: function (editor) {
+                editor.on('keydown', function(e) {
+                    if (e.keyCode === 27) { // escape
+                        ctrl.closeWithoutSave();
+                    }
+                    if (e.keyCode === 13){
+                        ctrl.saveAndClose();
+                    }
+                });
+                
+                editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
+                	event.stopPropagation();
+                	editor.save();
+                });
+
+                // Update model when:
+                // - a button has been clicked [ExecCommand]
+                // - the editor content has been modified [change]
+                // - the node has changed [NodeChange]
+                // - an object has been resized (table, image) [ObjectResized]
+                editor.on('ExecCommand change NodeChange ObjectResized', function() {
+                    editor.save();
+                    ctrl.updateView(editor);
+                    return;
+                });
+            }
+        }))
+        .then(function () {
+            element.focus();
+        });
+    };
+
+    editor.prototype.isHidden = function () {
+        return this._hide;
+    };
+
+    /**
+     * Read value from element and set into the element
+     */
+    editor.prototype.updateView = function (editor) {
+        var content = editor.getContent({
+            format : this.options.format || 'html'
+        }).trim();
+        this._content = content;
+        this.setDirty(true);
+    };
+
+    
+    editor.prototype.closeWithoutSave = function(){
+        this.setDirty(false);
+        this.hide();
+        // reset old value
+        var widget = this.widget;
+        widget.fire('modelUpdated', {
+            key: this.options.property,
+            oldValue: '',
+            value: this.widget.getModelProperty(this.options.property)
+        });
+    }
+    
+    editor.prototype.saveAndClose = function(){
+        this.hide();
+    }
+    
+//  the editor type
+    return editor;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name WidgetEditor
+ * @description Editor of a widget
+ * 
+ * 
+ * ## Events
+ * 
+ * - Click    native  Fires when the editor is clicked.
+ * - DblClick    native  Fires when the editor is double-clicked.
+ * - MouseDown   native  Fires when the mouse button is pressed down inside the editor.
+ * - MouseUp native  Fires when a mouse button is released inside the editor.
+ * - MouseMove   native  Fires when the mouse is moved within the editor.
+ * - MouseOver   native  Fires when a new element is being hovered within the editor.
+ * - MouseOut    native  Fires when an element is no longer being hovered within the editor.
+ * - MouseEnter  native  Fires when the mouse enters the editor.
+ * - MouseLeave  native  Fires when the mouse leaves the editor.
+ * - KeyDown native  Fires when a key is pressed within the editor.
+ * - KeyPress    native  Fires when a key is pressed within the editor.
+ * - KeyUp   native  Fires when a key is released within the editor.
+ * - ContextMenu native  Fires when the context menu is invoked within the editor.
+ * - Paste   native  Fires when a paste is done within the editor.
+ * - Init    core    Fires when the editor is initialized.
+ * - Focus   core    Fires when the editor is focused.
+ * - Blur    core    Fires when the editor is blurred.
+ * - BeforeSetContent    core    Fires before the content is set to the editor.
+ * - SetContent  core    Fires after the content is set to the editor.
+ * - GetContent  core    Fires after the content is extracted from the editor.
+ * - PreProcess  core    Fires when the contents in the editor are being serialized.
+ * - PostProcess core    Fires when the contents in the editor are being serialized.
+ * - NodeChange  core    Fires when selection inside the editor is changed.
+ * - Undo    core    Fires when the contents have been reverted to a previous state.
+ * - Redo    core    Fires to revert the effects of an Undo event.
+ * - Change  core    Fires when undo level is added to the editor.
+ * - Dirty   core    Fires when editor contents are being considered dirty.
+ * - Remove  core    Fires when the editor is removed.
+ * - ExecCommand core    Fires after a command has been executed.
+ * - PastePreProcess paste   Fires when contents are pasted into the editor.
+ * - PastePostProcess    paste   Fires when contents are pasted into the editor.
+ */
+
+
+
+.factory('WidgetEditor', function () {
+
+    /**
+     * Creates new instace of an editor
+     */
+    function widgetEditor(widget, options) {
+        this.callbacks = [];
+        this.widget = widget;
+        this.options = options;
+    }
+
+    /**
+     * Remove all resources
+     * 
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.destroy = function(){
+        this.callbacks = [];
+        delete this.widget;
+        delete this.options;
+    };
+
+    /**
+     * Get the widget of the editor
+     * 
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.getWidget = function(){
+        return this.widget;
+    };
+
+    /**
+     * Set the widget as dirty widget
+     * 
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.setDirty = function(dirty){
+        if(typeof(dirty) !== 'undefined'){
+            this.dirty = dirty;
+        } else {
+            this.dirty = true;
+        }
+    };
+
+    /**
+     * Check if the widget is dirty
+     * 
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.isDirty = function(){
+        return this.dirty;
+    };
+
+    /**
+     * Remove callbak from specific type
+     * 
+     * @param type {string} the event name
+     * @param callback {function} the function
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.off = function(type, callback){
+        if (!angular.isArray(this.callbacks[type])) {
+            return;
+        }
+        var callbacks = this.callbacks[type];
+        var index = callbacks.indexOf(callback);
+        if (index > -1) {
+            callbacks.splice(index, 1);
+        }
+    };
+
+    /**
+     * Add a callback function to the editor
+     * 
+     * @param type {string} the event name
+     * @param callback {function} the function
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.on = function(type, callback){
+        if (!angular.isArray(this.callbacks[type])) {
+            this.callbacks[type] = [];
+        }
+        if(!_.includes(this.callbacks[type], callback)){
+            this.callbacks[type].push(callback);
+        }
+    };
+
+    /**
+     * Fire the event
+     * 
+     * @param type {string} the event name
+     * @param param {object} event params
+     * @mrmberof WidgetEditor
+     */
+    widgetEditor.prototype.fire = function(type, params){
+        // TODO: maso, 2018: create event object
+        var event = _.merge({
+            source: this,
+            type: type
+        }, params || {});
+
+        // fire
+        var callbacks = this.callbacks[type] || [];
+        for(var i = 0; i < callbacks.length; i++){
+            // TODO: maso, 2018: check if the event is stopped to propagate
+            try {
+                callbacks[i](event);
+            } catch (error) {
+                // NOTE: remove on release
+                console.log(error);
+            }
+        }
+    }; // internal
+
+
+
+
+
+    widgetEditor.prototype.setActive = function(){}; // focus|skipFocuse
+    widgetEditor.prototype.isActive = function(){};
+    widgetEditor.prototype.save = function(){};
+    widgetEditor.prototype.hide = function(){};
+    widgetEditor.prototype.show = function(){};
+    widgetEditor.prototype.isHidden = function(){};
+
+    // the editor type
+    return widgetEditor;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name AbstractWidgetLocator
+ * @description Locates a widget on the view
+ * 
+ * It is used to display extra information about a widget on the screen. For
+ * example it is used to show widget actions on the fly.
+ * 
+ */
+.factory('AbstractWidgetLocator', function ($rootElement, $widget) {
+
+    /**
+     * Creates new instance of the widget locator
+     * 
+     * @memberof AbstractWidgetLocator
+     */
+    function abstractWidgetLocator() {
+        this.callbacks = [];
+        this.elements = [];
+        this.observedWidgets = [];
+
+        // Creates listeners
+        var ctrl = this;
+        this.widgetListeners = {
+                'select' : function ($event) {
+                    ctrl.addClass('selected');
+                    ctrl.removeClass('mouseover');
+                },
+                'unselect' : function ($event) {
+                    ctrl.removeClass('selected');
+                    if (ctrl.mouseover) {
+                        ctrl.addClass('mouseover');
+                    }
+                },
+                'mouseover' : function ($event) {
+                    ctrl.addClass('mouseover');
+                    ctrl.mouseover = true;
+                },
+                'mouseout' : function ($event) {
+                    ctrl.removeClass('mouseover');
+                    ctrl.mouseover = false;
+                },
+        };
+    }
+
+    /**
+     * Defines anchor 
+     */
+    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
+        this.anchor = anchor;
+    };
+
+    /**
+     * Update the view
+     */
+    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
+        this.anchor = anchor;
+    };
+
+    abstractWidgetLocator.prototype.getAnchor = function (auncher) {
+        // find custom anchor
+//        if(this.anchor){
+//            if(angular.isFunction(this.anchor)){
+//                return this.anchor();
+//            }
+//            if(angular.isString(this.anchor)){
+//                var list = $rootElement.find(this.anchor);
+//                if(list){
+//                    return list[0];
+//                }
+//            }
+//        }
+//        // find parent
+        var widget = this.getWidget();
+//        if(widget && widget.getParent()){
+//            return widget.getParent().getElement();
+//        }
+        // return root
+//        return $rootElement;
+      return widget.getRoot().getElement();
+    };
+
+
+    /**
+     * Sets new widget
+     */
+    abstractWidgetLocator.prototype.setWidget = function (widget) {
+        this.widget = widget;
+    };
+
+    abstractWidgetLocator.prototype.getWidget = function () {
+        return this.widget;
+    };
+
+    abstractWidgetLocator.prototype.setElements = function (elements) {
+        this.elements = elements;
+    };
+
+    abstractWidgetLocator.prototype.getElements = function () {
+        return this.elements;
+    };
+
+    abstractWidgetLocator.prototype.addClass = function (value) {
+        var elements = this.getElements();
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].addClass(value);
+        }
+    };
+
+    abstractWidgetLocator.prototype.removeClass = function (value) {
+        var elements = this.getElements();
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].removeClass(value);
+        }
+    };
+
+    /**
+     * Remove connection the the current widget
+     */
+    abstractWidgetLocator.prototype.disconnect = function () {
+        this.connect(null);
+        this.connected = false;
+    };
+
+    abstractWidgetLocator.prototype.connect = function (widget) {
+        this.connected = true;
+        if (this.widget !==  widget) {
+            var elements = this.getElements();
+            if(this.widget){
+                var oldWidget = this.widget;
+                angular.forEach(this.widgetListeners, function (listener, type) {
+                    oldWidget.off(type, listener);
+                });
+                for (var i = 0; i < elements.length; i++) {
+                    elements[i].detach();
+                }
+            }
+            this.setWidget(widget);
+            if(widget){
+                angular.forEach(this.widgetListeners, function (listener, type) {
+                    widget.on(type, listener);
+                });
+                var anchor = this.getAnchor();
+                angular.forEach(elements, function (element) {
+                    anchor.append(element);
+                });
+            }
+        }
+        if(this.getWidget()){
+            this.updateView();
+        }
+    };
+
+
+    abstractWidgetLocator.prototype.isConnected = function () {
+        return this.connected;
+    };
+
+    return abstractWidgetLocator;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name BoundWidgetLocator
+ * @description Locates a widget bound
+ * 
+ */
+.factory('BoundWidgetLocator', function (AbstractWidgetLocator, $rootScope) {
+
+	var boundWidgetLocator = function (options) {
+		options = options || {};
+		AbstractWidgetLocator.apply(this, options);
+
+        // set anchor
+        this.setAnchor(options.anchor);
+
+		// load templates
+		var template = options.template 
+		|| '<div class="wb-widget-locator bound"></div>';
+
+		// load elements
+		this.topElement = angular.element(template);
+		this.topElement.attr('id', 'top');
+
+		this.rightElement = angular.element(template);
+		this.rightElement.attr('id', 'right');
+
+		this.buttomElement = angular.element(template);
+		this.buttomElement.attr('id', 'buttom');
+
+		this.leftElement = angular.element(template);
+		this.leftElement.attr('id', 'left');
+
+		// init controller
+		this.setElements([this.topElement, this.rightElement,
+			this.buttomElement, this.leftElement]);
+	};
+	boundWidgetLocator.prototype = new AbstractWidgetLocator();
+
+	boundWidgetLocator.prototype.updateView = function () {
+        var widget = this.getWidget();
+	    var bound = widget.getBoundingClientRect();
+	    var space = 2;
+		this.topElement.css({
+			top: bound.top + space,
+			left: bound.left + space,
+			width: bound.width - 2*space
+		});
+		this.rightElement.css({
+			top: bound.top + space,
+			left: bound.left + bound.width - 2*space,
+			height: bound.height - 2*space
+		});
+		this.buttomElement.css({
+			top: bound.top + bound.height - space,
+			left: bound.left + space,
+			width: bound.width - 2*space
+		});
+		this.leftElement.css({
+			top: bound.top + space,
+			left: bound.left + space,
+			height: bound.height - 2*space
+		});
+
+	};
+	return boundWidgetLocator;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular
+.module('am-wb-core')
+
+
+/**
+ * @ngdoc Factories
+ * @name CursorWidgetLocator
+ * @description Manages list of locators
+ * 
+ * 
+ * There are two type of widgets locator: selection and bound.
+ * 
+ * For each widget a bound locator will be created.
+ * 
+ * For each item in selection a selection locator will be created.
+ */
+.factory('WidgetLocatorManager',function ($widget, BoundWidgetLocator, SelectionWidgetLocator, $timeout, $rootElement) {
+
+    /**
+     * Creates new instance of the manager
+     * 
+     * @memberof CursorWidgetLocator
+     */
+    function WidgetLocatorManager(options) {
+        var ctrl = this;
+        options = options || {};
+
+        this.boundLocatorMap = new Map();
+        this.boundLocatorTrash = [];
+
+        this.selectionLocatorMap = new Map();
+        this.selectionLocatorTrash = [];
+
+
+        // selection options
+        this.selectionLocatorOption = options.selectionLocatorOption || {};
+        this.selectionEnable = true;
+        if (angular.isDefined(options.selectionEnable)) {
+            this.selectionEnable = options.selectionEnable;
+        }
+
+        // bound options
+        this.boundLocatorOption = options.boundLocatorOption || {};
+        this.boundEnable = true;
+        if (angular.isDefined(options.boundEnable)) {
+            this.boundEnable = options.boundEnable;
+        }
+
+        this.widgetListeners = {
+                'select': function($event){
+                    ctrl.widgetSelectionChanged($event.source);
+                },
+                'unselect': function($event){
+                    ctrl.widgetSelectionChanged($event.source);
+                },
+                'delete': function($event) {
+                    ctrl.untrackWidget($event.source);
+                },
+                'newchild': function($event) {
+                    _.forEach($event.widgets, function(widget){
+                        ctrl.trackWidget(widget);
+                    });
+                },
+                'loaded': function($event){
+                    ctrl.disconnect();
+                    ctrl.rootWidget = null;
+                    ctrl.setRootWidget($event.source);
+                },
+        };
+        this.rootListeners = {
+                'newchild': function($event) {
+                    _.forEach($event.widgets, function(widget){
+                        ctrl.trackWidget(widget);
+                    });
+                },
+                'loaded': function($event){
+                    ctrl.disconnect();
+                    ctrl.rootWidget = null;
+                    ctrl.setRootWidget($event.source);
+                },
+        };
+    }
+
+
+    WidgetLocatorManager.prototype.untrackWidget = function(widget){
+        // events
+        var listener = widget.isRoot() ? this.rootListeners : this.widgetListeners;
+        angular.forEach(listener, function (callback, type) {
+            widget.off(type, callback);
+        });
+        this.removeBoundLocator(widget);
+        this.removeSelectionLocator(widget);
+    };
+
+    WidgetLocatorManager.prototype.trackWidget = function(widget){
+        // add events
+        var listener = widget.isRoot() ? this.rootListeners : this.widgetListeners;
+        angular.forEach(listener, function (callback, type) {
+            widget.on(type, callback);
+        });
+        if(widget.isRoot()){
+            return;
+        }
+        this.createBoundLocator(widget);
+        if(widget.isSelected()){
+            this.createSelectionLocator(widget);
+        }
+    };
+
+    WidgetLocatorManager.prototype.disconnect = function(){
+        var rootWidget = this.getRootWidget();
+        if(!rootWidget) {
+            return;
+        }
+        // Widgets
+        var widgets = $widget.getChildren(rootWidget);
+        this.untrackWidget(rootWidget);
+        var ctrl = this;
+        _.forEach(widgets, function(widget){
+            ctrl.untrackWidget(widget);
+        });
+        // interval
+        if(this._intervalCheck){
+            clearInterval(this._intervalCheck);
+            delete this._intervalCheck;
+        }
+    }
+
+    WidgetLocatorManager.prototype.connect = function(){
+        var rootWidget = this.getRootWidget();
+        if(!rootWidget){
+            return;
+        }
+        var ctrl = this;
+
+        // widgets
+        var widgets = $widget.getChildren(rootWidget);
+        this.trackWidget(rootWidget);
+        _.forEach(widgets, function(widget){
+            ctrl.trackWidget(widget);
+        });
+
+        // interval
+        if(!this._intervalCheck){
+            this._intervalCheck = setInterval(function(){
+                ctrl.updateLocators();
+            }, 300);
+        }
+    };
+
+    WidgetLocatorManager.prototype.setEnable = function (enable) {
+        if (this.enable === enable) {
+            return;
+        }
+        this.enable = enable;
+        if(this.enable){
+            this.connect();
+        } else {
+            this.disconnect();
+        }
+    };
+
+    WidgetLocatorManager.prototype.isEnable = function () {
+        return this.enable;
+    };
+
+    /**
+     * Sets the root widget
+     * 
+     * @param rootWidget
+     *            {WbAbstractWidget} root widget
+     * @memberof WidgetLocatorManager
+     */
+    WidgetLocatorManager.prototype.setRootWidget = function (rootWidget) {
+        if(this.rootWidget === rootWidget) {
+            return;
+        }
+        var enable = this.isEnable();
+        this.setEnable(false);
+        this.rootWidget = rootWidget;
+        this.setEnable(enable);
+    };
+
+    /**
+     * Gets the root widget
+     * 
+     * @return the root widget
+     * @memberof WidgetLocatorManager
+     */
+    WidgetLocatorManager.prototype.getRootWidget = function () {
+        return this.rootWidget;
+    };
+
+
+    /**
+     * Update all locators
+     * 
+     * @memberof WidgetLocatorManager
+     */
+    WidgetLocatorManager.prototype.updateLocators = function () {
+        var intersectingCount = 0;
+        function handleWidget(bound, widget){
+            if(widget.isIntersecting()){
+                bound.connect(widget);
+                bound.updateView();
+                intersectingCount++;
+            } else {
+                bound.disconnect();
+            }
+        }
+        // locator
+        this.boundLocatorMap.forEach(handleWidget);
+        // selector
+        this.selectionLocatorMap.forEach(handleWidget);
+        if(intersectingCount === 0){
+            // somethint is not correct?? try to correct
+            this.boundLocatorMap.forEach(function(bound, widget){
+                widget.setIntersecting(true);
+            });
+        }
+    };
+
+
+    /**********************************************************
+     * Selection
+     */
+    WidgetLocatorManager.prototype.hasBoundLocator = function(widget){
+        return this.boundLocatorMap.has(widget);
+    };
+
+    WidgetLocatorManager.prototype.getBoundLocator = function(widget){
+        return this.boundLocatorMap.get(widget);
+    };
+
+    WidgetLocatorManager.prototype.createBoundLocator = function(widget){
+        var map = this.boundLocatorMap;
+        if(!map.has(widget)) {
+            var locator;
+            if(this.boundLocatorTrash.length > 0){
+                locator = this.boundLocatorTrash.pop();
+            } else {
+                locator = new BoundWidgetLocator(this.boundLocatorOption);
+            }
+            map.set(widget, locator);
+        }
+        return map.get(widget);
+    };
+
+    WidgetLocatorManager.prototype.removeBoundLocator = function(widget){
+        if(!this.hasBoundLocator(widget)){
+            return;
+        }
+        var locator = this.getBoundLocator(widget);
+        locator.disconnect();
+        this.boundLocatorMap.delete(widget);
+        this.boundLocatorTrash.push(locator);
+    };
+
+    /**********************************************************
+     * Selection
+     */
+    /**
+     * Sets widgets which are selected
+     * 
+     */
+    WidgetLocatorManager.prototype.widgetSelectionChanged = function (widgets) {
+        if(!this.isEnable()){
+            return;
+        }
+        if(!angular.isArray(widgets)){
+            widgets = [widgets];
+        }
+        var ctrl = this;
+        _.forEach(widgets, function(widget){
+            if(widget.isSelected()){
+                ctrl.createSelectionLocator(widget);
+            } else {
+                ctrl.removeSelectionLocator(widget);
+            }
+        });
+    };
+
+
+    WidgetLocatorManager.prototype.removeSelectionLocator = function(widget) {
+        var map = this.selectionLocatorMap;
+        if(map.has(widget)) {
+            var locator = this.getSelectionLocator(widget);
+            this.selectionLocatorTrash.push(locator);
+            this.selectionLocatorMap.delete(widget);
+            locator.disconnect();
+        }
+    }
+
+    WidgetLocatorManager.prototype.createSelectionLocator = function(widget) {
+        var map = this.selectionLocatorMap;
+        if(!map.has(widget)) {
+            var locator;
+            if(this.selectionLocatorTrash.length > 0){
+                locator = this.selectionLocatorTrash.pop();
+            } else {
+                locator = new SelectionWidgetLocator(this.selectionLocatorOption);
+            }
+            map.set(widget, locator);
+        }
+        return map.get(widget);
+    };
+
+    WidgetLocatorManager.prototype.getSelectionLocator = function(widget) {
+        var map = this.selectionLocatorMap;
+        return map.get(widget);
+    };
+
+    WidgetLocatorManager.prototype.hasSelectionLocator = function(widget){
+        return this.selectionLocatorMap.has(widget);
+    };
+
+
+    return WidgetLocatorManager;
+});
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name AbstractWidgetLocator
+ * @description Locates a widget on the view
+ * 
+ * It is used to display extra information about a widget on the screen. For
+ * example it is used to show widget actions on the fly.
+ * 
+ */
+.factory('SelectionWidgetLocator', function (AbstractWidgetLocator, $document) {
+
+    var selectionWidgetLocator = function (options) {
+        options = options || {};
+        AbstractWidgetLocator.apply(this, options);
+
+        // set anchor
+        this.setAnchor(options.anchor);
+
+        // load templates
+        var template = options.template
+        || '<div class="wb-widget-locator selection"></div>';
+
+        this.titleElement = angular.element(template);
+        this.titleElement.attr('id', 'header');
+
+        // load elements
+        this.topElement = angular.element(template);
+        this.topElement.attr('id', 'top');
+
+        this.rightElement = angular.element(template);
+        this.rightElement.attr('id', 'right');
+
+        this.buttomElement = angular.element(template);
+        this.buttomElement.attr('id', 'buttom');
+
+        this.leftElement = angular.element(template);
+        this.leftElement.attr('id', 'left');
+
+        this.sizeElement = angular.element('<img class="wb-widget-locator selection" src="resources/corner-handle.png">');
+        this.sizeElement.attr('id', 'size');
+
+        // init controller
+        this.setElements([this.titleElement, this.topElement, this.rightElement,
+            this.buttomElement, this.leftElement, this.sizeElement]);
+        
+        
+        
+        var position = {};
+        var lock = false;
+        var dimension = {};
+        var ctrl = this;
+        
+
+        function mousemove($event) {
+            var deltaWidth = dimension.width - (position.x - $event.clientX);
+            var deltaHeight = dimension.height - (position.y - $event.clientY);
+            var newDimensions = {
+                    width: deltaWidth + 'px',
+                    height: deltaHeight + 'px'
+            };
+            
+            var widget = ctrl.getWidget();
+            var model = widget.getModel();
+            var $element = widget.getElement();
+            var $scope = widget.getScope();
+            
+            if (model.style.size.height === 'auto') {
+                newDimensions.height = 'auto';
+            }
+            $element.css(newDimensions);
+            
+            model.style.size.width = newDimensions.width;
+            model.style.size.height = newDimensions.height;
+
+            $scope.$apply();
+            return false;
+        }
+
+        function mouseup() {
+            $document.unbind('mousemove', mousemove);
+            $document.unbind('mouseup', mouseup);
+            lock = false;
+        }
+
+        function mousedown($event) {
+            $event.stopImmediatePropagation();
+            position.x = $event.clientX;
+            position.y = $event.clientY;
+            lock = true;
+            var $element = ctrl.getWidget().getElement();
+            dimension.width = $element.prop('offsetWidth');
+            dimension.height = $element.prop('offsetHeight');
+            $document.bind('mousemove', mousemove);
+            $document.bind('mouseup', mouseup);
+            return false;
+        }
+
+
+        this.sizeElement.on('mousedown', mousedown);
+    };
+    selectionWidgetLocator.prototype = new AbstractWidgetLocator();
+
+    selectionWidgetLocator.prototype.updateView = function () {
+        var widget = this.getWidget();
+        var bound = widget.getBoundingClientRect();
+        var space = 2;
+        this.topElement.css({
+            top: bound.top + space,
+            left: bound.left + space,
+            width: bound.width - 2*space
+        });
+        this.rightElement.css({
+            top: bound.top + space,
+            left: bound.left + bound.width - 2*space,
+            height: bound.height - 2*space
+        });
+        this.buttomElement.css({
+            top: bound.top + bound.height - space,
+            left: bound.left + space,
+            width: bound.width - 2*space
+        });
+        this.leftElement.css({
+            top: bound.top + space,
+            left: bound.left + space,
+            height: bound.height - 2*space
+        });
+        if (bound.top < 32) {
+            this.titleElement.css({
+                top: bound.top + bound.height,
+                left: bound.left + bound.width/2 - this.titleElement.width()/2
+            });
+        } else {
+            this.titleElement.css({
+                top: bound.top -  this.titleElement.height(),
+                left: bound.left + bound.width/2 - this.titleElement.width()/2
+            });
+        }
+        var widget = this.getWidget();
+        this.titleElement[0].innerHTML = '<span>'+ (widget.getTitle() || widget.getId() || widget.getType()) + '</span>'
+        
+        
+        this.sizeElement.css({
+
+            top: bound.top + bound.height -13 ,
+            left: bound.left + bound.width -15 ,
+
+        })
+    };
+    return selectionWidgetLocator;
+});
+
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Processor
+ * @name WbProcessorStyle
+ * @description Widget processor
+ * 
+ */
+.factory('WbProcessorAbstract', function () {
+    'use strict';
+
+    function Processor(){
+    };
+
+    return Processor;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')
+
+
+/**
+ * @ngdoc Processor
+ * @name WbProcessorAttribute
+ * @description Widget processor
+ * 
+ */
+.factory('WbProcessorAttribute', function (WbProcessorAbstract) {
+    'use strict';
+
+    function setWidgetElementAttribute(widget, key, value){
+        if(widget.isEditable() && (key === 'draggable' || key === 'dropzone')){
+            // are handled by processors in edit mode
+            return;
+        }
+        var $element = widget.getElement();
+        if(value){
+            $element.attr(key, value);
+        } else {
+            $element.removeAttr(key);
+        }
+        // NOTE: html is special value
+        if(key === 'html'){
+            $element.html(value);
+        }
+        if(key === 'inputType'){
+            widget.setElementAttribute('type', value);
+        }
+        if(key === 'value'){
+            $element.val(value);
+        }
+    }
+
+    function setWidgetElementAttributes(widget, elementAttributes) {
+        var elementAttributes = widget.getElementAttributes();
+        for(var i =0; i < elementAttributes.length; i++){
+            var key = elementAttributes[i];
+            setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key))
+        }
+    }
+
+    function Processor() {
+        WbProcessorAbstract.apply(this);
+    }
+    Processor.prototype = new WbProcessorAbstract();
+
+    Processor.prototype.process = function (widget, event) {
+        if (event.type === 'modelChanged') {
+            setWidgetElementAttributes(widget, widget.getElementAttributes());
+        } else if (event.type === 'modelUpdated') {
+            setWidgetElementAttributes(widget, _.intersection(event.keys || [event.key]));
+        }
+    };
+    return Processor;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Processor
+ * @name WbProcessorDnd
+ * @description Widget processor
+ * 
+ */
+.factory('WbProcessorDnd', function (WbProcessorAbstract, $widget) {
+    'use strict';
+
+    // In standard-compliant browsers we use a custom mime type and also encode the dnd-type in it.
+    // However, IE and Edge only support a limited number of mime types. The workarounds are described
+    // in https://github.com/marceljuenemann/angular-drag-and-drop-lists/wiki/Data-Transfer-Design
+    var MIME_TYPE = 'application/x-dnd';
+    var EDGE_MIME_TYPE = 'application/json';
+    var MSIE_MIME_TYPE = 'Text';
+
+    // All valid HTML5 drop effects, in the order in which we prefer to use them.
+    var ALL_EFFECTS = ['move', 'copy', 'link'];
+
+    // While an element is dragged over the list, this placeholder element is inserted
+    // at the location where the element would be inserted after dropping.
+    var placeholder = angular.element("<div class='wbDndPlaceholder'></div>");
+    var placeholderNode = placeholder[0];
+    placeholder.remove();
+
+
+    /**
+     * We use the position of the placeholder node to determine at which position of the array the
+     * object needs to be inserted
+     */
+    function getPlaceholderIndex(widget) {
+        var listNode = widget.getElement()[0];
+        return Array.prototype.indexOf.call(listNode.children, placeholderNode);
+    }
+
+    /**
+     * Small helper function that cleans up if we aborted a drop.
+     */
+    function stopDragover() {
+        placeholder.remove();
+        return true;
+    }
+
+    /**
+     * Filters an array of drop effects using a HTML5 effectAllowed string.
+     */
+    function filterEffects(effects, effectAllowed) {
+        if (effectAllowed == 'all') {
+            return effects;
+        }
+        return effects.filter(function(effect) {
+            return effectAllowed.toLowerCase().indexOf(effect) != -1;
+        });
+    }
+
+    /**
+     * Given the types array from the DataTransfer object, returns the first valid mime type.
+     * A type is valid if it starts with MIME_TYPE, or it equals MSIE_MIME_TYPE or EDGE_MIME_TYPE.
+     */
+    function getMimeType(types) {
+        if (!types){
+            return MSIE_MIME_TYPE; // IE 9 workaround.
+        }
+        var converters = $widget.getConverters();
+        for (var i = 0; i < converters.length; i++) {
+            var converter = converters[i];
+            if (_.includes(types, converter.getMimetype())){
+                return converter.getMimetype();
+            }
+        }
+        return null;
+    }
+
+
+//  /**
+//  * Determines the type of the item from the dndState, or from the mime type for items from
+//  * external sources. Returns undefined if no item type was set and null if the item type could
+//  * not be determined.
+//  */
+//  function getItemType(mimeType) {
+////if (dndState.isDragging){
+////return dndState.itemType || undefined;
+////}
+//  if (mimeType == MSIE_MIME_TYPE || mimeType == EDGE_MIME_TYPE){
+//  return null;
+//  }
+//  return (mimeType && mimeType.substr(MIME_TYPE.length + 1)) || undefined;
+//  }
+
+
+    /**
+     * Determines which drop effect to use for the given event. In Internet Explorer we have to
+     * ignore the effectAllowed field on dataTransfer, since we set a fake value in dragstart.
+     * In those cases we rely on dndState to filter effects. Read the design doc for more details:
+     * https://github.com/marceljuenemann/angular-drag-and-drop-lists/wiki/Data-Transfer-Design
+     */
+    function getDropEffect(event, ignoreDataTransfer) {
+        var effects = ALL_EFFECTS;
+        if (!ignoreDataTransfer) {
+            effects = filterEffects(effects, event.dataTransfer.effectAllowed);
+        }
+//      if (dndState.isDragging) {
+//      effects = filterEffects(effects, dndState.effectAllowed);
+//      }
+//      if (attr.dndEffectAllowed) {
+//      effects = filterEffects(effects, attr.dndEffectAllowed);
+//      }
+        // MacOS automatically filters dataTransfer.effectAllowed depending on the modifier keys,
+        // therefore the following modifier keys will only affect other operating systems.
+        if (!effects.length) {
+            return 'none';
+        } else if (event.ctrlKey && effects.indexOf('copy') != -1) {
+            return 'copy';
+        } else if (event.altKey && effects.indexOf('link') != -1) {
+            return 'link';
+        } else {
+            return effects[0];
+        }
+    }
+
+    function dragstart(event) {
+        event = event.originalEvent || event;
+        // 1 - load state, data and etc.
+        var widget = $widget.widgetFromElement(event.currentTarget);
+
+        widget.$$dndState = widget.$$dndState || {};
+
+        // Initialize global state.
+        widget.$$dndState.isDragging = true;
+        widget.$$dndState.itemType = widget.getType();
+
+        // Set the allowed drop effects. See below for special IE handling.
+        widget.$$dndState.dropEffect = "none";
+        widget.$$dndState.effectAllowed = /*dndEffectAllowed ||*/ ALL_EFFECTS[0];
+
+        // 2 - convert and put data
+        event.dataTransfer.effectAllowed =  widget.$$dndState.effectAllowed;
+        var converters = $widget.getConverters();
+        _.forEach(converters, function(converter){
+            try {
+                event.dataTransfer.setData(converter.getMimetype(), converter.encode(widget));
+            } catch (e) {
+                // TODO: maso, 2019: log errors
+                console.log('fail to convert to :' + converter.getMimetype(), e);
+            }
+        });
+
+        // Internet Explorer and Microsoft Edge don't support custom mime types, see design doc:
+        // https://github.com/marceljuenemann/angular-drag-and-drop-lists/wiki/Data-Transfer-Design
+////    var item = scope.$eval(attr.dndDraggable);
+////    var mimeType = MIME_TYPE + (dndState.itemType ? ('-' + dndState.itemType) : '');
+////    try {
+////    event.dataTransfer.setData(mimeType, angular.toJson(item));
+////    } catch (e) {
+////    // Setting a custom MIME type did not work, we are probably in IE or Edge.
+////    var data = angular.toJson({item: item, type: dndState.itemType});
+////    try {
+////    event.dataTransfer.setData(EDGE_MIME_TYPE, data);
+////    } catch (e) {
+////    // We are in Internet Explorer and can only use the Text MIME type. Also note that IE
+////    // does not allow changing the cursor in the dragover event, therefore we have to choose
+////    // the one we want to display now by setting effectAllowed.
+////    var effectsAllowed = filterEffects(ALL_EFFECTS, dndState.effectAllowed);
+////    event.dataTransfer.effectAllowed = effectsAllowed[0];
+////    event.dataTransfer.setData(MSIE_MIME_TYPE, data);
+////    }
+////    }
+
+        // Try setting a proper drag image if triggered on a dnd-handle (won't work in IE).
+        if (event._dndHandle && event.dataTransfer.setDragImage) {
+            event.dataTransfer.setDragImage(widget.getElement()[0], 0, 0);
+        }
+
+        event.stopPropagation();
+    }
+
+    function dragend(event) {
+        // Clean up
+        placeholder.remove();
+        event = event.originalEvent || event;
+        var widget = $widget.widgetFromElement(event.currentTarget);
+        widget.$$dndState.isDragging = false;
+        widget.$$dndState.callback = undefined;
+
+        // do action
+        var effect = event.dataTransfer.dropEffect;
+        switch(effect) {
+        case 'move':
+            widget.delete();
+            break;
+        case 'copy':
+        case 'link':
+        case 'canceled':
+            console.log('not supported');
+            break;
+        }
+
+        event.stopPropagation();
+    }
+
+    function dragenter(event) {
+        // Calculate list properties, so that we don't have to repeat this on every dragover event.
+        event = event.originalEvent || event;
+        var widget = $widget.widgetFromElement(event.currentTarget);
+        if(widget.isLeaf()){
+            return true;
+        }
+        var mimeType = getMimeType(event.dataTransfer.types);
+        if (!mimeType){
+            return true;
+        }
+        event.preventDefault();
+    }
+
+    function dragover(event) {
+        event = event.originalEvent || event;
+        var widget = $widget.widgetFromElement(event.currentTarget);
+
+        if(widget.isLeaf()){
+            return true;
+        }
+        // Check whether the drop is allowed and determine mime type.
+        var mimeType = getMimeType(event.dataTransfer.types);
+//      var itemType = getItemType(mimeType);
+        if (!mimeType) {
+            return true;
+        }
+
+        var element = widget.getElement();
+        var listNode = element[0];
+
+        // Make sure the placeholder is shown, which is especially important if the list is empty.
+        if (placeholderNode.parentNode != listNode) {
+            element.append(placeholder);
+        }
+
+        if (widget.isLeaf()) {
+            // Try to find the node direct directly below the list node.
+            var listItemNode = event.target;
+            while (listItemNode.parentNode != listNode && listItemNode.parentNode) {
+                listItemNode = listItemNode.parentNode;
+            }
+
+            if (listItemNode.parentNode == listNode && listItemNode != placeholderNode) {
+                // If the mouse pointer is in the upper half of the list item element,
+                // we position the placeholder before the list item, otherwise after it.
+                var rect = listItemNode.getBoundingClientRect();
+                var horizontal = true; // TODO:
+                if (horizontal) {
+                    var isFirstHalf = event.clientX < rect.left + rect.width / 2;
+                } else {
+                    var isFirstHalf = event.clientY < rect.top + rect.height / 2;
+                }
+                listNode.insertBefore(placeholderNode,
+                        isFirstHalf ? listItemNode : listItemNode.nextSibling);
+            }
+        } else {
+            var listItemNode = null;
+            var horizontal = widget.isHorizontal();
+            for(var i = 0; i < listNode.childNodes.length; i++){
+                var node = listNode.childNodes[i];
+                var rect = node.getBoundingClientRect();
+                if (horizontal) {
+                    if(rect.left > event.clientX) {
+                        listItemNode = node;
+                        break;
+                    }
+                } else {
+                    if(rect.top > event.clientY) {
+                        listItemNode = node;
+                        break;
+                    }
+                }
+            }
+            if(listItemNode){
+                listNode.insertBefore(placeholderNode, listItemNode);
+            }
+        }
+
+        // In IE we set a fake effectAllowed in dragstart to get the correct cursor, we therefore
+        // ignore the effectAllowed passed in dataTransfer. We must also not access dataTransfer for
+        // drops from external sources, as that throws an exception.
+        var ignoreDataTransfer = mimeType == MSIE_MIME_TYPE;
+        var dropEffect = getDropEffect(event, ignoreDataTransfer);
+        if (dropEffect == 'none') {
+            return stopDragover();
+        }
+
+        // Set dropEffect to modify the cursor shown by the browser, unless we're in IE, where this
+        // is not supported. This must be done after preventDefault in Firefox.
+        event.preventDefault();
+        if (!ignoreDataTransfer) {
+            event.dataTransfer.dropEffect = dropEffect;
+        }
+
+        event.stopPropagation();
+        return false;
+    }
+
+    function drop(event) {
+        event = event.originalEvent || event;
+
+        // Check whether the drop is allowed and determine mime type.
+        var mimeType = getMimeType(event.dataTransfer.types);
+//      var itemType = getItemType(mimeType);
+        if (!mimeType){
+            return true;
+        }
+
+        // The default behavior in Firefox is to interpret the dropped element as URL and
+        // forward to it. We want to prevent that even if our drop is aborted.
+        event.preventDefault();
+
+        // Unserialize the data that was serialized in dragstart.
+        try {
+            var converter = $widget.getConverter(mimeType);
+            var data = converter.decode(event.dataTransfer.getData(mimeType));
+        } catch(e) {
+            placeholder.remove();
+            return false;
+        }
+
+        // Drops with invalid types from external sources might not have been filtered out yet.
+//      if (mimeType == MSIE_MIME_TYPE || mimeType == EDGE_MIME_TYPE) {
+//      itemType = data.type || undefined;
+//      data = data.item;
+//      if (!isDropAllowed(itemType)) return stopDragover();
+//      }
+
+        // Special handling for internal IE drops, see dragover handler.
+        var ignoreDataTransfer = mimeType == MSIE_MIME_TYPE;
+        var dropEffect = getDropEffect(event, ignoreDataTransfer);
+        if (dropEffect == 'none') {
+            return stopDragover();
+        }
+
+        // Invoke the callback, which can transform the transferredObject and even abort the drop.
+        var widget = $widget.widgetFromElement(event.currentTarget);
+        var index = getPlaceholderIndex(widget);
+        widget.addChildrenModel(index, data);
+
+        // Clean up
+        placeholder.remove();
+        event.stopPropagation();
+        return false;
+    }
+
+    function dragleave(event) {
+        event = event.originalEvent || event;
+        var widget = $widget.widgetFromElement(event.currentTarget);
+
+        var listNode = widget.getElement()[0];
+
+        var newWidget = $widget.widgetFromPoint(event.clientX, event.clientY);
+        if(!newWidget){
+            return;
+        }
+        var newTarget = newWidget.getElement()[0];
+        if (!event._dndPhShown && listNode.contains(newTarget) && newWidget.isLeaf()) {
+            // Signalize to potential parent lists that a placeholder is already shown.
+            event._dndPhShown = true;
+        } else {
+            placeholder.remove();
+        }
+    }
+
+    /**
+     * Creates new instance of DND processor
+     * 
+     * @memberof WbProcessorDnd
+     */
+    function Processor(){
+        WbProcessorAbstract.apply(this);
+    };
+
+    // extend functionality
+    Processor.prototype = new WbProcessorAbstract();
+    Processor.prototype.process = function(widget, event){
+        if(event.type !== 'stateChanged') {
+            return;
+        }
+        var element = widget.getElement();
+        if(widget.state === 'edit') {
+
+            /*
+             * Groups must handle:
+             * - dragstart
+             * - dragend
+             */
+            if(!widget.isRoot()) {
+                /*
+                 * Set the HTML5 draggable attribute on the element.
+                 */
+                element.attr('draggable', 'true');
+
+                /*
+                 * When the drag operation is started we have to prepare the dataTransfer object,
+                 * which is the primary way we communicate with the target element
+                 */
+                element.on('dragstart', dragstart);
+
+                /*
+                 * The dragend event is triggered when the element was dropped or when the drag
+                 * operation was aborted (e.g. hit escape button). Depending on the executed action
+                 * we will invoke the callbacks specified with the dnd-moved or dnd-copied attribute.
+                 */
+                element.on('dragend', dragend);
+            }
+
+            /*
+             * Groups must handle:
+             * - dragenter
+             * - dragover
+             * - dragleave
+             * - drop
+             */
+            if(!widget.isLeaf()){
+                /**
+                 * The dragenter event is fired when a dragged element or text selection enters a valid drop
+                 * target. According to the spec, we either need to have a dropzone attribute or listen on
+                 * dragenter events and call preventDefault(). It should be noted though that no browser seems
+                 * to enforce this behaviour.
+                 */
+                element.on('dragenter', dragenter);
+
+
+                /**
+                 * The dragover event is triggered "every few hundred milliseconds" while an element
+                 * is being dragged over our list, or over an child element.
+                 */
+                element.on('dragover', dragover);
+
+                /**
+                 * We have to remove the placeholder when the element is no longer dragged over our list. The
+                 * problem is that the dragleave event is not only fired when the element leaves our list,
+                 * but also when it leaves a child element. Therefore, we determine whether the mouse cursor
+                 * is still pointing to an element inside the list or not.
+                 */
+                element.on('dragleave', dragleave);
+
+                /**
+                 * When the element is dropped, we use the position of the placeholder element as the
+                 * position where we insert the transferred data. This assumes that the list has exactly
+                 * one child element per array element.
+                 */
+                element.on('drop', drop);
+            }
+        } else {
+            element.removeAttr('draggable');
+            element.off('dragstart', dragstart);
+            element.off('dragend', dragend);
+            if(!widget.isLeaf()){
+                element.off('dragenter', dragenter);
+                element.off('dragover', dragover);
+                element.off('dragleave', dragleave);
+                element.off('drop', drop);
+            }
+        }
+    };
+    return Processor;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Processor
+ * @name WbProcessorEvent
+ * @description Widget processor
+ * 
+ */
+.factory('WbProcessorEvent', function (WbProcessorAbstract, $widget, $injector) {
+    'use strict';
+
+    /**
+     * Loads events for the widget
+     * 
+     * @param event
+     *            {object} part of the widget data model
+     * @memberof WbAbstractWidget
+     */
+    function evalWidgetEvent(widget, type, event) {
+        var eventFunction;
+        if (!widget.eventFunctions.hasOwnProperty(type)) {
+            try{
+                var ucode = widget.getEvent()[type];
+                if(!ucode){
+                    return;
+                }
+                ucode += '\n//@ sourceURL=wb-widget-'+ widget.getId() + '-' + type + '.js';
+                var params = _.join(_.concat(
+                        ['$widget', '$event'], // dynamic data
+                        $widget.getProvidersKey()));
+                widget.eventFunctions[type] = new Function(params, ucode);// code
+            }catch(ex){
+                console.error({
+                    message: 'Fail to load user function',
+                    original: ex
+                });
+            }
+        }
+        eventFunction = widget.eventFunctions[type];
+        if (eventFunction) {
+            try{
+                var locals = _.merge({
+                    $event: event, // -> $event
+                    $widget: widget, // -> $widget
+                }, $widget.getProviders());
+                return $injector.invoke(eventFunction, widget, locals);
+            } catch(ex){
+                console.error({
+                    original: ex,
+                    message: 'faile to run the event code of the widget',
+                    type: type,
+                    event: event
+                });
+            }
+        }
+    };
+
+    function loadWidgetEventsHandlers(widget){
+        widget.__eventListeners = {
+                click: function ($event) {
+                    return evalWidgetEvent(widget, 'click', $event);
+                },
+                dblclick: function ($event) {
+                    return evalWidgetEvent(widget, 'dblclick', $event);
+                },
+                mouseout: function ($event) {
+                    return evalWidgetEvent(widget, 'mouseout', $event);
+                },
+                mouseover: function ($event) {
+                    return evalWidgetEvent(widget, 'mouseover', $event);
+                },
+                mousedown: function ($event) {
+                    return evalWidgetEvent(widget, 'mousedown', $event);
+                },
+                mouseup: function ($event) {
+                    return evalWidgetEvent(widget, 'mouseup', $event);
+                },
+                mouseenter: function ($event) {
+                    return evalWidgetEvent(widget, 'mouseenter', $event);
+                },
+                mouseleave: function ($event) {
+                    return evalWidgetEvent(widget, 'mouseleave', $event);
+                },
+                resize: function ($event) {
+                    return evalWidgetEvent(widget, 'resize', $event);
+                },
+                intersection: function ($event) {
+                    return evalWidgetEvent(widget, 'intersection', $event);
+                },
+
+                //
+                // Common media events
+                //
+                success: function ($event) {
+                    return evalWidgetEvent(widget, 'success', $event);
+                },
+                error: function ($event) {
+                    return evalWidgetEvent(widget, 'error', $event);
+                },
+                abort: function ($event) {
+                    return evalWidgetEvent(widget, 'abort', $event);
+                },
+                load: function ($event) {
+                    return evalWidgetEvent(widget, 'load', $event);
+                },
+                beforeunload: function ($event) {
+                    return evalWidgetEvent(widget, 'beforeunload', $event);
+                },
+                unload: function ($event) {
+                    return evalWidgetEvent(widget, 'unload', $event);
+                },
+
+
+        };
+        angular.forEach(widget.__eventListeners, function (listener, key) {
+            widget.on(key, listener);
+        });
+    }
+
+    function removeWidgetEventsHandlers(widget){
+        if(angular.isDefined(widget.__eventListeners)){
+            angular.forEach(widget.__eventListeners, function (listener, key) {
+                widget.off(key, listener);
+            });
+            delete widget.__eventListeners;
+        }
+        // clean all providers
+        _.forEach($widget.getProviders(), function(provider){
+            if(_.isFunction(provider.clean)){
+                provider.clean();
+            }
+        });
+    }
+
+    function Processor(){
+        WbProcessorAbstract.apply(this);
+    };
+
+    // extend functionality
+    Processor.prototype = new WbProcessorAbstract();
+
+    Processor.prototype.process = function (widget, event){
+        if(event.type !== 'stateChanged') {
+            return;
+        }
+        if(widget.state === 'ready') {
+            loadWidgetEventsHandlers(widget);
+            evalWidgetEvent(widget, 'stateChanged', event);
+            // TODO: maso, 2019: remove in next major version
+            // support legecy
+            var newEvent = _.clone(event);
+            newEvent.type = 'init';
+            evalWidgetEvent(widget, newEvent.type, newEvent);
+        } else {
+            removeWidgetEventsHandlers(widget);
+        }
+    };
+
+    return Processor;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Processor
+ * @name WbProcessorLocator
+ * @description Widget processor
+ * 
+ */
+.factory('WbProcessorLocator', function ($wbUtil, WbProcessorAbstract, WidgetLocatorManager) {
+    'use strict';
+    function Processor(){
+        WbProcessorAbstract.apply(this);
+        this.widgetLocator = new WidgetLocatorManager();
+        this.autoVisible = true;
+    };
+
+    Processor.prototype = new WbProcessorAbstract();
+    
+    Processor.prototype.process = function(widget, event){
+        if(event.type !== 'stateChanged' || !widget.isRoot()){
+            return;
+        }
+        /*
+         * NOTE: we just trak a single root 
+         */
+        this.widgetLocator.setRootWidget(widget);
+        if(this.autoVisible){
+            this.widgetLocator.setEnable(widget.state === 'edit');
+        }
+    };
+
+    /**
+     * Enable the processor
+     */
+    Processor.prototype.setEnable = function(enable){
+        this.enable = enable;
+        var widgetLocator = this.widgetLocator;
+        widgetLocator.setEnable(enable);
+    };
+
+    /**
+     * Follow widget if is root
+     */
+    Processor.prototype.setTrackRoot = function(trackRoot){
+        this.trackRoot = trackRoot;
+    };
+    
+    Processor.prototype.setAutoVisible = function(autoVisible){
+        this.autoVisible = autoVisible;
+    };
+    
+    
+    return Processor;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Processor
+ * @name WbProcessorMicrodata
+ * @description Widget processor
+ * 
+ * @name microdata
+ * @description Handle widget microdata specification
+ * 
+ * Widget microdata is an specification which makes the widget readable by
+ * search engines. This processor just run in ready mode. 
+ * 
+ * @see document/widgets-microdata.md
+ */
+.factory('WbProcessorMicrodata', function (WbProcessorAbstract) {
+    'use strict';
+
+    var microdataAttributes = [
+        'itemscope', // groups list of item properties
+        'itemtype', // can use if it is item scope
+        'itemprop',
+        'itemref',
+        'itemid',
+        // extera properties
+        'content',
+        'value',
+        ];
+
+    function loadWidgetAttributes(widget, attributes){
+        var $element = widget.getElement();
+        angular.forEach(attributes, function(key){
+            var value = widget.getProperty(key) || widget.getModelProperty(key);
+            if(value){
+                $element.attr(key, value);
+            } else {
+                $element.removeAttr(key);
+            }
+        });
+    }
+
+
+    function Processor(){
+        WbProcessorAbstract.apply(this);
+    };
+
+    // extend functionality
+    Processor.prototype = new WbProcessorAbstract();
+
+    Processor.prototype.process = function(widget, event){
+        if(widget.state !== 'ready') {
+            return;
+        }
+
+        // 1- Handle model load
+        if(event.type === 'modelChanged' || event.type === 'stateChanged'){
+            loadWidgetAttributes(widget, microdataAttributes);
+            return;
+        }
+
+        // 2- Handle model update
+        if(event.type === 'modelUpdated'){
+            loadWidgetAttributes(widget, _.intersection(microdataAttributes, event.keys || [event.key]));
+            return;
+        }
+    }
+    return Processor;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Processor
+ * @name WbProcessorSelect
+ * @description Widget processor
+ * 
+ */
+.factory('WbProcessorSelect', function ($widget, WbProcessorAbstract) {
+    'use strict';
+
+    function Processor(){
+        WbProcessorAbstract.apply(this);
+        this.selectedWidgets = [];
+        this.callbacks = {
+                'selectionChange':[]
+        };
+
+        var ctrl = this;
+        this.clickListener = function($event){
+            var widget = $event.source;
+
+            widget.setSelected(true);
+            if($event.shiftKey){
+                ctrl.selectedWidgets.push(widget);
+            } else {
+                _.forEach(ctrl.selectedWidgets, function(widget){
+                    widget.setSelected(false);
+                });
+                ctrl.selectedWidgets = [widget];
+            }
+            $event.stopPropagation();
+            $event.preventDefault();
+            
+            $event.widgets = ctrl.selectedWidgets;
+            ctrl.fire('selectionChange', $event);
+        }
+
+        this.dblclickListener = function($event){
+            var widget = $event.source;
+            
+            widget.setSelected(true, $event);
+            $event.stopPropagation();
+            $event.preventDefault();
+
+            // clear selection
+            _.forEach(ctrl.selectedWidgets, function(widget){
+                widget.setSelected(false);
+            });
+            ctrl.selectedWidgets = [widget];
+
+            // Open an editor 
+            var editor = $widget.getEditor(widget);
+            editor.show();
+            
+            $event.widgets = ctrl.selectedWidgets;
+            ctrl.fire('selectionChange', $event);
+        }
+    };
+    Processor.prototype = new WbProcessorAbstract();
+    Processor.prototype.process = function(widget, event){
+        if(event.type !== 'stateChanged') {
+            return;
+        }
+        if(widget.state === 'edit') {
+            widget.on('click', this.clickListener);
+            widget.on('dblclick', this.dblclickListener);
+        } else {
+            widget.off('click', this.clickListener);
+            widget.off('dblclick', this.dblclickListener);
+        }
+    };
+
+    Processor.prototype.getSelectedWidgets = function(){
+        return this.selectedWidgets || [];
+    };
+
+    Processor.prototype.on = function(event, callback){
+        this.callbacks[event].push(callback);
+    };
+
+    Processor.prototype.off = function(event, callback){
+        var index = this.callbacks[event].indexOf(callback);
+        if(index > -1){
+            this.callbacks[event].slice(index, 1);
+        }
+    };
+    
+
+    Processor.prototype.fire = function (type, params) {
+        params = params || {};
+        
+        // 1- Call processors
+        var event = _.merge({
+            source: this,
+            type: type
+        }, params || {});
+
+        // 2- call listeners
+        if (!angular.isDefined(this.callbacks[type])) {
+            return;
+        }
+        var callbacks = this.callbacks[type];
+        var resultData = null;
+        for(var i = 0; i < callbacks.length; i++){
+            // TODO: maso, 2018: check if the event is stopped to propagate
+            try {
+                resultData = callbacks[i](event) || resultData;
+            } catch (error) {
+                // NOTE: remove on release
+                console.log(error);
+            }
+        }
+        return resultData;
+    };
+
+    return Processor;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Processor
+ * @name WbProcessorStyle
+ * @description Widget processor
+ * 
+ */
+.factory('WbProcessorStyle', function ($wbUtil, WbProcessorAbstract) {
+    'use strict';
+    
+    function loadStyle(widget, keys) {
+        var element = widget.getElement();
+        
+        var computedStyle = {};
+        var style = widget.getModelProperty('style') || {};
+        var runtimeModel = widget.getRuntimeModel() || {};
+        if(!keys){
+            element.attr('style', '');
+            computedStyle = angular.merge({}, style, runtimeModel.style);
+        } else {
+            _.forEach(keys, function(key){
+                computedStyle[key] = runtimeModel.style[key] || style[key] || '';
+            });
+        }
+        element.css(computedStyle);
+    }
+
+    function Processor(){
+        WbProcessorAbstract.apply(this);
+    };
+    Processor.prototype = new WbProcessorAbstract();
+
+    Processor.prototype.process = function(widget, event){
+        if(event.type === 'modelChanged'){
+            loadStyle(widget);
+        } else if(event.type === 'modelUpdated'){
+            var keys = [];
+            var evKeys = event.keys || [event.key];
+            for(var i = 0; i < evKeys.length; i++){
+                if(evKeys[i].startsWith('style.')){
+                    keys.push(evKeys[i].substring(6));
+                }
+            }
+            if(!_.isEmpty(keys)){
+                loadStyle(widget, keys);
+            }
+        }
+    }
+    return Processor;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+/**
+ * @ngdoc Services
+ * @name $WbProviderTimeout
+ * @description UI utilities management
+ * 
+ */
+angular.module('am-wb-core')
+.factory('$WbProviderTimeout', function($timeout) {
+
+    var promisses = [];
+
+    /*
+     * remove promise from list
+     */
+    function remove(promise){
+        _.remove(promisses, function(prom){
+            return prom == promise;
+        });
+    }
+
+    /*
+     * Simulates $timeout for widgets
+     */
+    function $WbProviderTimeout(fn, delay, invokeApply, pass){
+        var promiss = $timeout(fn, delay, invokeApply, pass)
+        .finally(function(){
+            remove(promiss);
+        });
+        return promiss;
+    }    
+    /**
+     * Clean the provider
+     * 
+     * @memberof $WbProviderTimeout
+     */
+    $WbProviderTimeout.clean = function(){
+        _.forEach(promisses, function(promiss){
+            $timeout.cancel(promiss);
+        });
+        promisses = [];
+    };
+    
+    return $WbProviderTimeout;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')
+
+/**
+ * @ngdoc Services
+ * @name $widget
+ * @description مدیریت ویجت‌های سیستم
+ * 
+ * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
+ */
+.service('$widget', function(
+        $wbUtil, 
+        $q, $injector,
+        WidgetEditorFake) {
+    'use strict';
+
+    var _group_repo = [];
+    var contentElementAsso = [];
+    var elementKey = [];
+    var service = this;
+
+    /*
+     * List of all widget processor
+     * 
+     * A processor is a function which accepts widget and event then 
+     * update widget based on the event. There are many predefined processor
+     * such as style, microdata, and DND processors.
+     * 
+     */
+    var processors = {};
+
+    /*
+     * List of converters
+     */
+    var converters = [];
+
+    var notFoundWidget = {
+            template : '<div ng-show="wbEditable">Unsuported widget?!</div>',
+            label : 'Not found',
+            description : 'Element not found'
+    };
+    var container = {
+            type : 'Page',
+            label : 'Page',
+            description : 'Panel contains list of widgets.',
+            image : 'images/wb/content.svg'
+    };
+
+    function _group(groupId){
+        for(var i = 0; i < _group_repo.length; i++){
+            if(_group_repo[i].id === groupId){
+                return _group_repo[i];
+            }
+        }
+        var group = {
+                id: groupId
+        };
+        _group_repo.push(group);
+        return group;
+    }
+
+    function _newGroup(group){
+        var g = _group(group.id);
+        angular.extend(g, group);
+    }
+
+    function _groups(){
+        return _group_repo;
+    }
+
+    function _widget(model){
+        if (model.type in contentElementAsso) {
+            return contentElementAsso[model.type];
+        }
+        if (model.type === 'Page') {
+            return container;
+        }
+        return notFoundWidget;
+    }
+    /**
+     * Finds a widget related to the input model.
+     * 
+     * Widget type is stored in the widget data model. This function get the
+     * model type from the input data type and return related widget.
+     * 
+     * NotFoundElement widget is returned if the widget type is not found.
+     * 
+     * @memberof $widget
+     * @param model to find a widget
+     * @returns promise to find a widget
+     */
+    function widget(model) {
+        return $q.when(_widget(model));
+    }
+
+    /**
+     * Returns list of all registerd widgets.
+     * 
+     * @memberof $widget
+     * @returns promise to load all widgets
+     */
+    function widgets() {
+        var widgets = {};
+        // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+        widgets.items = [];
+        elementKey.forEach(function(type) {
+            widgets.items.push(contentElementAsso[type]);
+        });
+        return $q.when(widgets);
+    }
+
+    /**
+     * List of all registered widgets
+     * 
+     * @memberof $widget
+     * @returns keys {array} list of all keys
+     */
+    function getWidgetsKey(){
+        return elementKey;
+    }
+
+    /**
+     * Registers new widget
+     * 
+     * The old widget will be override if a new widget with the same type is registered.
+     * 
+     * @See the following page for more information:
+     * 
+     *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
+     *    
+     * 
+     * @memberof $widget
+     * @param widget to add
+     * @return the service
+     */
+    function newWidget(widget) {
+        if (hasWidget(widget.type)) {
+            // TODO: maso, 2017: Add log for duplication
+        }
+        // fix widget data
+        widget.model = widget.model || {style:{}};
+        widget.model.type = widget.type;
+        widget.model.name = widget.model.name || widget.title; 
+
+        contentElementAsso[widget.type] = widget;
+        elementKey.push(widget.type);
+        return service;
+    }
+
+
+    function hasWidget(type) {
+        return type in contentElementAsso;
+    }
+    this.hasWidget = hasWidget;
+
+    function isWidgetLeaf(name){
+        if (name in contentElementAsso) {
+            return contentElementAsso[name].isLeaf;
+        }
+        return false;
+    }
+    this.isWidgetLeaf = isWidgetLeaf;
+
+    /**
+     * Compile element 
+     * 
+     * @name show
+     * @memberof $widget
+     * @param model
+     *            {object}
+     *            <ul>
+     *            <li>templateUrl - {string=}: The URL of a template that will
+     *            be used as the content of the dialog.</li>
+     *            <li>template- {string=}: HTML template to show in the dialog.
+     *            This must be trusted HTML with respect to Angular's $sce
+     *            service. This template should never be constructed with any
+     *            kind of user input or user data.</li>
+     *            <li>contentElement:</li>
+     *            <li>scope - {object=}: the scope to link the template
+     *            controller to. If none is specified, it will create a new
+     *            isolate scope. This scope will be destroyed when the dialog is
+     *            removed unless preserveScope is set to true.</li>
+     *            <li>controller - {function|string=}: The controller to
+     *            associate with the dialog. The controller will be injected
+     *            with the local $mdDialog, which passes along a scope for the
+     *            dialog.</li>
+     *            <li>controllerAs - {string=}: An alias to assign the
+     *            controller to on the scope.</li>
+     *            <li>parent - {element=}: The element to append the dialog to.
+     *            Defaults to appending to the root element of the application.</li>
+     *            </ul>
+     * @param parentWidget
+     *     {WbWidget} the parent
+     * @param preElement {Element} pre build element
+     * @return promise A promise that resolve created element
+     */
+    function compile(model, $parent, preElement){
+        var widgetDescription = _widget(model);
+        var gettingTemplatePromisse;
+        if(preElement){
+            gettingTemplatePromisse = $q.resolve(preElement);
+        } else {
+            gettingTemplatePromisse = $wbUtil.getTemplateFor(widgetDescription)
+            .then(function(template) {
+                // 3- bind controller
+                // TODO: maso, 2019: replace with JQuery 
+                return angular.element(template);
+            });
+        }
+        return gettingTemplatePromisse
+        .then(function($element){
+            var srcCtrl = (model.type === 'Group') ? 'WbWidgetGroup' : 'WbWidgetAbstract';
+            srcCtrl = widgetDescription.controller || srcCtrl;
+            var Widget = $injector.get(srcCtrl);
+            var widget = new Widget($element, $parent);
+            $element[0].$$wbController = widget;
+            return widget.setModel(model);
+        });
+    }
+
+
+    /**
+     * Creates new serialized data of widget
+     * 
+     * @memberof $widget
+     * @param widget
+     * @returns
+     */
+    function widgetData(widget){
+        return angular.copy(widget.model);
+    }
+
+    // widgets
+    service.newWidget = newWidget;
+    service.widget = widget;
+    service.widgets = widgets;
+    service.widgetData = widgetData;
+    service.getWidgetsKey = getWidgetsKey;
+
+    // new api
+    service.getWidget = _widget;
+    service.getWidgets =  function(){
+        var widgets = {};
+        // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+        widgets.items = [];
+        elementKey.forEach(function(type) {
+            widgets.items.push(contentElementAsso[type]);
+        });
+        return widgets;
+    };
+
+    // widget groups
+    service.group = _group;
+    service.groups = _groups;
+    service.newGroup = _newGroup;
+
+    // utils
+    service.compile = compile;
+
+    /**
+     * Gets list of all children from the widget
+     * 
+     * The list is consist of all children and sub-children from the given 
+     * widget.
+     * 
+     * @params widget {AbstractWidgetCtrl} the widget
+     * @return List of widgets
+     * @memberof $widget
+     */
+    this.getChildren = function(widget) {
+        // Check if it is group
+        var widgets = [];
+        if(widget.isLeaf()){
+            return widgets;
+        }
+
+        // load list of widgets
+        var groups = [];
+        _.forEach(widget.getChildren(), function(child){
+            groups.push(child);
+        });
+        while(groups.length) {
+            widget = groups.pop();
+            widgets.push(widget);
+            if(!widget.isLeaf()){
+                var children = widget.getChildren();
+                for(var i = 0; i < children.length; i++) {
+                    var child = children[i];
+                    groups.push(child);
+                }
+            }
+        }
+        //return the list
+        return widgets;
+    };
+
+    // Returns a function, that, as long as it continues to be invoked, will not
+    // be triggered. The function will be called after it stops being called for
+    // N milliseconds. If `immediate` is passed, trigger the function on the
+    // leading edge, instead of the trailing.
+    this.debounce = function (func, wait, immediate) {
+        var timeout;
+        return function() {
+            var context = this;
+            var args = arguments;
+            var later = function() {
+                timeout = null;
+                if (!immediate) {
+                    func.apply(context, args);
+                }
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) {
+                func.apply(context, args);
+            }
+        };
+    };
+
+
+    /***********************************************
+     * providers
+     ***********************************************/
+
+    var providers =  {};
+    
+    /**
+     * Removes a provider by its key
+     * 
+     * @memberof $widget
+     * @param key {string} of the provider
+     * @return the provider or null
+     */
+    this.removeProvider = function(key){
+        var provider = providers[key];
+        providers[key] = undefined;
+        return provider;
+    };
+    
+    /**
+     * Gets a provider by its key
+     * 
+     * @memberof $widget
+     * @param key {string} of the provider
+     * @return the provider or null
+     */
+    this.getProvider = function(key){
+        return providers[key];
+    };
+    
+    /**
+     * Sets a provider for the specified key
+     * 
+     * @memberof $widget
+     * @para key {string} of the provider
+     */
+    this.setProvider = function(key, provider){
+        providers[key] = provider;
+        return this;
+    }
+    
+    /**
+     * Gets the list of providers
+     * 
+     * @memberof $widget
+     * @return list of providers
+     */
+    this.getProviders = function(){
+        return providers;
+    };
+
+    /**
+     * Sets a provider
+     * 
+     * @deprecated use setprovider insted
+     */
+    this.addProvider = function(key, provider){
+        console.logs('$widget.addProvider is deprecated and will be removed in the next version');
+        return this.setProvider(key, provider)
+    };
+    
+    /**
+     * Gets list of providers keys
+     * 
+     * @memberof $widget
+     * @return list of keys
+     */
+    this.getProvidersKey = function(){
+        return _.keys(providers);
+    };
+    
+    /***********************************************
+     * Editors
+     ***********************************************/
+    var editors = {};
+    var fakeEditor = new WidgetEditorFake();
+
+
+
+    /**
+     * Set editor of a widgets
+     * 
+     * on double click editors are used to edit the widget.
+     * 
+     * @params type {string} type of the widget
+     * @params editor {Editor} editor
+     * @memberof $widget
+     */
+    this.setEditor = function(type, editor){
+        editors[type] = editor;
+    };
+
+    /**
+     * Find editor for the given widget
+     * 
+     * @params widget {WbWidget} the widget
+     * @return the editor or fake editor
+     * @memberof $widget
+     */
+    this.getEditor = function(widget){
+        if(widget.$$wbEditor){
+            // return old editor
+            return widget.$$wbEditor;
+        }
+        if(editors[widget.getType()] == undefined){
+            return fakeEditor;
+        }
+        var register = editors[widget.getType()];
+        // create editor
+        var Editor = $injector.get(register.type);
+        var editor = new Editor(widget, register.options || {});
+        var ctrl = this;
+        widget.$$wbEditor = editor;
+        editor.on('destroy', function(){
+            ctrl.removeEditorFromList(editor);
+        });
+        return editor;
+    };
+
+//  this.getEditors = function(){};
+//  this.getActiveEditor = function(){};
+
+
+    /***********************************************
+     * Processors
+     ***********************************************/
+    /**
+     * set a processor of the type
+     * 
+     * @memberof $widget
+     */
+    this.setProcessor = function(type, processor){
+        processors[type] = processor;
+    };
+
+    /**
+     * gets processor of the type
+     * 
+     * @memberof $widget
+     */
+    this.getProcessor = function(type) {
+        return processors[type];
+    };
+
+    /**
+     * gets list of processors
+     * 
+     * @memberof $widget
+     */
+    this.getProcessors = function(){
+        return processors;
+    };
+
+
+    /**
+     * Apply processor on the given widget
+     * 
+     * @memberof $widget
+     */
+    this.applyProcessors = function(widget, event){
+        event = event || {};
+        angular.forEach(processors, function(processor){
+            try{
+                processor.process(widget, event);
+            } catch (ex){
+                console.error('Fail to run the processor');
+                console.error(ex);
+            }
+        });
+    }
+
+
+    /***********************************************
+     * Convertors
+     ***********************************************/
+    this.addConverter = function(converter){
+        converters.push(converter);
+    };
+
+    this.getConverters = function(){
+        return converters;
+    };
+
+    this.getConverter = function(mimetype){
+        for(var i = 0; i < converters.length; i++){
+            if(converters[i].getMimetype() === mimetype){
+                return converters[i];
+            }
+        }
+    };
+
+    this.widgetFromPoint = function(x, y){
+        return this.widgetFromElement(document.elementFromPoint(x, y));
+    };
+
+    this.widgetFromElement = function(element){
+        if(!element){
+            return;
+        }
+        do{
+            if(element.$$wbController){
+                return element.$$wbController;
+            }
+            element = element.parentNode;
+        } while(element);
+    };
+
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+
+
+//submit the controller
+angular.module('am-wb-core')//
+/**
+ * @ngdoc Widgets
+ * @name WbWidgetAbstract
+ * @descreption Abstract widget
+ * 
+ * This is an abstract implementation of the widgets. ## Models
+ * 
+ * The model of the widget is consist of two main part:
+ * 
+ * <ul>
+ * <li>User data</li>
+ * <li>Runtime data</li>
+ * </ul>
+ * 
+ * User data is set as input data model and the runtime data is managed by
+ * events and user functions.
+ * 
+ * Finally the combination of user and runtime data is used to update the view.
+ * 
+ * The setModelProperty changes the user data model.
+ * 
+ * The setProperty changes the runtime properties.
+ *  ## Events
+ * 
+ * 
+ * Here is list of allowed types:
+ * 
+ * <ul>
+ * <li>modelChanged: some properties of the model is changed.</li>
+ * <li>modelUpdated: A new data model is replaced with the current one.</li>
+ * <li>styleChanged: Computed style of the current widget is update.</li>
+ * <li>widgetIsEditable: Widget is in editable state (so the result of
+ * isEditable() is true)</li>
+ * <li>widgetIsNotEditable: widget is not in editable mode any more(so the
+ * result of isEditable() is false)</li>
+ * <li>widgetDeleted: the widgets is removed.</li>
+ * <li>widgetUnderCursor: The widget is under the mouse</li>
+ * <li>widgetSelected: the widget is selected</li>
+ * <li>widgetUnselected: the widget is unselected</li>
+ * </ul>
+ * 
+ * Following event propagate on the root too
+ * 
+ * <ul>
+ * <li>widgetUnderCursor</li>
+ * <li>widgetSelected</li>
+ * </ul>
+ */
+.factory('WbWidgetAbstract', function($wbUtil, $widget, $timeout, $wbWindow ){
+    'use strict';
+
+    function debounce(func, wait) {
+        var timeout;
+        return function() {
+            var context = this;
+            var args = arguments;
+            var later = function() {
+                timeout = null;
+                func.apply(context, args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    function WbWidgetAbstract ($element, $parent){
+        this.elementAttributes = [
+            // identification
+            'id',
+            'name',
+            'title',
+            'class',
+            // access
+            'accesskey',
+            'contenteditable',
+            'hidden',
+            'tabindex',
+            // language
+            'dir',
+            'lang',
+            'translate',
+            'spellcheck',
+            /*
+             * NOTE: We must manage D&D internally to mange user D&D codes
+             * TODO: maso, 2019: move dnd into a processor
+             */
+            'draggable',
+            'dropzone',
+            ];
+        this.$element = $element;
+        this.$parent = $parent;
+        /**
+         * State of the widget
+         * 
+         * - init
+         * - edit
+         * - ready
+         * - deleted
+         * 
+         * @memberof WbAbstractWidget
+         */
+        this.state = 'init';
+
+        this.actions = [];
+        this.callbacks = [];
+        this.childWidgets = [];
+
+        /*
+         * This is a cache of customer function
+         * 
+         */
+        this.eventFunctions = {};
+        this.computedStyle = {};
+
+        // models
+        this.runtimeModel =  {
+                style:{},
+                on: {},
+        };
+        this.model = {};
+        // event listeners
+        var ctrl = this;
+        /*
+         * TODO: maso, 2019: move to event manager.
+         */
+        this.eventListeners = {
+                scroll: function($event){
+                    ctrl.fire('scroll', $event);
+                },
+                click: function ($event) {
+                    ctrl.fire('click', $event);
+                },
+                dblclick: function ($event) {
+                    ctrl.fire('dblclick', $event);
+                },
+                mouseout: function ($event) {
+                    ctrl.fire('mouseout', $event);
+                },
+                mouseover: function ($event) {
+                    ctrl.fire('mouseover', $event);
+                },
+                mousedown: function ($event) {
+                    ctrl.fire('mousedown', $event);
+                },
+                mouseup: function ($event) {
+                    ctrl.fire('mouseup', $event);
+                },
+                mouseenter: function ($event) {
+                    ctrl.fire('mouseenter', $event);
+                },
+                mouseleave: function ($event) {
+                    ctrl.fire('mouseleave', $event);
+                },
+
+                // Media events
+                error: function ($event) {
+                    ctrl.fire('error', $event);
+                },
+                success: function ($event) {
+                    ctrl.fire('success', $event);
+                },
+                load: function ($event) {
+                    ctrl.fire('load', $event);
+                },
+
+                // DND
+                dragstart: function ($event) {
+                    ctrl.fire('dragstart', $event);
+                },
+                dragend: function ($event) {
+                    ctrl.fire('dragend', $event);
+                },
+                dragenter: function ($event) {
+                    ctrl.fire('dragenter', $event);
+                },
+                dragover: function ($event) {
+                    ctrl.fire('dragover', $event);
+                },
+                dragleave: function ($event) {
+                    ctrl.fire('dragleave', $event);
+                },
+                drop: function ($event) {
+                    ctrl.fire('drop', $event);
+                },
+
+        };
+
+        /*
+         * Add resize observer to the element
+         */
+        this.resizeObserver = new ResizeObserver(debounce(function ($event) {
+            if(angular.isArray($event)){
+                $event = $event[0];
+            }
+            ctrl.fire('resize', $event);
+        }, 300));
+
+        var options = {
+                root: null,
+                rootMargin: '0px',
+        };
+
+        this.intersectionObserver = new IntersectionObserver(function ($event) {
+            if(angular.isArray($event)){
+                $event = $event[0];
+            }
+            ctrl.setIntersecting($event.isIntersecting, $event);
+        }, options);
+
+        // Init the widget
+        this.connect();
+        this.setIntersecting(true, {});
+    }
+
+    /**
+     * Returns model of the widget
+     * 
+     * The model is managed by other entity and used as read only part in the
+     * widget.
+     * 
+     * By the way it is supposed that the model is used just in a widget and to
+     * modify the model, a method of the widget is called. In this case the widget
+     * fire the changes of the model.
+     * 
+     * @see #setModelProperty(key, value)
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getModel = function () {
+        return this.model;
+    };
+
+    /**
+     * Sets model of the widget
+     * 
+     * @see #getModel()
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.setModel = function (model) {
+        this.setState('init');
+        if (model === this.model) {
+            return;
+        }
+        this.model = model;
+        this.runtimeModel =  {
+                style:{},
+                on: {},
+        };
+        this.fire('modelChanged');
+        this.setState('ready');
+        return this;
+    };
+
+    /**
+     * Checks if the key exist in the widget model
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.hasModelProperty = function(key){
+        return objectPath.has(this.getModel(), key);
+    };
+
+    /**
+     * Get model property
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getModelProperty = function(key){
+        return objectPath.get(this.getModel(), key);
+    };
+
+    /**
+     * Sets new model property value
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.setModelProperty = function (key, value){
+        // create the event
+        var $event = {
+                source: this,
+                key: key,
+                keys: [key],
+                oldValue: this.getModelProperty(key),
+                value: value
+        };
+
+        // check if value changed
+        if(angular.equals($event.oldValue, $event.value)){
+            return;
+        }
+
+        // Set the address
+        if(value){
+            objectPath.set(this.getModel(), key, value);
+        } else {
+            objectPath.del(this.getModel(), key);
+        }
+        this.fire('modelUpdated', $event);
+    };
+
+    /**
+     * Gets runtime model
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getRuntimeModel = function () {
+        return this.runtimeModel;
+    };
+
+    /**
+     * Checks if property exist
+     * 
+     * NOTE: just look for runtime property
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.hasProperty = function (key){
+        return objectPath.has(this.getRuntimeModel(), key);
+    };
+
+    /**
+     * Gets property of the model
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getProperty = function (key){
+        return objectPath.get(this.getRuntimeModel(), key);
+    };
+
+    /**
+     * Remove property
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.removeProperty = function (key){
+        var model = this.getRuntimeModel();
+        objectPath.del(model, key);
+    };
+
+    /**
+     * Changes property value
+     * 
+     * If the change cause the view to update then this function will update and
+     * render the view.
+     * 
+     * @memberof WbAbstractWidget
+     * @name setProperty
+     */
+    WbWidgetAbstract.prototype.setProperty = function (key, value){
+        // create the event
+        var $event = {
+                source: this,
+                key: key,
+                keys: [key],
+                oldValue: this.getProperty(key),
+                value: value
+        };
+
+        // check if value changed
+        if(angular.equals($event.oldValue, $event.value)){
+            return;
+        }
+
+        // Set the address
+        var model = this.getRuntimeModel();
+        if(angular.isDefined(value)){
+            objectPath.set(model, key, value);
+        } else {
+            objectPath.del(model, key);
+        }
+        this.fire('modelUpdated', $event);
+    };
+
+    /**
+     * Sets or gets style of the widget
+     * 
+     * The function effect on runtime style not the model. To change the model use
+     * #setModelProperty(key,value).
+     * 
+     * NOTE: this function is part of widget API.
+     * 
+     * Set style by key:
+     * 
+     * widget.style('background.color', '#ff00aa');
+     * 
+     * Get style by key:
+     * 
+     * var color = widget.style('background.color');
+     * 
+     * Remove style by key:
+     * 
+     * widget.style('background.color', null);
+     * 
+     * Set style by object:
+     * 
+     * widgt.style({ background: { color: 'red', image: null } });
+     * 
+     * The style object is read only and you can get it as follow:
+     * 
+     * var style = widget.style();
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.style = function (style, value) {
+        // there is no argument so act as get
+        if(!angular.isDefined(style)){
+            return angular.copy(this.getProperty('style'));
+        }
+        // style is a key
+        if(angular.isString(style)){
+            if(angular.isDefined(value)){
+                return this.setStyle(style, value);
+            } else {
+                return this.getStyle(style);
+            }
+        }
+    };
+
+    /**
+     * Sets style of the widget
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.setStyle = function(key, value) {
+        this.setProperty('style.' + key, value);
+    };
+
+    /**
+     * Get style from widget
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getStyle = function(key) {
+        return this.getProperty('style.' + key);
+    };
+
+
+    /**
+     * Delete the widget
+     * 
+     * This function just used in edit mode
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.delete = function () {
+        // remove itself
+        this.fire('delete');
+        this.getParent().removeChild(this);
+    };
+
+    /**
+     * Remove the widgets
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.destroy = function ($event) {
+        // remove callbacks
+        this.callbacks = [];
+        this.actions = [];
+
+        // destroy children
+        angular.forEach(this.childWidgets, function (widget) {
+            widget.destroy();
+        });
+        this.childWidgets = [];
+
+        // destroy view
+        var $element = this.getElement();
+        $element.remove();
+        $element = null;
+
+        // remove scope
+        this.fire('destroy', $event);
+    };
+
+    /**
+     * Disconnect view with the widget
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.disconnect = function () {
+        var $element = this.getElement();
+        if (!$element) {
+            return;
+        }
+        this.resizeObserver.unobserve($element[0]);
+        this.intersectionObserver.unobserve($element[0]);
+        angular.forEach(this.eventListeners, function (listener, key) {
+            $element.off(key, listener);
+        });
+    };
+
+    /**
+     * Connects view with widget
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.connect = function () {
+        var $element = this.getElement();
+        if (!$element) {
+            return;
+        }
+        angular.forEach(this.eventListeners, function (listener, key) {
+            $element.on(key, listener);
+        });
+        this.resizeObserver.observe($element[0]);
+        this.intersectionObserver.observe($element[0]);
+    };
+
+    /**
+     * Get elements of the widget
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getElement = function () {
+        return this.$element;
+    };
+
+    /**
+     * Sets element attributes
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.setElementAttribute = function(key, value){
+        var $element = this.$element;
+        if(value){
+            $element.attr(key, value);
+        } else {
+            $element.removeAttr(key);
+        }
+    };
+
+    /**
+     * Get element attribute
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getElementAttribute = function(key){
+        return this.$element.attr(key);
+    };
+
+    /**
+     * Remove element attribute
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.removeElementAttribute = function(key){
+        this.$element.removeAttr(key);
+    };
+
+    /**
+     * Set widget silent
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.setSilent = function(silent) {
+        this.silent = silent;
+    };
+
+    /**
+     * Checks if the element is silent
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.isSilent = function() {
+        return this.silent;
+    };
+
+    /**
+     * Adds new callback of type
+     * 
+     * @param typeof
+     *            the event
+     * @param callback
+     *            to call on the event
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.on = function (type, callback) {
+        if (!angular.isFunction(callback)) {
+            throw {
+                message: 'Callback must be a function'
+            };
+        }
+        if (!angular.isArray(this.callbacks[type])) {
+            this.callbacks[type] = [];
+        }
+        if(this.callbacks[type].includes(callback)){
+            return;
+        }
+        this.callbacks[type].push(callback);
+    };
+
+    /**
+     * Remove the callback
+     * 
+     * @param type
+     *            of the event
+     * @param callback
+     *            to remove
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.off = function (type, callback) {
+        if (!angular.isArray(this.callbacks[type])) {
+            return;
+        }
+        // remove callback
+        var callbacks = this.callbacks[type];
+        var index = callbacks.indexOf(callback);
+        if (index > -1) {
+            callbacks.splice(index, 1);
+        }
+    };
+
+    /**
+     * Call all callbacks on the given event type.
+     * 
+     * Before callbacks, widget processors will process the widget and event.
+     * 
+     * @param type
+     *            of the event
+     * @param params
+     *            to add to the event
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.fire = function (type, params) {
+        params = params || {};
+
+        // 1- Call processors
+        var event = _.merge({
+            source: this,
+            type: type
+        }, params || {});
+        $widget.applyProcessors(this, event);
+
+        // 2- call listeners
+        if (this.isSilent() || !angular.isDefined(this.callbacks[type])) {
+            return;
+        }
+        var callbacks = this.callbacks[type];
+        var resultData = null;
+        for(var i = 0; i < callbacks.length; i++){
+            // TODO: maso, 2018: check if the event is stopped to propagate
+            try {
+                resultData = callbacks[i](event) || resultData;
+            } catch (error) {
+                // NOTE: remove on release
+                console.log(error);
+            }
+        }
+        return resultData;
+    };
+
+    /**
+     * Gets direction of the widget
+     * 
+     * This function get direction from user model and is equals to:
+     * 
+     * widget.getModelProperty('style.layout.direction');
+     * 
+     * NOTE: default layout direction is column.
+     * 
+     * @returns {WbAbstractWidget.model.style.flexDirection|undefined}
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getDirection = function () {
+        return this.getModelProperty('style.flexDirection') || 'column';
+    };
+
+    /**
+     * Get events of the widget
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getEvent = function () {
+        return this.getModelProperty('on') || {};
+    };
+
+    /**
+     * Get title of the widget
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getTitle = function () {
+        return this.getModelProperty('label');
+    };
+
+    /**
+     * Gets type
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getType = function () {
+        return this.getModelProperty('type');
+    };
+
+    /**
+     * Gets Id of the model
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getId = function () {
+        return this.getModelProperty('id');
+    };
+
+    /**
+     * Get parent widget
+     * 
+     * Parent widget is called container in this model. It is attached dynamically
+     * on the render phease.
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getParent = function () {
+        return this.$parent;
+    };
+
+    /**
+     * Sets the state of the widget
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.setState = function (state) {
+        var oldState = this.state;
+        this.state = state;
+        this.fire('stateChanged', {
+            oldValue: oldState,
+            value: state
+        });
+    };
+
+
+
+    /**
+     * Checks if the editable mode is enable
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.isEditable = function () {
+        return this.editable;
+    };
+
+    /**
+     * Set edit mode
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.setEditable = function (editable) {
+        if (this.editable === editable) {
+            return;
+        }
+        this.editable = editable;
+        if (editable) {
+            this.setState('edit');
+        } else {
+            this.setState('ready');
+        }
+        // propagate to child
+        angular.forEach(this.childWidgets, function (widget) {
+            widget.setEditable(editable);
+        });
+    };
+
+    /**
+     * Check if intersecting
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.isIntersecting = function(){
+        return this.intersecting;
+    };
+
+    /**
+     * Set intersecting true
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.setIntersecting = function(intersecting, $event){
+        this.intersecting = intersecting;
+        this.fire('intersection', $event);
+    };
+
+    /**
+     * Clone current widget This method works in edit mode only.
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.clone = function () {
+        var $parent = this.getParent();
+        var index = $parent.indexOfChild(this);
+        $parent.addChild(index, angular.copy(this.getModel()));
+    };
+
+    /**
+     * This method moves widget one to next.
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.moveNext = function () {
+        var $parent = this.getParent();
+        $parent.moveChild(this, $parent.indexOfChild(this) + 1);
+    };
+
+    /**
+     * This method moves widget one to before
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.moveBefore = function () {
+        var $parent = this.getParent();
+        $parent.moveChild(this, $parent.indexOfChild(this) - 1);
+    };
+
+    /**
+     * This method moves widget to the first of it's parent
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.moveFirst = function () {
+        var $parent = this.getParent();
+        $parent.moveChild(this, 0);
+    };
+
+    /**
+     * This method moves widget to the last of it's parent
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.moveLast = function () {
+        var $parent = this.getParent();
+        $parent.moveChild(this, $parent.getChildren().length - 1);
+    };
+
+    /**
+     * Checks if the widget is root
+     * 
+     * If there is no parent controller then this is a root one.
+     * 
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.isRoot = function () {
+        var $parent = this.getParent();
+        return angular.isUndefined($parent) || $parent === null;
+    };
+
+    /**
+     * Gets root widgets of the widget
+     * 
+     * @return the root widget
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getRoot = function () {
+        // check if the root is set
+        if (this.rootWidget) {
+            return this.rootWidget;
+        }
+        // find root if is empty
+        this.rootWidget = this;
+        while (!this.rootWidget.isRoot()) {
+            this.rootWidget = this.rootWidget.getParent();
+        }
+        return this.rootWidget;
+    };
+
+
+    /**
+     * Checks if the widget is selected.
+     * 
+     * NOTE: it is not possible to select root widget
+     * 
+     * @return true if the widget is selected.
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.isSelected = function () {
+        return this.selected;
+    };
+
+    WbWidgetAbstract.prototype.setSelected = function (flag) {
+        if (this.selected === flag) {
+            return;
+        }
+        // fire events
+        this.selected = flag;
+        if (flag) {
+            this.fire('select');
+        } else {
+            this.fire('unselect');
+        }
+    };
+
+    /**
+     * Add new action in actions list
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.addAction = function (action) {
+        this.actions.push(action);
+    };
+
+    /**
+     * Gets widget actions
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getActions = function () {
+        return this.actions;
+    };
+
+    /**
+     * Returns bounding client rectangle to parent
+     * 
+     * @return bounding rectangle
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getBoundingClientRect = function () {
+        var element = this.getElement();
+        if(!element){
+            return {
+                width: 0,
+                height: 0,
+                top: 0,
+                left: 0
+            };
+        }
+
+        var offset = element.offset();
+        var width = element.outerWidth();
+        var height = element.outerHeight();
+
+        return {
+            // rect
+            width: width,
+            height: height,
+            // offset
+            top: offset.top /*+ parseInt(element.css('marginTop'), 10)*/ + element.scrollTop(),
+            left: offset.left /*+ parseInt(element.css('marginLeft'), 10)*/ + element.scrollLeft()
+        };
+    };
+
+
+    /**
+     * Adds animation to the page
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.animate = function (options) {
+        var animation = {
+                targets: this.getRuntimeModel(),
+        };
+
+        // copy animation properties
+        if(options.duration){
+            animation.duration = options.duration;
+        }
+        if(options.loop){
+            animation.loop = options.loop;
+        }
+        if(options.autoplay){
+            animation.autoplay = options.autoplay;
+        }
+        if(options.delay){
+            animation.delay = options.delay;
+        }
+        if(options.easing){
+            animation.easing = options.easing;
+        }
+
+        // Create list of attributes
+        var ctrl = this;
+        var keys = [];
+        for(var key in options){
+            // ignore keys
+            if(_.includes(['duration','loop','autoplay','delay','easing'], key)){
+                continue;
+            }
+            keys.push(key);
+            animation[key] = options[key];
+            // set initial value
+            var val = this.getProperty(key);
+            if(!val) {
+                this.setProperty(key, this.getModelProperty(key));
+            }
+        }
+        animation.update = function() {
+            ctrl.fire('modelUpdated', {
+                keys: keys,
+                value: null,
+                oldValue: null
+            });
+        };
+
+        return anime(animation);
+    };
+
+    /**
+     * Remove animations from the widget
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.removeAnimation = function () {
+        // The animation will not add to element so there is no need to remove
+    };
+
+    /**
+     * Sets window of the widget
+     * 
+     * @memberof WbAbstractWidget
+     * @params window {WbWindow} of the current widget
+     */
+    WbWidgetAbstract.prototype.setWindow = function (window) {
+        this.window = window;
+    };
+
+    /**
+     * Gets window of the widget
+     * 
+     * @memberof WbAbstractWidget
+     * @return window of the current widget or from the root
+     */
+    WbWidgetAbstract.prototype.getWindow = function () {
+        return this.window || this.getRoot().getWindow() || $wbWindow;
+    };
+
+
+    /**
+     * Adds attributes into the element attributes
+     * 
+     * $widget.addElementAttributes('a', 'b');
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.addElementAttributes = function(){
+        this.elementAttributes = _.union(this.elementAttributes, arguments);
+    };
+
+    /**
+     * Gets element attributes
+     * 
+     * @memberof WbAbstractWidget
+     */
+    WbWidgetAbstract.prototype.getElementAttributes = function(){
+        return this.elementAttributes;
+    }
+
+    WbWidgetAbstract.prototype.isLeaf = function(){
+        return true;
+    }
+
+    return WbWidgetAbstract;
+
+});
+
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+
+//submit the controller
+angular.module('am-wb-core')//
+/**
+ * @ngdoc Widget
+ * @name WbWidgetGroup
+ * @description Manages a group widgets
+ * 
+ * This is a group controller
+ * 
+ */
+.factory('WbWidgetGroup', function( $wbUtil, $widget, $q, WbWidgetAbstract){
+
+    /**
+     * Creates new instance of the group
+     * 
+     * @memberof WbWidgetGroupCtrl
+     * @ngInject
+     */
+    function WbWidgetGroupCtrl($element, $parent){
+        // call super constractor
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+
+        // init group
+    }
+
+    // extend functionality
+    WbWidgetGroupCtrl.prototype = Object.create(WbWidgetAbstract.prototype);
+
+
+    /**
+     * Set model to a group
+     * 
+     * Setting model to a group is differs from setting in widget. In group 
+     * we try to load children and finally loading the group itself.
+     * 
+     * @memberof WbWidgetGroupCtrl
+     * @param model Object to set into the group
+     */
+    WbWidgetGroupCtrl.prototype.setModel = function (model) {
+        this.setState('init');
+        if (model === this.model) {
+            return;
+        }
+        this.model = model;
+        this.fire('modelChanged');
+
+        var ctrl = this;
+        return this.loadWidgets()
+        .then(function(){
+            return ctrl;
+        })
+        .finally(function () {
+            ctrl.fire('loaded');
+            ctrl.setState('ready');
+        });
+    };
+
+    /**
+     * Delete the widget
+     * 
+     * This function just used in edit mode
+     * 
+     * @memberof WbWidgetGroupCtrl
+     */
+    WbWidgetGroupCtrl.prototype.delete = function () {
+        this.removeChildren();
+        this.fire('delete');
+        if (!this.isRoot()) {
+            this.getParent()
+            .removeChild(this);
+        }
+    };
+
+    WbWidgetGroupCtrl.prototype.getChildById = function (id) {
+        var widgets = this.childWidgets;
+        for (var i = 0; i < widgets.length; i++) {
+            if (widgets[i].getId() === id) {
+                return widgets[i];
+            }
+        }
+    };
+
+    /**
+     * Gets all children of the group
+     * 
+     * @return list of all widgets
+     */
+    WbWidgetGroupCtrl.prototype.getChildren = function () {
+        return this.childWidgets;
+    };
+
+    /**
+     * Removes a widget
+     * 
+     * Data model and visual element related to the input model will be removed.
+     * 
+     * @memberof WbWidgetGroupCtrl
+     */
+    WbWidgetGroupCtrl.prototype.removeChild = function (widget) {
+        var index = this.indexOfChild(widget);
+
+        if (index > -1) {
+            // remove model
+            this.childWidgets.splice(index, 1);
+
+            var model = this.getModel();
+            index = model.children.indexOf(widget.getModel());
+            model.children.splice(index, 1);
+
+            // destroy widget
+            widget.destroy();
+            return true;
+        }
+        return false;
+    };
+
+    /**
+     * Removes all children of the group.
+     * 
+     * @memberof WbWidgetGroupCtrl
+     */
+    WbWidgetGroupCtrl.prototype.removeChildren = function(){
+        // remove all children
+        var widgets = _.clone(this.getChildren());
+        angular.forEach(widgets, function (widget) {
+            widget.delete();
+        });
+    };
+
+
+    WbWidgetGroupCtrl.prototype.loadWidgets = function () {
+        // destroy all children
+        angular.forEach(this.childWidgets, function (widget) {
+            widget.destroy();
+        });
+        this.childWidgets = [];
+
+        // check for new child
+        if (!this.model || !angular.isArray(this.model.children)) {
+            return $q.resolve();
+        }
+
+        // create child
+        var parentWidget = this;
+
+        var compilesJob = [];
+        this.model.children.forEach(function (item, index) {
+            var job = $widget.compile(item, parentWidget)//
+            .then(function (widget) {
+                parentWidget.childWidgets[index] = widget;
+            });
+            compilesJob.push(job);
+        });
+
+        var ctrl = this;
+        return $q.all(compilesJob)//
+        .then(function () {
+            var $element = parentWidget.getElement();
+            parentWidget.childWidgets.forEach(function (widget) {
+                widget.setEditable(ctrl.isEditable());
+                $element.append(widget.getElement());
+            });
+        });
+    };
+
+
+    /**
+     * Adds child model
+     * 
+     * @memberof WbWidgetGroupCtrl
+     */
+    WbWidgetGroupCtrl.prototype.addChildModel = function (index, item) {
+        var model = this.getModel();
+        var ctrl = this;
+        index = this.__cleanInsertIndex(index);
+        // add widget
+        item = $wbUtil.clean(item);
+        return $widget.compile(item, this)//
+        .then(function (newWidget) {
+            if (index < ctrl.childWidgets.length) {
+                newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
+            } else {
+                ctrl.getElement().append(newWidget.getElement());
+            }
+            if(!angular.isArray(model.children)){
+                model.children = [];
+            }
+            model.children.splice(index, 0, item);
+            ctrl.childWidgets.splice(index, 0, newWidget);
+
+            // init the widget
+            newWidget.setEditable(ctrl.isEditable());
+            ctrl.fire('newchild', {
+                widgets: [newWidget]
+            });
+            return newWidget;
+        });
+    };
+
+    /**
+     * Adds children at specified index
+     * 
+     * Change data model and the view.
+     * 
+     * @memberof WbWidgetGroupCtrl
+     */
+    WbWidgetGroupCtrl.prototype.addChildrenModel = function (index, children) {
+        var model = this.getModel();
+        var ctrl = this;
+        index = this.__cleanInsertIndex(index);
+
+        // compile all
+        return this.__compileChildren(children)
+        .then(function (widgets) {
+            for(var i = 0; i < widgets.length; i++){
+                var newWidget = widgets[i];
+                
+                var j = i + index;
+                
+                if (j < ctrl.childWidgets.length) {
+                    newWidget.getElement().insertBefore(ctrl.childWidgets[j].getElement());
+                } else {
+                    ctrl.getElement().append(newWidget.getElement());
+                }
+                if(!angular.isArray(model.children)){
+                    model.children = [];
+                }
+                model.children.splice(j, 0, newWidget.getModel());
+                ctrl.childWidgets.splice(j, 0, newWidget);
+
+                // init the widget
+                newWidget.setEditable(ctrl.isEditable());
+            }
+            ctrl.fire('newchild', {
+                widgets: widgets
+            });
+        });
+    };
+    
+    /**
+     * Adds a child model to the group
+     * 
+     * @deprecated
+     */
+    WbWidgetGroupCtrl.prototype.addChild = WbWidgetGroupCtrl.prototype.addChildModel;
+    
+    /**
+     * Adds a children model to the group
+     * 
+     * @deprecated
+     */
+    WbWidgetGroupCtrl.prototype.addChildren = WbWidgetGroupCtrl.prototype.addChildrenModel;
+
+    /*
+     * Internal:
+     * 
+     * convert children model into a list of widgets.
+     */
+    WbWidgetGroupCtrl.prototype.__compileChildren = function(children){
+        var jobs = [];
+        var widgets = [];
+        var ctrl = this;
+        angular.forEach(children, function(item, i){
+            item = $wbUtil.clean(item);
+            jobs.push($widget.compile(item, ctrl)//
+                    .then(function(widget){
+                        widgets[i] = widget;
+                    }));
+        });
+
+        // add widget
+        return $q.all(jobs)//
+        .then(function(){
+            return widgets;
+        });
+    }
+
+    WbWidgetGroupCtrl.prototype.__cleanInsertIndex = function(index){
+        if(!angular.isDefined(index) || index > this.childWidgets.length){
+            return this.childWidgets.length;
+        }
+        if(index < 0){
+            return 0;
+        }
+        return index;
+    };
+    
+    /**
+     * Finds index of child element
+     * 
+     * @memberof WbWidgetGroupCtrl
+     */
+    WbWidgetGroupCtrl.prototype.moveChild = function (widget, index) {
+        function arraymove(arr, fromIndex, toIndex) {
+            var element = arr[fromIndex];
+            arr.splice(fromIndex, 1);
+            arr.splice(toIndex, 0, element);
+        }
+
+        if (index < 0 || index > this.getChildren().length - 1 || this.getChildren().length === 1) {
+            return;
+        }
+        if (this.getModel().children.indexOf(widget.getModel()) === index) {
+            return;
+        }
+        var positionWidget = this.getChildren()[index];
+        // move element
+        if (this.getModel().children.indexOf(widget.getModel()) < index) {
+            positionWidget.getElement().after(widget.getElement());
+        } else {
+            positionWidget.getElement().before(widget.getElement());
+        }
+
+        // move model
+        arraymove(this.getModel().children, this.getModel().children.indexOf(widget.getModel()), index);
+
+        // move controller
+        arraymove(this.getChildren(), this.indexOfChild(widget), index);
+    };
+
+    /**
+     * Finds index of child element
+     * 
+     * @memberof WbWidgetGroupCtrl
+     */
+    WbWidgetGroupCtrl.prototype.indexOfChild = function (widget) {
+        if (!this.childWidgets || !this.childWidgets.length) {
+            return -1;
+        }
+        return this.childWidgets.indexOf(widget);
+    };
+
+    /**
+     * List of allowed child
+     * 
+     * @memeberof WbWidgetGroupCtrl
+     */
+    WbWidgetGroupCtrl.prototype.getAllowedTypes = function () {
+        return this.allowedTypes;
+    };
+
+    /**
+     * set acceptable widgets
+     * 
+     * $widget.setAcceptableChild('a', 'b');
+     * 
+     * @memberof WbWidgetGroupCtrl
+     */
+    WbWidgetGroupCtrl.prototype.setAllowedTypes = function () {
+        this.allowedTypes = arguments;
+    };
+    
+
+    WbWidgetGroupCtrl.prototype.isLeaf = function(){
+        return false;
+    }
+    
+    WbWidgetGroupCtrl.prototype.isHorizontal = function(){
+        var direction = this.getModelProperty('style.flexDirection') || this.getProperty('style.flexDirection');
+        return direction === 'row';
+    }
+
+    return WbWidgetGroupCtrl;
+});
+
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name AbstractHtml
+ * @description Manage a widget with html text.
+ * 
+ * Most of textual widgets (such as h1..h6, p, a, html) just used html
+ * text in view. This controller are about to manage html attribute of
+ * a widget.
+ * 
+ */
+.factory('WbWidgetAbstractHtml', function (WbWidgetAbstract) {
+
+    /**
+     * Creates new instance 
+     * 
+     * @memberof WbWidgetGroupCtrl
+     */
+    function Widget($element, $parent){
+
+        // call super constractor
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes('html');
+        var ctrl = this;
+
+        /*
+         * set element attribute
+         */
+        function eventHandler(event){
+            if(event.key === 'html'){
+                var value = ctrl.getProperty(event.key) || ctrl.getModelProperty(event.key);
+                ctrl.getElement().html(value);
+            }
+        }
+
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+    };
+
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+
+    /**
+     * Gets value of the input
+     * 
+     * @memberof WbWidgetAbstractHtml
+     */
+    Widget.prototype.html = function(){
+        var value = arguments[0];
+        if(value){
+            this.setElementAttribute('html', value);
+        }
+        var element = this.getElement();
+        return element.html.apply(element, arguments);
+    };
+
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name a
+ * @description Manage a link to other documents
+ * 
+ */
+.factory('WbWidgetA', function (WbWidgetAbstractHtml) {
+    'use strict';
+
+    /**
+     * Creates new instance of the group
+     * 
+     * @memberof WbWidgetGroupCtrl
+     * @ngInject
+     */
+    function Widget($element, $parent){
+        // call super constractor
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+        this.addElementAttributes('download', 'href',
+                'hreflang', 'media', 'ping', 'referrerpolicy',
+                'rel', 'target', 'type');
+
+        // chack edit mode
+        function removeDefaultAction($event){
+            $event.preventDefault();
+        }
+        var ctrl = this;
+        this.on('stateChanged', function(event){
+            if(event.value === 'edit'){
+                ctrl.getElement().on('click dblclick', removeDefaultAction);
+            } else {
+                ctrl.getElement().off('click dblclick', removeDefaultAction);
+            }
+        });
+    };
+
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name address
+ * @description Manage a widget
+ */
+.factory('WbWidgetAddress', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name applet
+ * @description Manage a widget
+ */
+.factory('WbWidgetApplet', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name area
+ * @description Manage a widget
+ */
+.factory('WbWidgetArea', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name article
+ * @description Manage a widget
+ */
+.factory('WbWidgetArticle', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name aside
+ * @description Manage a widget
+ */
+.factory('WbWidgetAside', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name audio
+ * @description Manage a widget with audio.
+ * 
+ * 
+ */
+.factory('WbWidgetAudio', function (WbWidgetGroup) {
+    /**
+     * Creates new instance of the widget
+     * 
+     * @memberof audio
+     */
+    function Widget($element, $parent){
+        WbWidgetGroup.apply(this, [$element, $parent]);
+        this.addElementAttributes('autoplay', 'controls',
+                'loop', 'muted', 'preload', 'src');
+        this.setAllowedTypes('source');
+    };
+    Widget.prototype = Object.create(WbWidgetGroup.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name blockquote
+ * @description Manage a widget
+ */
+.factory('WbWidgetBlockquote', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name button
+ * @description Manage a widget
+ */
+.factory('WbWidgetButton', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name canvas
+ * @description Manage a widget
+ */
+.factory('WbWidgetCanvas', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name datalist
+ * @description Manage a widget
+ */
+.factory('WbWidgetDatalist', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name dd
+ * @description Manage a widget
+ */
+.factory('WbWidgetDd', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name details
+ * @description Manage a widget
+ */
+.factory('WbWidgetDetails', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name dialog
+ * @description Manage a widget
+ */
+.factory('WbWidgetDialog', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name div
+ * @description Manage a widget
+ */
+.factory('WbWidgetDiv', function (WbWidgetGroup) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetGroup.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetGroup.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name dl
+ * @description Manage a widget
+ */
+.factory('WbWidgetDl', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name dt
+ * @description Manage a widget
+ */
+.factory('WbWidgetDt', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name embed
+ * @description Manage a widget
+ */
+.factory('WbWidgetEmbed', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name fieldset
+ * @description Manage a widget
+ */
+.factory('WbWidgetFieldset', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name figcaption
+ * @description Manage a widget
+ */
+.factory('WbWidgetFigcaption', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name figure
+ * @description Manage a widget
+ */
+.factory('WbWidgetFigure', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name footer
+ * @description Manage a widget
+ */
+.factory('WbWidgetFooter', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name form
+ * @description Manage a widget
+ */
+.factory('WbWidgetForm', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name frame
+ * @description Manage a widget
+ */
+.factory('WbWidgetFrame', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name frameset
+ * @description Manage a widget
+ */
+.factory('WbWidgetFrameset', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name h1
+ * @description Manage a widget
+ */
+.factory('WbWidgetH1', function (WbWidgetAbstractHtml) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name h2
+ * @description Manage a widget
+ */
+.factory('WbWidgetH2', function (WbWidgetAbstractHtml) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name h3
+ * @description Manage a widget
+ */
+.factory('WbWidgetH3', function (WbWidgetAbstractHtml) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name h4
+ * @description Manage a widget
+ */
+.factory('WbWidgetH4', function (WbWidgetAbstractHtml) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name h5
+ * @description Manage a widget
+ */
+.factory('WbWidgetH5', function (WbWidgetAbstractHtml) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name h6
+ * @description Manage a widget
+ */
+.factory('WbWidgetH6', function (WbWidgetAbstractHtml) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name header
+ * @description Manage a widget
+ */
+.factory('WbWidgetHeader', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name hr
+ * @description Manage a widget
+ */
+.factory('WbWidgetHr', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name iframe
+ * @description Manage an iframe
+ * 
+ * Iframe is a widget to incloud other pages as a part of current page. This widget is
+ * used as Iframe manager.
+ * 
+ */
+.factory('WbWidgetIframe', function (WbWidgetAbstractHtml) {
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+        this.addElementAttributes('name', 'src', 'srcdoc', 'sandbox');
+    };
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')
+/**
+ * @ngdoc Widget
+ * @name img
+ * @description Manage an image
+ */
+.factory('WbWidgetImg', function (WbWidgetAbstract) {
+    function Widget($element, $parent) {
+        WbWidgetAbstract.apply(this, [$element, $parent ]);
+        this.addElementAttributes('alt', 'crossorigin',
+                'height', 'hspace', 'ismap', 'longdesc',
+                'sizes', 'src', 'usemap', 'width');
+    }
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widget
+ * @name input
+ * @description Manage an input field
+ * 
+ * The most used widget to get information from clients is an input. The input
+ * are responsible to get most of data types (email, text, number, ex.) from
+ * clients.
+ * 
+ */
+.factory('WbWidgetInput', function (WbWidgetAbstractHtml) {
+    /**
+     * Creates new instance of the group
+     * 
+     * @memberof WbWidgetGroupCtrl
+     * @ngInject
+     */
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+        this.addElementAttributes('accept', 'alt',
+                'autocomplete', 'autofocus', 'checked',
+                'dirname', 'disabled', 'form', 'max',
+                'maxlength', 'min', 'multiple', 'name',
+                'pattern', 'placeholder', 'readonly',
+                'required', 'size', 'src', 'step', 'inputType',
+                'value');
+        // init input
+        var ctrl = this;
+        function eventHandler(event){
+            if(event.key === 'inputType'){
+                ctrl.setElementAttribute('type', value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
+    }
+
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+
+
+    /**
+     * Gets value of the input
+     * 
+     * @memberof input
+     */
+    Widget.prototype.val = function(){
+        var value = arguments[0];
+        if(value){
+            this.setElementAttribute('value', value);
+        }
+        var element = this.getElement();
+        return element.val.apply(element, arguments);
+    };
+
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name kbd
+ * @description Manage a widget
+ */
+.factory('WbWidgetKbd', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name label
+ * @description Manage a widget
+ */
+.factory('WbWidgetLabel', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name legend
+ * @description Manage a widget
+ */
+.factory('WbWidgetLegend', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name li
+ * @description Manage a widget
+ */
+.factory('WbWidgetLi', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name link
+ * @description Manage a widget link
+ */
+.factory('WbWidgetLink', function (WbWidgetAbstract) {
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes('crossorigin', 'href',
+                'hreflang', 'media', 'rel', 'size', 'type');
+    };
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name main
+ * @description Manage a widget
+ */
+.factory('WbWidgetMain', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name map
+ * @description Manage a widget
+ */
+.factory('WbWidgetMap', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name meta
+ * @description Manage a meta data 
+ * 
+ * In seo (or equivalient usecase) 
+ * 
+ */
+.factory('WbWidgetMeta', function (WbWidgetAbstractHtml) {
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+        this.addElementAttributes('charset', 'content', 'http-equiv', 'name');
+
+        var ctrl = this;
+        function updateView(){
+            var name = ctrl.getProperty('name') || ctrl.getModelProperty('name');
+            var content = ctrl.getProperty('content') || ctrl.getModelProperty('content');
+            ctrl.getElement().html(name + ':' + content);
+        }
+
+        this.on('stateChanged', function(){
+            if(ctrl.state === 'edit'){
+                ctrl.getElement().show();
+                return;
+            }
+            ctrl.getElement().hide();
+        });
+        updateView();
+    };
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
+});
+
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name meter
+ * @description Manage a widget
+ */
+.factory('WbWidgetMeter', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name nav
+ * @description Manage a widget
+ */
+.factory('WbWidgetNav', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name noscript
+ * @description Manage a widget
+ */
+.factory('WbWidgetNoscript', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name object
+ * @description Manage a widget
+ */
+.factory('WbWidgetObject', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name ol
+ * @description Manage a widget
+ */
+.factory('WbWidgetOl', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name optgroup
+ * @description Manage a widget
+ */
+.factory('WbWidgetOptgroup', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name option
+ * @description Manage a widget
+ */
+.factory('WbWidgetOption', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name output
+ * @description Manage a widget
+ */
+.factory('WbWidgetOutput', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name pre
+ * @description Manage a widget with preformatted text.
+ * 
+ */
+.factory('WbWidgetP', function (WbWidgetAbstractHtml) {
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+    };
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name param
+ * @description Manage a widget
+ */
+.factory('WbWidgetParam', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name picture
+ * @description Add a picture widget
+ * 
+ */
+ .factory('WbWidgetPicture', function (WbWidgetGroup) {
+     function Widget($element, $parent){
+         WbWidgetGroup.apply(this, [$element, $parent]);
+        this.addElementAttributes('alt', 'crossorigin', 'height',
+                'hspace', 'ismap', 'longdesc', 'sizes', 'src',
+                'usemap', 'width');
+         this.setAllowedTypes('source', 'img');
+     };
+     // extend functionality
+     Widget.prototype = Object.create(WbWidgetGroup.prototype);
+     return Widget;
+ });
+
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name pre
+ * @description Manage a widget with preformatted text.
+ * 
+ */
+.factory('WbWidgetPre', function (WbWidgetAbstractHtml) {
+    function Widget($element, $parent){
+        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+    };
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name progress
+ * @description Manage a header
+ * 
+ */
+.factory('WbWidgetProgress', function (WbWidgetAbstract) {
+    function Widget($element, $parent) {
+        WbWidgetAbstract.apply(this, [$element, $parent ]);
+        this.addElementAttributes('value', 'max');
+    }
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name q
+ * @description Manage a widget
+ */
+.factory('WbWidgetQ', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name script
+ * @description Manage a widget
+ */
+.factory('WbWidgetScript', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name section
+ * @description Manage a widget
+ */
+.factory('WbWidgetSection', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name select
+ * @description Manage a widget
+ */
+.factory('WbWidgetSelect', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name source
+ * @description Manage resource
+ * 
+ */
+.factory('WbWidgetSource', function (WbWidgetAbstract) {
+
+    /**
+     * Creates new instance of the group
+     * 
+     * @memberof WbWidgetSource
+     */
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes('src', 'srcset', 'media', 'sizes', 'type');
+        
+        var ctrl = this;
+        function updateView(){
+            ctrl.getElement().html('src:' + ctrl.getProperty('src') || ctrl.getModelProperty('src'));
+        }
+
+        this.on('stateChanged', function(){
+            if(ctrl.state === 'edit'){
+                ctrl.getElement().show();
+                updateView();
+                return;
+            }
+            ctrl.getElement().hide();
+        });
+        updateView();
+    };
+
+    // extend functionality
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name style
+ * @description Manage a widget
+ */
+.factory('WbWidgetStyle', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name summary
+ * @description Manage a widget
+ */
+.factory('WbWidgetSummary', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name svg
+ * @description Manage a widget
+ */
+.factory('WbWidgetSvg', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name template
+ * @description Manage a widget
+ */
+.factory('WbWidgetTemplate', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name textarea
+ * @description Manage a textarea
+ * 
+ * Textarea is one of input widgets used to get textual information from clients.
+ * This controller is about to manage a textarea.
+ * 
+ */
+ .factory('WbWidgetTextarea', function (WbWidgetAbstract) {
+     function Widget($element, $parent) {
+         WbWidgetAbstract.apply(this, [$element, $parent]);
+         this.addElementAttributes('autofocus',
+                 'cols',
+                 'dirname',
+                 'disabled',
+                 'form',
+                 'maxlength',
+                 'name',
+                 'placeholder',
+                 'readonly',
+                 'required',
+                 'rows',
+                 'wrap',
+                 'value');
+     }
+     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+
+     /**
+      * Gets value of the input
+      * 
+      * @memberof input
+      */
+     Widget.prototype.val = function(){
+         var value = arguments[0];
+         if(value){
+             this.setElementAttribute('value', value);
+         }
+         var element = this.getElement();
+         return element.val.apply(element, arguments);
+     };
+
+     return Widget;
+ });
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name track
+ * @description Manage a widget
+ */
+.factory('WbWidgetTrack', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name ul
+ * @description Manage a widget
+ */
+.factory('WbWidgetUl', function (WbWidgetAbstract) {
+    'use strict';
+    function Widget($element, $parent){
+        WbWidgetAbstract.apply(this, [$element, $parent]);
+        this.addElementAttributes();
+    };
+    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name video
+ * @description Manage a widget with 
+ */
+ .factory('WbWidgetVideo', function (WbWidgetGroup) {
+    function Widget($element, $parent) {
+        WbWidgetGroup.apply(this, [$element, $parent ]);
+        this.addElementAttributes('autoplay', 'controls', 'height',
+                'loop', 'muted', 'poster', 'preload', 'src',
+                'usemap', 'width');
+        this.setAllowedTypes('source');
+    };
+    Widget.prototype = Object.create(WbWidgetGroup.prototype);
+    return Widget;
+});
+
 angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   'use strict';
 
@@ -20196,7 +22341,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-event-panel.html',
-    "<table class=mb-table style=\"font-size: 10px\"> <thead> <tr md-colors=\"{color: 'primary-700'}\"> <td translate=\"\">Name</td> <td translate=\"\">Code</td> <td></td> </tr> </thead> <tbody> <tr ng-click=\"ctrl.editEvent(event, $event)\" ng-repeat=\"event in events track by $index\" style=\"cursor: pointer\"> <td translate>{{event.title}}</td> <td style=\"cursor: pointer\">{{event.code| limitTo:13 }} ...</td> <td align=center style=\"cursor: pointer;min-height: 22px\"> <md-button style=\"min-height: 20px;height: 20px;margin: 0px;line-height: 20px;padding: 0px\" ng-if=event.code ng-click=\"ctrl.deleteEvent(event, $event)\" class=md-icon-button> <wb-icon size=16px>delete</wb-icon> </md-button> </td> </tr> </tbody> </table>"
+    "<table class=mb-table style=\"font-size: 10px\"> <thead> <tr md-colors=\"{color: 'primary-700'}\"> <td translate=\"\">Name</td> <td translate=\"\">Code</td> <td></td> </tr> </thead> <tbody> <tr ng-click=\"ctrl.editEvent(event, $event)\" ng-repeat=\"event in events track by $index\" style=\"cursor: pointer\"> <td translate>{{event.title}}</td> <td style=\"cursor: pointer\">{{event.code| limitTo:13 }} ...</td> <td align=center style=\"cursor: pointer;min-height: 22px\"> <md-button style=\"min-height: 20px;height: 20px;margin: 0px;line-height: 20px;padding: 0px\" ng-if=event.code ng-click=\"ctrl.deleteEvent(event, $event)\" class=md-icon-button aria-label=\"delete script\"> <wb-icon size=16px>delete</wb-icon> </md-button> </td> </tr> </tbody> </table>"
   );
 
 
@@ -20210,103 +22355,33 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/directives/wb-ui-choose.html',
-    "<md-tabs class=wb-tab-as-choose-button md-selected=ctrl.selectedIndex ng-change=ctrl.tabChanged(selectedIndex)> <md-tab ng-repeat=\"item in items\"> <md-tab-label> <wb-icon>{{item.icon}}</wb-icon> </md-tab-label> </md-tab> </md-tabs>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-audio.html',
-    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=ctrl.editValue(value)> <wb-icon>wb-object-audio</wb-icon> </md-button> <md-input-container> <input aria-label=\"field value\" ng-model=value ng-change=ctrl.updateValue(value)> </md-input-container> </md-list-item>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-background-attachment.html',
-    "<md-input-container> <label translate=\"\">Background attachment</label> <md-select aria-label=\"back ground attachment\" ng-model=attachment ng-change=attachmentChanged(attachment)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.name}}</md-option> </md-select> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-background-origin.html',
-    "<md-input-container> <label translate=\"\">Background origin</label> <md-select aria-label=\"background origin\" ng-model=origin ng-change=originChanged(origin)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.name}}</md-option> </md-select> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-background-position.html',
-    "<md-input-container> <label translate=\"\">Background position</label> <md-select aria-label=\"background option\" ng-model=position ng-change=positionChanged(position)> <md-option ng-repeat=\"item in items\" value={{::item.value}} translate=\"\">{{::item.title}}</md-option> </md-select> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-background-repeat.html',
-    "<md-input-container> <label translate=\"\">Background repeat</label> <md-select aria-label=\"background repeat\" ng-model=repeat ng-change=repeatChanged(repeat)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.name}}</md-option> </md-select> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-background-size.html',
-    "<md-input-container> <label translate=\"\">Background Size</label> <md-select aria-label=size ng-model=size ng-change=sizeChanged(size)> <md-option ng-repeat=\"item in items\" value={{item.value}} translate=\"\">{{item.name}}</md-option> </md-select> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-background.html',
-    "<md-input-container> <label translate=\"\">Background Size</label> <md-select aria-label=\"background size\" ng-model=value> <md-option ng-repeat=\"value in items\" value={{value.value}} translate=\"\">{{value.name}}</md-option> </md-select> </md-input-container>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-choose.html',
-    "<div layout=row> <div layout=row> <wb-icon ng-if=icon wb-icon-name={{::icon}}> </wb-icon> <p ng-if=title translate>{{::title}}</p> </div> <md-tabs flex class=wb-tab-as-choose-button md-selected=selectedIndex> <md-tab ng-repeat=\"item in ::xitems\" md-on-select=selectionChanged()> <md-tab-label> <md-tooltip ng-if=::item.title md-delay=1500> <span translate>{{::item.title}}</span> </md-tooltip> <wb-icon wb-icon-name={{::item.icon}}></wb-icon> </md-tab-label> </md-tab> </md-tabs> </div>"
+  $templateCache.put('views/directives/wb-ui-setting-boolean.html',
+    "<field layout=row layout-align=\"start center\"> <field-description flex> <label translate>{{::title}}</label> <wb-icon size=1em>info</wb-icon> </field-description> <div class=boolean> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\" type=checkbox> </div> </field>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-color.html',
-    "<div layout=row> <wb-icon ng-if=icon layout-padding>{{icon}} </wb-icon> <div md-color-picker ng-model=valueColor ng-change=colorChanged(valueColor) label={{title}} default random=true md-color-clear-button=true md-color-generic-palette=false md-color-history=false flex> </div> </div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-data.html',
-    "<md-list-item> <md-button class=md-icon-button aria-label=Edit ng-click=edit(value)> <wb-icon>{{icon || 'wb-object-data'}}</wb-icon> </md-button> <md-input-container> <input aria-label=\"text value\" ng-model=value.key> </md-input-container> </md-list-item>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-dropdown-value.html',
-    " <md-list-item> <wb-icon ng-hide=\"icon===undefined || icon===null || icon===''\">{{icon}}</wb-icon> <p ng-hide=\"title===undefined || title===null || title===''\">{{title}}</p> <md-select aria-label=\"value list\" style=\"margin: 0px\" ng-model=value> <md-option ng-repeat=\"item in items\" ng-value=item.value> {{item.title}} </md-option> </md-select> </md-list-item>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-dropdown.html',
-    "<div layout=row> <wb-icon ng-show=icon>{{::icon}}</wb-icon> <p style=\"margin: 0px 4px\" ng-show=title>{{::title}}</p> <md-select aria-label=\"value list\" style=\"margin: 0px\" ng-model=value ng-change=valueChanged(value) flex> <md-option ng-repeat=\"item in items track by $index\" value={{::item.value}}> <span translate>{{::item.title}}</span> </md-option> </md-select> </div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-image.html',
-    "<div class=\"wb-ui-setting-image wb-ui-setting-image-container\" layout=row> <div class=wb-ui-setting-image-preview ng-click=ctrl.showImagePicker($event) ng-if=wbUiSettingPreview> <img ng-if=ctrl.value class=wb-ui-setting-image-result ng-src=\"{{ctrl.value}}\"> </div> <md-input-container class=md-icon-float flex> <label ng-if=title> <span translate=\"\">{{title}}</span> </label> <input aria-label=file type=input ng-model=ctrl.value ng-change=ctrl.setValue(ctrl.value) class=wb-ui-setting-image-input ng-mousedown=\"(openOnInput || !wbUiSettingPreview) && ctrl.showImagePicker($event)\"> </md-input-container> <md-button class=\"md-icon-button wb-ui-setting-image-clear\" ng-if=\"wbUiSettingClearButton && ctrl.value\" ng-click=ctrl.clearValue($event) aria-label=\"Clear image\"> <md-icon md-svg-icon=clear.svg></md-icon> </md-button> </div>"
+    "<field layout=row layout-align=\"start center\"> <field-description flex> <label translate>{{::title}}</label> <wb-icon size=1em>info</wb-icon> </field-description> <div class=color layout=row> <input ng-model=value ng-change=setValue(value) aria-label=\"color of {{::title}}\" flex> <div ng-click=showColorPicker($event) class=preview></div> </div> </field>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-length.html',
-    "<div layout=row layout-align=\"end center\"> <wb-icon ng-if=icon>{{icon}}</wb-icon> <md-tooltip ng-if=description md-delay=1500> <span translate>{{::description}}</span> </md-tooltip> <span flex ng-if=title translate>{{::title}}</span> <md-input-container ng-show=ctrl.isNumerical() style=\"margin:0px; padding:0px; width:60px; height:30px\"> <input aria-label=value type=number ng-model=internalValue ng-change=\"updateLength(internalUnit, internalValue)\"> </md-input-container> <md-input-container style=\"margin:0px; padding:0px; width:80px; height:30px\"> <md-select aria-label=types style=max-width:75px ng-model=internalUnit ng-change=\"updateLength(internalUnit, internalValue)\"> <md-option ng-repeat=\"type in ::types track by $index\" value={{::type}}> <span translate>{{::type}}</span> </md-option> </md-select> </md-input-container> </div>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-link.html',
-    "<md-input-container class=md-icon-float> <lable ng-if=title translate>{{::title}}</lable> <input aria-label=url ng-model=url ng-change=urlChanged(url)> <wb-icon ng-click=ctrl.selectlink()>more_horiz</wb-icon> </md-input-container>"
+    "<field layout=row layout-align=\"start center\"> <field-description flex> <label translate>{{::title}}</label> <wb-icon size=1em>info</wb-icon> </field-description> <div class=length layout=row> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\"> </div> </field>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-number.html',
-    "<md-list-item ng-show=\"slider==undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input aria-label=\"number value\" style=\"width: 50px\" type=number ng-model=value ng-change=valueChanged(value) flex> </md-input-container> </md-list-item> <md-list-item ng-show=\"slider!=undefined\"> <wb-icon ng-hide=\"icon==undefined || icon==null || icon=='' || icon=='wb-blank'\">{{icon}}</wb-icon> <div ng-show=\"icon=='wb-blank'\" style=\"display: inline-block; width: 32px; opacity: 0.0\"></div> <p ng-hide=\"title==undefined || title==null || title==''\">{{title}}</p> <md-slider min=0 max=100 ng-model=value ng-change=valueChanged(value) flex></md-slider> </md-list-item>"
+    "<field layout=row layout-align=\"start center\"> <field-description flex> <label translate>{{::title}}</label> <wb-icon size=1em>info</wb-icon> </field-description> <div class=number layout=row> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\"> </div> </field>"
   );
 
 
-  $templateCache.put('views/directives/wb-ui-setting-on-off-switch.html',
-    "<md-list-item> <wb-icon ng-show=icon>{{icon}}</wb-icon> <p ng-show=title>{{title}}</p> <md-switch class=md-secondary ng-model=value ng-change=valueChanged(value)> </md-switch> </md-list-item>"
+  $templateCache.put('views/directives/wb-ui-setting-select.html',
+    "<field layout=row layout-align=\"start center\"> <field-description flex> <label translate>{{::title}}</label> <wb-icon size=1em>info</wb-icon> </field-description> <div class=select layout=row> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\"> </div> </field>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-text.html',
-    "<md-list-item> <wb-icon ng-hide=\"icon==undefined || icon==null || icon==''\">{{icon}}</wb-icon> <p ng-hide=\"title==undefined || title==null  || title==''\">{{title}}</p> <md-input-container style=\"margin: 0px\"> <input aria-label=value style=\"width: 200px\" ng-model=value flex> </md-input-container> </md-list-item>"
-  );
-
-
-  $templateCache.put('views/directives/wb-ui-setting-video.html',
-    "<md-input-container class=\"md-icon-float md-icon-right md-block\"> <label>{{::title}}</label> <wb-icon ng-click=ctrl.selectValue()>wb-object-video</wb-icon> <input aria-label=video ng-model=value ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.changeValue(value)> <wb-icon ng-click=ctrl.clearValue()>close</wb-icon> </md-input-container>"
+    "<field layout=row layout-align=\"start center\"> <field-description flex> <label translate>{{::title}}</label>  </field-description> <div class=text layout=row> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\"> </div> </field>"
   );
 
 
@@ -20316,12 +22391,12 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-widgets-list.html',
-    "<md-list flex> <md-list-item class=md-2-line ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy> <wb-icon>{{widget.icon}}</wb-icon> <div class=md-list-item-text layout=column> <h3 translate>{{widget.title}}</h3> <p translate>{{widget.description}}</p> </div> <wb-icon ng-if=openHelp class=md-secondary ng-click=\"openHelp(widget, $event)\" aria-label=\"Show help\">help</wb-icon> </md-list-item> </md-list>"
+    "<md-list flex> <md-list-item class=md-2-line ng-repeat=\"widget in widgets\" wb-on-dragstart=\"putDragdata($event, widget)\" draggable=true> <wb-icon>{{widget.icon}}</wb-icon> <div class=md-list-item-text layout=column> <h3 translate>{{widget.title}}</h3> <p translate>{{widget.description}}</p> </div> <wb-icon ng-if=openHelp class=md-secondary ng-click=\"openHelp(widget, $event)\" aria-label=\"Show help\">help</wb-icon> </md-list-item> </md-list>"
   );
 
 
   $templateCache.put('views/directives/wb-widgets-module.html',
-    "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" dnd-draggable=\"widget.model || {}\" dnd-type=widget.type dnd-effect-allowed=copy flex=none flex-gt-sm=30 layout=column layout-align=\"start center\" layout-padding> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <p flex class=wb-text-truncate translate=\"\">{{widget.title}}</p> <md-tooltip md-delay=1500>{{widget.description | translate}}</md-tooltip> </div> </div>"
+    "<div layout=column layout-gt-sm=row layout-align=space-around layout-wrap> <div class=\"wb-widgets-module md-whiteframe-1dp\" ng-repeat=\"widget in widgets\" flex=none flex-gt-sm=30 layout=column layout-align=\"start center\" layout-padding wb-on-dragstart=\"putDragdata($event, widget)\" draggable=true> <wb-icon size=32px wb-icon-name={{widget.icon}}></wb-icon> <p flex class=wb-text-truncate translate=\"\">{{widget.title}}</p> <md-tooltip md-delay=1500>{{widget.description | translate}}</md-tooltip> </div> </div>"
   );
 
 
@@ -20349,38 +22424,96 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/settings/wb-a.html',
-    "<div layout-padding layout=column> <md-input-container> <label translate>download</label> <input aria-label=download ng-model=ctrl.download ng-change=\"ctrl.setProperty('download', ctrl.download)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <wb-ui-setting-link title=URL ng-model=ctrl.href ng-change=\"ctrl.setProperty('href', ctrl.href)\" ng-model-options=\"{debounce: 200}\"> </wb-ui-setting-link> <md-input-container> <label translate>hreflang</label> <input aria-label=hreflang ng-model=ctrl.hreflang ng-change=\"ctrl.setProperty('hreflang', ctrl.hreflang)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>media</label> <input aria-label=media ng-model=ctrl.media ng-change=\"ctrl.setProperty('media', ctrl.media)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>ping</label> <input aria-label=ping ng-model=ctrl.ping ng-change=\"ctrl.setProperty('ping', ctrl.ping)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>referrerpolicy</label> <input aria-label=referrerpolicy ng-model=ctrl.referrerpolicy ng-change=\"ctrl.setProperty('referrerpolicy', ctrl.referrerpolicy)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>rel</label> <input aria-label=rel ng-model=ctrl.rel ng-change=\"ctrl.setProperty('rel', ctrl.rel)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>target</label> <input aria-label=target ng-model=ctrl.target ng-change=\"ctrl.setProperty('target', ctrl.target)\" ng-model-options=\"{debounce: 200}\"> </md-input-container>          </div>"
+  $templateCache.put('views/settings/wb-shadow.html',
+    " <div layout=row flex> <md-button class=\"md-raised md-primary\" ng-click=ctrl.addShadow()> <span translate>New shadow</span> </md-button> </div>  <fieldset ng-repeat=\"shadow in ctrl.shadows track by $index\" layout=column> <legend><span translate>Shadow</span>{{$index + 1}}</legend> <wb-ui-setting-length title=\"Horizontal Shift\" ng-model=shadow.hShift ng-change=ctrl.updateShadows()> </wb-ui-setting-length> <wb-ui-setting-length title=\"Vertical Shift\" ng-model=shadow.vShift ng-change=ctrl.updateShadows()> </wb-ui-setting-length> <wb-ui-setting-length title=Blur ng-model=shadow.blur ng-change=ctrl.updateShadows()> </wb-ui-setting-length> <wb-ui-setting-length title=Spread ng-model=shadow.spread ng-change=ctrl.updateShadows()> </wb-ui-setting-length> <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=shadow.color ng-change=ctrl.updateShadows()> </wb-ui-setting-color> <md-checkbox ng-model=shadow.inset ng-change=ctrl.updateShadows() aria-label=Inset> <span translate=\"\">Inset</span> </md-checkbox> <div layout=row layout-align=\"end center\"> <p style=\"font-size: 14px\" flex tab-index=0></p> <md-button class=\"md-raised md-accent\" aria-label=\"Delete shadow\" ng-click=ctrl.remove($index)> <span translate>Delete</span> </md-button> </div> </fieldset>"
   );
 
 
-  $templateCache.put('views/settings/wb-background.html',
-    " <wb-ui-setting-image title=\"Background image\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.image ng-change=\"ctrl.setStyleBackground('image', ctrl.image)\"> </wb-ui-setting-image> <wb-ui-setting-color title=\"Background Color\" wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setStyleBackground('color', ctrl.color)\"> </wb-ui-setting-color> <wb-ui-setting-background-size ng-model=ctrl.size ng-change=\"ctrl.setStyleBackground('size', ctrl.size)\"> </wb-ui-setting-background-size> <wb-ui-setting-background-repeat ng-model=ctrl.repeat ng-change=\"ctrl.setStyleBackground('repeat', ctrl.repeat)\"> </wb-ui-setting-background-repeat> <wb-ui-setting-background-attachment ng-model=ctrl.attachment ng-change=\"ctrl.setStyleBackground('attachment', ctrl.attachment)\"> </wb-ui-setting-background-attachment> <wb-ui-setting-background-origin ng-model=ctrl.origin ng-change=\"ctrl.setStyleBackground('origin', ctrl.origin)\"> </wb-ui-setting-background-origin> <wb-ui-setting-background-position ng-model=ctrl.position ng-change=\"ctrl.setStyleBackground('position', ctrl.position)\"> </wb-ui-setting-background-position>"
+  $templateCache.put('views/settings/wb-style-animation.html',
+    "<fieldset layout=column> <legend translate>Animation</legend> <wb-ui-setting-text ng-model=ctrl.style.animation ng-model-change=\"ctrl.setStyle('animation', ctrl.style.animation)\" wb-title=Animation wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.animationName ng-model-change=\"ctrl.setStyle('animationName', ctrl.style.animationName)\" wb-title=Name wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.animationDuration ng-model-change=\"ctrl.setStyle('animationDuration', ctrl.style.animationDuration)\" wb-title=Duration wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.animationTimingFunction ng-model-change=\"ctrl.setStyle('animationTimingFunction', ctrl.style.animationTimingFunction)\" wb-title=\"Timing Function\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.animationDelay ng-model-change=\"ctrl.setStyle('animationDelay', ctrl.style.animationDelay)\" wb-title=Delay wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.animationIterationCount ng-model-change=\"ctrl.setStyle('animationIterationCount', ctrl.style.animationIterationCount)\" wb-title=\"Iteration Count\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.animationDirection ng-model-change=\"ctrl.setStyle('animationDirection', ctrl.style.animationDirection)\" wb-title=Direction wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.animationDirection ng-model-change=\"ctrl.setStyle('animationDirection', ctrl.style.animationDirection)\" wb-title=Direction wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.animationFillMode ng-model-change=\"ctrl.setStyle('animationFillMode', ctrl.style.animationFillMode)\" wb-title=\"Fill Mode\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.animationPlayState ng-model-change=\"ctrl.setStyle('animationPlayState', ctrl.style.animationPlayState)\" wb-title=\"Play State\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> </fieldset>"
   );
 
 
-  $templateCache.put('views/settings/wb-border.html',
-    " <fieldset layout=column> <legend translate>Style and Color</legend>  <md-input-container class=md-block> <label translate>Style</label> <md-select aria-label=style ng-model=ctrl.style ng-change=\"ctrl.setStyleBorder('style', ctrl.style)\"> <md-option ng-repeat=\"style in ::ctrl.styles\" value={{::style.value}}> <span translate>{{::style.title}}</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true wb-ui-setting-icon=format_color_fill ng-model=ctrl.color ng-change=\"ctrl.setStyleBorder('color', ctrl.color)\"> </wb-ui-setting-color> </fieldset>  <fieldset layout=column> <legend translate>Width</legend> <wb-ui-setting-length title=All icon=border_all description=\"Set all sides width\" ng-model=ctrl.widthAll ng-change=ctrl.widthAllChanged(ctrl.widthAll) extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=Top icon=border_top ng-model=ctrl.width.top ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Right icon=border_right ng-model=ctrl.width.right ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=ctrl.width.bottom ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=Left icon=border_left ng-model=ctrl.width.left ng-change=ctrl.widthChanged() extra-values=\"['medium', 'thin', 'thick', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset>  <fieldset layout=column> <legend translate>Radius</legend> <wb-ui-setting-length title=All icon=full_rounded description=\"Set all sides radius\" ng-model=ctrl.radiusAll ng-change=ctrl.radiusAllChanged(ctrl.radiusAll) extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider> <wb-ui-setting-length title=\"Top left\" icon=corner_top_left ng-model=ctrl.radius.topLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Top right\" icon=corner_top_right ng-model=ctrl.radius.topRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom right\" icon=corner_bottom_right ng-model=ctrl.radius.bottomRight ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Bottom left\" icon=corner_bottom_left ng-model=ctrl.radius.bottomLeft ng-change=ctrl.radiusChanged() extra-values=\"['length', 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset>"
+  $templateCache.put('views/settings/wb-style-background.html',
+    "<fieldset layout=column> <legend translate>Background</legend> <wb-ui-setting-text ng-model=ctrl.style.background ng-model-change=\"ctrl.setStyle('background', ctrl.style.background)\" wb-title=Background wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-color ng-model=ctrl.style.backgroundColor ng-model-change=\"ctrl.setStyle('backgroundColor', ctrl.style.backgroundColor)\" wb-title=Color wb-description=\"\" wb-action-clean> </wb-ui-setting-color> <wb-ui-setting-text ng-model=ctrl.style.backgroundImage ng-model-change=\"ctrl.setStyle('backgroundImage', ctrl.style.backgroundImage)\" wb-title=Image wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.backgroundPosition ng-model-change=\"ctrl.setStyle('backgroundPosition', ctrl.style.backgroundPosition)\" wb-title=Position wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.backgroundSize ng-model-change=\"ctrl.setStyle('backgroundSize', ctrl.style.backgroundSize)\" wb-title=Size wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.backgroundRepeat ng-model-change=\"ctrl.setStyle('backgroundRepeat', ctrl.style.backgroundRepeat)\" wb-title=Repeat wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.backgroundOrigin ng-model-change=\"ctrl.setStyle('backgroundOrigin', ctrl.style.backgroundOrigin)\" wb-title=Origin wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.backgroundClip ng-model-change=\"ctrl.setStyle('backgroundClip', ctrl.style.backgroundClip)\" wb-title=Clip wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.backgroundAttachment ng-model-change=\"ctrl.setStyle('backgroundAttachment', ctrl.style.backgroundAttachment)\" wb-title=Attachment wb-description=\"\" wb-action-clean> </wb-ui-setting-text> </fieldset>"
   );
 
 
-  $templateCache.put('views/settings/wb-general.html',
-    " <fieldset layout=column> <legend translate>Identifier</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Id</label> <input ng-model=ctrl.id ng-change=\"ctrl.setProperty('id', ctrl.id)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Name</label> <input ng-model=ctrl.name ng-change=\"ctrl.setProperty('name', ctrl.name)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Title</label> <input ng-model=ctrl.title ng-change=\"ctrl.setProperty('title', ctrl.title)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Language</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Direction</label> <input ng-model=ctrl.dir ng-change=\"ctrl.setProperty('dir', ctrl.dir)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Language</label> <input ng-model=ctrl.lang ng-change=\"ctrl.setProperty('lang', ctrl.lang)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Translate</label> <input ng-model=ctrl.translate ng-change=\"ctrl.setProperty('translate', ctrl.translate)\"> </md-input-container> <md-input-container style=\"margin: 0px; margin-top: 10px\"> <label translate=\"\">Spell check</label> <input ng-model=ctrl.spellcheck ng-change=\"ctrl.setProperty('spellcheck', ctrl.spellcheck)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Access</legend> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Access Key</label> <input ng-model=ctrl.accesskey ng-change=\"ctrl.setProperty('accesskey', ctrl.accesskey)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">contenteditable</label> <input ng-model=ctrl.contenteditable ng-change=\"ctrl.setProperty('contenteditable', ctrl.contenteditable)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">tabindex</label> <input ng-model=ctrl.tabindex ng-change=\"ctrl.setProperty('tabindex', ctrl.tabindex)\"> </md-input-container> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">hidden</label> <input ng-model=ctrl.hidden ng-change=\"ctrl.setProperty('hidden', ctrl.hidden)\"> </md-input-container> </fieldset>   <fieldset layout=column> <legend translate>Style</legend> <md-input-container layout-align=\"end center\"> <md-select ng-model=ctrl.direction ng-change=\"ctrl.setProperty('style.direction', ctrl.direction)\" style=\"min-width: 200px\"> <md-option ng-value=\"'ltr'\"> <span translate>Left to right</span> </md-option> <md-option ng-value=\"'rtl'\"> <span translate>Right to left</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> </md-select> </md-input-container>  <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=ctrl.color ng-change=\"ctrl.setProperty('style.color', ctrl.color)\"> </wb-ui-setting-color> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>mouse</wb-icon> <label translate>Cursor</label> <md-select style=max-width:75px ng-model=ctrl.cursor ng-change=\"ctrl.setProperty('style.cursor', ctrl.cursor)\"> <md-option value=alias tooltip=\"The cursor indicates an alias of something is to be created\" translate=\"\">Alias</md-option> <md-option value=all-scroll tooltip=\"The cursor indicates that something can be scrolled in any direction\" translate=\"\">All Acroll</md-option> <md-option value=auto tooltip=\"Default. The browser sets a cursor\" translate=\"\">Auto</md-option> <md-option value=cell tooltip=\"The cursor indicates that a cell (or set of cells) may be selected\" translate=\"\">Cell</md-option> <md-option value=context-menu tooltip=\"The cursor indicates that a context-menu is available\" translate=\"\">Context Menu</md-option> <md-option value=col-resize tooltip=\"The cursor indicates that the column can be resized horizontally\" translate=\"\">Columne resize</md-option> <md-option value=copy tooltip=\"The cursor indicates something is to be copied\" translate=\"\">Copy</md-option> <md-option value=crosshair tooltip=\"The cursor render as a crosshair\" translate=\"\">Crosshair</md-option> <md-option value=default tooltip=\"The default cursor\" translate=\"\">Default</md-option> <md-option value=e-resize tooltip=\"The cursor indicates that an edge of a box is to be moved right (east)\" translate=\"\">Edge Resize</md-option> <md-option value=ew-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">Bidirectional Resize</md-option> <md-option value=grab tooltip=\"The cursor indicates that something can be grabbed\" translate=\"\">Grab</md-option> <md-option value=grabbing tooltip=\"The cursor indicates that something can be grabbed\" translate=\"\">Grabbing</md-option> <md-option value=help tooltip=\"The cursor indicates that help is available\" translate=\"\">Help</md-option> <md-option value=move tooltip=\"The cursor indicates something is to be moved\" translate=\"\">Move</md-option> <md-option value=n-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up (north)\" translate=\"\">North Resize</md-option> <md-option value=ne-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up and right (north/east)\" translate=\"\">North/East Resize</md-option> <md-option value=ns-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">NS Bidirectional Resize</md-option> <md-option value=nw-resize tooltip=\"The cursor indicates that an edge of a box is to be moved up and left (north/west)\" translate=\"\">North/West Resize</md-option> <md-option value=nwse-resize tooltip=\"Indicates a bidirectional resize cursor\" translate=\"\">Bidirectional Resize</md-option> <md-option value=no-drop tooltip=\"The cursor indicates that the dragged item cannot be dropped here\" translate=\"\">No Drop</md-option> <md-option value=none tooltip=\"No cursor is rendered for the element\" translate=\"\">None</md-option> <md-option value=not-allowed tooltip=\"The cursor indicates that the requested action will not be executed\" translate=\"\">Not Allowed</md-option> <md-option value=pointer tooltip=\"The cursor is a pointer and indicates a link\" translate=\"\">Pointer</md-option> <md-option value=progress tooltip=\"The cursor indicates that the program is busy (in progress)\" translate=\"\">Progress</md-option> <md-option value=row-resize tooltip=\"The cursor indicates that the row can be resized vertically\" translate=\"\">Row Resize</md-option> <md-option value=s-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down (south)\" translate=\"\">South Resize</md-option> <md-option value=se-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down and right (south/east)\" translate=\"\">South/East Resize</md-option> <md-option value=sw-resize tooltip=\"The cursor indicates that an edge of a box is to be moved down and left (south/west)\" translate=\"\">South/West Resize</md-option> <md-option value=text tooltip=\"The cursor indicates text that may be selected\" translate=\"\">Text</md-option> <md-option value=vertical-text tooltip=\"The cursor indicates vertical-text that may be selected\" translate=\"\">Vertical text</md-option> <md-option value=w-resize tooltip=\"The cursor indicates that an edge of a box is to be moved left (west)\" translate=\"\">West Resize</md-option> <md-option value=wait tooltip=\"The cursor indicates that the program is busy\" translate=\"\">Wait</md-option> <md-option value=zoom-in tooltip=\"The cursor indicates that something can be zoomed in\" translate=\"\">Zoom In</md-option> <md-option value=\"zoom-out'\" tooltip=\"The cursor indicates that something can be zoomed out\" translate=\"\">Zoom Out</md-option> <md-option value=initial tooltip=\"Sets this property to its default value. Read about initial\" translate=\"\">Initial</md-option> <md-option value=inherit tooltip=\"Inherits this property from its parent element. Read about inherit\" translate=\"\">Inherit</md-option> </md-select> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Visibility</legend> <md-input-container layout-align=\"end center\"> <label translate>Visibility</label> <md-select ng-model=ctrl.visibility ng-change=\"ctrl.setProperty('style.visibility', ctrl.visibility)\" style=\"min-width: 200px\" disabled> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> </md-select> </md-input-container> <md-input-container class=\"md-icon-float md-icon-right md-block\"> <wb-icon>opacity</wb-icon> <label translate>Opacity</label> <input ng-model=ctrl.opacity ng-change=\"ctrl.setProperty('style.opacity', ctrl.opacity)\"> </md-input-container> </fieldset>  <fieldset layout=column> <legend translate>Overflow</legend> <md-input-container layout-align=\"end center\"> <label translate>X</label> <md-select ng-model=ctrl.overflowX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setProperty('style.overflow.x', ctrl.overflowX)\" style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> <md-input-container layout-align=\"end center\"> <label translate>Y</label> <md-select ng-model=ctrl.overflowY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setProperty('style.overflow.y', ctrl.overflowY)\" style=\"min-width: 200px\"> <md-option ng-value=\"'visible'\"> <span translate>Visible</span> </md-option> <md-option ng-value=\"'hidden'\"> <span translate>Hidden</span> </md-option> <md-option ng-value=\"'scroll'\"> <span translate>Scroll</span> </md-option> <md-option ng-value=\"'auto'\"> <span translate>Auto</span> </md-option> <md-option ng-value=\"'initial'\"> <span translate>Initial</span> </md-option> <md-option ng-value=\"'inherit'\"> <span translate>Inherit</span> </md-option> </md-select> </md-input-container> </fieldset>"
+  $templateCache.put('views/settings/wb-style-border.html',
+    "<fieldset layout=column> <legend translate>Border</legend> <wb-ui-setting-text ng-model=ctrl.style.border ng-model-change=\"ctrl.setStyle('border', ctrl.style.border)\" wb-title=Boarder wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderWidth ng-model-change=\"ctrl.setStyle('borderWidth', ctrl.style.borderWidth)\" wb-title=Width wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderStyle ng-model-change=\"ctrl.setStyle('borderStyle', ctrl.style.borderStyle)\" wb-title=Style wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderColor ng-model-change=\"ctrl.setStyle('borderColor', ctrl.style.borderColor)\" wb-title=Color wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderCollapse ng-model-change=\"ctrl.setStyle('borderCollapse', ctrl.style.borderCollapse)\" wb-title=Collapse wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderSpacing ng-model-change=\"ctrl.setStyle('borderSpacing', ctrl.style.borderSpacing)\" wb-title=Spacing wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Top</legend> <wb-ui-setting-text ng-model=ctrl.style.borderTop ng-model-change=\"ctrl.setStyle('borderTop', ctrl.style.borderTop)\" wb-title=Top wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderTopWidth ng-model-change=\"ctrl.setStyle('borderTopWidth', ctrl.style.borderTopWidth)\" wb-title=Width wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderTopStyle ng-model-change=\"ctrl.setStyle('borderTopStyle', ctrl.style.borderTopStyle)\" wb-title=Style wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderTopColor ng-model-change=\"ctrl.setStyle('borderTopColor', ctrl.style.borderTopColor)\" wb-title=Color wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Right</legend> <wb-ui-setting-text ng-model=ctrl.style.borderRight ng-model-change=\"ctrl.setStyle('borderRight', ctrl.style.borderRight)\" wb-title=Right wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderRightWidth ng-model-change=\"ctrl.setStyle('borderRightWidth', ctrl.style.borderRightWidth)\" wb-title=Width wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderRightStyle ng-model-change=\"ctrl.setStyle('borderRightStyle', ctrl.style.borderRightStyle)\" wb-title=Style wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderRightColor ng-model-change=\"ctrl.setStyle('borderRightColor', ctrl.style.borderRightColor)\" wb-title=Color wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Bottom</legend> <wb-ui-setting-text ng-model=ctrl.style.borderBttom ng-model-change=\"ctrl.setStyle('borderBttom', ctrl.style.borderBttom)\" wb-title=Bttom wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderBttomWidth ng-model-change=\"ctrl.setStyle('borderBttomWidth', ctrl.style.borderBttomWidth)\" wb-title=Width wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderBttomStyle ng-model-change=\"ctrl.setStyle('borderBttomStyle', ctrl.style.borderBttomStyle)\" wb-title=Style wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderBttomColor ng-model-change=\"ctrl.setStyle('borderBttomColor', ctrl.style.borderBttomColor)\" wb-title=Color wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Left</legend> <wb-ui-setting-text ng-model=ctrl.style.borderLeft ng-model-change=\"ctrl.setStyle('borderLeft', ctrl.style.borderLeft)\" wb-title=Left wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderLeftWidth ng-model-change=\"ctrl.setStyle('borderLeftWidth', ctrl.style.borderLeftWidth)\" wb-title=Width wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderLeftStyle ng-model-change=\"ctrl.setStyle('borderLeftStyle', ctrl.style.borderLeftStyle)\" wb-title=Style wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderLeftColor ng-model-change=\"ctrl.setStyle('borderLeftColor', ctrl.style.borderLeftColor)\" wb-title=Color wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Radius</legend> <wb-ui-setting-text ng-model=ctrl.style.borderRadius ng-model-change=\"ctrl.setStyle('borderRadius', ctrl.style.borderRadius)\" wb-title=Radius wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderTopRightRadius ng-model-change=\"ctrl.setStyle('borderTopRightRadius', ctrl.style.borderTopRightRadius)\" wb-title=\"Top Right\" wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderTopLeftRadius ng-model-change=\"ctrl.setStyle('borderTopLeftRadius', ctrl.style.borderTopLeftRadius)\" wb-title=\"Top Left\" wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderBottomLeftRadius ng-model-change=\"ctrl.setStyle('borderBottomLeftRadius', ctrl.style.borderBottomLeftRadius)\" wb-title=\"Bottom Left\" wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderBottomRightRadius ng-model-change=\"ctrl.setStyle('borderBottomRightRadius', ctrl.style.borderBottomRightRadius)\" wb-title=\"Bottom Right\" wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Image</legend> <wb-ui-setting-text ng-model=ctrl.style.borderImage ng-model-change=\"ctrl.setStyle('borderImage', ctrl.style.borderImage)\" wb-title=Image wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderImageSource ng-model-change=\"ctrl.setStyle('borderImageSource', ctrl.style.borderImageSource)\" wb-title=Source wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderImageSlice ng-model-change=\"ctrl.setStyle('borderImageSlice', ctrl.style.borderImageSlice)\" wb-title=Slice wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderImageWidth ng-model-change=\"ctrl.setStyle('borderImageWidth', ctrl.style.borderImageWidth)\" wb-title=Width wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderImageOutset ng-model-change=\"ctrl.setStyle('borderImageOutset', ctrl.style.borderImageOutset)\" wb-title=Outset wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.borderImageRepeat ng-model-change=\"ctrl.setStyle('borderImageRepeat', ctrl.style.borderImageRepeat)\" wb-title=Repeat wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Outline</legend> <wb-ui-setting-text ng-model=ctrl.style.outline ng-model-change=\"ctrl.setStyle('outline', ctrl.style.outline)\" wb-title=Outline wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.outlineOffset ng-model-change=\"ctrl.setStyle('outlineOffset', ctrl.style.outlineOffset)\" wb-title=Offset wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.outlineWidth ng-model-change=\"ctrl.setStyle('outlineWidth', ctrl.style.outlineWidth)\" wb-title=Width wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.outlineStyle ng-model-change=\"ctrl.setStyle('outlineStyle', ctrl.style.outlineStyle)\" wb-title=Style wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-color ng-model=ctrl.style.outlineColor ng-model-change=\"ctrl.setStyle('outlineColor', ctrl.style.outlineColor)\" wb-title=Color wb-description=\"\"> </wb-ui-setting-color> </fieldset> <fieldset layout=column> <legend translate>Box</legend> <wb-ui-setting-text ng-model=ctrl.style.boxDecorationBreak ng-model-change=\"ctrl.setStyle('boxDecorationBreak', ctrl.style.boxDecorationBreak)\" wb-title=\"Decoration Break\" wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.boxShadow ng-model-change=\"ctrl.setStyle('boxShadow', ctrl.style.boxShadow)\" wb-title=Shadow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.boSizing ng-model-change=\"ctrl.setStyle('boxSizing', ctrl.style.boxSizing)\" wb-title=Sizing wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
   );
 
 
-  $templateCache.put('views/settings/wb-iframe.html',
+  $templateCache.put('views/settings/wb-style-general.html',
+    "<fieldset layout=column> <legend translate>View</legend> <wb-ui-setting-text ng-model=ctrl.style.opacity ng-model-change=\"ctrl.setStyle('opacity', ctrl.style.opacity)\" wb-title=Opacity wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.visibility ng-model-change=\"ctrl.setStyle('visibility', ctrl.style.visibility)\" wb-title=Visibility wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.color ng-model-change=\"ctrl.setStyle('color', ctrl.style.color)\" wb-title=Color wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.mixBlendMode ng-model-change=\"ctrl.setStyle('mixBlendMode', ctrl.style.mixBlendMode)\" wb-title=\"\" wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.isolation ng-model-change=\"ctrl.setStyle('isolation', ctrl.style.isolation)\" wb-title=\"\" wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Mouse</legend> <wb-ui-setting-text ng-model=ctrl.style.cursor ng-model-change=\"ctrl.setStyle('cursor', ctrl.style.cursor)\" wb-title=Cursor wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.pointerEvents ng-model-change=\"ctrl.setStyle('pointerEvents', ctrl.style.pointerEvents)\" wb-title=pointerEvents wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-style-layout.html',
+    "<fieldset layout=column> <legend translate>Layout</legend> <wb-ui-setting-text ng-model=ctrl.style.display ng-model-change=\"ctrl.setStyle('display', ctrl.style.display)\" wb-title=display wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.order ng-model-change=\"ctrl.setStyle('order', ctrl.style.order)\" wb-title=order wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.zIndex ng-model-change=\"ctrl.setStyle('zIndex', ctrl.style.zIndex)\" wb-title=zIndex wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.clear ng-model-change=\"ctrl.setStyle('clear', ctrl.style.clear)\" wb-title=clear wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.float ng-model-change=\"ctrl.setStyle('float', ctrl.style.float)\" wb-title=float wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Position</legend> <wb-ui-setting-text ng-model=ctrl.style.position ng-model-change=\"ctrl.setStyle('position', ctrl.style.position)\" wb-title=position wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.bottom ng-model-change=\"ctrl.setStyle('bottom', ctrl.style.bottom)\" wb-title=bottom wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.left ng-model-change=\"ctrl.setStyle('left', ctrl.style.left)\" wb-title=left wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.right ng-model-change=\"ctrl.setStyle('right', ctrl.style.right)\" wb-title=right wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.top ng-model-change=\"ctrl.setStyle('top', ctrl.style.top)\" wb-title=top wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>overflow</legend> <wb-ui-setting-text ng-model=ctrl.style.overflow ng-model-change=\"ctrl.setStyle('overflow', ctrl.style.overflow)\" wb-title=overflow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.overflowX ng-model-change=\"ctrl.setStyle('overflowX', ctrl.style.overflowX)\" wb-title=overflowX wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.overflowY ng-model-change=\"ctrl.setStyle('overflowY', ctrl.style.overflowY)\" wb-title=overflowY wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.scrollBehavior ng-model-change=\"ctrl.setStyle('scrollBehavior', ctrl.style.scrollBehavior)\" wb-title=scrollBehavior wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Print</legend> <wb-ui-setting-text ng-model=ctrl.style.pageBreakAfter ng-model-change=\"ctrl.setStyle('pageBreakAfter', ctrl.style.pageBreakAfter)\" wb-title=pageBreakAfter wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.pageBreakBefore ng-model-change=\"ctrl.setStyle('pageBreakBefore', ctrl.style.pageBreakBefore)\" wb-title=pageBreakBefore wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.pageBreakInside ng-model-change=\"ctrl.setStyle('pageBreakInside', ctrl.style.pageBreakInside)\" wb-title=pageBreakInside wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Flex</legend> <wb-ui-setting-text ng-model=ctrl.style.alignContent ng-model-change=\"ctrl.setStyle('alignContent', ctrl.style.alignContent)\" wb-title=alignContent wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.alignItems ng-model-change=\"ctrl.setStyle('alignItems', ctrl.style.alignItems)\" wb-title=alignItems wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.alignSelf ng-model-change=\"ctrl.setStyle('alignSelf', ctrl.style.alignSelf)\" wb-title=alignSelf wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.justifyContent ng-model-change=\"ctrl.setStyle('justifyContent', ctrl.style.justifyContent)\" wb-title=justifyContent wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.flex ng-model-change=\"ctrl.setStyle('flex', ctrl.style.flex)\" wb-title=flex wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.flexBasis ng-model-change=\"ctrl.setStyle('flexBasis', ctrl.style.flexBasis)\" wb-title=flexBasis wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.flexDirection ng-model-change=\"ctrl.setStyle('flexDirection', ctrl.style.flexDirection)\" wb-title=flexDirection wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.flexGrow ng-model-change=\"ctrl.setStyle('flexGrow', ctrl.style.flexGrow)\" wb-title=flexGrow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.flexShrink ng-model-change=\"ctrl.setStyle('flexShrink', ctrl.style.flexShrink)\" wb-title=flexShrink wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.flexBasis ng-model-change=\"ctrl.setStyle('flexBasis', ctrl.style.flexBasis)\" wb-title=flexBasis wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.flexWrap ng-model-change=\"ctrl.setStyle('flexWrap', ctrl.style.flexWrap)\" wb-title=flexWrap wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Grid</legend> <wb-ui-setting-text ng-model=ctrl.style.grid ng-model-change=\"ctrl.setStyle('grid', ctrl.style.grid)\" wb-title=grid wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridArea ng-model-change=\"ctrl.setStyle('gridArea', ctrl.style.gridArea)\" wb-title=gridArea wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridAutoColumns ng-model-change=\"ctrl.setStyle('gridAutoColumns', ctrl.style.gridAutoColumns)\" wb-title=gridAutoColumns wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridAutoFlow ng-model-change=\"ctrl.setStyle('gridAutoFlow', ctrl.style.gridAutoFlow)\" wb-title=gridAutoFlow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridAutoRows ng-model-change=\"ctrl.setStyle('gridAutoRows', ctrl.style.gridAutoRows)\" wb-title=gridAutoRows wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridColumn ng-model-change=\"ctrl.setStyle('gridColumn', ctrl.style.gridColumn)\" wb-title=gridColumn wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridColumnEnd ng-model-change=\"ctrl.setStyle('gridColumnEnd', ctrl.style.gridColumnEnd)\" wb-title=gridColumnEnd wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridColumnGap ng-model-change=\"ctrl.setStyle('gridColumnGap', ctrl.style.gridColumnGap)\" wb-title=gridColumnGap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridColumnStart ng-model-change=\"ctrl.setStyle('gridColumnStart', ctrl.style.gridColumnStart)\" wb-title=gridColumnStart wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridGap ng-model-change=\"ctrl.setStyle('gridGap', ctrl.style.gridGap)\" wb-title=gridGap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridRow ng-model-change=\"ctrl.setStyle('gridRow', ctrl.style.gridRow)\" wb-title=gridRow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridRowEnd ng-model-change=\"ctrl.setStyle('gridRowEnd', ctrl.style.gridRowEnd)\" wb-title=gridRowEnd wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridRowGap ng-model-change=\"ctrl.setStyle('gridRowGap', ctrl.style.gridRowGap)\" wb-title=gridRowGap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridRowStart ng-model-change=\"ctrl.setStyle('gridRowStart', ctrl.style.gridRowStart)\" wb-title=gridRowStart wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridTemplate ng-model-change=\"ctrl.setStyle('gridTemplate', ctrl.style.gridTemplate)\" wb-title=gridTemplate wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridTemplateAreas ng-model-change=\"ctrl.setStyle('gridTemplateAreas', ctrl.style.gridTemplateAreas)\" wb-title=gridTemplateAreas wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridTemplateColumns ng-model-change=\"ctrl.setStyle('gridTemplateColumns', ctrl.style.gridTemplateColumns)\" wb-title=gridTemplateColumns wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.gridTemplateRows ng-model-change=\"ctrl.setStyle('gridTemplateRows', ctrl.style.gridTemplateRows)\" wb-title=gridTemplateRows wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Column</legend> <wb-ui-setting-text ng-model=ctrl.style.columns ng-model-change=\"ctrl.setStyle('columns', ctrl.style.columns)\" wb-title=columns wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.columnWidth ng-model-change=\"ctrl.setStyle('columnWidth', ctrl.style.columnWidth)\" wb-title=columnWidth wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.columnCount ng-model-change=\"ctrl.setStyle('columnCount', ctrl.style.columnCount)\" wb-title=columnCount wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.columnSpan ng-model-change=\"ctrl.setStyle('columnSpan', ctrl.style.columnSpan)\" wb-title=columnSpan wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.columnFill ng-model-change=\"ctrl.setStyle('columnFill', ctrl.style.columnFill)\" wb-title=columnFill wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.columnGap ng-model-change=\"ctrl.setStyle('columnGap', ctrl.style.columnGap)\" wb-title=columnGap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.columnRule ng-model-change=\"ctrl.setStyle('columnRule', ctrl.style.columnRule)\" wb-title=columnRule wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.columnRuleColor ng-model-change=\"ctrl.setStyle('columnRuleColor', ctrl.style.columnRuleColor)\" wb-title=columnRuleColor wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.columnRuleStyle ng-model-change=\"ctrl.setStyle('columnRuleStyle', ctrl.style.columnRuleStyle)\" wb-title=columnRuleStyle wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.columnRuleWidth ng-model-change=\"ctrl.setStyle('columnRuleWidth', ctrl.style.columnRuleWidth)\" wb-title=columnRuleWidth wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-style-media.html',
+    "<fieldset layout=column> <legend translate>Layout</legend> <wb-ui-setting-text ng-model=ctrl.style.clip ng-model-change=\"ctrl.setStyle('clip', ctrl.style.clip)\" wb-title=clip wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.clipPath ng-model-change=\"ctrl.setStyle('clipPath', ctrl.style.clipPath)\" wb-title=clipPath wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.filter ng-model-change=\"ctrl.setStyle('filter', ctrl.style.filter)\" wb-title=filter wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.objectFit ng-model-change=\"ctrl.setStyle('objectFit', ctrl.style.objectFit)\" wb-title=objectFit wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.objectPosition ng-model-change=\"ctrl.setStyle('objectPosition', ctrl.style.objectPosition)\" wb-title=objectPosition wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-style-size.html',
+    "<fieldset layout=column> <legend translate>Size</legend> <wb-ui-setting-text ng-model=ctrl.style.resize ng-model-change=\"ctrl.setStyle('resize', ctrl.style.resize)\" wb-title=resize wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.height ng-model-change=\"ctrl.setStyle('height', ctrl.style.height)\" wb-title=height wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.maxHeight ng-model-change=\"ctrl.setStyle('maxHeight', ctrl.style.maxHeight)\" wb-title=maxHeight wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.minHeight ng-model-change=\"ctrl.setStyle('minHeight', ctrl.style.minHeight)\" wb-title=minHeight wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.width ng-model-change=\"ctrl.setStyle('width', ctrl.style.width)\" wb-title=width wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.maxWidth ng-model-change=\"ctrl.setStyle('maxWidth', ctrl.style.maxWidth)\" wb-title=maxWidth wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.minWidth ng-model-change=\"ctrl.setStyle('minWidth', ctrl.style.minWidth)\" wb-title=minWidth wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Margin</legend> <wb-ui-setting-text ng-model=ctrl.style.margin ng-model-change=\"ctrl.setStyle('margin', ctrl.style.margin)\" wb-title=margin wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.marginTop ng-model-change=\"ctrl.setStyle('marginTop', ctrl.style.marginTop)\" wb-title=\"Margin Top\" wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.marginRight ng-model-change=\"ctrl.setStyle('marginRight', ctrl.style.marginRight)\" wb-title=\"margin Right\" wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.marginBottom ng-model-change=\"ctrl.setStyle('marginBottom', ctrl.style.marginBottom)\" wb-title=\"margin Bottom\" wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.marginLeft ng-model-change=\"ctrl.setStyle('marginLeft', ctrl.style.marginLeft)\" wb-title=\"margin left\" wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Padding</legend> <wb-ui-setting-text ng-model=ctrl.style.padding ng-model-change=\"ctrl.setStyle('padding', ctrl.style.padding)\" wb-title=padding wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.paddingTop ng-model-change=\"ctrl.setStyle('paddingTop', ctrl.style.paddingTop)\" wb-title=\"padding Top\" wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.paddingRight ng-model-change=\"ctrl.setStyle('paddingRight', ctrl.style.paddingRight)\" wb-title=\"padding Right\" wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.paddingBottom ng-model-change=\"ctrl.setStyle('paddingBottom', ctrl.style.paddingBottom)\" wb-title=\"padding Bottom\" wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.paddingLeft ng-model-change=\"ctrl.setStyle('paddingLeft', ctrl.style.paddingLeft)\" wb-title=\"padding left\" wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-style-text.html',
+    "<fieldset layout=column> <legend translate>Text</legend> <wb-ui-setting-text ng-model=ctrl.style.textAlignLast ng-change=\"ctrl.setStyle('textAlignLast', ctrl.style.textAlignLast)\" wb-title=AlignLast wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.textDecoration ng-change=\"ctrl.setStyle('textDecoration', ctrl.style.textDecoration)\" wb-title=Decoration wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.textDecorationColor ng-change=\"ctrl.setStyle('textDecorationColor', ctrl.style.textDecorationColor)\" wb-title=DecorationColor wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.textDecorationLine ng-change=\"ctrl.setStyle('textDecorationLine', ctrl.style.textDecorationLine)\" wb-title=DecorationLine wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.textDecorationStyle ng-change=\"ctrl.setStyle('textDecorationStyle', ctrl.style.textDecorationStyle)\" wb-title=DecorationStyle wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.textIndent ng-change=\"ctrl.setStyle('textIndent', ctrl.style.textIndent)\" wb-title=Indent wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.textJustify ng-change=\"ctrl.setStyle('textJustify', ctrl.style.textJustify)\" wb-title=Justify wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.textOverflow ng-change=\"ctrl.setStyle('textOverflow', ctrl.style.textOverflow)\" wb-title=Overflow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.textShadow ng-change=\"ctrl.setStyle('textShadow', ctrl.style.textShadow)\" wb-title=Shadow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.textTransform ng-change=\"ctrl.setStyle('textTransform', ctrl.style.textTransform)\" wb-title=Transform wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Font</legend> <wb-ui-setting-text ng-model=ctrl.style.font ng-change=\"ctrl.setStyle('font', ctrl.style.font)\" wb-title=font wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.fontFamily ng-change=\"ctrl.setStyle('fontFamily', ctrl.style.fontFamily)\" wb-title=fontFamily wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.fontKerning ng-change=\"ctrl.setStyle('fontKerning', ctrl.style.fontKerning)\" wb-title=fontKerning wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.fontSize ng-change=\"ctrl.setStyle('fontSize', ctrl.style.fontSize)\" wb-title=fontSize wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.fontSizeAdjust ng-change=\"ctrl.setStyle('fontSizeAdjust', ctrl.style.fontSizeAdjust)\" wb-title=fontSizeAdjust wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.fontStretch ng-change=\"ctrl.setStyle('fontStretch', ctrl.style.fontStretch)\" wb-title=fontStretch wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.fontStyle ng-change=\"ctrl.setStyle('fontStyle', ctrl.style.fontStyle)\" wb-title=fontStyle wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.fontVariant ng-change=\"ctrl.setStyle('fontVariant', ctrl.style.fontVariant)\" wb-title=fontVariant wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.fontWeight ng-change=\"ctrl.setStyle('fontWeight', ctrl.style.fontWeight)\" wb-title=fontWeight wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Writing</legend> <wb-ui-setting-text ng-model=ctrl.style.hyphens ng-change=\"ctrl.setStyle('hyphens', ctrl.style.hyphens)\" wb-title=hyphens wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.letterSpacing ng-change=\"ctrl.setStyle('letterSpacing', ctrl.style.letterSpacing)\" wb-title=letterSpacing wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.lineHeight ng-change=\"ctrl.setStyle('lineHeight', ctrl.style.lineHeight)\" wb-title=lineHeight wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.quotes ng-change=\"ctrl.setStyle('quotes', ctrl.style.quotes)\" wb-title=quotes wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.tabSize ng-change=\"ctrl.setStyle('tabSize', ctrl.style.tabSize)\" wb-title=tabSize wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.verticalAlign ng-change=\"ctrl.setStyle('verticalAlign', ctrl.style.verticalAlign)\" wb-title=verticalAlign wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.whiteSpace ng-change=\"ctrl.setStyle('whiteSpace', ctrl.style.whiteSpace)\" wb-title=whiteSpace wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.wordBreak ng-change=\"ctrl.setStyle('wordBreak', ctrl.style.wordBreak)\" wb-title=wordBreak wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.wordSpacing ng-change=\"ctrl.setStyle('wordSpacing', ctrl.style.wordSpacing)\" wb-title=wordSpacing wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.wordWrap ng-change=\"ctrl.setStyle('wordWrap', ctrl.style.wordWrap)\" wb-title=wordWrap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.writingMode ng-change=\"ctrl.setStyle('writingMode', ctrl.style.writingMode)\" wb-title=writingMode wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.userSelect ng-change=\"ctrl.setStyle('userSelect', ctrl.style.userSelect)\" wb-title=userSelect wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Local</legend> <wb-ui-setting-text ng-model=ctrl.style.direction ng-change=\"ctrl.setStyle('direction', ctrl.style.direction)\" wb-title=direction wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.style.unicodeBidi ng-change=\"ctrl.setStyle('unicodeBidi', ctrl.style.unicodeBidi)\" wb-title=unicodeBidi wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-widget-a.html',
+    "<fieldset layout=column> <md-input-container> <label translate>download</label> <input aria-label=download ng-model=ctrl.download ng-change=\"ctrl.setProperty('download', ctrl.download)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <wb-ui-setting-link title=URL ng-model=ctrl.href ng-change=\"ctrl.setProperty('href', ctrl.href)\" ng-model-options=\"{debounce: 200}\"> </wb-ui-setting-link> <md-input-container> <label translate>hreflang</label> <input aria-label=hreflang ng-model=ctrl.hreflang ng-change=\"ctrl.setProperty('hreflang', ctrl.hreflang)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>media</label> <input aria-label=media ng-model=ctrl.media ng-change=\"ctrl.setProperty('media', ctrl.media)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>ping</label> <input aria-label=ping ng-model=ctrl.ping ng-change=\"ctrl.setProperty('ping', ctrl.ping)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>referrerpolicy</label> <input aria-label=referrerpolicy ng-model=ctrl.referrerpolicy ng-change=\"ctrl.setProperty('referrerpolicy', ctrl.referrerpolicy)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>rel</label> <input aria-label=rel ng-model=ctrl.rel ng-change=\"ctrl.setProperty('rel', ctrl.rel)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>target</label> <input aria-label=target ng-model=ctrl.target ng-change=\"ctrl.setProperty('target', ctrl.target)\" ng-model-options=\"{debounce: 200}\"> </md-input-container>          </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-widget-general.html',
+    "<fieldset layout=column> <legend translate>Access</legend> <wb-ui-setting-text ng-model=ctrl.attribute.id ng-change=\"ctrl.setAttribute('id', ctrl.attribute.id)\" wb-title=ID wb-description=\"Specifies a unique id for an element\" wb-action-clean wb-action-more=ctrl.generateRandomId()> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attribute.accesskey ng-change=\"ctrl.setAttribute('accesskey', ctrl.attribute.)\" wb-title=Accesskey wb-icon=\"\" wb-description=\"Specifies a shortcut key to activate/focus an element\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attribute.title ng-change=\"ctrl.setAttribute('title', ctrl.attribute.title)\" wb-title=Title wb-description=\"Specifies extra information about an element\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attribute.name ng-change=\"ctrl.setAttribute('name', ctrl.attribute.name)\" wb-title=Name wb-description=\"Specifies a unique id for an element\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-number ng-model=ctrl.attribute.tabindex ng-change=\"ctrl.setAttribute('tabindex', ctrl.attribute.tabindex)\" wb-title=\"Tab Index\" wb-description=\"Specifies the tabbing order of an element\" wb-action-clean wb-min=1> </wb-ui-setting-number> </fieldset> <fieldset layout=column> <legend translate>Edit</legend> <wb-ui-setting-boolean ng-model=ctrl.attribute.contenteditable ng-change=\"ctrl.setAttribute('contenteditable', ctrl.attribute.contenteditable)\" wb-title=\"Content Is Editable\" wb-description=\"Specifies whether the content of an element is editable or not\" wb-action-clean> </wb-ui-setting-boolean> <wb-ui-setting-boolean ng-model=ctrl.attribute.draggable ng-change=\"ctrl.setAttribute('draggable', ctrl.attribute.draggable)\" wb-title=\"Content Is Editable\" wb-description=\"Specifies whether an element is draggable or not\" wb-action-clean> </wb-ui-setting-boolean> <wb-ui-setting-select ng-model=ctrl.attribute.dropzone ng-change=\"ctrl.setAttribute('dropzone', ctrl.attribute.dropzone)\" wb-title=\"Drop Zone\" wb-description=\"Specifies whether the dragged data is copied, moved, or linked, when dropped\" wb-action-clean wb-items=\"[{\n" +
+    "\t\t\tvalue: 'copy',\n" +
+    "\t\t\ttitle: 'Copy',\n" +
+    "\t\t\ticon: 'copy'\n" +
+    "\t\t}, {\n" +
+    "\t\t\tvalue: 'move',\n" +
+    "\t\t\ttitle: 'Move',\n" +
+    "\t\t\ticon: 'move'\n" +
+    "\t\t}, {\n" +
+    "\t\t\tvalue: 'link',\n" +
+    "\t\t\ttitle: 'Link',\n" +
+    "\t\t\ticon: 'link'\n" +
+    "\t\t}]\"> </wb-ui-setting-select> </fieldset> <fieldset layout=column> <legend translate>Local</legend> <wb-ui-setting-select ng-model=ctrl.attribute.dir ng-change=\"ctrl.setAttribute('dropzone', ctrl.attribute.dropzone)\" wb-title=\"Text Direction\" wb-description=\"Specifies the text direction for the content in an element\" wb-action-clean wb-items=\"[{\n" +
+    "\t\t\tvalue: 'ltr',\n" +
+    "\t\t\ttitle: 'Default. Left-to-right text direction',\n" +
+    "\t\t\ticon: 'ltr'\n" +
+    "\t\t}, {\n" +
+    "\t\t\tvalue: 'rtl',\n" +
+    "\t\t\ttitle: 'Right-to-left text direction',\n" +
+    "\t\t\ticon: 'rtl'\n" +
+    "\t\t}, {\n" +
+    "\t\t\tvalue: 'auto',\n" +
+    "\t\t\ttitle: 'Let the browser figure out the text direction, based on the content',\n" +
+    "\t\t}]\"> </wb-ui-setting-select> <wb-ui-setting-text ng-model=ctrl.attribute.lang ng-change=\"ctrl.setAttribute('lang', ctrl.attribute.lang)\" wb-title=Language wb-description=\"Specifies the language of the element's content\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-boolean ng-model=ctrl.attribute.spellcheck ng-change=\"ctrl.setAttribute('spellcheck', ctrl.attribute.spellcheck)\" wb-title=Spellcheck wb-description=\"Specifies whether the element is to have its spelling and grammar checked or not\" wb-action-clean> </wb-ui-setting-boolean> <wb-ui-setting-boolean ng-model=ctrl.attribute.translate ng-change=\"ctrl.setAttribute('translate', ctrl.attribute.translate)\" wb-title=Translate wb-description=\"Specifies whether the content of an element should be translated or not\" wb-action-clean> </wb-ui-setting-boolean> </fieldset> <fieldset layout=column> <legend translate>View</legend> <wb-ui-setting-text ng-model=ctrl.attribute.class ng-change=\"ctrl.setAttribute('lang', ctrl.attribute.class)\" wb-title=Class wb-description=\"Specifies one or more classnames for an element (refers to a class in a style sheet)\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-boolean ng-model=ctrl.attribute.hidden ng-change=\"ctrl.setAttribute('hidden', ctrl.attribute.hidden)\" wb-title=Hidden wb-description=\"Specifies that an element is not yet, or is no longer, relevant\" wb-action-clean> </wb-ui-setting-boolean> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-widget-iframe.html',
     "<fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\"> <label translate=\"\">Name</label> <input ng-model=name ng-change=\"ctrl.setProperty('name', name)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Sandbox</label> <input ng-model=sandbox ng-change=\"ctrl.setProperty('sandbox', sandbox)\"> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Source</legend> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Source</label> <input ng-model=src ng-change=\"ctrl.setProperty('src', src)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Source Document</label> <textarea name=srcdoc ng-model=srcdoc ng-change=\"ctrl.setProperty('srcdoc', srcdoc)\">\n" +
     "        </textarea> </md-input-container> </fieldset>"
   );
 
 
-  $templateCache.put('views/settings/wb-img.html',
+  $templateCache.put('views/settings/wb-widget-img.html',
     "<md-input-container> <label translate>alg</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.alg ng-change=\"ctrl.contentChanged('alg', ctrl.alg)\"> </md-input-container> <md-input-container> <label translate>crossorigin</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.crossorigin ng-change=\"ctrl.contentChanged('crossorigin', ctrl.crossorigin)\"> </md-input-container> <md-input-container> <label translate>height</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.height ng-change=\"ctrl.contentChanged('height', ctrl.height)\"> </md-input-container> <md-input-container> <label translate>ismap</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.ismap ng-change=\"ctrl.contentChanged('ismap', ctrl.ismap)\"> </md-input-container> <md-input-container> <label translate>longdesc</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.longdesc ng-change=\"ctrl.contentChanged('longdesc', ctrl.longdesc)\"> </md-input-container> <wb-ui-setting-image title=\"Image address\" ng-model=ctrl.src ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setProperty('src', ctrl.src)\"> </wb-ui-setting-image> <md-input-container> <label translate>srcset</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.srcset ng-change=\"ctrl.contentChanged('srcset', ctrl.srcset)\"> </md-input-container> <md-input-container> <label translate>usemap</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.usemap ng-change=\"ctrl.contentChanged('usemap', ctrl.usemap)\"> </md-input-container> <md-input-container> <label translate>width</label> <input ng-model-options=\"{updateOn : 'change blur'}\" ng-model=ctrl.width ng-change=\"ctrl.contentChanged('width', ctrl.width)\"> </md-input-container>            "
   );
 
 
-  $templateCache.put('views/settings/wb-input.html',
+  $templateCache.put('views/settings/wb-widget-input.html',
     "<fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\" ng-repeat=\"name in [\n" +
     "\t\t\t\t'accept',\n" +
     "\t\t\t\t'alt', \n" +
@@ -20408,67 +22541,8 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('views/settings/wb-layout-self.html',
-    " <fieldset layout=column> <legend translate>Align</legend> <wb-ui-setting-choose ng-if=\"ctrl.getParentDirection() === 'row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['row']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.getParentDirection() !== 'row'\" title=\"Self Vert.\" items=\"ctrl.selfAlign_['column']\" ng-model=ctrl.alignSelf ng-change=ctrl.alignSelfChanged()> </wb-ui-setting-choose> </fieldset>  <fieldset layout=column> <legend translate>Box</legend> <md-input-container class=md-block> <label translate>Order</label> <input ng-model=ctrl.order ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateOrder(ctrl.order, $event)\" type=number> </md-input-container> <md-input-container class=md-block> <label translate>Basis</label> <input ng-model=ctrl.basis ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateBasis(ctrl.basis, $event)\"> </md-input-container> <md-input-container class=md-block> <label translate>Grow</label> <input ng-model=ctrl.grow ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateGrow(ctrl.grow, $event)\" type=number> </md-input-container> <md-input-container class=md-block> <label translate>Shrink</label> <input ng-model=ctrl.shrink ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.updateShrink(ctrl.shrink, $event)\" type=number> </md-input-container> </fieldset>"
-  );
-
-
-  $templateCache.put('views/settings/wb-layout.html',
-    " <wb-ui-setting-choose title=Direction icon=wb-direction items=ctrl.direction_ ng-model=ctrl.direction ng-change=ctrl.directionChanged()> </wb-ui-setting-choose>  <md-switch ng-model=ctrl.wrap ng-change=ctrl.wrapChanged() aria-label=\"Layout wrap\"> <span ng-if=\"ctrl.direction === 'row'\" translate=\"\">Multi row</span> <span ng-if=\"ctrl.direction !== 'row'\" translate=\"\">Multi column</span> </md-switch>  <wb-ui-setting-choose ng-if=\"ctrl.direction==='row'\" title=Vert. items=\"ctrl.align_['row']\" ng-model=ctrl.align ng-change=ctrl.alignChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.direction!=='row'\" title=Horz. items=\"ctrl.align_['column']\" ng-model=ctrl.align ng-change=ctrl.alignChanged()> </wb-ui-setting-choose>  <wb-ui-setting-choose ng-if=\"ctrl.direction==='row'\" title=\"Vert.'\" items=\"ctrl.justify_['row']\" ng-model=ctrl.justify ng-change=ctrl.justifyChanged()> </wb-ui-setting-choose> <wb-ui-setting-choose ng-if=\"ctrl.direction!=='row'\" title=Horz. items=\"ctrl.justify_['column']\" ng-model=ctrl.justify ng-change=ctrl.justifyChanged()> </wb-ui-setting-choose>"
-  );
-
-
-  $templateCache.put('views/settings/wb-margin-padding.html',
-    " <fieldset layout=column> <legend translate>Margin</legend>  <wb-ui-setting-length title=All icon=select_all description=\"Set all margins\" ng-model=ctrl.marginAll ng-change=ctrl.updateAllMargin(ctrl.marginAll) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length> <md-divider></md-divider>  <wb-ui-setting-length title=Top icon=border_top ng-model=ctrl.margin.top ng-change=ctrl.updateMargin(ctrl.margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=ctrl.margin.right ng-change=ctrl.updateMargin(ctrl.margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=ctrl.margin.bottom ng-change=ctrl.updateMargin(ctrl.margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=ctrl.margin.left ng-change=ctrl.updateMargin(ctrl.margin) extra-values=\"['length' , 'auto' , 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset> <fieldset layout=column> <legend translate>Padding</legend>  <wb-ui-setting-length title=All icon=select_all description=\"Set all paddings\" ng-model=ctrl.paddingAll ng-change=ctrl.updateAllPadding(ctrl.paddingAll) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Top icon=border_top ng-model=ctrl.padding.top ng-change=ctrl.updatePadding(ctrl.padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Right icon=border_right ng-model=ctrl.padding.right ng-change=ctrl.updatePadding(ctrl.padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Bottom icon=border_bottom ng-model=ctrl.padding.bottom ng-change=ctrl.updatePadding(ctrl.padding) extra-values=\"['inherit']\"> </wb-ui-setting-length>  <wb-ui-setting-length title=Left icon=border_left ng-model=ctrl.padding.left ng-change=ctrl.updatePadding(ctrl.padding) extra-values=\"['inherit']\"> </wb-ui-setting-length> </fieldset>"
-  );
-
-
-  $templateCache.put('views/settings/wb-microdata.html',
+  $templateCache.put('views/settings/wb-widget-microdata.html',
     " <fieldset layout=column style=\"padding: 0px\"> <legend translate=\"\">Widget Microdata</legend> <md-switch ng-model=ctrl.itemscope ng-change=\"ctrl.setProperty('itemscope', ctrl.itemscope)\" aria-label=itemscope translate=\"\">Item Scope</md-switch> <md-input-container style=\"margin: 0px\"> <label translate=\"\">itemtype</label> <input ng-model=ctrl.itemtype ng-change=\"ctrl.setProperty('itemtype', ctrl.itemtype)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">itemprop</label> <input ng-model=ctrl.itemprop ng-change=\"ctrl.setProperty('itemprop', ctrl.itemprop)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">itemid</label> <input ng-model=ctrl.itemid ng-change=\"ctrl.setProperty('itemid', ctrl.itemid)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">itemref</label> <input ng-model=ctrl.itemref ng-change=\"ctrl.setProperty('itemref', ctrl.itemref)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Value</label> <input ng-model=ctrl.value ng-change=\"ctrl.setProperty('value', ctrl.value)\"> </md-input-container> <md-input-container style=\"margin: 0px\"> <label translate=\"\">Content</label> <input ng-model=ctrl.content ng-change=\"ctrl.setProperty('content', ctrl.content)\"> </md-input-container> </fieldset>"
-  );
-
-
-  $templateCache.put('views/settings/wb-notfound.html',
-    " <wb-icon>bug</wb-icon> <h2>Settings page not found</h2>"
-  );
-
-
-  $templateCache.put('views/settings/wb-shadow.html',
-    " <div layout=row flex> <md-button class=\"md-raised md-primary\" ng-click=ctrl.addShadow()> <span translate>New shadow</span> </md-button> </div>  <fieldset ng-repeat=\"shadow in ctrl.shadows track by $index\" layout=column> <legend><span translate>Shadow</span>{{$index + 1}}</legend> <wb-ui-setting-length title=\"Horizontal Shift\" ng-model=shadow.hShift ng-change=ctrl.updateShadows()> </wb-ui-setting-length> <wb-ui-setting-length title=\"Vertical Shift\" ng-model=shadow.vShift ng-change=ctrl.updateShadows()> </wb-ui-setting-length> <wb-ui-setting-length title=Blur ng-model=shadow.blur ng-change=ctrl.updateShadows()> </wb-ui-setting-length> <wb-ui-setting-length title=Spread ng-model=shadow.spread ng-change=ctrl.updateShadows()> </wb-ui-setting-length> <wb-ui-setting-color title=Color wb-ui-setting-clear-button=true wb-ui-setting-preview=true ng-model=shadow.color ng-change=ctrl.updateShadows()> </wb-ui-setting-color> <md-checkbox ng-model=shadow.inset ng-change=ctrl.updateShadows() aria-label=Inset> <span translate=\"\">Inset</span> </md-checkbox> <div layout=row layout-align=\"end center\"> <p style=\"font-size: 14px\" flex tab-index=0></p> <md-button class=\"md-raised md-accent\" aria-label=\"Delete shadow\" ng-click=ctrl.remove($index)> <span translate>Delete</span> </md-button> </div> </fieldset>"
-  );
-
-
-  $templateCache.put('views/settings/wb-size.html',
-    " <fieldset> <legend translate>Width</legend> <wb-ui-setting-length title=Width description=\"Set the width\" ng-model=ctrl.width ng-change=ctrl.widthChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min width\" description=\"Set the minimum width\" ng-model=ctrl.minWidth ng-change=ctrl.minWidthChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max width\" description=\"Set the maximum width\" ng-model=ctrl.maxWidth ng-change=ctrl.maxWidthChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset> <fieldset> <legend translate>Height</legend> <wb-ui-setting-length title=Height description=\"Set the height\" ng-model=ctrl.height ng-change=ctrl.heightChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Min height\" description=\"Set the minimum height\" ng-model=ctrl.minHeight ng-change=ctrl.minHeightChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> <wb-ui-setting-length title=\"Max height\" description=\"Set the maximum height\" ng-model=ctrl.maxHeight ng-change=ctrl.maxHeightChanged() extra-values=\"['auto', 'length', 'initial', 'inherit']\"> </wb-ui-setting-length> </fieldset>"
-  );
-
-
-  $templateCache.put('views/settings/wb-style-text.html',
-    "<div layout-padding layout=column> <md-input-container> <label translate>Align</label> <input aria-label=align ng-model=ctrl.align ng-change=\"ctrl.setProperty('style.text.align', ctrl.align)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Align Last</label> <input aria-label=alignLast ng-model=ctrl.alignLast ng-change=\"ctrl.setProperty('style.text.alignLast', ctrl.alignLast)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Decoration</label> <input aria-label=decoration ng-model=ctrl.decoration ng-change=\"ctrl.setProperty('style.text.decoration', ctrl.decoration)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Indent</label> <input aria-label=indent ng-model=ctrl.indent ng-change=\"ctrl.setProperty('style.text.indent', ctrl.indent)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Justify</label> <input aria-label=justify ng-model=ctrl.justify ng-change=\"ctrl.setProperty('style.text.justify', ctrl.justify)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Overflow</label> <input aria-label=overflow ng-model=ctrl.overflow ng-change=\"ctrl.setProperty('style.text.overflow', ctrl.overflow)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Shadow</label> <input aria-label=shadow ng-model=ctrl.shadow ng-change=\"ctrl.setProperty('style.text.shadow', ctrl.shadow)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> <md-input-container> <label translate>Transform</label> <input aria-label=transform ng-model=ctrl.transform ng-change=\"ctrl.setProperty('style.text.transform', ctrl.transform)\" ng-model-options=\"{debounce: 200}\"> </md-input-container> </div>"
-  );
-
-
-  $templateCache.put('views/settings/wb-textarea.html',
-    "<fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\" ng-repeat=\"name in [\n" +
-    "\t\t\t\t'autofocus',\n" +
-    "\t\t\t\t'cols',\n" +
-    "\t\t\t\t'dirname',\n" +
-    "\t\t\t\t'disabled',\n" +
-    "\t\t\t\t'form',\n" +
-    "\t\t\t\t'maxlength',\n" +
-    "\t\t\t\t'name',\n" +
-    "\t\t\t\t'placeholder',\n" +
-    "\t\t\t\t'readonly',\n" +
-    "\t\t\t\t'required',\n" +
-    "\t\t\t\t'rows',\n" +
-    "\t\t\t\t'wrap',\n" +
-    "\t\t\t\t'value',\n" +
-    "\t\t\t\t]\"> <label translate=\"\">{{name}}</label> <input ng-model=ctrl[name] ng-change=\"ctrl.setProperty(name, ctrl[name])\"> </md-input-container> </fieldset>"
-  );
-
-
-  $templateCache.put('views/settings/wb-transform.html',
-    "<fieldset layout=column> <legend translate>General</legend> <md-input-container class=md-block> <label translate>Origin</label> <input ng-model=ctrl.origin ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateOrigin()> </md-input-container> <md-input-container class=md-block> <label translate>style</label> <input ng-model=ctrl.style ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateStyle()> </md-input-container> <md-input-container class=md-block> <label translate>Perspective</label> <input ng-model=ctrl.perspective ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updatePerspective()> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>X</legend> <md-input-container class=md-block> <label translate>translate</label> <input ng-model=ctrl.translateX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateTranslateX()> </md-input-container> <md-input-container class=md-block> <label translate>scale</label> <input ng-model=ctrl.scaleX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateScaleX()> </md-input-container> <md-input-container class=md-block> <label translate>rotate</label> <input ng-model=ctrl.rotateX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateRotateX()> </md-input-container> <md-input-container class=md-block> <label translate>skew</label> <input ng-model=ctrl.skewX ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateSkewX()> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Y</legend> <md-input-container class=md-block> <label translate>translate</label> <input ng-model=ctrl.translateY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateTranslateY()> </md-input-container> <md-input-container class=md-block> <label translate>scale</label> <input ng-model=ctrl.scaleY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateScaleY()> </md-input-container> <md-input-container class=md-block> <label translate>rotate</label> <input ng-model=ctrl.rotateY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateRotateY()> </md-input-container> <md-input-container class=md-block> <label translate>skew</label> <input ng-model=ctrl.skewY ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateSkewY()> </md-input-container> </fieldset> <fieldset layout=column> <legend translate>Z</legend> <md-input-container class=md-block> <label translate>translate</label> <input ng-model=ctrl.translateZ ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateTranslatez()> </md-input-container> <md-input-container class=md-block> <label translate>scale</label> <input ng-model=ctrl.scaleZ ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateScaleZ()> </md-input-container> <md-input-container class=md-block> <label translate>rotate</label> <input ng-model=ctrl.rotateZ ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=ctrl.updateRotateZ()> </md-input-container> </fieldset>"
   );
 
 

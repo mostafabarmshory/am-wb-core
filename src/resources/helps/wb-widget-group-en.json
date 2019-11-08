@@ -1,22 +1,15 @@
 {
-	"type": "Gruop",
+	"type": "div",
 	"title": "Groups of widgets",
 	"description": "In this help page you can learn how to use a group",
-	"style": {
-		"layout": {
-			"direction": "column",
-			"align": "center",
-			"justify": "streach"
-		}
-	},
-	"contents": [
+	"children": [
 		{
-			"type": "HtmlText",
-			"text": "<h2>Help not found!</h2>"
+			"type": "h2",
+			"text": "Help not found!"
 		},
 		{
-			"type": "HtmlText",
-			"text": "<p>Help content for requested page not found.</p>"
+			"type": "p",
+			"text": "Help content for requested page not found."
 		}
 	]
 }

@@ -1,21 +1,12 @@
 {
-    "contents": [
-        {
-            "text": "<h2>HTML Text</h2>\n<p>This is loaded from templages</p>",
-            "type": "HtmlText",
-            "name": "HTML text",
-            "style": {
-                "borderColor": {
-                    "bottom": "none"
-                },
-                "margin": {},
-                "borderRadius": {},
-                "borderStyleColorWidth": {},
-                "borderStyle": {},
-                "borderWidth": {},
-                "flexAlignItem": "wb-flex-item-auto"
-            }
-        }
-    ],
-    "type": "Page"
+	"type": "div",
+	"children": [
+		{
+			"type": "p",
+			"html": "This is loaded from templages",
+			"style": {
+				"margin": "0px"
+			}
+		}
+	]
 }

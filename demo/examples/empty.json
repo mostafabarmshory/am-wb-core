@@ -1,17 +1,15 @@
 {
-	"type": "Group",
-	"name": "Group main",
-	"comment": "This is an emplty group",
+	"type": "div",
 	"style": {
-		"border": {},
-		"padding": {},
-		"margin": {},
-		"layout": {}
+		"padding": "5px",
+		"margin": "0px",
+		"background": "pink",
+		"flexGrow": 2,
+		"flexShrink": 0,
+		"flexBasis": "auto"
 	},
-	"event": {
-		"click":"",
-		"mouseover":"",
-		"mouseout":""
+	"on": {
+		"click":"$widget.setProperty('style.background', 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) +')');"
 	},
-	"contents": []
+	"children": []
 }

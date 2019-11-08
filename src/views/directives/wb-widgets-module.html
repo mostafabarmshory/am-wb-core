@@ -6,14 +6,13 @@
 	<div 
 		class="wb-widgets-module md-whiteframe-1dp"
 		ng-repeat="widget in widgets"
-		dnd-draggable="widget.model || {}"
-		dnd-type="widget.type"
-		dnd-effect-allowed="copy"
 		flex="none"
 		flex-gt-sm="30"
 		layout="column"
 		layout-align="start center"
-		layout-padding>
+		layout-padding
+		wb-on-dragstart="putDragdata($event, widget)"
+		draggable="true">
 		<wb-icon 
 			size="32px"
 			wb-icon-name="{{widget.icon}}"></wb-icon>

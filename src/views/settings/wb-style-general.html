@@ -1,0 +1,51 @@
+<fieldset
+	layout="column">
+	<legend translate>View</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.opacity"
+		ng-model-change="ctrl.setStyle('opacity', ctrl.style.opacity)"
+		wb-title="Opacity"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.visibility"
+		ng-model-change="ctrl.setStyle('visibility', ctrl.style.visibility)"
+		wb-title="Visibility"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.color"
+		ng-model-change="ctrl.setStyle('color', ctrl.style.color)"
+		wb-title="Color"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.mixBlendMode"
+		ng-model-change="ctrl.setStyle('mixBlendMode', ctrl.style.mixBlendMode)"
+		wb-title=""
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.isolation"
+		ng-model-change="ctrl.setStyle('isolation', ctrl.style.isolation)"
+		wb-title=""
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Mouse</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.cursor"
+		ng-model-change="ctrl.setStyle('cursor', ctrl.style.cursor)"
+		wb-title="Cursor"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.pointerEvents"
+		ng-model-change="ctrl.setStyle('pointerEvents', ctrl.style.pointerEvents)"
+		wb-title="pointerEvents"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>

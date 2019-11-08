@@ -49,9 +49,7 @@ describe('Timeout test', function () {
 		 */
 		$widget.newWidget({
 			type: widgetType,
-			controller: function () {},
-			controllerAs: 'ctrl',
-			template: '<h1>{{ctrl.text}}</h1>'
+			template: '<h1></h1>'
 		});
 	}));
 
@@ -68,12 +66,12 @@ describe('Timeout test', function () {
 					color: 'black'
 				}
 			},
-			event: {
-				init: 'if ($timeout) {$widget.setProperty(\'style.background.color\',\'red\')}'
+			on: {
+				init: 'if ($timeout) {$widget.setProperty(\'style.background\',\'red\')}'
 			}
 		}, root)
 		.then(function (widget) {
-			expect(widget.getProperty('style.background.color')).toBe('red');
+			expect(widget.getProperty('style.background')).toBe('red');
 			done();
 		});
 		$rootScope.$apply();

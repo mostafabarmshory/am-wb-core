@@ -35,35 +35,30 @@ module.exports = function(config) {
 			'bower_components/angular-aria/angular-aria.js',
 			'bower_components/angular-messages/angular-messages.js',
 			'bower_components/angular-sanitize/angular-sanitize.js',
-			'bower_components/angular-material/angular-material.js',
-			'bower_components/angular-translate/angular-translate.js',
 			'bower_components/angular-route/angular-route.js',
+			'bower_components/lodash/lodash.js',
+			'bower_components/flux/dist/Flux.js',
+			'bower_components/object-path/index.js',
+			'bower_components/angular-material/angular-material.js',
+			'bower_components/tinymce/tinymce.js',
+			'bower_components/angular-translate/angular-translate.js',
+			'bower_components/jspanel4x/dist/jspanel.js',
 			'bower_components/weakmap-polyfill/weakmap-polyfill.js',
-			'bower_components/moment/moment.js',
-			'bower_components/numbro/numbro.js',
-			'bower_components/pikaday/pikaday.js',
-			'bower_components/zeroclipboard/dist/ZeroClipboard.js',
-			'bower_components/handsontable/dist/handsontable.js',
-			'bower_components/ngHandsontable/dist/ngHandsontable.js',
 			'bower_components/tinycolor/tinycolor.js',
 			'bower_components/md-color-picker/dist/md-color-picker.js',
-			'bower_components/angular-drag-and-drop-lists/angular-drag-and-drop-lists.js',
-			'bower_components/jspanel4x/dist/jspanel.js',
-			'bower_components/lodash/lodash.js',
-			'bower_components/tinymce/tinymce.js',
-			'bower_components/object-path/index.js',
-			'bower_components/flux/dist/Flux.js',
 			'bower_components/mustache.js/mustache.js',
 			'bower_components/ngstorage/ngStorage.js',
+			'bower_components/moment/moment.js',
 			'bower_components/angular-mocks/angular-mocks.js',
 			'bower_components/json-formatter/dist/json-formatter.js',
 			// endbower
 			'src/libs/*.js',
 			'src/scripts/**/*.js',
 			'test/mock/**/*.js',
-			'test/spec/**/*.js'
+			'test/spec/**/*.js',
+            '.tmp/templateCache.js'
 		],
-
+		
 		// optionally, configure the reporter
 		coverageReporter: {
 			dir : 'coverage',
@@ -71,7 +66,10 @@ module.exports = function(config) {
 				type : 'lcovonly',
 				file : 'lcov.info'
 			},{
-				type: 'text-summary'
+			    type: 'text-summary'
+			},{
+			    type: 'html',
+			    dir : 'coverage/'
 			}]
 		},
 
@@ -103,7 +101,7 @@ module.exports = function(config) {
 
 		// level of logging
 		// possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
-		logLevel: config.LOG_INFO
+		logLevel: config.LOG_WARN
 
 		// Uncomment the following lines if you are using grunt's server to run the tests
 		// proxies: {

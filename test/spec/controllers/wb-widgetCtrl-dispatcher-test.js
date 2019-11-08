@@ -47,9 +47,7 @@ describe('Dispatcher test', function () {
 		 */
 		$widget.newWidget({
 			type: widgetType,
-			controller: function () {},
-			controllerAs: 'ctrl',
-			template: '<h1>{{ctrl.text}}</h1>'
+			template: '<h1></h1>'
 		});
 	}));
 
@@ -62,16 +60,14 @@ describe('Dispatcher test', function () {
 			name: 'Widget',
 			text: '<h2>Dispatcher Test</h2>',
 			style: {
-				background: {
-					color: 'black'
-				}
+				background: 'black'
 			},
-			event: {
-				init: 'if ($dispatcher) {$widget.setProperty(\'style.background.color\',\'red\')}'
+			on: {
+				init: 'if ($dispatcher) {$widget.setProperty(\'style.background\',\'red\')}'
 			}
 		}, root)
 		.then(function (widget) {
-			expect(widget.getProperty('style.background.color')).toBe('red');
+			expect(widget.getProperty('style.background')).toBe('red');
 			done();
 		});
 		$rootScope.$apply();

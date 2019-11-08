@@ -1,0 +1,145 @@
+<fieldset
+	layout="column">
+	<legend translate>Access</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.attribute.id"
+		ng-change="ctrl.setAttribute('id', ctrl.attribute.id)"
+		wb-title="ID"
+		wb-description="Specifies a unique id for an element"
+		wb-action-clean
+		wb-action-more="ctrl.generateRandomId()">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.attribute.accesskey"
+		ng-change="ctrl.setAttribute('accesskey', ctrl.attribute.)"
+		wb-title="Accesskey"
+		wb-icon=""
+		wb-description="Specifies a shortcut key to activate/focus an element"
+		wb-action-clean>
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.attribute.title"
+		ng-change="ctrl.setAttribute('title', ctrl.attribute.title)"
+		wb-title="Title"
+		wb-description="Specifies extra information about an element"
+		wb-action-clean>
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.attribute.name"
+		ng-change="ctrl.setAttribute('name', ctrl.attribute.name)"
+		wb-title="Name"
+		wb-description="Specifies a unique id for an element"
+		wb-action-clean>
+	</wb-ui-setting-text>
+	<wb-ui-setting-number
+		ng-model="ctrl.attribute.tabindex"
+		ng-change="ctrl.setAttribute('tabindex', ctrl.attribute.tabindex)"
+		wb-title="Tab Index"
+		wb-description="Specifies the tabbing order of an element"
+		wb-action-clean
+		wb-min="1">
+	</wb-ui-setting-number>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Edit</legend>
+	<wb-ui-setting-boolean
+		ng-model="ctrl.attribute.contenteditable"
+		ng-change="ctrl.setAttribute('contenteditable', ctrl.attribute.contenteditable)"
+		wb-title="Content Is Editable"
+		wb-description="Specifies whether the content of an element is editable or not"
+		wb-action-clean>
+	</wb-ui-setting-boolean>
+	<wb-ui-setting-boolean
+		ng-model="ctrl.attribute.draggable"
+		ng-change="ctrl.setAttribute('draggable', ctrl.attribute.draggable)"
+		wb-title="Content Is Editable"
+		wb-description="Specifies whether an element is draggable or not"
+		wb-action-clean>
+	</wb-ui-setting-boolean>
+	<wb-ui-setting-select
+		ng-model="ctrl.attribute.dropzone"
+		ng-change="ctrl.setAttribute('dropzone', ctrl.attribute.dropzone)"
+		wb-title="Drop Zone"
+		wb-description="Specifies whether the dragged data is copied, moved, or linked, when dropped"
+		wb-action-clean
+		wb-items="[{
+			value: 'copy',
+			title: 'Copy',
+			icon: 'copy'
+		}, {
+			value: 'move',
+			title: 'Move',
+			icon: 'move'
+		}, {
+			value: 'link',
+			title: 'Link',
+			icon: 'link'
+		}]">
+	</wb-ui-setting-select>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Local</legend>
+	<wb-ui-setting-select
+		ng-model="ctrl.attribute.dir"
+		ng-change="ctrl.setAttribute('dropzone', ctrl.attribute.dropzone)"
+		wb-title="Text Direction"
+		wb-description="Specifies the text direction for the content in an element"
+		wb-action-clean
+		wb-items="[{
+			value: 'ltr',
+			title: 'Default. Left-to-right text direction',
+			icon: 'ltr'
+		}, {
+			value: 'rtl',
+			title: 'Right-to-left text direction',
+			icon: 'rtl'
+		}, {
+			value: 'auto',
+			title: 'Let the browser figure out the text direction, based on the content',
+		}]">
+	</wb-ui-setting-select>
+	<wb-ui-setting-text
+		ng-model="ctrl.attribute.lang"
+		ng-change="ctrl.setAttribute('lang', ctrl.attribute.lang)"
+		wb-title="Language"
+		wb-description="Specifies the language of the element's content"
+		wb-action-clean>
+	</wb-ui-setting-text>
+	<wb-ui-setting-boolean
+		ng-model="ctrl.attribute.spellcheck"
+		ng-change="ctrl.setAttribute('spellcheck', ctrl.attribute.spellcheck)"
+		wb-title="Spellcheck"
+		wb-description="Specifies whether the element is to have its spelling and grammar checked or not"
+		wb-action-clean>
+	</wb-ui-setting-boolean>
+	<wb-ui-setting-boolean
+		ng-model="ctrl.attribute.translate"
+		ng-change="ctrl.setAttribute('translate', ctrl.attribute.translate)"
+		wb-title="Translate"
+		wb-description="Specifies whether the content of an element should be translated or not"
+		wb-action-clean>
+	</wb-ui-setting-boolean>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>View</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.attribute.class"
+		ng-change="ctrl.setAttribute('lang', ctrl.attribute.class)"
+		wb-title="Class"
+		wb-description="Specifies one or more classnames for an element (refers to a class in a style sheet)"
+		wb-action-clean>
+	</wb-ui-setting-text>
+	<wb-ui-setting-boolean
+		ng-model="ctrl.attribute.hidden"
+		ng-change="ctrl.setAttribute('hidden', ctrl.attribute.hidden)"
+		wb-title="Hidden"
+		wb-description="Specifies that an element is not yet, or is no longer, relevant"
+		wb-action-clean>
+	</wb-ui-setting-boolean>
+</fieldset>

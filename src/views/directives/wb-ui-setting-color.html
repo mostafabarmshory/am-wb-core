@@ -1,19 +1,22 @@
-<div
-    layout="row">
-    <wb-icon
-        ng-if="icon"
-        layout-padding>{{icon}}
-    </wb-icon>
-    <div
-        md-color-picker
-        ng-model="valueColor"
-        ng-change="colorChanged(valueColor)"
-        label="{{title}}"
-        default="#f00"
-        random="true"
-        md-color-clear-button="true"
-        md-color-generic-palette="false"
-        md-color-history="false"
-        flex>
-    </div>
+<field
+	layout="row"
+	layout-align="start center">
+	<field-description flex>
+		<label translate>{{::title}}</label>
+		<wb-icon size="1em">info</wb-icon>
+	</field-description>
+	
+	<div
+		class="color"
+		layout="row">
+		<input 
+			ng-model="value"
+			ng-change="setValue(value)"
+			aria-label="color of {{::title}}"
+			type="text"
+			flex>
+		<div
+			ng-click="showColorPicker($event)"
+			class="preview"></div>
+	</div>
 </div>

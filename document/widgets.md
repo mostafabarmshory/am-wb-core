@@ -15,64 +15,303 @@ If the state of the widget is going to change then a event of stateChanged will 
 
 ## Styles
 
-The style is an specific widget attribute which controll the display of the widget.
+### ??
 
-### cursor
+- caption-side
+- backface-visibility
+- caret-color
+- hanging-punctuation
+- table-layout
 
-The cursor property specifies the mouse cursor to be displayed when pointing over an element.
+### Animation
+
+- animation
+- animation-name
+- animation-duration
+- animation-timing-function
+- animation-delay
+- animation-iteration-count
+- animation-direction
+- animation-fill-mode
+- animation-play-state
+
+### Background
+
+- background
+- background-color
+- background-image
+- background-position
+- background-size
+- background-repeat
+- background-origin
+- background-clip
+- background-attachment
+
+### Boarder & Autline
+
+#### Outline
+
+- outline
+- outline-offset
+- outline-width
+- outline-style (required)
+- outline-color
+
+#### Box
+
+- box-decoration-break
+- box-shadow
+- box-sizing
+
+#### Border
+
+- border
+- border-width
+- border-style (required)
+- border-color
+- border-collapse
+- border-spacing
+
+- border-bottom
+- border-bottom-width
+- border-bottom-style
+- border-bottom-color
+
+- border-left
+- border-left-width
+- border-left-style (required)
+- border-left-color
+
+- border-right
+- border-right-width
+- border-right-style (required)
+- border-right-color
+
+- border-top
+- border-top-width
+- border-top-style (required)
+- border-top-color
+
+##### Radius
+
+- border-radius
+- border-top-right-radius
+- border-top-left-radius
+- border-bottom-left-radius
+- border-bottom-right-radius
+
+##### Image
+
+- border-image
+- border-image-source
+- border-image-slice
+- border-image-width
+- border-image-outset
+- border-image-repeat
 
 
-	{
-		style: {
-			cursor: 'pointer'
-		}
-	}
+### layout
 
-The property path is:
+- display
+- order
+- z-index
+- clear
+- float
 
-	style.cursor
+#### Position
 
-Valid values are:
+- position
+- bottom
+- left
+- right
+- top
+ 
+#### overflow
 
-- alias:	The cursor indicates an alias of something is to be created	
-- all-scroll:	The cursor indicates that something can be scrolled in any direction	
-- auto:	Default. The browser sets a cursor	
-- cell:	The cursor indicates that a cell (or set of cells) may be selected	
-- context-menu:	The cursor indicates that a context-menu is available	
-- col-resize:	The cursor indicates that the column can be resized horizontally	
-- copy:	The cursor indicates something is to be copied	
-- crosshair:	The cursor render as a crosshair	
-- default:	The default cursor	
-- e-resize:	The cursor indicates that an edge of a box is to be moved right (east)	
-- ew-resize:	Indicates a bidirectional resize cursor	
-- grab:	The cursor indicates that something can be grabbed	
-- grabbing:	The cursor indicates that something can be grabbed	
-- help:	The cursor indicates that help is available	
-- move:	The cursor indicates something is to be moved	
-- n-resize:	The cursor indicates that an edge of a box is to be moved up (north)	
-- ne-resize:	The cursor indicates that an edge of a box is to be moved up and right (north/east)	
-- nesw-resize:	Indicates a bidirectional resize cursor	
-- ns-resize:	Indicates a bidirectional resize cursor	
-- nw-resize:	The cursor indicates that an edge of a box is to be moved up and left (north/west)	
-- nwse-resize:	Indicates a bidirectional resize cursor	
-- no-drop:	The cursor indicates that the dragged item cannot be dropped here	
-- none:	No cursor is rendered for the element	
-- not-allowed:	The cursor indicates that the requested action will not be executed	
-- pointer:	The cursor is a pointer and indicates a link	
-- progress:	The cursor indicates that the program is busy (in progress)	
-- row-resize:	The cursor indicates that the row can be resized vertically	
-- s-resize:	The cursor indicates that an edge of a box is to be moved down (south)	
-- se-resize:	The cursor indicates that an edge of a box is to be moved down and right (south/east)	
-- sw-resize:	The cursor indicates that an edge of a box is to be moved down and left (south/west)	
-- text:	The cursor indicates text that may be selected	
-- URL:	A comma separated list of URLs to custom cursors. Note: Always specify a generic cursor at the end of the list, in case none of the URL-defined cursors can be used	
-- vertical-text:	The cursor indicates vertical-text that may be selected	
-- w-resize:	The cursor indicates that an edge of a box is to be moved left (west)	
-- wait:	The cursor indicates that the program is busy	
-- zoom-in:	The cursor indicates that something can be zoomed in	
-- zoom-out:	The cursor indicates that something can be zoomed out	
-- initial:	Sets this property to its default value. Read about initial	
-- inherit:	Inherits this property from its parent element. Read about inherit
+- overflow
+- overflow-x
+- overflow-y
+- scroll-behavior
+ 
+#### Print
+
+- page-break-after
+- page-break-before
+- page-break-inside
+ 
+
+#### Flex
+
+- align-content
+- align-items
+- align-self
+- justify-content
+- flex
+- flex-basis
+- flex-direction
+- flex-grow
+- flex-shrink
+- flex-basis
+- flex-wrap
+
+
+#### grid
+
+- grid
+- grid-area
+- grid-auto-columns
+- grid-auto-flow
+- grid-auto-rows
+- grid-column
+- grid-column-end
+- grid-column-gap
+- grid-column-start
+- grid-gap
+- grid-row
+- grid-row-end
+- grid-row-gap
+- grid-row-start
+- grid-template
+- grid-template-areas
+- grid-template-columns
+- grid-template-rows
+
+
+#### column view
+
+- columns
+- column-width
+- column-count
+- column-span
+- column-fill
+- column-gap
+- column-rule
+- column-rule-color
+- column-rule-style
+- column-rule-width
+
+
+
+### Size
+ 
+ - margin
+ - margin-top
+ - margin-right
+ - margin-bottom
+ - margin-left
+ 
+ - padding
+ - padding-top
+ - padding-right
+ - padding-bottom
+ - padding-left
+ 
+ - resize
+ - height
+ - max-height
+ - min-height
+ - width
+ - max-width
+ - min-width
+ 
+### multimedia
+
+ - clip
+ - clip-path
+ - filter
+ - object-fit
+ - object-position
+
+### General?
+
+#### view
+
+- opacity
+- visibility
+- color
+- mix-blend-mode
+- isolation
+
+#### mouse
+
+- cursor
+- pointer-events
+
+
+
+
+### Text
+
+#### writing
+
+hyphens
+letter-spacing
+line-height
+quotes
+tab-size
+vertical-align
+white-space
+word-break
+word-spacing
+word-wrap
+writing-mode
+user-select
+
+#### Text
+
+text-align-last
+text-decoration
+text-decoration-color
+text-decoration-line
+text-decoration-style
+text-indent
+text-justify
+text-overflow
+text-shadow
+text-transform
+
+#### Local
+
+direction
+unicode-bidi
+
+ 
+#### font
+
+font
+font-family
+font-kerning
+font-size
+font-size-adjust
+font-stretch
+font-style
+font-variant
+font-weight
+
+
+### list (ul, ol)
+
+list-style
+list-style-type
+list-style-position
+list-style-image
+
+
+###  Transformation
+
+perspective
+perspective-origin
+
+transform
+transform-origin
+transform-style
+
+transition
+transition-delay
+transition-duration
+transition-property
+transition-timing-function
+
 
 ## Global Attributes
 

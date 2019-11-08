@@ -9,7 +9,7 @@
 			"justify": "streach"
 		}
 	},
-	"contents": [
+	"children": [
 		{
 			"type": "HtmlText",
 			"text": "<h2>راهنما یافت نشد!</h2>"

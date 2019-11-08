@@ -1,39 +1,17 @@
-<div 
-    layout="row"
-    layout-align="end center">
-    <wb-icon ng-if="icon">{{icon}}</wb-icon>
-    <md-tooltip 
-    	ng-if="description" 
-    	md-delay="1500">
-    	<span translate>{{::description}}</span>
-    </md-tooltip>
-    <span 
-    	flex 
-    	ng-if="title" 
-    	translate>{{::title}}</span>
-    <md-input-container 
-        ng-show="ctrl.isNumerical()"
-        style="margin:0px; padding:0px; width:60px; height:30px;">
-        <input 
-        	aria-label="value"
-        	type="number" 
-        	ng-model="internalValue"
-        	ng-change="updateLength(internalUnit, internalValue)">
-    </md-input-container>
-    
-    <md-input-container
-        style="margin:0px; padding:0px; width:80px; height:30px;">
-        <md-select 
-        	aria-label="types"
-            style="max-width:75px;"
-            ng-model="internalUnit"
-        	ng-change="updateLength(internalUnit, internalValue)">
-            <md-option 
-                ng-repeat="type in ::types track by $index"
-                value="{{::type}}">
-                <span translate>{{::type}}</span>
-            </md-option>
-        </md-select>
-    </md-input-container>
-</div>
-
+<field
+	layout="row"
+	layout-align="start center">
+	<field-description flex>
+		<label translate>{{::title}}</label>
+		<wb-icon size="1em">info</wb-icon>
+	</field-description>
+	<div
+		class="length"
+		layout="row">
+		<input 
+			ng-model="value"
+			ng-change="setValue(value)"
+			aria-label="set {{::title}} true or false"
+			type="text">
+	</div>
+</field>

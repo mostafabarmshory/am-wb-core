@@ -1,68 +1,217 @@
-<div 
-    layout-padding
-    layout="column">
-    <md-input-container>
-        <label translate>Align</label>
-        <input
-        	aria-label="align"
-        	ng-model="ctrl.align"
-        	ng-change="ctrl.setProperty('style.text.align', ctrl.align)"
-			ng-model-options="{debounce: 200}">
-    </md-input-container>
-    <md-input-container>
-        <label translate>Align Last</label>
-        <input
-        	aria-label="alignLast"
-        	ng-model="ctrl.alignLast"
-        	ng-change="ctrl.setProperty('style.text.alignLast', ctrl.alignLast)"
-			ng-model-options="{debounce: 200}">
-    </md-input-container>
-    <md-input-container>
-        <label translate>Decoration</label>
-        <input
-        	aria-label="decoration"
-        	ng-model="ctrl.decoration"
-        	ng-change="ctrl.setProperty('style.text.decoration', ctrl.decoration)"
-			ng-model-options="{debounce: 200}">
-    </md-input-container>
-    <md-input-container>
-        <label translate>Indent</label>
-        <input
-        	aria-label="indent"
-        	ng-model="ctrl.indent"
-        	ng-change="ctrl.setProperty('style.text.indent', ctrl.indent)"
-			ng-model-options="{debounce: 200}">
-    </md-input-container>
-    <md-input-container>
-        <label translate>Justify</label>
-        <input
-        	aria-label="justify"
-        	ng-model="ctrl.justify"
-        	ng-change="ctrl.setProperty('style.text.justify', ctrl.justify)"
-			ng-model-options="{debounce: 200}">
-    </md-input-container>
-    <md-input-container>
-        <label translate>Overflow</label>
-        <input
-        	aria-label="overflow"
-        	ng-model="ctrl.overflow"
-        	ng-change="ctrl.setProperty('style.text.overflow', ctrl.overflow)"
-			ng-model-options="{debounce: 200}">
-    </md-input-container>
-    <md-input-container>
-        <label translate>Shadow</label>
-        <input
-        	aria-label="shadow"
-        	ng-model="ctrl.shadow"
-        	ng-change="ctrl.setProperty('style.text.shadow', ctrl.shadow)"
-			ng-model-options="{debounce: 200}">
-    </md-input-container>
-    <md-input-container>
-        <label translate>Transform</label>
-        <input
-        	aria-label="transform"
-        	ng-model="ctrl.transform"
-        	ng-change="ctrl.setProperty('style.text.transform', ctrl.transform)"
-			ng-model-options="{debounce: 200}">
-    </md-input-container>
-</div>
+<fieldset
+	layout="column">
+	<legend translate>Text</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.textAlignLast"
+		ng-change="ctrl.setStyle('textAlignLast', ctrl.style.textAlignLast)"
+		wb-title="AlignLast"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.textDecoration"
+		ng-change="ctrl.setStyle('textDecoration', ctrl.style.textDecoration)"
+		wb-title="Decoration"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.textDecorationColor"
+		ng-change="ctrl.setStyle('textDecorationColor', ctrl.style.textDecorationColor)"
+		wb-title="DecorationColor"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.textDecorationLine"
+		ng-change="ctrl.setStyle('textDecorationLine', ctrl.style.textDecorationLine)"
+		wb-title="DecorationLine"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.textDecorationStyle"
+		ng-change="ctrl.setStyle('textDecorationStyle', ctrl.style.textDecorationStyle)"
+		wb-title="DecorationStyle"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.textIndent"
+		ng-change="ctrl.setStyle('textIndent', ctrl.style.textIndent)"
+		wb-title="Indent"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.textJustify"
+		ng-change="ctrl.setStyle('textJustify', ctrl.style.textJustify)"
+		wb-title="Justify"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.textOverflow"
+		ng-change="ctrl.setStyle('textOverflow', ctrl.style.textOverflow)"
+		wb-title="Overflow"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.textShadow"
+		ng-change="ctrl.setStyle('textShadow', ctrl.style.textShadow)"
+		wb-title="Shadow"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.textTransform"
+		ng-change="ctrl.setStyle('textTransform', ctrl.style.textTransform)"
+		wb-title="Transform"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Font</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.font"
+		ng-change="ctrl.setStyle('font', ctrl.style.font)"
+		wb-title="font"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.fontFamily"
+		ng-change="ctrl.setStyle('fontFamily', ctrl.style.fontFamily)"
+		wb-title="fontFamily"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.fontKerning"
+		ng-change="ctrl.setStyle('fontKerning', ctrl.style.fontKerning)"
+		wb-title="fontKerning"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.fontSize"
+		ng-change="ctrl.setStyle('fontSize', ctrl.style.fontSize)"
+		wb-title="fontSize"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.fontSizeAdjust"
+		ng-change="ctrl.setStyle('fontSizeAdjust', ctrl.style.fontSizeAdjust)"
+		wb-title="fontSizeAdjust"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.fontStretch"
+		ng-change="ctrl.setStyle('fontStretch', ctrl.style.fontStretch)"
+		wb-title="fontStretch"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.fontStyle"
+		ng-change="ctrl.setStyle('fontStyle', ctrl.style.fontStyle)"
+		wb-title="fontStyle"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.fontVariant"
+		ng-change="ctrl.setStyle('fontVariant', ctrl.style.fontVariant)"
+		wb-title="fontVariant"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.fontWeight"
+		ng-change="ctrl.setStyle('fontWeight', ctrl.style.fontWeight)"
+		wb-title="fontWeight"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Writing</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.hyphens"
+		ng-change="ctrl.setStyle('hyphens', ctrl.style.hyphens)"
+		wb-title="hyphens"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.letterSpacing"
+		ng-change="ctrl.setStyle('letterSpacing', ctrl.style.letterSpacing)"
+		wb-title="letterSpacing"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.lineHeight"
+		ng-change="ctrl.setStyle('lineHeight', ctrl.style.lineHeight)"
+		wb-title="lineHeight"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.quotes"
+		ng-change="ctrl.setStyle('quotes', ctrl.style.quotes)"
+		wb-title="quotes"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.tabSize"
+		ng-change="ctrl.setStyle('tabSize', ctrl.style.tabSize)"
+		wb-title="tabSize"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.verticalAlign"
+		ng-change="ctrl.setStyle('verticalAlign', ctrl.style.verticalAlign)"
+		wb-title="verticalAlign"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.whiteSpace"
+		ng-change="ctrl.setStyle('whiteSpace', ctrl.style.whiteSpace)"
+		wb-title="whiteSpace"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.wordBreak"
+		ng-change="ctrl.setStyle('wordBreak', ctrl.style.wordBreak)"
+		wb-title="wordBreak"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.wordSpacing"
+		ng-change="ctrl.setStyle('wordSpacing', ctrl.style.wordSpacing)"
+		wb-title="wordSpacing"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.wordWrap"
+		ng-change="ctrl.setStyle('wordWrap', ctrl.style.wordWrap)"
+		wb-title="wordWrap"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.writingMode"
+		ng-change="ctrl.setStyle('writingMode', ctrl.style.writingMode)"
+		wb-title="writingMode"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.userSelect"
+		ng-change="ctrl.setStyle('userSelect', ctrl.style.userSelect)"
+		wb-title="userSelect"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+
+<fieldset
+	layout="column">
+	<legend translate>Local</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.direction"
+		ng-change="ctrl.setStyle('direction', ctrl.style.direction)"
+		wb-title="direction"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.style.unicodeBidi"
+		ng-change="ctrl.setStyle('unicodeBidi', ctrl.style.unicodeBidi)"
+		wb-title="unicodeBidi"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
