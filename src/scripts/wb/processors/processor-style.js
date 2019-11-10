@@ -50,7 +50,7 @@ angular.module('am-wb-core')//
 
     function Processor(){
         WbProcessorAbstract.apply(this);
-    };
+    }
     Processor.prototype = new WbProcessorAbstract();
 
     Processor.prototype.process = function(widget, event){
@@ -68,6 +68,6 @@ angular.module('am-wb-core')//
                 loadStyle(widget, keys);
             }
         }
-    }
+    };
     return Processor;
 });

@@ -56,7 +56,7 @@ angular.module('am-wb-core')//
             
             $event.widgets = ctrl.selectedWidgets;
             ctrl.fire('selectionChange', $event);
-        }
+        };
 
         this.dblclickListener = function($event){
             var widget = $event.source;
@@ -77,8 +77,8 @@ angular.module('am-wb-core')//
             
             $event.widgets = ctrl.selectedWidgets;
             ctrl.fire('selectionChange', $event);
-        }
-    };
+        };
+    }
     Processor.prototype = new WbProcessorAbstract();
     Processor.prototype.process = function(widget, event){
         if(event.type !== 'stateChanged') {
@@ -130,7 +130,7 @@ angular.module('am-wb-core')//
                 resultData = callbacks[i](event) || resultData;
             } catch (error) {
                 // NOTE: remove on release
-                console.log(error);
+//                console.log(error);
             }
         }
         return resultData;

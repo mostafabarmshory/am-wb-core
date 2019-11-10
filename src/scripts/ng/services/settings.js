@@ -55,7 +55,7 @@ angular.module('am-wb-core')
             }
         }
         return false;
-    };
+    }
 
     /**
      * Fetchs a setting page with the given type

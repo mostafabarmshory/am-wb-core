@@ -60,7 +60,7 @@ angular.module('am-wb-core')//
         // listen on change
         this.on('modelUpdated', eventHandler);
         this.on('runtimeModelUpdated', eventHandler);
-    };
+    }
 
     // extend functionality
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);

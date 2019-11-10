@@ -49,13 +49,13 @@ angular.module('am-wb-core')
 .run(function ($widget, $http, $mdMedia, $wbWindow, $wbLocal, $WbProviderTimeout, $dispatcher, $storage, $routeParams) {
     $widget//
     .setProvider('$http', $http)
-    .setProvider('$wbWindow', $wbWindow)
+    .setProvider('$window', $wbWindow)
     .setProvider('$dispatcher', $dispatcher)
     .setProvider('$routeParams', $routeParams)
     .setProvider('$storage', $storage)
     .setProvider('$timeout', $WbProviderTimeout)
-    .setProvider('$wbLocal', $wbLocal)
-    .setProvider('$mdMedia', $mdMedia);
+    .setProvider('$local', $wbLocal)
+    .setProvider('$media', $mdMedia);
 })
 /***********************************************************************
  * Editors
@@ -144,7 +144,8 @@ angular.module('am-wb-core')
         model: {
             html: 'Link title'
         },
-        controller: 'WbWidgetA'
+        controller: 'WbWidgetA',
+        isLeaf: true
     });
     $widget.newWidget({
         // widget description
@@ -158,7 +159,8 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-address',
         // functional properties
         template: '<address></address>',
-        controller: 'WbWidgetAddress'
+        controller: 'WbWidgetAddress',
+        isLeaf: true
     });
     $widget.newWidget({
         // widget description
@@ -172,7 +174,8 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-applet',
         // functional properties
         template: '<applet></applet>',
-        controller: 'WbWidgetApplet'
+        controller: 'WbWidgetApplet',
+        isLeaf: true
     });
     $widget.newWidget({
         // widget description
@@ -240,7 +243,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<blockquote></blockquote>',
         help: 'http://dpq.co.ir/more-information-blockquote',
-        controller: 'WbWidgetBlockquote', 
+        controller: 'WbWidgetBlockquote',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'button',
@@ -251,7 +255,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<button></button>',
         help: 'http://dpq.co.ir/more-information-button',
-        controller: 'WbWidgetButton', 
+        controller: 'WbWidgetButton',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'canvas',
@@ -262,7 +267,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<canvas></canvas>',
         help: 'http://dpq.co.ir/more-information-canvas',
-        controller: 'WbWidgetCanvas', 
+        controller: 'WbWidgetCanvas',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'datalist',
@@ -452,7 +458,8 @@ angular.module('am-wb-core')
             helpId: 'wb-widget-hx',
             // functional properties
             template: '<h' +i +'></h' + i + '>',
-            controller:'WbWidgetH'+i
+            controller:'WbWidgetH',
+            isLeaf: true
         });
     }
     $widget.newWidget({
@@ -476,7 +483,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<hr></hr>',
         help: 'http://dpq.co.ir/more-information-hr',
-        controller: 'WbWidgetHr', 
+        controller: 'WbWidgetHr',
+        isLeaf: true, 
     });
     $widget.newWidget({
         // widget description
@@ -500,6 +508,7 @@ angular.module('am-wb-core')
         template: '<iframe>Frame Not Supported?!</iframe>',
         controllerAs: 'ctrl',
         controller: 'WbWidgetIframe',
+        isLeaf: true,
     });
     $widget.newWidget({
         type: 'img',
@@ -515,7 +524,8 @@ angular.module('am-wb-core')
             src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
         },
         controllerAs: 'ctrl',
-        controller: 'WbWidgetImg', 
+        controller: 'WbWidgetImg',
+        isLeaf: true, 
     });
     $widget.newWidget({
         // widget description
@@ -539,6 +549,7 @@ angular.module('am-wb-core')
         template: '<input></input>',
         controller: 'WbWidgetInput',
         controllerAs: 'ctrl',
+        isLeaf: true,
     });
     $widget.newWidget({
         type: 'kbd',
@@ -560,7 +571,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<label></label>',
         help: 'http://dpq.co.ir/more-information-label',
-        controller: 'WbWidgetLabel', 
+        controller: 'WbWidgetLabel',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'legend',
@@ -571,7 +583,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<legend></legend>',
         help: 'http://dpq.co.ir/more-information-label',
-        controller: 'WbWidgetLegend', 
+        controller: 'WbWidgetLegend',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'li',
@@ -582,7 +595,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<li></li>',
         help: 'http://dpq.co.ir/more-information-li',
-        controller: 'WbWidgetLi', 
+        controller: 'WbWidgetLi',
+        isLeaf: false, 
     });
     $widget.newWidget({
         type: 'link',
@@ -598,7 +612,8 @@ angular.module('am-wb-core')
             url: 'http://www.gitlab.com/am-wb/am-wb-common'
         },
         controllerAs: 'ctrl',
-        controller: 'WbWidgetLink', 
+        controller: 'WbWidgetLink',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'main',
@@ -640,11 +655,11 @@ angular.module('am-wb-core')
                     color: '#313131',
                 },
                 border: {
-                    style:  "dotted",
-                    color:  "#afafaf"
+                    style:  'dotted',
+                    color:  '#afafaf'
                 },
-                color:  "#ffffff",
-                padding:  "8px"
+                color:  '#ffffff',
+                padding:  '8px'
             }
         },
         // help id
@@ -766,7 +781,8 @@ angular.module('am-wb-core')
         // functional properties
         template: '<p></p>',
         controllerAs: 'ctrl',
-        controller: 'WbWidgetP'
+        controller: 'WbWidgetP',
+        isLeaf: true
     });
     $widget.newWidget({
         type: 'param',
@@ -777,7 +793,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<param></param>',
         help: 'http://dpq.co.ir/more-information-param',
-        controller: 'WbWidgetParam', 
+        controller: 'WbWidgetParam',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'picture',

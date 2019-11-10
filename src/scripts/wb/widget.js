@@ -31,8 +31,7 @@ angular.module('am-wb-core')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$widget', function(
-        $wbUtil, 
+.service('$widget', function($sce, $templateRequest,
         $q, $injector,
         WidgetEditorFake) {
     'use strict';
@@ -123,13 +122,13 @@ angular.module('am-wb-core')
      * @returns promise to load all widgets
      */
     function widgets() {
-        var widgets = {};
+        var list = {};
         // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-        widgets.items = [];
+        list.items = [];
         elementKey.forEach(function(type) {
-            widgets.items.push(contentElementAsso[type]);
+            list.items.push(contentElementAsso[type]);
         });
-        return $q.when(widgets);
+        return $q.when(list);
     }
 
     /**
@@ -223,7 +222,7 @@ angular.module('am-wb-core')
         if(preElement){
             gettingTemplatePromisse = $q.resolve(preElement);
         } else {
-            gettingTemplatePromisse = $wbUtil.getTemplateFor(widgetDescription)
+            gettingTemplatePromisse = getTemplateFor(widgetDescription)
             .then(function(template) {
                 // 3- bind controller
                 // TODO: maso, 2019: replace with JQuery 
@@ -381,7 +380,7 @@ angular.module('am-wb-core')
     this.setProvider = function(key, provider){
         providers[key] = provider;
         return this;
-    }
+    };
     
     /**
      * Gets the list of providers
@@ -399,8 +398,7 @@ angular.module('am-wb-core')
      * @deprecated use setprovider insted
      */
     this.addProvider = function(key, provider){
-        console.logs('$widget.addProvider is deprecated and will be removed in the next version');
-        return this.setProvider(key, provider)
+        return this.setProvider(key, provider);
     };
     
     /**
@@ -446,7 +444,7 @@ angular.module('am-wb-core')
             // return old editor
             return widget.$$wbEditor;
         }
-        if(editors[widget.getType()] == undefined){
+        if(editors[widget.getType()] === undefined){
             return fakeEditor;
         }
         var register = editors[widget.getType()];
@@ -507,11 +505,11 @@ angular.module('am-wb-core')
             try{
                 processor.process(widget, event);
             } catch (ex){
-                console.error('Fail to run the processor');
-                console.error(ex);
+//                console.error('Fail to run the processor');
+//                console.error(ex);
             }
         });
-    }
+    };
 
 
     /***********************************************
@@ -549,4 +547,33 @@ angular.module('am-wb-core')
         } while(element);
     };
 
+    
+
+    function getTemplateOf(page)
+    {
+        var template = page.template;
+        var templateUrl = page.templateUrl;
+        if (angular.isDefined(template)) {
+            if (angular.isFunction(template)) {
+                template = template(page.params || page);
+            }
+        } else if (angular.isDefined(templateUrl)) {
+            if (angular.isFunction(templateUrl)) {
+                templateUrl = templateUrl(page.params);
+            }
+            if (angular.isDefined(templateUrl)) {
+                page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+                template = $templateRequest(templateUrl);
+            }
+        }
+        return template;
+    }
+
+    /*
+     * Loading template of the page
+     */
+    function getTemplateFor(page)
+    {
+        return $q.when(getTemplateOf(page));
+    }
 });

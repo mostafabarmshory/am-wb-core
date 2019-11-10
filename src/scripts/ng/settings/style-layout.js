@@ -52,6 +52,6 @@ angular.module('am-wb-core')//
  * 
  * @see wb-layout
  */
-.controller('WbSettingStyleLayoutCtrl', function ($scope, $element) {
+.controller('WbSettingStyleLayoutCtrl', function (/*$scope, $element*/) {
 
 });

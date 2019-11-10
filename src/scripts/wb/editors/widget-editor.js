@@ -73,7 +73,7 @@ angular.module('am-wb-core')//
     /**
      * Creates new instace of an editor
      */
-    function widgetEditor(widget, options) {
+    function Editor(widget, options) {
         this.callbacks = [];
         this.widget = widget;
         this.options = options;
@@ -84,7 +84,7 @@ angular.module('am-wb-core')//
      * 
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.destroy = function(){
+    Editor.prototype.destroy = function(){
         this.callbacks = [];
         delete this.widget;
         delete this.options;
@@ -95,7 +95,7 @@ angular.module('am-wb-core')//
      * 
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.getWidget = function(){
+    Editor.prototype.getWidget = function(){
         return this.widget;
     };
 
@@ -104,7 +104,7 @@ angular.module('am-wb-core')//
      * 
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.setDirty = function(dirty){
+    Editor.prototype.setDirty = function(dirty){
         if(typeof(dirty) !== 'undefined'){
             this.dirty = dirty;
         } else {
@@ -117,7 +117,7 @@ angular.module('am-wb-core')//
      * 
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.isDirty = function(){
+    Editor.prototype.isDirty = function(){
         return this.dirty;
     };
 
@@ -128,7 +128,7 @@ angular.module('am-wb-core')//
      * @param callback {function} the function
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.off = function(type, callback){
+    Editor.prototype.off = function(type, callback){
         if (!angular.isArray(this.callbacks[type])) {
             return;
         }
@@ -146,7 +146,7 @@ angular.module('am-wb-core')//
      * @param callback {function} the function
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.on = function(type, callback){
+    Editor.prototype.on = function(type, callback){
         if (!angular.isArray(this.callbacks[type])) {
             this.callbacks[type] = [];
         }
@@ -162,7 +162,7 @@ angular.module('am-wb-core')//
      * @param param {object} event params
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.fire = function(type, params){
+    Editor.prototype.fire = function(type, params){
         // TODO: maso, 2018: create event object
         var event = _.merge({
             source: this,
@@ -177,7 +177,7 @@ angular.module('am-wb-core')//
                 callbacks[i](event);
             } catch (error) {
                 // NOTE: remove on release
-                console.log(error);
+//                console.log(error);
             }
         }
     }; // internal
@@ -186,13 +186,13 @@ angular.module('am-wb-core')//
 
 
 
-    widgetEditor.prototype.setActive = function(){}; // focus|skipFocuse
-    widgetEditor.prototype.isActive = function(){};
-    widgetEditor.prototype.save = function(){};
-    widgetEditor.prototype.hide = function(){};
-    widgetEditor.prototype.show = function(){};
-    widgetEditor.prototype.isHidden = function(){};
+    Editor.prototype.setActive = function(){}; // focus|skipFocuse
+    Editor.prototype.isActive = function(){};
+    Editor.prototype.save = function(){};
+    Editor.prototype.hide = function(){};
+    Editor.prototype.show = function(){};
+    Editor.prototype.isHidden = function(){};
 
     // the editor type
-    return widgetEditor;
+    return Editor;
 });

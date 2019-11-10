@@ -32,79 +32,79 @@ angular.module('am-wb-core')
  * 
  * Deprecated : use $wbWindow
  */
-.service('$wbLocal', function($wbWindow) {
-	var defaultDateFormat = 'YYYY-MM-DD hh:mm:ss';
-	
-	/**
-	 * Gets current data of the system.
-	 * 
-	 * @memberof $wbLocal
-	 */
-	this.getDate = function(){
-		return new Date();
-	};
-	
-	/**
-	 * Formats the input date based on the format
-	 * 
-	 * NOTE: default format is 'YYYY-MM-DD hh:mm:ss'
-	 * 
-	 * @params data {String | Date} to format
-	 * @params format {String} of the output
-	 * @memberof $wbLocal
-	 */
-	this.formatDate = function(date, format){
-		try {
+.service('$wbLocal', function() {
+    var defaultDateFormat = 'YYYY-MM-DD hh:mm:ss';
+
+    /**
+     * Gets current data of the system.
+     * 
+     * @memberof $wbLocal
+     */
+    this.getDate = function(){
+        return new Date();
+    };
+
+    /**
+     * Formats the input date based on the format
+     * 
+     * NOTE: default format is 'YYYY-MM-DD hh:mm:ss'
+     * 
+     * @params data {String | Date} to format
+     * @params format {String} of the output
+     * @memberof $wbLocal
+     */
+    this.formatDate = function(date, format){
+        try {
             var mf = format || defaultDateFormat;
             var localDate = moment //
-	            .utc(date) //
-	            .local();
+            .utc(date) //
+            .local();
             return localDate.format(mf);
         } catch (ex) {
             return '-' + ex.message;
         }
-	};
-	
-	/**
-	 * Get currency of the system
-	 * 
-	 * @return currency ISO code
-	 * @memberof $wbLocal
-	 */
-	this.getCurrency = function(){
-		return this.currency || 'USD';
-	};
-	
-	/**
-	 * Sets currency of the system
-	 * 
-	 * @param currency {String} ISO code
-	 * @memberof $wbLocal
-	 */
-	this.setCurrency = function(currency){
-		this.currency = currency;
-	};
-	
-	/**
-	 * Get language of the system
-	 * 
-	 * @return language ISO code
-	 * @memberof $wbLocal
-	 */
-	this.getLanguage = function(){
-		return  this.language || 'en';
-	};
+    };
 
-	/**
-	 * Sets language of the system
-	 * 
-	 * @params language {String} ISO code
-	 * @memberof $wbLocal
-	 */
-	this.setLanguage = function(language) {
-		this.language = language;
-	};
-	
-	
+    /**
+     * Get currency of the system
+     * 
+     * @return currency ISO code
+     * @memberof $wbLocal
+     */
+    this.getCurrency = function(){
+        return this.currency || 'USD';
+    };
+
+    /**
+     * Sets currency of the system
+     * 
+     * @param currency {String} ISO code
+     * @memberof $wbLocal
+     */
+    this.setCurrency = function(currency){
+        this.currency = currency;
+    };
+
+    /**
+     * Get language of the system
+     * 
+     * @return language ISO code
+     * @memberof $wbLocal
+     */
+    this.getLanguage = function(){
+        return  this.language || 'en';
+    };
+
+    /**
+     * Sets language of the system
+     * 
+     * @params language {String} ISO code
+     * @memberof $wbLocal
+     */
+    this.setLanguage = function(language) {
+        this.language = language;
+    };
+
+
     return this;
 });

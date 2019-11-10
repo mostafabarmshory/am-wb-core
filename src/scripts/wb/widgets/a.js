@@ -56,7 +56,7 @@ angular.module('am-wb-core')//
                 ctrl.getElement().off('click dblclick', removeDefaultAction);
             }
         });
-    };
+    }
 
     // extend functionality
     Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);

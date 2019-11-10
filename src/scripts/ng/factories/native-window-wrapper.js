@@ -4,7 +4,7 @@
  * Copyright (c) 2016 weburger
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
+ * of this software and associated documentation files (the 'Software'), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -13,7 +13,7 @@
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -50,12 +50,12 @@ angular.module('am-wb-core')
     /*
      * Open a float based on options
      */
-    function openFloatPanel(window, options) {
+    function openFloatPanel(parent, options) {
         if(!WbDialogWindow){
             WbDialogWindow = $injector.get('WbDialogWindow');
         }
 
-        var window = new WbDialogWindow(window);
+        var window = new WbDialogWindow(parent);
         window.setTitle(options.name);
         window.setLanguage(options.language);
         if(options.position){
@@ -87,7 +87,7 @@ angular.module('am-wb-core')
             throw {
                 message: 'Not supported type of URL',
                 url: options.url
-            }
+            };
         }
 
 
@@ -97,7 +97,7 @@ angular.module('am-wb-core')
     /*
      * Convert to window option
      */
-    function convertToWindowOption(options) {
+    function convertToWindowOption(/*options*/) {
         return '';
     }
 
@@ -130,11 +130,11 @@ angular.module('am-wb-core')
      */
     nativeWindowWrapper.prototype.getParent = function(){
         return this.nw.parent;
-    }
+    };
 
     nativeWindowWrapper.prototype.getDocument = function(){
         return this.nw.document;
-    }
+    };
 
     nativeWindowWrapper.prototype.getHeadElement = function(){
         if(this._he) {
@@ -312,9 +312,9 @@ angular.module('am-wb-core')
 
         var document = this.getDocument();
         var style = document.createElement('link');
-        style.setAttribute("rel", "stylesheet")
-        style.setAttribute("type", "text/css")
-        style.setAttribute("href", path)
+        style.setAttribute('rel', 'stylesheet');
+        style.setAttribute('type', 'text/css');
+        style.setAttribute('href', path);
         var ctrl = this;
         style.onload = function(){
             ctrl.styles[path] = true;
@@ -464,7 +464,7 @@ angular.module('am-wb-core')
         return this.nw.innerWidth;
     };
 
-    nativeWindowWrapper.prototype.setHeight = function(){
+    nativeWindowWrapper.prototype.setHeight = function(height){
         this.resizeTo(this.getWidth(), height);
     };
 

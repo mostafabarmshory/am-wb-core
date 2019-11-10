@@ -91,7 +91,7 @@ module.exports = function(grunt) {
                     ],
                     tasks : [
                         'injector',
-                        'newer:jshint:all'
+                        'newer:eslint:all'
                         ],
                         options : {
                             livereload : '<%= connect.options.livereload %>'
@@ -101,7 +101,7 @@ module.exports = function(grunt) {
                 files : [ 'test/spec/{,*/}*.js' ],
                 tasks : [
                     'injector',
-                    'newer:jshint:test', // 
+                    'newer:eslint:test', 
                     'karma' ]
             },
             styles : {
@@ -214,52 +214,6 @@ module.exports = function(grunt) {
         },
 
         /*
-         * اجرای تست ایستا روی تمام سروس‌های ایجاد شده . با این کار مطمئن می‌شیم
-         * که خطای نحوی در برنامه‌ها وجود نداره. برای این کار از تست‌های ایستای
-         * jshint استفاده می‌کنیم. این برنامه می‌تونه پرنده‌های js رو دریافت و
-         * تحلیل کنه. توضیحات بیشتر در مورد این برنامه رو در مسیر زیر ببینید:
-         * 
-         * http://jshint.com
-         * 
-         * نکته: ما فرض کردیم که تمام کدها در پوشه اصلی و یک زیر پوشه دیگر نوشته
-         * می شود در صورتی که سلسله مراتب پوشه‌ها بیشتر از این شد باید این
-         * تنظیم‌ها تغییر کند.
-         * 
-         * تنظیم‌های به کار رفته در این پردازش در فایل .jshintrc وجود دارد و شما
-         * می‌توانید در صورت نیاز این تنظیم‌ها را تغییر دهید.
-         * 
-         * برای استفاده از این تست در محیط grunt از بسته grunt-contrib-jshint
-         * استفاده شده است که به صورت خودکار و بر اساس تنظیم‌های موجود این نوع
-         * تست را روی تمام کدهای موجود در نرم افزار اجرا می‌کند. برای اطلاعات
-         * بیشتر در مورد این افزونه به آدرس زیر مراجعه کنید:
-         * 
-         * https://github.com/gruntjs/grunt-contrib-jshint
-         * 
-         * برای اینکه نتیجه‌های تولید شده بر اساس این تست خوب نمایش داده بشه از
-         * یک افزونه دیگه به نام jshint-stylish استفاده شده است. البته شما
-         * می‌تونید از روش‌های دیگه‌ای برای تولید گزارش استفاده کنید. برای اطلاع
-         * بیشتر در این زمینه پیوند زیر رو ببینید:
-         * 
-         * http://jshint.com/docs/reporters/
-         * 
-         */
-        jshint : {
-            options : {
-                jshintrc : '.jshintrc',
-                reporter : require('jshint-stylish')
-            },
-            all : {
-                src : [ 'Gruntfile.js', '<%= yeoman.app %>/{,*/}*.js' ]
-            },
-            test : {
-                options : {
-                    jshintrc : 'test/.jshintrc'
-                },
-                src : [ 'test/spec/{,*/}*.js' ]
-            }
-        },
-
-        /*
          * ESLint is an open source project originally created by Nicholas C. Zakas in June 2013. 
          * Its goal is to provide a pluggable linting utility for JavaScript.
          * 
@@ -270,7 +224,7 @@ module.exports = function(grunt) {
             options: {
                 configFile: '.eslintrc.json'
             },
-            target : [ '<%= yeoman.app %>/{,*/}*.js' ]
+            target : [ '<%= yeoman.app %>/scripts/**/*.js' ]
         },
 
         /*
@@ -719,7 +673,6 @@ module.exports = function(grunt) {
         ]);
 
     grunt.registerTask('default', [ //
-        'newer:jshint', //
         'newer:eslint', //
         'test', //
         'build' //

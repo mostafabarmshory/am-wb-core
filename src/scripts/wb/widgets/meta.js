@@ -51,7 +51,7 @@ angular.module('am-wb-core')//
             ctrl.getElement().hide();
         });
         updateView();
-    };
+    }
     // extend functionality
     Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
     return Widget;

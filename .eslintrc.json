@@ -19,7 +19,14 @@
     	"objectPath": false,
     	"Map": false,
     	"Promise": false,
-    	"jQuery": false
+    	"jQuery": false,
+	    "Mustache": false,
+	    "SVGMorpheus": false,
+		"ResizeObserver": false,
+		"IntersectionObserver": false,
+		"moment": false,
+		"Flux": false,
+		"ace": false
 	},
 	"extends": "eslint:recommended",
 	"parserOptions": {

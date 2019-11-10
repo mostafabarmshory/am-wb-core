@@ -82,6 +82,10 @@ Rules for sizing the icon.
 .jsPanel {
 	z-index: 70 !important;
 }
+a>p {
+	padding: 0px;
+	margin: 0px;
+}
 .tox-editor-header .tox-tinymce-inline.tox-toolbar-dock-transition.tox-toolbar-dock-fadein {
 	z-index: 60 !important;
 }

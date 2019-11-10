@@ -2374,6 +2374,752 @@
 });
 
 
+/*!
+ *  * machina - A library for creating powerful and flexible finite state machines. Loosely inspired by Erlang/OTP's gen_fsm behavior.
+ *  * Author: Jim Cowart (http://ifandelse.com)
+ *  * Version: v4.0.2
+ *  * Url: http://machina-js.org/
+ *  * License(s): 
+ */
+'use strict';   
+(function webpackUniversalModuleDefinition(root, factory) {
+    if(typeof exports === 'object' && typeof module === 'object'){
+        module.exports = factory(require("lodash"));
+    } else if(typeof define === 'function' && define.amd){
+        define(["lodash"], factory);
+    }else if(typeof exports === 'object'){
+        exports.machina = factory(require("lodash"));
+    }else{
+        root.machina = factory(root._);
+    }
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
+    return /******/ (function(modules) { // webpackBootstrap
+        /******/ 	// The module cache
+        /******/ 	var installedModules = {};
+        /******/
+        /******/ 	// The require function
+        /******/ 	function __webpack_require__(moduleId) {
+            /******/
+            /******/ 		// Check if module is in cache
+            /******/ 		if(installedModules[moduleId])
+                /******/ 			return installedModules[moduleId].exports;
+            /******/
+            /******/ 		// Create a new module (and put it into the cache)
+            /******/ 		var module = installedModules[moduleId] = {
+                    /******/ 			exports: {},
+                    /******/ 			id: moduleId,
+                    /******/ 			loaded: false
+            /******/ 		};
+            /******/
+            /******/ 		// Execute the module function
+            /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+            /******/
+            /******/ 		// Flag the module as loaded
+            /******/ 		module.loaded = true;
+            /******/
+            /******/ 		// Return the exports of the module
+            /******/ 		return module.exports;
+        /******/ 	}
+        /******/
+        /******/
+        /******/ 	// expose the modules object (__webpack_modules__)
+        /******/ 	__webpack_require__.m = modules;
+        /******/
+        /******/ 	// expose the module cache
+        /******/ 	__webpack_require__.c = installedModules;
+        /******/
+        /******/ 	// __webpack_public_path__
+        /******/ 	__webpack_require__.p = "";
+        /******/
+        /******/ 	// Load entry module and return exports
+        /******/ 	return __webpack_require__(0);
+    /******/ })
+    /************************************************************************/
+    /******/ ([
+        /* 0 */
+        /***/ (function(module, exports, __webpack_require__) {
+
+            var _ = __webpack_require__( 1 );
+            var emitter = __webpack_require__( 2 );
+
+            module.exports = _.merge( emitter.instance, {
+                Fsm: __webpack_require__( 5 ),
+                BehavioralFsm: __webpack_require__( 6 ),
+                utils: __webpack_require__( 3 ),
+                eventListeners: {
+                    newFsm: []
+                }
+            } );
+
+
+        /***/ }),
+        /* 1 */
+        /***/ (function(module, exports) {
+
+            module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
+
+        /***/ }),
+        /* 2 */
+        /***/ (function(module, exports, __webpack_require__) {
+
+            var utils = __webpack_require__( 3 );
+            var _ = __webpack_require__( 1 );
+
+            function getInstance() {
+                return {
+                    emit: function( eventName ) {
+                        var args = utils.getLeaklessArgs( arguments );
+                        if ( this.eventListeners[ "*" ] ) {
+                            _.each( this.eventListeners[ "*" ], function( callback ) {
+                                if ( !this.useSafeEmit ) {
+                                    callback.apply( this, args );
+                                } else {
+                                    try {
+                                        callback.apply( this, args );
+                                    } catch ( exception ) {
+                                        /* istanbul ignore else  */
+                                        if ( console && typeof console.log !== "undefined" ) {
+                                            console.log( exception.stack );
+                                        }
+                                    }
+                                }
+                            }.bind( this ) );
+                        }
+                        if ( this.eventListeners[ eventName ] ) {
+                            _.each( this.eventListeners[ eventName ], function( callback ) {
+                                if ( !this.useSafeEmit ) {
+                                    callback.apply( this, args.slice( 1 ) );
+                                } else {
+                                    try {
+                                        callback.apply( this, args.slice( 1 ) );
+                                    } catch ( exception ) {
+                                        /* istanbul ignore else  */
+                                        if ( console && typeof console.log !== "undefined" ) {
+                                            console.log( exception.stack );
+                                        }
+                                    }
+                                }
+                            }.bind( this ) );
+                        }
+                    },
+
+                    on: function( eventName, callback ) {
+                        var self = this;
+                        self.eventListeners = self.eventListeners || { "*": [] };
+                        if ( !self.eventListeners[ eventName ] ) {
+                            self.eventListeners[ eventName ] = [];
+                        }
+                        self.eventListeners[ eventName ].push( callback );
+                        return {
+                            eventName: eventName,
+                            callback: callback,
+                            off: function() {
+                                self.off( eventName, callback );
+                            }
+                        };
+                    },
+
+                    off: function( eventName, callback ) {
+                        this.eventListeners = this.eventListeners || { "*": [] };
+                        if ( !eventName ) {
+                            this.eventListeners = {};
+                        } else {
+                            if ( callback ) {
+                                this.eventListeners[ eventName ] = _.without( this.eventListeners[ eventName ], callback );
+                            } else {
+                                this.eventListeners[ eventName ] = [];
+                            }
+                        }
+                    }
+                };
+            }
+
+            module.exports = {
+                    getInstance: getInstance,
+                    instance: getInstance()
+            };
+
+
+        /***/ }),
+        /* 3 */
+        /***/ (function(module, exports, __webpack_require__) {
+
+            var slice = [].slice;
+            var events = __webpack_require__( 4 );
+            var _ = __webpack_require__( 1 );
+
+            var makeFsmNamespace = ( function() {
+                var machinaCount = 0;
+                return function() {
+                    return "fsm." + machinaCount++;
+                };
+            } )();
+
+            function getDefaultBehavioralOptions() {
+                return {
+                    initialState: "uninitialized",
+                    eventListeners: {
+                        "*": []
+                    },
+                    states: {},
+                    namespace: makeFsmNamespace(),
+                    useSafeEmit: false,
+                    hierarchy: {},
+                    pendingDelegations: {}
+                };
+            }
+
+            function getDefaultClientMeta() {
+                return {
+                    inputQueue: [],
+                    targetReplayState: "",
+                    state: undefined,
+                    priorState: undefined,
+                    priorAction: "",
+                    currentAction: "",
+                    currentActionArgs: undefined,
+                    inExitHandler: false
+                };
+            }
+
+            function getLeaklessArgs( args, startIdx ) {
+                var result = [];
+                for ( var i = ( startIdx || 0 ); i < args.length; i++ ) {
+                    result[ i ] = args[ i ];
+                }
+                return result;
+            }
+            /*
+		handle ->
+			child = stateObj._child && stateObj._child.instance;
+
+		transition ->
+			newStateObj._child = getChildFsmInstance( newStateObj._child );
+			child = newStateObj._child && newStateObj._child.instance;
+             */
+            function getChildFsmInstance( config ) {
+                if ( !config ) {
+                    return;
+                }
+                var childFsmDefinition = {};
+                if ( typeof config === "object" ) {
+                    // is this a config object with a factory?
+                    if ( config.factory ) {
+                        childFsmDefinition = config;
+                        childFsmDefinition.instance = childFsmDefinition.factory();
+                    } else {
+                        // assuming this is a machina instance
+                        childFsmDefinition.factory = function() {
+                            return config;
+                        };
+                    }
+                } else if ( typeof config === "function" ) {
+                    childFsmDefinition.factory = config;
+                }
+                childFsmDefinition.instance = childFsmDefinition.factory();
+                return childFsmDefinition;
+            }
+
+            function listenToChild( fsm, child ) {
+                // Need to investigate potential for discarded event
+                // listener memory leak in long-running, deeply-nested hierarchies.
+                return child.on( "*", function( eventName, data ) {
+                    switch ( eventName ) {
+                    case events.NO_HANDLER:
+                        if ( !data.ticket && !data.delegated && data.namespace !== fsm.namespace ) {
+                            // Ok - we're dealing w/ a child handling input that should bubble up
+                            data.args[ 1 ].bubbling = true;
+                        }
+                        // we do NOT bubble _reset inputs up to the parent
+                        if ( data.inputType !== "_reset" ) {
+                            fsm.handle.apply( fsm, data.args );
+                        }
+                        break;
+                    case events.HANDLING :
+                        var ticket = data.ticket;
+                        if ( ticket && fsm.pendingDelegations[ ticket ] ) {
+                            delete fsm.pendingDelegations[ ticket ];
+                        }
+                        fsm.emit( eventName, data ); // possibly transform payload?
+                        break;
+                    default:
+                        fsm.emit( eventName, data ); // possibly transform payload?
+                    break;
+                    }
+                } );
+            }
+
+            // _machKeys are members we want to track across the prototype chain of an extended FSM constructor
+            // Since we want to eventually merge the aggregate of those values onto the instance so that FSMs
+            // that share the same extended prototype won't share state *on* those prototypes.
+            var _machKeys = [ "states", "initialState" ];
+            var extend = function( protoProps, staticProps ) {
+                var parent = this;
+                var fsm; // placeholder for instance constructor
+                var machObj = {}; // object used to hold initialState & states from prototype for instance-level merging
+                var Ctor = function() {}; // placeholder ctor function used to insert level in prototype chain
+
+                // The constructor function for the new subclass is either defined by you
+                // (the "constructor" property in your `extend` definition), or defaulted
+                // by us to simply call the parent's constructor.
+                if ( protoProps && protoProps.hasOwnProperty( "constructor" ) ) {
+                    fsm = protoProps.constructor;
+                } else {
+                    // The default machina constructor (when using inheritance) creates a
+                    // deep copy of the states/initialState values from the prototype and
+                    // extends them over the instance so that they'll be instance-level.
+                    // If an options arg (args[0]) is passed in, a states or intialState
+                    // value will be preferred over any data pulled up from the prototype.
+                    fsm = function() {
+                        var args = slice.call( arguments, 0 );
+                        args[ 0 ] = args[ 0 ] || {};
+                        var blendedState;
+                        var instanceStates = args[ 0 ].states || {};
+                        blendedState = _.merge( _.cloneDeep( machObj ), { states: instanceStates } );
+                        blendedState.initialState = args[ 0 ].initialState || this.initialState;
+                        _.extend( args[ 0 ], blendedState );
+                        parent.apply( this, args );
+                    };
+                }
+
+                // Inherit class (static) properties from parent.
+                _.merge( fsm, parent );
+
+                // Set the prototype chain to inherit from `parent`, without calling
+                // `parent`'s constructor function.
+                Ctor.prototype = parent.prototype;
+                fsm.prototype = new Ctor();
+
+                // Add prototype properties (instance properties) to the subclass,
+                // if supplied.
+                if ( protoProps ) {
+                    _.extend( fsm.prototype, protoProps );
+                    _.merge( machObj, _.transform( protoProps, function( accum, val, key ) {
+                        if ( _machKeys.indexOf( key ) !== -1 ) {
+                            accum[ key ] = val;
+                        }
+                    } ) );
+                }
+
+                // Add static properties to the constructor function, if supplied.
+                if ( staticProps ) {
+                    _.merge( fsm, staticProps );
+                }
+
+                // Correctly set child's `prototype.constructor`.
+                fsm.prototype.constructor = fsm;
+
+                // Set a convenience property in case the parent's prototype is needed later.
+                fsm.__super__ = parent.prototype;
+                return fsm;
+            };
+
+            function createUUID() {
+                var s = [];
+                var hexDigits = "0123456789abcdef";
+                for ( var i = 0; i < 36; i++ ) {
+                    s[ i ] = hexDigits.substr( Math.floor( Math.random() * 0x10 ), 1 );
+                }
+                s[ 14 ] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+                /* jshint ignore:start */
+                s[ 19 ] = hexDigits.substr( ( s[ 19 ] & 0x3 ) | 0x8, 1 ); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+                /* jshint ignore:end */
+                s[ 8 ] = s[ 13 ] = s[ 18 ] = s[ 23 ] = "-";
+                return s.join( "" );
+            }
+
+            module.exports = {
+                    createUUID: createUUID,
+                    extend: extend,
+                    getDefaultBehavioralOptions: getDefaultBehavioralOptions,
+                    getDefaultOptions: getDefaultBehavioralOptions,
+                    getDefaultClientMeta: getDefaultClientMeta,
+                    getChildFsmInstance: getChildFsmInstance,
+                    getLeaklessArgs: getLeaklessArgs,
+                    listenToChild: listenToChild,
+                    makeFsmNamespace: makeFsmNamespace
+            };
+
+
+        /***/ }),
+        /* 4 */
+        /***/ (function(module, exports) {
+
+            module.exports = {
+                    NEXT_TRANSITION: "transition",
+                    HANDLING: "handling",
+                    HANDLED: "handled",
+                    NO_HANDLER: "nohandler",
+                    TRANSITION: "transition",
+                    TRANSITIONED: "transitioned",
+                    INVALID_STATE: "invalidstate",
+                    DEFERRED: "deferred",
+                    NEW_FSM: "newfsm"
+            };
+
+
+        /***/ }),
+        /* 5 */
+        /***/ (function(module, exports, __webpack_require__) {
+
+            var BehavioralFsm = __webpack_require__( 6 );
+            var utils = __webpack_require__( 3 );
+            var _ = __webpack_require__( 1 );
+
+            var Fsm = {
+                    constructor: function() {
+                        BehavioralFsm.apply( this, arguments );
+                        this.ensureClientMeta();
+                    },
+                    initClient: function initClient() {
+                        var initialState = this.initialState;
+                        if ( !initialState ) {
+                            throw new Error( "You must specify an initial state for this FSM" );
+                        }
+                        if ( !this.states[ initialState ] ) {
+                            throw new Error( "The initial state specified does not exist in the states object." );
+                        }
+                        this.transition( initialState );
+                    },
+                    ensureClientMeta: function ensureClientMeta() {
+                        if ( !this._stamped ) {
+                            this._stamped = true;
+                            _.defaults( this, _.cloneDeep( utils.getDefaultClientMeta() ) );
+                            this.initClient();
+                        }
+                        return this;
+                    },
+
+                    ensureClientArg: function( args ) {
+                        var _args = args;
+                        // we need to test the args and verify that if a client arg has
+                        // been passed, it must be this FSM instance (this isn't a behavioral FSM)
+                        if ( typeof _args[ 0 ] === "object" && !( "inputType" in _args[ 0 ] ) && _args[ 0 ] !== this ) {
+                            _args.splice( 0, 1, this );
+                        } else if ( typeof _args[ 0 ] !== "object" || ( typeof _args[ 0 ] === "object" && ( "inputType" in _args[ 0 ] ) ) ) {
+                            _args.unshift( this );
+                        }
+                        return _args;
+                    },
+
+                    getHandlerArgs: function( args, isCatchAll ) {
+                        // index 0 is the client, index 1 is inputType
+                        // if we're in a catch-all handler, input type needs to be included in the args
+                        // inputType might be an object, so we need to just get the inputType string if so
+                        var _args = args;
+                        var input = _args[ 1 ];
+                        if ( typeof inputType === "object" ) {
+                            _args.splice( 1, 1, input.inputType );
+                        }
+                        return isCatchAll ?
+                                _args.slice( 1 ) :
+                                    _args.slice( 2 );
+                    },
+
+                    getSystemHandlerArgs: function( args, client ) {
+                        return args;
+                    },
+
+                    // "classic" machina FSM do not emit the client property on events (which would be the FSM itself)
+                    buildEventPayload: function() {
+                        var args = this.ensureClientArg( utils.getLeaklessArgs( arguments ) );
+                        var data = args[ 1 ];
+                        if ( _.isPlainObject( data ) ) {
+                            return _.extend( data, { namespace: this.namespace } );
+                        } else {
+                            return { data: data || null, namespace: this.namespace };
+                        }
+                    }
+            };
+
+            _.each( [
+                "handle",
+                "transition",
+                "deferUntilTransition",
+                "processQueue",
+                "clearQueue"
+                ], function( methodWithClientInjected ) {
+                Fsm[ methodWithClientInjected ] = function() {
+                    var args = this.ensureClientArg( utils.getLeaklessArgs( arguments ) );
+                    return BehavioralFsm.prototype[ methodWithClientInjected ].apply( this, args );
+                };
+            } );
+
+            Fsm = BehavioralFsm.extend( Fsm );
+
+            module.exports = Fsm;
+
+
+        /***/ }),
+        /* 6 */
+        /***/ (function(module, exports, __webpack_require__) {
+
+            var _ = __webpack_require__( 1 );
+            var utils = __webpack_require__( 3 );
+            var emitter = __webpack_require__( 2 );
+            var topLevelEmitter = emitter.instance;
+            var events = __webpack_require__( 4 );
+
+            var MACHINA_PROP = "__machina__";
+
+            function BehavioralFsm( options ) {
+                _.extend( this, options );
+                _.defaults( this, utils.getDefaultBehavioralOptions() );
+                this.initialize.apply( this, arguments );
+                topLevelEmitter.emit( events.NEW_FSM, this );
+            }
+
+            _.extend( BehavioralFsm.prototype, {
+                initialize: function() {},
+
+                initClient: function initClient( client ) {
+                    var initialState = this.initialState;
+                    if ( !initialState ) {
+                        throw new Error( "You must specify an initial state for this FSM" );
+                    }
+                    if ( !this.states[ initialState ] ) {
+                        throw new Error( "The initial state specified does not exist in the states object." );
+                    }
+                    this.transition( client, initialState );
+                },
+
+                configForState: function configForState( newState ) {
+                    var newStateObj = this.states[ newState ];
+                    var child;
+                    _.each( this.hierarchy, function( childListener, key ) {
+                        if ( childListener && typeof childListener.off === "function" ) {
+                            childListener.off();
+                        }
+                    } );
+
+                    if ( newStateObj._child ) {
+                        newStateObj._child = utils.getChildFsmInstance( newStateObj._child );
+                        child = newStateObj._child && newStateObj._child.instance;
+                        this.hierarchy[ child.namespace ] = utils.listenToChild( this, child );
+                    }
+
+                    return child;
+                },
+
+                ensureClientMeta: function ensureClientMeta( client ) {
+                    if ( typeof client !== "object" ) {
+                        throw new Error( "An FSM client must be an object." );
+                    }
+                    client[ MACHINA_PROP ] = client[ MACHINA_PROP ] || {};
+                    if ( !client[ MACHINA_PROP ][ this.namespace ] ) {
+                        client[ MACHINA_PROP ][ this.namespace ] = _.cloneDeep( utils.getDefaultClientMeta() );
+                        this.initClient( client );
+                    }
+                    return client[ MACHINA_PROP ][ this.namespace ];
+                },
+
+                buildEventPayload: function( client, data ) {
+                    if ( _.isPlainObject( data ) ) {
+                        return _.extend( data, { client: client, namespace: this.namespace } );
+                    } else {
+                        return { client: client, data: data || null, namespace: this.namespace };
+                    }
+                },
+
+                getHandlerArgs: function( args, isCatchAll ) {
+                    // index 0 is the client, index 1 is inputType
+                    // if we're in a catch-all handler, input type needs to be included in the args
+                    // inputType might be an object, so we need to just get the inputType string if so
+                    var _args = args.slice( 0 );
+                    var input = _args[ 1 ];
+                    if ( typeof input === "object" ) {
+                        _args.splice( 1, 1, input.inputType );
+                    }
+                    return isCatchAll ?
+                            _args :
+                                [ _args[ 0 ] ].concat( _args.slice( 2 ) );
+                },
+
+                getSystemHandlerArgs: function( args, client ) {
+                    return [ client ].concat( args );
+                },
+
+                handle: function( client, input ) {
+                    var inputDef = input;
+                    if ( typeof input === "undefined" ) {
+                        throw new Error( "The input argument passed to the FSM's handle method is undefined. Did you forget to pass the input name?" );
+                    }
+                    if ( typeof input === "string" ) {
+                        inputDef = { inputType: input, delegated: false, ticket: undefined };
+                    }
+                    var clientMeta = this.ensureClientMeta( client );
+                    var args = utils.getLeaklessArgs( arguments );
+                    if ( typeof input !== "object" ) {
+                        args.splice( 1, 1, inputDef );
+                    }
+                    clientMeta.currentActionArgs = args.slice( 1 );
+                    var currentState = clientMeta.state;
+                    var stateObj = this.states[ currentState ];
+                    var handlerName;
+                    var handler;
+                    var isCatchAll = false;
+                    var child;
+                    var result;
+                    var action;
+                    if ( !clientMeta.inExitHandler ) {
+                        child = this.configForState( currentState );
+                        if ( child && !this.pendingDelegations[ inputDef.ticket ] && !inputDef.bubbling ) {
+                            inputDef.ticket = ( inputDef.ticket || utils.createUUID() );
+                            inputDef.delegated = true;
+                            this.pendingDelegations[ inputDef.ticket ] = { delegatedTo: child.namespace };
+                            // WARNING - returning a value from `handle` on child FSMs is not really supported.
+                            // If you need to return values from child FSM input handlers, use events instead.
+                            result = child.handle.apply( child, args );
+                        } else {
+                            if ( inputDef.ticket && this.pendingDelegations[ inputDef.ticket ] ) {
+                                delete this.pendingDelegations[ inputDef.ticket ];
+                            }
+                            handlerName = stateObj[ inputDef.inputType ] ? inputDef.inputType : "*";
+                            isCatchAll = ( handlerName === "*" );
+                            handler = ( stateObj[ handlerName ] || this[ handlerName ] ) || this[ "*" ];
+                            action = clientMeta.state + "." + handlerName;
+                            clientMeta.currentAction = action;
+                            var eventPayload = this.buildEventPayload(
+                                    client,
+                                    { inputType: inputDef.inputType, delegated: inputDef.delegated, ticket: inputDef.ticket }
+                            );
+                            if ( !handler ) {
+                                this.emit( events.NO_HANDLER, _.extend( { args: args }, eventPayload ) );
+                            } else {
+                                this.emit( events.HANDLING, eventPayload );
+                                if ( typeof handler === "function" ) {
+                                    result = handler.apply( this, this.getHandlerArgs( args, isCatchAll ) );
+                                } else {
+                                    result = handler;
+                                    this.transition( client, handler );
+                                }
+                                this.emit( events.HANDLED, eventPayload );
+                            }
+                            clientMeta.priorAction = clientMeta.currentAction;
+                            clientMeta.currentAction = "";
+                            clientMeta.currentActionArgs = undefined;
+                        }
+                    }
+                    return result;
+                },
+
+                transition: function( client, newState ) {
+                    var clientMeta = this.ensureClientMeta( client );
+                    var curState = clientMeta.state;
+                    var curStateObj = this.states[ curState ];
+                    var newStateObj = this.states[ newState ];
+                    var child;
+                    var args = utils.getLeaklessArgs( arguments ).slice( 2 );
+                    if ( !clientMeta.inExitHandler && newState !== curState ) {
+                        if ( newStateObj ) {
+                            child = this.configForState( newState );
+                            if ( curStateObj && curStateObj._onExit ) {
+                                clientMeta.inExitHandler = true;
+                                curStateObj._onExit.call( this, client );
+                                clientMeta.inExitHandler = false;
+                            }
+                            clientMeta.targetReplayState = newState;
+                            clientMeta.priorState = curState;
+                            clientMeta.state = newState;
+                            var eventPayload = this.buildEventPayload( client, {
+                                fromState: clientMeta.priorState,
+                                action: clientMeta.currentAction,
+                                toState: newState
+                            } );
+                            this.emit( events.TRANSITION, eventPayload );
+                            if ( newStateObj._onEnter ) {
+                                newStateObj._onEnter.apply( this, this.getSystemHandlerArgs( args, client ) );
+                            }
+                            this.emit( events.TRANSITIONED, eventPayload );
+                            if ( child ) {
+                                child.handle( client, "_reset" );
+                            }
+
+                            if ( clientMeta.targetReplayState === newState ) {
+                                this.processQueue( client, events.NEXT_TRANSITION );
+                            }
+                            return;
+                        }
+                        this.emit( events.INVALID_STATE, this.buildEventPayload( client, {
+                            state: clientMeta.state,
+                            attemptedState: newState
+                        } ) );
+                    }
+                },
+
+                deferUntilTransition: function( client, stateName ) {
+                    var clientMeta = this.ensureClientMeta( client );
+                    var stateList = _.isArray( stateName ) ? stateName : ( stateName ? [ stateName ] : undefined );
+                    if ( clientMeta.currentActionArgs ) {
+                        var queued = {
+                                type: events.NEXT_TRANSITION,
+                                untilState: stateList,
+                                args: clientMeta.currentActionArgs
+                        };
+                        clientMeta.inputQueue.push( queued );
+                        var eventPayload = this.buildEventPayload( client, {
+                            state: clientMeta.state,
+                            queuedArgs: queued
+                        } );
+                        this.emit( events.DEFERRED, eventPayload );
+                    }
+                },
+
+                deferAndTransition: function( client, stateName ) {
+                    this.deferUntilTransition( client, stateName );
+                    this.transition( client, stateName );
+                },
+
+                processQueue: function( client ) {
+                    var clientMeta = this.ensureClientMeta( client );
+                    var filterFn = function( item ) {
+                        return ( ( !item.untilState ) || ( _.includes( item.untilState, clientMeta.state ) ) );
+                    };
+                    var toProcess = _.filter( clientMeta.inputQueue, filterFn );
+                    clientMeta.inputQueue = _.difference( clientMeta.inputQueue, toProcess );
+                    _.each( toProcess, function( item ) {
+                        this.handle.apply( this, [ client ].concat( item.args ) );
+                    }.bind( this ) );
+                },
+
+                clearQueue: function( client, name ) {
+                    var clientMeta = this.ensureClientMeta( client );
+                    if ( !name ) {
+                        clientMeta.inputQueue = [];
+                    } else {
+                        // first pass we remove the target state from any `untilState` array
+                        _.each( clientMeta.inputQueue, function( item ) {
+                            item.untilState = _.without( item.untilState, name );
+                        } );
+                        // second pass we clear out deferred events with empty untilState arrays
+                        var filter = function( evnt ) {
+                            return evnt.untilState.length !== 0;
+                        };
+                        clientMeta.inputQueue = _.filter( clientMeta.inputQueue, filter );
+                    }
+                },
+
+                compositeState: function( client ) {
+                    var clientMeta = this.ensureClientMeta( client );
+                    var state = clientMeta.state;
+                    var child = this.states[state]._child && this.states[state]._child.instance;
+                    if ( child ) {
+                        state += "." + child.compositeState( client );
+                    }
+                    return state;
+                }
+            }, emitter.getInstance() );
+
+            BehavioralFsm.extend = utils.extend;
+
+            module.exports = BehavioralFsm;
+
+
+        /***/ })
+        /******/ ])
+});
+;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vd2VicGFjay91bml2ZXJzYWxNb2R1bGVEZWZpbml0aW9uIiwid2VicGFjazovLy93ZWJwYWNrL2Jvb3RzdHJhcCBkYmNmMjQ5MTk1NGQwMmNkNjAzNyIsIndlYnBhY2s6Ly8vLi9zcmMvbWFjaGluYS5qcyIsIndlYnBhY2s6Ly8vZXh0ZXJuYWwge1wicm9vdFwiOlwiX1wiLFwiY29tbW9uanNcIjpcImxvZGFzaFwiLFwiY29tbW9uanMyXCI6XCJsb2Rhc2hcIixcImFtZFwiOlwibG9kYXNoXCJ9Iiwid2VicGFjazovLy8uL3NyYy9lbWl0dGVyLmpzIiwid2VicGFjazovLy8uL3NyYy91dGlscy5qcyIsIndlYnBhY2s6Ly8vLi9zcmMvZXZlbnRzLmpzIiwid2VicGFjazovLy8uL3NyYy9Gc20uanMiLCJ3ZWJwYWNrOi8vLy4vc3JjL0JlaGF2aW9yYWxGc20uanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7OztBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLENBQUM7QUFDRCxPO0FDVkE7QUFDQTs7QUFFQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTs7QUFFQTtBQUNBO0FBQ0EsdUJBQWU7QUFDZjtBQUNBO0FBQ0E7O0FBRUE7QUFDQTs7QUFFQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTs7O0FBR0E7QUFDQTs7QUFFQTtBQUNBOztBQUVBO0FBQ0E7O0FBRUE7QUFDQTs7Ozs7OztBQ3RDQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EsRUFBQzs7Ozs7OztBQ1ZELGdEOzs7Ozs7QUNBQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxPQUFNO0FBQ047QUFDQTtBQUNBLFFBQU87QUFDUDtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxNQUFLO0FBQ0w7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLE9BQU07QUFDTjtBQUNBO0FBQ0EsUUFBTztBQUNQO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLE1BQUs7QUFDTDtBQUNBLElBQUc7O0FBRUg7QUFDQTtBQUNBLGtEQUFpRDtBQUNqRDtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EsSUFBRzs7QUFFSDtBQUNBLGtEQUFpRDtBQUNqRDtBQUNBO0FBQ0EsS0FBSTtBQUNKO0FBQ0E7QUFDQSxNQUFLO0FBQ0w7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTtBQUNBOzs7Ozs7O0FDM0VBO0FBQ0E7QUFDQTs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EsRUFBQzs7QUFFRDtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EsSUFBRztBQUNILGFBQVk7QUFDWjtBQUNBO0FBQ0EsZ0JBQWU7QUFDZjtBQUNBO0FBQ0E7O0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOztBQUVBO0FBQ0E7QUFDQSxrQ0FBaUMsaUJBQWlCO0FBQ2xEO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxJQUFHO0FBQ0g7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLEdBQUU7QUFDRjtBQUNBO0FBQ0E7QUFDQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxpQ0FBZ0M7QUFDaEM7QUFDQTtBQUNBLGlDQUFnQztBQUNoQztBQUNBO0FBQ0EsR0FBRTtBQUNGOztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLFVBQVM7QUFDVCxtQkFBa0I7QUFDbEIsMkJBQTBCOztBQUUxQjtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EsR0FBRTtBQUNGO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EscURBQW9ELHlCQUF5QjtBQUM3RTtBQUNBO0FBQ0E7QUFDQTtBQUNBOztBQUVBO0FBQ0E7O0FBRUE7QUFDQTtBQUNBO0FBQ0E7O0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLElBQUc7QUFDSDs7QUFFQTtBQUNBO0FBQ0E7QUFDQTs7QUFFQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTtBQUNBLGtCQUFpQixRQUFRO0FBQ3pCO0FBQ0E7QUFDQSxnQkFBZTtBQUNmO0FBQ0EsMkRBQTBEO0FBQzFEO0FBQ0E7QUFDQTtBQUNBOztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7Ozs7Ozs7QUNsTUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7Ozs7OztBQ1ZBO0FBQ0E7QUFDQTs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLEdBQUU7QUFDRjtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxHQUFFO0FBQ0Y7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxHQUFFOztBQUVGO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLElBQUc7QUFDSDtBQUNBO0FBQ0E7QUFDQSxHQUFFOztBQUVGO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLEdBQUU7O0FBRUY7QUFDQTtBQUNBLEdBQUU7O0FBRUY7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLDRCQUEyQiw0QkFBNEI7QUFDdkQsSUFBRztBQUNILFlBQVc7QUFDWDtBQUNBO0FBQ0E7O0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLEVBQUM7O0FBRUQ7O0FBRUE7Ozs7Ozs7QUNyRkE7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7QUFFQTs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7O0FBRUE7QUFDQSwyQkFBMEI7O0FBRTFCO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLEdBQUU7O0FBRUY7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxJQUFHOztBQUVIO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7O0FBRUE7QUFDQSxHQUFFOztBQUVGO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EsR0FBRTs7QUFFRjtBQUNBO0FBQ0EsNEJBQTJCLDRDQUE0QztBQUN2RSxJQUFHO0FBQ0gsWUFBVztBQUNYO0FBQ0EsR0FBRTs7QUFFRjtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxHQUFFOztBQUVGO0FBQ0E7QUFDQSxHQUFFOztBQUVGO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLGdCQUFlO0FBQ2Y7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLG1EQUFrRDtBQUNsRDtBQUNBO0FBQ0E7QUFDQSxLQUFJO0FBQ0o7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxPQUFNO0FBQ047QUFDQTtBQUNBLCtDQUE4QyxhQUFhO0FBQzNELE1BQUs7QUFDTDtBQUNBO0FBQ0E7QUFDQSxPQUFNO0FBQ047QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLEdBQUU7O0FBRUY7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxNQUFLO0FBQ0w7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EsS0FBSTtBQUNKO0FBQ0EsR0FBRTs7QUFFRjtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLEtBQUk7QUFDSjtBQUNBO0FBQ0EsR0FBRTs7QUFFRjtBQUNBO0FBQ0E7QUFDQSxHQUFFOztBQUVGO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLElBQUc7QUFDSCxHQUFFOztBQUVGO0FBQ0E7QUFDQTtBQUNBO0FBQ0EsSUFBRztBQUNIO0FBQ0E7QUFDQTtBQUNBLEtBQUk7QUFDSjtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSxHQUFFOztBQUVGO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBLEVBQUM7O0FBRUQ7O0FBRUEiLCJmaWxlIjoibWFjaGluYS5qcyIsInNvdXJjZXNDb250ZW50IjpbIihmdW5jdGlvbiB3ZWJwYWNrVW5pdmVyc2FsTW9kdWxlRGVmaW5pdGlvbihyb290LCBmYWN0b3J5KSB7XG5cdGlmKHR5cGVvZiBleHBvcnRzID09PSAnb2JqZWN0JyAmJiB0eXBlb2YgbW9kdWxlID09PSAnb2JqZWN0Jylcblx0XHRtb2R1bGUuZXhwb3J0cyA9IGZhY3RvcnkocmVxdWlyZShcImxvZGFzaFwiKSk7XG5cdGVsc2UgaWYodHlwZW9mIGRlZmluZSA9PT0gJ2Z1bmN0aW9uJyAmJiBkZWZpbmUuYW1kKVxuXHRcdGRlZmluZShbXCJsb2Rhc2hcIl0sIGZhY3RvcnkpO1xuXHRlbHNlIGlmKHR5cGVvZiBleHBvcnRzID09PSAnb2JqZWN0Jylcblx0XHRleHBvcnRzW1wibWFjaGluYVwiXSA9IGZhY3RvcnkocmVxdWlyZShcImxvZGFzaFwiKSk7XG5cdGVsc2Vcblx0XHRyb290W1wibWFjaGluYVwiXSA9IGZhY3Rvcnkocm9vdFtcIl9cIl0pO1xufSkodGhpcywgZnVuY3Rpb24oX19XRUJQQUNLX0VYVEVSTkFMX01PRFVMRV8xX18pIHtcbnJldHVybiBcblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gd2VicGFjay91bml2ZXJzYWxNb2R1bGVEZWZpbml0aW9uIiwiIFx0Ly8gVGhlIG1vZHVsZSBjYWNoZVxuIFx0dmFyIGluc3RhbGxlZE1vZHVsZXMgPSB7fTtcblxuIFx0Ly8gVGhlIHJlcXVpcmUgZnVuY3Rpb25cbiBcdGZ1bmN0aW9uIF9fd2VicGFja19yZXF1aXJlX18obW9kdWxlSWQpIHtcblxuIFx0XHQvLyBDaGVjayBpZiBtb2R1bGUgaXMgaW4gY2FjaGVcbiBcdFx0aWYoaW5zdGFsbGVkTW9kdWxlc1ttb2R1bGVJZF0pXG4gXHRcdFx0cmV0dXJuIGluc3RhbGxlZE1vZHVsZXNbbW9kdWxlSWRdLmV4cG9ydHM7XG5cbiBcdFx0Ly8gQ3JlYXRlIGEgbmV3IG1vZHVsZSAoYW5kIHB1dCBpdCBpbnRvIHRoZSBjYWNoZSlcbiBcdFx0dmFyIG1vZHVsZSA9IGluc3RhbGxlZE1vZHVsZXNbbW9kdWxlSWRdID0ge1xuIFx0XHRcdGV4cG9ydHM6IHt9LFxuIFx0XHRcdGlkOiBtb2R1bGVJZCxcbiBcdFx0XHRsb2FkZWQ6IGZhbHNlXG4gXHRcdH07XG5cbiBcdFx0Ly8gRXhlY3V0ZSB0aGUgbW9kdWxlIGZ1bmN0aW9uXG4gXHRcdG1vZHVsZXNbbW9kdWxlSWRdLmNhbGwobW9kdWxlLmV4cG9ydHMsIG1vZHVsZSwgbW9kdWxlLmV4cG9ydHMsIF9fd2VicGFja19yZXF1aXJlX18pO1xuXG4gXHRcdC8vIEZsYWcgdGhlIG1vZHVsZSBhcyBsb2FkZWRcbiBcdFx0bW9kdWxlLmxvYWRlZCA9IHRydWU7XG5cbiBcdFx0Ly8gUmV0dXJuIHRoZSBleHBvcnRzIG9mIHRoZSBtb2R1bGVcbiBcdFx0cmV0dXJuIG1vZHVsZS5leHBvcnRzO1xuIFx0fVxuXG5cbiBcdC8vIGV4cG9zZSB0aGUgbW9kdWxlcyBvYmplY3QgKF9fd2VicGFja19tb2R1bGVzX18pXG4gXHRfX3dlYnBhY2tfcmVxdWlyZV9fLm0gPSBtb2R1bGVzO1xuXG4gXHQvLyBleHBvc2UgdGhlIG1vZHVsZSBjYWNoZVxuIFx0X193ZWJwYWNrX3JlcXVpcmVfXy5jID0gaW5zdGFsbGVkTW9kdWxlcztcblxuIFx0Ly8gX193ZWJwYWNrX3B1YmxpY19wYXRoX19cbiBcdF9fd2VicGFja19yZXF1aXJlX18ucCA9IFwiXCI7XG5cbiBcdC8vIExvYWQgZW50cnkgbW9kdWxlIGFuZCByZXR1cm4gZXhwb3J0c1xuIFx0cmV0dXJuIF9fd2VicGFja19yZXF1aXJlX18oMCk7XG5cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gd2VicGFjay9ib290c3RyYXAgZGJjZjI0OTE5NTRkMDJjZDYwMzciLCJ2YXIgXyA9IHJlcXVpcmUoIFwibG9kYXNoXCIgKTtcbnZhciBlbWl0dGVyID0gcmVxdWlyZSggXCIuL2VtaXR0ZXJcIiApO1xuXG5tb2R1bGUuZXhwb3J0cyA9IF8ubWVyZ2UoIGVtaXR0ZXIuaW5zdGFuY2UsIHtcblx0RnNtOiByZXF1aXJlKCBcIi4vRnNtXCIgKSxcblx0QmVoYXZpb3JhbEZzbTogcmVxdWlyZSggXCIuL0JlaGF2aW9yYWxGc21cIiApLFxuXHR1dGlsczogcmVxdWlyZSggXCIuL3V0aWxzXCIgKSxcblx0ZXZlbnRMaXN0ZW5lcnM6IHtcblx0XHRuZXdGc206IFtdXG5cdH1cbn0gKTtcblxuXG5cbi8vLy8vLy8vLy8vLy8vLy8vL1xuLy8gV0VCUEFDSyBGT09URVJcbi8vIC4vc3JjL21hY2hpbmEuanNcbi8vIG1vZHVsZSBpZCA9IDBcbi8vIG1vZHVsZSBjaHVua3MgPSAwIiwibW9kdWxlLmV4cG9ydHMgPSBfX1dFQlBBQ0tfRVhURVJOQUxfTU9EVUxFXzFfXztcblxuXG4vLy8vLy8vLy8vLy8vLy8vLy9cbi8vIFdFQlBBQ0sgRk9PVEVSXG4vLyBleHRlcm5hbCB7XCJyb290XCI6XCJfXCIsXCJjb21tb25qc1wiOlwibG9kYXNoXCIsXCJjb21tb25qczJcIjpcImxvZGFzaFwiLFwiYW1kXCI6XCJsb2Rhc2hcIn1cbi8vIG1vZHVsZSBpZCA9IDFcbi8vIG1vZHVsZSBjaHVua3MgPSAwIiwidmFyIHV0aWxzID0gcmVxdWlyZSggXCIuL3V0aWxzXCIgKTtcbnZhciBfID0gcmVxdWlyZSggXCJsb2Rhc2hcIiApO1xuXG5mdW5jdGlvbiBnZXRJbnN0YW5jZSgpIHtcblx0cmV0dXJuIHtcblx0XHRlbWl0OiBmdW5jdGlvbiggZXZlbnROYW1lICkge1xuXHRcdFx0dmFyIGFyZ3MgPSB1dGlscy5nZXRMZWFrbGVzc0FyZ3MoIGFyZ3VtZW50cyApO1xuXHRcdFx0aWYgKCB0aGlzLmV2ZW50TGlzdGVuZXJzWyBcIipcIiBdICkge1xuXHRcdFx0XHRfLmVhY2goIHRoaXMuZXZlbnRMaXN0ZW5lcnNbIFwiKlwiIF0sIGZ1bmN0aW9uKCBjYWxsYmFjayApIHtcblx0XHRcdFx0XHRpZiAoICF0aGlzLnVzZVNhZmVFbWl0ICkge1xuXHRcdFx0XHRcdFx0Y2FsbGJhY2suYXBwbHkoIHRoaXMsIGFyZ3MgKTtcblx0XHRcdFx0XHR9IGVsc2Uge1xuXHRcdFx0XHRcdFx0dHJ5IHtcblx0XHRcdFx0XHRcdFx0Y2FsbGJhY2suYXBwbHkoIHRoaXMsIGFyZ3MgKTtcblx0XHRcdFx0XHRcdH0gY2F0Y2ggKCBleGNlcHRpb24gKSB7XG5cdFx0XHRcdFx0XHRcdC8qIGlzdGFuYnVsIGlnbm9yZSBlbHNlICAqL1xuXHRcdFx0XHRcdFx0XHRpZiAoIGNvbnNvbGUgJiYgdHlwZW9mIGNvbnNvbGUubG9nICE9PSBcInVuZGVmaW5lZFwiICkge1xuXHRcdFx0XHRcdFx0XHRcdGNvbnNvbGUubG9nKCBleGNlcHRpb24uc3RhY2sgKTtcblx0XHRcdFx0XHRcdFx0fVxuXHRcdFx0XHRcdFx0fVxuXHRcdFx0XHRcdH1cblx0XHRcdFx0fS5iaW5kKCB0aGlzICkgKTtcblx0XHRcdH1cblx0XHRcdGlmICggdGhpcy5ldmVudExpc3RlbmVyc1sgZXZlbnROYW1lIF0gKSB7XG5cdFx0XHRcdF8uZWFjaCggdGhpcy5ldmVudExpc3RlbmVyc1sgZXZlbnROYW1lIF0sIGZ1bmN0aW9uKCBjYWxsYmFjayApIHtcblx0XHRcdFx0XHRpZiAoICF0aGlzLnVzZVNhZmVFbWl0ICkge1xuXHRcdFx0XHRcdFx0Y2FsbGJhY2suYXBwbHkoIHRoaXMsIGFyZ3Muc2xpY2UoIDEgKSApO1xuXHRcdFx0XHRcdH0gZWxzZSB7XG5cdFx0XHRcdFx0XHR0cnkge1xuXHRcdFx0XHRcdFx0XHRjYWxsYmFjay5hcHBseSggdGhpcywgYXJncy5zbGljZSggMSApICk7XG5cdFx0XHRcdFx0XHR9IGNhdGNoICggZXhjZXB0aW9uICkge1xuXHRcdFx0XHRcdFx0XHQvKiBpc3RhbmJ1bCBpZ25vcmUgZWxzZSAgKi9cblx0XHRcdFx0XHRcdFx0aWYgKCBjb25zb2xlICYmIHR5cGVvZiBjb25zb2xlLmxvZyAhPT0gXCJ1bmRlZmluZWRcIiApIHtcblx0XHRcdFx0XHRcdFx0XHRjb25zb2xlLmxvZyggZXhjZXB0aW9uLnN0YWNrICk7XG5cdFx0XHRcdFx0XHRcdH1cblx0XHRcdFx0XHRcdH1cblx0XHRcdFx0XHR9XG5cdFx0XHRcdH0uYmluZCggdGhpcyApICk7XG5cdFx0XHR9XG5cdFx0fSxcblxuXHRcdG9uOiBmdW5jdGlvbiggZXZlbnROYW1lLCBjYWxsYmFjayApIHtcblx0XHRcdHZhciBzZWxmID0gdGhpcztcblx0XHRcdHNlbGYuZXZlbnRMaXN0ZW5lcnMgPSBzZWxmLmV2ZW50TGlzdGVuZXJzIHx8IHsgXCIqXCI6IFtdIH07XG5cdFx0XHRpZiAoICFzZWxmLmV2ZW50TGlzdGVuZXJzWyBldmVudE5hbWUgXSApIHtcblx0XHRcdFx0c2VsZi5ldmVudExpc3RlbmVyc1sgZXZlbnROYW1lIF0gPSBbXTtcblx0XHRcdH1cblx0XHRcdHNlbGYuZXZlbnRMaXN0ZW5lcnNbIGV2ZW50TmFtZSBdLnB1c2goIGNhbGxiYWNrICk7XG5cdFx0XHRyZXR1cm4ge1xuXHRcdFx0XHRldmVudE5hbWU6IGV2ZW50TmFtZSxcblx0XHRcdFx0Y2FsbGJhY2s6IGNhbGxiYWNrLFxuXHRcdFx0XHRvZmY6IGZ1bmN0aW9uKCkge1xuXHRcdFx0XHRcdHNlbGYub2ZmKCBldmVudE5hbWUsIGNhbGxiYWNrICk7XG5cdFx0XHRcdH1cblx0XHRcdH07XG5cdFx0fSxcblxuXHRcdG9mZjogZnVuY3Rpb24oIGV2ZW50TmFtZSwgY2FsbGJhY2sgKSB7XG5cdFx0XHR0aGlzLmV2ZW50TGlzdGVuZXJzID0gdGhpcy5ldmVudExpc3RlbmVycyB8fCB7IFwiKlwiOiBbXSB9O1xuXHRcdFx0aWYgKCAhZXZlbnROYW1lICkge1xuXHRcdFx0XHR0aGlzLmV2ZW50TGlzdGVuZXJzID0ge307XG5cdFx0XHR9IGVsc2Uge1xuXHRcdFx0XHRpZiAoIGNhbGxiYWNrICkge1xuXHRcdFx0XHRcdHRoaXMuZXZlbnRMaXN0ZW5lcnNbIGV2ZW50TmFtZSBdID0gXy53aXRob3V0KCB0aGlzLmV2ZW50TGlzdGVuZXJzWyBldmVudE5hbWUgXSwgY2FsbGJhY2sgKTtcblx0XHRcdFx0fSBlbHNlIHtcblx0XHRcdFx0XHR0aGlzLmV2ZW50TGlzdGVuZXJzWyBldmVudE5hbWUgXSA9IFtdO1xuXHRcdFx0XHR9XG5cdFx0XHR9XG5cdFx0fVxuXHR9O1xufVxuXG5tb2R1bGUuZXhwb3J0cyA9IHtcblx0Z2V0SW5zdGFuY2U6IGdldEluc3RhbmNlLFxuXHRpbnN0YW5jZTogZ2V0SW5zdGFuY2UoKVxufTtcblxuXG5cbi8vLy8vLy8vLy8vLy8vLy8vL1xuLy8gV0VCUEFDSyBGT09URVJcbi8vIC4vc3JjL2VtaXR0ZXIuanNcbi8vIG1vZHVsZSBpZCA9IDJcbi8vIG1vZHVsZSBjaHVua3MgPSAwIiwidmFyIHNsaWNlID0gW10uc2xpY2U7XG52YXIgZXZlbnRzID0gcmVxdWlyZSggXCIuL2V2ZW50cy5qc1wiICk7XG52YXIgXyA9IHJlcXVpcmUoIFwibG9kYXNoXCIgKTtcblxudmFyIG1ha2VGc21OYW1lc3BhY2UgPSAoIGZ1bmN0aW9uKCkge1xuXHR2YXIgbWFjaGluYUNvdW50ID0gMDtcblx0cmV0dXJuIGZ1bmN0aW9uKCkge1xuXHRcdHJldHVybiBcImZzbS5cIiArIG1hY2hpbmFDb3VudCsrO1xuXHR9O1xufSApKCk7XG5cbmZ1bmN0aW9uIGdldERlZmF1bHRCZWhhdmlvcmFsT3B0aW9ucygpIHtcblx0cmV0dXJuIHtcblx0XHRpbml0aWFsU3RhdGU6IFwidW5pbml0aWFsaXplZFwiLFxuXHRcdGV2ZW50TGlzdGVuZXJzOiB7XG5cdFx0XHRcIipcIjogW11cblx0XHR9LFxuXHRcdHN0YXRlczoge30sXG5cdFx0bmFtZXNwYWNlOiBtYWtlRnNtTmFtZXNwYWNlKCksXG5cdFx0dXNlU2FmZUVtaXQ6IGZhbHNlLFxuXHRcdGhpZXJhcmNoeToge30sXG5cdFx0cGVuZGluZ0RlbGVnYXRpb25zOiB7fVxuXHR9O1xufVxuXG5mdW5jdGlvbiBnZXREZWZhdWx0Q2xpZW50TWV0YSgpIHtcblx0cmV0dXJuIHtcblx0XHRpbnB1dFF1ZXVlOiBbXSxcblx0XHR0YXJnZXRSZXBsYXlTdGF0ZTogXCJcIixcblx0XHRzdGF0ZTogdW5kZWZpbmVkLFxuXHRcdHByaW9yU3RhdGU6IHVuZGVmaW5lZCxcblx0XHRwcmlvckFjdGlvbjogXCJcIixcblx0XHRjdXJyZW50QWN0aW9uOiBcIlwiLFxuXHRcdGN1cnJlbnRBY3Rpb25BcmdzOiB1bmRlZmluZWQsXG5cdFx0aW5FeGl0SGFuZGxlcjogZmFsc2Vcblx0fTtcbn1cblxuZnVuY3Rpb24gZ2V0TGVha2xlc3NBcmdzKCBhcmdzLCBzdGFydElkeCApIHtcblx0dmFyIHJlc3VsdCA9IFtdO1xuXHRmb3IgKCB2YXIgaSA9ICggc3RhcnRJZHggfHwgMCApOyBpIDwgYXJncy5sZW5ndGg7IGkrKyApIHtcblx0XHRyZXN1bHRbIGkgXSA9IGFyZ3NbIGkgXTtcblx0fVxuXHRyZXR1cm4gcmVzdWx0O1xufVxuLypcblx0aGFuZGxlIC0+XG5cdFx0Y2hpbGQgPSBzdGF0ZU9iai5fY2hpbGQgJiYgc3RhdGVPYmouX2NoaWxkLmluc3RhbmNlO1xuXG5cdHRyYW5zaXRpb24gLT5cblx0XHRuZXdTdGF0ZU9iai5fY2hpbGQgPSBnZXRDaGlsZEZzbUluc3RhbmNlKCBuZXdTdGF0ZU9iai5fY2hpbGQgKTtcblx0XHRjaGlsZCA9IG5ld1N0YXRlT2JqLl9jaGlsZCAmJiBuZXdTdGF0ZU9iai5fY2hpbGQuaW5zdGFuY2U7XG4qL1xuZnVuY3Rpb24gZ2V0Q2hpbGRGc21JbnN0YW5jZSggY29uZmlnICkge1xuXHRpZiAoICFjb25maWcgKSB7XG5cdFx0cmV0dXJuO1xuXHR9XG5cdHZhciBjaGlsZEZzbURlZmluaXRpb24gPSB7fTtcblx0aWYgKCB0eXBlb2YgY29uZmlnID09PSBcIm9iamVjdFwiICkge1xuXHRcdC8vIGlzIHRoaXMgYSBjb25maWcgb2JqZWN0IHdpdGggYSBmYWN0b3J5P1xuXHRcdGlmICggY29uZmlnLmZhY3RvcnkgKSB7XG5cdFx0XHRjaGlsZEZzbURlZmluaXRpb24gPSBjb25maWc7XG5cdFx0XHRjaGlsZEZzbURlZmluaXRpb24uaW5zdGFuY2UgPSBjaGlsZEZzbURlZmluaXRpb24uZmFjdG9yeSgpO1xuXHRcdH0gZWxzZSB7XG5cdFx0XHQvLyBhc3N1bWluZyB0aGlzIGlzIGEgbWFjaGluYSBpbnN0YW5jZVxuXHRcdFx0Y2hpbGRGc21EZWZpbml0aW9uLmZhY3RvcnkgPSBmdW5jdGlvbigpIHtcblx0XHRcdFx0cmV0dXJuIGNvbmZpZztcblx0XHRcdH07XG5cdFx0fVxuXHR9IGVsc2UgaWYgKCB0eXBlb2YgY29uZmlnID09PSBcImZ1bmN0aW9uXCIgKSB7XG5cdFx0Y2hpbGRGc21EZWZpbml0aW9uLmZhY3RvcnkgPSBjb25maWc7XG5cdH1cblx0Y2hpbGRGc21EZWZpbml0aW9uLmluc3RhbmNlID0gY2hpbGRGc21EZWZpbml0aW9uLmZhY3RvcnkoKTtcblx0cmV0dXJuIGNoaWxkRnNtRGVmaW5pdGlvbjtcbn1cblxuZnVuY3Rpb24gbGlzdGVuVG9DaGlsZCggZnNtLCBjaGlsZCApIHtcblx0Ly8gTmVlZCB0byBpbnZlc3RpZ2F0ZSBwb3RlbnRpYWwgZm9yIGRpc2NhcmRlZCBldmVudFxuXHQvLyBsaXN0ZW5lciBtZW1vcnkgbGVhayBpbiBsb25nLXJ1bm5pbmcsIGRlZXBseS1uZXN0ZWQgaGllcmFyY2hpZXMuXG5cdHJldHVybiBjaGlsZC5vbiggXCIqXCIsIGZ1bmN0aW9uKCBldmVudE5hbWUsIGRhdGEgKSB7XG5cdFx0c3dpdGNoICggZXZlbnROYW1lICkge1xuXHRcdFx0Y2FzZSBldmVudHMuTk9fSEFORExFUjpcblx0XHRcdFx0aWYgKCAhZGF0YS50aWNrZXQgJiYgIWRhdGEuZGVsZWdhdGVkICYmIGRhdGEubmFtZXNwYWNlICE9PSBmc20ubmFtZXNwYWNlICkge1xuXHRcdFx0XHRcdC8vIE9rIC0gd2UncmUgZGVhbGluZyB3LyBhIGNoaWxkIGhhbmRsaW5nIGlucHV0IHRoYXQgc2hvdWxkIGJ1YmJsZSB1cFxuXHRcdFx0XHRcdGRhdGEuYXJnc1sgMSBdLmJ1YmJsaW5nID0gdHJ1ZTtcblx0XHRcdFx0fVxuXHRcdFx0XHQvLyB3ZSBkbyBOT1QgYnViYmxlIF9yZXNldCBpbnB1dHMgdXAgdG8gdGhlIHBhcmVudFxuXHRcdFx0XHRpZiAoIGRhdGEuaW5wdXRUeXBlICE9PSBcIl9yZXNldFwiICkge1xuXHRcdFx0XHRcdGZzbS5oYW5kbGUuYXBwbHkoIGZzbSwgZGF0YS5hcmdzICk7XG5cdFx0XHRcdH1cblx0XHRcdFx0YnJlYWs7XG5cdFx0XHRjYXNlIGV2ZW50cy5IQU5ETElORyA6XG5cdFx0XHRcdHZhciB0aWNrZXQgPSBkYXRhLnRpY2tldDtcblx0XHRcdFx0aWYgKCB0aWNrZXQgJiYgZnNtLnBlbmRpbmdEZWxlZ2F0aW9uc1sgdGlja2V0IF0gKSB7XG5cdFx0XHRcdFx0ZGVsZXRlIGZzbS5wZW5kaW5nRGVsZWdhdGlvbnNbIHRpY2tldCBdO1xuXHRcdFx0XHR9XG5cdFx0XHRcdGZzbS5lbWl0KCBldmVudE5hbWUsIGRhdGEgKTsgLy8gcG9zc2libHkgdHJhbnNmb3JtIHBheWxvYWQ/XG5cdFx0XHRcdGJyZWFrO1xuXHRcdFx0ZGVmYXVsdDpcblx0XHRcdFx0ZnNtLmVtaXQoIGV2ZW50TmFtZSwgZGF0YSApOyAvLyBwb3NzaWJseSB0cmFuc2Zvcm0gcGF5bG9hZD9cblx0XHRcdFx0YnJlYWs7XG5cdFx0fVxuXHR9ICk7XG59XG5cbi8vIF9tYWNoS2V5cyBhcmUgbWVtYmVycyB3ZSB3YW50IHRvIHRyYWNrIGFjcm9zcyB0aGUgcHJvdG90eXBlIGNoYWluIG9mIGFuIGV4dGVuZGVkIEZTTSBjb25zdHJ1Y3RvclxuLy8gU2luY2Ugd2Ugd2FudCB0byBldmVudHVhbGx5IG1lcmdlIHRoZSBhZ2dyZWdhdGUgb2YgdGhvc2UgdmFsdWVzIG9udG8gdGhlIGluc3RhbmNlIHNvIHRoYXQgRlNNc1xuLy8gdGhhdCBzaGFyZSB0aGUgc2FtZSBleHRlbmRlZCBwcm90b3R5cGUgd29uJ3Qgc2hhcmUgc3RhdGUgKm9uKiB0aG9zZSBwcm90b3R5cGVzLlxudmFyIF9tYWNoS2V5cyA9IFsgXCJzdGF0ZXNcIiwgXCJpbml0aWFsU3RhdGVcIiBdO1xudmFyIGV4dGVuZCA9IGZ1bmN0aW9uKCBwcm90b1Byb3BzLCBzdGF0aWNQcm9wcyApIHtcblx0dmFyIHBhcmVudCA9IHRoaXM7XG5cdHZhciBmc207IC8vIHBsYWNlaG9sZGVyIGZvciBpbnN0YW5jZSBjb25zdHJ1Y3RvclxuXHR2YXIgbWFjaE9iaiA9IHt9OyAvLyBvYmplY3QgdXNlZCB0byBob2xkIGluaXRpYWxTdGF0ZSAmIHN0YXRlcyBmcm9tIHByb3RvdHlwZSBmb3IgaW5zdGFuY2UtbGV2ZWwgbWVyZ2luZ1xuXHR2YXIgQ3RvciA9IGZ1bmN0aW9uKCkge307IC8vIHBsYWNlaG9sZGVyIGN0b3IgZnVuY3Rpb24gdXNlZCB0byBpbnNlcnQgbGV2ZWwgaW4gcHJvdG90eXBlIGNoYWluXG5cblx0Ly8gVGhlIGNvbnN0cnVjdG9yIGZ1bmN0aW9uIGZvciB0aGUgbmV3IHN1YmNsYXNzIGlzIGVpdGhlciBkZWZpbmVkIGJ5IHlvdVxuXHQvLyAodGhlIFwiY29uc3RydWN0b3JcIiBwcm9wZXJ0eSBpbiB5b3VyIGBleHRlbmRgIGRlZmluaXRpb24pLCBvciBkZWZhdWx0ZWRcblx0Ly8gYnkgdXMgdG8gc2ltcGx5IGNhbGwgdGhlIHBhcmVudCdzIGNvbnN0cnVjdG9yLlxuXHRpZiAoIHByb3RvUHJvcHMgJiYgcHJvdG9Qcm9wcy5oYXNPd25Qcm9wZXJ0eSggXCJjb25zdHJ1Y3RvclwiICkgKSB7XG5cdFx0ZnNtID0gcHJvdG9Qcm9wcy5jb25zdHJ1Y3Rvcjtcblx0fSBlbHNlIHtcblx0XHQvLyBUaGUgZGVmYXVsdCBtYWNoaW5hIGNvbnN0cnVjdG9yICh3aGVuIHVzaW5nIGluaGVyaXRhbmNlKSBjcmVhdGVzIGFcblx0XHQvLyBkZWVwIGNvcHkgb2YgdGhlIHN0YXRlcy9pbml0aWFsU3RhdGUgdmFsdWVzIGZyb20gdGhlIHByb3RvdHlwZSBhbmRcblx0XHQvLyBleHRlbmRzIHRoZW0gb3ZlciB0aGUgaW5zdGFuY2Ugc28gdGhhdCB0aGV5J2xsIGJlIGluc3RhbmNlLWxldmVsLlxuXHRcdC8vIElmIGFuIG9wdGlvbnMgYXJnIChhcmdzWzBdKSBpcyBwYXNzZWQgaW4sIGEgc3RhdGVzIG9yIGludGlhbFN0YXRlXG5cdFx0Ly8gdmFsdWUgd2lsbCBiZSBwcmVmZXJyZWQgb3ZlciBhbnkgZGF0YSBwdWxsZWQgdXAgZnJvbSB0aGUgcHJvdG90eXBlLlxuXHRcdGZzbSA9IGZ1bmN0aW9uKCkge1xuXHRcdFx0dmFyIGFyZ3MgPSBzbGljZS5jYWxsKCBhcmd1bWVudHMsIDAgKTtcblx0XHRcdGFyZ3NbIDAgXSA9IGFyZ3NbIDAgXSB8fCB7fTtcblx0XHRcdHZhciBibGVuZGVkU3RhdGU7XG5cdFx0XHR2YXIgaW5zdGFuY2VTdGF0ZXMgPSBhcmdzWyAwIF0uc3RhdGVzIHx8IHt9O1xuXHRcdFx0YmxlbmRlZFN0YXRlID0gXy5tZXJnZSggXy5jbG9uZURlZXAoIG1hY2hPYmogKSwgeyBzdGF0ZXM6IGluc3RhbmNlU3RhdGVzIH0gKTtcblx0XHRcdGJsZW5kZWRTdGF0ZS5pbml0aWFsU3RhdGUgPSBhcmdzWyAwIF0uaW5pdGlhbFN0YXRlIHx8IHRoaXMuaW5pdGlhbFN0YXRlO1xuXHRcdFx0Xy5leHRlbmQoIGFyZ3NbIDAgXSwgYmxlbmRlZFN0YXRlICk7XG5cdFx0XHRwYXJlbnQuYXBwbHkoIHRoaXMsIGFyZ3MgKTtcblx0XHR9O1xuXHR9XG5cblx0Ly8gSW5oZXJpdCBjbGFzcyAoc3RhdGljKSBwcm9wZXJ0aWVzIGZyb20gcGFyZW50LlxuXHRfLm1lcmdlKCBmc20sIHBhcmVudCApO1xuXG5cdC8vIFNldCB0aGUgcHJvdG90eXBlIGNoYWluIHRvIGluaGVyaXQgZnJvbSBgcGFyZW50YCwgd2l0aG91dCBjYWxsaW5nXG5cdC8vIGBwYXJlbnRgJ3MgY29uc3RydWN0b3IgZnVuY3Rpb24uXG5cdEN0b3IucHJvdG90eXBlID0gcGFyZW50LnByb3RvdHlwZTtcblx0ZnNtLnByb3RvdHlwZSA9IG5ldyBDdG9yKCk7XG5cblx0Ly8gQWRkIHByb3RvdHlwZSBwcm9wZXJ0aWVzIChpbnN0YW5jZSBwcm9wZXJ0aWVzKSB0byB0aGUgc3ViY2xhc3MsXG5cdC8vIGlmIHN1cHBsaWVkLlxuXHRpZiAoIHByb3RvUHJvcHMgKSB7XG5cdFx0Xy5leHRlbmQoIGZzbS5wcm90b3R5cGUsIHByb3RvUHJvcHMgKTtcblx0XHRfLm1lcmdlKCBtYWNoT2JqLCBfLnRyYW5zZm9ybSggcHJvdG9Qcm9wcywgZnVuY3Rpb24oIGFjY3VtLCB2YWwsIGtleSApIHtcblx0XHRcdGlmICggX21hY2hLZXlzLmluZGV4T2YoIGtleSApICE9PSAtMSApIHtcblx0XHRcdFx0YWNjdW1bIGtleSBdID0gdmFsO1xuXHRcdFx0fVxuXHRcdH0gKSApO1xuXHR9XG5cblx0Ly8gQWRkIHN0YXRpYyBwcm9wZXJ0aWVzIHRvIHRoZSBjb25zdHJ1Y3RvciBmdW5jdGlvbiwgaWYgc3VwcGxpZWQuXG5cdGlmICggc3RhdGljUHJvcHMgKSB7XG5cdFx0Xy5tZXJnZSggZnNtLCBzdGF0aWNQcm9wcyApO1xuXHR9XG5cblx0Ly8gQ29ycmVjdGx5IHNldCBjaGlsZCdzIGBwcm90b3R5cGUuY29uc3RydWN0b3JgLlxuXHRmc20ucHJvdG90eXBlLmNvbnN0cnVjdG9yID0gZnNtO1xuXG5cdC8vIFNldCBhIGNvbnZlbmllbmNlIHByb3BlcnR5IGluIGNhc2UgdGhlIHBhcmVudCdzIHByb3RvdHlwZSBpcyBuZWVkZWQgbGF0ZXIuXG5cdGZzbS5fX3N1cGVyX18gPSBwYXJlbnQucHJvdG90eXBlO1xuXHRyZXR1cm4gZnNtO1xufTtcblxuZnVuY3Rpb24gY3JlYXRlVVVJRCgpIHtcblx0dmFyIHMgPSBbXTtcblx0dmFyIGhleERpZ2l0cyA9IFwiMDEyMzQ1Njc4OWFiY2RlZlwiO1xuXHRmb3IgKCB2YXIgaSA9IDA7IGkgPCAzNjsgaSsrICkge1xuXHRcdHNbIGkgXSA9IGhleERpZ2l0cy5zdWJzdHIoIE1hdGguZmxvb3IoIE1hdGgucmFuZG9tKCkgKiAweDEwICksIDEgKTtcblx0fVxuXHRzWyAxNCBdID0gXCI0XCI7IC8vIGJpdHMgMTItMTUgb2YgdGhlIHRpbWVfaGlfYW5kX3ZlcnNpb24gZmllbGQgdG8gMDAxMFxuXHQvKiBqc2hpbnQgaWdub3JlOnN0YXJ0ICovXG5cdHNbIDE5IF0gPSBoZXhEaWdpdHMuc3Vic3RyKCAoIHNbIDE5IF0gJiAweDMgKSB8IDB4OCwgMSApOyAvLyBiaXRzIDYtNyBvZiB0aGUgY2xvY2tfc2VxX2hpX2FuZF9yZXNlcnZlZCB0byAwMVxuXHQvKiBqc2hpbnQgaWdub3JlOmVuZCAqL1xuXHRzWyA4IF0gPSBzWyAxMyBdID0gc1sgMTggXSA9IHNbIDIzIF0gPSBcIi1cIjtcblx0cmV0dXJuIHMuam9pbiggXCJcIiApO1xufVxuXG5tb2R1bGUuZXhwb3J0cyA9IHtcblx0Y3JlYXRlVVVJRDogY3JlYXRlVVVJRCxcblx0ZXh0ZW5kOiBleHRlbmQsXG5cdGdldERlZmF1bHRCZWhhdmlvcmFsT3B0aW9uczogZ2V0RGVmYXVsdEJlaGF2aW9yYWxPcHRpb25zLFxuXHRnZXREZWZhdWx0T3B0aW9uczogZ2V0RGVmYXVsdEJlaGF2aW9yYWxPcHRpb25zLFxuXHRnZXREZWZhdWx0Q2xpZW50TWV0YTogZ2V0RGVmYXVsdENsaWVudE1ldGEsXG5cdGdldENoaWxkRnNtSW5zdGFuY2U6IGdldENoaWxkRnNtSW5zdGFuY2UsXG5cdGdldExlYWtsZXNzQXJnczogZ2V0TGVha2xlc3NBcmdzLFxuXHRsaXN0ZW5Ub0NoaWxkOiBsaXN0ZW5Ub0NoaWxkLFxuXHRtYWtlRnNtTmFtZXNwYWNlOiBtYWtlRnNtTmFtZXNwYWNlXG59O1xuXG5cblxuLy8vLy8vLy8vLy8vLy8vLy8vXG4vLyBXRUJQQUNLIEZPT1RFUlxuLy8gLi9zcmMvdXRpbHMuanNcbi8vIG1vZHVsZSBpZCA9IDNcbi8vIG1vZHVsZSBjaHVua3MgPSAwIiwibW9kdWxlLmV4cG9ydHMgPSB7XG5cdE5FWFRfVFJBTlNJVElPTjogXCJ0cmFuc2l0aW9uXCIsXG5cdEhBTkRMSU5HOiBcImhhbmRsaW5nXCIsXG5cdEhBTkRMRUQ6IFwiaGFuZGxlZFwiLFxuXHROT19IQU5ETEVSOiBcIm5vaGFuZGxlclwiLFxuXHRUUkFOU0lUSU9OOiBcInRyYW5zaXRpb25cIixcblx0VFJBTlNJVElPTkVEOiBcInRyYW5zaXRpb25lZFwiLFxuXHRJTlZBTElEX1NUQVRFOiBcImludmFsaWRzdGF0ZVwiLFxuXHRERUZFUlJFRDogXCJkZWZlcnJlZFwiLFxuXHRORVdfRlNNOiBcIm5ld2ZzbVwiXG59O1xuXG5cblxuLy8vLy8vLy8vLy8vLy8vLy8vXG4vLyBXRUJQQUNLIEZPT1RFUlxuLy8gLi9zcmMvZXZlbnRzLmpzXG4vLyBtb2R1bGUgaWQgPSA0XG4vLyBtb2R1bGUgY2h1bmtzID0gMCIsInZhciBCZWhhdmlvcmFsRnNtID0gcmVxdWlyZSggXCIuL0JlaGF2aW9yYWxGc21cIiApO1xudmFyIHV0aWxzID0gcmVxdWlyZSggXCIuL3V0aWxzXCIgKTtcbnZhciBfID0gcmVxdWlyZSggXCJsb2Rhc2hcIiApO1xuXG52YXIgRnNtID0ge1xuXHRjb25zdHJ1Y3RvcjogZnVuY3Rpb24oKSB7XG5cdFx0QmVoYXZpb3JhbEZzbS5hcHBseSggdGhpcywgYXJndW1lbnRzICk7XG5cdFx0dGhpcy5lbnN1cmVDbGllbnRNZXRhKCk7XG5cdH0sXG5cdGluaXRDbGllbnQ6IGZ1bmN0aW9uIGluaXRDbGllbnQoKSB7XG5cdFx0dmFyIGluaXRpYWxTdGF0ZSA9IHRoaXMuaW5pdGlhbFN0YXRlO1xuXHRcdGlmICggIWluaXRpYWxTdGF0ZSApIHtcblx0XHRcdHRocm93IG5ldyBFcnJvciggXCJZb3UgbXVzdCBzcGVjaWZ5IGFuIGluaXRpYWwgc3RhdGUgZm9yIHRoaXMgRlNNXCIgKTtcblx0XHR9XG5cdFx0aWYgKCAhdGhpcy5zdGF0ZXNbIGluaXRpYWxTdGF0ZSBdICkge1xuXHRcdFx0dGhyb3cgbmV3IEVycm9yKCBcIlRoZSBpbml0aWFsIHN0YXRlIHNwZWNpZmllZCBkb2VzIG5vdCBleGlzdCBpbiB0aGUgc3RhdGVzIG9iamVjdC5cIiApO1xuXHRcdH1cblx0XHR0aGlzLnRyYW5zaXRpb24oIGluaXRpYWxTdGF0ZSApO1xuXHR9LFxuXHRlbnN1cmVDbGllbnRNZXRhOiBmdW5jdGlvbiBlbnN1cmVDbGllbnRNZXRhKCkge1xuXHRcdGlmICggIXRoaXMuX3N0YW1wZWQgKSB7XG5cdFx0XHR0aGlzLl9zdGFtcGVkID0gdHJ1ZTtcblx0XHRcdF8uZGVmYXVsdHMoIHRoaXMsIF8uY2xvbmVEZWVwKCB1dGlscy5nZXREZWZhdWx0Q2xpZW50TWV0YSgpICkgKTtcblx0XHRcdHRoaXMuaW5pdENsaWVudCgpO1xuXHRcdH1cblx0XHRyZXR1cm4gdGhpcztcblx0fSxcblxuXHRlbnN1cmVDbGllbnRBcmc6IGZ1bmN0aW9uKCBhcmdzICkge1xuXHRcdHZhciBfYXJncyA9IGFyZ3M7XG5cdFx0Ly8gd2UgbmVlZCB0byB0ZXN0IHRoZSBhcmdzIGFuZCB2ZXJpZnkgdGhhdCBpZiBhIGNsaWVudCBhcmcgaGFzXG5cdFx0Ly8gYmVlbiBwYXNzZWQsIGl0IG11c3QgYmUgdGhpcyBGU00gaW5zdGFuY2UgKHRoaXMgaXNuJ3QgYSBiZWhhdmlvcmFsIEZTTSlcblx0XHRpZiAoIHR5cGVvZiBfYXJnc1sgMCBdID09PSBcIm9iamVjdFwiICYmICEoIFwiaW5wdXRUeXBlXCIgaW4gX2FyZ3NbIDAgXSApICYmIF9hcmdzWyAwIF0gIT09IHRoaXMgKSB7XG5cdFx0XHRfYXJncy5zcGxpY2UoIDAsIDEsIHRoaXMgKTtcblx0XHR9IGVsc2UgaWYgKCB0eXBlb2YgX2FyZ3NbIDAgXSAhPT0gXCJvYmplY3RcIiB8fCAoIHR5cGVvZiBfYXJnc1sgMCBdID09PSBcIm9iamVjdFwiICYmICggXCJpbnB1dFR5cGVcIiBpbiBfYXJnc1sgMCBdICkgKSApIHtcblx0XHRcdF9hcmdzLnVuc2hpZnQoIHRoaXMgKTtcblx0XHR9XG5cdFx0cmV0dXJuIF9hcmdzO1xuXHR9LFxuXG5cdGdldEhhbmRsZXJBcmdzOiBmdW5jdGlvbiggYXJncywgaXNDYXRjaEFsbCApIHtcblx0XHQvLyBpbmRleCAwIGlzIHRoZSBjbGllbnQsIGluZGV4IDEgaXMgaW5wdXRUeXBlXG5cdFx0Ly8gaWYgd2UncmUgaW4gYSBjYXRjaC1hbGwgaGFuZGxlciwgaW5wdXQgdHlwZSBuZWVkcyB0byBiZSBpbmNsdWRlZCBpbiB0aGUgYXJnc1xuXHRcdC8vIGlucHV0VHlwZSBtaWdodCBiZSBhbiBvYmplY3QsIHNvIHdlIG5lZWQgdG8ganVzdCBnZXQgdGhlIGlucHV0VHlwZSBzdHJpbmcgaWYgc29cblx0XHR2YXIgX2FyZ3MgPSBhcmdzO1xuXHRcdHZhciBpbnB1dCA9IF9hcmdzWyAxIF07XG5cdFx0aWYgKCB0eXBlb2YgaW5wdXRUeXBlID09PSBcIm9iamVjdFwiICkge1xuXHRcdFx0X2FyZ3Muc3BsaWNlKCAxLCAxLCBpbnB1dC5pbnB1dFR5cGUgKTtcblx0XHR9XG5cdFx0cmV0dXJuIGlzQ2F0Y2hBbGwgP1xuXHRcdFx0X2FyZ3Muc2xpY2UoIDEgKSA6XG5cdFx0XHRfYXJncy5zbGljZSggMiApO1xuXHR9LFxuXG5cdGdldFN5c3RlbUhhbmRsZXJBcmdzOiBmdW5jdGlvbiggYXJncywgY2xpZW50ICkge1xuXHRcdHJldHVybiBhcmdzO1xuXHR9LFxuXG5cdC8vIFwiY2xhc3NpY1wiIG1hY2hpbmEgRlNNIGRvIG5vdCBlbWl0IHRoZSBjbGllbnQgcHJvcGVydHkgb24gZXZlbnRzICh3aGljaCB3b3VsZCBiZSB0aGUgRlNNIGl0c2VsZilcblx0YnVpbGRFdmVudFBheWxvYWQ6IGZ1bmN0aW9uKCkge1xuXHRcdHZhciBhcmdzID0gdGhpcy5lbnN1cmVDbGllbnRBcmcoIHV0aWxzLmdldExlYWtsZXNzQXJncyggYXJndW1lbnRzICkgKTtcblx0XHR2YXIgZGF0YSA9IGFyZ3NbIDEgXTtcblx0XHRpZiAoIF8uaXNQbGFpbk9iamVjdCggZGF0YSApICkge1xuXHRcdFx0cmV0dXJuIF8uZXh0ZW5kKCBkYXRhLCB7IG5hbWVzcGFjZTogdGhpcy5uYW1lc3BhY2UgfSApO1xuXHRcdH0gZWxzZSB7XG5cdFx0XHRyZXR1cm4geyBkYXRhOiBkYXRhIHx8IG51bGwsIG5hbWVzcGFjZTogdGhpcy5uYW1lc3BhY2UgfTtcblx0XHR9XG5cdH1cbn07XG5cbl8uZWFjaCggW1xuXHRcImhhbmRsZVwiLFxuXHRcInRyYW5zaXRpb25cIixcblx0XCJkZWZlclVudGlsVHJhbnNpdGlvblwiLFxuXHRcInByb2Nlc3NRdWV1ZVwiLFxuXHRcImNsZWFyUXVldWVcIlxuXSwgZnVuY3Rpb24oIG1ldGhvZFdpdGhDbGllbnRJbmplY3RlZCApIHtcblx0RnNtWyBtZXRob2RXaXRoQ2xpZW50SW5qZWN0ZWQgXSA9IGZ1bmN0aW9uKCkge1xuXHRcdHZhciBhcmdzID0gdGhpcy5lbnN1cmVDbGllbnRBcmcoIHV0aWxzLmdldExlYWtsZXNzQXJncyggYXJndW1lbnRzICkgKTtcblx0XHRyZXR1cm4gQmVoYXZpb3JhbEZzbS5wcm90b3R5cGVbIG1ldGhvZFdpdGhDbGllbnRJbmplY3RlZCBdLmFwcGx5KCB0aGlzLCBhcmdzICk7XG5cdH07XG59ICk7XG5cbkZzbSA9IEJlaGF2aW9yYWxGc20uZXh0ZW5kKCBGc20gKTtcblxubW9kdWxlLmV4cG9ydHMgPSBGc207XG5cblxuXG4vLy8vLy8vLy8vLy8vLy8vLy9cbi8vIFdFQlBBQ0sgRk9PVEVSXG4vLyAuL3NyYy9Gc20uanNcbi8vIG1vZHVsZSBpZCA9IDVcbi8vIG1vZHVsZSBjaHVua3MgPSAwIiwidmFyIF8gPSByZXF1aXJlKCBcImxvZGFzaFwiICk7XG52YXIgdXRpbHMgPSByZXF1aXJlKCBcIi4vdXRpbHNcIiApO1xudmFyIGVtaXR0ZXIgPSByZXF1aXJlKCBcIi4vZW1pdHRlclwiICk7XG52YXIgdG9wTGV2ZWxFbWl0dGVyID0gZW1pdHRlci5pbnN0YW5jZTtcbnZhciBldmVudHMgPSByZXF1aXJlKCBcIi4vZXZlbnRzXCIgKTtcblxudmFyIE1BQ0hJTkFfUFJPUCA9IFwiX19tYWNoaW5hX19cIjtcblxuZnVuY3Rpb24gQmVoYXZpb3JhbEZzbSggb3B0aW9ucyApIHtcblx0Xy5leHRlbmQoIHRoaXMsIG9wdGlvbnMgKTtcblx0Xy5kZWZhdWx0cyggdGhpcywgdXRpbHMuZ2V0RGVmYXVsdEJlaGF2aW9yYWxPcHRpb25zKCkgKTtcblx0dGhpcy5pbml0aWFsaXplLmFwcGx5KCB0aGlzLCBhcmd1bWVudHMgKTtcblx0dG9wTGV2ZWxFbWl0dGVyLmVtaXQoIGV2ZW50cy5ORVdfRlNNLCB0aGlzICk7XG59XG5cbl8uZXh0ZW5kKCBCZWhhdmlvcmFsRnNtLnByb3RvdHlwZSwge1xuXHRpbml0aWFsaXplOiBmdW5jdGlvbigpIHt9LFxuXG5cdGluaXRDbGllbnQ6IGZ1bmN0aW9uIGluaXRDbGllbnQoIGNsaWVudCApIHtcblx0XHR2YXIgaW5pdGlhbFN0YXRlID0gdGhpcy5pbml0aWFsU3RhdGU7XG5cdFx0aWYgKCAhaW5pdGlhbFN0YXRlICkge1xuXHRcdFx0dGhyb3cgbmV3IEVycm9yKCBcIllvdSBtdXN0IHNwZWNpZnkgYW4gaW5pdGlhbCBzdGF0ZSBmb3IgdGhpcyBGU01cIiApO1xuXHRcdH1cblx0XHRpZiAoICF0aGlzLnN0YXRlc1sgaW5pdGlhbFN0YXRlIF0gKSB7XG5cdFx0XHR0aHJvdyBuZXcgRXJyb3IoIFwiVGhlIGluaXRpYWwgc3RhdGUgc3BlY2lmaWVkIGRvZXMgbm90IGV4aXN0IGluIHRoZSBzdGF0ZXMgb2JqZWN0LlwiICk7XG5cdFx0fVxuXHRcdHRoaXMudHJhbnNpdGlvbiggY2xpZW50LCBpbml0aWFsU3RhdGUgKTtcblx0fSxcblxuXHRjb25maWdGb3JTdGF0ZTogZnVuY3Rpb24gY29uZmlnRm9yU3RhdGUoIG5ld1N0YXRlICkge1xuXHRcdHZhciBuZXdTdGF0ZU9iaiA9IHRoaXMuc3RhdGVzWyBuZXdTdGF0ZSBdO1xuXHRcdHZhciBjaGlsZDtcblx0XHRfLmVhY2goIHRoaXMuaGllcmFyY2h5LCBmdW5jdGlvbiggY2hpbGRMaXN0ZW5lciwga2V5ICkge1xuXHRcdFx0aWYgKCBjaGlsZExpc3RlbmVyICYmIHR5cGVvZiBjaGlsZExpc3RlbmVyLm9mZiA9PT0gXCJmdW5jdGlvblwiICkge1xuXHRcdFx0XHRjaGlsZExpc3RlbmVyLm9mZigpO1xuXHRcdFx0fVxuXHRcdH0gKTtcblxuXHRcdGlmICggbmV3U3RhdGVPYmouX2NoaWxkICkge1xuXHRcdFx0bmV3U3RhdGVPYmouX2NoaWxkID0gdXRpbHMuZ2V0Q2hpbGRGc21JbnN0YW5jZSggbmV3U3RhdGVPYmouX2NoaWxkICk7XG5cdFx0XHRjaGlsZCA9IG5ld1N0YXRlT2JqLl9jaGlsZCAmJiBuZXdTdGF0ZU9iai5fY2hpbGQuaW5zdGFuY2U7XG5cdFx0XHR0aGlzLmhpZXJhcmNoeVsgY2hpbGQubmFtZXNwYWNlIF0gPSB1dGlscy5saXN0ZW5Ub0NoaWxkKCB0aGlzLCBjaGlsZCApO1xuXHRcdH1cblxuXHRcdHJldHVybiBjaGlsZDtcblx0fSxcblxuXHRlbnN1cmVDbGllbnRNZXRhOiBmdW5jdGlvbiBlbnN1cmVDbGllbnRNZXRhKCBjbGllbnQgKSB7XG5cdFx0aWYgKCB0eXBlb2YgY2xpZW50ICE9PSBcIm9iamVjdFwiICkge1xuXHRcdFx0dGhyb3cgbmV3IEVycm9yKCBcIkFuIEZTTSBjbGllbnQgbXVzdCBiZSBhbiBvYmplY3QuXCIgKTtcblx0XHR9XG5cdFx0Y2xpZW50WyBNQUNISU5BX1BST1AgXSA9IGNsaWVudFsgTUFDSElOQV9QUk9QIF0gfHwge307XG5cdFx0aWYgKCAhY2xpZW50WyBNQUNISU5BX1BST1AgXVsgdGhpcy5uYW1lc3BhY2UgXSApIHtcblx0XHRcdGNsaWVudFsgTUFDSElOQV9QUk9QIF1bIHRoaXMubmFtZXNwYWNlIF0gPSBfLmNsb25lRGVlcCggdXRpbHMuZ2V0RGVmYXVsdENsaWVudE1ldGEoKSApO1xuXHRcdFx0dGhpcy5pbml0Q2xpZW50KCBjbGllbnQgKTtcblx0XHR9XG5cdFx0cmV0dXJuIGNsaWVudFsgTUFDSElOQV9QUk9QIF1bIHRoaXMubmFtZXNwYWNlIF07XG5cdH0sXG5cblx0YnVpbGRFdmVudFBheWxvYWQ6IGZ1bmN0aW9uKCBjbGllbnQsIGRhdGEgKSB7XG5cdFx0aWYgKCBfLmlzUGxhaW5PYmplY3QoIGRhdGEgKSApIHtcblx0XHRcdHJldHVybiBfLmV4dGVuZCggZGF0YSwgeyBjbGllbnQ6IGNsaWVudCwgbmFtZXNwYWNlOiB0aGlzLm5hbWVzcGFjZSB9ICk7XG5cdFx0fSBlbHNlIHtcblx0XHRcdHJldHVybiB7IGNsaWVudDogY2xpZW50LCBkYXRhOiBkYXRhIHx8IG51bGwsIG5hbWVzcGFjZTogdGhpcy5uYW1lc3BhY2UgfTtcblx0XHR9XG5cdH0sXG5cblx0Z2V0SGFuZGxlckFyZ3M6IGZ1bmN0aW9uKCBhcmdzLCBpc0NhdGNoQWxsICkge1xuXHRcdC8vIGluZGV4IDAgaXMgdGhlIGNsaWVudCwgaW5kZXggMSBpcyBpbnB1dFR5cGVcblx0XHQvLyBpZiB3ZSdyZSBpbiBhIGNhdGNoLWFsbCBoYW5kbGVyLCBpbnB1dCB0eXBlIG5lZWRzIHRvIGJlIGluY2x1ZGVkIGluIHRoZSBhcmdzXG5cdFx0Ly8gaW5wdXRUeXBlIG1pZ2h0IGJlIGFuIG9iamVjdCwgc28gd2UgbmVlZCB0byBqdXN0IGdldCB0aGUgaW5wdXRUeXBlIHN0cmluZyBpZiBzb1xuXHRcdHZhciBfYXJncyA9IGFyZ3Muc2xpY2UoIDAgKTtcblx0XHR2YXIgaW5wdXQgPSBfYXJnc1sgMSBdO1xuXHRcdGlmICggdHlwZW9mIGlucHV0ID09PSBcIm9iamVjdFwiICkge1xuXHRcdFx0X2FyZ3Muc3BsaWNlKCAxLCAxLCBpbnB1dC5pbnB1dFR5cGUgKTtcblx0XHR9XG5cdFx0cmV0dXJuIGlzQ2F0Y2hBbGwgP1xuXHRcdFx0X2FyZ3MgOlxuXHRcdFx0WyBfYXJnc1sgMCBdIF0uY29uY2F0KCBfYXJncy5zbGljZSggMiApICk7XG5cdH0sXG5cblx0Z2V0U3lzdGVtSGFuZGxlckFyZ3M6IGZ1bmN0aW9uKCBhcmdzLCBjbGllbnQgKSB7XG5cdFx0cmV0dXJuIFsgY2xpZW50IF0uY29uY2F0KCBhcmdzICk7XG5cdH0sXG5cblx0aGFuZGxlOiBmdW5jdGlvbiggY2xpZW50LCBpbnB1dCApIHtcblx0XHR2YXIgaW5wdXREZWYgPSBpbnB1dDtcblx0XHRpZiAoIHR5cGVvZiBpbnB1dCA9PT0gXCJ1bmRlZmluZWRcIiApIHtcblx0XHRcdHRocm93IG5ldyBFcnJvciggXCJUaGUgaW5wdXQgYXJndW1lbnQgcGFzc2VkIHRvIHRoZSBGU00ncyBoYW5kbGUgbWV0aG9kIGlzIHVuZGVmaW5lZC4gRGlkIHlvdSBmb3JnZXQgdG8gcGFzcyB0aGUgaW5wdXQgbmFtZT9cIiApO1xuXHRcdH1cblx0XHRpZiAoIHR5cGVvZiBpbnB1dCA9PT0gXCJzdHJpbmdcIiApIHtcblx0XHRcdGlucHV0RGVmID0geyBpbnB1dFR5cGU6IGlucHV0LCBkZWxlZ2F0ZWQ6IGZhbHNlLCB0aWNrZXQ6IHVuZGVmaW5lZCB9O1xuXHRcdH1cblx0XHR2YXIgY2xpZW50TWV0YSA9IHRoaXMuZW5zdXJlQ2xpZW50TWV0YSggY2xpZW50ICk7XG5cdFx0dmFyIGFyZ3MgPSB1dGlscy5nZXRMZWFrbGVzc0FyZ3MoIGFyZ3VtZW50cyApO1xuXHRcdGlmICggdHlwZW9mIGlucHV0ICE9PSBcIm9iamVjdFwiICkge1xuXHRcdFx0YXJncy5zcGxpY2UoIDEsIDEsIGlucHV0RGVmICk7XG5cdFx0fVxuXHRcdGNsaWVudE1ldGEuY3VycmVudEFjdGlvbkFyZ3MgPSBhcmdzLnNsaWNlKCAxICk7XG5cdFx0dmFyIGN1cnJlbnRTdGF0ZSA9IGNsaWVudE1ldGEuc3RhdGU7XG5cdFx0dmFyIHN0YXRlT2JqID0gdGhpcy5zdGF0ZXNbIGN1cnJlbnRTdGF0ZSBdO1xuXHRcdHZhciBoYW5kbGVyTmFtZTtcblx0XHR2YXIgaGFuZGxlcjtcblx0XHR2YXIgaXNDYXRjaEFsbCA9IGZhbHNlO1xuXHRcdHZhciBjaGlsZDtcblx0XHR2YXIgcmVzdWx0O1xuXHRcdHZhciBhY3Rpb247XG5cdFx0aWYgKCAhY2xpZW50TWV0YS5pbkV4aXRIYW5kbGVyICkge1xuXHRcdFx0Y2hpbGQgPSB0aGlzLmNvbmZpZ0ZvclN0YXRlKCBjdXJyZW50U3RhdGUgKTtcblx0XHRcdGlmICggY2hpbGQgJiYgIXRoaXMucGVuZGluZ0RlbGVnYXRpb25zWyBpbnB1dERlZi50aWNrZXQgXSAmJiAhaW5wdXREZWYuYnViYmxpbmcgKSB7XG5cdFx0XHRcdGlucHV0RGVmLnRpY2tldCA9ICggaW5wdXREZWYudGlja2V0IHx8IHV0aWxzLmNyZWF0ZVVVSUQoKSApO1xuXHRcdFx0XHRpbnB1dERlZi5kZWxlZ2F0ZWQgPSB0cnVlO1xuXHRcdFx0XHR0aGlzLnBlbmRpbmdEZWxlZ2F0aW9uc1sgaW5wdXREZWYudGlja2V0IF0gPSB7IGRlbGVnYXRlZFRvOiBjaGlsZC5uYW1lc3BhY2UgfTtcblx0XHRcdFx0Ly8gV0FSTklORyAtIHJldHVybmluZyBhIHZhbHVlIGZyb20gYGhhbmRsZWAgb24gY2hpbGQgRlNNcyBpcyBub3QgcmVhbGx5IHN1cHBvcnRlZC5cblx0XHRcdFx0Ly8gSWYgeW91IG5lZWQgdG8gcmV0dXJuIHZhbHVlcyBmcm9tIGNoaWxkIEZTTSBpbnB1dCBoYW5kbGVycywgdXNlIGV2ZW50cyBpbnN0ZWFkLlxuXHRcdFx0XHRyZXN1bHQgPSBjaGlsZC5oYW5kbGUuYXBwbHkoIGNoaWxkLCBhcmdzICk7XG5cdFx0XHR9IGVsc2Uge1xuXHRcdFx0XHRpZiAoIGlucHV0RGVmLnRpY2tldCAmJiB0aGlzLnBlbmRpbmdEZWxlZ2F0aW9uc1sgaW5wdXREZWYudGlja2V0IF0gKSB7XG5cdFx0XHRcdFx0ZGVsZXRlIHRoaXMucGVuZGluZ0RlbGVnYXRpb25zWyBpbnB1dERlZi50aWNrZXQgXTtcblx0XHRcdFx0fVxuXHRcdFx0XHRoYW5kbGVyTmFtZSA9IHN0YXRlT2JqWyBpbnB1dERlZi5pbnB1dFR5cGUgXSA/IGlucHV0RGVmLmlucHV0VHlwZSA6IFwiKlwiO1xuXHRcdFx0XHRpc0NhdGNoQWxsID0gKCBoYW5kbGVyTmFtZSA9PT0gXCIqXCIgKTtcblx0XHRcdFx0aGFuZGxlciA9ICggc3RhdGVPYmpbIGhhbmRsZXJOYW1lIF0gfHwgdGhpc1sgaGFuZGxlck5hbWUgXSApIHx8IHRoaXNbIFwiKlwiIF07XG5cdFx0XHRcdGFjdGlvbiA9IGNsaWVudE1ldGEuc3RhdGUgKyBcIi5cIiArIGhhbmRsZXJOYW1lO1xuXHRcdFx0XHRjbGllbnRNZXRhLmN1cnJlbnRBY3Rpb24gPSBhY3Rpb247XG5cdFx0XHRcdHZhciBldmVudFBheWxvYWQgPSB0aGlzLmJ1aWxkRXZlbnRQYXlsb2FkKFxuXHRcdFx0XHRcdGNsaWVudCxcblx0XHRcdFx0XHR7IGlucHV0VHlwZTogaW5wdXREZWYuaW5wdXRUeXBlLCBkZWxlZ2F0ZWQ6IGlucHV0RGVmLmRlbGVnYXRlZCwgdGlja2V0OiBpbnB1dERlZi50aWNrZXQgfVxuXHRcdFx0XHQpO1xuXHRcdFx0XHRpZiAoICFoYW5kbGVyICkge1xuXHRcdFx0XHRcdHRoaXMuZW1pdCggZXZlbnRzLk5PX0hBTkRMRVIsIF8uZXh0ZW5kKCB7IGFyZ3M6IGFyZ3MgfSwgZXZlbnRQYXlsb2FkICkgKTtcblx0XHRcdFx0fSBlbHNlIHtcblx0XHRcdFx0XHR0aGlzLmVtaXQoIGV2ZW50cy5IQU5ETElORywgZXZlbnRQYXlsb2FkICk7XG5cdFx0XHRcdFx0aWYgKCB0eXBlb2YgaGFuZGxlciA9PT0gXCJmdW5jdGlvblwiICkge1xuXHRcdFx0XHRcdFx0cmVzdWx0ID0gaGFuZGxlci5hcHBseSggdGhpcywgdGhpcy5nZXRIYW5kbGVyQXJncyggYXJncywgaXNDYXRjaEFsbCApICk7XG5cdFx0XHRcdFx0fSBlbHNlIHtcblx0XHRcdFx0XHRcdHJlc3VsdCA9IGhhbmRsZXI7XG5cdFx0XHRcdFx0XHR0aGlzLnRyYW5zaXRpb24oIGNsaWVudCwgaGFuZGxlciApO1xuXHRcdFx0XHRcdH1cblx0XHRcdFx0XHR0aGlzLmVtaXQoIGV2ZW50cy5IQU5ETEVELCBldmVudFBheWxvYWQgKTtcblx0XHRcdFx0fVxuXHRcdFx0XHRjbGllbnRNZXRhLnByaW9yQWN0aW9uID0gY2xpZW50TWV0YS5jdXJyZW50QWN0aW9uO1xuXHRcdFx0XHRjbGllbnRNZXRhLmN1cnJlbnRBY3Rpb24gPSBcIlwiO1xuXHRcdFx0XHRjbGllbnRNZXRhLmN1cnJlbnRBY3Rpb25BcmdzID0gdW5kZWZpbmVkO1xuXHRcdFx0fVxuXHRcdH1cblx0XHRyZXR1cm4gcmVzdWx0O1xuXHR9LFxuXG5cdHRyYW5zaXRpb246IGZ1bmN0aW9uKCBjbGllbnQsIG5ld1N0YXRlICkge1xuXHRcdHZhciBjbGllbnRNZXRhID0gdGhpcy5lbnN1cmVDbGllbnRNZXRhKCBjbGllbnQgKTtcblx0XHR2YXIgY3VyU3RhdGUgPSBjbGllbnRNZXRhLnN0YXRlO1xuXHRcdHZhciBjdXJTdGF0ZU9iaiA9IHRoaXMuc3RhdGVzWyBjdXJTdGF0ZSBdO1xuXHRcdHZhciBuZXdTdGF0ZU9iaiA9IHRoaXMuc3RhdGVzWyBuZXdTdGF0ZSBdO1xuXHRcdHZhciBjaGlsZDtcblx0XHR2YXIgYXJncyA9IHV0aWxzLmdldExlYWtsZXNzQXJncyggYXJndW1lbnRzICkuc2xpY2UoIDIgKTtcblx0XHRpZiAoICFjbGllbnRNZXRhLmluRXhpdEhhbmRsZXIgJiYgbmV3U3RhdGUgIT09IGN1clN0YXRlICkge1xuXHRcdFx0aWYgKCBuZXdTdGF0ZU9iaiApIHtcblx0XHRcdFx0Y2hpbGQgPSB0aGlzLmNvbmZpZ0ZvclN0YXRlKCBuZXdTdGF0ZSApO1xuXHRcdFx0XHRpZiAoIGN1clN0YXRlT2JqICYmIGN1clN0YXRlT2JqLl9vbkV4aXQgKSB7XG5cdFx0XHRcdFx0Y2xpZW50TWV0YS5pbkV4aXRIYW5kbGVyID0gdHJ1ZTtcblx0XHRcdFx0XHRjdXJTdGF0ZU9iai5fb25FeGl0LmNhbGwoIHRoaXMsIGNsaWVudCApO1xuXHRcdFx0XHRcdGNsaWVudE1ldGEuaW5FeGl0SGFuZGxlciA9IGZhbHNlO1xuXHRcdFx0XHR9XG5cdFx0XHRcdGNsaWVudE1ldGEudGFyZ2V0UmVwbGF5U3RhdGUgPSBuZXdTdGF0ZTtcblx0XHRcdFx0Y2xpZW50TWV0YS5wcmlvclN0YXRlID0gY3VyU3RhdGU7XG5cdFx0XHRcdGNsaWVudE1ldGEuc3RhdGUgPSBuZXdTdGF0ZTtcblx0XHRcdFx0dmFyIGV2ZW50UGF5bG9hZCA9IHRoaXMuYnVpbGRFdmVudFBheWxvYWQoIGNsaWVudCwge1xuXHRcdFx0XHRcdGZyb21TdGF0ZTogY2xpZW50TWV0YS5wcmlvclN0YXRlLFxuXHRcdFx0XHRcdGFjdGlvbjogY2xpZW50TWV0YS5jdXJyZW50QWN0aW9uLFxuXHRcdFx0XHRcdHRvU3RhdGU6IG5ld1N0YXRlXG5cdFx0XHRcdH0gKTtcblx0XHRcdFx0dGhpcy5lbWl0KCBldmVudHMuVFJBTlNJVElPTiwgZXZlbnRQYXlsb2FkICk7XG5cdFx0XHRcdGlmICggbmV3U3RhdGVPYmouX29uRW50ZXIgKSB7XG5cdFx0XHRcdFx0bmV3U3RhdGVPYmouX29uRW50ZXIuYXBwbHkoIHRoaXMsIHRoaXMuZ2V0U3lzdGVtSGFuZGxlckFyZ3MoIGFyZ3MsIGNsaWVudCApICk7XG5cdFx0XHRcdH1cblx0XHRcdFx0dGhpcy5lbWl0KCBldmVudHMuVFJBTlNJVElPTkVELCBldmVudFBheWxvYWQgKTtcblx0XHRcdFx0aWYgKCBjaGlsZCApIHtcblx0XHRcdFx0XHRjaGlsZC5oYW5kbGUoIGNsaWVudCwgXCJfcmVzZXRcIiApO1xuXHRcdFx0XHR9XG5cblx0XHRcdFx0aWYgKCBjbGllbnRNZXRhLnRhcmdldFJlcGxheVN0YXRlID09PSBuZXdTdGF0ZSApIHtcblx0XHRcdFx0XHR0aGlzLnByb2Nlc3NRdWV1ZSggY2xpZW50LCBldmVudHMuTkVYVF9UUkFOU0lUSU9OICk7XG5cdFx0XHRcdH1cblx0XHRcdFx0cmV0dXJuO1xuXHRcdFx0fVxuXHRcdFx0dGhpcy5lbWl0KCBldmVudHMuSU5WQUxJRF9TVEFURSwgdGhpcy5idWlsZEV2ZW50UGF5bG9hZCggY2xpZW50LCB7XG5cdFx0XHRcdHN0YXRlOiBjbGllbnRNZXRhLnN0YXRlLFxuXHRcdFx0XHRhdHRlbXB0ZWRTdGF0ZTogbmV3U3RhdGVcblx0XHRcdH0gKSApO1xuXHRcdH1cblx0fSxcblxuXHRkZWZlclVudGlsVHJhbnNpdGlvbjogZnVuY3Rpb24oIGNsaWVudCwgc3RhdGVOYW1lICkge1xuXHRcdHZhciBjbGllbnRNZXRhID0gdGhpcy5lbnN1cmVDbGllbnRNZXRhKCBjbGllbnQgKTtcblx0XHR2YXIgc3RhdGVMaXN0ID0gXy5pc0FycmF5KCBzdGF0ZU5hbWUgKSA/IHN0YXRlTmFtZSA6ICggc3RhdGVOYW1lID8gWyBzdGF0ZU5hbWUgXSA6IHVuZGVmaW5lZCApO1xuXHRcdGlmICggY2xpZW50TWV0YS5jdXJyZW50QWN0aW9uQXJncyApIHtcblx0XHRcdHZhciBxdWV1ZWQgPSB7XG5cdFx0XHRcdHR5cGU6IGV2ZW50cy5ORVhUX1RSQU5TSVRJT04sXG5cdFx0XHRcdHVudGlsU3RhdGU6IHN0YXRlTGlzdCxcblx0XHRcdFx0YXJnczogY2xpZW50TWV0YS5jdXJyZW50QWN0aW9uQXJnc1xuXHRcdFx0fTtcblx0XHRcdGNsaWVudE1ldGEuaW5wdXRRdWV1ZS5wdXNoKCBxdWV1ZWQgKTtcblx0XHRcdHZhciBldmVudFBheWxvYWQgPSB0aGlzLmJ1aWxkRXZlbnRQYXlsb2FkKCBjbGllbnQsIHtcblx0XHRcdFx0c3RhdGU6IGNsaWVudE1ldGEuc3RhdGUsXG5cdFx0XHRcdHF1ZXVlZEFyZ3M6IHF1ZXVlZFxuXHRcdFx0fSApO1xuXHRcdFx0dGhpcy5lbWl0KCBldmVudHMuREVGRVJSRUQsIGV2ZW50UGF5bG9hZCApO1xuXHRcdH1cblx0fSxcblxuXHRkZWZlckFuZFRyYW5zaXRpb246IGZ1bmN0aW9uKCBjbGllbnQsIHN0YXRlTmFtZSApIHtcblx0XHR0aGlzLmRlZmVyVW50aWxUcmFuc2l0aW9uKCBjbGllbnQsIHN0YXRlTmFtZSApO1xuXHRcdHRoaXMudHJhbnNpdGlvbiggY2xpZW50LCBzdGF0ZU5hbWUgKTtcblx0fSxcblxuXHRwcm9jZXNzUXVldWU6IGZ1bmN0aW9uKCBjbGllbnQgKSB7XG5cdFx0dmFyIGNsaWVudE1ldGEgPSB0aGlzLmVuc3VyZUNsaWVudE1ldGEoIGNsaWVudCApO1xuXHRcdHZhciBmaWx0ZXJGbiA9IGZ1bmN0aW9uKCBpdGVtICkge1xuXHRcdFx0cmV0dXJuICggKCAhaXRlbS51bnRpbFN0YXRlICkgfHwgKCBfLmluY2x1ZGVzKCBpdGVtLnVudGlsU3RhdGUsIGNsaWVudE1ldGEuc3RhdGUgKSApICk7XG5cdFx0fTtcblx0XHR2YXIgdG9Qcm9jZXNzID0gXy5maWx0ZXIoIGNsaWVudE1ldGEuaW5wdXRRdWV1ZSwgZmlsdGVyRm4gKTtcblx0XHRjbGllbnRNZXRhLmlucHV0UXVldWUgPSBfLmRpZmZlcmVuY2UoIGNsaWVudE1ldGEuaW5wdXRRdWV1ZSwgdG9Qcm9jZXNzICk7XG5cdFx0Xy5lYWNoKCB0b1Byb2Nlc3MsIGZ1bmN0aW9uKCBpdGVtICkge1xuXHRcdFx0dGhpcy5oYW5kbGUuYXBwbHkoIHRoaXMsIFsgY2xpZW50IF0uY29uY2F0KCBpdGVtLmFyZ3MgKSApO1xuXHRcdH0uYmluZCggdGhpcyApICk7XG5cdH0sXG5cblx0Y2xlYXJRdWV1ZTogZnVuY3Rpb24oIGNsaWVudCwgbmFtZSApIHtcblx0XHR2YXIgY2xpZW50TWV0YSA9IHRoaXMuZW5zdXJlQ2xpZW50TWV0YSggY2xpZW50ICk7XG5cdFx0aWYgKCAhbmFtZSApIHtcblx0XHRcdGNsaWVudE1ldGEuaW5wdXRRdWV1ZSA9IFtdO1xuXHRcdH0gZWxzZSB7XG5cdFx0XHQvLyBmaXJzdCBwYXNzIHdlIHJlbW92ZSB0aGUgdGFyZ2V0IHN0YXRlIGZyb20gYW55IGB1bnRpbFN0YXRlYCBhcnJheVxuXHRcdFx0Xy5lYWNoKCBjbGllbnRNZXRhLmlucHV0UXVldWUsIGZ1bmN0aW9uKCBpdGVtICkge1xuXHRcdFx0XHRpdGVtLnVudGlsU3RhdGUgPSBfLndpdGhvdXQoIGl0ZW0udW50aWxTdGF0ZSwgbmFtZSApO1xuXHRcdFx0fSApO1xuXHRcdFx0Ly8gc2Vjb25kIHBhc3Mgd2UgY2xlYXIgb3V0IGRlZmVycmVkIGV2ZW50cyB3aXRoIGVtcHR5IHVudGlsU3RhdGUgYXJyYXlzXG5cdFx0XHR2YXIgZmlsdGVyID0gZnVuY3Rpb24oIGV2bnQgKSB7XG5cdFx0XHRcdHJldHVybiBldm50LnVudGlsU3RhdGUubGVuZ3RoICE9PSAwO1xuXHRcdFx0fTtcblx0XHRcdGNsaWVudE1ldGEuaW5wdXRRdWV1ZSA9IF8uZmlsdGVyKCBjbGllbnRNZXRhLmlucHV0UXVldWUsIGZpbHRlciApO1xuXHRcdH1cblx0fSxcblxuXHRjb21wb3NpdGVTdGF0ZTogZnVuY3Rpb24oIGNsaWVudCApIHtcblx0XHR2YXIgY2xpZW50TWV0YSA9IHRoaXMuZW5zdXJlQ2xpZW50TWV0YSggY2xpZW50ICk7XG5cdFx0dmFyIHN0YXRlID0gY2xpZW50TWV0YS5zdGF0ZTtcblx0XHR2YXIgY2hpbGQgPSB0aGlzLnN0YXRlc1tzdGF0ZV0uX2NoaWxkICYmIHRoaXMuc3RhdGVzW3N0YXRlXS5fY2hpbGQuaW5zdGFuY2U7XG5cdFx0aWYgKCBjaGlsZCApIHtcblx0XHRcdHN0YXRlICs9IFwiLlwiICsgY2hpbGQuY29tcG9zaXRlU3RhdGUoIGNsaWVudCApO1xuXHRcdH1cblx0XHRyZXR1cm4gc3RhdGU7XG5cdH1cbn0sIGVtaXR0ZXIuZ2V0SW5zdGFuY2UoKSApO1xuXG5CZWhhdmlvcmFsRnNtLmV4dGVuZCA9IHV0aWxzLmV4dGVuZDtcblxubW9kdWxlLmV4cG9ydHMgPSBCZWhhdmlvcmFsRnNtO1xuXG5cblxuLy8vLy8vLy8vLy8vLy8vLy8vXG4vLyBXRUJQQUNLIEZPT1RFUlxuLy8gLi9zcmMvQmVoYXZpb3JhbEZzbS5qc1xuLy8gbW9kdWxlIGlkID0gNlxuLy8gbW9kdWxlIGNodW5rcyA9IDAiXSwic291cmNlUm9vdCI6IiJ9
 /* PrismJS 1.15.0
 https://prismjs.com/download.html#themes=prism&languages=markup+css+clike+javascript&plugins=line-numbers */
 
@@ -4566,12 +5312,12 @@ angular.module('am-wb-core')
     return {
         link : function (scope, element, attrs) {
             element.bind('error', function () {
-                if (attrs.src != attrs.ngSrcError) {
+                if (attrs.src !== attrs.ngSrcError) {
                     attrs.$set('src', attrs.ngSrcError);
                 }
             });
         }
-    }
+    };
 });
 /* 
  * The MIT License (MIT)
@@ -4869,6 +5615,7 @@ angular.module('am-wb-core')
             if(rootWidget){
                 rootWidget.delete();
             }
+            $element.empty();
 
             // 1- create widget
             $widget.compile(model, null, $element)
@@ -4924,159 +5671,157 @@ angular.module('am-wb-core')
  * Loads list of settings.
  * 
  */
-.directive('wbEventPanel', function ($settings, $widget) {
-	/**
-	 * Init settings
-	 */
-	function postLink($scope, $element, $attrs, $ctrls) {
-		// Load ngModel
-		var ngModelCtrl = $ctrls[0];
-		var widget = null;
-		var eventTypes = [{
-			key: 'init',
-			title: 'Initialization'
-		}, {
-			key: 'click',
-			title: 'Click'
-		}, {
-			key: 'dblclick',
-			title: 'Double click'
-		}, {
-			key: 'mouseout',
-			title: 'Mouse out'
-		}, {
-			key: 'mouseover',
-			title: 'Mouse over'
-		}, {
-			key: 'mousedown',
-			title: 'Mouse down'
-		}, {
-			key: 'mouseup',
-			title: 'Mouse up'
-		}, {
-			key: 'mouseenter',
-			title: 'Mouse enter'
-		}, {
-			key: 'mouseleave',
-			title: 'Mouse leave'
-		}, {
-			key: 'resize',
-			title: 'Resize'
-		}, {
-			key: 'intersection',
-			title: 'Intersection'
-		}, {
-			key: 'success',
-			title: 'Success'
-		}, {
-			key: 'error',
-			title: 'Failure'
-		}, {
-		    key: 'load',
-		    title: 'Load'
-		}, {
-		    key: 'load',
-		    title: 'Load'
-		}];
+.directive('wbEventPanel', function () {
+    /**
+     * Init settings
+     */
+    function postLink($scope, $element, $attrs, $ctrls) {
+        // Load ngModel
+        var ngModelCtrl = $ctrls[0];
+        var widget = null;
+        var eventTypes = [{
+            key: 'init',
+            title: 'Initialization'
+        }, {
+            key: 'click',
+            title: 'Click'
+        }, {
+            key: 'dblclick',
+            title: 'Double click'
+        }, {
+            key: 'mouseout',
+            title: 'Mouse out'
+        }, {
+            key: 'mouseover',
+            title: 'Mouse over'
+        }, {
+            key: 'mousedown',
+            title: 'Mouse down'
+        }, {
+            key: 'mouseup',
+            title: 'Mouse up'
+        }, {
+            key: 'mouseenter',
+            title: 'Mouse enter'
+        }, {
+            key: 'mouseleave',
+            title: 'Mouse leave'
+        }, {
+            key: 'resize',
+            title: 'Resize'
+        }, {
+            key: 'intersection',
+            title: 'Intersection'
+        }, {
+            key: 'success',
+            title: 'Success'
+        }, {
+            key: 'error',
+            title: 'Failure'
+        }, {
+            key: 'load',
+            title: 'Load'
+        }, {
+            key: 'load',
+            title: 'Load'
+        }];
 
-		ngModelCtrl.$render = function () {
-			if (ngModelCtrl.$viewValue) {
-				cleanEvents();
-				widget = ngModelCtrl.$viewValue;
-				if (angular.isArray(widget)) {
-					if(widget.length > 0){
-						widget = widget[0];
-					}else {
-						widget = null;
-					}
-				}
-				loadEvents();
-			}
-		};
+        ngModelCtrl.$render = function () {
+            if (ngModelCtrl.$viewValue) {
+                cleanEvents();
+                widget = ngModelCtrl.$viewValue;
+                if (angular.isArray(widget)) {
+                    if(widget.length > 0){
+                        widget = widget[0];
+                    }else {
+                        widget = null;
+                    }
+                }
+                loadEvents();
+            }
+        };
 
-		function cleanEvents() {
-			$scope.events = [];
-		}
+        function cleanEvents() {
+            $scope.events = [];
+        }
 
-		function loadEvents() {
-			cleanEvents();
-			if(!widget){
-				return;
-			}
-			for (var i = 0; i < eventTypes.length; i++) {
-				var event = eventTypes[i];
-				event.code = widget.getModelProperty('on.' + event.key);
-				$scope.events.push(event);
-			}
-		}
+        function loadEvents() {
+            cleanEvents();
+            if(!widget){
+                return;
+            }
+            for (var i = 0; i < eventTypes.length; i++) {
+                var event = eventTypes[i];
+                event.code = widget.getModelProperty('on.' + event.key);
+                $scope.events.push(event);
+            }
+        }
 
-		function saveEvents() {
-			if(!widget){
-				return;
-			}
-			for (var i = 0; i < $scope.events.length; i++) {
-				var event = $scope.events[i];
-				if (event.code) {
-					widget.setModelProperty('on.'
-							+ event.key, event.code);
-				} else {
-					widget.setModelProperty('on.'
-							+ event.key, undefined);
-				}
-			}
-		}
+        function saveEvents() {
+            if(!widget){
+                return;
+            }
+            for (var i = 0; i < $scope.events.length; i++) {
+                var event = $scope.events[i];
+                if (event.code) {
+                    widget.setModelProperty('on.' + event.key, event.code);
+                } else {
+                    widget.setModelProperty('on.' + event.key, undefined);
+                }
+            }
+        }
 
-		/**
-		 * Save events into the model
-		 */
-		$scope.saveEvents = saveEvents;
+        /**
+         * Save events into the model
+         */
+        $scope.saveEvents = saveEvents;
 
-		$element.on('keypress keyup keydown paste copy', function(event){
-			event.stopPropagation();
-		});
-	}
+        $element.on('keypress keyup keydown paste copy', function(event){
+            event.stopPropagation();
+        });
+    }
 
-	return {
-		restrict: 'E',
-		replace: true,
-		templateUrl: 'views/directives/wb-event-panel.html',
-		scope: {},
-		link: postLink,
-		require: ['ngModel'],
-		controllerAs: 'ctrl',
-		/*
-		 * @ngInject
-		 */
-		controller: function ($scope, $resource) {
+    return {
+        restrict: 'E',
+        replace: true,
+        templateUrl: 'views/directives/wb-event-panel.html',
+        scope: {},
+        link: postLink,
+        require: ['ngModel'],
+        controllerAs: 'ctrl',
+        /*
+         * @ngInject
+         */
+        controller: function ($scope, $resource) {
 
-			var defaultLanguages = [{
-				text: 'JavaScript',
-				value: 'javascript'
-			}];
-			this.editEvent = function (event, $evn) {
-				$evn.stopPropagation();
-				$resource.get('script', {
-					data: {
-						language: 'javascript',
-						languages: defaultLanguages,
-						code: event.code
-					}
-				}).then(function (value) {
-					event.code = value.code;
-					if (!value) {
-						delete event.code;
-					}
-					$scope.saveEvents();
-				});
-			};
+            var defaultLanguages = [{
+                text: 'JavaScript',
+                value: 'javascript'
+            }];
+            this.editEvent = function (event, $evn) {
+                $evn.stopPropagation();
+                $resource.get('script', {
+                    data: {
+                        language: 'javascript',
+                        languages: defaultLanguages,
+                        code: event.code
+                    }
+                }).then(function (value) {
+                    event.code = value.code;
+                    if (!value) {
+                        delete event.code;
+                    }
+                    $scope.saveEvents();
+                });
+            };
 
-			this.deleteEvent = function (event, $evn) {
-				$evn.stopPropagation();
-				delete event.code;
-				$scope.saveEvents();
-			};
-		}
-	};
+            this.deleteEvent = function (event, $evn) {
+                $evn.stopPropagation();
+                delete event.code;
+                $scope.saveEvents();
+            };
+        }
+    };
 });
 
 /* 
@@ -5103,6 +5848,7 @@ angular.module('am-wb-core')
  * SOFTWARE.
  */
 
+'use strict';
 angular.module('am-wb-core')
 
 
@@ -5113,161 +5859,159 @@ angular.module('am-wb-core')
  * @description Icon for WB
  */
 .directive('wbIcon', function (wbIconService, $interpolate) {
-	'use strict';
-	// FORMAT
-	var template = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="{{icon.viewbox}}" width="{{icon.size}}" height="{{icon.size}}">{{{icon.shape}}}</svg>';
-	// REPLACE FORMAT
-	var replaceTemplate = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="{{icon.viewbox}}" width="{{icon.size}}" height="{{icon.size}}"><g id="{{icon.name}}" style="display:none">{{{icon.shape}}}</g><g id="{{old.name}}" style="display:none">{{{old.shape}}}</g></svg>';
-	
-	// optimize pars
-	Mustache.parse(template);
-	Mustache.parse(replaceTemplate);
+    // FORMAT
+    var template = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="{{icon.viewbox}}" width="{{icon.size}}" height="{{icon.size}}">{{{icon.shape}}}</svg>';
+    // REPLACE FORMAT
+    var replaceTemplate = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="{{icon.viewbox}}" width="{{icon.size}}" height="{{icon.size}}"><g id="{{icon.name}}" style="display:none">{{{icon.shape}}}</g><g id="{{old.name}}" style="display:none">{{{old.shape}}}</g></svg>';
 
-	var shapes = wbIconService.getShapes();
+    // optimize pars
+    Mustache.parse(template);
+    Mustache.parse(replaceTemplate);
 
-	function postLink(scope, element, attr, ctrls, transclude) {
-		// icon information
-		var icon = {
-				name: 'help',
-				viewbox: '0 0 24 24',
-				size: 24,
-		};
-		// Counter
-		var renderCount = 0;
+    var shapes = wbIconService.getShapes();
+
+    function postLink(scope, element, attr, ctrls, transclude) {
+        // icon information
+        var icon = {
+                name: 'help',
+                viewbox: '0 0 24 24',
+                size: 24,
+        };
+        // Counter
+        var renderCount = 0;
 
 
-		/*
-		 * Sets icon and render the shape
-		 */
-		function setIcon(iconName){
-			var tempIcon = _.clone(icon);
-			// icon
-			if (iconName !== undefined) {
-				tempIcon.name = iconName;
-				// Check for material-design-icons style name, and extract icon / size
-				var ss = iconName.match(/ic_(.*)_([0-9]+)px.svg/m);
-				if (ss !== null) {
-					tempIcon.name = ss[1];
-					tempIcon.size = ss[2];
-				}
-			}
-			
-			render(tempIcon);
-		}
+        /*
+         * Sets icon and render the shape
+         */
+        function setIcon(iconName){
+            var tempIcon = _.clone(icon);
+            // icon
+            if (iconName !== undefined) {
+                tempIcon.name = iconName;
+                // Check for material-design-icons style name, and extract icon / size
+                var ss = iconName.match(/ic_(.*)_([0-9]+)px.svg/m);
+                if (ss !== null) {
+                    tempIcon.name = ss[1];
+                    tempIcon.size = ss[2];
+                }
+            }
 
-		function setViewBox(viewBox){
-			// viewBox
-			if (attr.viewBox !== undefined) {
-				viewBox = attr.viewBox;
-			} else {
-				viewBox = wbIconService.getViewBox(icon) ? wbIconService.getViewBox(icon) : '0 0 24 24';
-			}
-			render();
-		}
+            render(tempIcon);
+        }
 
-		function setSize(newsize){
-			if (newsize === icon.size) { 
-				return; 
-			}
-			var tempIcon = _.clone(icon);
-			tempIcon.size = newsize;
-			render(tempIcon);
-		}
+//        function setViewBox(viewBox){
+//            // viewBox
+//            if (attr.viewBox !== undefined) {
+//                viewBox = attr.viewBox;
+//            } else {
+//                viewBox = wbIconService.getViewBox(icon) ? wbIconService.getViewBox(icon) : '0 0 24 24';
+//            }
+//            render();
+//            return viewBox;
+//        }
 
-		function render(newIcon) {
-			// check for new changes
-			if(renderCount && newIcon.name === icon.name 
-					&& newIcon.size === icon.size
-					&& newIcon.viewbox === icon.viewbox){
-				return;
-			}
-			newIcon.shape = shapes[newIcon.name];
-			if(renderCount && window.SVGMorpheus) {
-				// this block will succeed if SVGMorpheus is available
-				var options = JSON.parse(attr.options || '{}');
-				element.html(Mustache.render(replaceTemplate, {
-					icon: newIcon,
-					old: icon
-				}));
-				new SVGMorpheus(element.children()[0]).to(newicon, options);
-			} else {
-				element.html(Mustache.render(template, {
-					icon: newIcon
-				}));
-			}
+        function setSize(newsize){
+            if (newsize === icon.size) { 
+                return; 
+            }
+            var tempIcon = _.clone(icon);
+            tempIcon.size = newsize;
+            render(tempIcon);
+        }
 
-			icon = newIcon;
-			renderCount++;
-		};
+        function render(newIcon) {
+            // check for new changes
+            if(renderCount && newIcon.name === icon.name && 
+                    newIcon.size === icon.size && 
+                    newIcon.viewbox === icon.viewbox){
+                return;
+            }
+            newIcon.shape = shapes[newIcon.name];
+            if(renderCount && window.SVGMorpheus) {
+                // this block will succeed if SVGMorpheus is available
+                var options = JSON.parse(attr.options || '{}');
+                element.html(Mustache.render(replaceTemplate, {
+                    icon: newIcon,
+                    old: icon
+                }));
+                new SVGMorpheus(element.children()[0]).to(newIcon, options);
+            } else {
+                element.html(Mustache.render(template, {
+                    icon: newIcon
+                }));
+            }
 
-		// watch for any changes
-		if (attr.icon !== undefined) {
-			attr.$observe('icon', setIcon); 
-		} else if(attr.wbIconName !== undefined){
-			attr.$observe('wbIconName', setIcon);
-		} else {
-			transclude(scope, function(clone) {
-				var text = clone.text();
-				if (text && text.trim()) {
-					scope.$watch(function() {
-						return $interpolate(text.trim())(scope);
-					}, setIcon);
-				}
-			});
-		}
-		if (attr.size !== undefined) { 
-			attr.$observe('size', setSize);  
-		}
-	}
+            icon = newIcon;
+            renderCount++;
+        }
 
-	return {
-		restrict: 'AE',
-		transclude : true,
-		link: postLink,
-		replace: false
-	};
+        // watch for any changes
+        if (attr.icon !== undefined) {
+            attr.$observe('icon', setIcon); 
+        } else if(attr.wbIconName !== undefined){
+            attr.$observe('wbIconName', setIcon);
+        } else {
+            transclude(scope, function(clone) {
+                var text = clone.text();
+                if (text && text.trim()) {
+                    scope.$watch(function() {
+                        return $interpolate(text.trim())(scope);
+                    }, setIcon);
+                }
+            });
+        }
+        if (attr.size !== undefined) { 
+            attr.$observe('size', setSize);  
+        }
+    }
+
+    return {
+        restrict: 'AE',
+        transclude : true,
+        link: postLink,
+        replace: false
+    };
 })
 
 .directive('mdIconFloat', function($mdTheming) {
 
-	var INPUT_TAGS = [ 'INPUT', 'TEXTAREA', 'SELECT',
-		'MD-SELECT' ];
+    var INPUT_TAGS = [ 'INPUT', 'TEXTAREA', 'SELECT',
+        'MD-SELECT' ];
 
-	var LEFT_SELECTORS = INPUT_TAGS.reduce(
-			function(selectors, isel) {
-				return selectors.concat([ 'wb-icon ~ ' + isel,
-					'.wb-icon ~ ' + isel ]);
-			}, []).join(',');
+    var LEFT_SELECTORS = INPUT_TAGS.reduce(
+            function(selectors, isel) {
+                return selectors.concat([ 'wb-icon ~ ' + isel, '.wb-icon ~ ' + isel ]);
+            }, []).join(',');
 
-	var RIGHT_SELECTORS = INPUT_TAGS.reduce(
-			function(selectors, isel) {
-				return selectors.concat([ isel + ' ~ wb-icon',
-					isel + ' ~ .wb-icon' ]);
-			}, []).join(',');
+    var RIGHT_SELECTORS = INPUT_TAGS.reduce(
+            function(selectors, isel) {
+                return selectors.concat([ isel + ' ~ wb-icon', isel + ' ~ .wb-icon' ]);
+            }, []).join(',');
 
-	function compile(tElement) {
-		// Check for both a left & right icon
-		var leftIcon = tElement[0]
-		.querySelector(LEFT_SELECTORS);
-		var rightIcon = tElement[0]
-		.querySelector(RIGHT_SELECTORS);
+    function compile(tElement) {
+        // Check for both a left & right icon
+        var leftIcon = tElement[0]
+        .querySelector(LEFT_SELECTORS);
+        var rightIcon = tElement[0]
+        .querySelector(RIGHT_SELECTORS);
 
-		if (leftIcon) {
-			tElement.addClass('md-icon-left');
-		}
-		if (rightIcon) {
-			tElement.addClass('md-icon-right');
-		}
+        if (leftIcon) {
+            tElement.addClass('md-icon-left');
+        }
+        if (rightIcon) {
+            tElement.addClass('md-icon-right');
+        }
 
-		return function postLink(scope, element) {
-			$mdTheming(element);
-		};
-	}
+        return function postLink(scope, element) {
+            $mdTheming(element);
+        };
+    }
 
-	return {
-		restrict : 'C',
-		compile : compile
-	};
+    return {
+        restrict : 'C',
+        compile : compile
+    };
 });
 
 /*
@@ -5402,17 +6146,17 @@ angular.module('am-wb-core')
  * ```
  */
 .directive('wbOnError', function() {
-	return {
-		restrict : 'A',
-		link : function(scope, element, attrs) {
-			element.bind('error', function() {
-				// call the function that was passed
-				if (attrs.wbOnError) {
-					scope.$apply(attrs.wbOnError);
-				}
-			});
-		}
-	};
+    return {
+        restrict : 'A',
+        link : function(scope, element, attrs) {
+            element.bind('error', function() {
+                // call the function that was passed
+                if (attrs.wbOnError) {
+                    scope.$apply(attrs.wbOnError);
+                }
+            });
+        }
+    };
 });
 
 /*
@@ -5501,21 +6245,21 @@ angular.module('am-wb-core')
  * ```
  */
 .directive('wbOnLoad', function() {
-	return {
-		restrict : 'A',
-		link : function(scope, element, attrs) {
-			element.bind('load', function(event, data) {
-				// call the function that was passed
-				if (attrs.wbOnLoad) {
-					scope.$eval(attrs.wbOnLoad, {
-					    $event: event,
-					    $element: element,
-					    $data: data
-					});
-				}
-			});
-		}
-	};
+    return {
+        restrict : 'A',
+        link : function(scope, element, attrs) {
+            element.bind('load', function(event, data) {
+                // call the function that was passed
+                if (attrs.wbOnLoad) {
+                    scope.$eval(attrs.wbOnLoad, {
+                        $event: event,
+                        $element: element,
+                        $data: data
+                    });
+                }
+            });
+        }
+    };
 });
 
 /* 
@@ -5658,86 +6402,86 @@ angular.module('am-wb-core')
  */
 .directive('wbSettingPanelGroup', function($settings, $widget) {
 
-	/**
-	 * Init settings
-	 */
-	function postLink($scope, $element, $attrs, $ctrls) {
+    /**
+     * Init settings
+     */
+    function postLink($scope, $element, $attrs, $ctrls) {
 
-		// Load ngModel
-		var ngModelCtrl = $ctrls[0];
-		var settingMap = [];
-		$scope.settings = [];
+        // Load ngModel
+        var ngModelCtrl = $ctrls[0];
+        var settingMap = [];
+        $scope.settings = [];
 
-		/**
-		 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-		 * 
-		 * @returns
-		 */
-		function loadSetting(wbWidget) {
+        /**
+         * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+         * 
+         * @returns
+         */
+        function loadSetting(wbWidget) {
 
-			// hide all settings
-			var i;
-			for(i = 0; i < $scope.settings.length; i++){
-				$scope.settings[i].visible = false;
-			}
-			
-			if(!wbWidget || (angular.isArray(wbWidget) && wbWidget.length < 1)){
-			    $scope.wbModel = null;
-			    return;
-			}
+            // hide all settings
+            var i;
+            for(i = 0; i < $scope.settings.length; i++){
+                $scope.settings[i].visible = false;
+            }
 
-			// load pages
-			var widget = $widget.getWidget(wbWidget.getModel());
-			var settingKeys = $settings.getSettingsFor(widget);
+            if(!wbWidget || (angular.isArray(wbWidget) && wbWidget.length < 1)){
+                $scope.wbModel = null;
+                return;
+            }
 
-			// visible new ones
-			for(i = 0; i < settingKeys.length; i++){
-				var key = settingKeys[i].type;
-				if(!settingMap[key]){
-					var setting = settingKeys[i];
-					settingMap[key] = angular.copy(setting);
-					$scope.settings.push(settingMap[key]);
-				}
-				settingMap[key].visible = true;
-			}
-			
-			// set model in view
-			$scope.wbModel = wbWidget;
-		}
+            // load pages
+            var widget = $widget.getWidget(wbWidget.getModel());
+            var settingKeys = $settings.getSettingsFor(widget);
 
-		ngModelCtrl.$render = function() {
-			if(ngModelCtrl.$viewValue) {
-				var model = ngModelCtrl.$viewValue;
-				if(angular.isArray(model) && model.length){
-					loadSetting(model[0]);
-				} else {
-					loadSetting(model);
-				}
-			}
-		};
-		
-		
-		$element.on('keypress keyup keydown paste copy', function(event){
-			event.stopPropagation();
-		});
-	}
-	
-	return {
-		restrict : 'E',
-		replace: true,
-		templateUrl: function($element, $attr){
-			var link = 'views/directives/wb-setting-panel-';
-			if(angular.isDefined($attr.wbTabMode)){
-				link += 'tabs.html';
-			} else {
-				link += 'expansion.html';
-			}
-			return link;
-		},
-		scope : {},
-		link : postLink,
-		require:['ngModel']
-	};
+            // visible new ones
+            for(i = 0; i < settingKeys.length; i++){
+                var key = settingKeys[i].type;
+                if(!settingMap[key]){
+                    var setting = settingKeys[i];
+                    settingMap[key] = angular.copy(setting);
+                    $scope.settings.push(settingMap[key]);
+                }
+                settingMap[key].visible = true;
+            }
+
+            // set model in view
+            $scope.wbModel = wbWidget;
+        }
+
+        ngModelCtrl.$render = function() {
+            if(ngModelCtrl.$viewValue) {
+                var model = ngModelCtrl.$viewValue;
+                if(angular.isArray(model) && model.length){
+                    loadSetting(model[0]);
+                } else {
+                    loadSetting(model);
+                }
+            }
+        };
+
+
+        $element.on('keypress keyup keydown paste copy', function(event){
+            event.stopPropagation();
+        });
+    }
+
+    return {
+        restrict : 'E',
+        replace: true,
+        templateUrl: function($element, $attr){
+            var link = 'views/directives/wb-setting-panel-';
+            if(angular.isDefined($attr.wbTabMode)){
+                link += 'tabs.html';
+            } else {
+                link += 'expansion.html';
+            }
+            return link;
+        },
+        scope : {},
+        link : postLink,
+        require:['ngModel']
+    };
 });
 
 /* 
@@ -5788,72 +6532,72 @@ function wbUiSettingLinkFunction($scope, $element, $attrs, ctrls) {
     }
 }
 
-/*
- * link function of the number
- */
-function wbUiSettingNumberLinkFunction($scope, $element, $attrs, ctrls) {
-    wbUiSettingLinkFunction($scope, $element, $attrs, ctrls);
-    var ngModel = ctrls[0];
-
-    ngModel.$render = function () {
-        pars(ngModel.$modelValue);
-    };
-
-    // Add all length by default
-    $scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
-    $scope.extraValues = $scope.extraValues || [];
-    var types = $scope.extraValues;
-    if (types) { 
-        types = types.concat($scope.lengthValues);
-        if (types.includes('length')) {
-            var index = types.indexOf('length');
-            types.splice(index, 1);
-        }
-    } else {
-        types = $scope.lengthValues;
-    }
-
-    $scope.types = types;
-
-    function pars(value) {
-        if (!value) {
-            $scope.internalUnit = types[0];
-            $scope.internalValue = 0;
-        } else {
-            split(value);
-        }
-    }
-
-    $scope.updateLength = function(unit, value) {
-        if ($scope.lengthValues.includes(unit)) {
-            ngModel.$setViewValue(value+unit);
-        } else {
-            ngModel.$setViewValue(unit);
-        }
-    };
-
-    /*
-     * @param {type} val
-     * @returns {undefined}
-     * decsription  Splite value to 'unit' and 'value'
-     */
-    function split(val) {
-        if ($scope.extraValues.includes(val)) {
-            $scope.internalUnit = val;
-        } else {
-            /*
-             * A regex which groups the val into the value and unit(such as 10px -> 10 , px).
-             * This regex also support signed float format such as (+10.75%, -100.76em)
-             */
-            var regex = /^([+-]?\d+\.?\d*)([a-zA-Z%]*)$/;
-            var matches = regex.exec(val);
-            if(angular.isArray(matches)){
-                $scope.internalValue = Number(matches[1]);
-                $scope.internalUnit = matches[2];
-            }
-        }
-    }
-}
+///*
+// * link function of the number
+// */
+//function wbUiSettingNumberLinkFunction($scope, $element, $attrs, ctrls) {
+//    wbUiSettingLinkFunction($scope, $element, $attrs, ctrls);
+//    var ngModel = ctrls[0];
+//
+//    ngModel.$render = function () {
+//        pars(ngModel.$modelValue);
+//    };
+//
+//    // Add all length by default
+//    $scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
+//    $scope.extraValues = $scope.extraValues || [];
+//    var types = $scope.extraValues;
+//    if (types) { 
+//        types = types.concat($scope.lengthValues);
+//        if (types.includes('length')) {
+//            var index = types.indexOf('length');
+//            types.splice(index, 1);
+//        }
+//    } else {
+//        types = $scope.lengthValues;
+//    }
+//
+//    $scope.types = types;
+//
+//    function pars(value) {
+//        if (!value) {
+//            $scope.internalUnit = types[0];
+//            $scope.internalValue = 0;
+//        } else {
+//            split(value);
+//        }
+//    }
+//
+//    $scope.updateLength = function(unit, value) {
+//        if ($scope.lengthValues.includes(unit)) {
+//            ngModel.$setViewValue(value+unit);
+//        } else {
+//            ngModel.$setViewValue(unit);
+//        }
+//    };
+//
+//    /*
+//     * @param {type} val
+//     * @returns {undefined}
+//     * decsription  Splite value to 'unit' and 'value'
+//     */
+//    function split(val) {
+//        if ($scope.extraValues.includes(val)) {
+//            $scope.internalUnit = val;
+//        } else {
+//            /*
+//             * A regex which groups the val into the value and unit(such as 10px -> 10 , px).
+//             * This regex also support signed float format such as (+10.75%, -100.76em)
+//             */
+//            var regex = /^([+-]?\d+\.?\d*)([a-zA-Z%]*)$/;
+//            var matches = regex.exec(val);
+//            if(angular.isArray(matches)){
+//                $scope.internalValue = Number(matches[1]);
+//                $scope.internalUnit = matches[2];
+//            }
+//        }
+//    }
+//}
 
 angular.module('am-wb-core')
 
@@ -6140,7 +6884,7 @@ angular.module('am-wb-core')
  * This is widgets explorer list.
  * 
  */
-.directive('wbWidgetsList', function($window, $widget) {
+.directive('wbWidgetsList', function($window) {
 
     return {
         templateUrl : 'views/directives/wb-widgets-list.html',
@@ -6201,7 +6945,7 @@ angular.module('am-wb-core')
  * This is widgets explorer list.
  * 
  */
-.directive('wbWidgetsModule', function($window, $widget) {
+.directive('wbWidgetsModule', function($window) {
 
     return {
         templateUrl : 'views/directives/wb-widgets-module.html',
@@ -6337,474 +7081,465 @@ angular.module('am-wb-core')
  **/
 .directive('mdExpansionPanel', function() {
 
-	"use strict";
-	var ANIMATION_TIME = 180; //ms
-
-
-
-
-	function compile(tElement, tAttrs) {
-		var INVALID_PREFIX = 'Invalid HTML for md-expansion-panel: ';
-
-		tElement.attr('tabindex', tAttrs.tabindex || '0');
-
-		if (tElement[0].querySelector('md-expansion-panel-collapsed') === null) {
-			throw Error(INVALID_PREFIX + 'Expected a child element of `md-epxansion-panel-collapsed`');
-		}
-		if (tElement[0].querySelector('md-expansion-panel-expanded') === null) {
-			throw Error(INVALID_PREFIX + 'Expected a child element of `md-epxansion-panel-expanded`');
-		}
-
-		return function postLink(scope, element, attrs, ctrls) {
-			var epxansionPanelCtrl = ctrls[0];
-			var epxansionPanelGroupCtrl = ctrls[1];
-
-			epxansionPanelCtrl.epxansionPanelGroupCtrl = epxansionPanelGroupCtrl || undefined;
-			epxansionPanelCtrl.init();
-		};
-	}
-
-
-
-
-	function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q, $animate, $parse) {
-		/* jshint validthis: true */
-		var vm = this;
-
-		var collapsedCtrl;
-		var expandedCtrl;
-		var headerCtrl;
-		var footerCtrl;
-		var deregister;
-		var scrollContainer;
-		var topKiller;
-		var resizeKiller;
-		var onRemoveCallback;
-		var transformParent;
-		var backdrop;
-		var inited = false;
-		var registerOnInit = false;
-		var _isOpen = false;
-		var isDisabled = false;
-		var debouncedUpdateScroll = $$rAF.throttle(updateScroll);
-		var debouncedUpdateResize = $$rAF.throttle(updateResize);
-
-		vm.registerCollapsed = function (ctrl) {
-			collapsedCtrl = ctrl;
-		};
-		vm.registerExpanded = function (ctrl) {
-			expandedCtrl = ctrl;
-		};
-		vm.registerHeader = function (ctrl) {
-			headerCtrl = ctrl;
-		};
-		vm.registerFooter = function (ctrl) {
-			footerCtrl = ctrl;
-		};
-
-
-
-		if ($attrs.mdComponentId === undefined) {
-			$attrs.$set('mdComponentId', '_expansion_panel_id_' + $mdUtil.nextUid());
-			registerPanel();
-		} else {
-			$attrs.$observe('mdComponentId', function () {
-				registerPanel();
-			});
-		}
-
-		vm.$element = $element;
-		vm.expand = expand;
-		vm.collapse = collapse;
-		vm.remove = remove;
-		vm.destroy = destroy;
-		vm.onRemove = onRemove;
-		vm.init = init;
-
-		if ($attrs.ngDisabled !== undefined) {
-			$scope.$watch($attrs.ngDisabled, function (value) {
-				isDisabled = value;
-				$element.attr('tabindex', isDisabled ? -1 : 0);
-			});
-		} else if ($attrs.disabled !== undefined) {
-			isDisabled = ($attrs.disabled !== undefined && $attrs.disabled !== 'false' && $attrs.disabled !== false);
-			$element.attr('tabindex', isDisabled ? -1 : 0);
-		}
-
-		$element
-		.on('focus', function (ev) {
-			$element.on('keydown', handleKeypress);
-		})
-		.on('blur', function (ev) {
-			$element.off('keydown', handleKeypress);
-		});
-
-		$element.addClass('md-whiteframe-1dp');
-
-		function handleKeypress(ev) {
-			var keyCodes = $mdConstant.KEY_CODE;
-			switch (ev.keyCode) {
-			case keyCodes.ENTER:
-				expand();
-				break;
-			case keyCodes.ESCAPE:
-				collapse();
-				break;
-			}
-		}
-
-
-		$scope.$panel = {
-				collapse: collapse,
-				expand: expand,
-				remove: remove,
-				isOpen: isOpen
-		};
-
-		$scope.$on('$destroy', function () {
-			removeClickCatcher();
-
-			// remove component from registry
-			if (typeof deregister === 'function') {
-				deregister();
-				deregister = undefined;
-			}
-			killEvents();
-		});
-
-
-
-
-
-		function init() {
-			inited = true;
-			if (registerOnInit === true) {
-				registerPanel();
-			}
-		}
-
-
-		function registerPanel() {
-			if (inited === false) {
-				registerOnInit = true;
-				return;
-			}
-
-			// deregister if component was already registered
-			if (typeof deregister === 'function') {
-				deregister();
-				deregister = undefined;
-			}
-			// remove component from group ctrl if component was already added
-			if (vm.componentId && vm.epxansionPanelGroupCtrl) {
-				vm.epxansionPanelGroupCtrl.removePanel(vm.componentId);
-			}
-
-			// if componentId was removed then set one
-			if ($attrs.mdComponentId === undefined) {
-				$attrs.$set('mdComponentId', '_expansion_panel_id_' + $mdUtil.nextUid());
-			}
-
-			vm.componentId = $attrs.mdComponentId;
-			deregister = $mdComponentRegistry.register({
-				expand: expand,
-				collapse: collapse,
-				remove: remove,
-				onRemove: onRemove,
-				isOpen: isOpen,
-				addClickCatcher: addClickCatcher,
-				removeClickCatcher: removeClickCatcher,
-				componentId: $attrs.mdComponentId
-			}, $attrs.mdComponentId);
-
-			if (vm.epxansionPanelGroupCtrl) {
-				vm.epxansionPanelGroupCtrl.addPanel(vm.componentId, {
-					expand: expand,
-					collapse: collapse,
-					remove: remove,
-					onRemove: onRemove,
-					destroy: destroy,
-					isOpen: isOpen
-				});
-			}
-		}
-
-
-		function isOpen() {
-			return _isOpen;
-		}
-
-		function expand(options) {
-			if (_isOpen === true || isDisabled === true) {
-				return;
-			}
-			_isOpen = true;
-			options = options || {};
-
-			var deferred = $q.defer();
-
-			if (vm.epxansionPanelGroupCtrl) {
-				vm.epxansionPanelGroupCtrl.expandPanel(vm.componentId);
-			}
-
-			$element.removeClass('md-close');
-			$element.addClass('md-open');
-			if (options.animation === false) {
-				$element.addClass('md-no-animation');
-			} else {
-				$element.removeClass('md-no-animation');
-			}
-
-			initEvents();
-			collapsedCtrl.hide(options);
-			expandedCtrl.show(options);
-
-			if (headerCtrl) {
-				headerCtrl.show(options);
-			}
-			if (footerCtrl) {
-				footerCtrl.show(options);
-			}
-
-			$timeout(function () {
-				deferred.resolve();
-			}, options.animation === false ? 0 : ANIMATION_TIME);
-			return deferred.promise;
-		}
-
-
-		function collapse(options) {
-			if (_isOpen === false) {
-				return;
-			}
-			_isOpen = false;
-			options = options || {};
-
-			var deferred = $q.defer();
-
-			$element.addClass('md-close');
-			$element.removeClass('md-open');
-			if (options.animation === false) {
-				$element.addClass('md-no-animation');
-			} else {
-				$element.removeClass('md-no-animation');
-			}
-
-			killEvents();
-			collapsedCtrl.show(options);
-			expandedCtrl.hide(options);
-
-			if (headerCtrl) {
-				headerCtrl.hide(options);
-			}
-			if (footerCtrl) {
-				footerCtrl.hide(options);
-			}
-
-			$timeout(function () {
-				deferred.resolve();
-			}, options.animation === false ? 0 : ANIMATION_TIME);
-			return deferred.promise;
-		}
-
-
-		function remove(options) {
-			options = options || {};
-			var deferred = $q.defer();
-
-			if (vm.epxansionPanelGroupCtrl) {
-				vm.epxansionPanelGroupCtrl.removePanel(vm.componentId);
-			}
-
-			if (typeof deregister === 'function') {
-				deregister();
-				deregister = undefined;
-			}
-
-			if (options.animation === false || _isOpen === false) {
-				$scope.$destroy();
-				$element.remove();
-				deferred.resolve();
-				callbackRemove();
-			} else {
-				collapse();
-				$timeout(function () {
-					$scope.$destroy();
-					$element.remove();
-					deferred.resolve();
-					callbackRemove();
-				}, ANIMATION_TIME);
-			}
-
-			return deferred.promise;
-		}
-
-		function onRemove(callback) {
-			onRemoveCallback = callback;
-		}
-
-		function callbackRemove() {
-			if (typeof onRemoveCallback === 'function') {
-				onRemoveCallback();
-				onRemoveCallback = undefined;
-			}
-		}
-
-		function destroy() {
-			$scope.$destroy();
-		}
-
-
-
-		function initEvents() {
-			if ((!footerCtrl || footerCtrl.noSticky === true) && (!headerCtrl || headerCtrl.noSticky === true)) {
-				return;
-			}
-
-			// watch for panel position changes
-			topKiller = $scope.$watch(function () {
-				return $element[0].offsetTop;
-			}, debouncedUpdateScroll, true);
-
-			// watch for panel position changes
-			resizeKiller = $scope.$watch(function () {
-				return $element[0].offsetWidth;
-			}, debouncedUpdateResize, true);
-
-			// listen to md-content scroll events id we are nested in one
-			scrollContainer = $mdUtil.getNearestContentElement($element);
-			if (scrollContainer.nodeName === 'MD-CONTENT') {
-				transformParent = getTransformParent(scrollContainer);
-				angular.element(scrollContainer).on('scroll', debouncedUpdateScroll);
-			} else {
-				transformParent = undefined;
-			}
-
-			// listen to expanded content scroll if height is set
-			if (expandedCtrl.setHeight === true) {
-				expandedCtrl.$element.on('scroll', debouncedUpdateScroll);
-			}
-
-			// listen to window scroll events
-			angular.element($window)
-			.on('scroll', debouncedUpdateScroll)
-			.on('resize', debouncedUpdateScroll)
-			.on('resize', debouncedUpdateResize);
-		}
-
-
-		function killEvents() {
-			if (typeof topKiller === 'function') {
-				topKiller();
-				topKiller = undefined;
-			}
-
-			if (typeof resizeKiller === 'function') {
-				resizeKiller();
-				resizeKiller = undefined;
-			}
-
-			if (scrollContainer && scrollContainer.nodeName === 'MD-CONTENT') {
-				angular.element(scrollContainer).off('scroll', debouncedUpdateScroll);
-			}
-
-			if (expandedCtrl.setHeight === true) {
-				expandedCtrl.$element.off('scroll', debouncedUpdateScroll);
-			}
-
-			angular.element($window)
-			.off('scroll', debouncedUpdateScroll)
-			.off('resize', debouncedUpdateScroll)
-			.off('resize', debouncedUpdateResize);
-		}
-
-
-
-		function getTransformParent(el) {
-			var parent = el.parentNode;
-
-			while (parent && parent !== document) {
-				if (hasComputedStyle(parent, 'transform')) {
-					return parent;
-				}
-				parent = parent.parentNode;
-			}
-
-			return undefined;
-		}
-
-		function hasComputedStyle(target, key) {
-			var hasValue = false;
-
-			if (target) {
-				var computedStyles = $window.getComputedStyle(target);
-				hasValue = computedStyles[key] !== undefined && computedStyles[key] !== 'none';
-			}
-
-			return hasValue;
-		}
-
-
-		function updateScroll(e) {
-			var top;
-			var bottom;
-			var bounds;
-			if (expandedCtrl.setHeight === true) {
-				bounds = expandedCtrl.$element[0].getBoundingClientRect();
-			} else {
-				bounds = scrollContainer.getBoundingClientRect();
-			}
-			var transformTop = transformParent ? transformParent.getBoundingClientRect().top : 0;
-
-			// we never want the header going post the top of the page. to prevent this don't allow top to go below 0
-			top = Math.max(bounds.top, 0);
-			bottom = top + bounds.height;
-
-			if (footerCtrl && footerCtrl.noSticky === false) {
-				footerCtrl.onScroll(top, bottom, transformTop);
-			}
-			if (headerCtrl && headerCtrl.noSticky === false) {
-				headerCtrl.onScroll(top, bottom, transformTop);
-			}
-		}
-
-
-		function updateResize() {
-			var value = $element[0].offsetWidth;
-			if (footerCtrl && footerCtrl.noSticky === false) {
-				footerCtrl.onResize(value);
-			}
-			if (headerCtrl && headerCtrl.noSticky === false) {
-				headerCtrl.onResize(value);
-			}
-		}
-
-
-
-
-		function addClickCatcher(clickCallback) {
-			backdrop = $mdUtil.createBackdrop($scope);
-			backdrop[0].tabIndex = -1;
-
-			if (typeof clickCallback === 'function') {
-				backdrop.on('click', clickCallback);
-			}
-
-			$animate.enter(backdrop, $element.parent(), null, {duration: 0});
-			$element.css('z-index', 60);
-		}
-
-		function removeClickCatcher() {
-			if (backdrop) {
-				backdrop.remove();
-				backdrop.off('click');
-				backdrop = undefined;
-				$element.css('z-index', '');
-			}
-		}
-	}
-	
-	
+    'use strict';
+    var ANIMATION_TIME = 180; //ms
+
+    function compile(tElement, tAttrs) {
+        var INVALID_PREFIX = 'Invalid HTML for md-expansion-panel: ';
+
+        tElement.attr('tabindex', tAttrs.tabindex || '0');
+
+        if (tElement[0].querySelector('md-expansion-panel-collapsed') === null) {
+            throw Error(INVALID_PREFIX + 'Expected a child element of `md-epxansion-panel-collapsed`');
+        }
+        if (tElement[0].querySelector('md-expansion-panel-expanded') === null) {
+            throw Error(INVALID_PREFIX + 'Expected a child element of `md-epxansion-panel-expanded`');
+        }
+
+        return function postLink(scope, element, attrs, ctrls) {
+            var epxansionPanelCtrl = ctrls[0];
+            var epxansionPanelGroupCtrl = ctrls[1];
+
+            epxansionPanelCtrl.epxansionPanelGroupCtrl = epxansionPanelGroupCtrl || undefined;
+            epxansionPanelCtrl.init();
+        };
+    }
+
+
+    function controller($scope, $element, $attrs, $window, $$rAF, $mdConstant, $mdUtil, $mdComponentRegistry, $timeout, $q, $animate) {
+        /* jshint validthis: true */
+        var vm = this;
+
+        var collapsedCtrl;
+        var expandedCtrl;
+        var headerCtrl;
+        var footerCtrl;
+        var deregister;
+        var scrollContainer;
+        var topKiller;
+        var resizeKiller;
+        var onRemoveCallback;
+        var transformParent;
+        var backdrop;
+        var inited = false;
+        var registerOnInit = false;
+        var _isOpen = false;
+        var isDisabled = false;
+        var debouncedUpdateScroll = $$rAF.throttle(updateScroll);
+        var debouncedUpdateResize = $$rAF.throttle(updateResize);
+
+        vm.registerCollapsed = function (ctrl) {
+            collapsedCtrl = ctrl;
+        };
+        vm.registerExpanded = function (ctrl) {
+            expandedCtrl = ctrl;
+        };
+        vm.registerHeader = function (ctrl) {
+            headerCtrl = ctrl;
+        };
+        vm.registerFooter = function (ctrl) {
+            footerCtrl = ctrl;
+        };
+
+
+
+        if ($attrs.mdComponentId === undefined) {
+            $attrs.$set('mdComponentId', '_expansion_panel_id_' + $mdUtil.nextUid());
+            registerPanel();
+        } else {
+            $attrs.$observe('mdComponentId', function () {
+                registerPanel();
+            });
+        }
+
+        vm.$element = $element;
+        vm.expand = expand;
+        vm.collapse = collapse;
+        vm.remove = remove;
+        vm.destroy = destroy;
+        vm.onRemove = onRemove;
+        vm.init = init;
+
+        if ($attrs.ngDisabled !== undefined) {
+            $scope.$watch($attrs.ngDisabled, function (value) {
+                isDisabled = value;
+                $element.attr('tabindex', isDisabled ? -1 : 0);
+            });
+        } else if ($attrs.disabled !== undefined) {
+            isDisabled = ($attrs.disabled !== undefined && $attrs.disabled !== 'false' && $attrs.disabled !== false);
+            $element.attr('tabindex', isDisabled ? -1 : 0);
+        }
+
+        $element
+        .on('focus', function (/*ev*/) {
+            $element.on('keydown', handleKeypress);
+        })
+        .on('blur', function (/*ev*/) {
+            $element.off('keydown', handleKeypress);
+        });
+
+        $element.addClass('md-whiteframe-1dp');
+
+        function handleKeypress(ev) {
+            var keyCodes = $mdConstant.KEY_CODE;
+            switch (ev.keyCode) {
+            case keyCodes.ENTER:
+                expand();
+                break;
+            case keyCodes.ESCAPE:
+                collapse();
+                break;
+            }
+        }
+
+
+        $scope.$panel = {
+                collapse: collapse,
+                expand: expand,
+                remove: remove,
+                isOpen: isOpen
+        };
+
+        $scope.$on('$destroy', function () {
+            removeClickCatcher();
+
+            // remove component from registry
+            if (typeof deregister === 'function') {
+                deregister();
+                deregister = undefined;
+            }
+            killEvents();
+        });
+
+
+
+
+
+        function init() {
+            inited = true;
+            if (registerOnInit === true) {
+                registerPanel();
+            }
+        }
+
+
+        function registerPanel() {
+            if (inited === false) {
+                registerOnInit = true;
+                return;
+            }
+
+            // deregister if component was already registered
+            if (typeof deregister === 'function') {
+                deregister();
+                deregister = undefined;
+            }
+            // remove component from group ctrl if component was already added
+            if (vm.componentId && vm.epxansionPanelGroupCtrl) {
+                vm.epxansionPanelGroupCtrl.removePanel(vm.componentId);
+            }
+
+            // if componentId was removed then set one
+            if ($attrs.mdComponentId === undefined) {
+                $attrs.$set('mdComponentId', '_expansion_panel_id_' + $mdUtil.nextUid());
+            }
+
+            vm.componentId = $attrs.mdComponentId;
+            deregister = $mdComponentRegistry.register({
+                expand: expand,
+                collapse: collapse,
+                remove: remove,
+                onRemove: onRemove,
+                isOpen: isOpen,
+                addClickCatcher: addClickCatcher,
+                removeClickCatcher: removeClickCatcher,
+                componentId: $attrs.mdComponentId
+            }, $attrs.mdComponentId);
+
+            if (vm.epxansionPanelGroupCtrl) {
+                vm.epxansionPanelGroupCtrl.addPanel(vm.componentId, {
+                    expand: expand,
+                    collapse: collapse,
+                    remove: remove,
+                    onRemove: onRemove,
+                    destroy: destroy,
+                    isOpen: isOpen
+                });
+            }
+        }
+
+
+        function isOpen() {
+            return _isOpen;
+        }
+
+        function expand(options) {
+            if (_isOpen === true || isDisabled === true) {
+                return;
+            }
+            _isOpen = true;
+            options = options || {};
+
+            var deferred = $q.defer();
+
+            if (vm.epxansionPanelGroupCtrl) {
+                vm.epxansionPanelGroupCtrl.expandPanel(vm.componentId);
+            }
+
+            $element.removeClass('md-close');
+            $element.addClass('md-open');
+            if (options.animation === false) {
+                $element.addClass('md-no-animation');
+            } else {
+                $element.removeClass('md-no-animation');
+            }
+
+            initEvents();
+            collapsedCtrl.hide(options);
+            expandedCtrl.show(options);
+
+            if (headerCtrl) {
+                headerCtrl.show(options);
+            }
+            if (footerCtrl) {
+                footerCtrl.show(options);
+            }
+
+            $timeout(function () {
+                deferred.resolve();
+            }, options.animation === false ? 0 : ANIMATION_TIME);
+            return deferred.promise;
+        }
+
+
+        function collapse(options) {
+            if (_isOpen === false) {
+                return;
+            }
+            _isOpen = false;
+            options = options || {};
+
+            var deferred = $q.defer();
+
+            $element.addClass('md-close');
+            $element.removeClass('md-open');
+            if (options.animation === false) {
+                $element.addClass('md-no-animation');
+            } else {
+                $element.removeClass('md-no-animation');
+            }
+
+            killEvents();
+            collapsedCtrl.show(options);
+            expandedCtrl.hide(options);
+
+            if (headerCtrl) {
+                headerCtrl.hide(options);
+            }
+            if (footerCtrl) {
+                footerCtrl.hide(options);
+            }
+
+            $timeout(function () {
+                deferred.resolve();
+            }, options.animation === false ? 0 : ANIMATION_TIME);
+            return deferred.promise;
+        }
+
+
+        function remove(options) {
+            options = options || {};
+            var deferred = $q.defer();
+
+            if (vm.epxansionPanelGroupCtrl) {
+                vm.epxansionPanelGroupCtrl.removePanel(vm.componentId);
+            }
+
+            if (typeof deregister === 'function') {
+                deregister();
+                deregister = undefined;
+            }
+
+            if (options.animation === false || _isOpen === false) {
+                $scope.$destroy();
+                $element.remove();
+                deferred.resolve();
+                callbackRemove();
+            } else {
+                collapse();
+                $timeout(function () {
+                    $scope.$destroy();
+                    $element.remove();
+                    deferred.resolve();
+                    callbackRemove();
+                }, ANIMATION_TIME);
+            }
+
+            return deferred.promise;
+        }
+
+        function onRemove(callback) {
+            onRemoveCallback = callback;
+        }
+
+        function callbackRemove() {
+            if (typeof onRemoveCallback === 'function') {
+                onRemoveCallback();
+                onRemoveCallback = undefined;
+            }
+        }
+
+        function destroy() {
+            $scope.$destroy();
+        }
+
+
+
+        function initEvents() {
+            if ((!footerCtrl || footerCtrl.noSticky === true) && (!headerCtrl || headerCtrl.noSticky === true)) {
+                return;
+            }
+
+            // watch for panel position changes
+            topKiller = $scope.$watch(function () {
+                return $element[0].offsetTop;
+            }, debouncedUpdateScroll, true);
+
+            // watch for panel position changes
+            resizeKiller = $scope.$watch(function () {
+                return $element[0].offsetWidth;
+            }, debouncedUpdateResize, true);
+
+            // listen to md-content scroll events id we are nested in one
+            scrollContainer = $mdUtil.getNearestContentElement($element);
+            if (scrollContainer.nodeName === 'MD-CONTENT') {
+                transformParent = getTransformParent(scrollContainer);
+                angular.element(scrollContainer).on('scroll', debouncedUpdateScroll);
+            } else {
+                transformParent = undefined;
+            }
+
+            // listen to expanded content scroll if height is set
+            if (expandedCtrl.setHeight === true) {
+                expandedCtrl.$element.on('scroll', debouncedUpdateScroll);
+            }
+
+            // listen to window scroll events
+            angular.element($window)
+            .on('scroll', debouncedUpdateScroll)
+            .on('resize', debouncedUpdateScroll)
+            .on('resize', debouncedUpdateResize);
+        }
+
+
+        function killEvents() {
+            if (typeof topKiller === 'function') {
+                topKiller();
+                topKiller = undefined;
+            }
+
+            if (typeof resizeKiller === 'function') {
+                resizeKiller();
+                resizeKiller = undefined;
+            }
+
+            if (scrollContainer && scrollContainer.nodeName === 'MD-CONTENT') {
+                angular.element(scrollContainer).off('scroll', debouncedUpdateScroll);
+            }
+
+            if (expandedCtrl.setHeight === true) {
+                expandedCtrl.$element.off('scroll', debouncedUpdateScroll);
+            }
+
+            angular.element($window)
+            .off('scroll', debouncedUpdateScroll)
+            .off('resize', debouncedUpdateScroll)
+            .off('resize', debouncedUpdateResize);
+        }
+
+
+
+        function getTransformParent(el) {
+            var parent = el.parentNode;
+
+            while (parent && parent !== document) {
+                if (hasComputedStyle(parent, 'transform')) {
+                    return parent;
+                }
+                parent = parent.parentNode;
+            }
+
+            return undefined;
+        }
+
+        function hasComputedStyle(target, key) {
+            var hasValue = false;
+
+            if (target) {
+                var computedStyles = $window.getComputedStyle(target);
+                hasValue = computedStyles[key] !== undefined && computedStyles[key] !== 'none';
+            }
+
+            return hasValue;
+        }
+
+
+        function updateScroll(/*e*/) {
+            var top;
+            var bottom;
+            var bounds;
+            if (expandedCtrl.setHeight === true) {
+                bounds = expandedCtrl.$element[0].getBoundingClientRect();
+            } else {
+                bounds = scrollContainer.getBoundingClientRect();
+            }
+            var transformTop = transformParent ? transformParent.getBoundingClientRect().top : 0;
+
+            // we never want the header going post the top of the page. to prevent this don't allow top to go below 0
+            top = Math.max(bounds.top, 0);
+            bottom = top + bounds.height;
+
+            if (footerCtrl && footerCtrl.noSticky === false) {
+                footerCtrl.onScroll(top, bottom, transformTop);
+            }
+            if (headerCtrl && headerCtrl.noSticky === false) {
+                headerCtrl.onScroll(top, bottom, transformTop);
+            }
+        }
+
+        function updateResize() {
+            var value = $element[0].offsetWidth;
+            if (footerCtrl && footerCtrl.noSticky === false) {
+                footerCtrl.onResize(value);
+            }
+            if (headerCtrl && headerCtrl.noSticky === false) {
+                headerCtrl.onResize(value);
+            }
+        }
+
+        function addClickCatcher(clickCallback) {
+            backdrop = $mdUtil.createBackdrop($scope);
+            backdrop[0].tabIndex = -1;
+
+            if (typeof clickCallback === 'function') {
+                backdrop.on('click', clickCallback);
+            }
+
+            $animate.enter(backdrop, $element.parent(), null, {duration: 0});
+            $element.css('z-index', 60);
+        }
+
+        function removeClickCatcher() {
+            if (backdrop) {
+                backdrop.remove();
+                backdrop.off('click');
+                backdrop = undefined;
+                $element.css('z-index', '');
+            }
+        }
+    }
+
+
 
     return {
         restrict: 'E',
@@ -7199,181 +7934,176 @@ angular.module('am-wb-core')
  * });
  */
 .factory('$mdExpansionPanelGroup', function ($mdComponentRegistry, $mdUtil, $mdExpansionPanel, $templateRequest, $rootScope, $compile, $controller, $q, $log) {
-	var errorMsg = "ExpansionPanelGroup '{0}' is not available! Did you use md-component-id='{0}'?";
-	var service = {
-			find: findInstance,
-			waitFor: waitForInstance
-	};
+    var errorMsg = 'ExpansionPanelGroup "{0}" is not available! Did you use md-component-id="{0}"?';
+    var service = {
+            find: findInstance,
+            waitFor: waitForInstance
+    };
 
-	return function (handle) {
-		if (handle === undefined) { return service; }
-		return findInstance(handle);
-	};
-
-
-
-	function findInstance(handle) {
-		var instance = $mdComponentRegistry.get(handle);
-
-		if (!instance) {
-			// Report missing instance
-			$log.error( $mdUtil.supplant(errorMsg, [handle || ""]) );
-			return undefined;
-		}
-
-		return createGroupInstance(instance);
-	}
-
-	function waitForInstance(handle) {
-		var deffered = $q.defer();
-
-		$mdComponentRegistry.when(handle).then(function (instance) {
-			deffered.resolve(createGroupInstance(instance));
-		}).catch(function (error) {
-			deffered.reject();
-			$log.error(error);
-		});
-
-		return deffered.promise;
-	}
+    return function (handle) {
+        if (handle === undefined) { return service; }
+        return findInstance(handle);
+    };
 
 
 
+    function findInstance(handle) {
+        var instance = $mdComponentRegistry.get(handle);
 
+        if (!instance) {
+            // Report missing instance
+            $log.error( $mdUtil.supplant(errorMsg, [handle || '']) );
+            return undefined;
+        }
 
-	// --- returned service for group instance ---
+        return createGroupInstance(instance);
+    }
 
-	function createGroupInstance(instance) {
-		var service = {
-				add: add,
-				register: register,
-				getAll: getAll,
-				getOpen: getOpen,
-				remove: remove,
-				removeAll: removeAll,
-				collapseAll: collapseAll,
-				onChange: onChange,
-				count: count
-		};
+    function waitForInstance(handle) {
+        var deffered = $q.defer();
 
-		return service;
+        $mdComponentRegistry.when(handle).then(function (instance) {
+            deffered.resolve(createGroupInstance(instance));
+        }).catch(function (error) {
+            deffered.reject();
+            $log.error(error);
+        });
 
-
-		function register(name, options) {
-			if (typeof name !== 'string') {
-				throw Error('$mdExpansionPanelGroup.register() Expects name to be a string');
-			}
-
-			validateOptions(options);
-			instance.register(name, options);
-		}
-
-		function remove(componentId, options) {
-			return instance.remove(componentId, options);
-		}
-
-		function removeAll(options) {
-			instance.removeAll(options);
-		}
-
-		function onChange(callback) {
-			return instance.onChange(callback);
-		}
-
-		function count() {
-			return instance.count();
-		}
-
-		function getAll() {
-			return instance.getAll();
-		}
-
-		function getOpen() {
-			return instance.getOpen();
-		}
-
-		function collapseAll(noAnimation) {
-			instance.collapseAll(noAnimation);
-		}
-
-
-		function add(options, locals) {
-			locals = locals || {};
-			// assume if options is a string then they are calling a registered card by its component id
-			if (typeof options === 'string') {
-				// call add panel with the stored options
-				return add(instance.getRegistered(options), locals);
-			}
-
-			validateOptions(options);
-			if (options.componentId && instance.isPanelActive(options.componentId)) {
-				return $q.reject('panel with componentId "' + options.componentId + '" is currently active');
-			}
-
-
-			var deffered = $q.defer();
-			var scope = $rootScope.$new();
-			angular.extend(scope, options.scope);
-
-			getTemplate(options, function (template) {
-				var element = angular.element(template);
-				var componentId = options.componentId || element.attr('md-component-id') || '_panelComponentId_' + $mdUtil.nextUid();
-				var panelPromise = $mdExpansionPanel().waitFor(componentId);
-				element.attr('md-component-id', componentId);
-
-				var linkFunc = $compile(element);
-				if (options.controller) {
-					angular.extend(locals, options.locals || {});
-					locals.$scope = scope;
-					locals.$panel = panelPromise;
-					var invokeCtrl = $controller(options.controller, locals, true);
-					var ctrl = invokeCtrl();
-					element.data('$ngControllerController', ctrl);
-					element.children().data('$ngControllerController', ctrl);
-					if (options.controllerAs) {
-						scope[options.controllerAs] = ctrl;
-					}
-				}
-
-				// link after the element is added so we can find card manager directive
-				instance.$element.append(element);
-				linkFunc(scope);
-
-				panelPromise.then(function (instance) {
-					deffered.resolve(instance);
-				});
-			});
-
-			return deffered.promise;
-		}
-
-
-		function validateOptions(options) {
-			if (typeof options !== 'object' || options === null) {
-				throw Error('$mdExapnsionPanelGroup.add()/.register() : Requires an options object to be passed in');
-			}
-
-			// if none of these exist then a dialog box cannot be created
-			if (!options.template && !options.templateUrl) {
-				throw Error('$mdExapnsionPanelGroup.add()/.register() : Is missing required paramters to create. Required One of the following: template, templateUrl');
-			}
-		}
+        return deffered.promise;
+    }
 
 
 
-		function getTemplate(options, callback) {
-			var template;
 
-			if (options.templateUrl !== undefined) {
-				$templateRequest(options.templateUrl)
-				.then(function(response) {
-					callback(response);
-				});
-			} else {
-				callback(options.template);
-			}
-		}
-	}
+
+    // --- returned service for group instance ---
+
+    function createGroupInstance(instance) {
+        var service = {
+                add: add,
+                register: register,
+                getAll: getAll,
+                getOpen: getOpen,
+                remove: remove,
+                removeAll: removeAll,
+                collapseAll: collapseAll,
+                onChange: onChange,
+                count: count
+        };
+
+        return service;
+
+
+        function register(name, options) {
+            if (typeof name !== 'string') {
+                throw Error('$mdExpansionPanelGroup.register() Expects name to be a string');
+            }
+
+            validateOptions(options);
+            instance.register(name, options);
+        }
+
+        function remove(componentId, options) {
+            return instance.remove(componentId, options);
+        }
+
+        function removeAll(options) {
+            instance.removeAll(options);
+        }
+
+        function onChange(callback) {
+            return instance.onChange(callback);
+        }
+
+        function count() {
+            return instance.count();
+        }
+
+        function getAll() {
+            return instance.getAll();
+        }
+
+        function getOpen() {
+            return instance.getOpen();
+        }
+
+        function collapseAll(noAnimation) {
+            instance.collapseAll(noAnimation);
+        }
+
+
+        function add(options, locals) {
+            locals = locals || {};
+            // assume if options is a string then they are calling a registered card by its component id
+            if (typeof options === 'string') {
+                // call add panel with the stored options
+                return add(instance.getRegistered(options), locals);
+            }
+
+            validateOptions(options);
+            if (options.componentId && instance.isPanelActive(options.componentId)) {
+                return $q.reject('panel with componentId "' + options.componentId + '" is currently active');
+            }
+
+
+            var deffered = $q.defer();
+            var scope = $rootScope.$new();
+            angular.extend(scope, options.scope);
+
+            getTemplate(options, function (template) {
+                var element = angular.element(template);
+                var componentId = options.componentId || element.attr('md-component-id') || '_panelComponentId_' + $mdUtil.nextUid();
+                var panelPromise = $mdExpansionPanel().waitFor(componentId);
+                element.attr('md-component-id', componentId);
+
+                var linkFunc = $compile(element);
+                if (options.controller) {
+                    angular.extend(locals, options.locals || {});
+                    locals.$scope = scope;
+                    locals.$panel = panelPromise;
+                    var invokeCtrl = $controller(options.controller, locals, true);
+                    var ctrl = invokeCtrl();
+                    element.data('$ngControllerController', ctrl);
+                    element.children().data('$ngControllerController', ctrl);
+                    if (options.controllerAs) {
+                        scope[options.controllerAs] = ctrl;
+                    }
+                }
+
+                // link after the element is added so we can find card manager directive
+                instance.$element.append(element);
+                linkFunc(scope);
+
+                panelPromise.then(function (instance) {
+                    deffered.resolve(instance);
+                });
+            });
+
+            return deffered.promise;
+        }
+
+        function validateOptions(options) {
+            if (typeof options !== 'object' || options === null) {
+                throw Error('$mdExapnsionPanelGroup.add()/.register() : Requires an options object to be passed in');
+            }
+
+            // if none of these exist then a dialog box cannot be created
+            if (!options.template && !options.templateUrl) {
+                throw Error('$mdExapnsionPanelGroup.add()/.register() : Is missing required paramters to create. Required One of the following: template, templateUrl');
+            }
+        }
+
+        function getTemplate(options, callback) {
+            if (options.templateUrl !== undefined) {
+                $templateRequest(options.templateUrl)
+                .then(function(response) {
+                    callback(response);
+                });
+            } else {
+                callback(options.template);
+            }
+        }
+    }
 });
 
 
@@ -7497,7 +8227,7 @@ angular.module('am-wb-core')
  * });
  */
 .factory('$mdExpansionPanel', function ($mdComponentRegistry, $mdUtil, $log) {
-	var errorMsg = "ExpansionPanel '{0}' is not available! Did you use md-component-id='{0}'?";
+	var errorMsg = 'ExpansionPanel "{0}" is not available! Did you use md-component-id="{0}"?';
 	var service = {
 			find: findInstance,
 			waitFor: waitForInstance
@@ -7515,7 +8245,7 @@ angular.module('am-wb-core')
 
 		if (!instance) {
 			// Report missing instance
-			$log.error( $mdUtil.supplant(errorMsg, [handle || ""]) );
+			$log.error( $mdUtil.supplant(errorMsg, [handle || '']) );
 			return undefined;
 		}
 
@@ -7554,366 +8284,366 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 .factory('WbDialogWindow', function($wbWindow, $document, $wbFloat) {
-	'use strict';
+    'use strict';
 
 
-	// Utils
-	function covertToFloadConfig(dialogWindow) {
-		var options = {
-				closeOnEscape: dialogWindow.closeOnEscape,
-				header: dialogWindow.isTitleVisible(),
-				headerTitle: dialogWindow.getTitle(),
-				headerLogo: '',
-				headerControls: {
-//					close: 'remove',
-//					maximize: 'remove',
-//					normalize: 'remove',
-//					minimize: 'remove',
-//					smallify: 'remove',
-//					smallifyrev: 'remove',
-				}
-		};
+    // Utils
+    function covertToFloadConfig(dialogWindow) {
+        var options = {
+                closeOnEscape: dialogWindow.closeOnEscape,
+                header: dialogWindow.isTitleVisible(),
+                headerTitle: dialogWindow.getTitle(),
+                headerLogo: '',
+                headerControls: {
+//                  close: 'remove',
+//                  maximize: 'remove',
+//                  normalize: 'remove',
+//                  minimize: 'remove',
+//                  smallify: 'remove',
+//                  smallifyrev: 'remove',
+                }
+        };
 
-		if(angular.isDefined(dialogWindow.x)){
-			options.position = {
-					type: 'fixed',
-					my: 'left-top',
-					at: 'left-top',
-					of: 'body',
-					container: 'body',
-					offsetX: dialogWindow.x,
-					offsetY: dialogWindow.y
-			}
-		}
-		if(angular.isDefined(dialogWindow.width)){
-			options.panelSize = {
-					width: dialogWindow.width, 
-					height: dialogWindow.width
-			};
-		}
+        if(angular.isDefined(dialogWindow.x)){
+            options.position = {
+                    type: 'fixed',
+                    my: 'left-top',
+                    at: 'left-top',
+                    of: 'body',
+                    container: 'body',
+                    offsetX: dialogWindow.x,
+                    offsetY: dialogWindow.y
+            };
+        }
+        if(angular.isDefined(dialogWindow.width)){
+            options.panelSize = {
+                    width: dialogWindow.width, 
+                    height: dialogWindow.width
+            };
+        }
 
-		return options;
-	}
+        return options;
+    }
 
-	/**
-	 * @ngdoc Factory
-	 * @name WbDialogWindow
-	 * @description WbDialogWindow a dialog manager
-	 * 
-	 */
-	var wbWindow = function(parent){
-		this.parent = parent || $wbWindow;
-		this.floatDialogElement = null;
-		this.setTitleVisible(true);
-	};
+    /**
+     * @ngdoc Factory
+     * @name WbDialogWindow
+     * @description WbDialogWindow a dialog manager
+     * 
+     */
+    var wbWindow = function(parent){
+        this.parent = parent || $wbWindow;
+        this.floatDialogElement = null;
+        this.setTitleVisible(true);
+    };
 
-	/**
-	 * Gets parent of the window
-	 * 
-	 * @memberof WbDialogWindow
-	 */
-	wbWindow.prototype.getParent = function(){
-		return this.parent;
-	}
+    /**
+     * Gets parent of the window
+     * 
+     * @memberof WbDialogWindow
+     */
+    wbWindow.prototype.getParent = function(){
+        return this.parent;
+    };
 
-	/**
-	 * Sets title of the window
-	 * 
-	 * @memberof WbDialogWindow
-	 * @params title {string} the window title
-	 */
-	wbWindow.prototype.setTitle = function(title){
-		this.title = title;
-		if(this.isVisible()){
-			// TODO: maso, 2019: set title of the current dialog
-		}
-	};
+    /**
+     * Sets title of the window
+     * 
+     * @memberof WbDialogWindow
+     * @params title {string} the window title
+     */
+    wbWindow.prototype.setTitle = function(title){
+        this.title = title;
+        if(this.isVisible()){
+            // TODO: maso, 2019: set title of the current dialog
+        }
+    };
 
-	/**
-	 * Sets title of the window
-	 * 
-	 * @memberof WbDialogWindow
-	 * @return {string} the window title
-	 */
-	wbWindow.prototype.getTitle = function(){
-		return this.title;
-	};
-
-
-	/**
-	 * Sets language of the window
-	 * 
-	 * @memberof WbDialogWindow
-	 * @params language {string} the window language
-	 */
-	wbWindow.prototype.setLanguage = function(language){
-		this.language = language;
-		if(this.isVisible()){
-			// TODO: maso, 2019: set title of the current dialog
-		}
-	};
-
-	/**
-	 * Sets title of the window
-	 * 
-	 * @memberof WbDialogWindow
-	 * @return {string} the window language
-	 */
-	wbWindow.prototype.getLanguage = function(){
-		return this.language;
-	};
-
-	/**
-	 * 
-	 * The open() method opens a new browser window, or a new tab, depending 
-	 * on your browser settings.
-	 * 
-	 * Tip: Use the close() method to close the window.
-	 * 
-	 * @memberof WbDialogWindow
-	 * @return window object
-	 */
-	wbWindow.prototype.open = function(url, name, options, replace){
-		return $wbWindow.open(url, name, options, replace);
-	};
-
-	/**
-	 * Close current window
-	 * 
-	 * 
-	 * @memberof WbDialogWindow
-	 * @params visible {boolean} of the window
-	 */
-	wbWindow.prototype.close = function(){
-		this.setVisible(false);
-		// TODO: maso, 2019: remove dome and destroy scope.
-	};
-
-	/**
-	 * Sets visible of the window
-	 * 
-	 * 
-	 * @memberof WbDialogWindow
-	 * @params visible {boolean} of the window
-	 */
-	wbWindow.prototype.setVisible = function(visible){
-		if(!this.floatDialogElement) {
-			this.floatDialogElement = $wbFloat.create(covertToFloadConfig(this));
-		} else if(this.floatDialogElement.isVisible() === visible) {
-			return;
-		}
-
-		this.floatDialogElement.setVisible(visible);
-	};
-
-	/**
-	 * Gets visible of the window
-	 * 
-	 * 
-	 * @memberof WbDialogWindow
-	 * @returns true if the window is visible
-	 */
-	wbWindow.prototype.isVisible = function(){
-		if(! this.floatDialogElement){
-			return false;
-		}
-		return this.floatDialogElement.isVisible();
-	};
-
-	/**
-	 * Sets position of the window
-	 * 
-	 * 
-	 * @memberof WbDialogWindow
-	 * @params x {string|int} absolute position
-	 * @params y {string|int} absolute position
-	 */
-	wbWindow.prototype.setPosition = function(x, y) {
-		this.x = x;
-		this.y = y;
-		if(this.floatDialogElement){
-			// TODO: reload the window position
-		}
-	};
-
-	/**
-	 * Gets current position of the window
-	 * 
-	 * @memberof WbDialogWindow
-	 * @return position
-	 */
-	wbWindow.prototype.getPosition = function() {
-		return {
-			x: this.x,
-			y:this.y,
-		};
-	};
+    /**
+     * Sets title of the window
+     * 
+     * @memberof WbDialogWindow
+     * @return {string} the window title
+     */
+    wbWindow.prototype.getTitle = function(){
+        return this.title;
+    };
 
 
+    /**
+     * Sets language of the window
+     * 
+     * @memberof WbDialogWindow
+     * @params language {string} the window language
+     */
+    wbWindow.prototype.setLanguage = function(language){
+        this.language = language;
+        if(this.isVisible()){
+            // TODO: maso, 2019: set title of the current dialog
+        }
+    };
 
-	/**
-	 * Close window on Escape
-	 * 
-	 * @memberof WbDialogWindow
-	 * @params x {string|int} absolute position
-	 * @params y {string|int} absolute position
-	 */
-	wbWindow.prototype.setCloseOnEscape = function(closeOnEscape) {
-		this.closeOnEscape = closeOnEscape;
-		if(this.floatDialogElement){
-			// TODO: reload the window close
-		}
-	};
+    /**
+     * Sets title of the window
+     * 
+     * @memberof WbDialogWindow
+     * @return {string} the window language
+     */
+    wbWindow.prototype.getLanguage = function(){
+        return this.language;
+    };
 
-	/**
-	 * Sets size of the window
-	 * 
-	 * @memberof WbDialogWindow
-	 * @params width {string|int} absolute position
-	 * @params height {string|int} absolute position
-	 */
-	wbWindow.prototype.setSize = function(width, height) {
-		this.width = width;
-		this.height = height;
-		if(this.floatDialogElement){
-			// TODO: reload the window size
-		}
-	};
+    /**
+     * 
+     * The open() method opens a new browser window, or a new tab, depending 
+     * on your browser settings.
+     * 
+     * Tip: Use the close() method to close the window.
+     * 
+     * @memberof WbDialogWindow
+     * @return window object
+     */
+    wbWindow.prototype.open = function(url, name, options, replace){
+        return $wbWindow.open(url, name, options, replace);
+    };
 
-	/**
-	 * Loads a library
-	 * 
-	 * @memberof WbDialogWindow
-	 * @path path of library
-	 * @return promise to load the library
-	 */
-	wbWindow.prototype.loadLibrary = function(path){
-		return $wbWindow.loadLibrary(path);
-	};
+    /**
+     * Close current window
+     * 
+     * 
+     * @memberof WbDialogWindow
+     * @params visible {boolean} of the window
+     */
+    wbWindow.prototype.close = function(){
+        this.setVisible(false);
+        // TODO: maso, 2019: remove dome and destroy scope.
+    };
 
-	/**
-	 * Check if the library is loaded
-	 * 
-	 * @memberof WbDialogWindow
-	 * @return true if the library is loaded
-	 */
-	wbWindow.prototype.isLibraryLoaded = function(path){
-		return $wbWindow.isLibraryLoaded(path);
-	};
-	
-	/**
-	 * Loads a library
-	 * 
-	 * @memberof WbDialogWindow
-	 * @path path of library
-	 * @return promise to load the library
-	 */
-	wbWindow.prototype.loadStyle = function(path){
-	    return $wbWindow.loadStyle(path);
-	};
-	
-	/**
-	 * Check if the library is loaded
-	 * 
-	 * @memberof WbDialogWindow
-	 * @return true if the library is loaded
-	 */
-	wbWindow.prototype.isStyleLoaded = function(path){
-	    return $wbWindow.isStyleLoaded(path);
-	};
+    /**
+     * Sets visible of the window
+     * 
+     * 
+     * @memberof WbDialogWindow
+     * @params visible {boolean} of the window
+     */
+    wbWindow.prototype.setVisible = function(visible){
+        if(!this.floatDialogElement) {
+            this.floatDialogElement = $wbFloat.create(covertToFloadConfig(this));
+        } else if(this.floatDialogElement.isVisible() === visible) {
+            return;
+        }
 
+        this.floatDialogElement.setVisible(visible);
+    };
 
-	/**
-	 * Set meta
-	 * 
-	 * @memberof WbDialogWindow
-	 * @params key {string} the key of meta
-	 * @params value {string} the value of meta
-	 */
-	wbWindow.prototype.setMeta = function (key, value){
-		var parent = this.getParent();
-		if(parent) {
-			parent.setMeta(key, value);
-		}
-	};
+    /**
+     * Gets visible of the window
+     * 
+     * 
+     * @memberof WbDialogWindow
+     * @returns true if the window is visible
+     */
+    wbWindow.prototype.isVisible = function(){
+        if(! this.floatDialogElement){
+            return false;
+        }
+        return this.floatDialogElement.isVisible();
+    };
 
-	/**
-	 * Set link
-	 * 
-	 * @memberof WbDialogWindow
-	 * @params key {string} the key of link
-	 * @params data {string} the value of link
-	 */
-	wbWindow.prototype.setLink = function (key, data){
-		var parent = this.getParent();
-		if(parent) {
-			parent.setLink(key, data);
-		}
-	};
+    /**
+     * Sets position of the window
+     * 
+     * 
+     * @memberof WbDialogWindow
+     * @params x {string|int} absolute position
+     * @params y {string|int} absolute position
+     */
+    wbWindow.prototype.setPosition = function(x, y) {
+        this.x = x;
+        this.y = y;
+        if(this.floatDialogElement){
+            // TODO: reload the window position
+        }
+    };
+
+    /**
+     * Gets current position of the window
+     * 
+     * @memberof WbDialogWindow
+     * @return position
+     */
+    wbWindow.prototype.getPosition = function() {
+        return {
+            x: this.x,
+            y:this.y,
+        };
+    };
 
 
-	/**
-	 * Write the body
-	 * 
-	 * @memberof WbDialogWindow
-	 * @params data {string} the value
-	 */
-	wbWindow.prototype.write = function (data){
-		this.floatDialogElement.getElement()
-		.then(function(parentElement){
-			// string
-			var element = angular.element(data);
-			parentElement.empty();
-			parentElement.append(element);
-		});
-	};
 
-	/**
-	 * Set view the body
-	 * 
-	 * @memberof WbDialogWindow
-	 * @params data {Object} the view
-	 */
-	wbWindow.prototype.setView = function (view){
-		return this.floatDialogElement.setView(view);
-	};
+    /**
+     * Close window on Escape
+     * 
+     * @memberof WbDialogWindow
+     * @params x {string|int} absolute position
+     * @params y {string|int} absolute position
+     */
+    wbWindow.prototype.setCloseOnEscape = function(closeOnEscape) {
+        this.closeOnEscape = closeOnEscape;
+        if(this.floatDialogElement){
+            // TODO: reload the window close
+        }
+    };
 
-	wbWindow.prototype.setWidth = function(width){
-		this.resizeTo(width, this.getHeight());
-	};
+    /**
+     * Sets size of the window
+     * 
+     * @memberof WbDialogWindow
+     * @params width {string|int} absolute position
+     * @params height {string|int} absolute position
+     */
+    wbWindow.prototype.setSize = function(width, height) {
+        this.width = width;
+        this.height = height;
+        if(this.floatDialogElement){
+            // TODO: reload the window size
+        }
+    };
 
-	wbWindow.prototype.getWidth = function(){
-		return this.width;
-	};
+    /**
+     * Loads a library
+     * 
+     * @memberof WbDialogWindow
+     * @path path of library
+     * @return promise to load the library
+     */
+    wbWindow.prototype.loadLibrary = function(path){
+        return $wbWindow.loadLibrary(path);
+    };
 
-	wbWindow.prototype.setHeight = function(height){
-		this.resizeTo(this.getWidth(), height);
-	};
+    /**
+     * Check if the library is loaded
+     * 
+     * @memberof WbDialogWindow
+     * @return true if the library is loaded
+     */
+    wbWindow.prototype.isLibraryLoaded = function(path){
+        return $wbWindow.isLibraryLoaded(path);
+    };
 
-	wbWindow.prototype.getHeight = function(){
-		return this.height;
-	};
+    /**
+     * Loads a library
+     * 
+     * @memberof WbDialogWindow
+     * @path path of library
+     * @return promise to load the library
+     */
+    wbWindow.prototype.loadStyle = function(path){
+        return $wbWindow.loadStyle(path);
+    };
 
-	wbWindow.prototype.resizeTo = function(width, height) {
-		this.width = width;
-		this.height = height;
-		if(this.floatDialogElement){
-			this.floatDialogElement.resize(width, height);
-		}
-	};
-	
-	wbWindow.prototype.setTitleVisible = function(visible){
-		this._titleVisible = visible;
-		if(this.floatDialogElement){
-			// TODO: maso, 2019: Check if the JPanel supports title visibility online.
-		}
-	};
-	
-	wbWindow.prototype.isTitleVisible = function(){
-		return this._titleVisible;
-	};
+    /**
+     * Check if the library is loaded
+     * 
+     * @memberof WbDialogWindow
+     * @return true if the library is loaded
+     */
+    wbWindow.prototype.isStyleLoaded = function(path){
+        return $wbWindow.isStyleLoaded(path);
+    };
 
-	return wbWindow;
+
+    /**
+     * Set meta
+     * 
+     * @memberof WbDialogWindow
+     * @params key {string} the key of meta
+     * @params value {string} the value of meta
+     */
+    wbWindow.prototype.setMeta = function (key, value){
+        var parent = this.getParent();
+        if(parent) {
+            parent.setMeta(key, value);
+        }
+    };
+
+    /**
+     * Set link
+     * 
+     * @memberof WbDialogWindow
+     * @params key {string} the key of link
+     * @params data {string} the value of link
+     */
+    wbWindow.prototype.setLink = function (key, data){
+        var parent = this.getParent();
+        if(parent) {
+            parent.setLink(key, data);
+        }
+    };
+
+
+    /**
+     * Write the body
+     * 
+     * @memberof WbDialogWindow
+     * @params data {string} the value
+     */
+    wbWindow.prototype.write = function (data){
+        this.floatDialogElement.getElement()
+        .then(function(parentElement){
+            // string
+            var element = angular.element(data);
+            parentElement.empty();
+            parentElement.append(element);
+        });
+    };
+
+    /**
+     * Set view the body
+     * 
+     * @memberof WbDialogWindow
+     * @params data {Object} the view
+     */
+    wbWindow.prototype.setView = function (view){
+        return this.floatDialogElement.setView(view);
+    };
+
+    wbWindow.prototype.setWidth = function(width){
+        this.resizeTo(width, this.getHeight());
+    };
+
+    wbWindow.prototype.getWidth = function(){
+        return this.width;
+    };
+
+    wbWindow.prototype.setHeight = function(height){
+        this.resizeTo(this.getWidth(), height);
+    };
+
+    wbWindow.prototype.getHeight = function(){
+        return this.height;
+    };
+
+    wbWindow.prototype.resizeTo = function(width, height) {
+        this.width = width;
+        this.height = height;
+        if(this.floatDialogElement){
+            this.floatDialogElement.resize(width, height);
+        }
+    };
+
+    wbWindow.prototype.setTitleVisible = function(visible){
+        this._titleVisible = visible;
+        if(this.floatDialogElement){
+            // TODO: maso, 2019: Check if the JPanel supports title visibility online.
+        }
+    };
+
+    wbWindow.prototype.isTitleVisible = function(){
+        return this._titleVisible;
+    };
+
+    return wbWindow;
 });
 
 /* 
@@ -7922,7 +8652,7 @@ angular.module('am-wb-core')
  * Copyright (c) 2016 weburger
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
+ * of this software and associated documentation files (the 'Software'), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -7931,7 +8661,7 @@ angular.module('am-wb-core')
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -7968,12 +8698,12 @@ angular.module('am-wb-core')
     /*
      * Open a float based on options
      */
-    function openFloatPanel(window, options) {
+    function openFloatPanel(parent, options) {
         if(!WbDialogWindow){
             WbDialogWindow = $injector.get('WbDialogWindow');
         }
 
-        var window = new WbDialogWindow(window);
+        var window = new WbDialogWindow(parent);
         window.setTitle(options.name);
         window.setLanguage(options.language);
         if(options.position){
@@ -8005,7 +8735,7 @@ angular.module('am-wb-core')
             throw {
                 message: 'Not supported type of URL',
                 url: options.url
-            }
+            };
         }
 
 
@@ -8015,7 +8745,7 @@ angular.module('am-wb-core')
     /*
      * Convert to window option
      */
-    function convertToWindowOption(options) {
+    function convertToWindowOption(/*options*/) {
         return '';
     }
 
@@ -8048,11 +8778,11 @@ angular.module('am-wb-core')
      */
     nativeWindowWrapper.prototype.getParent = function(){
         return this.nw.parent;
-    }
+    };
 
     nativeWindowWrapper.prototype.getDocument = function(){
         return this.nw.document;
-    }
+    };
 
     nativeWindowWrapper.prototype.getHeadElement = function(){
         if(this._he) {
@@ -8230,9 +8960,9 @@ angular.module('am-wb-core')
 
         var document = this.getDocument();
         var style = document.createElement('link');
-        style.setAttribute("rel", "stylesheet")
-        style.setAttribute("type", "text/css")
-        style.setAttribute("href", path)
+        style.setAttribute('rel', 'stylesheet');
+        style.setAttribute('type', 'text/css');
+        style.setAttribute('href', path);
         var ctrl = this;
         style.onload = function(){
             ctrl.styles[path] = true;
@@ -8382,7 +9112,7 @@ angular.module('am-wb-core')
         return this.nw.innerWidth;
     };
 
-    nativeWindowWrapper.prototype.setHeight = function(){
+    nativeWindowWrapper.prototype.setHeight = function(height){
         this.resizeTo(this.getWidth(), height);
     };
 
@@ -9791,7 +10521,7 @@ angular.module('ngMdIcons', [])
  * Copyright (c) 2016 weburger
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
+ * of this software and associated documentation files (the 'Software'), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -9800,7 +10530,7 @@ angular.module('ngMdIcons', [])
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -9906,13 +10636,12 @@ angular.module('am-wb-core')
 //				editor.setTheme('resources/libs/ace/theme/chrome');
 //				editor.session.setMode('resources/libs/ace/mode/javascript');
 				editor.setValue(ctrl.value.code || '');
-				editor.on("change", function(){
+				editor.on('change', function(){
 					ctrl.setCode(editor.getValue());
 				});
 			};
-			
 
-			var ctrl = this;
+//			var ctrl = this;
 			$wbLibs.load('resources/libs/ace.js')
 			.then(function(){
 				ctrl.setEditor(ace.edit($element.find('div#am-wb-resources-script-editor')[0]));
@@ -10092,7 +10821,7 @@ angular.module('am-wb-core')
  * Load default resources
  */
 .run(function(/*$resource, TinymcePluginImageTool, TinymcePluginCodesample, TinymcePluginLink*/) {
-	var pluginManager = tinymce.PluginManager;
+//	var pluginManager = tinymce.PluginManager;
 	// XXX: maso, 2019: update to tinymce5
 //	pluginManager.add('codesample', TinymcePluginCodesample);
 //	pluginManager.add('image', TinymcePluginImageTool);
@@ -10150,13 +10879,13 @@ angular.module('am-wb-core')
 .run(function ($widget, $http, $mdMedia, $wbWindow, $wbLocal, $WbProviderTimeout, $dispatcher, $storage, $routeParams) {
     $widget//
     .setProvider('$http', $http)
-    .setProvider('$wbWindow', $wbWindow)
+    .setProvider('$window', $wbWindow)
     .setProvider('$dispatcher', $dispatcher)
     .setProvider('$routeParams', $routeParams)
     .setProvider('$storage', $storage)
     .setProvider('$timeout', $WbProviderTimeout)
-    .setProvider('$wbLocal', $wbLocal)
-    .setProvider('$mdMedia', $mdMedia);
+    .setProvider('$local', $wbLocal)
+    .setProvider('$media', $mdMedia);
 })
 /***********************************************************************
  * Editors
@@ -10245,7 +10974,8 @@ angular.module('am-wb-core')
         model: {
             html: 'Link title'
         },
-        controller: 'WbWidgetA'
+        controller: 'WbWidgetA',
+        isLeaf: true
     });
     $widget.newWidget({
         // widget description
@@ -10259,7 +10989,8 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-address',
         // functional properties
         template: '<address></address>',
-        controller: 'WbWidgetAddress'
+        controller: 'WbWidgetAddress',
+        isLeaf: true
     });
     $widget.newWidget({
         // widget description
@@ -10273,7 +11004,8 @@ angular.module('am-wb-core')
         helpId: 'wb-widget-applet',
         // functional properties
         template: '<applet></applet>',
-        controller: 'WbWidgetApplet'
+        controller: 'WbWidgetApplet',
+        isLeaf: true
     });
     $widget.newWidget({
         // widget description
@@ -10341,7 +11073,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<blockquote></blockquote>',
         help: 'http://dpq.co.ir/more-information-blockquote',
-        controller: 'WbWidgetBlockquote', 
+        controller: 'WbWidgetBlockquote',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'button',
@@ -10352,7 +11085,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<button></button>',
         help: 'http://dpq.co.ir/more-information-button',
-        controller: 'WbWidgetButton', 
+        controller: 'WbWidgetButton',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'canvas',
@@ -10363,7 +11097,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<canvas></canvas>',
         help: 'http://dpq.co.ir/more-information-canvas',
-        controller: 'WbWidgetCanvas', 
+        controller: 'WbWidgetCanvas',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'datalist',
@@ -10553,7 +11288,8 @@ angular.module('am-wb-core')
             helpId: 'wb-widget-hx',
             // functional properties
             template: '<h' +i +'></h' + i + '>',
-            controller:'WbWidgetH'+i
+            controller:'WbWidgetH',
+            isLeaf: true
         });
     }
     $widget.newWidget({
@@ -10577,7 +11313,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<hr></hr>',
         help: 'http://dpq.co.ir/more-information-hr',
-        controller: 'WbWidgetHr', 
+        controller: 'WbWidgetHr',
+        isLeaf: true, 
     });
     $widget.newWidget({
         // widget description
@@ -10601,6 +11338,7 @@ angular.module('am-wb-core')
         template: '<iframe>Frame Not Supported?!</iframe>',
         controllerAs: 'ctrl',
         controller: 'WbWidgetIframe',
+        isLeaf: true,
     });
     $widget.newWidget({
         type: 'img',
@@ -10616,7 +11354,8 @@ angular.module('am-wb-core')
             src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
         },
         controllerAs: 'ctrl',
-        controller: 'WbWidgetImg', 
+        controller: 'WbWidgetImg',
+        isLeaf: true, 
     });
     $widget.newWidget({
         // widget description
@@ -10640,6 +11379,7 @@ angular.module('am-wb-core')
         template: '<input></input>',
         controller: 'WbWidgetInput',
         controllerAs: 'ctrl',
+        isLeaf: true,
     });
     $widget.newWidget({
         type: 'kbd',
@@ -10661,7 +11401,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<label></label>',
         help: 'http://dpq.co.ir/more-information-label',
-        controller: 'WbWidgetLabel', 
+        controller: 'WbWidgetLabel',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'legend',
@@ -10672,7 +11413,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<legend></legend>',
         help: 'http://dpq.co.ir/more-information-label',
-        controller: 'WbWidgetLegend', 
+        controller: 'WbWidgetLegend',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'li',
@@ -10683,7 +11425,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<li></li>',
         help: 'http://dpq.co.ir/more-information-li',
-        controller: 'WbWidgetLi', 
+        controller: 'WbWidgetLi',
+        isLeaf: false, 
     });
     $widget.newWidget({
         type: 'link',
@@ -10699,7 +11442,8 @@ angular.module('am-wb-core')
             url: 'http://www.gitlab.com/am-wb/am-wb-common'
         },
         controllerAs: 'ctrl',
-        controller: 'WbWidgetLink', 
+        controller: 'WbWidgetLink',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'main',
@@ -10741,11 +11485,11 @@ angular.module('am-wb-core')
                     color: '#313131',
                 },
                 border: {
-                    style:  "dotted",
-                    color:  "#afafaf"
+                    style:  'dotted',
+                    color:  '#afafaf'
                 },
-                color:  "#ffffff",
-                padding:  "8px"
+                color:  '#ffffff',
+                padding:  '8px'
             }
         },
         // help id
@@ -10867,7 +11611,8 @@ angular.module('am-wb-core')
         // functional properties
         template: '<p></p>',
         controllerAs: 'ctrl',
-        controller: 'WbWidgetP'
+        controller: 'WbWidgetP',
+        isLeaf: true
     });
     $widget.newWidget({
         type: 'param',
@@ -10878,7 +11623,8 @@ angular.module('am-wb-core')
         groups: ['basic'],
         template: '<param></param>',
         help: 'http://dpq.co.ir/more-information-param',
-        controller: 'WbWidgetParam', 
+        controller: 'WbWidgetParam',
+        isLeaf: true, 
     });
     $widget.newWidget({
         type: 'picture',
@@ -11128,8 +11874,8 @@ angular.module('am-wb-core')
  */
 'use strict';
 
+/* eslint no-bitwise: 0 */
 angular.module('am-wb-core')
-
 /**
  * @ngdoc Services
  * @name $$wbCrypto
@@ -11239,7 +11985,7 @@ angular.module('am-wb-core')
     }
 
     function md51(s) {
-        var txt = '';
+//        var txt = '';
         var n = s.length, state = [ 1732584193, -271733879,
             -1732584194, 271733878 ], i;
         for (i = 64; i <= s.length; i += 64) {
@@ -11322,13 +12068,13 @@ angular.module('am-wb-core')
         return (a + b) & 0xFFFFFFFF;
     }
 
-    if (md5('hello') != '5d41402abc4b2a76b9719d911017c592') {
-        function add32(x, y) {
-            var lsw = (x & 0xFFFF) + (y & 0xFFFF), msw = (x >> 16)
-            + (y >> 16) + (lsw >> 16);
-            return (msw << 16) | (lsw & 0xFFFF);
-        }
-    }
+//    if (md5('hello') != '5d41402abc4b2a76b9719d911017c592') {
+//        function add32(x, y) {
+//            var lsw = (x & 0xFFFF) + (y & 0xFFFF), msw = (x >> 16)
+//            + (y >> 16) + (lsw >> 16);
+//            return (msw << 16) | (lsw & 0xFFFF);
+//        }
+//    }
 
     this.md5 = md5;
     return this;
@@ -11548,7 +12294,7 @@ angular.module('am-wb-core')
 			if(!this._elementPromise){
 				this._elementPromise = $q.defer();
 			}
-			this._elementPromise.promise;
+			return this._elementPromise.promise;
 		}
 		return $q.when(this._element);
 	};
@@ -11637,7 +12383,7 @@ angular.module('am-wb-core')
 		return this.getElement()
 		.then(function(element){
 			contentElement = element;
-			return $wbUtil.getTemplateFor(optionsOrPreset)//
+			return $wbUtil.getTemplateFor(optionsOrPreset);
 		})
 		.then(function(templateL){
 			template = templateL;
@@ -11764,7 +12510,7 @@ angular.module('am-wb-core')
 .service('$wbLibs', function($wbWindow) {
 	this.load = function(path){
 		return $wbWindow.loadLibrary(path);
-	}
+	};
     return this;
 });
 
@@ -11802,80 +12548,80 @@ angular.module('am-wb-core')
  * 
  * Deprecated : use $wbWindow
  */
-.service('$wbLocal', function($wbWindow) {
-	var defaultDateFormat = 'YYYY-MM-DD hh:mm:ss';
-	
-	/**
-	 * Gets current data of the system.
-	 * 
-	 * @memberof $wbLocal
-	 */
-	this.getDate = function(){
-		return new Date();
-	};
-	
-	/**
-	 * Formats the input date based on the format
-	 * 
-	 * NOTE: default format is 'YYYY-MM-DD hh:mm:ss'
-	 * 
-	 * @params data {String | Date} to format
-	 * @params format {String} of the output
-	 * @memberof $wbLocal
-	 */
-	this.formatDate = function(date, format){
-		try {
+.service('$wbLocal', function() {
+    var defaultDateFormat = 'YYYY-MM-DD hh:mm:ss';
+
+    /**
+     * Gets current data of the system.
+     * 
+     * @memberof $wbLocal
+     */
+    this.getDate = function(){
+        return new Date();
+    };
+
+    /**
+     * Formats the input date based on the format
+     * 
+     * NOTE: default format is 'YYYY-MM-DD hh:mm:ss'
+     * 
+     * @params data {String | Date} to format
+     * @params format {String} of the output
+     * @memberof $wbLocal
+     */
+    this.formatDate = function(date, format){
+        try {
             var mf = format || defaultDateFormat;
             var localDate = moment //
-	            .utc(date) //
-	            .local();
+            .utc(date) //
+            .local();
             return localDate.format(mf);
         } catch (ex) {
             return '-' + ex.message;
         }
-	};
-	
-	/**
-	 * Get currency of the system
-	 * 
-	 * @return currency ISO code
-	 * @memberof $wbLocal
-	 */
-	this.getCurrency = function(){
-		return this.currency || 'USD';
-	};
-	
-	/**
-	 * Sets currency of the system
-	 * 
-	 * @param currency {String} ISO code
-	 * @memberof $wbLocal
-	 */
-	this.setCurrency = function(currency){
-		this.currency = currency;
-	};
-	
-	/**
-	 * Get language of the system
-	 * 
-	 * @return language ISO code
-	 * @memberof $wbLocal
-	 */
-	this.getLanguage = function(){
-		return  this.language || 'en';
-	};
+    };
 
-	/**
-	 * Sets language of the system
-	 * 
-	 * @params language {String} ISO code
-	 * @memberof $wbLocal
-	 */
-	this.setLanguage = function(language) {
-		this.language = language;
-	};
-	
-	
+    /**
+     * Get currency of the system
+     * 
+     * @return currency ISO code
+     * @memberof $wbLocal
+     */
+    this.getCurrency = function(){
+        return this.currency || 'USD';
+    };
+
+    /**
+     * Sets currency of the system
+     * 
+     * @param currency {String} ISO code
+     * @memberof $wbLocal
+     */
+    this.setCurrency = function(currency){
+        this.currency = currency;
+    };
+
+    /**
+     * Get language of the system
+     * 
+     * @return language ISO code
+     * @memberof $wbLocal
+     */
+    this.getLanguage = function(){
+        return  this.language || 'en';
+    };
+
+    /**
+     * Sets language of the system
+     * 
+     * @params language {String} ISO code
+     * @memberof $wbLocal
+     */
+    this.setLanguage = function(language) {
+        this.language = language;
+    };
+
+
     return this;
 });
 
@@ -11921,7 +12667,7 @@ angular.module('am-wb-core')
 	 * Manages resource dialog
 	 * @ngInject
 	 */
-	function wbResourceCtrl($scope,  $mdDialog, $wbUtil,
+	function ResourceCtrl($scope,  $mdDialog, $wbUtil,
 			$q, $controller, $compile, pages, style, data, $element, $window) {
 
 		$scope.value = angular.copy(data);
@@ -11964,7 +12710,7 @@ angular.module('am-wb-core')
 		 */
 		this.setValue = function(value){
 			$scope.value = value;
-		}
+		};
 
 		/*
 		 * Gets current value
@@ -12064,7 +12810,7 @@ angular.module('am-wb-core')
 		var ctrl = this;
 		$scope.setValue = function(value){
 			return ctrl.setValue(value);
-		}
+		};
 	}
 
 
@@ -12126,7 +12872,7 @@ angular.module('am-wb-core')
 		}
 		var tmplUrl = pages.length > 1 ? 'views/dialogs/wb-select-resource.html' : 'views/dialogs/wb-select-resource-single-page.html';
 		return $wbUi.openDialog({
-			controller : wbResourceCtrl,
+			controller : ResourceCtrl,
 			templateUrl : tmplUrl,
 			parent : angular.element(document.body),
 			clickOutsideToClose : true,
@@ -12206,7 +12952,7 @@ angular.module('am-wb-core')
             }
         }
         return false;
-    };
+    }
 
     /**
      * Fetchs a setting page with the given type
@@ -12337,47 +13083,47 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 
-	/**
-	 * @ngdoc Services
-	 * @name $storage
-	 * @description A service to work with storage of browser
-	 * 
-	 */
-	.service('$storage', function ($localStorage) {
-	    /*
-	     * @param 
-	     * @returns
-	     */
-	    function get(key) {
-		return $localStorage[key];
-	    }
-	    /*
-	     * @param 
-	     * @returns
-	     */
-	    function put (key,value) {
-		$localStorage[key] = value;
-	    }
-	    /*
-	     * @param 
-	     * @returns
-	     */
-	    function remove(key) {
-		delete $localStorage[key];
-	    }
-	    /*
-	     * @param 
-	     * @returns
-	     */
-	    function has(key) {
-		return ($localStorage[key]? true : false);
-	    }
-	    
-	    this.get = get;
-	    this.put = put;
-	    this.remove = remove;
-	    this.has = has;
-	});
+/**
+ * @ngdoc Services
+ * @name $storage
+ * @description A service to work with storage of browser
+ * 
+ */
+.service('$storage', function ($localStorage) {
+    /*
+     * @param 
+     * @returns
+     */
+    function get(key) {
+        return $localStorage[key];
+    }
+    /*
+     * @param 
+     * @returns
+     */
+    function put (key,value) {
+        $localStorage[key] = value;
+    }
+    /*
+     * @param 
+     * @returns
+     */
+    function remove(key) {
+        delete $localStorage[key];
+    }
+    /*
+     * @param 
+     * @returns
+     */
+    function has(key) {
+        return ($localStorage[key]? true : false);
+    }
+
+    this.get = get;
+    this.put = put;
+    this.remove = remove;
+    this.has = has;
+});
 
 /* 
  * The MIT License (MIT)
@@ -12553,95 +13299,10 @@ angular.module('am-wb-core')
  * Utility class of WB
  */
 angular.module('am-wb-core')
-.service('$wbUtil', function ($q, $templateRequest, $sce) {
+.service('$wbUtil', function ($q, $templateRequest, $sce, WbConverterDom) {
     'use strict';
-    var REGEX_BACKGROUND_IMAGE_SPEC = RegExp('(repeating\-)?(linear|radial)\-(gradient)');
-
-    var styleMap = [
-        //==============================================
-        // Text
-        //==============================================
-        {
-            cssKey: 'text-align',
-            key: 'text.align',
-            defaultValue: 'none'
-        },{
-            cssKey: 'text-align-last',
-            key: 'text.alignLast', 
-            defaultValue: 'auto'
-        },{
-            cssKey: 'text-decoration',
-            key: 'text.decoration',
-            defaultValue: 'none'
-        },{
-            cssKey: 'text-shadow',
-            key: 'text.shadow',
-            defaultValue: 'none'
-        },{
-            cssKey: 'text-transform',
-            key: 'text.transform',
-            defaultValue: 'none'
-        },{
-            cssKey: 'text-overflow',
-            key: 'text.overflow',
-            defaultValue: 'clip'
-        },{
-            cssKey: 'text-justify',
-            key: 'text.justify',
-            defaultValue: 'auto'
-        },{
-            cssKey: 'text-indent',
-            key: 'text.indent',
-            defaultValue: ''
-        },
-
-        //==============================================
-        // general
-        //==============================================
-        {
-            cssKey: 'padding',
-            key: 'padding', 
-            defaultValue: ''
-        },{
-            cssKey: 'margin',
-            key: 'margin', 
-            defaultValue: ''
-        },{
-            cssKey: 'direction',
-            key: 'direction', 
-            defaultValue: 'ltr'
-        },{
-            cssKey: 'color',
-            key: 'color', 
-            defaultValue: 'initial'
-        },{
-            cssKey: 'cursor',
-            key: 'cursor', 
-            defaultValue: 'auto'
-        },{
-            cssKey: 'opacity',
-            key: 'opacity', 
-            defaultValue: ''
-        },{
-            cssKey: 'overflow-x',
-            key: 'overflow.x', 
-            defaultValue: 'visible'
-        },{
-            cssKey: 'overflow-y',
-            key: 'overflow.y', 
-            defaultValue: 'visible'
-        }];
-
+    var converterDom = new WbConverterDom();
     var service = this;
-
-    function cleanMap(oldStyle, newStyle, map) {
-        for (var i = 0; i < map.length; i++) {
-            if (oldStyle[map[i][0]]) {
-                newStyle[map[i][1]] = oldStyle[map[i][0]];
-                delete oldStyle[map[i][0]];
-            }
-        }
-    }
 
     function getTemplateOf(page)
     {
@@ -12649,7 +13310,7 @@ angular.module('am-wb-core')
         var templateUrl = page.templateUrl;
         if (angular.isDefined(template)) {
             if (angular.isFunction(template)) {
-                template = template(page.params | page);
+                template = template(page.params || page);
             }
         } else if (angular.isDefined(templateUrl)) {
             if (angular.isFunction(templateUrl)) {
@@ -12677,365 +13338,14 @@ angular.module('am-wb-core')
         return $q.when(getTemplateOf(page));
     }
 
-    /**
-     * Converts data into a valid CSS attributes
-     */
-    function convertToGroupCss(style) {
-        var style = style || {};
-        var css = convertToWidgetCss(style);
-
-        if(style.visibility === 'hidden'){
-            css.display = 'none';
-        } else {
-            /*
-             * Group
-             * 
-             * check if is group apply flex flow
-             */
-            css.display = 'flex';
-            var layout = style.layout || {};
-            // row
-            if (layout.direction === 'row') {
-                css['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
-                if(!style.overflow){
-                    css['overflow-x'] = layout.wrap ? 'visible' : 'auto';
-                    css['overflow-y'] = 'visible';
-                }
-            } else {
-                css['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
-                if(!style.overflow){
-                    css['overflow-x'] = 'visible';
-                    css['overflow-y'] = layout.wrap ? 'visible' : 'auto';
-                }
-            }
-
-
-            // wrap
-            if (layout.wrap) {
-                css['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
-                // wrap align
-                var alignContent;
-                switch (layout.wrap_align) {
-                case 'start':
-                    alignContent = 'flex-start';
-                    break;
-                case 'end':
-                    alignContent = 'flex-end';
-                    break;
-                case 'center':
-                    alignContent = 'center';
-                    break;
-                case 'space-between':
-                    alignContent = 'space-between';
-                    break;
-                case 'space-around':
-                    alignContent = 'space-around';
-                    break;
-                case 'stretch':
-                    alignContent = 'stretch';
-                    break;
-                default:
-                    alignContent = 'stretch';
-                }
-                css['align-content'] = alignContent;
-            } else {
-                css['flex-wrap'] = 'nowrap';
-            }
-
-
-            // justify
-            var justify;
-            switch (layout.justify) {
-            case 'start':
-                justify = 'flex-start';
-                break;
-            case 'end':
-                justify = 'flex-end';
-                break;
-            case 'center':
-                justify = 'center';
-                break;
-            case 'space-between':
-                justify = 'space-between';
-                break;
-            case 'space-around':
-                justify = 'space-around';
-                break;
-            case 'space-evenly':
-                justify = 'space-evenly';
-                break;
-            default:
-                justify = 'flex-start';
-            }
-            css['justify-content'] = justify;
-
-            // align
-            var align;
-            switch (layout.align) {
-            case 'start':
-                align = 'flex-start';
-                break;
-            case 'end':
-                align = 'flex-end';
-                break;
-            case 'center':
-                align = 'center';
-                break;
-            case 'baseline':
-                align = 'baseline';
-                break;
-            case 'stretch':
-                align = 'stretch';
-                break;
-            default:
-                align = 'stretch';
-            }
-            css['align-items'] = align;
-        }
-
-        return css;
-    }
-
-    /**
-     * Converts data into a valid CSS attributes
-     */
-    function convertToWidgetCss(style) {
-        var style = style || {};
-        var css = {};
-
-        // layout
-        if(style.visibility === 'hidden'){
-            css.display = 'none';
-        } else {
-            css.display = '';
-        }
-
-        css = _.merge(css, 
-                // layout
-                convertToWidgetCssLayout(style.layout || {}),
-                // size
-                convertToWidgetCssSize(style.size || {}),
-                // background
-                convertToWidgetCssBackground(style.background || {}),
-                // border
-                convertToWidgetCssBoarder(style.border || {}),
-                // shadows
-                convertToWidgetCssShadows(style.shadows || {}),
-                // transform
-                convertToWidgetCssTransfrom(style.transform || {}));		
-
-        for(var i = 0; i < styleMap.length; i++){
-            var cssItem = styleMap[i];
-            var value = objectPath.get(style, cssItem.key) || cssItem.defaultValue;
-            objectPath.set(css, cssItem.cssKey, value);
-        }
-        return css;
-    }
-
-
-
-
-    function convertToWidgetCssTransfrom(transformOptions) {
-        var transform = '';
-
-        if(transformOptions.x){
-            var x = transformOptions.x;
-            if(x.rotate){
-                transform += ' rotateX('+x.rotate+')';
-            }
-            if(x.translate){
-                transform  += ' translateX('+x.translate+')';
-            }
-            if(x.scale){
-                transform += ' scaleX('+ x.scale+')';
-            }
-            if(x.skew){
-                transform += ' skewX('+ x.skew+')';
-            }
-        }
-        if(transformOptions.y){
-            var y = transformOptions.y;
-            if(y.rotate){
-                transform += ' rotateY('+y.rotate+')';
-            }
-            if(y.translate){
-                transform += ' translateY('+y.translate+')';
-            }
-            if(y.scale){
-                transform += ' scaleY('+y.scale+')';
-            }
-            if(y.skew){
-                transform += ' skewY('+y.skew+')';
-            }
-        }
-        if(transformOptions.z){
-            var z = transformOptions.z;
-            if(z.rotate){
-                transform += ' rotateZ('+z.rotate+')';
-            }
-            if(z.translate){
-                transform += ' translateZ('+z.translate+')';
-            }
-            if(z.scale){
-                transform += ' scaleZ('+z.scale+')';
-            }
-        }
-
-        if(transformOptions.perspective){
-            transform += ' perspective('+transformOptions.perspective+')';
-        }
-
-        if(!transform) {
-            return {
-                transform: 'none'
-            };
-        }
-
-        return {
-            transform: transform,
-            'transform-origin': transformOptions.origin || 'center',
-            'transform-style': transformOptions.style || 'flat'
-        };
-    };
-
-    function createShadowStr(shadow) {
-        var hShift = shadow.hShift || '0px';
-        var vShift = shadow.vShift || '0px';
-        var blur = shadow.blur || '0px';
-        var spread = shadow.spread || '0px';
-        var color = shadow.color || 'black';
-
-        var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
-
-        if(shadow.inset) {
-            boxShadow = boxShadow.concat(' ' + 'inset');
-        }
-
-        return boxShadow;
-    }
-
-    function convertToWidgetCssShadows(shadows) {
-        var shadowStr = '';
-
-        if (!angular.isArray(shadows) || shadows.length === 0) {
-            shadowStr = 'none';
-        } else {
-            angular.forEach(shadows, function (shadow, index) {
-                shadowStr += createShadowStr(shadow);
-                if(index + 1 < shadows.length){
-                    shadowStr += ', ';
-                }
-            });
-        }
-
-        return {
-            'box-shadow': shadowStr
-        };
-    }
-
-    function convertToWidgetCssBoarder(style) {
-        var conf = {};
-        if (style.style) {
-            conf['border-style'] = style.style;
-        }
-        if (style.width) {
-            conf['border-width'] = style.width;
-        }
-        if (style.color) {
-            conf['border-color'] = style.color;
-        }
-        if (style.radius) {
-            conf['border-radius'] = style.radius;
-        }
-
-        return conf;
-    }
-
-    function convertToWidgetCssBackground(style){
-        var cssValue = {};
-        if(style.background){
-            cssValue.background = style.background;
-            return;
-        }
-        // image
-        var image = 'none';
-        if(style.image){
-            if(REGEX_BACKGROUND_IMAGE_SPEC.test(style.image)){
-                image = style.image;
-            } else {
-                image = 'url(\''+style.image+'\')';
-            }
-        }
-
-        cssValue['background-image'] = image;
-        cssValue['background-color'] = style.color || 'initial';
-        cssValue['background-size'] = style.size || 'auto';
-        cssValue['background-repeat'] = style.repeat || 'repeat';
-        cssValue['background-position'] = style.position || '0px 0px';
-        cssValue['background-attachment'] = style.attachment || 'scroll';
-        cssValue['background-origin'] = style.origin || 'padding-box';
-        cssValue['background-clip'] = style.clip || 'border-box';
-
-        return cssValue;
-    }
-
-    /**
-     * Converts data into a layout CSS3
-     */
-    function convertToWidgetCssLayout(layout){
-        var flexLayout = {};
-        /*
-         * Widget
-         */
-        flexLayout.order = layout.order >= 0 ? layout.order : 0;
-        flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
-        flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
-        flexLayout['flex-basis'] = layout.basis || 'auto';
-
-        // align-self
-        // auto | flex-start | flex-end | center | baseline | stretch;
-        var alignSelf;
-        switch (layout.align_self) {
-        case 'start':
-            alignSelf = 'flex-start';
-            break;
-        case 'end':
-            alignSelf = 'flex-end';
-            break;
-        case 'center':
-            alignSelf = 'center';
-            break;
-        case 'baseline':
-            alignSelf = 'baseline';
-            break;
-        case 'stretch':
-            alignSelf = 'stretch';
-            break;
-        default:
-            alignSelf = 'auto';
-        }
-        flexLayout['align-self'] = alignSelf;
-
-        return flexLayout;
-    }
-
-    /*
-     * Convert size object to valid CSS size
-     */
-    function convertToWidgetCssSize(size) {
-        return {
-            'width': size.width || 'auto',
-            'min-width': size.minWidth || '0',
-            'max-width': size.maxWidth || 'none',
-
-            'height': size.height || 'auto',
-            'min-height': size.minHeight || '0',
-            'max-height': size.maxHeight || 'none',
-        };
-    }
 
     function cleanEvetns(model)
     {
+        if(model.on){
+            delete model.event;
+            return;
+        }
+
         // event
         if (!model.event) {
             model.event = {};
@@ -13046,123 +13356,98 @@ angular.module('am-wb-core')
             model.event.error = model.event.failure;
             delete model.event.failure;
         }
+
+        if(model.event){
+            model.on = model.event;
+            delete model.event;
+        }
+        
+        // add a note to all event 
+        if(model.on){
+            _.forOwn(model.on, function(value, key) { 
+                model.on[key] = '/* code style is deprecated. see http://www.viraweb123.ir/amh-blog/content/wb-v4-release */ \n' + value;
+            } );
+        }
     }
 
     function cleanLayout(model)
+
     {
-        if (!model.style.layout) {
-            model.style.layout = {};
-        }
-        if (model.type === 'Group' || model.type === 'Page') {
-            // convert
-            var newStyle = model.style.layout;
-            var oldStyle = model.style;
+        if (model.style.layout) {
+            if(model.style.layout.align_self){
+                model.style.alignSelf = model.style.layout.align_self;
+            }
+            if(model.style.layout.direction){
+                model.style.display = 'flex';
 
-            if (oldStyle.flexDirection) {
-                if (oldStyle.flexDirection === 'wb-flex-row') {
-                    newStyle.direction = 'row';
-                } else {
-                    newStyle.direction = 'column';
+//              model.style.flex
+                model.style.flexGrow = model.style.layout.grow;
+                model.style.flexShrink = model.style.layout.shrink;
+                model.style.flexBasis = model.style.layout.basis;
+
+//              model.style.flexFlow
+                model.style.flexDirection = model.style.layout.direction;
+                model.style.flexWrap = model.style.layout.wrap ? 'wrap' : 'no-wrap';
+                model.style.justifyContent = model.style.layout.justify;
+                if(model.style.justifyContent === 'end' || model.style.justifyContent === 'end' ){
+                    model.style.justifyContent = 'flex-' + model.style.justifyContent;
                 }
-                delete oldStyle.flexDirection;
+//              alignContent = ??
+                model.style.alignItems = model.style.layout.align;
+                model.style.order = model.style.layout.order;
             }
-            if (!newStyle.direction) {
-                newStyle.direction = 'column';
-            }
-
-            switch (oldStyle.flexAlignItem) {
-            case 'wb-flex-align-items-center':
-                newStyle.align = 'center';
-                break;
-            case 'wb-flex-align-items-end':
-                newStyle.align = 'end';
-                break;
-            case 'wb-flex-align-items-start':
-                newStyle.align = 'start';
-                break;
-            case 'wb-flex-align-items-stretch':
-                newStyle.align = 'stretch';
-                break;
-            default:
-                newStyle.align = 'stretch';
-            }
-            delete oldStyle.flexAlignItem;
-
-            switch (oldStyle.justifyContent) {
-            case 'wb-flex-justify-content-center':
-                newStyle.justify = 'center';
-                break;
-            case 'wb-flex-justify-content-end':
-                newStyle.justify = 'end';
-                break;
-            case 'wb-flex-justify-content-start':
-                newStyle.justify = 'start';
-                break;
-            case 'wb-flex-justify-content-space-between':
-                newStyle.justify = 'space-between';
-                break;
-            case 'wb-flex-justify-content-space-around':
-                newStyle.justify = 'space-around';
-                break;
-            default:
-                newStyle.justify = 'center';
-            }
-            delete oldStyle.justifyContent;
+            delete model.style.layout;
+            return;
         }
     }
 
     function cleanSize(model)
     {
-        if (!model.style.size) {
-            model.style.size = {};
+        // w1 style.size -> w4
+        if (model.style.size) {
+            model.style.width = model.style.size.width;
+            model.style.minWidth = model.style.size.minWidth;
+            model.style.maxWidth = model.style.size.maxWidth;
+
+            model.style.height = model.style.size.height;
+            model.style.minHeight = model.style.size.minHeight;
+            model.style.maxHeight = model.style.size.maxHeight;
+            delete model.style.size;
         }
-        var newStyle = model.style.size;
-        var oldStyle = model.style;
-        var map = [['width', 'width'],
-            ['height', 'height']];
-        cleanMap(oldStyle, newStyle, map);
     }
 
     function cleanBackground(model)
     {
-        if (!model.style.background) {
-            model.style.background = {};
+        if (model.style.background) {
+            if(model.style.background.image) {
+                model.style.backgroundImage = 'url("' + model.style.background.image + '")';
+            }
+            model.style.backgroundColor = model.style.background.color;
+            model.style.backgroundSize = model.style.background.size;
+            model.style.backgroundRepeat = model.style.background.repeat;
+            model.style.backgroundOrigin = model.style.background.origin;
+            model.style.backgroundPosition = model.style.background.position;
+            delete model.style.background;
+            return;
         }
-        var newStyle = model.style.background;
-        var oldStyle = model.style;
-        var map = [['backgroundImage', 'image'],
-            ['backgroundColor', 'color'],
-            ['backgroundSize', 'size'],
-            ['backgroundRepeat', 'repeat'],
-            ['backgroundPosition', 'position']];
-        cleanMap(oldStyle, newStyle, map);
     }
 
     function cleanBorder(model)
     {
-        if (!model.style.border) {
-            model.style.border = {};
+        // w1 border -> w4
+        if (model.style.border) {
+            model.style.borderStyle = model.style.border.style;
+            model.style.borderColor = model.style.border.color;
+            model.style.borderWidth = model.style.border.width;
+            model.style.borderRadius = model.style.border.radius;
+            delete model.style.border;
+            return;
         }
-        var oldStyle = model.style;
-        var newStyle = model.style.border;
-
-        if (oldStyle.borderRadius) {
-            if (oldStyle.borderRadius.uniform) {
-                newStyle.radius = oldStyle.borderRadius.all + 'px';
-            }
-            // TODO: maso, 2018: support other models
-        }
-        // delete old values
-        delete model.style.borderColor;
-        delete model.style.borderRadius;
-        delete model.style.borderStyleColorWidth;
-        delete model.style.borderStyle;
-        delete model.style.borderWidth;
     }
 
     function cleanSpace(model)
     {
-        // Margin and padding
+        // Padding from W0 -> w4
         if (model.style.padding && angular.isObject(model.style.padding)) {
             var padding = '';
             if (model.style.padding.isUniform) {
@@ -13176,6 +13461,7 @@ angular.module('am-wb-core')
             model.style.padding = padding;
         }
 
+        // Margin from W0 -> w4
         if (model.style.margin && angular.isObject(model.style.margin)) {
             var margin = '';
             if (model.style.margin.isUniform) {
@@ -13188,13 +13474,40 @@ angular.module('am-wb-core')
             }
             model.style.margin = margin;
         }
-
     }
 
-    function cleanAlign(model)
+    function cleanAlign(/*model*/)
     {
-        if (!model.style.align) {
-            model.style.align = {};
+//      if (!model.style.align) {
+//      model.style.align = {};
+//      }
+    }
+
+    function cleanOverflow(model){
+        if(model.style.overflow){
+            model.style.overflowX = model.style.overflow.x;
+            model.style.overflowY = model.style.overflow.y;
+        }
+    }
+
+    function cleanShadow(model){
+        //h-offset v-offset blur spread color
+        if(model.style.shadows){
+            var boxShadows = [];
+            _.forEach(model.style.shadows, function(shadow){
+                var sh = shadow.hShift + ' ' + 
+                shadow.vShift + ' ' + 
+                shadow.blur + ' ' + 
+                shadow.spread + ' ' + 
+                shadow.color;
+                if(shadow.inset){
+                    sh += ' ' + 'inset';
+                }
+                boxShadows.push(sh);
+            });
+            model.style.boxShadow = _.join(boxShadows);
+            delete model.style.shadows;
+            return;
         }
     }
 
@@ -13209,10 +13522,17 @@ angular.module('am-wb-core')
         cleanBorder(model);
         cleanSpace(model);
         cleanAlign(model);
+        cleanOverflow(model);
+        cleanShadow(model);
     }
 
-
     function cleanType(model){
+        if(model.type === 'Group'){
+            model.type = 'div';
+        }
+        if(model.type === 'Import'){
+            model.type = 'import';
+        }
         if(model.type === 'Link') {
             model.type = 'a';
             model.html = model.title;
@@ -13235,21 +13555,24 @@ angular.module('am-wb-core')
             model.html = model.text;
             delete model.text;
         }
+        if(model.type === 'HtmlText'){
+            model.type = 'section';
+            model.children = converterDom.decode(model.html);
+            delete model.html;
+        }
     }
 
     function cleanInternal(model)
     {
+        delete model.version;
         cleanEvetns(model);
         cleanStyle(model);
-        if (model.type === 'Group' || model.type === 'Page') {
-            if (!model.children) {
-                model.children = [];
-            }
-            if (model.children.length) {
-                for (var i = 0; i < model.children.length; i++) {
-                    cleanInternal(model.children[i]);
-                }
-            }
+        if(_.isArray(model.contents)){
+            model.children = model.contents;
+            delete model.contents;
+        }
+        if (_.isArray(model.children) && model.children.length) {
+            _.forEach(model.children, cleanInternal);
         }
         cleanType(model);
         return model;
@@ -13263,34 +13586,21 @@ angular.module('am-wb-core')
      */
     function clean(model, force)
     {
-        if (!model.type || model.type === 'Page') {
-            model.type = 'Group';
+        if (!model.type || model.type === 'Page' || model.type === 'Group') {
+            model.type = 'div';
         }
-        if (model.version === 'wb3' && !force) {
+        if (model.version === 'wb4' && !force) {
             return model;
         }
         var newModel = cleanInternal(model);
-        newModel.version = 'wb3';
+        newModel.version = 'wb4';
         return newModel;
     }
 
-    service.cleanMap = cleanMap;
     service.clean = clean;
-    service.cleanInternal = cleanInternal;
-    service.cleanStyle = cleanStyle;
-    service.cleanAlign = cleanAlign;
-    service.cleanSpace = cleanSpace;
-    service.cleanBorder = cleanBorder;
-    service.cleanBackground = cleanBackground;
-    service.cleanSize = cleanSize;
-    service.cleanLayout = cleanLayout;
-    service.cleanEvetns = cleanEvetns;
 
     service.getTemplateFor = getTemplateFor;
     service.getTemplateOf = getTemplateOf;
-    service.convertToGroupCss = convertToGroupCss;
-    service.convertToWidgetCss = convertToWidgetCss;
-    service.convertToWidgetCssLayout = convertToWidgetCssLayout;
 });
 
 /* 
@@ -13504,7 +13814,7 @@ angular.module('am-wb-core')//
             try{
                 callback.apply(callback, [event]);
             } catch(ex){
-                console.error(ex);
+//                console.error(ex);
             }
         });
     };
@@ -13552,7 +13862,6 @@ angular.module('am-wb-core')//
 
         // 2- load
         var ctrl = this;
-        var widget = this.widget;
         _.forEach(this.attributes, function(attrKey){
             ctrl.attributesValue[attrKey] = widget.getModelProperty(attrKey);
         });
@@ -13837,7 +14146,7 @@ angular.module('am-wb-core')//
  * 
  * @see wb-layout
  */
-.controller('WbSettingStyleLayoutCtrl', function ($scope, $element) {
+.controller('WbSettingStyleLayoutCtrl', function (/*$scope, $element*/) {
 
 });
 
@@ -14372,7 +14681,7 @@ angular.module('am-wb-core')//
      */
     function Converter(mimetype){
         this.mimetype = mimetype || 'text/plain';
-    };
+    }
     
     /**
      * Convert widgets into data
@@ -14454,11 +14763,11 @@ angular.module('am-wb-core')//
     'use strict';
     function cssNameToJsName(name)
     {
-        var split = name.split("-");
-        var output = "";
+        var split = name.split('-');
+        var output = '';
         for(var i = 0; i < split.length; i++)
         {
-            if (i > 0 && split[i].length > 0 && !(i == 1 && split[i] == "ms"))
+            if (i > 0 && split[i].length > 0 && !(i === 1 && split[i] === 'ms'))
             {
                 split[i] = split[i].substr(0, 1).toUpperCase() + split[i].substr(1);
             }
@@ -14485,7 +14794,7 @@ angular.module('am-wb-core')//
             if(attr.name !== 'style'){
                 model[attr.name] = attr.value;
             }
-        })
+        });
         //style
         for(var i = 0; i < element.style.length; i++){
             var sname = element.style.item(i);
@@ -14493,19 +14802,19 @@ angular.module('am-wb-core')//
         }
         // html
         if($widget.isWidgetLeaf(name)){
-            model['html'] = element.innerHTML;
+            model.html = element.innerHTML;
         } else {
             model.children = [];
             _.forEach(element.children, function(childelement){
                 model.children.push(convertElementToModel(childelement));
-            })
+            });
         }
         return model;
     }
 
     function Converter(){
         WbConverterAbstract.apply(this, ['text/html']);
-    };
+    }
     Converter.prototype = new WbConverterAbstract();
 
     Converter.prototype.encode = function(){
@@ -14513,7 +14822,7 @@ angular.module('am-wb-core')//
         var data = '';
         while(widgets.length){
             var widget = widgets.pop();
-            data += widget.getElement().prop('outerHTML'); + '\n';
+            data += widget.getElement().prop('outerHTML') + '\n';
         }
         return data;
     };
@@ -14529,7 +14838,7 @@ angular.module('am-wb-core')//
                 }
             }
         } catch(ex){
-            console.error(ex);
+//            console.error(ex);
         }
         return widgets;
     };
@@ -14575,7 +14884,7 @@ angular.module('am-wb-core')//
 
     function Converter(){
         WbConverterAbstract.apply(this, ['text/plain']);
-    };
+    }
     Converter.prototype = new WbConverterAbstract();
 
     Converter.prototype.encode = function(){
@@ -14645,12 +14954,12 @@ angular.module('am-wb-core')//
  * A converter are responsible to encode and decode a widget.
  * 
  */
-.factory('WbConverterWeburger', function (WbConverterAbstract, $widget) {
+.factory('WbConverterWeburger', function (WbConverterAbstract) {
     'use strict';
 
     function Converter(){
         WbConverterAbstract.apply(this, ['application/json']);
-    };
+    }
     Converter.prototype = new WbConverterAbstract();
 
     Converter.prototype.encode = function(){
@@ -14809,24 +15118,24 @@ angular.module('am-wb-core')//
      * 
      * Creates new instace of an editor
      */
-    function editor(widget, options) {
+    function Editor(widget, options) {
         options = options || {};
         WidgetEditor.apply(this, [widget, options]);
     }
-    editor.prototype = Object.create(WidgetEditor.prototype);
+    Editor.prototype = Object.create(WidgetEditor.prototype);
 
 
-    editor.prototype.setActive = function(){}; 
-    editor.prototype.isActive = function(){};
-    editor.prototype.save = function(){};
-    editor.prototype.hide = function(){};
-    editor.prototype.show = function(){
-        $window.alert('This widget type is deprecated. This will be removed in the next major version.')
+    Editor.prototype.setActive = function(){}; 
+    Editor.prototype.isActive = function(){};
+    Editor.prototype.save = function(){};
+    Editor.prototype.hide = function(){};
+    Editor.prototype.show = function(){
+        $window.alert('This widget type is deprecated. This will be removed in the next major version.');
     };
-    editor.prototype.isHidden = function(){};
-    
+    Editor.prototype.isHidden = function(){};
+
 //  the editor type
-    return editor;
+    return Editor;
 });
 
 /* 
@@ -14933,27 +15242,27 @@ angular.module('am-wb-core')//
      * 
      * Creates new instace of an editor
      */
-    function editor(widget, options) {
+    function Editor(widget, options) {
         options = options || {};
         WidgetEditor.apply(this, [widget, options]);
     }
-    
-    editor.prototype = new WidgetEditor();
+
+    Editor.prototype = new WidgetEditor();
 
     /**
      * remove all resources
      * 
      * @memberof WidgetEditorTinymce
      */
-    editor.prototype.destroy = function () {
+    Editor.prototype.destroy = function () {
         this.hide();
         WidgetEditor.prototype.destroy.call(this);
     };
-    
+
     /**
      * Remove editor
      */
-    editor.prototype.hide = function () {
+    Editor.prototype.hide = function () {
         if (this.isHidden()) {
             return;
         }
@@ -14962,13 +15271,13 @@ angular.module('am-wb-core')//
         if(this.isDirty()){
             this.widget.setModelProperty(this.options.property, this._content);
         }
-        tinymce.remove(this.widget.getElement().getPath())
+        tinymce.remove(this.widget.getElement().getPath());
     };
 
     /**
      * Run and display editor for the current widget
      */
-    editor.prototype.show = function () {
+    Editor.prototype.show = function () {
         this._hide = false;
         var ctrl = this;
         var widget = this.getWidget();
@@ -14986,10 +15295,10 @@ angular.module('am-wb-core')//
                         ctrl.saveAndClose();
                     }
                 });
-                
+
                 editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
-                	event.stopPropagation();
-                	editor.save();
+                    event.stopPropagation();
+                    editor.save();
                 });
 
                 // Update model when:
@@ -15009,14 +15318,14 @@ angular.module('am-wb-core')//
         });
     };
 
-    editor.prototype.isHidden = function () {
+    Editor.prototype.isHidden = function () {
         return this._hide;
     };
 
     /**
      * Read value from element and set into the element
      */
-    editor.prototype.updateView = function (editor) {
+    Editor.prototype.updateView = function (editor) {
         var content = editor.getContent({
             format : this.options.format || 'html'
         }).trim();
@@ -15024,8 +15333,8 @@ angular.module('am-wb-core')//
         this.setDirty(true);
     };
 
-    
-    editor.prototype.closeWithoutSave = function(){
+
+    Editor.prototype.closeWithoutSave = function(){
         this.setDirty(false);
         this.hide();
         // reset old value
@@ -15035,14 +15344,14 @@ angular.module('am-wb-core')//
             oldValue: '',
             value: this.widget.getModelProperty(this.options.property)
         });
-    }
-    
-    editor.prototype.saveAndClose = function(){
+    };
+
+    Editor.prototype.saveAndClose = function(){
         this.hide();
-    }
-    
+    };
+
 //  the editor type
-    return editor;
+    return Editor;
 });
 
 /* 
@@ -15120,7 +15429,7 @@ angular.module('am-wb-core')//
     /**
      * Creates new instace of an editor
      */
-    function widgetEditor(widget, options) {
+    function Editor(widget, options) {
         this.callbacks = [];
         this.widget = widget;
         this.options = options;
@@ -15131,7 +15440,7 @@ angular.module('am-wb-core')//
      * 
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.destroy = function(){
+    Editor.prototype.destroy = function(){
         this.callbacks = [];
         delete this.widget;
         delete this.options;
@@ -15142,7 +15451,7 @@ angular.module('am-wb-core')//
      * 
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.getWidget = function(){
+    Editor.prototype.getWidget = function(){
         return this.widget;
     };
 
@@ -15151,7 +15460,7 @@ angular.module('am-wb-core')//
      * 
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.setDirty = function(dirty){
+    Editor.prototype.setDirty = function(dirty){
         if(typeof(dirty) !== 'undefined'){
             this.dirty = dirty;
         } else {
@@ -15164,7 +15473,7 @@ angular.module('am-wb-core')//
      * 
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.isDirty = function(){
+    Editor.prototype.isDirty = function(){
         return this.dirty;
     };
 
@@ -15175,7 +15484,7 @@ angular.module('am-wb-core')//
      * @param callback {function} the function
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.off = function(type, callback){
+    Editor.prototype.off = function(type, callback){
         if (!angular.isArray(this.callbacks[type])) {
             return;
         }
@@ -15193,7 +15502,7 @@ angular.module('am-wb-core')//
      * @param callback {function} the function
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.on = function(type, callback){
+    Editor.prototype.on = function(type, callback){
         if (!angular.isArray(this.callbacks[type])) {
             this.callbacks[type] = [];
         }
@@ -15209,7 +15518,7 @@ angular.module('am-wb-core')//
      * @param param {object} event params
      * @mrmberof WidgetEditor
      */
-    widgetEditor.prototype.fire = function(type, params){
+    Editor.prototype.fire = function(type, params){
         // TODO: maso, 2018: create event object
         var event = _.merge({
             source: this,
@@ -15224,7 +15533,7 @@ angular.module('am-wb-core')//
                 callbacks[i](event);
             } catch (error) {
                 // NOTE: remove on release
-                console.log(error);
+//                console.log(error);
             }
         }
     }; // internal
@@ -15233,15 +15542,15 @@ angular.module('am-wb-core')//
 
 
 
-    widgetEditor.prototype.setActive = function(){}; // focus|skipFocuse
-    widgetEditor.prototype.isActive = function(){};
-    widgetEditor.prototype.save = function(){};
-    widgetEditor.prototype.hide = function(){};
-    widgetEditor.prototype.show = function(){};
-    widgetEditor.prototype.isHidden = function(){};
+    Editor.prototype.setActive = function(){}; // focus|skipFocuse
+    Editor.prototype.isActive = function(){};
+    Editor.prototype.save = function(){};
+    Editor.prototype.hide = function(){};
+    Editor.prototype.show = function(){};
+    Editor.prototype.isHidden = function(){};
 
     // the editor type
-    return widgetEditor;
+    return Editor;
 });
 
 /* 
@@ -15280,14 +15589,14 @@ angular.module('am-wb-core')//
  * example it is used to show widget actions on the fly.
  * 
  */
-.factory('AbstractWidgetLocator', function ($rootElement, $widget) {
+.factory('AbstractWidgetLocator', function () {
 
     /**
      * Creates new instance of the widget locator
      * 
      * @memberof AbstractWidgetLocator
      */
-    function abstractWidgetLocator() {
+    function Locator() {
         this.callbacks = [];
         this.elements = [];
         this.observedWidgets = [];
@@ -15295,21 +15604,21 @@ angular.module('am-wb-core')//
         // Creates listeners
         var ctrl = this;
         this.widgetListeners = {
-                'select' : function ($event) {
+                'select' : function (/*$event*/) {
                     ctrl.addClass('selected');
                     ctrl.removeClass('mouseover');
                 },
-                'unselect' : function ($event) {
+                'unselect' : function (/*$event*/) {
                     ctrl.removeClass('selected');
                     if (ctrl.mouseover) {
                         ctrl.addClass('mouseover');
                     }
                 },
-                'mouseover' : function ($event) {
+                'mouseover' : function (/*$event*/) {
                     ctrl.addClass('mouseover');
                     ctrl.mouseover = true;
                 },
-                'mouseout' : function ($event) {
+                'mouseout' : function (/*$event*/) {
                     ctrl.removeClass('mouseover');
                     ctrl.mouseover = false;
                 },
@@ -15319,18 +15628,18 @@ angular.module('am-wb-core')//
     /**
      * Defines anchor 
      */
-    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
+    Locator.prototype.setAnchor = function (anchor) {
         this.anchor = anchor;
     };
 
     /**
      * Update the view
      */
-    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
+    Locator.prototype.setAnchor = function (anchor) {
         this.anchor = anchor;
     };
 
-    abstractWidgetLocator.prototype.getAnchor = function (auncher) {
+    Locator.prototype.getAnchor = function (/*auncher*/) {
         // find custom anchor
 //        if(this.anchor){
 //            if(angular.isFunction(this.anchor)){
@@ -15357,30 +15666,30 @@ angular.module('am-wb-core')//
     /**
      * Sets new widget
      */
-    abstractWidgetLocator.prototype.setWidget = function (widget) {
+    Locator.prototype.setWidget = function (widget) {
         this.widget = widget;
     };
 
-    abstractWidgetLocator.prototype.getWidget = function () {
+    Locator.prototype.getWidget = function () {
         return this.widget;
     };
 
-    abstractWidgetLocator.prototype.setElements = function (elements) {
+    Locator.prototype.setElements = function (elements) {
         this.elements = elements;
     };
 
-    abstractWidgetLocator.prototype.getElements = function () {
+    Locator.prototype.getElements = function () {
         return this.elements;
     };
 
-    abstractWidgetLocator.prototype.addClass = function (value) {
+    Locator.prototype.addClass = function (value) {
         var elements = this.getElements();
         for (var i = 0; i < elements.length; i++) {
             elements[i].addClass(value);
         }
     };
 
-    abstractWidgetLocator.prototype.removeClass = function (value) {
+    Locator.prototype.removeClass = function (value) {
         var elements = this.getElements();
         for (var i = 0; i < elements.length; i++) {
             elements[i].removeClass(value);
@@ -15390,12 +15699,12 @@ angular.module('am-wb-core')//
     /**
      * Remove connection the the current widget
      */
-    abstractWidgetLocator.prototype.disconnect = function () {
+    Locator.prototype.disconnect = function () {
         this.connect(null);
         this.connected = false;
     };
 
-    abstractWidgetLocator.prototype.connect = function (widget) {
+    Locator.prototype.connect = function (widget) {
         this.connected = true;
         if (this.widget !==  widget) {
             var elements = this.getElements();
@@ -15425,11 +15734,11 @@ angular.module('am-wb-core')//
     };
 
 
-    abstractWidgetLocator.prototype.isConnected = function () {
+    Locator.prototype.isConnected = function () {
         return this.connected;
     };
 
-    return abstractWidgetLocator;
+    return Locator;
 });
 
 /* 
@@ -15466,65 +15775,64 @@ angular.module('am-wb-core')//
  * @description Locates a widget bound
  * 
  */
-.factory('BoundWidgetLocator', function (AbstractWidgetLocator, $rootScope) {
+.factory('BoundWidgetLocator', function (AbstractWidgetLocator) {
 
-	var boundWidgetLocator = function (options) {
-		options = options || {};
-		AbstractWidgetLocator.apply(this, options);
+    var boundWidgetLocator = function (options) {
+        options = options || {};
+        AbstractWidgetLocator.apply(this, options);
 
         // set anchor
         this.setAnchor(options.anchor);
 
-		// load templates
-		var template = options.template 
-		|| '<div class="wb-widget-locator bound"></div>';
+        // load templates
+        var template = options.template || '<div class="wb-widget-locator bound"></div>';
 
-		// load elements
-		this.topElement = angular.element(template);
-		this.topElement.attr('id', 'top');
+        // load elements
+        this.topElement = angular.element(template);
+        this.topElement.attr('id', 'top');
 
-		this.rightElement = angular.element(template);
-		this.rightElement.attr('id', 'right');
+        this.rightElement = angular.element(template);
+        this.rightElement.attr('id', 'right');
 
-		this.buttomElement = angular.element(template);
-		this.buttomElement.attr('id', 'buttom');
+        this.buttomElement = angular.element(template);
+        this.buttomElement.attr('id', 'buttom');
 
-		this.leftElement = angular.element(template);
-		this.leftElement.attr('id', 'left');
+        this.leftElement = angular.element(template);
+        this.leftElement.attr('id', 'left');
 
-		// init controller
-		this.setElements([this.topElement, this.rightElement,
-			this.buttomElement, this.leftElement]);
-	};
-	boundWidgetLocator.prototype = new AbstractWidgetLocator();
+        // init controller
+        this.setElements([this.topElement, this.rightElement,
+            this.buttomElement, this.leftElement]);
+    };
+    boundWidgetLocator.prototype = new AbstractWidgetLocator();
 
-	boundWidgetLocator.prototype.updateView = function () {
+    boundWidgetLocator.prototype.updateView = function () {
         var widget = this.getWidget();
-	    var bound = widget.getBoundingClientRect();
-	    var space = 2;
-		this.topElement.css({
-			top: bound.top + space,
-			left: bound.left + space,
-			width: bound.width - 2*space
-		});
-		this.rightElement.css({
-			top: bound.top + space,
-			left: bound.left + bound.width - 2*space,
-			height: bound.height - 2*space
-		});
-		this.buttomElement.css({
-			top: bound.top + bound.height - space,
-			left: bound.left + space,
-			width: bound.width - 2*space
-		});
-		this.leftElement.css({
-			top: bound.top + space,
-			left: bound.left + space,
-			height: bound.height - 2*space
-		});
+        var bound = widget.getBoundingClientRect();
+        var space = 2;
+        this.topElement.css({
+            top: bound.top + space,
+            left: bound.left + space,
+            width: bound.width - 2*space
+        });
+        this.rightElement.css({
+            top: bound.top + space,
+            left: bound.left + bound.width - 2*space,
+            height: bound.height - 2*space
+        });
+        this.buttomElement.css({
+            top: bound.top + bound.height - space,
+            left: bound.left + space,
+            width: bound.width - 2*space
+        });
+        this.leftElement.css({
+            top: bound.top + space,
+            left: bound.left + space,
+            height: bound.height - 2*space
+        });
 
-	};
-	return boundWidgetLocator;
+    };
+    return boundWidgetLocator;
 });
 
 /* 
@@ -15568,7 +15876,7 @@ angular
  * 
  * For each item in selection a selection locator will be created.
  */
-.factory('WidgetLocatorManager',function ($widget, BoundWidgetLocator, SelectionWidgetLocator, $timeout, $rootElement) {
+.factory('WidgetLocatorManager',function ($widget, BoundWidgetLocator, SelectionWidgetLocator) {
 
     /**
      * Creates new instance of the manager
@@ -15678,7 +15986,7 @@ angular
             clearInterval(this._intervalCheck);
             delete this._intervalCheck;
         }
-    }
+    };
 
     WidgetLocatorManager.prototype.connect = function(){
         var rootWidget = this.getRootWidget();
@@ -15834,7 +16142,6 @@ angular
         });
     };
 
-
     WidgetLocatorManager.prototype.removeSelectionLocator = function(widget) {
         var map = this.selectionLocatorMap;
         if(map.has(widget)) {
@@ -15843,7 +16150,7 @@ angular
             this.selectionLocatorMap.delete(widget);
             locator.disconnect();
         }
-    }
+    };
 
     WidgetLocatorManager.prototype.createSelectionLocator = function(widget) {
         var map = this.selectionLocatorMap;
@@ -15918,8 +16225,7 @@ angular.module('am-wb-core')//
         this.setAnchor(options.anchor);
 
         // load templates
-        var template = options.template
-        || '<div class="wb-widget-locator selection"></div>';
+        var template = options.template || '<div class="wb-widget-locator selection"></div>';
 
         this.titleElement = angular.element(template);
         this.titleElement.attr('id', 'header');
@@ -15947,7 +16253,7 @@ angular.module('am-wb-core')//
         
         
         var position = {};
-        var lock = false;
+//        var lock = false;
         var dimension = {};
         var ctrl = this;
         
@@ -15980,14 +16286,14 @@ angular.module('am-wb-core')//
         function mouseup() {
             $document.unbind('mousemove', mousemove);
             $document.unbind('mouseup', mouseup);
-            lock = false;
+//            lock = false;
         }
 
         function mousedown($event) {
             $event.stopImmediatePropagation();
             position.x = $event.clientX;
             position.y = $event.clientY;
-            lock = true;
+//            lock = true;
             var $element = ctrl.getWidget().getElement();
             dimension.width = $element.prop('offsetWidth');
             dimension.height = $element.prop('offsetHeight');
@@ -16036,16 +16342,15 @@ angular.module('am-wb-core')//
                 left: bound.left + bound.width/2 - this.titleElement.width()/2
             });
         }
-        var widget = this.getWidget();
-        this.titleElement[0].innerHTML = '<span>'+ (widget.getTitle() || widget.getId() || widget.getType()) + '</span>'
+        this.titleElement[0].innerHTML = '<span>' + 
+            (widget.getTitle() || widget.getId() || widget.getType()) + 
+            '</span>';
         
         
         this.sizeElement.css({
-
             top: bound.top + bound.height -13 ,
             left: bound.left + bound.width -15 ,
-
-        })
+        });
     };
     return selectionWidgetLocator;
 });
@@ -16084,8 +16389,7 @@ angular.module('am-wb-core')//
 .factory('WbProcessorAbstract', function () {
     'use strict';
 
-    function Processor(){
-    };
+    function Processor(){}
 
     return Processor;
 });
@@ -16148,10 +16452,10 @@ angular.module('am-wb-core')
     }
 
     function setWidgetElementAttributes(widget, elementAttributes) {
-        var elementAttributes = widget.getElementAttributes();
+//        var elementAttributes = widget.getElementAttributes();
         for(var i =0; i < elementAttributes.length; i++){
             var key = elementAttributes[i];
-            setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key))
+            setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key));
         }
     }
 
@@ -16206,8 +16510,8 @@ angular.module('am-wb-core')//
     // In standard-compliant browsers we use a custom mime type and also encode the dnd-type in it.
     // However, IE and Edge only support a limited number of mime types. The workarounds are described
     // in https://github.com/marceljuenemann/angular-drag-and-drop-lists/wiki/Data-Transfer-Design
-    var MIME_TYPE = 'application/x-dnd';
-    var EDGE_MIME_TYPE = 'application/json';
+//    var MIME_TYPE = 'application/x-dnd';
+//    var EDGE_MIME_TYPE = 'application/json';
     var MSIE_MIME_TYPE = 'Text';
 
     // All valid HTML5 drop effects, in the order in which we prefer to use them.
@@ -16215,7 +16519,7 @@ angular.module('am-wb-core')//
 
     // While an element is dragged over the list, this placeholder element is inserted
     // at the location where the element would be inserted after dropping.
-    var placeholder = angular.element("<div class='wbDndPlaceholder'></div>");
+    var placeholder = angular.element('<div class="wbDndPlaceholder"></div>');
     var placeholderNode = placeholder[0];
     placeholder.remove();
 
@@ -16241,11 +16545,11 @@ angular.module('am-wb-core')//
      * Filters an array of drop effects using a HTML5 effectAllowed string.
      */
     function filterEffects(effects, effectAllowed) {
-        if (effectAllowed == 'all') {
+        if (effectAllowed === 'all') {
             return effects;
         }
         return effects.filter(function(effect) {
-            return effectAllowed.toLowerCase().indexOf(effect) != -1;
+            return effectAllowed.toLowerCase().indexOf(effect) !== -1;
         });
     }
 
@@ -16305,9 +16609,9 @@ angular.module('am-wb-core')//
         // therefore the following modifier keys will only affect other operating systems.
         if (!effects.length) {
             return 'none';
-        } else if (event.ctrlKey && effects.indexOf('copy') != -1) {
+        } else if (event.ctrlKey && effects.indexOf('copy') !== -1) {
             return 'copy';
-        } else if (event.altKey && effects.indexOf('link') != -1) {
+        } else if (event.altKey && effects.indexOf('link') !== -1) {
             return 'link';
         } else {
             return effects[0];
@@ -16326,7 +16630,7 @@ angular.module('am-wb-core')//
         widget.$$dndState.itemType = widget.getType();
 
         // Set the allowed drop effects. See below for special IE handling.
-        widget.$$dndState.dropEffect = "none";
+        widget.$$dndState.dropEffect = 'none';
         widget.$$dndState.effectAllowed = /*dndEffectAllowed ||*/ ALL_EFFECTS[0];
 
         // 2 - convert and put data
@@ -16337,7 +16641,7 @@ angular.module('am-wb-core')//
                 event.dataTransfer.setData(converter.getMimetype(), converter.encode(widget));
             } catch (e) {
                 // TODO: maso, 2019: log errors
-                console.log('fail to convert to :' + converter.getMimetype(), e);
+//                console.log('fail to convert to :' + converter.getMimetype(), e);
             }
         });
 
@@ -16387,7 +16691,7 @@ angular.module('am-wb-core')//
         case 'copy':
         case 'link':
         case 'canceled':
-            console.log('not supported');
+//            console.log('not supported');
             break;
         }
 
@@ -16426,36 +16730,39 @@ angular.module('am-wb-core')//
         var listNode = element[0];
 
         // Make sure the placeholder is shown, which is especially important if the list is empty.
-        if (placeholderNode.parentNode != listNode) {
+        if (placeholderNode.parentNode !== listNode) {
             element.append(placeholder);
         }
 
+        var listItemNode = null;
+        var horizontal;
+        var rect;
         if (widget.isLeaf()) {
             // Try to find the node direct directly below the list node.
-            var listItemNode = event.target;
-            while (listItemNode.parentNode != listNode && listItemNode.parentNode) {
+            listItemNode = event.target;
+            while (listItemNode.parentNode !== listNode && listItemNode.parentNode) {
                 listItemNode = listItemNode.parentNode;
             }
 
-            if (listItemNode.parentNode == listNode && listItemNode != placeholderNode) {
+            if (listItemNode.parentNode === listNode && listItemNode !== placeholderNode) {
                 // If the mouse pointer is in the upper half of the list item element,
                 // we position the placeholder before the list item, otherwise after it.
-                var rect = listItemNode.getBoundingClientRect();
-                var horizontal = true; // TODO:
+                rect = listItemNode.getBoundingClientRect();
+                horizontal = true; // TODO:
+                var isFirstHalf;
                 if (horizontal) {
-                    var isFirstHalf = event.clientX < rect.left + rect.width / 2;
+                    isFirstHalf = event.clientX < rect.left + rect.width / 2;
                 } else {
-                    var isFirstHalf = event.clientY < rect.top + rect.height / 2;
+                    isFirstHalf = event.clientY < rect.top + rect.height / 2;
                 }
                 listNode.insertBefore(placeholderNode,
                         isFirstHalf ? listItemNode : listItemNode.nextSibling);
             }
         } else {
-            var listItemNode = null;
-            var horizontal = widget.isHorizontal();
+            horizontal = widget.isHorizontal();
             for(var i = 0; i < listNode.childNodes.length; i++){
                 var node = listNode.childNodes[i];
-                var rect = node.getBoundingClientRect();
+                rect = node.getBoundingClientRect();
                 if (horizontal) {
                     if(rect.left > event.clientX) {
                         listItemNode = node;
@@ -16476,9 +16783,9 @@ angular.module('am-wb-core')//
         // In IE we set a fake effectAllowed in dragstart to get the correct cursor, we therefore
         // ignore the effectAllowed passed in dataTransfer. We must also not access dataTransfer for
         // drops from external sources, as that throws an exception.
-        var ignoreDataTransfer = mimeType == MSIE_MIME_TYPE;
+        var ignoreDataTransfer = mimeType === MSIE_MIME_TYPE;
         var dropEffect = getDropEffect(event, ignoreDataTransfer);
-        if (dropEffect == 'none') {
+        if (dropEffect === 'none') {
             return stopDragover();
         }
 
@@ -16508,25 +16815,26 @@ angular.module('am-wb-core')//
         event.preventDefault();
 
         // Unserialize the data that was serialized in dragstart.
+        var data;
         try {
             var converter = $widget.getConverter(mimeType);
-            var data = converter.decode(event.dataTransfer.getData(mimeType));
+            data = converter.decode(event.dataTransfer.getData(mimeType));
         } catch(e) {
             placeholder.remove();
             return false;
         }
 
         // Drops with invalid types from external sources might not have been filtered out yet.
-//      if (mimeType == MSIE_MIME_TYPE || mimeType == EDGE_MIME_TYPE) {
+//      if (mimeType === MSIE_MIME_TYPE || mimeType === EDGE_MIME_TYPE) {
 //      itemType = data.type || undefined;
 //      data = data.item;
 //      if (!isDropAllowed(itemType)) return stopDragover();
 //      }
 
         // Special handling for internal IE drops, see dragover handler.
-        var ignoreDataTransfer = mimeType == MSIE_MIME_TYPE;
+        var ignoreDataTransfer = mimeType === MSIE_MIME_TYPE;
         var dropEffect = getDropEffect(event, ignoreDataTransfer);
-        if (dropEffect == 'none') {
+        if (dropEffect === 'none') {
             return stopDragover();
         }
 
@@ -16567,7 +16875,7 @@ angular.module('am-wb-core')//
      */
     function Processor(){
         WbProcessorAbstract.apply(this);
-    };
+    }
 
     // extend functionality
     Processor.prototype = new WbProcessorAbstract();
@@ -16708,12 +17016,13 @@ angular.module('am-wb-core')//
                 var params = _.join(_.concat(
                         ['$widget', '$event'], // dynamic data
                         $widget.getProvidersKey()));
+                /*jslint evil: true */
                 widget.eventFunctions[type] = new Function(params, ucode);// code
             }catch(ex){
-                console.error({
-                    message: 'Fail to load user function',
-                    original: ex
-                });
+//                console.error({
+//                    message: 'Fail to load user function',
+//                    original: ex
+//                });
             }
         }
         eventFunction = widget.eventFunctions[type];
@@ -16725,15 +17034,15 @@ angular.module('am-wb-core')//
                 }, $widget.getProviders());
                 return $injector.invoke(eventFunction, widget, locals);
             } catch(ex){
-                console.error({
-                    original: ex,
-                    message: 'faile to run the event code of the widget',
-                    type: type,
-                    event: event
-                });
+//                console.error({
+//                    original: ex,
+//                    message: 'faile to run the event code of the widget',
+//                    type: type,
+//                    event: event
+//                });
             }
         }
-    };
+    }
 
     function loadWidgetEventsHandlers(widget){
         widget.__eventListeners = {
@@ -16814,7 +17123,7 @@ angular.module('am-wb-core')//
 
     function Processor(){
         WbProcessorAbstract.apply(this);
-    };
+    }
 
     // extend functionality
     Processor.prototype = new WbProcessorAbstract();
@@ -16875,7 +17184,7 @@ angular.module('am-wb-core')//
         WbProcessorAbstract.apply(this);
         this.widgetLocator = new WidgetLocatorManager();
         this.autoVisible = true;
-    };
+    }
 
     Processor.prototype = new WbProcessorAbstract();
     
@@ -16982,7 +17291,7 @@ angular.module('am-wb-core')//
 
     function Processor(){
         WbProcessorAbstract.apply(this);
-    };
+    }
 
     // extend functionality
     Processor.prototype = new WbProcessorAbstract();
@@ -17003,7 +17312,7 @@ angular.module('am-wb-core')//
             loadWidgetAttributes(widget, _.intersection(microdataAttributes, event.keys || [event.key]));
             return;
         }
-    }
+    };
     return Processor;
 });
 
@@ -17065,7 +17374,7 @@ angular.module('am-wb-core')//
             
             $event.widgets = ctrl.selectedWidgets;
             ctrl.fire('selectionChange', $event);
-        }
+        };
 
         this.dblclickListener = function($event){
             var widget = $event.source;
@@ -17086,8 +17395,8 @@ angular.module('am-wb-core')//
             
             $event.widgets = ctrl.selectedWidgets;
             ctrl.fire('selectionChange', $event);
-        }
-    };
+        };
+    }
     Processor.prototype = new WbProcessorAbstract();
     Processor.prototype.process = function(widget, event){
         if(event.type !== 'stateChanged') {
@@ -17139,7 +17448,7 @@ angular.module('am-wb-core')//
                 resultData = callbacks[i](event) || resultData;
             } catch (error) {
                 // NOTE: remove on release
-                console.log(error);
+//                console.log(error);
             }
         }
         return resultData;
@@ -17200,7 +17509,7 @@ angular.module('am-wb-core')//
 
     function Processor(){
         WbProcessorAbstract.apply(this);
-    };
+    }
     Processor.prototype = new WbProcessorAbstract();
 
     Processor.prototype.process = function(widget, event){
@@ -17218,7 +17527,7 @@ angular.module('am-wb-core')//
                 loadStyle(widget, keys);
             }
         }
-    }
+    };
     return Processor;
 });
 
@@ -17325,8 +17634,7 @@ angular.module('am-wb-core')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$widget', function(
-        $wbUtil, 
+.service('$widget', function($sce, $templateRequest,
         $q, $injector,
         WidgetEditorFake) {
     'use strict';
@@ -17417,13 +17725,13 @@ angular.module('am-wb-core')
      * @returns promise to load all widgets
      */
     function widgets() {
-        var widgets = {};
+        var list = {};
         // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-        widgets.items = [];
+        list.items = [];
         elementKey.forEach(function(type) {
-            widgets.items.push(contentElementAsso[type]);
+            list.items.push(contentElementAsso[type]);
         });
-        return $q.when(widgets);
+        return $q.when(list);
     }
 
     /**
@@ -17517,7 +17825,7 @@ angular.module('am-wb-core')
         if(preElement){
             gettingTemplatePromisse = $q.resolve(preElement);
         } else {
-            gettingTemplatePromisse = $wbUtil.getTemplateFor(widgetDescription)
+            gettingTemplatePromisse = getTemplateFor(widgetDescription)
             .then(function(template) {
                 // 3- bind controller
                 // TODO: maso, 2019: replace with JQuery 
@@ -17675,7 +17983,7 @@ angular.module('am-wb-core')
     this.setProvider = function(key, provider){
         providers[key] = provider;
         return this;
-    }
+    };
     
     /**
      * Gets the list of providers
@@ -17693,8 +18001,7 @@ angular.module('am-wb-core')
      * @deprecated use setprovider insted
      */
     this.addProvider = function(key, provider){
-        console.logs('$widget.addProvider is deprecated and will be removed in the next version');
-        return this.setProvider(key, provider)
+        return this.setProvider(key, provider);
     };
     
     /**
@@ -17740,7 +18047,7 @@ angular.module('am-wb-core')
             // return old editor
             return widget.$$wbEditor;
         }
-        if(editors[widget.getType()] == undefined){
+        if(editors[widget.getType()] === undefined){
             return fakeEditor;
         }
         var register = editors[widget.getType()];
@@ -17801,11 +18108,11 @@ angular.module('am-wb-core')
             try{
                 processor.process(widget, event);
             } catch (ex){
-                console.error('Fail to run the processor');
-                console.error(ex);
+//                console.error('Fail to run the processor');
+//                console.error(ex);
             }
         });
-    }
+    };
 
 
     /***********************************************
@@ -17843,6 +18150,35 @@ angular.module('am-wb-core')
         } while(element);
     };
 
+    
+
+    function getTemplateOf(page)
+    {
+        var template = page.template;
+        var templateUrl = page.templateUrl;
+        if (angular.isDefined(template)) {
+            if (angular.isFunction(template)) {
+                template = template(page.params || page);
+            }
+        } else if (angular.isDefined(templateUrl)) {
+            if (angular.isFunction(templateUrl)) {
+                templateUrl = templateUrl(page.params);
+            }
+            if (angular.isDefined(templateUrl)) {
+                page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+                template = $templateRequest(templateUrl);
+            }
+        }
+        return template;
+    }
+
+    /*
+     * Loading template of the page
+     */
+    function getTemplateFor(page)
+    {
+        return $q.when(getTemplateOf(page));
+    }
 });
 
 /* 
@@ -18223,6 +18559,23 @@ angular.module('am-wb-core')//
      * @name setProperty
      */
     WbWidgetAbstract.prototype.setProperty = function (key, value){
+        /*
+         * Support old widget scripts
+         */
+        switch(key){
+        case 'style.layout.direction':
+            key = 'style.flexDirection';
+            break;
+        case 'style.background.color':
+            key = 'style.backgroundColor';
+            break;
+        case 'style.size.width':
+            key = 'style.width';
+            break;
+        case 'style.size.height':
+            key = 'style.height';
+            break;
+        }
         // create the event
         var $event = {
                 source: this,
@@ -18529,7 +18882,7 @@ angular.module('am-wb-core')//
                 resultData = callbacks[i](event) || resultData;
             } catch (error) {
                 // NOTE: remove on release
-                console.log(error);
+//                console.log(error);
             }
         }
         return resultData;
@@ -18933,11 +19286,11 @@ angular.module('am-wb-core')//
      */
     WbWidgetAbstract.prototype.getElementAttributes = function(){
         return this.elementAttributes;
-    }
+    };
 
     WbWidgetAbstract.prototype.isLeaf = function(){
         return true;
-    }
+    };
 
     return WbWidgetAbstract;
 
@@ -19245,7 +19598,7 @@ angular.module('am-wb-core')//
         .then(function(){
             return widgets;
         });
-    }
+    };
 
     WbWidgetGroupCtrl.prototype.__cleanInsertIndex = function(index){
         if(!angular.isDefined(index) || index > this.childWidgets.length){
@@ -19325,12 +19678,12 @@ angular.module('am-wb-core')//
 
     WbWidgetGroupCtrl.prototype.isLeaf = function(){
         return false;
-    }
+    };
     
     WbWidgetGroupCtrl.prototype.isHorizontal = function(){
         var direction = this.getModelProperty('style.flexDirection') || this.getProperty('style.flexDirection');
         return direction === 'row';
-    }
+    };
 
     return WbWidgetGroupCtrl;
 });
@@ -19398,7 +19751,7 @@ angular.module('am-wb-core')//
         // listen on change
         this.on('modelUpdated', eventHandler);
         this.on('runtimeModelUpdated', eventHandler);
-    };
+    }
 
     // extend functionality
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
@@ -19478,7 +19831,7 @@ angular.module('am-wb-core')//
                 ctrl.getElement().off('click dblclick', removeDefaultAction);
             }
         });
-    };
+    }
 
     // extend functionality
     Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
@@ -19519,7 +19872,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -19558,7 +19911,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -19597,7 +19950,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -19636,7 +19989,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -19675,7 +20028,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -19723,7 +20076,7 @@ angular.module('am-wb-core')//
         this.addElementAttributes('autoplay', 'controls',
                 'loop', 'muted', 'preload', 'src');
         this.setAllowedTypes('source');
-    };
+    }
     Widget.prototype = Object.create(WbWidgetGroup.prototype);
     return Widget;
 });
@@ -19762,7 +20115,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -19801,7 +20154,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -19840,7 +20193,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -19879,7 +20232,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -19918,7 +20271,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -19957,7 +20310,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -19996,7 +20349,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20035,7 +20388,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetGroup.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetGroup.prototype);
     return Widget;
 });
@@ -20074,7 +20427,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20113,7 +20466,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20152,7 +20505,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20191,7 +20544,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20230,7 +20583,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20269,7 +20622,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20308,7 +20661,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20347,7 +20700,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20386,7 +20739,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20425,7 +20778,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20456,210 +20809,15 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Widgets
- * @name h1
- * @description Manage a widget
+ * @name h 
+ * @description Manage header (h1..h6)
  */
-.factory('WbWidgetH1', function (WbWidgetAbstractHtml) {
+.factory('WbWidgetH', function (WbWidgetAbstractHtml) {
     'use strict';
     function Widget($element, $parent){
         WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    };
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Widgets
- * @name h2
- * @description Manage a widget
- */
-.factory('WbWidgetH2', function (WbWidgetAbstractHtml) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    };
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Widgets
- * @name h3
- * @description Manage a widget
- */
-.factory('WbWidgetH3', function (WbWidgetAbstractHtml) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    };
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Widgets
- * @name h4
- * @description Manage a widget
- */
-.factory('WbWidgetH4', function (WbWidgetAbstractHtml) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    };
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Widgets
- * @name h5
- * @description Manage a widget
- */
-.factory('WbWidgetH5', function (WbWidgetAbstractHtml) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    };
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Widgets
- * @name h6
- * @description Manage a widget
- */
-.factory('WbWidgetH6', function (WbWidgetAbstractHtml) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    };
+        this.addElementAttributes('align');
+    }
     Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
     return Widget;
 });
@@ -20698,7 +20856,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20737,7 +20895,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20780,7 +20938,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstractHtml.apply(this, [$element, $parent]);
         this.addElementAttributes('name', 'src', 'srcdoc', 'sandbox');
-    };
+    }
     // extend functionality
     Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
     return Widget;
@@ -20882,7 +21040,7 @@ angular.module('am-wb-core')//
         var ctrl = this;
         function eventHandler(event){
             if(event.key === 'inputType'){
-                ctrl.setElementAttribute('type', value);
+                ctrl.setElementAttribute('type', event.value);
             }
         }
         // listen on change
@@ -20945,7 +21103,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -20984,7 +21142,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21023,7 +21181,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21062,7 +21220,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21102,7 +21260,7 @@ angular.module('am-wb-core')//
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes('crossorigin', 'href',
                 'hreflang', 'media', 'rel', 'size', 'type');
-    };
+    }
     // extend functionality
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
@@ -21143,7 +21301,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21182,7 +21340,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21240,7 +21398,7 @@ angular.module('am-wb-core')//
             ctrl.getElement().hide();
         });
         updateView();
-    };
+    }
     // extend functionality
     Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
     return Widget;
@@ -21281,7 +21439,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21320,7 +21478,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21359,7 +21517,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21398,7 +21556,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21437,7 +21595,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21476,7 +21634,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21515,7 +21673,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21554,7 +21712,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21593,7 +21751,7 @@ angular.module('am-wb-core')//
 .factory('WbWidgetP', function (WbWidgetAbstractHtml) {
     function Widget($element, $parent){
         WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
     return Widget;
 });
@@ -21632,7 +21790,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21675,7 +21833,7 @@ angular.module('am-wb-core')//
                 'hspace', 'ismap', 'longdesc', 'sizes', 'src',
                 'usemap', 'width');
          this.setAllowedTypes('source', 'img');
-     };
+     }
      // extend functionality
      Widget.prototype = Object.create(WbWidgetGroup.prototype);
      return Widget;
@@ -21716,7 +21874,7 @@ angular.module('am-wb-core')//
 .factory('WbWidgetPre', function (WbWidgetAbstractHtml) {
     function Widget($element, $parent){
         WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
     return Widget;
 });
@@ -21796,7 +21954,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21835,7 +21993,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21869,13 +22027,13 @@ angular.module('am-wb-core')//
  * @name section
  * @description Manage a widget
  */
-.factory('WbWidgetSection', function (WbWidgetAbstract) {
+.factory('WbWidgetSection', function (WbWidgetGroup) {
     'use strict';
     function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
+        WbWidgetGroup.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    }
+    Widget.prototype = Object.create(WbWidgetGroup.prototype);
     return Widget;
 });
 
@@ -21913,7 +22071,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -21974,7 +22132,7 @@ angular.module('am-wb-core')//
             ctrl.getElement().hide();
         });
         updateView();
-    };
+    }
 
     // extend functionality
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
@@ -22015,7 +22173,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -22054,7 +22212,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -22093,7 +22251,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -22132,7 +22290,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -22241,7 +22399,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -22280,7 +22438,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;
 });
@@ -22322,7 +22480,7 @@ angular.module('am-wb-core')//
                 'loop', 'muted', 'poster', 'preload', 'src',
                 'usemap', 'width');
         this.setAllowedTypes('source');
-    };
+    }
     Widget.prototype = Object.create(WbWidgetGroup.prototype);
     return Widget;
 });

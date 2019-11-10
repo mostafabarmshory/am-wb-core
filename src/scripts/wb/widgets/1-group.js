@@ -299,7 +299,7 @@ angular.module('am-wb-core')//
         .then(function(){
             return widgets;
         });
-    }
+    };
 
     WbWidgetGroupCtrl.prototype.__cleanInsertIndex = function(index){
         if(!angular.isDefined(index) || index > this.childWidgets.length){
@@ -379,12 +379,12 @@ angular.module('am-wb-core')//
 
     WbWidgetGroupCtrl.prototype.isLeaf = function(){
         return false;
-    }
+    };
     
     WbWidgetGroupCtrl.prototype.isHorizontal = function(){
         var direction = this.getModelProperty('style.flexDirection') || this.getProperty('style.flexDirection');
         return direction === 'row';
-    }
+    };
 
     return WbWidgetGroupCtrl;
 });

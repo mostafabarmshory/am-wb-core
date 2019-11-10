@@ -35,7 +35,7 @@ angular.module('am-wb-core')//
                 'loop', 'muted', 'poster', 'preload', 'src',
                 'usemap', 'width');
         this.setAllowedTypes('source');
-    };
+    }
     Widget.prototype = Object.create(WbWidgetGroup.prototype);
     return Widget;
 });

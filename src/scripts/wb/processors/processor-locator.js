@@ -34,7 +34,7 @@ angular.module('am-wb-core')//
         WbProcessorAbstract.apply(this);
         this.widgetLocator = new WidgetLocatorManager();
         this.autoVisible = true;
-    };
+    }
 
     Processor.prototype = new WbProcessorAbstract();
     

@@ -25,44 +25,44 @@
 
 angular.module('am-wb-core')
 
-	/**
-	 * @ngdoc Services
-	 * @name $storage
-	 * @description A service to work with storage of browser
-	 * 
-	 */
-	.service('$storage', function ($localStorage) {
-	    /*
-	     * @param 
-	     * @returns
-	     */
-	    function get(key) {
-		return $localStorage[key];
-	    }
-	    /*
-	     * @param 
-	     * @returns
-	     */
-	    function put (key,value) {
-		$localStorage[key] = value;
-	    }
-	    /*
-	     * @param 
-	     * @returns
-	     */
-	    function remove(key) {
-		delete $localStorage[key];
-	    }
-	    /*
-	     * @param 
-	     * @returns
-	     */
-	    function has(key) {
-		return ($localStorage[key]? true : false);
-	    }
-	    
-	    this.get = get;
-	    this.put = put;
-	    this.remove = remove;
-	    this.has = has;
-	});
+/**
+ * @ngdoc Services
+ * @name $storage
+ * @description A service to work with storage of browser
+ * 
+ */
+.service('$storage', function ($localStorage) {
+    /*
+     * @param 
+     * @returns
+     */
+    function get(key) {
+        return $localStorage[key];
+    }
+    /*
+     * @param 
+     * @returns
+     */
+    function put (key,value) {
+        $localStorage[key] = value;
+    }
+    /*
+     * @param 
+     * @returns
+     */
+    function remove(key) {
+        delete $localStorage[key];
+    }
+    /*
+     * @param 
+     * @returns
+     */
+    function has(key) {
+        return ($localStorage[key]? true : false);
+    }
+
+    this.get = get;
+    this.put = put;
+    this.remove = remove;
+    this.has = has;
+});

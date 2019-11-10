@@ -172,7 +172,7 @@ angular.module('am-wb-core')//
             try{
                 callback.apply(callback, [event]);
             } catch(ex){
-                console.error(ex);
+//                console.error(ex);
             }
         });
     };
@@ -220,7 +220,6 @@ angular.module('am-wb-core')//
 
         // 2- load
         var ctrl = this;
-        var widget = this.widget;
         _.forEach(this.attributes, function(attrKey){
             ctrl.attributesValue[attrKey] = widget.getModelProperty(attrKey);
         });

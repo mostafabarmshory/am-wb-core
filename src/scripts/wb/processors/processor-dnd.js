@@ -34,8 +34,8 @@ angular.module('am-wb-core')//
     // In standard-compliant browsers we use a custom mime type and also encode the dnd-type in it.
     // However, IE and Edge only support a limited number of mime types. The workarounds are described
     // in https://github.com/marceljuenemann/angular-drag-and-drop-lists/wiki/Data-Transfer-Design
-    var MIME_TYPE = 'application/x-dnd';
-    var EDGE_MIME_TYPE = 'application/json';
+//    var MIME_TYPE = 'application/x-dnd';
+//    var EDGE_MIME_TYPE = 'application/json';
     var MSIE_MIME_TYPE = 'Text';
 
     // All valid HTML5 drop effects, in the order in which we prefer to use them.
@@ -43,7 +43,7 @@ angular.module('am-wb-core')//
 
     // While an element is dragged over the list, this placeholder element is inserted
     // at the location where the element would be inserted after dropping.
-    var placeholder = angular.element("<div class='wbDndPlaceholder'></div>");
+    var placeholder = angular.element('<div class="wbDndPlaceholder"></div>');
     var placeholderNode = placeholder[0];
     placeholder.remove();
 
@@ -69,11 +69,11 @@ angular.module('am-wb-core')//
      * Filters an array of drop effects using a HTML5 effectAllowed string.
      */
     function filterEffects(effects, effectAllowed) {
-        if (effectAllowed == 'all') {
+        if (effectAllowed === 'all') {
             return effects;
         }
         return effects.filter(function(effect) {
-            return effectAllowed.toLowerCase().indexOf(effect) != -1;
+            return effectAllowed.toLowerCase().indexOf(effect) !== -1;
         });
     }
 
@@ -133,9 +133,9 @@ angular.module('am-wb-core')//
         // therefore the following modifier keys will only affect other operating systems.
         if (!effects.length) {
             return 'none';
-        } else if (event.ctrlKey && effects.indexOf('copy') != -1) {
+        } else if (event.ctrlKey && effects.indexOf('copy') !== -1) {
             return 'copy';
-        } else if (event.altKey && effects.indexOf('link') != -1) {
+        } else if (event.altKey && effects.indexOf('link') !== -1) {
             return 'link';
         } else {
             return effects[0];
@@ -154,7 +154,7 @@ angular.module('am-wb-core')//
         widget.$$dndState.itemType = widget.getType();
 
         // Set the allowed drop effects. See below for special IE handling.
-        widget.$$dndState.dropEffect = "none";
+        widget.$$dndState.dropEffect = 'none';
         widget.$$dndState.effectAllowed = /*dndEffectAllowed ||*/ ALL_EFFECTS[0];
 
         // 2 - convert and put data
@@ -165,7 +165,7 @@ angular.module('am-wb-core')//
                 event.dataTransfer.setData(converter.getMimetype(), converter.encode(widget));
             } catch (e) {
                 // TODO: maso, 2019: log errors
-                console.log('fail to convert to :' + converter.getMimetype(), e);
+//                console.log('fail to convert to :' + converter.getMimetype(), e);
             }
         });
 
@@ -215,7 +215,7 @@ angular.module('am-wb-core')//
         case 'copy':
         case 'link':
         case 'canceled':
-            console.log('not supported');
+//            console.log('not supported');
             break;
         }
 
@@ -254,36 +254,39 @@ angular.module('am-wb-core')//
         var listNode = element[0];
 
         // Make sure the placeholder is shown, which is especially important if the list is empty.
-        if (placeholderNode.parentNode != listNode) {
+        if (placeholderNode.parentNode !== listNode) {
             element.append(placeholder);
         }
 
+        var listItemNode = null;
+        var horizontal;
+        var rect;
         if (widget.isLeaf()) {
             // Try to find the node direct directly below the list node.
-            var listItemNode = event.target;
-            while (listItemNode.parentNode != listNode && listItemNode.parentNode) {
+            listItemNode = event.target;
+            while (listItemNode.parentNode !== listNode && listItemNode.parentNode) {
                 listItemNode = listItemNode.parentNode;
             }
 
-            if (listItemNode.parentNode == listNode && listItemNode != placeholderNode) {
+            if (listItemNode.parentNode === listNode && listItemNode !== placeholderNode) {
                 // If the mouse pointer is in the upper half of the list item element,
                 // we position the placeholder before the list item, otherwise after it.
-                var rect = listItemNode.getBoundingClientRect();
-                var horizontal = true; // TODO:
+                rect = listItemNode.getBoundingClientRect();
+                horizontal = true; // TODO:
+                var isFirstHalf;
                 if (horizontal) {
-                    var isFirstHalf = event.clientX < rect.left + rect.width / 2;
+                    isFirstHalf = event.clientX < rect.left + rect.width / 2;
                 } else {
-                    var isFirstHalf = event.clientY < rect.top + rect.height / 2;
+                    isFirstHalf = event.clientY < rect.top + rect.height / 2;
                 }
                 listNode.insertBefore(placeholderNode,
                         isFirstHalf ? listItemNode : listItemNode.nextSibling);
             }
         } else {
-            var listItemNode = null;
-            var horizontal = widget.isHorizontal();
+            horizontal = widget.isHorizontal();
             for(var i = 0; i < listNode.childNodes.length; i++){
                 var node = listNode.childNodes[i];
-                var rect = node.getBoundingClientRect();
+                rect = node.getBoundingClientRect();
                 if (horizontal) {
                     if(rect.left > event.clientX) {
                         listItemNode = node;
@@ -304,9 +307,9 @@ angular.module('am-wb-core')//
         // In IE we set a fake effectAllowed in dragstart to get the correct cursor, we therefore
         // ignore the effectAllowed passed in dataTransfer. We must also not access dataTransfer for
         // drops from external sources, as that throws an exception.
-        var ignoreDataTransfer = mimeType == MSIE_MIME_TYPE;
+        var ignoreDataTransfer = mimeType === MSIE_MIME_TYPE;
         var dropEffect = getDropEffect(event, ignoreDataTransfer);
-        if (dropEffect == 'none') {
+        if (dropEffect === 'none') {
             return stopDragover();
         }
 
@@ -336,25 +339,26 @@ angular.module('am-wb-core')//
         event.preventDefault();
 
         // Unserialize the data that was serialized in dragstart.
+        var data;
         try {
             var converter = $widget.getConverter(mimeType);
-            var data = converter.decode(event.dataTransfer.getData(mimeType));
+            data = converter.decode(event.dataTransfer.getData(mimeType));
         } catch(e) {
             placeholder.remove();
             return false;
         }
 
         // Drops with invalid types from external sources might not have been filtered out yet.
-//      if (mimeType == MSIE_MIME_TYPE || mimeType == EDGE_MIME_TYPE) {
+//      if (mimeType === MSIE_MIME_TYPE || mimeType === EDGE_MIME_TYPE) {
 //      itemType = data.type || undefined;
 //      data = data.item;
 //      if (!isDropAllowed(itemType)) return stopDragover();
 //      }
 
         // Special handling for internal IE drops, see dragover handler.
-        var ignoreDataTransfer = mimeType == MSIE_MIME_TYPE;
+        var ignoreDataTransfer = mimeType === MSIE_MIME_TYPE;
         var dropEffect = getDropEffect(event, ignoreDataTransfer);
-        if (dropEffect == 'none') {
+        if (dropEffect === 'none') {
             return stopDragover();
         }
 
@@ -395,7 +399,7 @@ angular.module('am-wb-core')//
      */
     function Processor(){
         WbProcessorAbstract.apply(this);
-    };
+    }
 
     // extend functionality
     Processor.prototype = new WbProcessorAbstract();

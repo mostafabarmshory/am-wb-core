@@ -40,7 +40,7 @@ angular.module('am-wb-core')
 	 * Manages resource dialog
 	 * @ngInject
 	 */
-	function wbResourceCtrl($scope,  $mdDialog, $wbUtil,
+	function ResourceCtrl($scope,  $mdDialog, $wbUtil,
 			$q, $controller, $compile, pages, style, data, $element, $window) {
 
 		$scope.value = angular.copy(data);
@@ -83,7 +83,7 @@ angular.module('am-wb-core')
 		 */
 		this.setValue = function(value){
 			$scope.value = value;
-		}
+		};
 
 		/*
 		 * Gets current value
@@ -183,7 +183,7 @@ angular.module('am-wb-core')
 		var ctrl = this;
 		$scope.setValue = function(value){
 			return ctrl.setValue(value);
-		}
+		};
 	}
 
 
@@ -245,7 +245,7 @@ angular.module('am-wb-core')
 		}
 		var tmplUrl = pages.length > 1 ? 'views/dialogs/wb-select-resource.html' : 'views/dialogs/wb-select-resource-single-page.html';
 		return $wbUi.openDialog({
-			controller : wbResourceCtrl,
+			controller : ResourceCtrl,
 			templateUrl : tmplUrl,
 			parent : angular.element(document.body),
 			clickOutsideToClose : true,

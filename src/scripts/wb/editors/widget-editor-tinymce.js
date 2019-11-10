@@ -39,27 +39,27 @@ angular.module('am-wb-core')//
      * 
      * Creates new instace of an editor
      */
-    function editor(widget, options) {
+    function Editor(widget, options) {
         options = options || {};
         WidgetEditor.apply(this, [widget, options]);
     }
-    
-    editor.prototype = new WidgetEditor();
+
+    Editor.prototype = new WidgetEditor();
 
     /**
      * remove all resources
      * 
      * @memberof WidgetEditorTinymce
      */
-    editor.prototype.destroy = function () {
+    Editor.prototype.destroy = function () {
         this.hide();
         WidgetEditor.prototype.destroy.call(this);
     };
-    
+
     /**
      * Remove editor
      */
-    editor.prototype.hide = function () {
+    Editor.prototype.hide = function () {
         if (this.isHidden()) {
             return;
         }
@@ -68,13 +68,13 @@ angular.module('am-wb-core')//
         if(this.isDirty()){
             this.widget.setModelProperty(this.options.property, this._content);
         }
-        tinymce.remove(this.widget.getElement().getPath())
+        tinymce.remove(this.widget.getElement().getPath());
     };
 
     /**
      * Run and display editor for the current widget
      */
-    editor.prototype.show = function () {
+    Editor.prototype.show = function () {
         this._hide = false;
         var ctrl = this;
         var widget = this.getWidget();
@@ -92,10 +92,10 @@ angular.module('am-wb-core')//
                         ctrl.saveAndClose();
                     }
                 });
-                
+
                 editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
-                	event.stopPropagation();
-                	editor.save();
+                    event.stopPropagation();
+                    editor.save();
                 });
 
                 // Update model when:
@@ -115,14 +115,14 @@ angular.module('am-wb-core')//
         });
     };
 
-    editor.prototype.isHidden = function () {
+    Editor.prototype.isHidden = function () {
         return this._hide;
     };
 
     /**
      * Read value from element and set into the element
      */
-    editor.prototype.updateView = function (editor) {
+    Editor.prototype.updateView = function (editor) {
         var content = editor.getContent({
             format : this.options.format || 'html'
         }).trim();
@@ -130,8 +130,8 @@ angular.module('am-wb-core')//
         this.setDirty(true);
     };
 
-    
-    editor.prototype.closeWithoutSave = function(){
+
+    Editor.prototype.closeWithoutSave = function(){
         this.setDirty(false);
         this.hide();
         // reset old value
@@ -141,12 +141,12 @@ angular.module('am-wb-core')//
             oldValue: '',
             value: this.widget.getModelProperty(this.options.property)
         });
-    }
-    
-    editor.prototype.saveAndClose = function(){
+    };
+
+    Editor.prototype.saveAndClose = function(){
         this.hide();
-    }
-    
+    };
+
 //  the editor type
-    return editor;
+    return Editor;
 });

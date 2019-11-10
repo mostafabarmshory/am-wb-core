@@ -34,11 +34,11 @@ angular.module('am-wb-core')//
     'use strict';
     function cssNameToJsName(name)
     {
-        var split = name.split("-");
-        var output = "";
+        var split = name.split('-');
+        var output = '';
         for(var i = 0; i < split.length; i++)
         {
-            if (i > 0 && split[i].length > 0 && !(i == 1 && split[i] == "ms"))
+            if (i > 0 && split[i].length > 0 && !(i === 1 && split[i] === 'ms'))
             {
                 split[i] = split[i].substr(0, 1).toUpperCase() + split[i].substr(1);
             }
@@ -65,7 +65,7 @@ angular.module('am-wb-core')//
             if(attr.name !== 'style'){
                 model[attr.name] = attr.value;
             }
-        })
+        });
         //style
         for(var i = 0; i < element.style.length; i++){
             var sname = element.style.item(i);
@@ -73,19 +73,19 @@ angular.module('am-wb-core')//
         }
         // html
         if($widget.isWidgetLeaf(name)){
-            model['html'] = element.innerHTML;
+            model.html = element.innerHTML;
         } else {
             model.children = [];
             _.forEach(element.children, function(childelement){
                 model.children.push(convertElementToModel(childelement));
-            })
+            });
         }
         return model;
     }
 
     function Converter(){
         WbConverterAbstract.apply(this, ['text/html']);
-    };
+    }
     Converter.prototype = new WbConverterAbstract();
 
     Converter.prototype.encode = function(){
@@ -93,7 +93,7 @@ angular.module('am-wb-core')//
         var data = '';
         while(widgets.length){
             var widget = widgets.pop();
-            data += widget.getElement().prop('outerHTML'); + '\n';
+            data += widget.getElement().prop('outerHTML') + '\n';
         }
         return data;
     };
@@ -109,7 +109,7 @@ angular.module('am-wb-core')//
                 }
             }
         } catch(ex){
-            console.error(ex);
+//            console.error(ex);
         }
         return widgets;
     };

@@ -37,15 +37,15 @@ angular.module('am-wb-core')
  * ```
  */
 .directive('wbOnError', function() {
-	return {
-		restrict : 'A',
-		link : function(scope, element, attrs) {
-			element.bind('error', function() {
-				// call the function that was passed
-				if (attrs.wbOnError) {
-					scope.$apply(attrs.wbOnError);
-				}
-			});
-		}
-	};
+    return {
+        restrict : 'A',
+        link : function(scope, element, attrs) {
+            element.bind('error', function() {
+                // call the function that was passed
+                if (attrs.wbOnError) {
+                    scope.$apply(attrs.wbOnError);
+                }
+            });
+        }
+    };
 });

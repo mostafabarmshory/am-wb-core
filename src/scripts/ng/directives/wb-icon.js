@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+'use strict';
 angular.module('am-wb-core')
 
 
@@ -32,159 +33,157 @@ angular.module('am-wb-core')
  * @description Icon for WB
  */
 .directive('wbIcon', function (wbIconService, $interpolate) {
-	'use strict';
-	// FORMAT
-	var template = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="{{icon.viewbox}}" width="{{icon.size}}" height="{{icon.size}}">{{{icon.shape}}}</svg>';
-	// REPLACE FORMAT
-	var replaceTemplate = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="{{icon.viewbox}}" width="{{icon.size}}" height="{{icon.size}}"><g id="{{icon.name}}" style="display:none">{{{icon.shape}}}</g><g id="{{old.name}}" style="display:none">{{{old.shape}}}</g></svg>';
-	
-	// optimize pars
-	Mustache.parse(template);
-	Mustache.parse(replaceTemplate);
+    // FORMAT
+    var template = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="{{icon.viewbox}}" width="{{icon.size}}" height="{{icon.size}}">{{{icon.shape}}}</svg>';
+    // REPLACE FORMAT
+    var replaceTemplate = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="{{icon.viewbox}}" width="{{icon.size}}" height="{{icon.size}}"><g id="{{icon.name}}" style="display:none">{{{icon.shape}}}</g><g id="{{old.name}}" style="display:none">{{{old.shape}}}</g></svg>';
 
-	var shapes = wbIconService.getShapes();
+    // optimize pars
+    Mustache.parse(template);
+    Mustache.parse(replaceTemplate);
 
-	function postLink(scope, element, attr, ctrls, transclude) {
-		// icon information
-		var icon = {
-				name: 'help',
-				viewbox: '0 0 24 24',
-				size: 24,
-		};
-		// Counter
-		var renderCount = 0;
+    var shapes = wbIconService.getShapes();
+
+    function postLink(scope, element, attr, ctrls, transclude) {
+        // icon information
+        var icon = {
+                name: 'help',
+                viewbox: '0 0 24 24',
+                size: 24,
+        };
+        // Counter
+        var renderCount = 0;
 
 
-		/*
-		 * Sets icon and render the shape
-		 */
-		function setIcon(iconName){
-			var tempIcon = _.clone(icon);
-			// icon
-			if (iconName !== undefined) {
-				tempIcon.name = iconName;
-				// Check for material-design-icons style name, and extract icon / size
-				var ss = iconName.match(/ic_(.*)_([0-9]+)px.svg/m);
-				if (ss !== null) {
-					tempIcon.name = ss[1];
-					tempIcon.size = ss[2];
-				}
-			}
-			
-			render(tempIcon);
-		}
+        /*
+         * Sets icon and render the shape
+         */
+        function setIcon(iconName){
+            var tempIcon = _.clone(icon);
+            // icon
+            if (iconName !== undefined) {
+                tempIcon.name = iconName;
+                // Check for material-design-icons style name, and extract icon / size
+                var ss = iconName.match(/ic_(.*)_([0-9]+)px.svg/m);
+                if (ss !== null) {
+                    tempIcon.name = ss[1];
+                    tempIcon.size = ss[2];
+                }
+            }
 
-		function setViewBox(viewBox){
-			// viewBox
-			if (attr.viewBox !== undefined) {
-				viewBox = attr.viewBox;
-			} else {
-				viewBox = wbIconService.getViewBox(icon) ? wbIconService.getViewBox(icon) : '0 0 24 24';
-			}
-			render();
-		}
+            render(tempIcon);
+        }
 
-		function setSize(newsize){
-			if (newsize === icon.size) { 
-				return; 
-			}
-			var tempIcon = _.clone(icon);
-			tempIcon.size = newsize;
-			render(tempIcon);
-		}
+//        function setViewBox(viewBox){
+//            // viewBox
+//            if (attr.viewBox !== undefined) {
+//                viewBox = attr.viewBox;
+//            } else {
+//                viewBox = wbIconService.getViewBox(icon) ? wbIconService.getViewBox(icon) : '0 0 24 24';
+//            }
+//            render();
+//            return viewBox;
+//        }
 
-		function render(newIcon) {
-			// check for new changes
-			if(renderCount && newIcon.name === icon.name 
-					&& newIcon.size === icon.size
-					&& newIcon.viewbox === icon.viewbox){
-				return;
-			}
-			newIcon.shape = shapes[newIcon.name];
-			if(renderCount && window.SVGMorpheus) {
-				// this block will succeed if SVGMorpheus is available
-				var options = JSON.parse(attr.options || '{}');
-				element.html(Mustache.render(replaceTemplate, {
-					icon: newIcon,
-					old: icon
-				}));
-				new SVGMorpheus(element.children()[0]).to(newicon, options);
-			} else {
-				element.html(Mustache.render(template, {
-					icon: newIcon
-				}));
-			}
+        function setSize(newsize){
+            if (newsize === icon.size) { 
+                return; 
+            }
+            var tempIcon = _.clone(icon);
+            tempIcon.size = newsize;
+            render(tempIcon);
+        }
 
-			icon = newIcon;
-			renderCount++;
-		};
+        function render(newIcon) {
+            // check for new changes
+            if(renderCount && newIcon.name === icon.name && 
+                    newIcon.size === icon.size && 
+                    newIcon.viewbox === icon.viewbox){
+                return;
+            }
+            newIcon.shape = shapes[newIcon.name];
+            if(renderCount && window.SVGMorpheus) {
+                // this block will succeed if SVGMorpheus is available
+                var options = JSON.parse(attr.options || '{}');
+                element.html(Mustache.render(replaceTemplate, {
+                    icon: newIcon,
+                    old: icon
+                }));
+                new SVGMorpheus(element.children()[0]).to(newIcon, options);
+            } else {
+                element.html(Mustache.render(template, {
+                    icon: newIcon
+                }));
+            }
 
-		// watch for any changes
-		if (attr.icon !== undefined) {
-			attr.$observe('icon', setIcon); 
-		} else if(attr.wbIconName !== undefined){
-			attr.$observe('wbIconName', setIcon);
-		} else {
-			transclude(scope, function(clone) {
-				var text = clone.text();
-				if (text && text.trim()) {
-					scope.$watch(function() {
-						return $interpolate(text.trim())(scope);
-					}, setIcon);
-				}
-			});
-		}
-		if (attr.size !== undefined) { 
-			attr.$observe('size', setSize);  
-		}
-	}
+            icon = newIcon;
+            renderCount++;
+        }
 
-	return {
-		restrict: 'AE',
-		transclude : true,
-		link: postLink,
-		replace: false
-	};
+        // watch for any changes
+        if (attr.icon !== undefined) {
+            attr.$observe('icon', setIcon); 
+        } else if(attr.wbIconName !== undefined){
+            attr.$observe('wbIconName', setIcon);
+        } else {
+            transclude(scope, function(clone) {
+                var text = clone.text();
+                if (text && text.trim()) {
+                    scope.$watch(function() {
+                        return $interpolate(text.trim())(scope);
+                    }, setIcon);
+                }
+            });
+        }
+        if (attr.size !== undefined) { 
+            attr.$observe('size', setSize);  
+        }
+    }
+
+    return {
+        restrict: 'AE',
+        transclude : true,
+        link: postLink,
+        replace: false
+    };
 })
 
 .directive('mdIconFloat', function($mdTheming) {
 
-	var INPUT_TAGS = [ 'INPUT', 'TEXTAREA', 'SELECT',
-		'MD-SELECT' ];
+    var INPUT_TAGS = [ 'INPUT', 'TEXTAREA', 'SELECT',
+        'MD-SELECT' ];
 
-	var LEFT_SELECTORS = INPUT_TAGS.reduce(
-			function(selectors, isel) {
-				return selectors.concat([ 'wb-icon ~ ' + isel,
-					'.wb-icon ~ ' + isel ]);
-			}, []).join(',');
+    var LEFT_SELECTORS = INPUT_TAGS.reduce(
+            function(selectors, isel) {
+                return selectors.concat([ 'wb-icon ~ ' + isel, '.wb-icon ~ ' + isel ]);
+            }, []).join(',');
 
-	var RIGHT_SELECTORS = INPUT_TAGS.reduce(
-			function(selectors, isel) {
-				return selectors.concat([ isel + ' ~ wb-icon',
-					isel + ' ~ .wb-icon' ]);
-			}, []).join(',');
+    var RIGHT_SELECTORS = INPUT_TAGS.reduce(
+            function(selectors, isel) {
+                return selectors.concat([ isel + ' ~ wb-icon', isel + ' ~ .wb-icon' ]);
+            }, []).join(',');
 
-	function compile(tElement) {
-		// Check for both a left & right icon
-		var leftIcon = tElement[0]
-		.querySelector(LEFT_SELECTORS);
-		var rightIcon = tElement[0]
-		.querySelector(RIGHT_SELECTORS);
+    function compile(tElement) {
+        // Check for both a left & right icon
+        var leftIcon = tElement[0]
+        .querySelector(LEFT_SELECTORS);
+        var rightIcon = tElement[0]
+        .querySelector(RIGHT_SELECTORS);
 
-		if (leftIcon) {
-			tElement.addClass('md-icon-left');
-		}
-		if (rightIcon) {
-			tElement.addClass('md-icon-right');
-		}
+        if (leftIcon) {
+            tElement.addClass('md-icon-left');
+        }
+        if (rightIcon) {
+            tElement.addClass('md-icon-right');
+        }
 
-		return function postLink(scope, element) {
-			$mdTheming(element);
-		};
-	}
+        return function postLink(scope, element) {
+            $mdTheming(element);
+        };
+    }
 
-	return {
-		restrict : 'C',
-		compile : compile
-	};
+    return {
+        restrict : 'C',
+        compile : compile
+    };
 });

@@ -31,8 +31,7 @@ angular.module('am-wb-core')//
 .factory('WbProcessorAbstract', function () {
     'use strict';
 
-    function Processor(){
-    };
+    function Processor(){}
 
     return Processor;
 });

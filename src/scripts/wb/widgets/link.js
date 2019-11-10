@@ -33,7 +33,7 @@ angular.module('am-wb-core')//
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes('crossorigin', 'href',
                 'hreflang', 'media', 'rel', 'size', 'type');
-    };
+    }
     // extend functionality
     Widget.prototype = Object.create(WbWidgetAbstract.prototype);
     return Widget;

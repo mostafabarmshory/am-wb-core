@@ -39,7 +39,7 @@ angular
  * 
  * For each item in selection a selection locator will be created.
  */
-.factory('WidgetLocatorManager',function ($widget, BoundWidgetLocator, SelectionWidgetLocator, $timeout, $rootElement) {
+.factory('WidgetLocatorManager',function ($widget, BoundWidgetLocator, SelectionWidgetLocator) {
 
     /**
      * Creates new instance of the manager
@@ -149,7 +149,7 @@ angular
             clearInterval(this._intervalCheck);
             delete this._intervalCheck;
         }
-    }
+    };
 
     WidgetLocatorManager.prototype.connect = function(){
         var rootWidget = this.getRootWidget();
@@ -305,7 +305,6 @@ angular
         });
     };
 
-
     WidgetLocatorManager.prototype.removeSelectionLocator = function(widget) {
         var map = this.selectionLocatorMap;
         if(map.has(widget)) {
@@ -314,7 +313,7 @@ angular
             this.selectionLocatorMap.delete(widget);
             locator.disconnect();
         }
-    }
+    };
 
     WidgetLocatorManager.prototype.createSelectionLocator = function(widget) {
         var map = this.selectionLocatorMap;

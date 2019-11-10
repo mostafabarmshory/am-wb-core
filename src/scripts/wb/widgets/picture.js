@@ -36,7 +36,7 @@ angular.module('am-wb-core')//
                 'hspace', 'ismap', 'longdesc', 'sizes', 'src',
                 'usemap', 'width');
          this.setAllowedTypes('source', 'img');
-     };
+     }
      // extend functionality
      Widget.prototype = Object.create(WbWidgetGroup.prototype);
      return Widget;

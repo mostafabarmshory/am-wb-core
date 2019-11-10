@@ -64,7 +64,7 @@ angular.module('am-wb-core')//
 
     function Processor(){
         WbProcessorAbstract.apply(this);
-    };
+    }
 
     // extend functionality
     Processor.prototype = new WbProcessorAbstract();
@@ -85,6 +85,6 @@ angular.module('am-wb-core')//
             loadWidgetAttributes(widget, _.intersection(microdataAttributes, event.keys || [event.key]));
             return;
         }
-    }
+    };
     return Processor;
 });

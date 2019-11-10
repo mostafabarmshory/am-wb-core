@@ -376,6 +376,23 @@ angular.module('am-wb-core')//
      * @name setProperty
      */
     WbWidgetAbstract.prototype.setProperty = function (key, value){
+        /*
+         * Support old widget scripts
+         */
+        switch(key){
+        case 'style.layout.direction':
+            key = 'style.flexDirection';
+            break;
+        case 'style.background.color':
+            key = 'style.backgroundColor';
+            break;
+        case 'style.size.width':
+            key = 'style.width';
+            break;
+        case 'style.size.height':
+            key = 'style.height';
+            break;
+        }
         // create the event
         var $event = {
                 source: this,
@@ -682,7 +699,7 @@ angular.module('am-wb-core')//
                 resultData = callbacks[i](event) || resultData;
             } catch (error) {
                 // NOTE: remove on release
-                console.log(error);
+//                console.log(error);
             }
         }
         return resultData;
@@ -1086,11 +1103,11 @@ angular.module('am-wb-core')//
      */
     WbWidgetAbstract.prototype.getElementAttributes = function(){
         return this.elementAttributes;
-    }
+    };
 
     WbWidgetAbstract.prototype.isLeaf = function(){
         return true;
-    }
+    };
 
     return WbWidgetAbstract;
 

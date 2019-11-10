@@ -56,10 +56,10 @@ angular.module('am-wb-core')
     }
 
     function setWidgetElementAttributes(widget, elementAttributes) {
-        var elementAttributes = widget.getElementAttributes();
+//        var elementAttributes = widget.getElementAttributes();
         for(var i =0; i < elementAttributes.length; i++){
             var key = elementAttributes[i];
-            setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key))
+            setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key));
         }
     }
 
