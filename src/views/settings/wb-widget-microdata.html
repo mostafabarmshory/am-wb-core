@@ -21,52 +21,40 @@ SEE: document/widgets-microdata.md
 <fieldset
 	layout="column"
 	style="padding: 0px">
-	<legend translate="">Widget Microdata</legend>
-	<md-switch 
+	<legend translate="">Microdata</legend>
+	<wb-ui-setting-text
 		ng-model="ctrl.itemscope"
 		ng-change="ctrl.setProperty('itemscope', ctrl.itemscope)"
-		aria-label="itemscope"
-		translate="">Item Scope</md-switch>
-	<md-input-container style="margin: 0px">
-		<label translate="">itemtype</label>
-		<input 
-			type="text" 
-			ng-model="ctrl.itemtype"
-			ng-change="ctrl.setProperty('itemtype', ctrl.itemtype)">
-	</md-input-container>
-	<md-input-container style="margin: 0px">
-		<label translate="">itemprop</label>
-		<input 
-			type="text" 
-			ng-model="ctrl.itemprop"
-			ng-change="ctrl.setProperty('itemprop', ctrl.itemprop)">
-	</md-input-container>
-	<md-input-container style="margin: 0px">
-		<label translate="">itemid</label>
-		<input 
-			type="text" 
-			ng-model="ctrl.itemid"
-			ng-change="ctrl.setProperty('itemid', ctrl.itemid)">
-	</md-input-container>
-	<md-input-container style="margin: 0px">
-		<label translate="">itemref</label>
-		<input 
-			type="text" 
-			ng-model="ctrl.itemref"
-			ng-change="ctrl.setProperty('itemref', ctrl.itemref)">
-	</md-input-container>
-	<md-input-container style="margin: 0px">
-		<label translate="">Value</label>
-		<input 
-			type="text" 
-			ng-model="ctrl.value"
-			ng-change="ctrl.setProperty('value', ctrl.value)">
-	</md-input-container>
-	<md-input-container style="margin: 0px">
-		<label translate="">Content</label>
-		<input 
-			type="text" 
-			ng-model="ctrl.content"
-			ng-change="ctrl.setProperty('content', ctrl.content)">
-	</md-input-container>
+		wb-title="Scope"
+		wb-description=""></wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.itemtype"
+		ng-change="ctrl.setProperty('itemtype', ctrl.itemtype)"
+		wb-title="Type"
+		wb-description=""></wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.itemprop"
+		ng-change="ctrl.setProperty('itemprop', ctrl.itemprop)"
+		wb-title="Property"
+		wb-description=""></wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.itemid"
+		ng-change="ctrl.setProperty('itemid', ctrl.itemid)"
+		wb-title="ID"
+		wb-description=""></wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.itemref"
+		ng-change="ctrl.setProperty('itemref', ctrl.itemref)"
+		wb-title="Reference"
+		wb-description=""></wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.value"
+		ng-change="ctrl.setProperty('value', ctrl.value)"
+		wb-title="Value"
+		wb-description=""></wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.content"
+		ng-change="ctrl.setProperty('content', ctrl.content)"
+		wb-title="Content"
+		wb-description=""></wb-ui-setting-text>
 </fieldset>
