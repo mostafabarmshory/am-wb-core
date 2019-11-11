@@ -14090,7 +14090,63 @@ angular.module('am-wb-core')//
  * 
  */
 .controller('WbSettingStyleBorderCtrl', function () {
-	
+
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            'border',
+            'borderWidth',
+            'borderStyle',
+            'borderColor',
+            'borderCollapse',
+            'borderSpacing',
+
+            'borderTop',
+            'borderTopWidth',
+            'borderTopStyle',
+            'borderTopColor',
+
+            'borderRight',
+            'borderRightWidth',
+            'borderRightStyle',
+            'borderRightColor',
+
+            'borderBttom',
+            'borderBttomWidth',
+            'borderBttomStyle',
+            'borderBttomColor',
+
+            'borderLeft',
+            'borderLeftWidth',
+            'borderLeftStyle',
+            'borderLeftColor',
+
+            'borderRadius',
+            'borderTopRightRadius',
+            'borderTopLeftRadius',
+            'borderBottomLeftRadius',
+            'borderBottomRightRadius',
+
+            'borderImage',
+            'borderImageSource',
+            'borderImageSlice',
+            'borderImageWidth',
+            'borderImageOutset',
+            'borderImageRepeat',
+
+            'outline',
+            'outlineOffset',
+            'outlineWidth',
+            'outlineStyle',
+            'outlineColor',
+
+            'boxDecorationBreak',
+            'boxShadow',
+            'boxSizing'
+            ]);
+    };
 });
 
 /*
@@ -14129,6 +14185,22 @@ angular.module('am-wb-core')//
  * 
  */
 .controller('WbSettingStyleGeneralCtrl', function () {
+
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            'opacity',
+            'visibility',
+            'color',
+            'mixBlendMode',
+            'isolation',
+
+            'cursor',
+            'pointerEvents',
+            ]);
+    };
 });
 
 /*
@@ -14187,6 +14259,74 @@ angular.module('am-wb-core')//
  */
 .controller('WbSettingStyleLayoutCtrl', function (/*$scope, $element*/) {
 
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            'display',
+            'order',
+            'zIndex',
+            'clear',
+            'float',
+            // Position
+            'position',
+            'bottom',
+            'left',
+            'right',
+            'top',
+            // overflow
+            'overflow',
+            'overflowX',
+            'overflowY',
+            'scrollBehavior',
+            // Print
+            'pageBreakAfter',
+            'pageBreakBefore',
+            'pageBreakInside',
+            // Flex
+            'alignContent',
+            'alignItems',
+            'alignSelf',
+            'justifyContent',
+            'flex',
+            'flexBasis',
+            'flexDirection',
+            'flexGrow',
+            'flexShrink',
+            'flexWrap',
+            // grid
+            'grid',
+            'gridArea',
+            'gridAutoColumns',
+            'gridAutoFlow',
+            'gridAutoRows',
+            'gridColumn',
+            'gridColumnEnd',
+            'gridColumnGap',
+            'gridColumnStart',
+            'gridGap',
+            'gridRow',
+            'gridRowEnd',
+            'gridRowGap',
+            'gridRowStart',
+            'gridTemplate',
+            'gridTemplateAreas',
+            'gridTemplateColumns',
+            'gridTemplateRows',
+            // column view
+            'columns',
+            'columnWidth',
+            'columnCount',
+            'columnSpan',
+            'columnFill',
+            'columnGap',
+            'columnRule',
+            'columnRuleColor',
+            'columnRuleStyle',
+            'columnRuleWidth',
+            ]);
+    };
 });
 
 /*
@@ -14222,6 +14362,18 @@ angular.module('am-wb-core')//
  */
 .controller('WbSettingStyleMediaCtrl', function () {
 
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            'clip',
+            'clipPath',
+            'filter',
+            'objectFit',
+            'objectPosition',
+            ]);
+    };
 });
 
 /*
@@ -14257,6 +14409,30 @@ angular.module('am-wb-core')//
  */
 .controller('WbSettingStyleSizeCtrl', function () {
 
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            'margin',
+            'marginTop',
+            'marginRight',
+            'marginBottom',
+            'marginLeft',
+            'padding',
+            'paddingTop',
+            'paddingRight',
+            'paddingBottom',
+            'paddingLeft',
+            'resize',
+            'height',
+            'maxHeight',
+            'minHeight',
+            'width',
+            'maxWidth',
+            'minWidth',
+            ]);
+    };
 });
 
 /*
@@ -14291,6 +14467,52 @@ angular.module('am-wb-core')//
  * 
  */
 .controller('WbSettingStyleTextCtrl', function () {
+
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            // writing
+            'hyphens',
+            'letterSpacing',
+            'lineHeight',
+            'quotes',
+            'tabSize',
+            'verticalAlign',
+            'whiteSpace',
+            'wordBreak',
+            'wordSpacing',
+            'wordWrap',
+            'writingMode',
+            'userSelect',
+            // Text
+            'textAlign-last',
+            'textDecoration',
+            'textDecorationColor',
+            'textDecorationLine',
+            'textDecorationStyle',
+            'textIndent',
+            'textJustify',
+            'textOverflow',
+            'textShadow',
+            'textTransform',
+            // Local
+            'direction',
+            'unicodeBidi',
+            // font
+            'font',
+            'fontFamily',
+            'fontKerning',
+            'fontSize',
+            'fontSizeAdjust',
+            'fontStretch',
+            'fontStyle',
+            'fontVariant',
+            'fontWeight',
+            ]);
+    };
+
 
 });
 
