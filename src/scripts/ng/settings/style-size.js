@@ -31,4 +31,28 @@ angular.module('am-wb-core')//
  */
 .controller('WbSettingStyleSizeCtrl', function () {
 
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            'margin',
+            'marginTop',
+            'marginRight',
+            'marginBottom',
+            'marginLeft',
+            'padding',
+            'paddingTop',
+            'paddingRight',
+            'paddingBottom',
+            'paddingLeft',
+            'resize',
+            'height',
+            'maxHeight',
+            'minHeight',
+            'width',
+            'maxWidth',
+            'minWidth',
+            ]);
+    };
 });

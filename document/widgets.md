@@ -72,42 +72,42 @@ If the state of the widget is going to change then a event of stateChanged will 
 - border-collapse
 - border-spacing
 
-- border-bottom
-- border-bottom-width
-- border-bottom-style
-- border-bottom-color
+- borderBottom
+- borderBottom-width
+- borderBottom-style
+- borderBottom-color
 
-- border-left
-- border-left-width
-- border-left-style (required)
-- border-left-color
+- borderLeft
+- borderLeft-width
+- borderLeft-style (required)
+- borderLeft-color
 
-- border-right
-- border-right-width
-- border-right-style (required)
-- border-right-color
+- borderRight
+- borderRight-width
+- borderRight-style (required)
+- borderRight-color
 
-- border-top
-- border-top-width
-- border-top-style (required)
-- border-top-color
+- borderTop
+- borderTop-width
+- borderTop-style (required)
+- borderTop-color
 
 ##### Radius
 
-- border-radius
-- border-top-right-radius
-- border-top-left-radius
-- border-bottom-left-radius
-- border-bottom-right-radius
+- borderRadius
+- borderTopRightRadius
+- borderTopLeftRadius
+- borderBottomLeftRadius
+- borderBottomRightRadius
 
 ##### Image
 
-- border-image
-- border-image-source
-- border-image-slice
-- border-image-width
-- border-image-outset
-- border-image-repeat
+- borderImage
+- borderImageSource
+- borderImageSlice
+- borderImageWidth
+- borderImageOutset
+- borderImageRepeat
 
 
 ### layout
@@ -228,13 +228,13 @@ If the state of the widget is going to change then a event of stateChanged will 
 - opacity
 - visibility
 - color
-- mix-blend-mode
+- mixBlendMode
 - isolation
 
 #### mouse
 
 - cursor
-- pointer-events
+- pointerEvents
 
 
 
@@ -244,48 +244,48 @@ If the state of the widget is going to change then a event of stateChanged will 
 #### writing
 
 hyphens
-letter-spacing
-line-height
+letterSpacing
+lineHeight
 quotes
-tab-size
-vertical-align
-white-space
-word-break
-word-spacing
-word-wrap
-writing-mode
-user-select
+tabSize
+verticalAlign
+whiteSpace
+wordBreak
+wordSpacing
+wordWrap
+writingMode
+userSelect
 
 #### Text
 
-text-align-last
-text-decoration
-text-decoration-color
-text-decoration-line
-text-decoration-style
-text-indent
-text-justify
-text-overflow
-text-shadow
-text-transform
+textAlign-last
+textDecoration
+textDecorationColor
+textDecorationLine
+textDecorationStyle
+textIndent
+textJustify
+textOverflow
+textShadow
+textTransform
 
 #### Local
 
 direction
-unicode-bidi
+unicodeBidi
 
  
 #### font
 
 font
-font-family
-font-kerning
-font-size
-font-size-adjust
-font-stretch
-font-style
-font-variant
-font-weight
+fontFamily
+fontKerning
+fontSize
+fontSizeAdjust
+fontStretch
+fontStyle
+fontVariant
+fontWeight
 
 
 ### list (ul, ol)
