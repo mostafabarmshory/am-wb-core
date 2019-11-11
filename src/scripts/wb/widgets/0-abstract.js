@@ -681,10 +681,9 @@ angular.module('am-wb-core')//
         params = params || {};
 
         // 1- Call processors
-        var event = _.merge({
-            source: this,
-            type: type
-        }, params || {});
+        var event = params || {};
+        event.source = this;
+        event.type = type;
         $widget.applyProcessors(this, event);
 
         // 2- call listeners
