@@ -474,6 +474,10 @@ angular.module('am-wb-core')
     this.setProcessor = function(type, processor){
         processors[type] = processor;
     };
+    
+    this.removeProcessor = function(type){
+        processors[type] = undefined;
+    };
 
     /**
      * gets processor of the type

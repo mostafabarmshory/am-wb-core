@@ -40,41 +40,68 @@ angular.module('am-wb-core')//
 
         var ctrl = this;
         this.clickListener = function($event){
-            var widget = $event.source;
+            try{
+                ctrl.lock = true;
+                var widget = $event.source;
 
-            widget.setSelected(true);
-            if($event.shiftKey){
-                ctrl.selectedWidgets.push(widget);
-            } else {
+                widget.setSelected(true);
+                if($event.shiftKey){
+                    ctrl.selectedWidgets.push(widget);
+                } else {
+                    _.forEach(ctrl.selectedWidgets, function(widget){
+                        widget.setSelected(false);
+                    });
+                    ctrl.selectedWidgets = [widget];
+                }
+                $event.stopPropagation();
+                $event.preventDefault();
+
+                $event.widgets = ctrl.selectedWidgets;
+                ctrl.fire('selectionChange', $event);
+            } finally {
+                delete ctrl.lock;
+            }
+        };
+
+        this.dblclickListener = function($event){
+            try{
+                ctrl.lock = true;
+                var widget = $event.source;
+
+                widget.setSelected(true, $event);
+                $event.stopPropagation();
+                $event.preventDefault();
+
+                // clear selection
                 _.forEach(ctrl.selectedWidgets, function(widget){
                     widget.setSelected(false);
                 });
                 ctrl.selectedWidgets = [widget];
+
+                // Open an editor 
+                var editor = $widget.getEditor(widget);
+                editor.show();
+
+                $event.widgets = ctrl.selectedWidgets;
+                ctrl.fire('selectionChange', $event);
+            } finally {
+                delete ctrl.lock;
             }
-            $event.stopPropagation();
-            $event.preventDefault();
-            
-            $event.widgets = ctrl.selectedWidgets;
-            ctrl.fire('selectionChange', $event);
         };
 
-        this.dblclickListener = function($event){
+        this.selectionListener = function($event){
+            if(ctrl.lock){
+                return;
+            }
             var widget = $event.source;
-            
-            widget.setSelected(true, $event);
-            $event.stopPropagation();
-            $event.preventDefault();
 
             // clear selection
+            // TODO: maso, 2019: check if shift key is hold
             _.forEach(ctrl.selectedWidgets, function(widget){
                 widget.setSelected(false);
             });
             ctrl.selectedWidgets = [widget];
 
-            // Open an editor 
-            var editor = $widget.getEditor(widget);
-            editor.show();
-            
             $event.widgets = ctrl.selectedWidgets;
             ctrl.fire('selectionChange', $event);
         };
@@ -87,9 +114,11 @@ angular.module('am-wb-core')//
         if(widget.state === 'edit') {
             widget.on('click', this.clickListener);
             widget.on('dblclick', this.dblclickListener);
+            widget.on('select', this.selectionListener);
         } else {
             widget.off('click', this.clickListener);
             widget.off('dblclick', this.dblclickListener);
+            widget.off('select', this.selectionListener);
         }
     };
 
@@ -107,11 +136,10 @@ angular.module('am-wb-core')//
             this.callbacks[event].slice(index, 1);
         }
     };
-    
 
     Processor.prototype.fire = function (type, params) {
         params = params || {};
-        
+
         // 1- Call processors
         var event = _.merge({
             source: this,
@@ -130,10 +158,18 @@ angular.module('am-wb-core')//
                 resultData = callbacks[i](event) || resultData;
             } catch (error) {
                 // NOTE: remove on release
-//                console.log(error);
+//              console.log(error);
             }
         }
         return resultData;
+    };
+
+
+    /**
+     * Enable the processor
+     */
+    Processor.prototype.setEnable = function(enable){
+        this.enable = enable;
     };
 
     return Processor;

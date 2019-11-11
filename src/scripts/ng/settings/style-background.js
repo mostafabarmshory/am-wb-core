@@ -36,4 +36,21 @@ angular.module('am-wb-core')//
  */
 .controller('WbSettingStyleBackgroundCtrl', function () {
 
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            // id
+            'background',
+            'backgroundColor',
+            'backgroundImage',
+            'backgroundPosition',
+            'backgroundSize',
+            'backgroundRepeat',
+            'backgroundOrigin',
+            'backgroundClip',
+            'backgroundAttachment'
+            ]);
+    };
 });
