@@ -43,6 +43,9 @@ angular.module('am-wb-core')//
             try{
                 ctrl.lock = true;
                 var widget = $event.source;
+                if(widget.isSilent()){
+                    return false;
+                }
 
                 widget.setSelected(true);
                 if($event.shiftKey){
@@ -67,6 +70,9 @@ angular.module('am-wb-core')//
             try{
                 ctrl.lock = true;
                 var widget = $event.source;
+                if(widget.isSilent()){
+                    return false;
+                }
 
                 widget.setSelected(true, $event);
                 $event.stopPropagation();
