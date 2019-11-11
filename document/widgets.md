@@ -112,11 +112,21 @@ If the state of the widget is going to change then a event of stateChanged will 
 
 ### layout
 
+#### Layout
+
 - display
 - order
 - zIndex
 - clear
 - float
+
+##### zIndex
+
+The zIndex property specifies the stack order of an widget.
+
+An widget with greater stack order is always in front of an widget with a lower stack order.
+
+Note: z-index only works on positioned widget (position: absolute, position: relative, position: fixed, or position: sticky).
 
 #### Position
 
@@ -125,6 +135,26 @@ If the state of the widget is going to change then a event of stateChanged will 
 - left
 - right
 - top
+
+##### Position
+
+The position property specifies the type of positioning method used for an widget (static, relative, absolute, fixed, or sticky).
+
+- Default value:	static
+- Inherited:	no
+- Animatable:	no
+
+- static	Widget render in order, as they appear in the document flow	
+- absolute	The widget is positioned relative to its first positioned (not static) ancestor element	
+- fixed	The widget is positioned relative to the browser window	
+- relative	The widget is positioned relative to its normal position, so "left:20px" adds 20 pixels to the widget`s LEFT position
+- sticky	The widget is positioned based on the user's scroll position
+- initial	Sets this property to its default value. Read about initial	
+- inherit	Inherits this property from its parent element
+
+A sticky widget toggles between relative and fixed, depending on the scroll position. It is positioned relative until a given offset position is met in the viewport - then it "sticks" in place (like position:fixed).
+
+Note: Sticky not supported in IE/Edge 15 or earlier. Supported in Safari from version 6.1.	
  
 #### overflow
 

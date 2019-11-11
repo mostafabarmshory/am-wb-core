@@ -42,7 +42,7 @@ angular.module('am-wb-core')//
         this.setAnchor(options.anchor);
 
         // load templates
-        var template = options.template || '<div class="wb-widget-locator bound"></div>';
+        var template = options.template || '<div class="wb-widget-locator bound wb-layer-editor-locator"></div>';
 
         // load elements
         this.topElement = angular.element(template);

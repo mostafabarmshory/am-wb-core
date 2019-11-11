@@ -45,7 +45,7 @@ angular.module('am-wb-core')//
         this.setAnchor(options.anchor);
 
         // load templates
-        var template = options.template || '<div class="wb-widget-locator selection"></div>';
+        var template = options.template || '<div class="wb-widget-locator selection wb-layer-editor-selector"></div>';
 
         this.titleElement = angular.element(template);
         this.titleElement.attr('id', 'header');

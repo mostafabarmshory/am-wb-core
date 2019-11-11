@@ -36,10 +36,10 @@
         <link rel="stylesheet" href="styles/hack-tinymce5-inline-toolbar.css">
         <link rel="stylesheet" href="styles/md-expansion-panel.css">
         <link rel="stylesheet" href="styles/prism.css">
-        <link rel="stylesheet" href="styles/setting-layout.css">
         <link rel="stylesheet" href="styles/typography.css">
         <link rel="stylesheet" href="styles/wb-dnd.css">
         <link rel="stylesheet" href="styles/wb-icon.css">
+        <link rel="stylesheet" href="styles/wb-layers.css">
         <link rel="stylesheet" href="styles/wb-text.css">
         <link rel="stylesheet" href="styles/wb-ui-choose.css">
         <link rel="stylesheet" href="styles/wb-ui-setting-image.css">
@@ -54,7 +54,8 @@
     </head>
     <body
 		layout="column">
-		<md-toolbar>
+		<md-toolbar
+			class="wb-layer-tool-bottom">
 			<div layout-align="center center" layout="row">
 				<md-toolbar-filler layout="row" layout-align="center center">
 					<wb-icon>list</wb-icon>
@@ -126,6 +127,7 @@
 			layout="row"
 			flex>
 			<md-toolbar
+				class="wb-layer-tool-bottom"
 				ng-show="ctrl.editable"
 				flex="5">
 				<div layout="column" layout-align="center center">
