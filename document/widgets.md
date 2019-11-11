@@ -114,7 +114,7 @@ If the state of the widget is going to change then a event of stateChanged will 
 
 - display
 - order
-- z-index
+- zIndex
 - clear
 - float
 
@@ -129,98 +129,97 @@ If the state of the widget is going to change then a event of stateChanged will 
 #### overflow
 
 - overflow
-- overflow-x
-- overflow-y
-- scroll-behavior
+- overflowX
+- overflowY
+- scrollBehavior
  
 #### Print
 
-- page-break-after
-- page-break-before
-- page-break-inside
+- pageBreakAfter
+- pageBreakBefore
+- pageBreakInside
  
 
 #### Flex
 
-- align-content
-- align-items
-- align-self
-- justify-content
+- alignContent
+- alignItems
+- alignSelf
+- justifyContent
 - flex
-- flex-basis
-- flex-direction
-- flex-grow
-- flex-shrink
-- flex-basis
-- flex-wrap
+- flexBasis
+- flexDirection
+- flexGrow
+- flexShrink
+- flexWrap
 
 
 #### grid
 
 - grid
-- grid-area
-- grid-auto-columns
-- grid-auto-flow
-- grid-auto-rows
-- grid-column
-- grid-column-end
-- grid-column-gap
-- grid-column-start
-- grid-gap
-- grid-row
-- grid-row-end
-- grid-row-gap
-- grid-row-start
-- grid-template
-- grid-template-areas
-- grid-template-columns
-- grid-template-rows
+- gridArea
+- gridAutoColumns
+- gridAutoFlow
+- gridAutoRows
+- gridColumn
+- gridColumnEnd
+- gridColumnGap
+- gridColumnStart
+- gridGap
+- gridRow
+- gridRowEnd
+- gridRowGap
+- gridRowStart
+- gridTemplate
+- gridTemplateAreas
+- gridTemplateColumns
+- gridTemplateRows
 
 
 #### column view
 
 - columns
-- column-width
-- column-count
-- column-span
-- column-fill
-- column-gap
-- column-rule
-- column-rule-color
-- column-rule-style
-- column-rule-width
+- columnWidth
+- columnCount
+- columnSpan
+- columnFill
+- columnGap
+- columnRule
+- columnRuleColor
+- columnRuleStyle
+- columnRuleWidth
 
 
 
 ### Size
  
  - margin
- - margin-top
- - margin-right
- - margin-bottom
- - margin-left
+ - marginTop
+ - marginRight
+ - marginBottom
+ - marginLeft
  
  - padding
- - padding-top
- - padding-right
- - padding-bottom
- - padding-left
+ - paddingTop
+ - paddingRight
+ - paddingBottom
+ - paddingLeft
  
  - resize
  - height
- - max-height
- - min-height
+ - maxHeight
+ - minHeight
  - width
- - max-width
- - min-width
+ - maxWidth
+ - minWidth
  
 ### multimedia
 
  - clip
- - clip-path
+ - clipPath
  - filter
- - object-fit
- - object-position
+ - objectFit
+ - objectPosition
 
 ### General?
 
