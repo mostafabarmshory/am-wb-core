@@ -71,9 +71,12 @@ angular.module('am-wb-core')//
 			var sname = element.style.item(i);
 			model.style[cssNameToJsName(sname)] = element.style.getPropertyValue(sname);
 		}
-		// html
 		if($widget.isWidgetLeaf(name)){
+			// html
 			model.html = element.innerHTML;
+			if(model.type === 'pre'){
+				model.text = element.innerText;
+			}
 		} else {
 			model.children = [];
 			_.forEach(element.children, function(childelement){

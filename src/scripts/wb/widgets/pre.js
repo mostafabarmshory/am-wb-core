@@ -29,10 +29,51 @@ angular.module('am-wb-core')//
  * @description Manage a widget with preformatted text.
  * 
  */
-.factory('WbWidgetPre', function (WbWidgetAbstractHtml) {
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-    }
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
+.factory('WbWidgetPre', function (WbWidgetAbstract) {
+
+	/**
+	 * Creates new instance 
+	 * 
+	 * @memberof pre
+	 */
+	function Widget($element, $parent){
+
+		// call super constractor
+		WbWidgetAbstract.apply(this, [$element, $parent]);
+		this.addElementAttributes('text');
+		var ctrl = this;
+
+		/*
+		 * set element attribute
+		 */
+		function eventHandler(event){
+			if(event.key === 'text'){
+				var value = ctrl.getProperty(event.key) || ctrl.getModelProperty(event.key);
+				ctrl.getElement().text(value);
+			}
+		}
+
+		// listen on change
+		this.on('modelUpdated', eventHandler);
+		this.on('runtimeModelUpdated', eventHandler);
+	}
+
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+
+	/**
+	 * Gets value of the input
+	 * 
+	 * @memberof pre
+	 */
+	Widget.prototype.text = function(){
+		var value = arguments[0];
+		if(value){
+			this.setElementAttribute('text', value);
+		}
+		var element = this.getElement();
+		return element.text.apply(element, arguments);
+	};
+
+	return Widget;
 });

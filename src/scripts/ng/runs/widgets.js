@@ -825,7 +825,8 @@ angular.module('am-wb-core')
             html: 'class A {\n\tint a;\n}',
         },
         controller: 'WbWidgetPre', 
-        controllerAs: 'ctrl'
+        controllerAs: 'ctrl', 
+        isLeaf: true
     });
     $widget.newWidget({
         // widget description

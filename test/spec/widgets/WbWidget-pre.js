@@ -51,11 +51,25 @@ describe('WbWidget pre ', function () {
 		// Create new instance
 		var model = {
 				type: 'pre',
-				html: 'hi this is text',
+				text: 'hi this is text',
 		};
 		$widget.compile(model, root)
 		.then(function(widget){
 			expect(widget.getType()).toBe('pre');
+			done();
+		});
+		$rootScope.$apply();
+	});
+	it('should set text from model', function (done) {
+		var root = new MockRootWidget();
+		// Create new instance
+		var model = {
+				type: 'pre',
+				text: 'hi this is text',
+		};
+		$widget.compile(model, root)
+		.then(function(widget){
+			expect(widget.text()).toBe(model.text);
 			done();
 		});
 		$rootScope.$apply();

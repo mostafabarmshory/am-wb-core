@@ -30,50 +30,53 @@ angular.module('am-wb-core')
  * 
  */
 .factory('WbProcessorAttribute', function (WbProcessorAbstract) {
-    'use strict';
+	'use strict';
 
-    function setWidgetElementAttribute(widget, key, value){
-        if(widget.isEditable() && (key === 'draggable' || key === 'dropzone')){
-            // are handled by processors in edit mode
-            return;
-        }
-        var $element = widget.getElement();
-        if(value){
-            $element.attr(key, value);
-        } else {
-            $element.removeAttr(key);
-        }
-        // NOTE: html is special value
-        if(key === 'html'){
-            $element.html(value);
-        }
-        if(key === 'inputType'){
-            widget.setElementAttribute('type', value);
-        }
-        if(key === 'value'){
-            $element.val(value);
-        }
-    }
+	function setWidgetElementAttribute(widget, key, value){
+		if(widget.isEditable() && (key === 'draggable' || key === 'dropzone')){
+			// are handled by processors in edit mode
+			return;
+		}
+		var $element = widget.getElement();
+		if(value){
+			$element.attr(key, value);
+		} else {
+			$element.removeAttr(key);
+		}
+		// NOTE: html is special value
+		if(key === 'html'){
+			$element.html(value);
+		}
+		if(key === 'text'){
+			$element.text(value);
+		}
+		if(key === 'inputType'){
+			widget.setElementAttribute('type', value);
+		}
+		if(key === 'value'){
+			$element.val(value);
+		}
+	}
 
-    function setWidgetElementAttributes(widget, elementAttributes) {
-//        var elementAttributes = widget.getElementAttributes();
-        for(var i =0; i < elementAttributes.length; i++){
-            var key = elementAttributes[i];
-            setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key));
-        }
-    }
+	function setWidgetElementAttributes(widget, elementAttributes) {
+//		var elementAttributes = widget.getElementAttributes();
+		for(var i =0; i < elementAttributes.length; i++){
+			var key = elementAttributes[i];
+			setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key));
+		}
+	}
 
-    function Processor() {
-        WbProcessorAbstract.apply(this);
-    }
-    Processor.prototype = new WbProcessorAbstract();
+	function Processor() {
+		WbProcessorAbstract.apply(this);
+	}
+	Processor.prototype = new WbProcessorAbstract();
 
-    Processor.prototype.process = function (widget, event) {
-        if (event.type === 'modelChanged') {
-            setWidgetElementAttributes(widget, widget.getElementAttributes());
-        } else if (event.type === 'modelUpdated') {
-            setWidgetElementAttributes(widget, _.intersection(event.keys || [event.key]));
-        }
-    };
-    return Processor;
+	Processor.prototype.process = function (widget, event) {
+		if (event.type === 'modelChanged') {
+			setWidgetElementAttributes(widget, widget.getElementAttributes());
+		} else if (event.type === 'modelUpdated') {
+			setWidgetElementAttributes(widget, _.intersection(event.keys || [event.key]));
+		}
+	};
+	return Processor;
 });

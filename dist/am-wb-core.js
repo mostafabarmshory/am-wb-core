@@ -11661,7 +11661,8 @@ angular.module('am-wb-core')
             html: 'class A {\n\tint a;\n}',
         },
         controller: 'WbWidgetPre', 
-        controllerAs: 'ctrl'
+        controllerAs: 'ctrl', 
+        isLeaf: true
     });
     $widget.newWidget({
         // widget description
@@ -15053,9 +15054,12 @@ angular.module('am-wb-core')//
 			var sname = element.style.item(i);
 			model.style[cssNameToJsName(sname)] = element.style.getPropertyValue(sname);
 		}
-		// html
 		if($widget.isWidgetLeaf(name)){
+			// html
 			model.html = element.innerHTML;
+			if(model.type === 'pre'){
+				model.text = element.innerText;
+			}
 		} else {
 			model.children = [];
 			_.forEach(element.children, function(childelement){
@@ -16682,52 +16686,55 @@ angular.module('am-wb-core')
  * 
  */
 .factory('WbProcessorAttribute', function (WbProcessorAbstract) {
-    'use strict';
+	'use strict';
 
-    function setWidgetElementAttribute(widget, key, value){
-        if(widget.isEditable() && (key === 'draggable' || key === 'dropzone')){
-            // are handled by processors in edit mode
-            return;
-        }
-        var $element = widget.getElement();
-        if(value){
-            $element.attr(key, value);
-        } else {
-            $element.removeAttr(key);
-        }
-        // NOTE: html is special value
-        if(key === 'html'){
-            $element.html(value);
-        }
-        if(key === 'inputType'){
-            widget.setElementAttribute('type', value);
-        }
-        if(key === 'value'){
-            $element.val(value);
-        }
-    }
+	function setWidgetElementAttribute(widget, key, value){
+		if(widget.isEditable() && (key === 'draggable' || key === 'dropzone')){
+			// are handled by processors in edit mode
+			return;
+		}
+		var $element = widget.getElement();
+		if(value){
+			$element.attr(key, value);
+		} else {
+			$element.removeAttr(key);
+		}
+		// NOTE: html is special value
+		if(key === 'html'){
+			$element.html(value);
+		}
+		if(key === 'text'){
+			$element.text(value);
+		}
+		if(key === 'inputType'){
+			widget.setElementAttribute('type', value);
+		}
+		if(key === 'value'){
+			$element.val(value);
+		}
+	}
 
-    function setWidgetElementAttributes(widget, elementAttributes) {
-//        var elementAttributes = widget.getElementAttributes();
-        for(var i =0; i < elementAttributes.length; i++){
-            var key = elementAttributes[i];
-            setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key));
-        }
-    }
+	function setWidgetElementAttributes(widget, elementAttributes) {
+//		var elementAttributes = widget.getElementAttributes();
+		for(var i =0; i < elementAttributes.length; i++){
+			var key = elementAttributes[i];
+			setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key));
+		}
+	}
 
-    function Processor() {
-        WbProcessorAbstract.apply(this);
-    }
-    Processor.prototype = new WbProcessorAbstract();
+	function Processor() {
+		WbProcessorAbstract.apply(this);
+	}
+	Processor.prototype = new WbProcessorAbstract();
 
-    Processor.prototype.process = function (widget, event) {
-        if (event.type === 'modelChanged') {
-            setWidgetElementAttributes(widget, widget.getElementAttributes());
-        } else if (event.type === 'modelUpdated') {
-            setWidgetElementAttributes(widget, _.intersection(event.keys || [event.key]));
-        }
-    };
-    return Processor;
+	Processor.prototype.process = function (widget, event) {
+		if (event.type === 'modelChanged') {
+			setWidgetElementAttributes(widget, widget.getElementAttributes());
+		} else if (event.type === 'modelUpdated') {
+			setWidgetElementAttributes(widget, _.intersection(event.keys || [event.key]));
+		}
+	};
+	return Processor;
 });
 
 /*
@@ -17629,12 +17636,10 @@ angular.module('am-wb-core')//
 					}
 					$event.widgets = ctrl.selectedWidgets;
 					ctrl.fire('selectionChange', $event);
-					
+
 					$event.preventDefault();
 					$event.stopPropagation();
 				}
-			} catch(ex){
-				console.error(ex);
 			} finally {
 				delete ctrl.lock;
 			}
@@ -17663,8 +17668,6 @@ angular.module('am-wb-core')//
 					$event.preventDefault();
 					$event.stopPropagation();
 				}
-			} catch(ex){
-				console.error(ex);
 			}finally {
 				delete ctrl.lock;
 			}
@@ -22173,12 +22176,53 @@ angular.module('am-wb-core')//
  * @description Manage a widget with preformatted text.
  * 
  */
-.factory('WbWidgetPre', function (WbWidgetAbstractHtml) {
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-    }
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
+.factory('WbWidgetPre', function (WbWidgetAbstract) {
+
+	/**
+	 * Creates new instance 
+	 * 
+	 * @memberof pre
+	 */
+	function Widget($element, $parent){
+
+		// call super constractor
+		WbWidgetAbstract.apply(this, [$element, $parent]);
+		this.addElementAttributes('text');
+		var ctrl = this;
+
+		/*
+		 * set element attribute
+		 */
+		function eventHandler(event){
+			if(event.key === 'text'){
+				var value = ctrl.getProperty(event.key) || ctrl.getModelProperty(event.key);
+				ctrl.getElement().text(value);
+			}
+		}
+
+		// listen on change
+		this.on('modelUpdated', eventHandler);
+		this.on('runtimeModelUpdated', eventHandler);
+	}
+
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+
+	/**
+	 * Gets value of the input
+	 * 
+	 * @memberof pre
+	 */
+	Widget.prototype.text = function(){
+		var value = arguments[0];
+		if(value){
+			this.setElementAttribute('text', value);
+		}
+		var element = this.getElement();
+		return element.text.apply(element, arguments);
+	};
+
+	return Widget;
 });
 
 /*

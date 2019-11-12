@@ -80,4 +80,14 @@ describe('WbWidget converter WbConverterDom ', function () {
         });
         $rootScope.$apply();
     });
+
+    it('should converte pre and its text', function () {
+        // Create new instance
+        var data = '<pre>hi</pre>';
+        var converter = new WbConverterDom();
+        var result = converter.decode(data);
+        expect(result.length).toBe(1);
+        expect(result[0].type).toBe('pre');
+        expect(result[0].text).toBe('hi');
+    });
 });
