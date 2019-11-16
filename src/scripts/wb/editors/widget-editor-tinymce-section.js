@@ -35,118 +35,139 @@ angular.module('am-wb-core')//
  * 
  */
 
-.factory('WidgetEditorTinymceSection', function ($sce, WidgetEditor) {
+.factory('WidgetEditorTinymceSection', function ($widget, WidgetEditor) {
 
-    /**
-     * TODO: maso, 2019: extends WidgetEditorFake
-     * 
-     * Creates new instace of an editor
-     */
-    function Editor(widget, options) {
-        options = options || {};
-        WidgetEditor.apply(this, [widget, options]);
-    }
+	/**
+	 * TODO: maso, 2019: extends WidgetEditorFake
+	 * 
+	 * Creates new instace of an editor
+	 */
+	function Editor(widget, options) {
+		options = options || {};
+		WidgetEditor.apply(this, [widget, options]);
+	}
 
-    Editor.prototype = new WidgetEditor();
+	Editor.prototype = new WidgetEditor();
 
-    /**
-     * remove all resources
-     * 
-     * @memberof WidgetEditorTinymce
-     */
-    Editor.prototype.destroy = function () {
-    	WidgetEditor.prototype.destroy.call(this);
-        this.hide();
-    };
+	/**
+	 * remove all resources
+	 * 
+	 * @memberof WidgetEditorTinymce
+	 */
+	Editor.prototype.destroy = function () {
+		WidgetEditor.prototype.destroy.call(this);
+		this.hide();
+	};
 
-    /**
-     * Remove editor
-     */
-    Editor.prototype.hide = function () {
-        if (this.isHidden()) {
-            return;
-        }
-        this._hide = true;
-        // remove editor
-        if(this.isDirty()){
-            this.widget.setModelProperty(this.options.property, this._content);
-        }
-        tinymce.remove(this.widget.getElement().getPath());
-    };
+	/**
+	 * Remove editor
+	 */
+	Editor.prototype.hide = function () {
+		if (this.isHidden()) {
+			return;
+		}
+		this._hide = true;
+		tinymce.remove(this.widget.getElement().getPath());
+	};
 
-    /**
-     * Run and display editor for the current widget
-     */
-    Editor.prototype.show = function () {
-        this._hide = false;
-        var ctrl = this;
-        var widget = this.getWidget();
-        var element = widget.getElement();
-        var selectorPath = element.getPath();
-        tinymce.init(_.merge(this.options, {
-            selector : selectorPath,
-            themes : 'modern',
-            setup: function (editor) {
-                editor.on('keydown', function(e) {
-                    if (e.keyCode === 27) { // escape
-                        ctrl.closeWithoutSave();
-                    }
-                });
+	/**
+	 * Run and display editor for the current widget
+	 */
+	Editor.prototype.show = function () {
+		this._hide = false;
+		var ctrl = this;
+		var widget = this.getWidget();
+		var element = widget.getElement();
+		var selectorPath = element.getPath();
+		tinymce.init(_.merge(this.options, {
+			selector : selectorPath,
+			themes : 'modern',
+			setup: function (editor) {
 
-                editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
-                    event.stopPropagation();
-                    editor.save();
-                });
+				// Save button to save and close the editor
+				editor.ui.registry.addButton('save', {
+					text: 'save',
+					icon: 'save',
+					tooltip: 'Save current changes and close the editor',
+					onAction: function() {
+						ctrl.saveAndClose();
+					}
+				});
+				// close button
+				editor.ui.registry.addButton('close', {
+					text: 'close',
+					icon: 'close',
+					tooltip: 'Close and discards changes',
+					onAction: function() {
+						ctrl.closeWithoutSave();
+					}
+				});
 
-                // Update model when:
-                // - a button has been clicked [ExecCommand]
-                // - the editor content has been modified [change]
-                // - the node has changed [NodeChange]
-                // - an object has been resized (table, image) [ObjectResized]
-                editor.on('ExecCommand change NodeChange ObjectResized', function() {
-                    editor.save();
-                    ctrl.updateView(editor);
-                    return;
-                });
-            }
-        }))
-        .then(function () {
-            element.focus();
-        });
-    };
+				editor.on('keydown', function(e) {
+					if (e.keyCode === 27) { // escape
+						ctrl.closeWithoutSave();
+						return false;
+					}
+				});
 
-    Editor.prototype.isHidden = function () {
-        return this._hide;
-    };
+				editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
+					event.stopPropagation();
+					editor.save();
+				});
 
-    /**
-     * Read value from element and set into the element
-     */
-    Editor.prototype.updateView = function (editor) {
-        var content = editor.getContent({
-            format : this.options.format || 'html'
-        }).trim();
-        this._content = content;
-        this.setDirty(true);
-    };
+				// Update model when:
+				// - a button has been clicked [ExecCommand]
+				// - the editor content has been modified [change]
+				// - the node has changed [NodeChange]
+				// - an object has been resized (table, image) [ObjectResized]
+				editor.on('ExecCommand change NodeChange ObjectResized', function() {
+					editor.save();
+					ctrl.updateView(editor);
+				});
+			}
+		}))
+		.then(function () {
+			element.focus();
+		});
+	};
+
+	Editor.prototype.isHidden = function () {
+		return this._hide;
+	};
+
+	/**
+	 * Read value from element and set into the element
+	 */
+	Editor.prototype.updateView = function (editor) {
+		var content = editor.getContent({
+			format : this.options.format || 'html'
+		}).trim();
+		this._content = content;
+		this.setDirty(true);
+	};
 
 
-    Editor.prototype.closeWithoutSave = function(){
-        this.setDirty(false);
-        this.hide();
-        // reset old value
-        var widget = this.widget;
-        widget.fire('modelUpdated', {
-            key: this.options.property,
-            oldValue: '',
-            value: this.widget.getModelProperty(this.options.property)
-        });
-    };
+	Editor.prototype.closeWithoutSave = function(){
+		this.setDirty(false);
+		this.hide();
+		// reset old value
+		var widget = this.widget;
+		widget.loadWidgets();
+	};
 
-    Editor.prototype.saveAndClose = function(){
-        this.hide();
-    };
+	Editor.prototype.saveAndClose = function(){
+		this.hide();
+		if(this.isDirty()){
+			var widget = this.widget;
+			var converter = $widget.getConverter('text/html');
+			var widgets = converter.decode(this._content);
+			widget.removeChildren();
+			widget.getElement().empty();
+			widget.addChildrenModel(0, widgets);
+			this.setDirty(false);
+		}
+	};
 
-//  the editor type
-    return Editor;
+//	the editor type
+	return Editor;
 });

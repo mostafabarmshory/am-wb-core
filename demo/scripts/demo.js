@@ -124,6 +124,82 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
     };
     
     this.init();
+})
+
+
+/***********************************************************************
+ * Editors
+ ***********************************************************************/
+.run(function ($widget) {
+
+	/***************************************
+	 * Section editor
+	 * 
+	 *  A section is combination of blocks
+	 * widgets such as h, p, and pre. This 
+	 * is an editor to edit the section.
+	 ***************************************/
+	$widget.setEditor('section', {
+		type: 'WidgetEditorTinymceSection',
+		options:{
+			inline: true,
+			menubar: false,
+			plugins: ['link', 'lists', 'powerpaste', 'autolink'],
+			// Toolbar
+			toolbar: ['close save | undo redo | bold italic underline | fontselect fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+			fixed_toolbar_container: '#demo-widget-editor-toolbar',
+		    toolbar_drawer: 'floating'
+		}
+	});
+	
+	
+	
+	
+	
+	// Editors
+	var headerEditorDescription =  {
+			type: 'WidgetEditorTinymce',
+			options:{
+				property: 'html',
+				inline: true,
+				menubar: false,
+				plugins: ['lists', 'powerpaste', 'autolink'],
+				valid_elements: 'strong,em,span[style],a[href]',
+				powerpaste_word_import: 'clean',
+				powerpaste_html_import: 'clean',
+				// Toolbar
+				toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignjustify alignright alignfull ',
+				fixed_toolbar_container: '#demo-widget-editor-toolbar'
+			}
+	};
+	$widget.setEditor('a', headerEditorDescription);
+
+	for(var i = 1; i < 7; i++){
+		var type = 'h'+i;
+		$widget.setEditor(type, headerEditorDescription);
+	}
+
+	$widget.setEditor('pre', {
+		type: 'WidgetEditorCode',
+		options: {}
+	});
+
+	$widget.setEditor('p', {
+		type: 'WidgetEditorTinymce',
+		options:{
+			property: 'html',
+			inline: true,
+			menubar: false,
+			plugins: ['link', 'lists', 'powerpaste', 'autolink'],
+			toolbar: ['undo redo | bold italic underline | fontselect fontsizeselect', 'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+			valid_elements: 'p[style],strong,em,span[style],a[href],img,q',
+			valid_styles: {
+				'*': 'font-size,font-family,color,text-decoration,text-align '
+			},
+			powerpaste_word_import: 'clean',
+			powerpaste_html_import: 'clean',
+		}
+	});
 });
 
 

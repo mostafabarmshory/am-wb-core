@@ -182,6 +182,7 @@ angular.module('am-wb-core')//
         return $q.all(compilesJob)//
         .then(function () {
             var $element = parentWidget.getElement();
+            $element.empty();
             parentWidget.childWidgets.forEach(function (widget) {
                 widget.setEditable(ctrl.isEditable());
                 $element.append(widget.getElement());

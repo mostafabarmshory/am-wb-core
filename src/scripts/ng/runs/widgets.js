@@ -57,65 +57,6 @@ angular.module('am-wb-core')
 	.setProvider('$local', $wbLocal)
 	.setProvider('$media', $mdMedia);
 })
-/***********************************************************************
- * Editors
- ***********************************************************************/
-.run(function ($widget) {
-	// Editors
-	var headerEditorDescription =  {
-			type: 'WidgetEditorTinymce',
-			options:{
-				property: 'html',
-				inline: true,
-				menubar: false,
-				plugins: [
-					'lists',
-					'powerpaste',
-					'autolink'
-					],
-					toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignjustify alignright alignfull ',
-					valid_elements: 'strong,em,span[style],a[href]',
-					valid_styles: {
-						'*': 'font-size,font-family,color,text-decoration,text-align'
-					},
-					powerpaste_word_import: 'clean',
-					powerpaste_html_import: 'clean',
-			}
-	};
-	$widget.setEditor('a', headerEditorDescription);
-
-	for(var i = 1; i < 7; i++){
-		var type = 'h'+i;
-		$widget.setEditor(type, headerEditorDescription);
-	}
-
-	$widget.setEditor('pre', {
-		type: 'WidgetEditorCode',
-		options: {}
-	});
-
-	$widget.setEditor('section', {
-		type: 'WidgetEditorTinymceSection',
-		options:{}
-	});
-
-	$widget.setEditor('p', {
-		type: 'WidgetEditorTinymce',
-		options:{
-			property: 'html',
-			inline: true,
-			menubar: false,
-			plugins: ['link', 'lists', 'powerpaste', 'autolink', 'tinymcespellchecker'],
-			toolbar: ['undo redo | bold italic underline | fontselect fontsizeselect', 'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-			valid_elements: 'p[style],strong,em,span[style],a[href],img,q',
-			valid_styles: {
-				'*': 'font-size,font-family,color,text-decoration,text-align '
-			},
-			powerpaste_word_import: 'clean',
-			powerpaste_html_import: 'clean',
-		}
-	});
-})
 
 /***********************************************************************
  * Widgets

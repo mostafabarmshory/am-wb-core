@@ -223,12 +223,9 @@ angular
      * @memberof WidgetLocatorManager
      */
     WidgetLocatorManager.prototype.updateLocators = function () {
-        var intersectingCount = 0;
         function handleWidget(bound, widget){
             if(widget.isIntersecting()){
                 bound.connect(widget);
-                bound.updateView();
-                intersectingCount++;
             } else {
                 bound.disconnect();
             }
@@ -237,12 +234,6 @@ angular
         this.boundLocatorMap.forEach(handleWidget);
         // selector
         this.selectionLocatorMap.forEach(handleWidget);
-        if(intersectingCount === 0){
-            // somethint is not correct?? try to correct
-            this.boundLocatorMap.forEach(function(bound, widget){
-                widget.setIntersecting(true);
-            });
-        }
     };
 
 

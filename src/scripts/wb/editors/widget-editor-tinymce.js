@@ -34,119 +34,123 @@ angular.module('am-wb-core')//
 
 .factory('WidgetEditorTinymce', function ($sce, WidgetEditor) {
 
-    /**
-     * TODO: maso, 2019: extends WidgetEditorFake
-     * 
-     * Creates new instace of an editor
-     */
-    function Editor(widget, options) {
-        options = options || {};
-        WidgetEditor.apply(this, [widget, options]);
-    }
+	/**
+	 * TODO: maso, 2019: extends WidgetEditorFake
+	 * 
+	 * Creates new instace of an editor
+	 */
+	function Editor(widget, options) {
+		options = options || {};
+		WidgetEditor.apply(this, [widget, options]);
+	}
 
-    Editor.prototype = new WidgetEditor();
+	Editor.prototype = new WidgetEditor();
 
-    /**
-     * remove all resources
-     * 
-     * @memberof WidgetEditorTinymce
-     */
-    Editor.prototype.destroy = function () {
-        this.hide();
-        WidgetEditor.prototype.destroy.call(this);
-    };
+	/**
+	 * remove all resources
+	 * 
+	 * @memberof WidgetEditorTinymce
+	 */
+	Editor.prototype.destroy = function () {
+		this.hide();
+		WidgetEditor.prototype.destroy.call(this);
+	};
 
-    /**
-     * Remove editor
-     */
-    Editor.prototype.hide = function () {
-        if (this.isHidden()) {
-            return;
-        }
-        this._hide = true;
-        // remove editor
-        if(this.isDirty()){
-            this.widget.setModelProperty(this.options.property, this._content);
-        }
-        tinymce.remove(this.widget.getElement().getPath());
-    };
+	/**
+	 * Remove editor
+	 */
+	Editor.prototype.hide = function () {
+		if (this.isHidden()) {
+			return;
+		}
+		this._hide = true;
+		if(this.tinyEditor){
+			this.tinyEditor.remove();
+			delete this.tinyEditor;
+		}
+	};
 
-    /**
-     * Run and display editor for the current widget
-     */
-    Editor.prototype.show = function () {
-        this._hide = false;
-        var ctrl = this;
-        var widget = this.getWidget();
-        var element = widget.getElement();
-        var selectorPath = element.getPath();
-        tinymce.init(_.merge(this.options, {
-            selector : selectorPath,
-            themes : 'modern',
-            setup: function (editor) {
-                editor.on('keydown', function(e) {
-                    if (e.keyCode === 27) { // escape
-                        ctrl.closeWithoutSave();
-                    }
-                    if (e.keyCode === 13){
-                        ctrl.saveAndClose();
-                    }
-                });
+	/**
+	 * Run and display editor for the current widget
+	 */
+	Editor.prototype.show = function () {
+		this._hide = false;
+		var ctrl = this;
+		var widget = this.getWidget();
+		var element = widget.getElement();
+		tinymce.init(_.merge(this.options, {
+			selector : element.getPath(),
+			themes : 'modern',
+			setup: function (editor) {
+				ctrl.tinyEditor = editor;
+				editor.on('keydown', function(e) {
+					if (e.keyCode === 27) { // escape
+						ctrl.closeWithoutSave();
+						return false;
+					}
+					if (e.keyCode === 13){
+						ctrl.saveAndClose();
+						return false;
+					}
+				});
 
-                editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
-                    event.stopPropagation();
-                    editor.save();
-                });
+				editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
+					event.stopPropagation();
+					editor.save();
+				});
 
-                // Update model when:
-                // - a button has been clicked [ExecCommand]
-                // - the editor content has been modified [change]
-                // - the node has changed [NodeChange]
-                // - an object has been resized (table, image) [ObjectResized]
-                editor.on('ExecCommand change NodeChange ObjectResized', function() {
-                    editor.save();
-                    ctrl.updateView(editor);
-                    return;
-                });
-            }
-        }))
-        .then(function () {
-            element.focus();
-        });
-    };
+				// Update model when:
+				// - a button has been clicked [ExecCommand]
+				// - the editor content has been modified [change]
+				// - the node has changed [NodeChange]
+				// - an object has been resized (table, image) [ObjectResized]
+				editor.on('ExecCommand change NodeChange ObjectResized', function() {
+					editor.save();
+					ctrl.updateView(editor);
+				});
+			}
+		}))
+		.then(function () {
+			element.focus();
+		});
+	};
 
-    Editor.prototype.isHidden = function () {
-        return this._hide;
-    };
+	Editor.prototype.isHidden = function () {
+		return this._hide;
+	};
 
-    /**
-     * Read value from element and set into the element
-     */
-    Editor.prototype.updateView = function (editor) {
-        var content = editor.getContent({
-            format : this.options.format || 'html'
-        }).trim();
-        this._content = content;
-        this.setDirty(true);
-    };
+	/**
+	 * Read value from element and set into the element
+	 */
+	Editor.prototype.updateView = function (editor) {
+		var content = editor.getContent({
+			format : this.options.format || 'html'
+		}).trim();
+		this._content = content;
+		this.setDirty(true);
+	};
 
 
-    Editor.prototype.closeWithoutSave = function(){
-        this.setDirty(false);
-        this.hide();
-        // reset old value
-        var widget = this.widget;
-        widget.fire('modelUpdated', {
-            key: this.options.property,
-            oldValue: '',
-            value: this.widget.getModelProperty(this.options.property)
-        });
-    };
+	Editor.prototype.closeWithoutSave = function(){
+		this.setDirty(false);
+		this.hide();
+		// reset old value
+		var widget = this.widget;
+		widget.fire('modelUpdated', {
+			key: this.options.property,
+			oldValue: '',
+			value: this.widget.getModelProperty(this.options.property)
+		});
+	};
 
-    Editor.prototype.saveAndClose = function(){
-        this.hide();
-    };
+	Editor.prototype.saveAndClose = function(){
+		// remove editor
+		if(this.isDirty()){
+			this.widget.setModelProperty(this.options.property, this._content);
+		}
+		this.hide();
+	};
 
-//  the editor type
-    return Editor;
+//	the editor type
+	return Editor;
 });
