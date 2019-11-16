@@ -42,10 +42,11 @@ angular.module('am-wb-core')//
             'height',
             'ismap',
             'longdesc',
+            'size',
             'src',
             'srcset',
             'usemap',
             'width',
-            ]);
+        ]);
     };
 });

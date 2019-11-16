@@ -1,0 +1,34 @@
+{
+	"type": "div",
+	"style": {
+		"padding": "5px",
+		"margin": "0px",
+		"background": "pink",
+		"flexGrow": 2,
+		"flexShrink": 2,
+		"flexBasis": "auto",
+		"display": "flex",
+		"flexDirection": "row",
+		"justifyContent": "center",
+		"alignItems": "center"
+	},
+	"children": [{
+		"type": "img",
+		"src": "images/collapsibleitemlist.svg",
+		"size": "256px",
+		"style": {
+			"padding": "15px",
+			"margin": "0px",
+			"minHight": "80px"
+		}
+	},{
+		"type": "img",
+		"src": "images/content.svg",
+		"size": "256px",
+		"style": {
+			"padding": "15px",
+			"margin": "0px",
+			"minHight": "80px"
+		}
+	}]
+}

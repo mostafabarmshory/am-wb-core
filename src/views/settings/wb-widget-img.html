@@ -1,83 +1,76 @@
-<md-input-container>
-	<label translate>alg</label>
-	<input 
-		ng-model-options="{updateOn : 'change blur'}"
-		ng-model="ctrl.alg" 
-    	ng-change="ctrl.contentChanged('alg', ctrl.alg)"
-		type="text">
-</md-input-container>
-<md-input-container>
-	<label translate>crossorigin</label>
-	<input 
-		ng-model-options="{updateOn : 'change blur'}"
-		ng-model="ctrl.crossorigin" 
-    	ng-change="ctrl.contentChanged('crossorigin', ctrl.crossorigin)"
-		type="text">
-</md-input-container>
-<md-input-container>
-	<label translate>height</label>
-	<input 
-		ng-model-options="{updateOn : 'change blur'}"
-		ng-model="ctrl.height" 
-    	ng-change="ctrl.contentChanged('height', ctrl.height)"
-		type="text">
-</md-input-container>
-<md-input-container>
-	<label translate>ismap</label>
-	<input 
-		ng-model-options="{updateOn : 'change blur'}"
-		ng-model="ctrl.ismap" 
-    	ng-change="ctrl.contentChanged('ismap', ctrl.ismap)"
-		type="text">
-</md-input-container>
-<md-input-container>
-	<label translate>longdesc</label>
-	<input 
-		ng-model-options="{updateOn : 'change blur'}"
-		ng-model="ctrl.longdesc" 
-    	ng-change="ctrl.contentChanged('longdesc', ctrl.longdesc)"
-		type="text">
-</md-input-container>
-<wb-ui-setting-image 
-	title="Image address" 
-	ng-model="ctrl.src"
-    ng-model-options="{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}"
-	ng-change="ctrl.setProperty('src', ctrl.src)">
-</wb-ui-setting-image>
-<md-input-container>
-	<label translate>srcset</label>
-	<input 
-		ng-model-options="{updateOn : 'change blur'}"
-		ng-model="ctrl.srcset" 
-    	ng-change="ctrl.contentChanged('srcset', ctrl.srcset)"
-		type="text">
-</md-input-container>
-<md-input-container>
-	<label translate>usemap</label>
-	<input 
-		ng-model-options="{updateOn : 'change blur'}"
-		ng-model="ctrl.usemap" 
-    	ng-change="ctrl.contentChanged('usemap', ctrl.usemap)"
-		type="text">
-</md-input-container>
-<md-input-container>
-	<label translate>width</label>
-	<input 
-		ng-model-options="{updateOn : 'change blur'}"
-		ng-model="ctrl.width" 
-    	ng-change="ctrl.contentChanged('width', ctrl.width)"
-		type="text">
-</md-input-container>
-
-<!-- <wb-ui-setting-dropdown  -->
-<!-- 	title="Fit"  -->
-<!-- 	icon="cached" -->
-<!-- 	items="[{'title':'fill','value':'fill'}, -->
-<!-- 			{'title':'contain','value':'contain'}, -->
-<!-- 			{'title':'cover','value':'cover'}, -->
-<!-- 			{'title':'scale-down','value':'scale-down'}, -->
-<!-- 			{'title':'none','value':'none'}]"  -->
-<!-- 	ng-model="ctrl.fit" -->
-<!--        ng-model-options="{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}" -->
-<!-- 	ng-change="ctrl.updateFit()"> -->
-<!-- </wb-ui-setting-dropdown> -->
+<fieldset
+	layout="column">
+	<legend translate>Image</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.alg"
+		ng-change="ctrl.setAttribute('alg', ctrl.attributesValue.alg)"
+		wb-title="alg"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.crossorigin"
+		ng-change="ctrl.setAttribute('crossorigin', ctrl.attributesValue.crossorigin)"
+		wb-title="crossorigin"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.longdesc"
+		ng-change="ctrl.setAttribute('longdesc', ctrl.attributesValue.longdesc)"
+		wb-title="longdesc"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+<fieldset
+	layout="column">
+	<legend translate>Source</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.src"
+		ng-change="ctrl.setAttribute('src', ctrl.attributesValue.src)"
+		wb-title="src"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.srcset"
+		ng-change="ctrl.setAttribute('srcset', ctrl.attributesValue.srcset)"
+		wb-title="srcset"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+<fieldset
+	layout="column">
+	<legend translate>Map</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.ismap"
+		ng-change="ctrl.setAttribute('ismap', ctrl.attributesValue.ismap)"
+		wb-title="ismap"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.usemap"
+		ng-change="ctrl.setAttribute('usemap', ctrl.attributesValue.usemap)"
+		wb-title="usemap"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
+<fieldset
+	layout="column">
+	<legend translate>Size</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.size"
+		ng-change="ctrl.setAttribute('size', ctrl.attributesValue.size)"
+		wb-title="size"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.height"
+		ng-change="ctrl.setAttribute('height', ctrl.attributesValue.height)"
+		wb-title="height"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.width"
+		ng-change="ctrl.setAttribute('width', ctrl.attributesValue.width)"
+		wb-title="width"
+		wb-description="">
+	</wb-ui-setting-text>
+</fieldset>
