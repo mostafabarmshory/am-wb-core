@@ -14957,7 +14957,13 @@ angular.module('am-wb-core')//
 				if(childWidget){
 					model.children.push(childWidget);
 				}
-			}); 
+			});
+			if(model.type === 'li' && model.children.length === 0){
+				model.children.push({
+					type: 'p',
+					html: element.innerText
+				});
+			}
 		}
 		return model;
 	}
@@ -16834,7 +16840,6 @@ angular.module('am-wb-core')
 	}
 
 	function setWidgetElementAttributes(widget, elementAttributes) {
-//		var elementAttributes = widget.getElementAttributes();
 		for(var i =0; i < elementAttributes.length; i++){
 			var key = elementAttributes[i];
 			setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key));
@@ -16850,7 +16855,8 @@ angular.module('am-wb-core')
 		if (event.type === 'modelChanged') {
 			setWidgetElementAttributes(widget, widget.getElementAttributes());
 		} else if (event.type === 'modelUpdated') {
-			setWidgetElementAttributes(widget, _.intersection(event.keys || [event.key]));
+			var evKeys = event.keys || [event.key];
+			setWidgetElementAttributes(widget, _.intersection(evKeys, widget.getElementAttributes()));
 		}
 	};
 	return Processor;
@@ -21117,14 +21123,14 @@ angular.module('am-wb-core')//
  * @name form
  * @description Manage a widget
  */
-.factory('WbWidgetForm', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetForm', function (WbWidgetGroup) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetGroup.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+	return Widget;
 });
 
 /*
@@ -21637,14 +21643,14 @@ angular.module('am-wb-core')//
  * @name li
  * @description Manage a widget
  */
-.factory('WbWidgetLi', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetLi', function (WbWidgetGroup) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetGroup.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+	return Widget;
 });
 
 /*
@@ -22012,14 +22018,14 @@ angular.module('am-wb-core')//
  * @name ol
  * @description Manage a widget
  */
-.factory('WbWidgetOl', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetOl', function (WbWidgetGroup) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetGroup.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+	return Widget;
 });
 
 /*
@@ -22896,14 +22902,14 @@ angular.module('am-wb-core')//
  * @name ul
  * @description Manage a widget
  */
-.factory('WbWidgetUl', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetUl', function (WbWidgetGroup) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetGroup.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+	return Widget;
 });
 
 /*

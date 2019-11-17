@@ -176,8 +176,25 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 			}
 		});
 	}
-	
-	
+
+	/***************************************
+	 * List item editor
+	 * 
+	 *  We use a section text editor for
+	 * a list item editor.
+	 ***************************************/
+	$widget.setEditor('li', {
+		type: 'WidgetEditorTinymceSection',
+		options:{
+			inline: true,
+			menubar: false,
+			plugins: ['link', 'lists', 'powerpaste', 'autolink'],
+			// Toolbar
+			toolbar: ['close save | undo redo | bold italic underline | fontselect fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+			fixed_toolbar_container: '#demo-widget-editor-toolbar',
+		    toolbar_drawer: 'floating'
+		}
+	});
 	
 	
 	// Editors

@@ -1,0 +1,63 @@
+{
+	"type": "div",
+	"style": {
+		"padding": "5px",
+		"margin": "0px",
+		"background": "pink",
+		"flexGrow": 2,
+		"flexShrink": 2,
+		"flexBasis": "auto",
+		"display": "flex",
+		"flexDirection": "row",
+		"justifyContent": "center",
+		"alignItems": "center"
+	},
+	"children": [{
+		"type": "section",
+		"children": [{
+			"type": "ol",
+			"children": [{
+				"type": "li",
+				"children": [{
+					"type": "p",
+					"html": "ol item"
+				}, {
+					"type": "p",
+					"html": "ol item"
+				}]
+			},
+			{
+				"type": "li",
+				"children": [{
+					"type": "p",
+					"html": "ol item"
+				}, {
+					"type": "p",
+					"html": "ol item"
+				}]
+			}]
+		}, {
+			"type": "ul",
+			"children": [{
+				"type": "li",
+				"children": [{
+					"type": "p",
+					"html": "ol item"
+				}, {
+					"type": "p",
+					"html": "ol item"
+				}]
+			},
+			{
+				"type": "li",
+				"children": [{
+					"type": "p",
+					"html": "ol item"
+				}, {
+					"type": "p",
+					"html": "ol item"
+				}]
+			}]
+		}]
+	}]
+}

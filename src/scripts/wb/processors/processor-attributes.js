@@ -59,7 +59,6 @@ angular.module('am-wb-core')
 	}
 
 	function setWidgetElementAttributes(widget, elementAttributes) {
-//		var elementAttributes = widget.getElementAttributes();
 		for(var i =0; i < elementAttributes.length; i++){
 			var key = elementAttributes[i];
 			setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key));
@@ -75,7 +74,8 @@ angular.module('am-wb-core')
 		if (event.type === 'modelChanged') {
 			setWidgetElementAttributes(widget, widget.getElementAttributes());
 		} else if (event.type === 'modelUpdated') {
-			setWidgetElementAttributes(widget, _.intersection(event.keys || [event.key]));
+			var evKeys = event.keys || [event.key];
+			setWidgetElementAttributes(widget, _.intersection(evKeys, widget.getElementAttributes()));
 		}
 	};
 	return Processor;

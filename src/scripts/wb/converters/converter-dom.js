@@ -84,7 +84,13 @@ angular.module('am-wb-core')//
 				if(childWidget){
 					model.children.push(childWidget);
 				}
-			}); 
+			});
+			if(model.type === 'li' && model.children.length === 0){
+				model.children.push({
+					type: 'p',
+					html: element.innerText
+				});
+			}
 		}
 		return model;
 	}
