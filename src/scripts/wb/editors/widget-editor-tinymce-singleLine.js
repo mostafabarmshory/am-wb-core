@@ -26,13 +26,20 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Factories
- * @name WidgetEditorFake
- * @description Editor of a widget
+ * @ngdoc Widget Editor
+ * @name WidgetEditorTinymceSingleLine
+ * @description A single line text editor
+ * 
+ *  In a single line editor you are allowed to set a text property into a widget. For
+ * example you can change text of a header. Some key and actions are reserved:
+ * 
+ * - Enter: save and close the editor
+ * - ESC: close editor without save
+ * 
  * 
  */
 
-.factory('WidgetEditorTinymce', function ($sce, WidgetEditor) {
+.factory('WidgetEditorTinymceSingleLine', function ($sce, WidgetEditor) {
 
 	/**
 	 * TODO: maso, 2019: extends WidgetEditorFake
@@ -49,7 +56,7 @@ angular.module('am-wb-core')//
 	/**
 	 * remove all resources
 	 * 
-	 * @memberof WidgetEditorTinymce
+	 * @memberof WidgetEditorTinymceSingleLine
 	 */
 	Editor.prototype.destroy = function () {
 		this.hide();
@@ -58,6 +65,8 @@ angular.module('am-wb-core')//
 
 	/**
 	 * Remove editor
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
 	 */
 	Editor.prototype.hide = function () {
 		if (this.isHidden()) {
@@ -72,6 +81,8 @@ angular.module('am-wb-core')//
 
 	/**
 	 * Run and display editor for the current widget
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
 	 */
 	Editor.prototype.show = function () {
 		this._hide = false;
@@ -108,6 +119,39 @@ angular.module('am-wb-core')//
 					editor.save();
 					ctrl.updateView(editor);
 				});
+				
+				//
+				// Adding custom actions
+				//
+				// Save button to save and close the editor
+				editor.ui.registry.addButton('save', {
+					text: 'save',
+					icon: 'save',
+					tooltip: 'Save current changes and close the editor',
+					onAction: function() {
+						ctrl.saveAndClose();
+					}
+				});
+				// close button
+				editor.ui.registry.addButton('close', {
+					text: 'close',
+					icon: 'close',
+					tooltip: 'Close and discards changes',
+					onAction: function() {
+						ctrl.closeWithoutSave();
+					}
+				});
+				
+//				alignleft aligncenter alignjustify alignright alignfull
+				// style.textAlign: left, center, right, justify;
+				_.forEach(['widgetalignleft', 'widgetaligncenter', 'widgetalignjustify', 'widgetalignright'], function(action){
+					editor.ui.registry.addButton(action, {
+						icon: 'align-' + action.substring(11),
+						onAction: function() {
+							ctrl.widget.setModelProperty('style.textAlign', action.substring(11));
+						}
+					});
+				});
 			}
 		}))
 		.then(function () {
@@ -115,12 +159,19 @@ angular.module('am-wb-core')//
 		});
 	};
 
+	/**
+	 * Checks if the editor is hiden
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
+	 */
 	Editor.prototype.isHidden = function () {
 		return this._hide;
 	};
 
 	/**
 	 * Read value from element and set into the element
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
 	 */
 	Editor.prototype.updateView = function (editor) {
 		var content = editor.getContent({
@@ -130,7 +181,11 @@ angular.module('am-wb-core')//
 		this.setDirty(true);
 	};
 
-
+	/**
+	 * Close editor and discards changes
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
+	 */
 	Editor.prototype.closeWithoutSave = function(){
 		this.setDirty(false);
 		this.hide();
@@ -143,6 +198,11 @@ angular.module('am-wb-core')//
 		});
 	};
 
+	/**
+	 * Save and close the editor
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
+	 */
 	Editor.prototype.saveAndClose = function(){
 		// remove editor
 		if(this.isDirty()){

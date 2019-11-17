@@ -151,7 +151,31 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 		    toolbar_drawer: 'floating'
 		}
 	});
-	
+
+	/***************************************
+	 * Header editor
+	 * 
+	 *  We use a single line text editor for
+	 * a header. In single line editor you
+	 * are allowed to modify the parent properties
+	 * such as text align.
+	 ***************************************/
+	for(var i = 1; i < 7; i++){
+		var type = 'h'+i;
+		$widget.setEditor(type, {
+			type: 'WidgetEditorTinymceSingleLine',
+			options:{
+				property: 'html',
+				inline: true,
+				menubar: false,
+				plugins: ['autolink'],
+				valid_elements: 'strong,em,span[style],a[href]',
+				// Toolbar
+				toolbar: 'close save | undo redo | bold italic underline | widgetalignleft widgetaligncenter widgetalignjustify widgetalignright ',
+				fixed_toolbar_container: '#demo-widget-editor-toolbar'
+			}
+		});
+	}
 	
 	
 	
@@ -174,10 +198,6 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 	};
 	$widget.setEditor('a', headerEditorDescription);
 
-	for(var i = 1; i < 7; i++){
-		var type = 'h'+i;
-		$widget.setEditor(type, headerEditorDescription);
-	}
 
 	$widget.setEditor('pre', {
 		type: 'WidgetEditorCode',

@@ -30,9 +30,9 @@ angular.module('am-wb-core')//
  * @name WidgetEditorTinymceSection
  * @description Editor of a section
  * 
- * Section is list of html widgets such as a, p, pre, and h. This editor allow
- * you to edit the section.
- * 
+ *  Section is list of html widgets such as a, p, pre, and h. This editor allow
+ * you to edit a section as a simple text. All entered text converted into a 
+ * common widgets and stored into the section.
  */
 
 .factory('WidgetEditorTinymceSection', function ($widget, WidgetEditor) {

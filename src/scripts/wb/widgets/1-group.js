@@ -74,10 +74,6 @@ angular.module('am-wb-core')//
         return this.loadWidgets()
         .then(function(){
             return ctrl;
-        })
-        .finally(function () {
-            ctrl.fire('loaded');
-            ctrl.setState('ready');
         });
     };
 
@@ -187,6 +183,10 @@ angular.module('am-wb-core')//
                 widget.setEditable(ctrl.isEditable());
                 $element.append(widget.getElement());
             });
+        })
+        .finally(function () {
+            ctrl.fire('loaded');
+            ctrl.setState('ready');
         });
     };
 
