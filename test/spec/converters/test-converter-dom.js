@@ -55,7 +55,7 @@ describe('WbWidget converter WbConverterDom ', function () {
         expect(result[0].children[0].children[0].src).toBe('test/path.svg');
     });
 
-    it('should encode lit of html widgets', function (done) {
+    it('should encode list of html widgets', function (done) {
         // Create new instance
         var model = {
                 type: 'div',

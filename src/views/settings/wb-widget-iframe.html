@@ -1,39 +1,29 @@
 <fieldset
-    layout="column">
-    <md-input-container style="margin: 0px;margin-top: 10px">
-        <label translate="">Name</label>
-        <input 
-            type="text" 
-            ng-model="name"
-            ng-change="ctrl.setProperty('name', name)">
-    </md-input-container>
-    <md-input-container style="margin: 0px">
-        <label translate="">Sandbox</label>
-        <input 
-            type="text" 
-            ng-model="sandbox"
-            ng-change="ctrl.setProperty('sandbox', sandbox)">
-    </md-input-container>
-</fieldset>
-
-
-<fieldset
-    layout="column">
-    <legend translate>Source</legend>
-    <md-input-container style="margin: 0px">
-        <label translate="">Source</label>
-        <input 
-            type="text" 
-            ng-model="src"
-            ng-change="ctrl.setProperty('src', src)">
-    </md-input-container>
-    <md-input-container style="margin: 0px">
-        <label translate="">Source Document</label>
-        <textarea 
-            name="srcdoc" 
-            ng-model="srcdoc"
-            ng-change="ctrl.setProperty('srcdoc', srcdoc)">
-        </textarea>
-    </md-input-container>
+	layout="column">
+	<legend translate>Frame</legend>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.name"
+		ng-change="ctrl.setAttribute('name', ctrl.attributesValue.name)"
+		wb-title="name"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.src"
+		ng-change="ctrl.setAttribute('src', ctrl.attributesValue.src)"
+		wb-title="src"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.srcdoc"
+		ng-change="ctrl.setAttribute('srcdoc', ctrl.attributesValue.srcdoc)"
+		wb-title="srcdoc"
+		wb-description="">
+	</wb-ui-setting-text>
+	<wb-ui-setting-text
+		ng-model="ctrl.attributesValue.sandbox"
+		ng-change="ctrl.setAttribute('sandbox', ctrl.attributesValue.sandbox)"
+		wb-title="sandbox"
+		wb-description="">
+	</wb-ui-setting-text>
 </fieldset>
 

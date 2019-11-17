@@ -63,10 +63,10 @@ angular.module('am-wb-core')//
      * @param model Object to set into the group
      */
     WbWidgetGroupCtrl.prototype.setModel = function (model) {
-        this.setState('init');
         if (model === this.model) {
             return;
         }
+        this.setState('init');
         this.model = model;
         this.fire('modelChanged');
 
@@ -156,10 +156,16 @@ angular.module('am-wb-core')//
             widget.destroy();
         });
         this.childWidgets = [];
+        var ctrl = this;
+        var loadState = function () {
+            ctrl.fire('loaded');
+            ctrl.setState('ready');
+        };
 
         // check for new child
         if (!this.model || !angular.isArray(this.model.children)) {
-            return $q.resolve();
+            return $q.resolve()
+            .finally(loadState);
         }
 
         // create child
@@ -174,7 +180,6 @@ angular.module('am-wb-core')//
             compilesJob.push(job);
         });
 
-        var ctrl = this;
         return $q.all(compilesJob)//
         .then(function () {
             var $element = parentWidget.getElement();
@@ -184,10 +189,7 @@ angular.module('am-wb-core')//
                 $element.append(widget.getElement());
             });
         })
-        .finally(function () {
-            ctrl.fire('loaded');
-            ctrl.setState('ready');
-        });
+        .finally(loadState);
     };
 
 

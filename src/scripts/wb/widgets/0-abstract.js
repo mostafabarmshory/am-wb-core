@@ -262,10 +262,10 @@ angular.module('am-wb-core')//
 	 * @memberof WbAbstractWidget
 	 */
 	WbWidgetAbstract.prototype.setModel = function (model) {
-		this.setState('init');
 		if (model === this.model) {
 			return;
 		}
+		this.setState('init');
 		this.model = model;
 		this.runtimeModel =  {
 				style:{},
@@ -273,7 +273,6 @@ angular.module('am-wb-core')//
 		};
 		this.fire('modelChanged');
 		this.setState('ready');
-
 		return this;
 	};
 

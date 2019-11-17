@@ -58,7 +58,7 @@ function wbUiSettingLinkFunction($scope, $element, $attrs, ctrls) {
 //pars(ngModel.$modelValue);
 //};
 
-//// Add all length by default
+////Add all length by default
 //$scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
 //$scope.extraValues = $scope.extraValues || [];
 //var types = $scope.extraValues;
