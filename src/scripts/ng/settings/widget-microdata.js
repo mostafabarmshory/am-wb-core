@@ -34,175 +34,20 @@ angular.module('am-wb-core')//
  * 
  */
 .controller('WbSettingWidgetMicrodataCtrl', function () {
-	var attrs = [
-		'itemscope',
-		'itemtype',
-		'itemprop',
-		'itemid',
-		'itemref',
-		// extra attributes
-		'value',
-		'content',
-		];
 
 	/*
 	 * Initial the setting editor
 	 */
 	this.init = function () {
-		/*
-		 * Load data of the widget
-		 */
-		var ctrl = this;
-		angular.forEach(attrs, function(attr){
-			ctrl[attr] = ctrl.getProperty(attr);
-		});
+		this.trackAttributes([
+			'itemscope',
+			'itemtype',
+			'itemprop',
+			'itemid',
+			'itemref',
+			// extra attributes
+			'value',
+			'content',
+			]);
 	};
-
-
-
-//	/*
-//	* Supported Schema Types:
-//	* Article, Book, Image, Person, Product, Service, Text, Thing, WebPage
-//	*/
-//	this.schemaTypes = [
-//	{
-//	key: 'Article',
-//	value: 'http://schema.org/Article'
-
-//	}, {
-//	key: 'Book',
-//	value: 'http://schema.org/Book'
-
-//	}, {
-//	key: 'Image',
-//	value: 'http://schema.org/ImageObject'
-
-//	}, {
-//	key: 'Movie',
-//	value: 'http://schema.org/Movie'
-//	}, {
-//	key: 'Person',
-//	value: 'http://schema.org/Person'
-//	}, {
-//	key: 'Product',
-//	value: 'http://schema.org/Product'
-
-//	}, {
-//	key: 'Service',
-//	value: 'http://schema.org/Service'
-
-//	}, {
-//	key: 'Text',
-//	value: 'http://schema.org/Text'
-//	}, {
-//	key: 'Thing',
-//	value: 'http://schema.org/Thing'
-//	}, {
-//	key: 'WebPage',
-//	value: 'http://schema.org/WebPage'
-
-//	}
-//	];
-
-//	this.getParentCategory = function () {
-//	var widget = this.getWidget();
-//	while (!widget.isRoot() && !widget.getModelProperty('category')) {
-//	widget = widget.getParent();
-//	}
-//	this.parentCategory = widget.getModelProperty('category');
-//	};
-
-//	this.setProperties = function () {
-//	if (!this.parentCategory) {
-//	this.alert = 'No parent type is defined.';
-//	} else {
-//	this.setType(this.parentCategory);
-//	}
-//	};
-
-//	this.setType = function (type) {
-//	switch (type) {
-//	case 'http://schema.org/Article':
-//	this.properties =
-//	[
-//	'articleBody', 'articleSection', 'about', 'author', 'comment',
-//	'commentCount', 'contributor', 'creator', 'description', 'editor',
-//	'genre', 'headline', 'keywords', 'publisher', 'text', 'translator',
-//	'video'
-//	];
-//	break;
-
-//	case 'http://schema.org/Book':
-//	this.properties =
-//	[
-//	'about', 'author', 'bookFormat', 'comment', 'creator', 'genre',
-//	'headline', 'image', 'keywords', 'name', 'publisher', 'text',
-//	'translator', 'video'
-//	];
-//	break;
-
-//	case 'http://schema.org/Image':
-//	this.properties =
-//	[
-//	'about', 'description', 'caption', 'comment', 'thumbnail',
-//	'keywords', 'image', 'name', 'url'
-//	];
-//	break;
-
-//	case 'http://schema.org/Movie':
-//	this.properties =
-//	[
-//	'about', 'actor', 'comment', 'commentCount', 'copyrightYear',
-//	'countryOfOrigin', 'creator', 'dateCreated', 'description',
-//	'director', 'duration', 'genre', 'headline', 'isBasedOn',
-//	'image', 'keywords', 'musicBy', 'name', 'provider', 'productionCompany',
-//	'sponsor', 'subtitleLanguage', 'text', 'thumbnailUrl', 'trailer'
-//	];
-//	break;
-
-//	case 'http://schema.org/Person':
-//	this.properties =
-//	[
-//	'additionalName', 'address', 'birthDate', 'birthPlace',
-//	'children', 'deathDate', 'daethPlace', 'email', 'familyName',
-//	'gender', 'homeLocation', 'parent', 'telephone', 'description',
-//	'image', 'spouse'
-//	];
-//	break;
-
-//	case 'http://schema.org/Product':
-//	this.properties =
-//	[
-//	'brand', 'category', 'color', 'description', 'height',
-//	'isConsumableFor', 'genre', 'headline', 'image', 'name'
-//	];
-//	break;
-
-//	case 'http://schema.org/Service':
-//	this.properties =
-//	[
-//	'areaServed', 'brand', 'category', 'logo', 'serviceType',
-//	'description', 'image', 'name'
-//	];
-//	break;
-
-//	case 'http://schema.org/Thing':
-//	this.properties = ['description', 'image', 'name'];
-//	break;
-
-//	case 'http://schema.org/Text':
-//	this.properties = ['description', 'image', 'keywords', 'name'];
-//	break;
-
-//	case 'http://schema.org/WebPage':
-//	this.properties =
-//	[
-//	'about', 'author', 'comment', 'description', 'image', 'headline',
-//	'keywords', 'commentCount', 'mainContentOfPage', 'primaryImageOfPage',
-//	'video'
-//	];
-//	break;
-//	}
-//	};
-
 });

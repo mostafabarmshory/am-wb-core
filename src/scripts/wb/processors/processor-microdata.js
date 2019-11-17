@@ -70,10 +70,6 @@ angular.module('am-wb-core')//
     Processor.prototype = new WbProcessorAbstract();
 
     Processor.prototype.process = function(widget, event){
-        if(widget.state !== 'ready') {
-            return;
-        }
-
         // 1- Handle model load
         if(event.type === 'modelChanged' || event.type === 'stateChanged'){
             loadWidgetAttributes(widget, microdataAttributes);
