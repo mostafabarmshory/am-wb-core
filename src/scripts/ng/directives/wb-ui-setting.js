@@ -26,91 +26,92 @@
  * link setting widgets
  */
 function wbUiSettingLinkFunction($scope, $element, $attrs, ctrls) {
-    var ngModel = ctrls[0];
+	var ngModel = ctrls[0];
 
-    $scope.wbActionClean = ! _.isUndefined($attrs.wbActionClean);
+	$scope.wbActionClean = ! _.isUndefined($attrs.wbActionClean);
 
-    ngModel.$render = function () {
-        $scope.value = ngModel.$modelValue;
-    };
+	ngModel.$render = function () {
+		$scope.value = ngModel.$modelValue;
+	};
 
-    $scope.cleanValue = function () {
-        setValue(undefined);
-    };
-    
-    $scope.setValue = setValue;
+	$scope.cleanValue = function () {
+		setValue(undefined);
+	};
 
-    function setValue(value){
-        // TODO: validate and set
-        ngModel.$setViewValue(value);
-    }
+	$scope.setValue = setValue;
+
+	function setValue(value){
+		$scope.value = value;
+		// TODO: validate and set
+		ngModel.$setViewValue(value);
+	}
 }
 
 ///*
-// * link function of the number
-// */
+//* link function of the number
+//*/
 //function wbUiSettingNumberLinkFunction($scope, $element, $attrs, ctrls) {
-//    wbUiSettingLinkFunction($scope, $element, $attrs, ctrls);
-//    var ngModel = ctrls[0];
-//
-//    ngModel.$render = function () {
-//        pars(ngModel.$modelValue);
-//    };
-//
-//    // Add all length by default
-//    $scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
-//    $scope.extraValues = $scope.extraValues || [];
-//    var types = $scope.extraValues;
-//    if (types) { 
-//        types = types.concat($scope.lengthValues);
-//        if (types.includes('length')) {
-//            var index = types.indexOf('length');
-//            types.splice(index, 1);
-//        }
-//    } else {
-//        types = $scope.lengthValues;
-//    }
-//
-//    $scope.types = types;
-//
-//    function pars(value) {
-//        if (!value) {
-//            $scope.internalUnit = types[0];
-//            $scope.internalValue = 0;
-//        } else {
-//            split(value);
-//        }
-//    }
-//
-//    $scope.updateLength = function(unit, value) {
-//        if ($scope.lengthValues.includes(unit)) {
-//            ngModel.$setViewValue(value+unit);
-//        } else {
-//            ngModel.$setViewValue(unit);
-//        }
-//    };
-//
-//    /*
-//     * @param {type} val
-//     * @returns {undefined}
-//     * decsription  Splite value to 'unit' and 'value'
-//     */
-//    function split(val) {
-//        if ($scope.extraValues.includes(val)) {
-//            $scope.internalUnit = val;
-//        } else {
-//            /*
-//             * A regex which groups the val into the value and unit(such as 10px -> 10 , px).
-//             * This regex also support signed float format such as (+10.75%, -100.76em)
-//             */
-//            var regex = /^([+-]?\d+\.?\d*)([a-zA-Z%]*)$/;
-//            var matches = regex.exec(val);
-//            if(angular.isArray(matches)){
-//                $scope.internalValue = Number(matches[1]);
-//                $scope.internalUnit = matches[2];
-//            }
-//        }
-//    }
+//wbUiSettingLinkFunction($scope, $element, $attrs, ctrls);
+//var ngModel = ctrls[0];
+
+//ngModel.$render = function () {
+//pars(ngModel.$modelValue);
+//};
+
+//// Add all length by default
+//$scope.lengthValues = ['px', 'cm', 'in', '%', 'vh'];
+//$scope.extraValues = $scope.extraValues || [];
+//var types = $scope.extraValues;
+//if (types) { 
+//types = types.concat($scope.lengthValues);
+//if (types.includes('length')) {
+//var index = types.indexOf('length');
+//types.splice(index, 1);
+//}
+//} else {
+//types = $scope.lengthValues;
+//}
+
+//$scope.types = types;
+
+//function pars(value) {
+//if (!value) {
+//$scope.internalUnit = types[0];
+//$scope.internalValue = 0;
+//} else {
+//split(value);
+//}
+//}
+
+//$scope.updateLength = function(unit, value) {
+//if ($scope.lengthValues.includes(unit)) {
+//ngModel.$setViewValue(value+unit);
+//} else {
+//ngModel.$setViewValue(unit);
+//}
+//};
+
+///*
+//* @param {type} val
+//* @returns {undefined}
+//* decsription  Splite value to 'unit' and 'value'
+//*/
+//function split(val) {
+//if ($scope.extraValues.includes(val)) {
+//$scope.internalUnit = val;
+//} else {
+///*
+//* A regex which groups the val into the value and unit(such as 10px -> 10 , px).
+//* This regex also support signed float format such as (+10.75%, -100.76em)
+//*/
+//var regex = /^([+-]?\d+\.?\d*)([a-zA-Z%]*)$/;
+//var matches = regex.exec(val);
+//if(angular.isArray(matches)){
+//$scope.internalValue = Number(matches[1]);
+//$scope.internalUnit = matches[2];
+//}
+//}
+//}
 //}
 
 angular.module('am-wb-core')
@@ -122,17 +123,17 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingBoolean', function () {
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-boolean.html',
-        restrict: 'E',
-        replace: true,
-        scope: {
-            title: '@wbTitle',
-            description: '@wbDescription',
-        },
-        require: ['ngModel'],
-        link: wbUiSettingLinkFunction
-    };
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-boolean.html',
+		restrict: 'E',
+		replace: true,
+		scope: {
+			title: '@wbTitle',
+			description: '@wbDescription',
+		},
+		require: ['ngModel'],
+		link: wbUiSettingLinkFunction
+	};
 })
 
 /**
@@ -141,16 +142,16 @@ angular.module('am-wb-core')
  * @description Setting for a text
  */
 .directive('wbUiSettingText', function () {
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-text.html',
-        restrict: 'E',
-        scope: {
-            title: '@wbTitle',
-            description: '@wbDescription',
-        },
-        require: ['ngModel'],
-        link: wbUiSettingLinkFunction
-    };
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-text.html',
+		restrict: 'E',
+		scope: {
+			title: '@wbTitle',
+			description: '@wbDescription',
+		},
+		require: ['ngModel'],
+		link: wbUiSettingLinkFunction
+	};
 })
 
 
@@ -160,16 +161,16 @@ angular.module('am-wb-core')
  * @description a setting section for choosing values.
  */
 .directive('wbUiSettingSelect', function () {
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-select.html',
-        restrict: 'E',
-        scope: {
-            title: '@wbTitle',
-            description: '@wbDescription',
-        },
-        require: ['ngModel'],
-        link: wbUiSettingLinkFunction
-    };
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-select.html',
+		restrict: 'E',
+		scope: {
+			title: '@wbTitle',
+			description: '@wbDescription',
+		},
+		require: ['ngModel'],
+		link: wbUiSettingLinkFunction
+	};
 })
 
 
@@ -180,16 +181,16 @@ angular.module('am-wb-core')
  *
  */
 .directive('wbUiSettingNumber', function () {
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-number.html',
-        restrict: 'E',
-        scope: {
-            title: '@wbTitle',
-            description: '@wbDescription',
-        },
-        require: ['ngModel'],
-        link: wbUiSettingLinkFunction
-    };
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-number.html',
+		restrict: 'E',
+		scope: {
+			title: '@wbTitle',
+			description: '@wbDescription',
+		},
+		require: ['ngModel'],
+		link: wbUiSettingLinkFunction
+	};
 })
 
 
@@ -198,17 +199,17 @@ angular.module('am-wb-core')
  * @name wbUiSettingLength
  */
 .directive('wbUiSettingLength', function () {
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-length.html',
-        restrict: 'E',
-        replace: true,
-        scope: {
-            title: '@wbTitle',
-            description: '@wbDescription',
-        },
-        require: ['ngModel'],
-        link: wbUiSettingLinkFunction
-    };
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-length.html',
+		restrict: 'E',
+		replace: true,
+		scope: {
+			title: '@wbTitle',
+			description: '@wbDescription',
+		},
+		require: ['ngModel'],
+		link: wbUiSettingLinkFunction
+	};
 })
 
 /**
@@ -217,26 +218,87 @@ angular.module('am-wb-core')
  * @description a setting section to set color.
  *
  */
-.directive('wbUiSettingColor', function (){
-    return {
-        templateUrl: 'views/directives/wb-ui-setting-color.html',
-        restrict: 'E',
-        scope: {
-            title: '@wbTitle',
-            description: '@wbDescription',
-        },
-        require: ['ngModel'],
-        link: wbUiSettingLinkFunction,
-        /*
-         * @ngInject
-         */
-        controller: function($scope, $element) {
-            var preview = $element.find('.preview');
-            $scope.$watch('value', function(color){
-                preview.css({background: color});
-            });
-        },
-        controllerAs: 'ctrl'
-    };
+.directive('wbUiSettingColor', function ($mdColorPicker){
+	return {
+		templateUrl: 'views/directives/wb-ui-setting-color.html',
+		restrict: 'E',
+		scope: {
+			title: '@wbTitle',
+			description: '@wbDescription',
+
+
+			options: '=wbColorPicker',
+
+			// Input options
+			type: '@wbType',
+			label: '@?wbLabel',
+			icon: '@?wbIcon',
+			random: '@?wbRandom',
+		default: '@?wbDefault',
+
+		// Dialog Options
+		openOnInput: '=?wbOpenOnInput',
+		hasBackdrop: '=?wbHasBackdrop',
+		clickOutsideToClose: '=?wbClickOutsideToClose',
+		skipHide: '=?wbSkipHide',
+		preserveScope: '=?wbPreserveScope',
+
+		// Advanced options
+		wbColorClearButton: '=?wbColorClearButton',
+		wbColorPreview: '=?wbColorPreview',
+
+		wbColorAlphaChannel: '=?wbColorAlphaChannel',
+		wbColorSpectrum: '=?wbColorSpectrum',
+		wbColorSliders: '=?wbColorSliders',
+		wbColorGenericPalette: '=?wbColorGenericPalette',
+		wbColorMaterialPalette: '=?wbColorMaterialPalette',
+		wbColorHistory: '=?wbColorHistory',
+		wbColorHex: '=?wbColorHex',
+		wbColorRgb: '=?wbColorRgb',
+		wbColorHsl: '=?wbColorHsl',
+		wbColorDefaultTab: '=?wbColorDefaultTab'
+		},
+		require: ['ngModel'],
+		link: wbUiSettingLinkFunction,
+		/*
+		 * @ngInject
+		 */
+		controller: function($scope, $element) {
+			var preview = $element.find('.preview');
+			$scope.$watch('value', function(color){
+				preview.css({background: color});
+			});
+
+			$scope.selectColor = function($event){
+
+				$mdColorPicker.show({
+					value: $scope.value || 'red',
+					defaultValue: $scope.default,
+					random: $scope.random,
+					clickOutsideToClose: $scope.clickOutsideToClose,
+					hasBackdrop: $scope.hasBackdrop,
+					skipHide: $scope.skipHide,
+					preserveScope: $scope.preserveScope,
+
+					mdColorAlphaChannel: $scope.wbColorAlphaChannel,
+					mdColorSpectrum: $scope.wbColorSpectrum,
+					mdColorSliders: $scope.wbColorSliders,
+					mdColorGenericPalette: $scope.wbColorGenericPalette,
+					mdColorMaterialPalette: $scope.wbColorMaterialPalette,
+					mdColorHistory: $scope.wbColorHistory,
+					mdColorHex: $scope.wbColorHex,
+					mdColorRgb: $scope.wbColorRgb,
+					mdColorHsl: $scope.wbColorHsl,
+					mdColorDefaultTab: $scope.wbColorDefaultTab,
+
+					$event: $event
+
+				}).then(function( color ) {
+					$scope.setValue(color);
+				});
+			};
+		},
+		controllerAs: 'ctrl'
+	};
 });
 
