@@ -57,14 +57,14 @@
  * Layer: sidenav
  * Range: [60,70)
  ******************************************************************************/
-.wb-layer-sidenav-bottom{
+.wb-layer-sidenav-bottom {
 	z-index: 60 !important;
 }
 
 /*
  * Last layer of the content
  */
-.wb-layer-sidenav-top{
+.wb-layer-sidenav-top {
 	z-index: 69 !important;
 }
 /*******************************************************************************
@@ -85,13 +85,13 @@
  * Layer: Dialog
  * Range: [80,90)
  ******************************************************************************/
- .wb-layer-dialog-bottom{
+ .wb-layer-dialog-bottom {
 	z-index: 80 !important;
 }
 
 /*
  * Last layer of the content
  */
-.wb-layer-dialog-top{
+.wb-layer-dialog-top {
 	z-index: 89 !important;
 }

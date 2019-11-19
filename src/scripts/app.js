@@ -49,22 +49,126 @@ jQuery.fn.extend({
 });
 
 angular.module('am-wb-core', [
-    // base
+	// base
 	'ngMessages',
 	'ngAnimate',
 	'ngAria',
 	'ngSanitize',
 	'ngRoute', 
-	
+
 	// editor
 	'ngMaterial',
 	'ngMdIcons',
 	'mdColorPicker',
 	'pascalprecht.translate',
 
-//	'ui.tinymce',
-//	'dndLists',
-//	'material.components.expansionPanels',
-//	'ngHandsontable',
 	'ngStorage', // https://github.com/gsklee/ngStorage
-	]);
+])
+
+/**
+ * @ngdoc Service
+ * @name $ObjectPath
+ * 
+ * Utility to access object properties
+ */
+.service('$objectPath', function(){
+
+	this.proxy = function(object){
+		return objectPath(object);
+	};
+
+	/**
+	 * @name has
+	 * @memberof $ObjectPath
+	 */
+	this.has = function(key){
+		return objectPath.has(key);
+	};
+
+	/**
+	 * @name ensureExists
+	 * @memberof $ObjectPath
+	 */
+	this.ensureExists = function(obj, path, value){
+		objectPath.ensureExists(obj, path, value);
+	};
+
+	/**
+	 * @name set
+	 * @memberof $ObjectPath
+	 */
+	this.set = function(obj, path, value, doNotReplace){ 
+		return objectPath.set(obj, path, value, doNotReplace); 
+	};
+
+	/**
+	 * @name hainserts
+	 * @memberof $ObjectPath
+	 */
+	this.insert = function(obj, path, value, at){
+		return objectPath.insert(obj, path, value, at); 
+	};
+
+	/**
+	 * @name haemptys
+	 * @memberof $ObjectPath
+	 * 
+	 * empty a given path (but do not delete it) depending on their type,so it
+	 * retains reference to objects and arrays.
+	 * 
+	 * functions that are not inherited from prototype are set to null.
+	 * 
+	 * object instances are considered objects and just own property names are
+	 * deleted
+	 */
+	this.empty = function(obj, path) {
+		return objectPath.empty(obj, path);
+	};
+
+	/**
+	 * @name push
+	 * @memberof $ObjectPath
+	 * 
+	 * example:
+	 * 
+	 * $ObjectPath.push(obj, 'a.b', 'a', 'b', 'c', 'd');
+	 */
+	this.push = function(obj, path /*, values */){
+		return objectPath.push(obj, path /*, values */); 
+	};
+
+	/**
+	 * @name coalesce
+	 * @memberof $ObjectPath
+	 * 
+	 * get the first non-undefined value
+	 * 
+	 * objectPath.coalesce(obj, ['a.z', 'a.d'], 'default');
+	 */
+	this.coalesce = function(obj, paths, defaultValue){
+		return objectPath.coalesce(obj, paths, defaultValue); 
+	};
+
+	/**
+	 * @name get
+	 * @memberof $ObjectPath
+	 * 
+	 * get deep property
+	 * 
+	 * objectPath.get(obj, "a.b");  //returns "d"
+	 * objectPath.get(obj, ["a", "dot.dot"]);  //returns "key"
+	 * objectPath.get(obj, 'a.\u1200');  //returns "unicode key"
+	 */
+	this.get = function(obj, path, defaultValue){
+		return objectPath.get(obj, path, defaultValue); 
+	};
+
+	/**
+	 * @name del
+	 * @memberof $ObjectPath
+	 */
+	this.del = function(obj, path){
+		return objectPath.del(obj, path);
+	};
+});
+

@@ -5,7 +5,6 @@
  *  * Url: http://machina-js.org/
  *  * License(s): 
  */
-'use strict';   
 (function webpackUniversalModuleDefinition(root, factory) {
     if(typeof exports === 'object' && typeof module === 'object'){
         module.exports = factory(require("lodash"));

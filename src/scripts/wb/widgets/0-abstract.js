@@ -74,7 +74,7 @@ angular.module('am-wb-core')//
  * <li>widgetSelected</li>
  * </ul>
  */
-.factory('WbWidgetAbstract', function($wbUtil, $widget, $timeout, $wbWindow ){
+.factory('WbWidgetAbstract', function($widget, $wbWindow, $objectPath){
 	'use strict';
 
 	function debounce(func, wait) {
@@ -282,7 +282,7 @@ angular.module('am-wb-core')//
 	 * @memberof WbAbstractWidget
 	 */
 	WbWidgetAbstract.prototype.hasModelProperty = function(key){
-		return objectPath.has(this.getModel(), key);
+		return $objectPath.has(this.getModel(), key);
 	};
 
 	/**
@@ -292,7 +292,7 @@ angular.module('am-wb-core')//
 	 * @memberof WbAbstractWidget
 	 */
 	WbWidgetAbstract.prototype.getModelProperty = function(key){
-		return objectPath.get(this.getModel(), key);
+		return $objectPath.get(this.getModel(), key);
 	};
 
 	/**
@@ -317,9 +317,9 @@ angular.module('am-wb-core')//
 
 		// Set the address
 		if(value){
-			objectPath.set(this.getModel(), key, value);
+			$objectPath.set(this.getModel(), key, value);
 		} else {
-			objectPath.del(this.getModel(), key);
+			$objectPath.del(this.getModel(), key);
 		}
 		this.fire('modelUpdated', $event);
 	};
@@ -342,7 +342,7 @@ angular.module('am-wb-core')//
 	 * @memberof WbAbstractWidget
 	 */
 	WbWidgetAbstract.prototype.hasProperty = function (key){
-		return objectPath.has(this.getRuntimeModel(), key);
+		return $objectPath.has(this.getRuntimeModel(), key);
 	};
 
 	/**
@@ -351,7 +351,7 @@ angular.module('am-wb-core')//
 	 * @memberof WbAbstractWidget
 	 */
 	WbWidgetAbstract.prototype.getProperty = function (key){
-		return objectPath.get(this.getRuntimeModel(), key);
+		return $objectPath.get(this.getRuntimeModel(), key);
 	};
 
 	/**
@@ -361,7 +361,7 @@ angular.module('am-wb-core')//
 	 */
 	WbWidgetAbstract.prototype.removeProperty = function (key){
 		var model = this.getRuntimeModel();
-		objectPath.del(model, key);
+		$objectPath.del(model, key);
 	};
 
 	/**
@@ -408,9 +408,9 @@ angular.module('am-wb-core')//
 		// Set the address
 		var model = this.getRuntimeModel();
 		if(angular.isDefined(value)){
-			objectPath.set(model, key, value);
+			$objectPath.set(model, key, value);
 		} else {
-			objectPath.del(model, key);
+			$objectPath.del(model, key);
 		}
 		this.fire('modelUpdated', $event);
 	};

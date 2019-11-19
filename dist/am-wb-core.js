@@ -2381,7 +2381,6 @@
  *  * Url: http://machina-js.org/
  *  * License(s): 
  */
-'use strict';   
 (function webpackUniversalModuleDefinition(root, factory) {
     if(typeof exports === 'object' && typeof module === 'object'){
         module.exports = factory(require("lodash"));
@@ -4102,25 +4101,129 @@ jQuery.fn.extend({
 });
 
 angular.module('am-wb-core', [
-    // base
+	// base
 	'ngMessages',
 	'ngAnimate',
 	'ngAria',
 	'ngSanitize',
 	'ngRoute', 
-	
+
 	// editor
 	'ngMaterial',
 	'ngMdIcons',
 	'mdColorPicker',
 	'pascalprecht.translate',
 
-//	'ui.tinymce',
-//	'dndLists',
-//	'material.components.expansionPanels',
-//	'ngHandsontable',
 	'ngStorage', // https://github.com/gsklee/ngStorage
-	]);
+])
+
+/**
+ * @ngdoc Service
+ * @name $ObjectPath
+ * 
+ * Utility to access object properties
+ */
+.service('$objectPath', function(){
+
+	this.proxy = function(object){
+		return objectPath(object);
+	};
+
+	/**
+	 * @name has
+	 * @memberof $ObjectPath
+	 */
+	this.has = function(key){
+		return objectPath.has(key);
+	};
+
+	/**
+	 * @name ensureExists
+	 * @memberof $ObjectPath
+	 */
+	this.ensureExists = function(obj, path, value){
+		objectPath.ensureExists(obj, path, value);
+	};
+
+	/**
+	 * @name set
+	 * @memberof $ObjectPath
+	 */
+	this.set = function(obj, path, value, doNotReplace){ 
+		return objectPath.set(obj, path, value, doNotReplace); 
+	};
+
+	/**
+	 * @name hainserts
+	 * @memberof $ObjectPath
+	 */
+	this.insert = function(obj, path, value, at){
+		return objectPath.insert(obj, path, value, at); 
+	};
+
+	/**
+	 * @name haemptys
+	 * @memberof $ObjectPath
+	 * 
+	 * empty a given path (but do not delete it) depending on their type,so it
+	 * retains reference to objects and arrays.
+	 * 
+	 * functions that are not inherited from prototype are set to null.
+	 * 
+	 * object instances are considered objects and just own property names are
+	 * deleted
+	 */
+	this.empty = function(obj, path) {
+		return objectPath.empty(obj, path);
+	};
+
+	/**
+	 * @name push
+	 * @memberof $ObjectPath
+	 * 
+	 * example:
+	 * 
+	 * $ObjectPath.push(obj, 'a.b', 'a', 'b', 'c', 'd');
+	 */
+	this.push = function(obj, path /*, values */){
+		return objectPath.push(obj, path /*, values */); 
+	};
+
+	/**
+	 * @name coalesce
+	 * @memberof $ObjectPath
+	 * 
+	 * get the first non-undefined value
+	 * 
+	 * objectPath.coalesce(obj, ['a.z', 'a.d'], 'default');
+	 */
+	this.coalesce = function(obj, paths, defaultValue){
+		return objectPath.coalesce(obj, paths, defaultValue); 
+	};
+
+	/**
+	 * @name get
+	 * @memberof $ObjectPath
+	 * 
+	 * get deep property
+	 * 
+	 * objectPath.get(obj, "a.b");  //returns "d"
+	 * objectPath.get(obj, ["a", "dot.dot"]);  //returns "key"
+	 * objectPath.get(obj, 'a.\u1200');  //returns "unicode key"
+	 */
+	this.get = function(obj, path, defaultValue){
+		return objectPath.get(obj, path, defaultValue); 
+	};
+
+	/**
+	 * @name del
+	 * @memberof $ObjectPath
+	 */
+	this.del = function(obj, path){
+		return objectPath.del(obj, path);
+	};
+});
+
 
 /* 
  * The MIT License (MIT)
@@ -18682,7 +18785,7 @@ angular.module('am-wb-core')//
  * <li>widgetSelected</li>
  * </ul>
  */
-.factory('WbWidgetAbstract', function($wbUtil, $widget, $timeout, $wbWindow ){
+.factory('WbWidgetAbstract', function($widget, $wbWindow, $objectPath){
 	'use strict';
 
 	function debounce(func, wait) {
@@ -18890,7 +18993,7 @@ angular.module('am-wb-core')//
 	 * @memberof WbAbstractWidget
 	 */
 	WbWidgetAbstract.prototype.hasModelProperty = function(key){
-		return objectPath.has(this.getModel(), key);
+		return $objectPath.has(this.getModel(), key);
 	};
 
 	/**
@@ -18900,7 +19003,7 @@ angular.module('am-wb-core')//
 	 * @memberof WbAbstractWidget
 	 */
 	WbWidgetAbstract.prototype.getModelProperty = function(key){
-		return objectPath.get(this.getModel(), key);
+		return $objectPath.get(this.getModel(), key);
 	};
 
 	/**
@@ -18925,9 +19028,9 @@ angular.module('am-wb-core')//
 
 		// Set the address
 		if(value){
-			objectPath.set(this.getModel(), key, value);
+			$objectPath.set(this.getModel(), key, value);
 		} else {
-			objectPath.del(this.getModel(), key);
+			$objectPath.del(this.getModel(), key);
 		}
 		this.fire('modelUpdated', $event);
 	};
@@ -18950,7 +19053,7 @@ angular.module('am-wb-core')//
 	 * @memberof WbAbstractWidget
 	 */
 	WbWidgetAbstract.prototype.hasProperty = function (key){
-		return objectPath.has(this.getRuntimeModel(), key);
+		return $objectPath.has(this.getRuntimeModel(), key);
 	};
 
 	/**
@@ -18959,7 +19062,7 @@ angular.module('am-wb-core')//
 	 * @memberof WbAbstractWidget
 	 */
 	WbWidgetAbstract.prototype.getProperty = function (key){
-		return objectPath.get(this.getRuntimeModel(), key);
+		return $objectPath.get(this.getRuntimeModel(), key);
 	};
 
 	/**
@@ -18969,7 +19072,7 @@ angular.module('am-wb-core')//
 	 */
 	WbWidgetAbstract.prototype.removeProperty = function (key){
 		var model = this.getRuntimeModel();
-		objectPath.del(model, key);
+		$objectPath.del(model, key);
 	};
 
 	/**
@@ -19016,9 +19119,9 @@ angular.module('am-wb-core')//
 		// Set the address
 		var model = this.getRuntimeModel();
 		if(angular.isDefined(value)){
-			objectPath.set(model, key, value);
+			$objectPath.set(model, key, value);
 		} else {
-			objectPath.del(model, key);
+			$objectPath.del(model, key);
 		}
 		this.fire('modelUpdated', $event);
 	};
