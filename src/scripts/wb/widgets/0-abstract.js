@@ -757,6 +757,16 @@ angular.module('am-wb-core')//
 	WbWidgetAbstract.prototype.getId = function () {
 		return this.getModelProperty('id');
 	};
+	
+	/**
+	 * Gets name of the widget
+	 * 
+	 * 
+	 * @memberof WbAbstractWidget
+	 */
+	WbWidgetAbstract.prototype.getName = function () {
+		return this.getModelProperty('name');
+	};
 
 	/**
 	 * Get parent widget

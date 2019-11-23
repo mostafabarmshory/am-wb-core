@@ -17833,7 +17833,7 @@ angular.module('am-wb-core')//
  * @description Widget processor
  * 
  */
-.factory('WbProcessorSelect', function ($widget, WbProcessorAbstract) {
+.factory('WbProcessorSelect', function ($rootScope, $widget, WbProcessorAbstract) {
 	'use strict';
 
 	function Processor(){
@@ -17863,6 +17863,7 @@ angular.module('am-wb-core')//
 
 					$event.preventDefault();
 					$event.stopPropagation();
+					$rootScope.$digest();
 				}
 			} finally {
 				delete ctrl.lock;
@@ -17891,6 +17892,7 @@ angular.module('am-wb-core')//
 
 					$event.preventDefault();
 					$event.stopPropagation();
+					$rootScope.$digest();
 				}
 			}finally {
 				delete ctrl.lock;
@@ -17912,6 +17914,7 @@ angular.module('am-wb-core')//
 
 			$event.widgets = ctrl.selectedWidgets;
 			ctrl.fire('selectionChange', $event);
+			$rootScope.$digest();
 		};
 	}
 	Processor.prototype = new WbProcessorAbstract();
@@ -19467,6 +19470,16 @@ angular.module('am-wb-core')//
 	 */
 	WbWidgetAbstract.prototype.getId = function () {
 		return this.getModelProperty('id');
+	};
+	
+	/**
+	 * Gets name of the widget
+	 * 
+	 * 
+	 * @memberof WbAbstractWidget
+	 */
+	WbWidgetAbstract.prototype.getName = function () {
+		return this.getModelProperty('name');
 	};
 
 	/**
