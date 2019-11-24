@@ -12988,7 +12988,7 @@ angular.module('am-wb-core')
 			controller : ResourceCtrl,
 			templateUrl : tmplUrl,
 			parent : angular.element(document.body),
-			clickOutsideToClose : true,
+			clickOutsideToClose : false,
 			fullscreen : true,
 			multiple:true,
 			locals : {
