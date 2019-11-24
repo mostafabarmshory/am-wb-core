@@ -43,7 +43,9 @@ angular.module('am-wb-core')
 			});
 		},
 		controllerAs: 'ctrl',
-		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url','link']
+		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url', 'link',
+			// new models
+			'image-url', 'vedio-url', 'audio-url', 'page-url']
 	});
 	$resource.newPage({
 		type : 'wb-sheet',

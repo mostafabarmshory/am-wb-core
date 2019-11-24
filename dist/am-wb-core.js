@@ -6743,9 +6743,30 @@ angular.module('am-wb-core')
 		scope: {
 			title: '@wbTitle',
 			description: '@wbDescription',
+			resourceType: '@?wbResourceType'
 		},
 		require: ['ngModel'],
-		link: wbUiSettingLinkFunction
+		link: wbUiSettingLinkFunction,
+		/*
+		 * @ngInject
+		 */
+		controller: function($scope, $resource){
+			function openResourcePage(type){
+				return $resource.get(type, {
+					data: $scope.value,
+					style: {
+						title: $scope.title,
+						description: $scope.description
+					}
+				})
+				.then(function(newValue){
+					$scope.setValue(newValue);
+				});
+			}
+			$scope.openResource = function(){
+				openResourcePage($scope.resourceType);
+			};
+		}
 	};
 })
 
@@ -14650,36 +14671,28 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
- * @name MbSettingACtrl
+ * @name WbSettingACtrl
  * @description Manage Widget A 
  * 
  */
-.controller('MbSettingACtrl', function () {
-	
-	var attrs = [
-		// id
-		'download',
-		'href',
-		'hreflang',
-		'media',
-		'ping',
-		'referrerpolicy',
-		'rel',
-		'target',
-		'type',
-		];
+.controller('WbSettingACtrl', function () {
 
 	/*
 	 * Initial the setting editor
 	 */
 	this.init = function () {
-		/*
-		 * Load data of the widget
-		 */
-		var ctrl = this;
-		angular.forEach(attrs, function(attr){
-			ctrl[attr] = ctrl.getProperty(attr);
-		});
+		this.trackAttributes([
+			// id
+			'download',
+			'href',
+			'hreflang',
+			'media',
+			'ping',
+			'referrerpolicy',
+			'rel',
+			'target',
+			'type',
+			]);
 	};
 });
 
@@ -23124,7 +23137,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-text.html',
-    "<field layout=row layout-align=\"start center\"> <field-description flex> <label translate>{{::title}}</label>  </field-description> <div class=text layout=row> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\"> </div> </field>"
+    "<field layout=row layout-align=\"start center\"> <field-description> <label translate>{{::title}}</label>  </field-description> <div class=text layout=row flex> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\" flex> <wb-icon ng-if=resourceType ng-click=openResource() size=1em>more_horiz</wb-icon> </div> </field>"
   );
 
 
@@ -23251,7 +23264,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-widget-img.html',
-    "<fieldset layout=column> <legend translate>Image</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.alg ng-change=\"ctrl.setAttribute('alg', ctrl.attributesValue.alg)\" wb-title=alg wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.crossorigin ng-change=\"ctrl.setAttribute('crossorigin', ctrl.attributesValue.crossorigin)\" wb-title=crossorigin wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.longdesc ng-change=\"ctrl.setAttribute('longdesc', ctrl.attributesValue.longdesc)\" wb-title=longdesc wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Source</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.srcset ng-change=\"ctrl.setAttribute('srcset', ctrl.attributesValue.srcset)\" wb-title=srcset wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Map</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.ismap ng-change=\"ctrl.setAttribute('ismap', ctrl.attributesValue.ismap)\" wb-title=ismap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.usemap ng-change=\"ctrl.setAttribute('usemap', ctrl.attributesValue.usemap)\" wb-title=usemap wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Size</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.size ng-change=\"ctrl.setAttribute('size', ctrl.attributesValue.size)\" wb-title=size wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.height ng-change=\"ctrl.setAttribute('height', ctrl.attributesValue.height)\" wb-title=height wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.width ng-change=\"ctrl.setAttribute('width', ctrl.attributesValue.width)\" wb-title=width wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+    "<fieldset layout=column> <legend translate>Image</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.alg ng-change=\"ctrl.setAttribute('alg', ctrl.attributesValue.alg)\" wb-title=alg wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.crossorigin ng-change=\"ctrl.setAttribute('crossorigin', ctrl.attributesValue.crossorigin)\" wb-title=crossorigin wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.longdesc ng-change=\"ctrl.setAttribute('longdesc', ctrl.attributesValue.longdesc)\" wb-title=longdesc wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Source</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"Path of the image\" wb-resource-type=image-url> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.srcset ng-change=\"ctrl.setAttribute('srcset', ctrl.attributesValue.srcset)\" wb-title=srcset wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Map</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.ismap ng-change=\"ctrl.setAttribute('ismap', ctrl.attributesValue.ismap)\" wb-title=ismap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.usemap ng-change=\"ctrl.setAttribute('usemap', ctrl.attributesValue.usemap)\" wb-title=usemap wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Size</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.size ng-change=\"ctrl.setAttribute('size', ctrl.attributesValue.size)\" wb-title=size wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.height ng-change=\"ctrl.setAttribute('height', ctrl.attributesValue.height)\" wb-title=height wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.width ng-change=\"ctrl.setAttribute('width', ctrl.attributesValue.width)\" wb-title=width wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
   );
 
 

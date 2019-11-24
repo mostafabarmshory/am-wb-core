@@ -1098,10 +1098,16 @@ field, field > field-description, field > input{
 	color: inherit;
 }
 
-field-description {
-	min-width: 100px;
-	width: auto;
+field {
+	max-width: 100%;
 }
+
+field-description {
+/* 	min-width: 100px; */
+/* 	width: auto; */
+	width: 10em;
+}
+
 
 field .color input,
 field .length input,
@@ -1109,7 +1115,7 @@ field .number input,
 field .select input,
 field .text input
 {
-	width: 5em;
+	width: auto;
 	border-radius: 0.5em;
 	border-width: 1px;
 }

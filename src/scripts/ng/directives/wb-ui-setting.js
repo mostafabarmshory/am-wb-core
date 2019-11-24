@@ -148,9 +148,30 @@ angular.module('am-wb-core')
 		scope: {
 			title: '@wbTitle',
 			description: '@wbDescription',
+			resourceType: '@?wbResourceType'
 		},
 		require: ['ngModel'],
-		link: wbUiSettingLinkFunction
+		link: wbUiSettingLinkFunction,
+		/*
+		 * @ngInject
+		 */
+		controller: function($scope, $resource){
+			function openResourcePage(type){
+				return $resource.get(type, {
+					data: $scope.value,
+					style: {
+						title: $scope.title,
+						description: $scope.description
+					}
+				})
+				.then(function(newValue){
+					$scope.setValue(newValue);
+				});
+			}
+			$scope.openResource = function(){
+				openResourcePage($scope.resourceType);
+			};
+		}
 	};
 })
 
