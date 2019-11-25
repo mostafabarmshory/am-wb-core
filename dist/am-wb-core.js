@@ -10752,7 +10752,9 @@ angular.module('am-wb-core')
 			});
 		},
 		controllerAs: 'ctrl',
-		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url','link']
+		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url', 'link',
+			// new models
+			'image-url', 'vedio-url', 'audio-url', 'page-url']
 	});
 	$resource.newPage({
 		type : 'wb-sheet',
@@ -23112,17 +23114,17 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-boolean.html',
-    "<field layout=row layout-align=\"start center\"> <field-description flex> <label translate>{{::title}}</label> <wb-icon size=1em>info</wb-icon> </field-description> <div class=boolean> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\" type=checkbox> </div> </field>"
+    "<field layout=row layout-align=\"start center\"> <field-description flex> <label translate>{{::title}}</label> <wb-icon size=1em>info</wb-icon> </field-description> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\" type=checkbox> </field>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-color.html',
-    "<field layout=row layout-align=\"start center\"> <field-description flex> <label translate>{{::title}}</label> <wb-icon size=1em>info</wb-icon> </field-description> <div class=color layout=row> <input ng-model=value ng-change=setValue(value) aria-label=\"color of {{::title}}\" flex> <div ng-click=selectColor($event) class=preview></div> </div> </field>"
+    "<field layout=row layout-align=\"start stretch\"> <field-description> <label translate>{{::title}}</label> <wb-icon size=1em>info</wb-icon> </field-description> <input ng-model=value ng-change=setValue(value) aria-label=\"color of {{::title}}\" flex> <div ng-click=selectColor($event) class=preview></div> </field>"
   );
 
 
   $templateCache.put('views/directives/wb-ui-setting-length.html',
-    "<field layout=row layout-align=\"start center\"> <field-description flex> <label translate>{{::title}}</label> <wb-icon size=1em>info</wb-icon> </field-description> <div class=length layout=row> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\"> </div> </field>"
+    "<field layout=row layout-align=\"start center\"> <field-description flex> <label translate>{{::title}}</label> <wb-icon size=1em>info</wb-icon> </field-description> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\"> </field>"
   );
 
 
@@ -23137,7 +23139,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/directives/wb-ui-setting-text.html',
-    "<field layout=row layout-align=\"start center\"> <field-description> <label translate>{{::title}}</label>  </field-description> <div class=text layout=row flex> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\" flex> <wb-icon ng-if=resourceType ng-click=openResource() size=1em>more_horiz</wb-icon> </div> </field>"
+    "<field layout=row layout-align=\"start center\"> <field-description> <label translate>{{::title}}</label>  </field-description> <input ng-model=value ng-change=setValue(value) aria-label=\"set {{::title}} true or false\" flex> <wb-icon ng-if=resourceType ng-click=openResource() size=1em>more_horiz</wb-icon> </field>"
   );
 
 

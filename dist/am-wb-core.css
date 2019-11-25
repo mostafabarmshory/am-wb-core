@@ -1105,7 +1105,7 @@ field {
 field-description {
 /* 	min-width: 100px; */
 /* 	width: auto; */
-	width: 10em;
+	width: 5em;
 }
 
 
@@ -1113,9 +1113,9 @@ field .color input,
 field .length input,
 field .number input,
 field .select input,
-field .text input
+field .text input,
+field input
 {
-	width: auto;
 	border-radius: 0.5em;
 	border-width: 1px;
 }
@@ -1123,12 +1123,11 @@ field .text input
 /**********************************************
  * Color
  **********************************************/
-field .color input {
-	width: 3em;
+field input {
 	border-radius: 0.5em 0 0 0.5em;
 }
 
-field .color .preview {
+field .preview {
 	width: 2em;
 	border-radius: 0 0.5em 0.5em 0;
 	background: red;
