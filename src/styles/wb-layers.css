@@ -54,31 +54,31 @@
 	z-index: 59 !important;
 }
 /*******************************************************************************
- * Layer: sidenav
- * Range: [60,70)
+ * Layer: Tool
+ * Range: [60,69)
  ******************************************************************************/
-.wb-layer-sidenav-bottom {
+.wb-layer-tool-bottom{
 	z-index: 60 !important;
 }
 
 /*
  * Last layer of the content
  */
-.wb-layer-sidenav-top {
+.wb-layer-tool-top{
 	z-index: 69 !important;
 }
 /*******************************************************************************
- * Layer: Tool
- * Range: [70,80)
+ * Layer: sidenav
+ * Range: [70,79)
  ******************************************************************************/
-.wb-layer-tool-bottom{
+.wb-layer-sidenav-bottom {
 	z-index: 70 !important;
 }
 
 /*
  * Last layer of the content
  */
-.wb-layer-tool-top{
+.wb-layer-sidenav-top {
 	z-index: 79 !important;
 }
 /*******************************************************************************
@@ -93,5 +93,9 @@
  * Last layer of the content
  */
 .wb-layer-dialog-top {
+	z-index: 89 !important;
+}
+
+.md-dialog-container {
 	z-index: 89 !important;
 }

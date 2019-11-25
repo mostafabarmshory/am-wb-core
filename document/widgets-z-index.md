@@ -7,8 +7,8 @@ WB define the following layers:
 - content [0, 40)
 - editor [40, 50)
 - menus [50, 60)
-- sidenav [60, 70)
-- tool [70, 80)
+- tool [60, 70)
+- sidenav [70, 80)
 - dialog [80, 90)
 
 So to create valid content you must use ZIndex in the range of 0 to 50. For example, all widget locators will be added in the editor layer (40) to be on the top of all contents.
