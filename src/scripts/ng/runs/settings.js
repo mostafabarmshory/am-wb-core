@@ -74,6 +74,14 @@ angular.module('am-wb-core')
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetIFrameCtrl',
 		targets: ['iframe']
+	})
+	.addPage({
+		type: 'source',
+		label: 'Source',
+		templateUrl: 'views/settings/wb-widget-source.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetSourceCtrl',
+		targets: ['source']
 	});
 
 

@@ -10922,6 +10922,14 @@ angular.module('am-wb-core')
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetIFrameCtrl',
 		targets: ['iframe']
+	})
+	.addPage({
+		type: 'source',
+		label: 'Source',
+		templateUrl: 'views/settings/wb-widget-source.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetSourceCtrl',
+		targets: ['source']
 	});
 
 
@@ -14899,6 +14907,47 @@ angular.module('am-wb-core')//
 			'content',
 			]);
 	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Settings
+ * @name WbSettingWidgetSourceCtrl
+ * @description Manage IFrame widget 
+ * 
+ */
+.controller('WbSettingWidgetSourceCtrl', function () {
+
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackAttributes(['src', 'srcset', 'media', 'sizes', 'type']);
+    };
 });
 
 /*
@@ -20353,6 +20402,71 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name meta
+ * @description Manage a meta data 
+ * 
+ * In seo (or equivalient usecase) 
+ * 
+ */
+.factory('WbWidgetUnvisible', function (WbWidgetAbstractHtml) {
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		var ctrl = this;
+		function updateView(){
+			var str = 'Unvisible Widget (' + ctrl.getType() + ')';
+			if(_.isFunction(ctrl.toString)){
+				str = ctrl.toString();
+			}
+			ctrl.getElement().html(str);
+		}
+		this.on('stateChanged', function(){
+			var element = ctrl.getElement();
+			if(ctrl.state === 'edit'){
+				element.show();
+				element.css({
+					minHeight: '60px',
+					minWidth: '60px',
+					padding: '16px'
+				});
+				return;
+			}
+			ctrl.getElement().hide();
+		});
+		updateView();
+	}
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	return Widget;
+});
+
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 angular.module('am-wb-core')//
 
@@ -20376,7 +20490,7 @@ angular.module('am-wb-core')//
         WbWidgetAbstractHtml.apply(this, [$element, $parent]);
         this.addElementAttributes('download', 'href',
                 'hreflang', 'media', 'ping', 'referrerpolicy',
-                'rel', 'target', 'type');
+                'rel', 'target', 'aType');
 
         // chack edit mode
         function removeDefaultAction($event){
@@ -20390,6 +20504,16 @@ angular.module('am-wb-core')//
                 ctrl.getElement().off('click dblclick', removeDefaultAction);
             }
         });
+
+        // init input
+        function eventHandler(event){
+            if(event.key === 'aType'){
+                ctrl.setElementAttribute('type', event.value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
     }
 
     // extend functionality
@@ -21937,30 +22061,20 @@ angular.module('am-wb-core')//
  * In seo (or equivalient usecase) 
  * 
  */
-.factory('WbWidgetMeta', function (WbWidgetAbstractHtml) {
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes('charset', 'content', 'http-equiv', 'name');
+.factory('WbWidgetMeta', function (WbWidgetUnvisible) {
 
-        var ctrl = this;
-        function updateView(){
-            var name = ctrl.getProperty('name') || ctrl.getModelProperty('name');
-            var content = ctrl.getProperty('content') || ctrl.getModelProperty('content');
-            ctrl.getElement().html(name + ':' + content);
-        }
-
-        this.on('stateChanged', function(){
-            if(ctrl.state === 'edit'){
-                ctrl.getElement().show();
-                return;
-            }
-            ctrl.getElement().hide();
-        });
-        updateView();
-    }
-    // extend functionality
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
+	function Widget($element, $parent){
+		WbWidgetUnvisible.apply(this, [$element, $parent]);
+		this.addElementAttributes('charset', 'content', 'http-equiv', 'name');
+	}
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetUnvisible.prototype);
+	Widget.prototype.toString = function(){
+		var name = this.getProperty('name') || this.getModelProperty('name');
+		var content = this.getProperty('content') || this.getModelProperty('content');
+		return name + ':' + content;
+	};
+	return Widget;
 });
 
 
@@ -22707,36 +22821,35 @@ angular.module('am-wb-core')//
  * @description Manage resource
  * 
  */
-.factory('WbWidgetSource', function (WbWidgetAbstract) {
+.factory('WbWidgetSource', function (WbWidgetUnvisible) {
 
-    /**
-     * Creates new instance of the group
-     * 
-     * @memberof WbWidgetSource
-     */
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes('src', 'srcset', 'media', 'sizes', 'type');
-        
-        var ctrl = this;
-        function updateView(){
-            ctrl.getElement().html('src:' + ctrl.getProperty('src') || ctrl.getModelProperty('src'));
-        }
+	/**
+	 * Creates new instance of the group
+	 * 
+	 * @memberof WbWidgetSource
+	 */
+	function Widget($element, $parent){
+		WbWidgetUnvisible.apply(this, [$element, $parent]);
+		this.addElementAttributes('src', 'srcset', 'media', 'sizes', 'sourceType');
 
-        this.on('stateChanged', function(){
-            if(ctrl.state === 'edit'){
-                ctrl.getElement().show();
-                updateView();
-                return;
-            }
-            ctrl.getElement().hide();
-        });
-        updateView();
-    }
+		// init input
+		var ctrl = this;
+		function eventHandler(event){
+			if(event.key === 'sourceType'){
+				ctrl.setElementAttribute('type', event.value);
+			}
+		}
+		// listen on change
+		this.on('modelUpdated', eventHandler);
+		this.on('runtimeModelUpdated', eventHandler);
+	}
 
-    // extend functionality
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetUnvisible.prototype);
+	Widget.prototype.toString = function(){
+		return 'src:' + this.getProperty('sourceType') || this.getModelProperty('sourceType');
+	};
+	return Widget;
 });
 
 /*
@@ -23300,6 +23413,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/settings/wb-widget-microdata.html',
     " <fieldset layout=column style=\"padding: 0px\"> <legend translate=\"\">Microdata</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.itemscope ng-change=\"ctrl.setAttribute('itemscope', ctrl.attributesValue.itemscope)\" wb-title=Scope wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.itemtype ng-change=\"ctrl.setAttribute('itemtype', ctrl.attributesValue.itemtype)\" wb-title=Type wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.itemprop ng-change=\"ctrl.setAttribute('itemprop', ctrl.attributesValue.itemprop)\" wb-title=Property wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.itemid ng-change=\"ctrl.setAttribute('itemid', ctrl.attributesValue.itemid)\" wb-title=ID wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.itemref ng-change=\"ctrl.setAttribute('itemref', ctrl.attributesValue.itemref)\" wb-title=Reference wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.value ng-change=\"ctrl.setAttribute('value', ctrl.attributesValue.value)\" wb-title=Value wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.content ng-change=\"ctrl.setAttribute('content', ctrl.attributesValue.content)\" wb-title=Content wb-description=\"\"></wb-ui-setting-text> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-widget-source.html',
+    "<fieldset layout=column> <legend translate>Source</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"Path of the image\" wb-resource-type=image-url> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.srcset ng-change=\"ctrl.setAttribute('srcset', ctrl.attributesValue.srcset)\" wb-title=srcset wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.media ng-change=\"ctrl.setAttribute('media', ctrl.attributesValue.media)\" wb-title=media wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.sizes ng-change=\"ctrl.setAttribute('sizes', ctrl.attributesValue.sizes)\" wb-title=sizes wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.sourceType ng-change=\"ctrl.setAttribute('sourceType', ctrl.attributesValue.sourceType)\" wb-title=sourceType wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
   );
 
 

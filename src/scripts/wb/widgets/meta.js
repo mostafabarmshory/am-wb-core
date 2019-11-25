@@ -31,29 +31,19 @@ angular.module('am-wb-core')//
  * In seo (or equivalient usecase) 
  * 
  */
-.factory('WbWidgetMeta', function (WbWidgetAbstractHtml) {
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes('charset', 'content', 'http-equiv', 'name');
+.factory('WbWidgetMeta', function (WbWidgetUnvisible) {
 
-        var ctrl = this;
-        function updateView(){
-            var name = ctrl.getProperty('name') || ctrl.getModelProperty('name');
-            var content = ctrl.getProperty('content') || ctrl.getModelProperty('content');
-            ctrl.getElement().html(name + ':' + content);
-        }
-
-        this.on('stateChanged', function(){
-            if(ctrl.state === 'edit'){
-                ctrl.getElement().show();
-                return;
-            }
-            ctrl.getElement().hide();
-        });
-        updateView();
-    }
-    // extend functionality
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
+	function Widget($element, $parent){
+		WbWidgetUnvisible.apply(this, [$element, $parent]);
+		this.addElementAttributes('charset', 'content', 'http-equiv', 'name');
+	}
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetUnvisible.prototype);
+	Widget.prototype.toString = function(){
+		var name = this.getProperty('name') || this.getModelProperty('name');
+		var content = this.getProperty('content') || this.getModelProperty('content');
+		return name + ':' + content;
+	};
+	return Widget;
 });
 

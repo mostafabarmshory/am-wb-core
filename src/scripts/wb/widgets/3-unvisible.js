@@ -25,37 +25,40 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Widgets
- * @name source
- * @description Manage resource
+ * @name meta
+ * @description Manage a meta data 
+ * 
+ * In seo (or equivalient usecase) 
  * 
  */
-.factory('WbWidgetSource', function (WbWidgetUnvisible) {
-
-	/**
-	 * Creates new instance of the group
-	 * 
-	 * @memberof WbWidgetSource
-	 */
+.factory('WbWidgetUnvisible', function (WbWidgetAbstractHtml) {
 	function Widget($element, $parent){
-		WbWidgetUnvisible.apply(this, [$element, $parent]);
-		this.addElementAttributes('src', 'srcset', 'media', 'sizes', 'sourceType');
-
-		// init input
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
 		var ctrl = this;
-		function eventHandler(event){
-			if(event.key === 'sourceType'){
-				ctrl.setElementAttribute('type', event.value);
+		function updateView(){
+			var str = 'Unvisible Widget (' + ctrl.getType() + ')';
+			if(_.isFunction(ctrl.toString)){
+				str = ctrl.toString();
 			}
+			ctrl.getElement().html(str);
 		}
-		// listen on change
-		this.on('modelUpdated', eventHandler);
-		this.on('runtimeModelUpdated', eventHandler);
+		this.on('stateChanged', function(){
+			var element = ctrl.getElement();
+			if(ctrl.state === 'edit'){
+				element.show();
+				element.css({
+					minHeight: '60px',
+					minWidth: '60px',
+					padding: '16px'
+				});
+				return;
+			}
+			ctrl.getElement().hide();
+		});
+		updateView();
 	}
-
 	// extend functionality
-	Widget.prototype = Object.create(WbWidgetUnvisible.prototype);
-	Widget.prototype.toString = function(){
-		return 'src:' + this.getProperty('sourceType') || this.getModelProperty('sourceType');
-	};
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
 	return Widget;
 });
+

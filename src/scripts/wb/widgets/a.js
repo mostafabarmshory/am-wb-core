@@ -42,7 +42,7 @@ angular.module('am-wb-core')//
         WbWidgetAbstractHtml.apply(this, [$element, $parent]);
         this.addElementAttributes('download', 'href',
                 'hreflang', 'media', 'ping', 'referrerpolicy',
-                'rel', 'target', 'type');
+                'rel', 'target', 'aType');
 
         // chack edit mode
         function removeDefaultAction($event){
@@ -56,6 +56,16 @@ angular.module('am-wb-core')//
                 ctrl.getElement().off('click dblclick', removeDefaultAction);
             }
         });
+
+        // init input
+        function eventHandler(event){
+            if(event.key === 'aType'){
+                ctrl.setElementAttribute('type', event.value);
+            }
+        }
+        // listen on change
+        this.on('modelUpdated', eventHandler);
+        this.on('runtimeModelUpdated', eventHandler);
     }
 
     // extend functionality

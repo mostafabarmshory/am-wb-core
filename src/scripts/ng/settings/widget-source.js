@@ -24,38 +24,17 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Widgets
- * @name source
- * @description Manage resource
+ * @ngdoc Settings
+ * @name WbSettingWidgetSourceCtrl
+ * @description Manage IFrame widget 
  * 
  */
-.factory('WbWidgetSource', function (WbWidgetUnvisible) {
+.controller('WbSettingWidgetSourceCtrl', function () {
 
-	/**
-	 * Creates new instance of the group
-	 * 
-	 * @memberof WbWidgetSource
-	 */
-	function Widget($element, $parent){
-		WbWidgetUnvisible.apply(this, [$element, $parent]);
-		this.addElementAttributes('src', 'srcset', 'media', 'sizes', 'sourceType');
-
-		// init input
-		var ctrl = this;
-		function eventHandler(event){
-			if(event.key === 'sourceType'){
-				ctrl.setElementAttribute('type', event.value);
-			}
-		}
-		// listen on change
-		this.on('modelUpdated', eventHandler);
-		this.on('runtimeModelUpdated', eventHandler);
-	}
-
-	// extend functionality
-	Widget.prototype = Object.create(WbWidgetUnvisible.prototype);
-	Widget.prototype.toString = function(){
-		return 'src:' + this.getProperty('sourceType') || this.getModelProperty('sourceType');
-	};
-	return Widget;
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackAttributes(['src', 'srcset', 'media', 'sizes', 'type']);
+    };
 });
