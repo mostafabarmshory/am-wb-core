@@ -82,6 +82,14 @@ angular.module('am-wb-core')
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetSourceCtrl',
 		targets: ['source']
+	})
+	.addPage({
+		type: 'picture',
+		label: 'Picture',
+		templateUrl: 'views/settings/wb-widget-picture.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetPictureCtrl',
+		targets: ['picture']
 	});
 
 

@@ -10930,6 +10930,14 @@ angular.module('am-wb-core')
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetSourceCtrl',
 		targets: ['source']
+	})
+	.addPage({
+		type: 'picture',
+		label: 'Picture',
+		templateUrl: 'views/settings/wb-widget-picture.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetPictureCtrl',
+		targets: ['picture']
 	});
 
 
@@ -14907,6 +14915,49 @@ angular.module('am-wb-core')//
 			'content',
 			]);
 	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Settings
+ * @name WbSettingWidgetPictureCtrl
+ * @description Manage IFrame widget 
+ * 
+ */
+.controller('WbSettingWidgetPictureCtrl', function () {
+
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackAttributes(['alt', 'crossorigin', 'height',
+            'hspace', 'ismap', 'longdesc', 'sizes', 'src',
+            'usemap', 'width']);
+    };
 });
 
 /*
@@ -23413,6 +23464,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/settings/wb-widget-microdata.html',
     " <fieldset layout=column style=\"padding: 0px\"> <legend translate=\"\">Microdata</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.itemscope ng-change=\"ctrl.setAttribute('itemscope', ctrl.attributesValue.itemscope)\" wb-title=Scope wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.itemtype ng-change=\"ctrl.setAttribute('itemtype', ctrl.attributesValue.itemtype)\" wb-title=Type wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.itemprop ng-change=\"ctrl.setAttribute('itemprop', ctrl.attributesValue.itemprop)\" wb-title=Property wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.itemid ng-change=\"ctrl.setAttribute('itemid', ctrl.attributesValue.itemid)\" wb-title=ID wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.itemref ng-change=\"ctrl.setAttribute('itemref', ctrl.attributesValue.itemref)\" wb-title=Reference wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.value ng-change=\"ctrl.setAttribute('value', ctrl.attributesValue.value)\" wb-title=Value wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.content ng-change=\"ctrl.setAttribute('content', ctrl.attributesValue.content)\" wb-title=Content wb-description=\"\"></wb-ui-setting-text> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-widget-picture.html',
+    "<fieldset layout=column> <legend translate>Image</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.alt ng-change=\"ctrl.setAttribute('alt', ctrl.attributesValue.alt)\" wb-title=alt wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.crossorigin ng-change=\"ctrl.setAttribute('crossorigin', ctrl.attributesValue.crossorigin)\" wb-title=crossorigin wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.longdesc ng-change=\"ctrl.setAttribute('longdesc', ctrl.attributesValue.longdesc)\" wb-title=longdesc wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Source</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"Path of the image\" wb-resource-type=image-url> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.hspace ng-change=\"ctrl.setAttribute('hspace', ctrl.attributesValue.hspace)\" wb-title=hspace wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Map</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.ismap ng-change=\"ctrl.setAttribute('ismap', ctrl.attributesValue.ismap)\" wb-title=ismap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.usemap ng-change=\"ctrl.setAttribute('usemap', ctrl.attributesValue.usemap)\" wb-title=usemap wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Size</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.size ng-change=\"ctrl.setAttribute('size', ctrl.attributesValue.size)\" wb-title=size wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.height ng-change=\"ctrl.setAttribute('height', ctrl.attributesValue.height)\" wb-title=height wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.width ng-change=\"ctrl.setAttribute('width', ctrl.attributesValue.width)\" wb-title=width wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
   );
 
 
