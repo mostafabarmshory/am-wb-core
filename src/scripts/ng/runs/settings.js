@@ -92,6 +92,14 @@ angular.module('am-wb-core')
 		targets: ['picture']
 	})
 	.addPage({
+		type: 'video',
+		label: 'Video',
+		templateUrl: 'views/settings/wb-widget-video.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetVideoCtrl',
+		targets: ['video']
+	})
+	.addPage({
 		type: 'audio',
 		label: 'Audio',
 		templateUrl: 'views/settings/wb-widget-audio.html',

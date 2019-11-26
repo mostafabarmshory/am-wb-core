@@ -10940,6 +10940,14 @@ angular.module('am-wb-core')
 		targets: ['picture']
 	})
 	.addPage({
+		type: 'video',
+		label: 'Video',
+		templateUrl: 'views/settings/wb-widget-video.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetVideoCtrl',
+		targets: ['video']
+	})
+	.addPage({
 		type: 'audio',
 		label: 'Audio',
 		templateUrl: 'views/settings/wb-widget-audio.html',
@@ -15049,6 +15057,49 @@ angular.module('am-wb-core')//
      */
     this.init = function () {
         this.trackAttributes(['src', 'srcset', 'media', 'sizes', 'type']);
+    };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Settings
+ * @name WbSettingWidgetVideoCtrl
+ * @description Manage IFrame widget 
+ * 
+ */
+.controller('WbSettingWidgetVideoCtrl', function () {
+
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackAttributes(['autoplay', 'controls', 'height',
+            'loop', 'muted', 'poster', 'preload', 'src',
+            'usemap', 'width']);
     };
 });
 
@@ -23530,6 +23581,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/settings/wb-widget-source.html',
     "<fieldset layout=column> <legend translate>Source</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"Path of the image\" wb-resource-type=image-url> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.srcset ng-change=\"ctrl.setAttribute('srcset', ctrl.attributesValue.srcset)\" wb-title=srcset wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.media ng-change=\"ctrl.setAttribute('media', ctrl.attributesValue.media)\" wb-title=media wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.sizes ng-change=\"ctrl.setAttribute('sizes', ctrl.attributesValue.sizes)\" wb-title=sizes wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.sourceType ng-change=\"ctrl.setAttribute('sourceType', ctrl.attributesValue.sourceType)\" wb-title=sourceType wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-widget-video.html',
+    "<fieldset layout=column> <legend translate>audio</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.autoplay ng-change=\"ctrl.setAttribute('autoplay', ctrl.attributesValue.autoplay)\" wb-title=autoplay wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.controls ng-change=\"ctrl.setAttribute('controls', ctrl.attributesValue.controls)\" wb-title=controls wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.loop ng-change=\"ctrl.setAttribute('loop', ctrl.attributesValue.loop)\" wb-title=loop wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.muted ng-change=\"ctrl.setAttribute('muted', ctrl.attributesValue.muted)\" wb-title=muted wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.preload ng-change=\"ctrl.setAttribute('preload', ctrl.attributesValue.preload)\" wb-title=preload wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.height ng-change=\"ctrl.setAttribute('height', ctrl.attributesValue.height)\" wb-title=height wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.poster ng-change=\"ctrl.setAttribute('poster', ctrl.attributesValue.poster)\" wb-title=poster wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.usemap ng-change=\"ctrl.setAttribute('usemap', ctrl.attributesValue.usemap)\" wb-title=usemap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.width ng-change=\"ctrl.setAttribute('width', ctrl.attributesValue.width)\" wb-title=width wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
   );
 
 
