@@ -90,6 +90,14 @@ angular.module('am-wb-core')
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetPictureCtrl',
 		targets: ['picture']
+	})
+	.addPage({
+		type: 'audio',
+		label: 'Audio',
+		templateUrl: 'views/settings/wb-widget-audio.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetAudioCtrl',
+		targets: ['audio']
 	});
 
 

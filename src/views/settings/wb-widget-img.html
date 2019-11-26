@@ -2,16 +2,16 @@
 	layout="column">
 	<legend translate>Image</legend>
 	<wb-ui-setting-text
-		ng-model="ctrl.attributesValue.alg"
-		ng-change="ctrl.setAttribute('alg', ctrl.attributesValue.alg)"
+		ng-model="ctrl.attributesValue.alt"
+		ng-change="ctrl.setAttribute('alt', ctrl.attributesValue.alt)"
 		wb-title="alg"
-		wb-description="">
+		wb-description="Defines an alternative text description of the image.">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
 		ng-model="ctrl.attributesValue.crossorigin"
 		ng-change="ctrl.setAttribute('crossorigin', ctrl.attributesValue.crossorigin)"
 		wb-title="crossorigin"
-		wb-description="">
+		wb-description="Indicates if the fetching of the image must be done using CORS.">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
 		ng-model="ctrl.attributesValue.longdesc"

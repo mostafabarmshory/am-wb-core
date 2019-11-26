@@ -166,6 +166,7 @@ angular.module('am-wb-core')
 			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
 		},
 		controller: 'WbWidgetAudio', 
+		isLeaf: false, 
 	});
 	$widget.newWidget({
 		type: 'blockquote',

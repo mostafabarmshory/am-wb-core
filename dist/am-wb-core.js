@@ -10938,6 +10938,14 @@ angular.module('am-wb-core')
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetPictureCtrl',
 		targets: ['picture']
+	})
+	.addPage({
+		type: 'audio',
+		label: 'Audio',
+		templateUrl: 'views/settings/wb-widget-audio.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetAudioCtrl',
+		targets: ['audio']
 	});
 
 
@@ -11214,6 +11222,7 @@ angular.module('am-wb-core')
 			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
 		},
 		controller: 'WbWidgetAudio', 
+		isLeaf: false, 
 	});
 	$widget.newWidget({
 		type: 'blockquote',
@@ -14735,6 +14744,48 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Settings
+ * @name WbSettingWidgetAudioCtrl
+ * @description Manage IFrame widget 
+ * 
+ */
+.controller('WbSettingWidgetAudioCtrl', function () {
+
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackAttributes(['autoplay', 'controls',
+            'loop', 'muted', 'preload', 'src']);
+    };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 angular.module('am-wb-core')//
 
@@ -14849,7 +14900,7 @@ angular.module('am-wb-core')//
     this.init = function () {
         this.trackAttributes([
             // id
-            'alg',
+            'alt',
             'crossorigin',
             'height',
             'ismap',
@@ -23396,6 +23447,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/settings/wb-widget-audio.html',
+    "<fieldset layout=column> <legend translate>audio</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.autoplay ng-change=\"ctrl.setAttribute('autoplay', ctrl.attributesValue.autoplay)\" wb-title=autoplay wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.controls ng-change=\"ctrl.setAttribute('controls', ctrl.attributesValue.controls)\" wb-title=controls wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.loop ng-change=\"ctrl.setAttribute('loop', ctrl.attributesValue.loop)\" wb-title=loop wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.muted ng-change=\"ctrl.setAttribute('muted', ctrl.attributesValue.muted)\" wb-title=muted wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.preload ng-change=\"ctrl.setAttribute('preload', ctrl.attributesValue.preload)\" wb-title=preload wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+  );
+
+
   $templateCache.put('views/settings/wb-widget-general.html',
     "<fieldset layout=column> <legend translate>Access</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.id ng-change=\"ctrl.setAttribute('id', ctrl.attributesValue.id)\" wb-title=ID wb-description=\"Specifies a unique id for an element\" wb-action-clean wb-action-more=ctrl.generateRandomId()> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.accesskey ng-change=\"ctrl.setAttribute('accesskey', ctrl.attributesValue.accesskey)\" wb-title=Accesskey wb-icon=\"\" wb-description=\"Specifies a shortcut key to activate/focus an element\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.title ng-change=\"ctrl.setAttribute('title', ctrl.attributesValue.title)\" wb-title=Title wb-description=\"Specifies extra information about an element\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.name ng-change=\"ctrl.setAttribute('name', ctrl.attributesValue.name)\" wb-title=Name wb-description=\"Specifies a unique id for an element\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-number ng-model=ctrl.attributesValue.tabindex ng-change=\"ctrl.setAttribute('tabindex', ctrl.attributesValue.tabindex)\" wb-title=\"Tab Index\" wb-description=\"Specifies the tabbing order of an element\" wb-action-clean wb-min=1> </wb-ui-setting-number> </fieldset> <fieldset layout=column> <legend translate>Edit</legend> <wb-ui-setting-boolean ng-model=ctrl.attributesValue.contenteditable ng-change=\"ctrl.setAttribute('contenteditable', ctrl.attributesValue.contenteditable)\" wb-title=\"Content Is Editable\" wb-description=\"Specifies whether the content of an element is editable or not\" wb-action-clean> </wb-ui-setting-boolean> <wb-ui-setting-boolean ng-model=ctrl.attributesValue.draggable ng-change=\"ctrl.setAttribute('draggable', ctrl.attributesValue.draggable)\" wb-title=\"Content Is Editable\" wb-description=\"Specifies whether an element is draggable or not\" wb-action-clean> </wb-ui-setting-boolean> <wb-ui-setting-select ng-model=ctrl.attributesValue.dropzone ng-change=\"ctrl.setAttribute('dropzone', ctrl.attributesValue.dropzone)\" wb-title=\"Drop Zone\" wb-description=\"Specifies whether the dragged data is copied, moved, or linked, when dropped\" wb-action-clean wb-items=\"[{\n" +
     "\t\t\tvalue: 'copy',\n" +
@@ -23430,7 +23486,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-widget-img.html',
-    "<fieldset layout=column> <legend translate>Image</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.alg ng-change=\"ctrl.setAttribute('alg', ctrl.attributesValue.alg)\" wb-title=alg wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.crossorigin ng-change=\"ctrl.setAttribute('crossorigin', ctrl.attributesValue.crossorigin)\" wb-title=crossorigin wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.longdesc ng-change=\"ctrl.setAttribute('longdesc', ctrl.attributesValue.longdesc)\" wb-title=longdesc wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Source</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"Path of the image\" wb-resource-type=image-url> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.srcset ng-change=\"ctrl.setAttribute('srcset', ctrl.attributesValue.srcset)\" wb-title=srcset wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Map</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.ismap ng-change=\"ctrl.setAttribute('ismap', ctrl.attributesValue.ismap)\" wb-title=ismap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.usemap ng-change=\"ctrl.setAttribute('usemap', ctrl.attributesValue.usemap)\" wb-title=usemap wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Size</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.size ng-change=\"ctrl.setAttribute('size', ctrl.attributesValue.size)\" wb-title=size wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.height ng-change=\"ctrl.setAttribute('height', ctrl.attributesValue.height)\" wb-title=height wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.width ng-change=\"ctrl.setAttribute('width', ctrl.attributesValue.width)\" wb-title=width wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+    "<fieldset layout=column> <legend translate>Image</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.alt ng-change=\"ctrl.setAttribute('alt', ctrl.attributesValue.alt)\" wb-title=alg wb-description=\"Defines an alternative text description of the image.\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.crossorigin ng-change=\"ctrl.setAttribute('crossorigin', ctrl.attributesValue.crossorigin)\" wb-title=crossorigin wb-description=\"Indicates if the fetching of the image must be done using CORS.\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.longdesc ng-change=\"ctrl.setAttribute('longdesc', ctrl.attributesValue.longdesc)\" wb-title=longdesc wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Source</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"Path of the image\" wb-resource-type=image-url> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.srcset ng-change=\"ctrl.setAttribute('srcset', ctrl.attributesValue.srcset)\" wb-title=srcset wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Map</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.ismap ng-change=\"ctrl.setAttribute('ismap', ctrl.attributesValue.ismap)\" wb-title=ismap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.usemap ng-change=\"ctrl.setAttribute('usemap', ctrl.attributesValue.usemap)\" wb-title=usemap wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Size</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.size ng-change=\"ctrl.setAttribute('size', ctrl.attributesValue.size)\" wb-title=size wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.height ng-change=\"ctrl.setAttribute('height', ctrl.attributesValue.height)\" wb-title=height wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.width ng-change=\"ctrl.setAttribute('width', ctrl.attributesValue.width)\" wb-title=width wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
   );
 
 

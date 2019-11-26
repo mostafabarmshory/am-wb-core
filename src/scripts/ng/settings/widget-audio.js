@@ -25,28 +25,17 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Settings
- * @name WbSettingWidgetImgCtrl
- * @description Manage Widget img 
+ * @name WbSettingWidgetAudioCtrl
+ * @description Manage IFrame widget 
  * 
  */
-.controller('WbSettingWidgetImgCtrl', function () {
+.controller('WbSettingWidgetAudioCtrl', function () {
 
     /*
      * Initial the setting editor
      */
     this.init = function () {
-        this.trackAttributes([
-            // id
-            'alt',
-            'crossorigin',
-            'height',
-            'ismap',
-            'longdesc',
-            'size',
-            'src',
-            'srcset',
-            'usemap',
-            'width',
-        ]);
+        this.trackAttributes(['autoplay', 'controls',
+            'loop', 'muted', 'preload', 'src']);
     };
 });
