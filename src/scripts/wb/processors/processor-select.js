@@ -44,21 +44,22 @@ angular.module('am-wb-core')//
 				ctrl.lock = true;
 				var widget = $event.source;
 				if(!widget.isSilent()){
-					widget.setSelected(true);
-					if($event.shiftKey){
-						ctrl.selectedWidgets.push(widget);
-					} else {
-						_.forEach(ctrl.selectedWidgets, function(widget){
-							widget.setSelected(false);
-						});
-						ctrl.selectedWidgets = [widget];
+					if(!widget.isSelected()){
+						widget.setSelected(true);
+						if($event.shiftKey){
+							ctrl.selectedWidgets.push(widget);
+						} else {
+							_.forEach(ctrl.selectedWidgets, function(widget){
+								widget.setSelected(false);
+							});
+							ctrl.selectedWidgets = [widget];
+						}
+						$event.widgets = ctrl.selectedWidgets;
+						ctrl.fire('selectionChange', $event);
+						$rootScope.$digest();
 					}
-					$event.widgets = ctrl.selectedWidgets;
-					ctrl.fire('selectionChange', $event);
-
 					$event.preventDefault();
 					$event.stopPropagation();
-					$rootScope.$digest();
 				}
 			} finally {
 				delete ctrl.lock;
@@ -70,12 +71,13 @@ angular.module('am-wb-core')//
 				ctrl.lock = true;
 				var widget = $event.source;
 				if(!widget.isSilent()){
-					widget.setSelected(true, $event);
-
-					// clear selection
 					_.forEach(ctrl.selectedWidgets, function(widget){
 						widget.setSelected(false);
 					});
+					
+					widget.setSelected(true, $event);
+
+					// clear selection
 					ctrl.selectedWidgets = [widget];
 
 					// Open an editor 
@@ -89,7 +91,9 @@ angular.module('am-wb-core')//
 					$event.stopPropagation();
 					$rootScope.$digest();
 				}
-			}finally {
+			} catch(ex) {
+				$widget.log(ex);
+			} finally {
 				delete ctrl.lock;
 			}
 		};

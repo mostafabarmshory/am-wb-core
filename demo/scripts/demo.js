@@ -148,20 +148,24 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 			// Toolbar
 			toolbar: ['close save | undo redo | bold italic underline | fontselect fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
 			fixed_toolbar_container: '#demo-widget-editor-toolbar',
-		    toolbar_drawer: 'floating'
+			toolbar_drawer: 'floating'
 		}
 	});
 
 	/***************************************
-	 * Header editor
+	 * Single line editor
 	 * 
-	 *  We use a single line text editor for
-	 * a header. In single line editor you
-	 * are allowed to modify the parent properties
-	 * such as text align.
+	 *  Single line editor is used for nay widget
+	 * with html property.
 	 ***************************************/
-	for(var i = 1; i < 7; i++){
-		var type = 'h'+i;
+	var lineWidgetsTypes = [
+		'h1','h2','h3','h4','h5','h6', 
+		'li',
+		'button',
+		'a',
+		'p',
+	];
+	_.forEach(lineWidgetsTypes, function(type){
 		$widget.setEditor(type, {
 			type: 'WidgetEditorTinymceSingleLine',
 			options:{
@@ -175,68 +179,14 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 				fixed_toolbar_container: '#demo-widget-editor-toolbar'
 			}
 		});
-	}
-
-	/***************************************
-	 * List item editor
-	 * 
-	 *  We use a section text editor for
-	 * a list item editor.
-	 ***************************************/
-	$widget.setEditor('li', {
-		type: 'WidgetEditorTinymceSection',
-		options:{
-			inline: true,
-			menubar: false,
-			plugins: ['link', 'lists', 'powerpaste', 'autolink'],
-			// Toolbar
-			toolbar: ['close save | undo redo | bold italic underline | fontselect fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-			fixed_toolbar_container: '#demo-widget-editor-toolbar',
-		    toolbar_drawer: 'floating'
-		}
 	});
-	
-	
-	// Editors
-	var headerEditorDescription =  {
-			type: 'WidgetEditorTinymce',
-			options:{
-				property: 'html',
-				inline: true,
-				menubar: false,
-				plugins: ['lists', 'powerpaste', 'autolink'],
-				valid_elements: 'strong,em,span[style],a[href]',
-				powerpaste_word_import: 'clean',
-				powerpaste_html_import: 'clean',
-				// Toolbar
-				toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignjustify alignright alignfull ',
-				fixed_toolbar_container: '#demo-widget-editor-toolbar'
-			}
-	};
-	$widget.setEditor('a', headerEditorDescription);
 
-
+	/************************************
+	 * Code editor
+	 * 
+	 ************************************/
 	$widget.setEditor('pre', {
 		type: 'WidgetEditorCode',
 		options: {}
 	});
-
-	$widget.setEditor('p', {
-		type: 'WidgetEditorTinymce',
-		options:{
-			property: 'html',
-			inline: true,
-			menubar: false,
-			plugins: ['link', 'lists', 'powerpaste', 'autolink'],
-			toolbar: ['undo redo | bold italic underline | fontselect fontsizeselect', 'forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
-			valid_elements: 'p[style],strong,em,span[style],a[href],img,q',
-			valid_styles: {
-				'*': 'font-size,font-family,color,text-decoration,text-align '
-			},
-			powerpaste_word_import: 'clean',
-			powerpaste_html_import: 'clean',
-		}
-	});
 });
-
-
