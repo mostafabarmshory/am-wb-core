@@ -35,6 +35,6 @@ angular.module('am-wb-core')
 .service('$wbLibs', function($wbWindow) {
 	this.load = function(path){
 		return $wbWindow.loadLibrary(path);
-	}
+	};
     return this;
 });

@@ -23,7 +23,7 @@
  */
 'use strict';
 
-describe('WbWidget group', function () {
+describe('Widget div ', function () {
     // instantiate service
     var $rootScope;
     var $widget;
@@ -37,7 +37,7 @@ describe('WbWidget group', function () {
 
     it('should implements collection api ', function (done) {
         var model = {
-                type: 'Group',
+                type: 'div',
         };
         $widget.compile(model)
         .then(function(group){
@@ -81,7 +81,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
         };
         $widget.compile(model)
         .then(function(widget){
@@ -113,7 +113,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'h1'
                 }, {
@@ -151,7 +151,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'h1'
                 }, {
@@ -189,7 +189,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'h1'
                 }, {
@@ -227,7 +227,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
         };
         $widget.compile(model)
         .then(function(widget){
@@ -264,7 +264,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'meta'
                 }]
@@ -305,7 +305,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'meta'
                 }]
@@ -345,7 +345,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'meta'
                 },{
@@ -389,7 +389,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'meta'
                 },{
@@ -433,7 +433,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'h1',
                     id: '1'
@@ -470,7 +470,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'h1',
                     id: '1'
@@ -499,7 +499,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'h1',
                     id: '1'
@@ -539,7 +539,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'h1',
                     id: '1'
@@ -579,7 +579,7 @@ describe('WbWidget group', function () {
         var group;
         // Create new instance
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'Group',
                     id: '1'
@@ -617,7 +617,7 @@ describe('WbWidget group', function () {
     it('should select child group', function (done) {
         var group;
         var model = {
-                type: 'Group',
+                type: 'div',
                 children:[{
                     type: 'Group',
                     id: '1'

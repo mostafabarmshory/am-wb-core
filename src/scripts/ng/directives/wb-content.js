@@ -56,6 +56,7 @@ angular.module('am-wb-core')
             if(rootWidget){
                 rootWidget.delete();
             }
+            $element.empty();
 
             // 1- create widget
             $widget.compile(model, null, $element)

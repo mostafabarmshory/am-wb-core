@@ -26,95 +26,10 @@
  * Utility class of WB
  */
 angular.module('am-wb-core')
-.service('$wbUtil', function ($q, $templateRequest, $sce) {
+.service('$wbUtil', function ($q, $templateRequest, $sce, WbConverterDom) {
     'use strict';
-    var REGEX_BACKGROUND_IMAGE_SPEC = RegExp('(repeating\-)?(linear|radial)\-(gradient)');
-
-    var styleMap = [
-        //==============================================
-        // Text
-        //==============================================
-        {
-            cssKey: 'text-align',
-            key: 'text.align',
-            defaultValue: 'none'
-        },{
-            cssKey: 'text-align-last',
-            key: 'text.alignLast', 
-            defaultValue: 'auto'
-        },{
-            cssKey: 'text-decoration',
-            key: 'text.decoration',
-            defaultValue: 'none'
-        },{
-            cssKey: 'text-shadow',
-            key: 'text.shadow',
-            defaultValue: 'none'
-        },{
-            cssKey: 'text-transform',
-            key: 'text.transform',
-            defaultValue: 'none'
-        },{
-            cssKey: 'text-overflow',
-            key: 'text.overflow',
-            defaultValue: 'clip'
-        },{
-            cssKey: 'text-justify',
-            key: 'text.justify',
-            defaultValue: 'auto'
-        },{
-            cssKey: 'text-indent',
-            key: 'text.indent',
-            defaultValue: ''
-        },
-
-        //==============================================
-        // general
-        //==============================================
-        {
-            cssKey: 'padding',
-            key: 'padding', 
-            defaultValue: ''
-        },{
-            cssKey: 'margin',
-            key: 'margin', 
-            defaultValue: ''
-        },{
-            cssKey: 'direction',
-            key: 'direction', 
-            defaultValue: 'ltr'
-        },{
-            cssKey: 'color',
-            key: 'color', 
-            defaultValue: 'initial'
-        },{
-            cssKey: 'cursor',
-            key: 'cursor', 
-            defaultValue: 'auto'
-        },{
-            cssKey: 'opacity',
-            key: 'opacity', 
-            defaultValue: ''
-        },{
-            cssKey: 'overflow-x',
-            key: 'overflow.x', 
-            defaultValue: 'visible'
-        },{
-            cssKey: 'overflow-y',
-            key: 'overflow.y', 
-            defaultValue: 'visible'
-        }];
-
+    var converterDom = new WbConverterDom();
     var service = this;
-
-    function cleanMap(oldStyle, newStyle, map) {
-        for (var i = 0; i < map.length; i++) {
-            if (oldStyle[map[i][0]]) {
-                newStyle[map[i][1]] = oldStyle[map[i][0]];
-                delete oldStyle[map[i][0]];
-            }
-        }
-    }
 
     function getTemplateOf(page)
     {
@@ -122,7 +37,7 @@ angular.module('am-wb-core')
         var templateUrl = page.templateUrl;
         if (angular.isDefined(template)) {
             if (angular.isFunction(template)) {
-                template = template(page.params | page);
+                template = template(page.params || page);
             }
         } else if (angular.isDefined(templateUrl)) {
             if (angular.isFunction(templateUrl)) {
@@ -150,365 +65,14 @@ angular.module('am-wb-core')
         return $q.when(getTemplateOf(page));
     }
 
-    /**
-     * Converts data into a valid CSS attributes
-     */
-    function convertToGroupCss(style) {
-        var style = style || {};
-        var css = convertToWidgetCss(style);
-
-        if(style.visibility === 'hidden'){
-            css.display = 'none';
-        } else {
-            /*
-             * Group
-             * 
-             * check if is group apply flex flow
-             */
-            css.display = 'flex';
-            var layout = style.layout || {};
-            // row
-            if (layout.direction === 'row') {
-                css['flex-direction'] = layout.direction_reverse ? 'row-reverse' : 'row';
-                if(!style.overflow){
-                    css['overflow-x'] = layout.wrap ? 'visible' : 'auto';
-                    css['overflow-y'] = 'visible';
-                }
-            } else {
-                css['flex-direction'] = layout.direction_reverse ? 'column-reverse' : 'column';
-                if(!style.overflow){
-                    css['overflow-x'] = 'visible';
-                    css['overflow-y'] = layout.wrap ? 'visible' : 'auto';
-                }
-            }
-
-
-            // wrap
-            if (layout.wrap) {
-                css['flex-wrap'] = layout.wrap_reverse ? 'wrap-reverse' : 'wrap';
-                // wrap align
-                var alignContent;
-                switch (layout.wrap_align) {
-                case 'start':
-                    alignContent = 'flex-start';
-                    break;
-                case 'end':
-                    alignContent = 'flex-end';
-                    break;
-                case 'center':
-                    alignContent = 'center';
-                    break;
-                case 'space-between':
-                    alignContent = 'space-between';
-                    break;
-                case 'space-around':
-                    alignContent = 'space-around';
-                    break;
-                case 'stretch':
-                    alignContent = 'stretch';
-                    break;
-                default:
-                    alignContent = 'stretch';
-                }
-                css['align-content'] = alignContent;
-            } else {
-                css['flex-wrap'] = 'nowrap';
-            }
-
-
-            // justify
-            var justify;
-            switch (layout.justify) {
-            case 'start':
-                justify = 'flex-start';
-                break;
-            case 'end':
-                justify = 'flex-end';
-                break;
-            case 'center':
-                justify = 'center';
-                break;
-            case 'space-between':
-                justify = 'space-between';
-                break;
-            case 'space-around':
-                justify = 'space-around';
-                break;
-            case 'space-evenly':
-                justify = 'space-evenly';
-                break;
-            default:
-                justify = 'flex-start';
-            }
-            css['justify-content'] = justify;
-
-            // align
-            var align;
-            switch (layout.align) {
-            case 'start':
-                align = 'flex-start';
-                break;
-            case 'end':
-                align = 'flex-end';
-                break;
-            case 'center':
-                align = 'center';
-                break;
-            case 'baseline':
-                align = 'baseline';
-                break;
-            case 'stretch':
-                align = 'stretch';
-                break;
-            default:
-                align = 'stretch';
-            }
-            css['align-items'] = align;
-        }
-
-        return css;
-    }
-
-    /**
-     * Converts data into a valid CSS attributes
-     */
-    function convertToWidgetCss(style) {
-        var style = style || {};
-        var css = {};
-
-        // layout
-        if(style.visibility === 'hidden'){
-            css.display = 'none';
-        } else {
-            css.display = '';
-        }
-
-        css = _.merge(css, 
-                // layout
-                convertToWidgetCssLayout(style.layout || {}),
-                // size
-                convertToWidgetCssSize(style.size || {}),
-                // background
-                convertToWidgetCssBackground(style.background || {}),
-                // border
-                convertToWidgetCssBoarder(style.border || {}),
-                // shadows
-                convertToWidgetCssShadows(style.shadows || {}),
-                // transform
-                convertToWidgetCssTransfrom(style.transform || {}));		
-
-        for(var i = 0; i < styleMap.length; i++){
-            var cssItem = styleMap[i];
-            var value = objectPath.get(style, cssItem.key) || cssItem.defaultValue;
-            objectPath.set(css, cssItem.cssKey, value);
-        }
-        return css;
-    }
-
-
-
-
-    function convertToWidgetCssTransfrom(transformOptions) {
-        var transform = '';
-
-        if(transformOptions.x){
-            var x = transformOptions.x;
-            if(x.rotate){
-                transform += ' rotateX('+x.rotate+')';
-            }
-            if(x.translate){
-                transform  += ' translateX('+x.translate+')';
-            }
-            if(x.scale){
-                transform += ' scaleX('+ x.scale+')';
-            }
-            if(x.skew){
-                transform += ' skewX('+ x.skew+')';
-            }
-        }
-        if(transformOptions.y){
-            var y = transformOptions.y;
-            if(y.rotate){
-                transform += ' rotateY('+y.rotate+')';
-            }
-            if(y.translate){
-                transform += ' translateY('+y.translate+')';
-            }
-            if(y.scale){
-                transform += ' scaleY('+y.scale+')';
-            }
-            if(y.skew){
-                transform += ' skewY('+y.skew+')';
-            }
-        }
-        if(transformOptions.z){
-            var z = transformOptions.z;
-            if(z.rotate){
-                transform += ' rotateZ('+z.rotate+')';
-            }
-            if(z.translate){
-                transform += ' translateZ('+z.translate+')';
-            }
-            if(z.scale){
-                transform += ' scaleZ('+z.scale+')';
-            }
-        }
-
-        if(transformOptions.perspective){
-            transform += ' perspective('+transformOptions.perspective+')';
-        }
-
-        if(!transform) {
-            return {
-                transform: 'none'
-            };
-        }
-
-        return {
-            transform: transform,
-            'transform-origin': transformOptions.origin || 'center',
-            'transform-style': transformOptions.style || 'flat'
-        };
-    };
-
-    function createShadowStr(shadow) {
-        var hShift = shadow.hShift || '0px';
-        var vShift = shadow.vShift || '0px';
-        var blur = shadow.blur || '0px';
-        var spread = shadow.spread || '0px';
-        var color = shadow.color || 'black';
-
-        var boxShadow = hShift + ' ' + vShift + ' ' + blur + ' ' + spread + ' ' + color;
-
-        if(shadow.inset) {
-            boxShadow = boxShadow.concat(' ' + 'inset');
-        }
-
-        return boxShadow;
-    }
-
-    function convertToWidgetCssShadows(shadows) {
-        var shadowStr = '';
-
-        if (!angular.isArray(shadows) || shadows.length === 0) {
-            shadowStr = 'none';
-        } else {
-            angular.forEach(shadows, function (shadow, index) {
-                shadowStr += createShadowStr(shadow);
-                if(index + 1 < shadows.length){
-                    shadowStr += ', ';
-                }
-            });
-        }
-
-        return {
-            'box-shadow': shadowStr
-        };
-    }
-
-    function convertToWidgetCssBoarder(style) {
-        var conf = {};
-        if (style.style) {
-            conf['border-style'] = style.style;
-        }
-        if (style.width) {
-            conf['border-width'] = style.width;
-        }
-        if (style.color) {
-            conf['border-color'] = style.color;
-        }
-        if (style.radius) {
-            conf['border-radius'] = style.radius;
-        }
-
-        return conf;
-    }
-
-    function convertToWidgetCssBackground(style){
-        var cssValue = {};
-        if(style.background){
-            cssValue.background = style.background;
-            return;
-        }
-        // image
-        var image = 'none';
-        if(style.image){
-            if(REGEX_BACKGROUND_IMAGE_SPEC.test(style.image)){
-                image = style.image;
-            } else {
-                image = 'url(\''+style.image+'\')';
-            }
-        }
-
-        cssValue['background-image'] = image;
-        cssValue['background-color'] = style.color || 'initial';
-        cssValue['background-size'] = style.size || 'auto';
-        cssValue['background-repeat'] = style.repeat || 'repeat';
-        cssValue['background-position'] = style.position || '0px 0px';
-        cssValue['background-attachment'] = style.attachment || 'scroll';
-        cssValue['background-origin'] = style.origin || 'padding-box';
-        cssValue['background-clip'] = style.clip || 'border-box';
-
-        return cssValue;
-    }
-
-    /**
-     * Converts data into a layout CSS3
-     */
-    function convertToWidgetCssLayout(layout){
-        var flexLayout = {};
-        /*
-         * Widget
-         */
-        flexLayout.order = layout.order >= 0 ? layout.order : 0;
-        flexLayout['flex-grow'] = layout.grow >= 0 ? layout.grow : 0;
-        flexLayout['flex-shrink'] = layout.shrink >= 0 ? layout.shrink : 1;
-        flexLayout['flex-basis'] = layout.basis || 'auto';
-
-        // align-self
-        // auto | flex-start | flex-end | center | baseline | stretch;
-        var alignSelf;
-        switch (layout.align_self) {
-        case 'start':
-            alignSelf = 'flex-start';
-            break;
-        case 'end':
-            alignSelf = 'flex-end';
-            break;
-        case 'center':
-            alignSelf = 'center';
-            break;
-        case 'baseline':
-            alignSelf = 'baseline';
-            break;
-        case 'stretch':
-            alignSelf = 'stretch';
-            break;
-        default:
-            alignSelf = 'auto';
-        }
-        flexLayout['align-self'] = alignSelf;
-
-        return flexLayout;
-    }
-
-    /*
-     * Convert size object to valid CSS size
-     */
-    function convertToWidgetCssSize(size) {
-        return {
-            'width': size.width || 'auto',
-            'min-width': size.minWidth || '0',
-            'max-width': size.maxWidth || 'none',
-
-            'height': size.height || 'auto',
-            'min-height': size.minHeight || '0',
-            'max-height': size.maxHeight || 'none',
-        };
-    }
 
     function cleanEvetns(model)
     {
+        if(model.on){
+            delete model.event;
+            return;
+        }
+
         // event
         if (!model.event) {
             model.event = {};
@@ -519,123 +83,98 @@ angular.module('am-wb-core')
             model.event.error = model.event.failure;
             delete model.event.failure;
         }
+
+        if(model.event){
+            model.on = model.event;
+            delete model.event;
+        }
+        
+        // add a note to all event 
+        if(model.on){
+            _.forOwn(model.on, function(value, key) { 
+                model.on[key] = '/* code style is deprecated. see http://www.viraweb123.ir/amh-blog/content/wb-v4-release */ \n' + value;
+            } );
+        }
     }
 
     function cleanLayout(model)
+
     {
-        if (!model.style.layout) {
-            model.style.layout = {};
-        }
-        if (model.type === 'Group' || model.type === 'Page') {
-            // convert
-            var newStyle = model.style.layout;
-            var oldStyle = model.style;
+        if (model.style.layout) {
+            if(model.style.layout.align_self){
+                model.style.alignSelf = model.style.layout.align_self;
+            }
+            if(model.style.layout.direction){
+                model.style.display = 'flex';
 
-            if (oldStyle.flexDirection) {
-                if (oldStyle.flexDirection === 'wb-flex-row') {
-                    newStyle.direction = 'row';
-                } else {
-                    newStyle.direction = 'column';
+//              model.style.flex
+                model.style.flexGrow = model.style.layout.grow;
+                model.style.flexShrink = model.style.layout.shrink;
+                model.style.flexBasis = model.style.layout.basis;
+
+//              model.style.flexFlow
+                model.style.flexDirection = model.style.layout.direction;
+                model.style.flexWrap = model.style.layout.wrap ? 'wrap' : 'no-wrap';
+                model.style.justifyContent = model.style.layout.justify;
+                if(model.style.justifyContent === 'end' || model.style.justifyContent === 'end' ){
+                    model.style.justifyContent = 'flex-' + model.style.justifyContent;
                 }
-                delete oldStyle.flexDirection;
+//              alignContent = ??
+                model.style.alignItems = model.style.layout.align;
+                model.style.order = model.style.layout.order;
             }
-            if (!newStyle.direction) {
-                newStyle.direction = 'column';
-            }
-
-            switch (oldStyle.flexAlignItem) {
-            case 'wb-flex-align-items-center':
-                newStyle.align = 'center';
-                break;
-            case 'wb-flex-align-items-end':
-                newStyle.align = 'end';
-                break;
-            case 'wb-flex-align-items-start':
-                newStyle.align = 'start';
-                break;
-            case 'wb-flex-align-items-stretch':
-                newStyle.align = 'stretch';
-                break;
-            default:
-                newStyle.align = 'stretch';
-            }
-            delete oldStyle.flexAlignItem;
-
-            switch (oldStyle.justifyContent) {
-            case 'wb-flex-justify-content-center':
-                newStyle.justify = 'center';
-                break;
-            case 'wb-flex-justify-content-end':
-                newStyle.justify = 'end';
-                break;
-            case 'wb-flex-justify-content-start':
-                newStyle.justify = 'start';
-                break;
-            case 'wb-flex-justify-content-space-between':
-                newStyle.justify = 'space-between';
-                break;
-            case 'wb-flex-justify-content-space-around':
-                newStyle.justify = 'space-around';
-                break;
-            default:
-                newStyle.justify = 'center';
-            }
-            delete oldStyle.justifyContent;
+            delete model.style.layout;
+            return;
         }
     }
 
     function cleanSize(model)
     {
-        if (!model.style.size) {
-            model.style.size = {};
+        // w1 style.size -> w4
+        if (model.style.size) {
+            model.style.width = model.style.size.width;
+            model.style.minWidth = model.style.size.minWidth;
+            model.style.maxWidth = model.style.size.maxWidth;
+
+            model.style.height = model.style.size.height;
+            model.style.minHeight = model.style.size.minHeight;
+            model.style.maxHeight = model.style.size.maxHeight;
+            delete model.style.size;
         }
-        var newStyle = model.style.size;
-        var oldStyle = model.style;
-        var map = [['width', 'width'],
-            ['height', 'height']];
-        cleanMap(oldStyle, newStyle, map);
     }
 
     function cleanBackground(model)
     {
-        if (!model.style.background) {
-            model.style.background = {};
+        if (model.style.background) {
+            if(model.style.background.image) {
+                model.style.backgroundImage = 'url("' + model.style.background.image + '")';
+            }
+            model.style.backgroundColor = model.style.background.color;
+            model.style.backgroundSize = model.style.background.size;
+            model.style.backgroundRepeat = model.style.background.repeat;
+            model.style.backgroundOrigin = model.style.background.origin;
+            model.style.backgroundPosition = model.style.background.position;
+            delete model.style.background;
+            return;
         }
-        var newStyle = model.style.background;
-        var oldStyle = model.style;
-        var map = [['backgroundImage', 'image'],
-            ['backgroundColor', 'color'],
-            ['backgroundSize', 'size'],
-            ['backgroundRepeat', 'repeat'],
-            ['backgroundPosition', 'position']];
-        cleanMap(oldStyle, newStyle, map);
     }
 
     function cleanBorder(model)
     {
-        if (!model.style.border) {
-            model.style.border = {};
+        // w1 border -> w4
+        if (model.style.border) {
+            model.style.borderStyle = model.style.border.style;
+            model.style.borderColor = model.style.border.color;
+            model.style.borderWidth = model.style.border.width;
+            model.style.borderRadius = model.style.border.radius;
+            delete model.style.border;
+            return;
         }
-        var oldStyle = model.style;
-        var newStyle = model.style.border;
-
-        if (oldStyle.borderRadius) {
-            if (oldStyle.borderRadius.uniform) {
-                newStyle.radius = oldStyle.borderRadius.all + 'px';
-            }
-            // TODO: maso, 2018: support other models
-        }
-        // delete old values
-        delete model.style.borderColor;
-        delete model.style.borderRadius;
-        delete model.style.borderStyleColorWidth;
-        delete model.style.borderStyle;
-        delete model.style.borderWidth;
     }
 
     function cleanSpace(model)
     {
-        // Margin and padding
+        // Padding from W0 -> w4
         if (model.style.padding && angular.isObject(model.style.padding)) {
             var padding = '';
             if (model.style.padding.isUniform) {
@@ -649,6 +188,7 @@ angular.module('am-wb-core')
             model.style.padding = padding;
         }
 
+        // Margin from W0 -> w4
         if (model.style.margin && angular.isObject(model.style.margin)) {
             var margin = '';
             if (model.style.margin.isUniform) {
@@ -661,13 +201,40 @@ angular.module('am-wb-core')
             }
             model.style.margin = margin;
         }
-
     }
 
-    function cleanAlign(model)
+    function cleanAlign(/*model*/)
     {
-        if (!model.style.align) {
-            model.style.align = {};
+//      if (!model.style.align) {
+//      model.style.align = {};
+//      }
+    }
+
+    function cleanOverflow(model){
+        if(model.style.overflow){
+            model.style.overflowX = model.style.overflow.x;
+            model.style.overflowY = model.style.overflow.y;
+        }
+    }
+
+    function cleanShadow(model){
+        //h-offset v-offset blur spread color
+        if(model.style.shadows){
+            var boxShadows = [];
+            _.forEach(model.style.shadows, function(shadow){
+                var sh = shadow.hShift + ' ' + 
+                shadow.vShift + ' ' + 
+                shadow.blur + ' ' + 
+                shadow.spread + ' ' + 
+                shadow.color;
+                if(shadow.inset){
+                    sh += ' ' + 'inset';
+                }
+                boxShadows.push(sh);
+            });
+            model.style.boxShadow = _.join(boxShadows);
+            delete model.style.shadows;
+            return;
         }
     }
 
@@ -682,10 +249,17 @@ angular.module('am-wb-core')
         cleanBorder(model);
         cleanSpace(model);
         cleanAlign(model);
+        cleanOverflow(model);
+        cleanShadow(model);
     }
 
-
     function cleanType(model){
+        if(model.type === 'Group'){
+            model.type = 'div';
+        }
+        if(model.type === 'Import'){
+            model.type = 'import';
+        }
         if(model.type === 'Link') {
             model.type = 'a';
             model.html = model.title;
@@ -708,21 +282,24 @@ angular.module('am-wb-core')
             model.html = model.text;
             delete model.text;
         }
+        if(model.type === 'HtmlText'){
+            model.type = 'section';
+            model.children = converterDom.decode(model.html);
+            delete model.html;
+        }
     }
 
     function cleanInternal(model)
     {
+        delete model.version;
         cleanEvetns(model);
         cleanStyle(model);
-        if (model.type === 'Group' || model.type === 'Page') {
-            if (!model.children) {
-                model.children = [];
-            }
-            if (model.children.length) {
-                for (var i = 0; i < model.children.length; i++) {
-                    cleanInternal(model.children[i]);
-                }
-            }
+        if(_.isArray(model.contents)){
+            model.children = model.contents;
+            delete model.contents;
+        }
+        if (_.isArray(model.children) && model.children.length) {
+            _.forEach(model.children, cleanInternal);
         }
         cleanType(model);
         return model;
@@ -736,32 +313,19 @@ angular.module('am-wb-core')
      */
     function clean(model, force)
     {
-        if (!model.type || model.type === 'Page') {
-            model.type = 'Group';
+        if (!model.type || model.type === 'Page' || model.type === 'Group') {
+            model.type = 'div';
         }
-        if (model.version === 'wb3' && !force) {
+        if (model.version === 'wb4' && !force) {
             return model;
         }
         var newModel = cleanInternal(model);
-        newModel.version = 'wb3';
+        newModel.version = 'wb4';
         return newModel;
     }
 
-    service.cleanMap = cleanMap;
     service.clean = clean;
-    service.cleanInternal = cleanInternal;
-    service.cleanStyle = cleanStyle;
-    service.cleanAlign = cleanAlign;
-    service.cleanSpace = cleanSpace;
-    service.cleanBorder = cleanBorder;
-    service.cleanBackground = cleanBackground;
-    service.cleanSize = cleanSize;
-    service.cleanLayout = cleanLayout;
-    service.cleanEvetns = cleanEvetns;
 
     service.getTemplateFor = getTemplateFor;
     service.getTemplateOf = getTemplateOf;
-    service.convertToGroupCss = convertToGroupCss;
-    service.convertToWidgetCss = convertToWidgetCss;
-    service.convertToWidgetCssLayout = convertToWidgetCssLayout;
 });

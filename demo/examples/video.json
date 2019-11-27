@@ -1,0 +1,37 @@
+{
+	"type": "div",
+	"style": {
+		"padding": "5px",
+		"margin": "0px",
+		"background": "pink",
+		"flexGrow": 2,
+		"flexShrink": 2,
+		"flexBasis": "auto",
+		"display": "flex",
+		"flexDirection": "row",
+		"justifyContent": "center",
+		"alignItems": "center"
+	},
+	"children": [{
+		"type": "video",
+		"controls": "true",
+		"children": [{
+			"id": "source0",
+			"type": "source",
+			"src": "/path/to/source"
+		},{
+			"id": "source1",
+			"type": "source",
+			"src": "/path/to/source"
+		},{
+			"id": "source2",
+			"type": "source",
+			"src": "/path/to/source"
+		}],
+		"style": {
+			"height": "80px",
+			"minHeight": "80px",
+			"minWidth": "80px"
+		}
+	}]
+}

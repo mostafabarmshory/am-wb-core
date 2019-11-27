@@ -39,22 +39,22 @@ angular.module('am-wb-core')//
      * 
      * Creates new instace of an editor
      */
-    function editor(widget, options) {
+    function Editor(widget, options) {
         options = options || {};
         WidgetEditor.apply(this, [widget, options]);
     }
-    editor.prototype = Object.create(WidgetEditor.prototype);
+    Editor.prototype = Object.create(WidgetEditor.prototype);
 
 
-    editor.prototype.setActive = function(){}; 
-    editor.prototype.isActive = function(){};
-    editor.prototype.save = function(){};
-    editor.prototype.hide = function(){};
-    editor.prototype.show = function(){
-        $window.alert('This widget type is deprecated. This will be removed in the next major version.')
+    Editor.prototype.setActive = function(){}; 
+    Editor.prototype.isActive = function(){};
+    Editor.prototype.save = function(){};
+    Editor.prototype.hide = function(){};
+    Editor.prototype.show = function(){
+        $window.alert('This widget type is deprecated. This will be removed in the next major version.');
     };
-    editor.prototype.isHidden = function(){};
-    
+    Editor.prototype.isHidden = function(){};
+
 //  the editor type
-    return editor;
+    return Editor;
 });

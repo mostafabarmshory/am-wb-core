@@ -24,36 +24,29 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Controllers
- * @name MbSettingImgCtrl
+ * @ngdoc Settings
+ * @name WbSettingWidgetImgCtrl
  * @description Manage Widget img 
  * 
  */
-.controller('MbSettingImgCtrl', function () {
-	
-	var attrs = [
-		// id
-		'alg',
-		'crossorigin',
-		'height',
-		'ismap',
-		'longdesc',
-		'src',
-		'srcset',
-		'usemap',
-		'width',
-		];
+.controller('WbSettingWidgetImgCtrl', function () {
 
-	/*
-	 * Initial the setting editor
-	 */
-	this.init = function () {
-		/*
-		 * Load data of the widget
-		 */
-		var ctrl = this;
-		angular.forEach(attrs, function(attr){
-			ctrl[attr] = ctrl.getProperty(attr);
-		});
-	};
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackAttributes([
+            // id
+            'alt',
+            'crossorigin',
+            'height',
+            'ismap',
+            'longdesc',
+            'size',
+            'src',
+            'srcset',
+            'usemap',
+            'width',
+        ]);
+    };
 });

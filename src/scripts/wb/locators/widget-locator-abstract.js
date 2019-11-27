@@ -34,14 +34,14 @@ angular.module('am-wb-core')//
  * example it is used to show widget actions on the fly.
  * 
  */
-.factory('AbstractWidgetLocator', function ($rootElement, $widget) {
+.factory('AbstractWidgetLocator', function () {
 
     /**
      * Creates new instance of the widget locator
      * 
      * @memberof AbstractWidgetLocator
      */
-    function abstractWidgetLocator() {
+    function Locator() {
         this.callbacks = [];
         this.elements = [];
         this.observedWidgets = [];
@@ -49,21 +49,21 @@ angular.module('am-wb-core')//
         // Creates listeners
         var ctrl = this;
         this.widgetListeners = {
-                'select' : function ($event) {
+                'select' : function (/*$event*/) {
                     ctrl.addClass('selected');
                     ctrl.removeClass('mouseover');
                 },
-                'unselect' : function ($event) {
+                'unselect' : function (/*$event*/) {
                     ctrl.removeClass('selected');
                     if (ctrl.mouseover) {
                         ctrl.addClass('mouseover');
                     }
                 },
-                'mouseover' : function ($event) {
+                'mouseover' : function (/*$event*/) {
                     ctrl.addClass('mouseover');
                     ctrl.mouseover = true;
                 },
-                'mouseout' : function ($event) {
+                'mouseout' : function (/*$event*/) {
                     ctrl.removeClass('mouseover');
                     ctrl.mouseover = false;
                 },
@@ -73,18 +73,18 @@ angular.module('am-wb-core')//
     /**
      * Defines anchor 
      */
-    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
+    Locator.prototype.setAnchor = function (anchor) {
         this.anchor = anchor;
     };
 
     /**
      * Update the view
      */
-    abstractWidgetLocator.prototype.setAnchor = function (anchor) {
+    Locator.prototype.setAnchor = function (anchor) {
         this.anchor = anchor;
     };
 
-    abstractWidgetLocator.prototype.getAnchor = function (auncher) {
+    Locator.prototype.getAnchor = function (/*auncher*/) {
         // find custom anchor
 //        if(this.anchor){
 //            if(angular.isFunction(this.anchor)){
@@ -111,30 +111,30 @@ angular.module('am-wb-core')//
     /**
      * Sets new widget
      */
-    abstractWidgetLocator.prototype.setWidget = function (widget) {
+    Locator.prototype.setWidget = function (widget) {
         this.widget = widget;
     };
 
-    abstractWidgetLocator.prototype.getWidget = function () {
+    Locator.prototype.getWidget = function () {
         return this.widget;
     };
 
-    abstractWidgetLocator.prototype.setElements = function (elements) {
+    Locator.prototype.setElements = function (elements) {
         this.elements = elements;
     };
 
-    abstractWidgetLocator.prototype.getElements = function () {
+    Locator.prototype.getElements = function () {
         return this.elements;
     };
 
-    abstractWidgetLocator.prototype.addClass = function (value) {
+    Locator.prototype.addClass = function (value) {
         var elements = this.getElements();
         for (var i = 0; i < elements.length; i++) {
             elements[i].addClass(value);
         }
     };
 
-    abstractWidgetLocator.prototype.removeClass = function (value) {
+    Locator.prototype.removeClass = function (value) {
         var elements = this.getElements();
         for (var i = 0; i < elements.length; i++) {
             elements[i].removeClass(value);
@@ -144,12 +144,12 @@ angular.module('am-wb-core')//
     /**
      * Remove connection the the current widget
      */
-    abstractWidgetLocator.prototype.disconnect = function () {
+    Locator.prototype.disconnect = function () {
         this.connect(null);
         this.connected = false;
     };
 
-    abstractWidgetLocator.prototype.connect = function (widget) {
+    Locator.prototype.connect = function (widget) {
         this.connected = true;
         if (this.widget !==  widget) {
             var elements = this.getElements();
@@ -179,9 +179,9 @@ angular.module('am-wb-core')//
     };
 
 
-    abstractWidgetLocator.prototype.isConnected = function () {
+    Locator.prototype.isConnected = function () {
         return this.connected;
     };
 
-    return abstractWidgetLocator;
+    return Locator;
 });

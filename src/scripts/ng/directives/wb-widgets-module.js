@@ -33,7 +33,7 @@ angular.module('am-wb-core')
  * This is widgets explorer list.
  * 
  */
-.directive('wbWidgetsModule', function($window, $widget) {
+.directive('wbWidgetsModule', function($window) {
 
     return {
         templateUrl : 'views/directives/wb-widgets-module.html',

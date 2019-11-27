@@ -40,7 +40,7 @@ angular.module('am-wb-core')//
      */
     function Converter(mimetype){
         this.mimetype = mimetype || 'text/plain';
-    };
+    }
     
     /**
      * Convert widgets into data

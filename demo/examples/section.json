@@ -1,0 +1,30 @@
+{
+	"type": "div",
+	"style": {
+		"padding": "5px",
+		"margin": "0px",
+		"background": "pink",
+		"flexGrow": 2,
+		"flexShrink": 2,
+		"flexBasis": "auto",
+		"display": "flex",
+		"flexDirection": "row",
+		"justifyContent": "center",
+		"alignItems": "center"
+	},
+	"children": [{
+		"type": "section",
+		"style": {
+			"padding": "15px",
+			"margin": "0px",
+			"minHight": "80px"
+		},
+		"children":[{
+			"type": "h1",
+			"html": "Center header",
+			"style": {
+				"margin": "0px"
+			}
+		}]
+	}]
+}

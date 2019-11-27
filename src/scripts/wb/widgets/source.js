@@ -29,34 +29,33 @@ angular.module('am-wb-core')//
  * @description Manage resource
  * 
  */
-.factory('WbWidgetSource', function (WbWidgetAbstract) {
+.factory('WbWidgetSource', function (WbWidgetUnvisible) {
 
-    /**
-     * Creates new instance of the group
-     * 
-     * @memberof WbWidgetSource
-     */
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes('src', 'srcset', 'media', 'sizes', 'type');
-        
-        var ctrl = this;
-        function updateView(){
-            ctrl.getElement().html('src:' + ctrl.getProperty('src') || ctrl.getModelProperty('src'));
-        }
+	/**
+	 * Creates new instance of the group
+	 * 
+	 * @memberof WbWidgetSource
+	 */
+	function Widget($element, $parent){
+		WbWidgetUnvisible.apply(this, [$element, $parent]);
+		this.addElementAttributes('src', 'srcset', 'media', 'sizes', 'sourceType');
 
-        this.on('stateChanged', function(){
-            if(ctrl.state === 'edit'){
-                ctrl.getElement().show();
-                updateView();
-                return;
-            }
-            ctrl.getElement().hide();
-        });
-        updateView();
-    };
+		// init input
+		var ctrl = this;
+		function eventHandler(event){
+			if(event.key === 'sourceType'){
+				ctrl.setElementAttribute('type', event.value);
+			}
+		}
+		// listen on change
+		this.on('modelUpdated', eventHandler);
+		this.on('runtimeModelUpdated', eventHandler);
+	}
 
-    // extend functionality
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetUnvisible.prototype);
+	Widget.prototype.toString = function(){
+		return 'src:' + this.getProperty('sourceType') || this.getModelProperty('sourceType');
+	};
+	return Widget;
 });

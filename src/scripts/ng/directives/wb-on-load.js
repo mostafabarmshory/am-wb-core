@@ -38,19 +38,19 @@ angular.module('am-wb-core')
  * ```
  */
 .directive('wbOnLoad', function() {
-	return {
-		restrict : 'A',
-		link : function(scope, element, attrs) {
-			element.bind('load', function(event, data) {
-				// call the function that was passed
-				if (attrs.wbOnLoad) {
-					scope.$eval(attrs.wbOnLoad, {
-					    $event: event,
-					    $element: element,
-					    $data: data
-					});
-				}
-			});
-		}
-	};
+    return {
+        restrict : 'A',
+        link : function(scope, element, attrs) {
+            element.bind('load', function(event, data) {
+                // call the function that was passed
+                if (attrs.wbOnLoad) {
+                    scope.$eval(attrs.wbOnLoad, {
+                        $event: event,
+                        $element: element,
+                        $data: data
+                    });
+                }
+            });
+        }
+    };
 });

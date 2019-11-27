@@ -31,4 +31,50 @@ angular.module('am-wb-core')//
  */
 .controller('WbSettingStyleTextCtrl', function () {
 
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            // writing
+            'hyphens',
+            'letterSpacing',
+            'lineHeight',
+            'quotes',
+            'tabSize',
+            'verticalAlign',
+            'whiteSpace',
+            'wordBreak',
+            'wordSpacing',
+            'wordWrap',
+            'writingMode',
+            'userSelect',
+            // Text
+            'textAlign-last',
+            'textDecoration',
+            'textDecorationColor',
+            'textDecorationLine',
+            'textDecorationStyle',
+            'textIndent',
+            'textJustify',
+            'textOverflow',
+            'textShadow',
+            'textTransform',
+            // Local
+            'direction',
+            'unicodeBidi',
+            // font
+            'font',
+            'fontFamily',
+            'fontKerning',
+            'fontSize',
+            'fontSizeAdjust',
+            'fontStretch',
+            'fontStyle',
+            'fontVariant',
+            'fontWeight',
+            ]);
+    };
+
+
 });

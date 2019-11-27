@@ -5,7 +5,7 @@
 		"margin": "0px",
 		"background": "pink",
 		"flexGrow": 2,
-		"flexShrink": 0,
+		"flexShrink": 2,
 		"flexBasis": "auto"
 	},
 	"on": {

@@ -22,130 +22,204 @@
  * SOFTWARE.
  */
 'use strict';
-var testData = {
-		'features': [{
-			'title': 'Title',
-			'text': 'This is a sample link to a site',
-			'icon': 'todo',
-			'action': {
-				'type': 'link',
-				'link': 'http://google.com'
-			},
-			'$$hashKey': 'object:291'
-		}, {
-			'title': 'Title',
-			'text': 'This is a sample link to a site',
-			'icon': 'todo',
-			'action': {
-				'type': 'link',
-				'link': 'http://google.com'
-			},
-			'$$hashKey': 'object:292'
-		}],
-		'type': 'CommonActionCall',
-		'name': 'Action call',
-		'style': {
-			'borderColor': {
-				'bottom': 'none'
-			},
-			'height': '90vh',
-			'minHeight':'300px',
-			'maxHeight':'800px',
-			'margin': {},
-			'padding': {
-				'top': '100px'
-			},
-			'borderRadius': {},
-			'borderStyleColorWidth': {},
-			'borderStyle': {},
-			'borderWidth': {},
-			'flexAlignItem': 'wb-flex-item-auto',
-			'backgroundColor':'#e1860b',
-			'backgroundImage': 'resources/templates/chershoee/bg/bg1.jpg',
-			'backgroundSize': 'cover',
-			'backgroundRepeat': 'no-repeat',
-			'backgroundPosition': 'center'
-		},
-		'label': 'Viverra Massa Malesuada',
-		'description': 'Consectetur in dolor vitae consectetur maecenas id ultrices'
+var testDataW1 = {
+        "type" : "Group",
+        "version" : "wb1",
+        "id" : "main",
+        "label" : "main",
+        "description" : "main",
+        "category" : "http://schema.org/ImageObject",
+        "event" : {
+            "init" : "var a = 10;",
+            "click" : "var a = 10;",
+            "dblclick" : "var a = 10;",
+            "mouseout" : "var a = 10;",
+            "mouseover" : "var a = 10;",
+            "mousedown" : "var a = 10;",
+            "mouseup" : "var a = 10;",
+            "mouseenter" : "var a = 10;",
+            "resize" : "var a = 10;",
+            "mouseleave" : "var a = 10;",
+            "intersection" : "var a = 10;",
+            "success" : "var a = 10;",
+            "failure" : "var a = 10;"
+        },
+        "style" : {
+            "layout" : {
+                "direction" : "column",
+                "align" : "center",
+                "justify" : "space-around",
+                "wrap" : true,
+                "align_self" : "stretch",
+                "order" : 3,
+                "basis" : "0px",
+                "shrink" : 2,
+                "grow" : 2
+            },
+            "size" : {
+                "minHeight" : "1vh",
+                "width" : "2%",
+                "minWidth" : "3%",
+                "maxWidth" : "4%",
+                "height" : "5vh",
+                "maxHeight" : "6vh"
+            },
+            "background" : {
+                "image" : "/api/v2/cms/contents/3437/content",
+                "color" : "#ad91e2",
+                "size" : "length",
+                "repeat" : "no-repeat",
+                "attachment" : "fixed",
+                "origin" : "border-box",
+                "position" : "left center"
+            },
+            "border" : {
+                "style" : "solid",
+                "color" : "#f2a272",
+                "width" : "2px 2px 2px 2px",
+                "radius" : "11px 11px 11px 11px"
+            },
+            "align" : {},
+            "direction" : "rtl",
+            "color" : "#1d7745",
+            "cursor" : "grab",
+            "opacity" : "0.8",
+            "overflow" : {
+                "x" : "hidden",
+                "y" : "hidden"
+            },
+            "margin" : "1px 1px 1px 1px",
+            "padding" : "17px 17px 17px 17px",
+            "shadows" : [ {
+                "hShift" : "1px",
+                "vShift" : "2px",
+                "blur" : "3px",
+                "spread" : "4px",
+                "color" : "red",
+                "inset" : true
+            }, {
+                "hShift" : "5px",
+                "vShift" : "60px",
+                "blur" : "7px",
+                "spread" : "8px",
+                "color" : "black",
+                "inset" : false
+            } ]
+        },
+        "contents" : [ {
+            "name" : "Header-1",
+            "type" : "h1",
+            "version" : "wb1",
+            "html" : "Test Site"
+        }, {
+            "name" : "Pragraph",
+            "type" : "p",
+            "version" : "wb1"
+        } ]
 };
-describe('Service $wbUtil', function () {
-	// instantiate service
-	var $wbUtil;
+var testDataW2 = {};
+var testDataW3 = {};
 
 
-	// load the service's module
-	beforeEach(module('am-wb-core'));
-	beforeEach(inject(function (_$wbUtil_) {
-		$wbUtil = _$wbUtil_;
-	}));
+describe('Service $wbUtil ', function () {
+    // instantiate service
+    var $wbUtil;
 
-	it('should add a clean function', function () {
-		expect(angular.isFunction($wbUtil.clean)).toBe(true);
-	});
 
-	it('should clean background', function () {
-		var clone = {};
-		angular.copy(testData, clone);
+    // load the service's module
+    beforeEach(function(){
+        module('am-wb-core');
+        inject(function (_$wbUtil_) {
+            $wbUtil = _$wbUtil_;
+        });
+    });
 
-		clone = $wbUtil.clean(clone);
+    it('should not change model type if the model has type; Otherwise the type is set to "Group"', function () {
+        var model1 = {
+                type : 'section'
+        };
+        var model2 = {
+        };
 
-		expect(angular.isDefined(clone.style.backgroundImage)).toBe(false);
-		expect(angular.isDefined(clone.style.background.image)).toBe(true);
-		expect(clone.style.background.image).toBe(testData.style.backgroundImage);
-	});
+        var newModel = $wbUtil.clean(model1);
+        expect(newModel.type).toBe('section');
 
-	it('should clean border', function () {
-		var dataList =  [{
-			type: 'Component',
-			style: {
-				borderColor: {},
-				borderRadius: {
-					uniform:true,
-					all:18
-				},
-				borderStyleColorWidth: {},
-				borderStyle: {},
-				borderWidth: {}
-			}
-		}];
-		var expDataList =  [{
-			type: 'Component',
-			style: {
-				border: {
-					radius: '18px'
-				}
-			}
-		}];
+        newModel = $wbUtil.clean(model2);
+        expect(newModel.type).toBe('div');
 
-		for(var i = 0; i < dataList.length; i++){
-			var data = dataList[i];
-			var clone = $wbUtil.clean(data);
+        newModel = $wbUtil.clean({
+            type: 'Group'
+        });
+        expect(newModel.type).toBe('div');
 
-			expect(clone.version).toBe('wb3');
+        newModel = $wbUtil.clean({
+            type: 'Page'
+        });
+        expect(newModel.type).toBe('div');
+    });
 
-			expect(angular.isDefined(clone.style.borderColor)).toBe(false);
-			expect(angular.isDefined(clone.style.borderRadius)).toBe(false);
-			expect(angular.isDefined(clone.style.borderStyleColorWidth)).toBe(false);
-			expect(angular.isDefined(clone.style.borderStyle)).toBe(false);
-			expect(angular.isDefined(clone.style.borderWidth)).toBe(false);
+    it('should convert events of w1 to w4', function(){
+        var newModel = $wbUtil.clean(_.cloneDeep(testDataW1));
+        expect(angular.isDefined(newModel.on)).toBe(true);
+        expect(angular.isDefined(newModel.event)).toBe(false);
+        expect(newModel.on.click.indexOf(testDataW1.event.click) >= 0).toBe(true);
+    });
 
-			var expData = expDataList[i];
-			expect(angular.isDefined(clone.style.border)).toBe(true);
-			expect(clone.style.border.radius).toBe(expData.style.border.radius);
-		}
-	});
-	it('should not change model type if the model has type; Otherwise the type is set to "Group"', function () {
-	    var model1 = {
-		type : 'Text'
-	    };
-	    var model2 = {
-	    };
-	    
-	    var newModel1 = $wbUtil.clean(model1);
-	    expect(newModel1.type).toBe('Text');
-	    
-	    var newModel2 = $wbUtil.clean(model2);
-	    expect(newModel2.type).toBe('Group');
-	});
+    it('should convert style.size of w1 to w4', function(){
+        var newModel = $wbUtil.clean(_.cloneDeep(testDataW1));
+        expect(angular.isDefined(newModel.style)).toBe(true);
+        expect(angular.isDefined(newModel.style.size)).toBe(false);
+
+        expect(testDataW1.style.size.width).toBe(newModel.style.width);
+        expect(testDataW1.style.size.minWidth).toBe(newModel.style.minWidth);
+        expect(testDataW1.style.size.maxWidth).toBe(newModel.style.maxWidth);
+
+        expect(testDataW1.style.size.height).toBe(newModel.style.height);
+        expect(testDataW1.style.size.minHeight).toBe(newModel.style.minHeight);
+        expect(testDataW1.style.size.maxHeight).toBe(newModel.style.maxHeight);
+    });
+
+
+    it('should convert style.background from w1 to w4', function(){
+        var newModel = $wbUtil.clean(_.cloneDeep(testDataW1));
+
+        // TODO: maso, 2019: support all type of background image
+        expect(newModel.style.backgroundImage).toBe('url("'+testDataW1.style.background.image+'")');
+        expect(newModel.style.backgroundColor).toBe(testDataW1.style.background.color);
+        expect(newModel.style.backgroundSize).toBe(testDataW1.style.background.size);
+        expect(newModel.style.backgroundRepeat).toBe(testDataW1.style.background.repeat);
+        expect(newModel.style.backgroundOrigin).toBe(testDataW1.style.background.origin);
+        expect(newModel.style.backgroundPosition).toBe(testDataW1.style.background.position);
+    });
+
+    it('should convert style.border from w1 to w4', function(){
+        var newModel = $wbUtil.clean(_.cloneDeep(testDataW1));
+
+        // TODO: maso, 2019: support all type of background image
+        expect(newModel.style.borderStyle).toBe(testDataW1.style.border.style);
+        expect(newModel.style.borderColor).toBe(testDataW1.style.border.color);
+        expect(newModel.style.borderWidth).toBe(testDataW1.style.border.width);
+        expect(newModel.style.borderRadius).toBe(testDataW1.style.border.radius);
+    });
+
+    it('should convert style.shadows from w1 to w4', function(){
+        var newModel = $wbUtil.clean(_.cloneDeep(testDataW1));
+        var shadow = '1px 2px 3px 4px red inset,5px 60px 7px 8px black';
+        expect(newModel.style.boxShadow).toBe(shadow);
+    });
+
+    it('should convert style.layout from w1 to w4', function(){
+        var newModel = $wbUtil.clean(_.cloneDeep(testDataW1));
+
+        expect(newModel.style.display).toBe('flex');
+        expect(newModel.style.flexGrow).toBe(testDataW1.style.layout.grow);
+        expect(newModel.style.flexShrink).toBe(testDataW1.style.layout.shrink);
+        expect(newModel.style.flexBasis).toBe(testDataW1.style.layout.basis);
+
+        expect(newModel.style.flexDirection).toBe(testDataW1.style.layout.direction);
+        expect(newModel.style.flexWrap).toBe('wrap');
+        expect(newModel.style.justifyContent).toBe(testDataW1.style.layout.justify);
+
+        expect(newModel.style.order).toBe(testDataW1.style.layout.order);
+    });
 });

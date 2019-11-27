@@ -19,7 +19,7 @@ angular.module('am-wb-core')
  * });
  */
 .factory('$mdExpansionPanel', function ($mdComponentRegistry, $mdUtil, $log) {
-	var errorMsg = "ExpansionPanel '{0}' is not available! Did you use md-component-id='{0}'?";
+	var errorMsg = 'ExpansionPanel "{0}" is not available! Did you use md-component-id="{0}"?';
 	var service = {
 			find: findInstance,
 			waitFor: waitForInstance
@@ -37,7 +37,7 @@ angular.module('am-wb-core')
 
 		if (!instance) {
 			// Report missing instance
-			$log.error( $mdUtil.supplant(errorMsg, [handle || ""]) );
+			$log.error( $mdUtil.supplant(errorMsg, [handle || '']) );
 			return undefined;
 		}
 

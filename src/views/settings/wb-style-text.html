@@ -2,62 +2,62 @@
 	layout="column">
 	<legend translate>Text</legend>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.textAlignLast"
-		ng-change="ctrl.setStyle('textAlignLast', ctrl.style.textAlignLast)"
+		ng-model="ctrl.stylesValue.textAlignLast"
+		ng-change="ctrl.setStyle('textAlignLast', ctrl.stylesValue.textAlignLast)"
 		wb-title="AlignLast"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.textDecoration"
-		ng-change="ctrl.setStyle('textDecoration', ctrl.style.textDecoration)"
+		ng-model="ctrl.stylesValue.textDecoration"
+		ng-change="ctrl.setStyle('textDecoration', ctrl.stylesValue.textDecoration)"
 		wb-title="Decoration"
 		wb-description="">
 	</wb-ui-setting-text>
-	<wb-ui-setting-text
-		ng-model="ctrl.style.textDecorationColor"
-		ng-change="ctrl.setStyle('textDecorationColor', ctrl.style.textDecorationColor)"
+	<wb-ui-setting-color
+		ng-model="ctrl.stylesValue.textDecorationColor"
+		ng-change="ctrl.setStyle('textDecorationColor', ctrl.stylesValue.textDecorationColor)"
 		wb-title="DecorationColor"
 		wb-description="">
-	</wb-ui-setting-text>
+	</wb-ui-setting-color>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.textDecorationLine"
-		ng-change="ctrl.setStyle('textDecorationLine', ctrl.style.textDecorationLine)"
+		ng-model="ctrl.stylesValue.textDecorationLine"
+		ng-change="ctrl.setStyle('textDecorationLine', ctrl.stylesValue.textDecorationLine)"
 		wb-title="DecorationLine"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.textDecorationStyle"
-		ng-change="ctrl.setStyle('textDecorationStyle', ctrl.style.textDecorationStyle)"
+		ng-model="ctrl.stylesValue.textDecorationStyle"
+		ng-change="ctrl.setStyle('textDecorationStyle', ctrl.stylesValue.textDecorationStyle)"
 		wb-title="DecorationStyle"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.textIndent"
-		ng-change="ctrl.setStyle('textIndent', ctrl.style.textIndent)"
+		ng-model="ctrl.stylesValue.textIndent"
+		ng-change="ctrl.setStyle('textIndent', ctrl.stylesValue.textIndent)"
 		wb-title="Indent"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.textJustify"
-		ng-change="ctrl.setStyle('textJustify', ctrl.style.textJustify)"
+		ng-model="ctrl.stylesValue.textJustify"
+		ng-change="ctrl.setStyle('textJustify', ctrl.stylesValue.textJustify)"
 		wb-title="Justify"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.textOverflow"
-		ng-change="ctrl.setStyle('textOverflow', ctrl.style.textOverflow)"
+		ng-model="ctrl.stylesValue.textOverflow"
+		ng-change="ctrl.setStyle('textOverflow', ctrl.stylesValue.textOverflow)"
 		wb-title="Overflow"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.textShadow"
-		ng-change="ctrl.setStyle('textShadow', ctrl.style.textShadow)"
+		ng-model="ctrl.stylesValue.textShadow"
+		ng-change="ctrl.setStyle('textShadow', ctrl.stylesValue.textShadow)"
 		wb-title="Shadow"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.textTransform"
-		ng-change="ctrl.setStyle('textTransform', ctrl.style.textTransform)"
+		ng-model="ctrl.stylesValue.textTransform"
+		ng-change="ctrl.setStyle('textTransform', ctrl.stylesValue.textTransform)"
 		wb-title="Transform"
 		wb-description="">
 	</wb-ui-setting-text>
@@ -67,56 +67,56 @@
 	layout="column">
 	<legend translate>Font</legend>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.font"
-		ng-change="ctrl.setStyle('font', ctrl.style.font)"
+		ng-model="ctrl.stylesValue.font"
+		ng-change="ctrl.setStyle('font', ctrl.stylesValue.font)"
 		wb-title="font"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.fontFamily"
-		ng-change="ctrl.setStyle('fontFamily', ctrl.style.fontFamily)"
+		ng-model="ctrl.stylesValue.fontFamily"
+		ng-change="ctrl.setStyle('fontFamily', ctrl.stylesValue.fontFamily)"
 		wb-title="fontFamily"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.fontKerning"
-		ng-change="ctrl.setStyle('fontKerning', ctrl.style.fontKerning)"
+		ng-model="ctrl.stylesValue.fontKerning"
+		ng-change="ctrl.setStyle('fontKerning', ctrl.stylesValue.fontKerning)"
 		wb-title="fontKerning"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.fontSize"
-		ng-change="ctrl.setStyle('fontSize', ctrl.style.fontSize)"
+		ng-model="ctrl.stylesValue.fontSize"
+		ng-change="ctrl.setStyle('fontSize', ctrl.stylesValue.fontSize)"
 		wb-title="fontSize"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.fontSizeAdjust"
-		ng-change="ctrl.setStyle('fontSizeAdjust', ctrl.style.fontSizeAdjust)"
+		ng-model="ctrl.stylesValue.fontSizeAdjust"
+		ng-change="ctrl.setStyle('fontSizeAdjust', ctrl.stylesValue.fontSizeAdjust)"
 		wb-title="fontSizeAdjust"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.fontStretch"
-		ng-change="ctrl.setStyle('fontStretch', ctrl.style.fontStretch)"
+		ng-model="ctrl.stylesValue.fontStretch"
+		ng-change="ctrl.setStyle('fontStretch', ctrl.stylesValue.fontStretch)"
 		wb-title="fontStretch"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.fontStyle"
-		ng-change="ctrl.setStyle('fontStyle', ctrl.style.fontStyle)"
+		ng-model="ctrl.stylesValue.fontStyle"
+		ng-change="ctrl.setStyle('fontStyle', ctrl.stylesValue.fontStyle)"
 		wb-title="fontStyle"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.fontVariant"
-		ng-change="ctrl.setStyle('fontVariant', ctrl.style.fontVariant)"
+		ng-model="ctrl.stylesValue.fontVariant"
+		ng-change="ctrl.setStyle('fontVariant', ctrl.stylesValue.fontVariant)"
 		wb-title="fontVariant"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.fontWeight"
-		ng-change="ctrl.setStyle('fontWeight', ctrl.style.fontWeight)"
+		ng-model="ctrl.stylesValue.fontWeight"
+		ng-change="ctrl.setStyle('fontWeight', ctrl.stylesValue.fontWeight)"
 		wb-title="fontWeight"
 		wb-description="">
 	</wb-ui-setting-text>
@@ -126,74 +126,74 @@
 	layout="column">
 	<legend translate>Writing</legend>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.hyphens"
-		ng-change="ctrl.setStyle('hyphens', ctrl.style.hyphens)"
+		ng-model="ctrl.stylesValue.hyphens"
+		ng-change="ctrl.setStyle('hyphens', ctrl.stylesValue.hyphens)"
 		wb-title="hyphens"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.letterSpacing"
-		ng-change="ctrl.setStyle('letterSpacing', ctrl.style.letterSpacing)"
+		ng-model="ctrl.stylesValue.letterSpacing"
+		ng-change="ctrl.setStyle('letterSpacing', ctrl.stylesValue.letterSpacing)"
 		wb-title="letterSpacing"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.lineHeight"
-		ng-change="ctrl.setStyle('lineHeight', ctrl.style.lineHeight)"
+		ng-model="ctrl.stylesValue.lineHeight"
+		ng-change="ctrl.setStyle('lineHeight', ctrl.stylesValue.lineHeight)"
 		wb-title="lineHeight"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.quotes"
-		ng-change="ctrl.setStyle('quotes', ctrl.style.quotes)"
+		ng-model="ctrl.stylesValue.quotes"
+		ng-change="ctrl.setStyle('quotes', ctrl.stylesValue.quotes)"
 		wb-title="quotes"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.tabSize"
-		ng-change="ctrl.setStyle('tabSize', ctrl.style.tabSize)"
+		ng-model="ctrl.stylesValue.tabSize"
+		ng-change="ctrl.setStyle('tabSize', ctrl.stylesValue.tabSize)"
 		wb-title="tabSize"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.verticalAlign"
-		ng-change="ctrl.setStyle('verticalAlign', ctrl.style.verticalAlign)"
+		ng-model="ctrl.stylesValue.verticalAlign"
+		ng-change="ctrl.setStyle('verticalAlign', ctrl.stylesValue.verticalAlign)"
 		wb-title="verticalAlign"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.whiteSpace"
-		ng-change="ctrl.setStyle('whiteSpace', ctrl.style.whiteSpace)"
+		ng-model="ctrl.stylesValue.whiteSpace"
+		ng-change="ctrl.setStyle('whiteSpace', ctrl.stylesValue.whiteSpace)"
 		wb-title="whiteSpace"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.wordBreak"
-		ng-change="ctrl.setStyle('wordBreak', ctrl.style.wordBreak)"
+		ng-model="ctrl.stylesValue.wordBreak"
+		ng-change="ctrl.setStyle('wordBreak', ctrl.stylesValue.wordBreak)"
 		wb-title="wordBreak"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.wordSpacing"
-		ng-change="ctrl.setStyle('wordSpacing', ctrl.style.wordSpacing)"
+		ng-model="ctrl.stylesValue.wordSpacing"
+		ng-change="ctrl.setStyle('wordSpacing', ctrl.stylesValue.wordSpacing)"
 		wb-title="wordSpacing"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.wordWrap"
-		ng-change="ctrl.setStyle('wordWrap', ctrl.style.wordWrap)"
+		ng-model="ctrl.stylesValue.wordWrap"
+		ng-change="ctrl.setStyle('wordWrap', ctrl.stylesValue.wordWrap)"
 		wb-title="wordWrap"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.writingMode"
-		ng-change="ctrl.setStyle('writingMode', ctrl.style.writingMode)"
+		ng-model="ctrl.stylesValue.writingMode"
+		ng-change="ctrl.setStyle('writingMode', ctrl.stylesValue.writingMode)"
 		wb-title="writingMode"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.userSelect"
-		ng-change="ctrl.setStyle('userSelect', ctrl.style.userSelect)"
+		ng-model="ctrl.stylesValue.userSelect"
+		ng-change="ctrl.setStyle('userSelect', ctrl.stylesValue.userSelect)"
 		wb-title="userSelect"
 		wb-description="">
 	</wb-ui-setting-text>
@@ -203,14 +203,14 @@
 	layout="column">
 	<legend translate>Local</legend>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.direction"
-		ng-change="ctrl.setStyle('direction', ctrl.style.direction)"
+		ng-model="ctrl.stylesValue.direction"
+		ng-change="ctrl.setStyle('direction', ctrl.stylesValue.direction)"
 		wb-title="direction"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.unicodeBidi"
-		ng-change="ctrl.setStyle('unicodeBidi', ctrl.style.unicodeBidi)"
+		ng-model="ctrl.stylesValue.unicodeBidi"
+		ng-change="ctrl.setStyle('unicodeBidi', ctrl.stylesValue.unicodeBidi)"
 		wb-title="unicodeBidi"
 		wb-description="">
 	</wb-ui-setting-text>

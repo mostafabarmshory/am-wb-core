@@ -2,32 +2,32 @@
 	layout="column">
 	<legend translate>View</legend>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.opacity"
-		ng-model-change="ctrl.setStyle('opacity', ctrl.style.opacity)"
+		ng-model="ctrl.stylesValue.opacity"
+		ng-change="ctrl.setStyle('opacity', ctrl.stylesValue.opacity)"
 		wb-title="Opacity"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.visibility"
-		ng-model-change="ctrl.setStyle('visibility', ctrl.style.visibility)"
+		ng-model="ctrl.stylesValue.visibility"
+		ng-change="ctrl.setStyle('visibility', ctrl.stylesValue.visibility)"
 		wb-title="Visibility"
 		wb-description="">
 	</wb-ui-setting-text>
-	<wb-ui-setting-text
-		ng-model="ctrl.style.color"
-		ng-model-change="ctrl.setStyle('color', ctrl.style.color)"
+	<wb-ui-setting-color
+		ng-model="ctrl.stylesValue.color"
+		ng-change="ctrl.setStyle('color', ctrl.stylesValue.color)"
 		wb-title="Color"
 		wb-description="">
-	</wb-ui-setting-text>
+	</wb-ui-setting-color>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.mixBlendMode"
-		ng-model-change="ctrl.setStyle('mixBlendMode', ctrl.style.mixBlendMode)"
+		ng-model="ctrl.stylesValue.mixBlendMode"
+		ng-change="ctrl.setStyle('mixBlendMode', ctrl.stylesValue.mixBlendMode)"
 		wb-title=""
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.isolation"
-		ng-model-change="ctrl.setStyle('isolation', ctrl.style.isolation)"
+		ng-model="ctrl.stylesValue.isolation"
+		ng-change="ctrl.setStyle('isolation', ctrl.stylesValue.isolation)"
 		wb-title=""
 		wb-description="">
 	</wb-ui-setting-text>
@@ -37,14 +37,14 @@
 	layout="column">
 	<legend translate>Mouse</legend>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.cursor"
-		ng-model-change="ctrl.setStyle('cursor', ctrl.style.cursor)"
+		ng-model="ctrl.stylesValue.cursor"
+		ng-change="ctrl.setStyle('cursor', ctrl.stylesValue.cursor)"
 		wb-title="Cursor"
 		wb-description="">
 	</wb-ui-setting-text>
 	<wb-ui-setting-text
-		ng-model="ctrl.style.pointerEvents"
-		ng-model-change="ctrl.setStyle('pointerEvents', ctrl.style.pointerEvents)"
+		ng-model="ctrl.stylesValue.pointerEvents"
+		ng-change="ctrl.setStyle('pointerEvents', ctrl.stylesValue.pointerEvents)"
 		wb-title="pointerEvents"
 		wb-description="">
 	</wb-ui-setting-text>

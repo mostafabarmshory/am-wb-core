@@ -28,7 +28,7 @@
 angular.module('ui.tinymce', [])
 .value('uiTinymceConfig', {})
 .directive('uiTinymce', function($rootScope, $compile, $timeout, $window, $sce, uiTinymceConfig, uiTinymceService) {
-    'use strict';
+	'use strict';
 	uiTinymceConfig = uiTinymceConfig || {};
 
 	if (uiTinymceConfig.baseUrl) {

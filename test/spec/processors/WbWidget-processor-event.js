@@ -24,230 +24,231 @@
 'use strict';
 
 describe('WbWidget processor event ', function () {
-    // instantiate service
-    var $widget;
-    var processor;
-    var $timeout;
-    var $rootScope;
-    
-
-    angular.module('am-wb-core')//
-    .config(['$qProvider', function ($qProvider) {
-        $qProvider.errorOnUnhandledRejections(false);
-    }]);
-
-    // load the service's module
-    beforeEach(module('am-wb-core'));
-    beforeEach(inject(function (_$widget_, _WbProcessorStyle_, _$rootScope_, _$timeout_) {
-        $widget = _$widget_;
-        processor = new _WbProcessorStyle_();
-        $rootScope = _$rootScope_;
-        $timeout = _$timeout_;
-    }));
-
-    it('should load event handlers on init', function (done) {
-        // Create new instance
-        var model = {
-                type: 'div',
-                id: 'test',
-                'class': 'a b',
-                style: {
-                    background: 'red'
-                },
-                on: {
-                    init: '$widget.setProperty(\'style.background\', \'black\');'
-                }
-        };
-        $widget.compile(model)
-        .then(function(widget){
-            expect(widget.getElement().css('background')).toBe('black');
-            done();
-        });
-        $rootScope.$apply();
-    });
-
-    it('should load style on model update', function (done) {
-        // Create new instance
-        var model = {
-                type: 'div',
-                id: 'test',
-                on: {
-                    click: '$widget.setProperty(\'style.background\', \'pink\');'
-                }
-        };
-        $widget.compile(model)
-        .then(function(widget){
-            widget.getElement().click();
-            expect(widget.getElement().css('background')).toBe('pink');
-            done();
-        });
-        $rootScope.$apply();
-    });
-
-    it('should not intropt the engine if there is error', function (done) {
-        // Create new instance
-        var model = {
-                type: 'div',
-                id: 'test',
-                style: {
-                    background: 'red'
-                },
-                on: {
-                    init: '$widget2.setProperty(\'style.background\', \'pink\');',
-                    load: '+++.setProperty(\'style.background\', \'pink\');',
-                    click: '$widget.setProperty(\'style.background\', \'pink\');'
-                }
-        };
-        $widget.compile(model)
-        .then(function(widget){
-            expect(widget.getElement().css('background')).toBe('red');
-
-            widget.getElement().click();
-            expect(widget.getElement().css('background')).toBe('pink');
-
-            done();
-        });
-        $rootScope.$apply();
-    });
-    it('must disable events in edit mode', function (done) {
-        // Create new instance
-        var model = {
-                type: 'div',
-                id: 'test',
-                style: {
-                    background: 'red'
-                },
-                on: {
-                    click: '$widget.setProperty(\'style.background\', \'pink\');'
-                }
-        };
-        $widget.compile(model)
-        .then(function(widget){
-            expect(widget.getElement().css('background')).toBe('red');
-
-            widget.setEditable(true);
-
-            widget.getElement().click();
-            expect(widget.getElement().css('background')).toBe('red');
-
-            widget.setEditable(false);
-
-            widget.getElement().click();
-            expect(widget.getElement().css('background')).toBe('pink');
-            done();
-        });
-        $rootScope.$apply();
-    });
+	// instantiate service
+	var $widget;
+	var processor;
+	var $timeout;
+	var $rootScope;
 
 
-    it('should handle dblclick', function (done) {
-        // Create new instance
-        var model = {
-                type: 'div',
-                id: 'test',
-                on: {
-                    dblclick: '$widget.setProperty(\'style.background\', \'pink\');'
-                }
-        };
-        $widget.compile(model)
-        .then(function(widget){
-            widget.getElement().dblclick();
-            expect(widget.getElement().css('background')).toBe('pink');
-            done();
-        });
-        $rootScope.$apply();
-    });
-    it('should handle mouseout', function (done) {
-        // Create new instance
-        var model = {
-                type: 'div',
-                id: 'test',
-                on: {
-                    mouseout: '$widget.setProperty(\'style.background\', \'pink\');'
-                }
-        };
-        $widget.compile(model)
-        .then(function(widget){
-            widget.getElement().mouseout();
-            expect(widget.getElement().css('background')).toBe('pink');
-            done();
-        });
-        $rootScope.$apply();
-    });
-    it('should handle mouseover', function (done) {
-        // Create new instance
-        var model = {
-                type: 'div',
-                id: 'test',
-                on: {
-                    mouseover: '$widget.setProperty(\'style.background\', \'pink\');'
-                }
-        };
-        $widget.compile(model)
-        .then(function(widget){
-            widget.getElement().mouseover();
-            expect(widget.getElement().css('background')).toBe('pink');
-            done();
-        });
-        $rootScope.$apply();
-    });
-    it('should handle mousedown', function (done) {
-        // Create new instance
-        var model = {
-                type: 'div',
-                id: 'test',
-                on: {
-                    mousedown: '$widget.setProperty(\'style.background\', \'pink\');'
-                }
-        };
-        $widget.compile(model)
-        .then(function(widget){
-            widget.getElement().mousedown();
-            expect(widget.getElement().css('background')).toBe('pink');
-            done();
-        });
-        $rootScope.$apply();
-    });
-    it('should handle mouseup', function (done) {
-        // Create new instance
-        var model = {
-                type: 'div',
-                id: 'test',
-                on: {
-                    mouseup: '$widget.setProperty(\'style.background\', \'pink\');'
-                }
-        };
-        $widget.compile(model)
-        .then(function(widget){
-            widget.getElement().mouseup();
-            expect(widget.getElement().css('background')).toBe('pink');
-            done();
-        });
-        $rootScope.$apply();
-    });
+	angular.module('am-wb-core')//
+	.config(['$qProvider', function ($qProvider) {
+		$qProvider.errorOnUnhandledRejections(false);
+	}]);
+
+	// load the service's module
+	beforeEach(module('am-wb-core'));
+	beforeEach(inject(function (_$widget_, _WbProcessorStyle_, _$rootScope_, _$timeout_) {
+		$widget = _$widget_;
+		processor = new _WbProcessorStyle_();
+		$rootScope = _$rootScope_;
+		$timeout = _$timeout_;
+	}));
+
+	it('should load event handlers on init', function (done) {
+		// Create new instance
+		var model = {
+				type: 'div',
+				id: 'WbWidget-processor-event-test-001',
+				'class': 'a b',
+				style: {
+					background: 'red'
+				},
+				on: {
+					init: '$widget.setProperty(\'style.background\', \'black\');',
+					click: 'alert("hi");'
+				}
+		};
+		$widget.compile(model)
+		.then(function(widget){
+			expect(widget.getElement().css('background')).toBe('black');
+			done();
+		});
+		$rootScope.$apply();
+	});
+
+	it('should load style on model update', function (done) {
+		// Create new instance
+		var model = {
+				type: 'div',
+				id: 'test',
+				on: {
+					click: '$widget.setProperty(\'style.background\', \'pink\');'
+				}
+		};
+		$widget.compile(model)
+		.then(function(widget){
+			widget.getElement().click();
+			expect(widget.getElement().css('background')).toBe('pink');
+			done();
+		});
+		$rootScope.$apply();
+	});
+
+	it('should not intropt the engine if there is error', function (done) {
+		// Create new instance
+		var model = {
+				type: 'div',
+				id: 'test',
+				style: {
+					background: 'red'
+				},
+				on: {
+					init: '$widget2.setProperty(\'style.background\', \'pink\');',
+					load: '+++.setProperty(\'style.background\', \'pink\');',
+					click: '$widget.setProperty(\'style.background\', \'pink\');'
+				}
+		};
+		$widget.compile(model)
+		.then(function(widget){
+			expect(widget.getElement().css('background')).toBe('red');
+
+			widget.getElement().click();
+			expect(widget.getElement().css('background')).toBe('pink');
+
+			done();
+		});
+		$rootScope.$apply();
+	});
+	it('must disable events in edit mode', function (done) {
+		// Create new instance
+		var model = {
+				type: 'div',
+				id: 'test',
+				style: {
+					background: 'red'
+				},
+				on: {
+					click: '$widget.setProperty(\'style.background\', \'pink\');'
+				}
+		};
+		$widget.compile(model)
+		.then(function(widget){
+			expect(widget.getElement().css('background')).toBe('red');
+
+			widget.setEditable(true);
+
+			widget.getElement().click();
+			expect(widget.getElement().css('background')).toBe('red');
+
+			widget.setEditable(false);
+
+			widget.getElement().click();
+			expect(widget.getElement().css('background')).toBe('pink');
+			done();
+		});
+		$rootScope.$apply();
+	});
 
 
-    it('should cancel timeout service on edit mode', function (done) {
-        // Create new instance
-        var model = {
-                type: 'div',
-                id: 'test',
-                style: {
-                    background: 'red'
-                },
-                on: {
-                    init: '$timeout(function(){\n\t$widget.setProperty(\'style.background\', \'pink\')\n}, 1);'
-                }
-        };
-        $widget.compile(model)
-        .then(function(widget){
-            widget.setEditable(true);
-            $timeout(function(){
-                expect(widget.getElement().css('background')).toBe('pink');
-                done();
-            }, 2000);
-        });
-        $rootScope.$apply();
-        $timeout.flush();
-    });
+	it('should handle dblclick', function (done) {
+		// Create new instance
+		var model = {
+				type: 'div',
+				id: 'test',
+				on: {
+					dblclick: '$widget.setProperty(\'style.background\', \'pink\');'
+				}
+		};
+		$widget.compile(model)
+		.then(function(widget){
+			widget.getElement().dblclick();
+			expect(widget.getElement().css('background')).toBe('pink');
+			done();
+		});
+		$rootScope.$apply();
+	});
+	it('should handle mouseout', function (done) {
+		// Create new instance
+		var model = {
+				type: 'div',
+				id: 'test',
+				on: {
+					mouseout: '$widget.setProperty(\'style.background\', \'pink\');'
+				}
+		};
+		$widget.compile(model)
+		.then(function(widget){
+			widget.getElement().mouseout();
+			expect(widget.getElement().css('background')).toBe('pink');
+			done();
+		});
+		$rootScope.$apply();
+	});
+	it('should handle mouseover', function (done) {
+		// Create new instance
+		var model = {
+				type: 'div',
+				id: 'test',
+				on: {
+					mouseover: '$widget.setProperty(\'style.background\', \'pink\');'
+				}
+		};
+		$widget.compile(model)
+		.then(function(widget){
+			widget.getElement().mouseover();
+			expect(widget.getElement().css('background')).toBe('pink');
+			done();
+		});
+		$rootScope.$apply();
+	});
+	it('should handle mousedown', function (done) {
+		// Create new instance
+		var model = {
+				type: 'div',
+				id: 'test',
+				on: {
+					mousedown: '$widget.setProperty(\'style.background\', \'pink\');'
+				}
+		};
+		$widget.compile(model)
+		.then(function(widget){
+			widget.getElement().mousedown();
+			expect(widget.getElement().css('background')).toBe('pink');
+			done();
+		});
+		$rootScope.$apply();
+	});
+	it('should handle mouseup', function (done) {
+		// Create new instance
+		var model = {
+				type: 'div',
+				id: 'test',
+				on: {
+					mouseup: '$widget.setProperty(\'style.background\', \'pink\');'
+				}
+		};
+		$widget.compile(model)
+		.then(function(widget){
+			widget.getElement().mouseup();
+			expect(widget.getElement().css('background')).toBe('pink');
+			done();
+		});
+		$rootScope.$apply();
+	});
+
+
+	it('should cancel timeout service on edit mode', function (done) {
+		// Create new instance
+		var model = {
+				type: 'div',
+				id: 'test',
+				style: {
+					background: 'red'
+				},
+				on: {
+					init: '$timeout(function(){\n\t$widget.setProperty(\'style.background\', \'pink\')\n}, 1);'
+				}
+		};
+		$widget.compile(model)
+		.then(function(widget){
+			widget.setEditable(true);
+			$timeout(function(){
+				expect(widget.getElement().css('background')).toBe('pink');
+				done();
+			}, 2000);
+		});
+		$rootScope.$apply();
+		$timeout.flush();
+	});
 });

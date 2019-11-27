@@ -41,7 +41,7 @@ angular.module('am-wb-core')//
         this.addElementAttributes('autoplay', 'controls',
                 'loop', 'muted', 'preload', 'src');
         this.setAllowedTypes('source');
-    };
+    }
     Widget.prototype = Object.create(WbWidgetGroup.prototype);
     return Widget;
 });

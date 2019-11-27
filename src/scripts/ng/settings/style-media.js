@@ -31,4 +31,16 @@ angular.module('am-wb-core')//
  */
 .controller('WbSettingStyleMediaCtrl', function () {
 
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            'clip',
+            'clipPath',
+            'filter',
+            'objectFit',
+            'objectPosition',
+            ]);
+    };
 });

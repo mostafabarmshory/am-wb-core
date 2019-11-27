@@ -1,22 +1,17 @@
 <field
 	layout="row"
-	layout-align="start center">
-	<field-description flex>
+	layout-align="start stretch">
+	<field-description>
 		<label translate>{{::title}}</label>
 		<wb-icon size="1em">info</wb-icon>
 	</field-description>
-	
+	<input 
+		ng-model="value"
+		ng-change="setValue(value)"
+		aria-label="color of {{::title}}"
+		type="text"
+		flex>
 	<div
-		class="color"
-		layout="row">
-		<input 
-			ng-model="value"
-			ng-change="setValue(value)"
-			aria-label="color of {{::title}}"
-			type="text"
-			flex>
-		<div
-			ng-click="showColorPicker($event)"
-			class="preview"></div>
-	</div>
+		ng-click="selectColor($event)"
+		class="preview"></div>
 </div>

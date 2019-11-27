@@ -52,6 +52,74 @@ angular.module('am-wb-core')//
  * 
  * @see wb-layout
  */
-.controller('WbSettingStyleLayoutCtrl', function ($scope, $element) {
+.controller('WbSettingStyleLayoutCtrl', function (/*$scope, $element*/) {
 
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            'display',
+            'order',
+            'zIndex',
+            'clear',
+            'float',
+            // Position
+            'position',
+            'bottom',
+            'left',
+            'right',
+            'top',
+            // overflow
+            'overflow',
+            'overflowX',
+            'overflowY',
+            'scrollBehavior',
+            // Print
+            'pageBreakAfter',
+            'pageBreakBefore',
+            'pageBreakInside',
+            // Flex
+            'alignContent',
+            'alignItems',
+            'alignSelf',
+            'justifyContent',
+            'flex',
+            'flexBasis',
+            'flexDirection',
+            'flexGrow',
+            'flexShrink',
+            'flexWrap',
+            // grid
+            'grid',
+            'gridArea',
+            'gridAutoColumns',
+            'gridAutoFlow',
+            'gridAutoRows',
+            'gridColumn',
+            'gridColumnEnd',
+            'gridColumnGap',
+            'gridColumnStart',
+            'gridGap',
+            'gridRow',
+            'gridRowEnd',
+            'gridRowGap',
+            'gridRowStart',
+            'gridTemplate',
+            'gridTemplateAreas',
+            'gridTemplateColumns',
+            'gridTemplateRows',
+            // column view
+            'columns',
+            'columnWidth',
+            'columnCount',
+            'columnSpan',
+            'columnFill',
+            'columnGap',
+            'columnRule',
+            'columnRuleColor',
+            'columnRuleStyle',
+            'columnRuleWidth',
+            ]);
+    };
 });

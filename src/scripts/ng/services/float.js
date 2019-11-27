@@ -104,7 +104,7 @@ angular.module('am-wb-core')
 			if(!this._elementPromise){
 				this._elementPromise = $q.defer();
 			}
-			this._elementPromise.promise;
+			return this._elementPromise.promise;
 		}
 		return $q.when(this._element);
 	};
@@ -193,7 +193,7 @@ angular.module('am-wb-core')
 		return this.getElement()
 		.then(function(element){
 			contentElement = element;
-			return $wbUtil.getTemplateFor(optionsOrPreset)//
+			return $wbUtil.getTemplateFor(optionsOrPreset);
 		})
 		.then(function(templateL){
 			template = templateL;

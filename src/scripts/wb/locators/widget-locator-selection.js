@@ -45,8 +45,7 @@ angular.module('am-wb-core')//
         this.setAnchor(options.anchor);
 
         // load templates
-        var template = options.template
-        || '<div class="wb-widget-locator selection"></div>';
+        var template = options.template || '<div class="wb-widget-locator selection wb-layer-editor-selector"></div>';
 
         this.titleElement = angular.element(template);
         this.titleElement.attr('id', 'header');
@@ -74,7 +73,7 @@ angular.module('am-wb-core')//
         
         
         var position = {};
-        var lock = false;
+//        var lock = false;
         var dimension = {};
         var ctrl = this;
         
@@ -107,14 +106,14 @@ angular.module('am-wb-core')//
         function mouseup() {
             $document.unbind('mousemove', mousemove);
             $document.unbind('mouseup', mouseup);
-            lock = false;
+//            lock = false;
         }
 
         function mousedown($event) {
             $event.stopImmediatePropagation();
             position.x = $event.clientX;
             position.y = $event.clientY;
-            lock = true;
+//            lock = true;
             var $element = ctrl.getWidget().getElement();
             dimension.width = $element.prop('offsetWidth');
             dimension.height = $element.prop('offsetHeight');
@@ -163,16 +162,15 @@ angular.module('am-wb-core')//
                 left: bound.left + bound.width/2 - this.titleElement.width()/2
             });
         }
-        var widget = this.getWidget();
-        this.titleElement[0].innerHTML = '<span>'+ (widget.getTitle() || widget.getId() || widget.getType()) + '</span>'
+        this.titleElement[0].innerHTML = '<span>' + 
+            (widget.getTitle() || widget.getId() || widget.getType()) + 
+            '</span>';
         
         
         this.sizeElement.css({
-
             top: bound.top + bound.height -13 ,
             left: bound.left + bound.width -15 ,
-
-        })
+        });
     };
     return selectionWidgetLocator;
 });

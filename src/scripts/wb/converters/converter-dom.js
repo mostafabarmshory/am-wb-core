@@ -31,89 +31,101 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbConverterDom', function (WbConverterAbstract, $widget) {
-    'use strict';
-    function cssNameToJsName(name)
-    {
-        var split = name.split("-");
-        var output = "";
-        for(var i = 0; i < split.length; i++)
-        {
-            if (i > 0 && split[i].length > 0 && !(i == 1 && split[i] == "ms"))
-            {
-                split[i] = split[i].substr(0, 1).toUpperCase() + split[i].substr(1);
-            }
-            output += split[i];
-        }
-        return output;
-    }
+	'use strict';
+	function cssNameToJsName(name)
+	{
+		var split = name.split('-');
+		var output = '';
+		for(var i = 0; i < split.length; i++)
+		{
+			if (i > 0 && split[i].length > 0 && !(i === 1 && split[i] === 'ms'))
+			{
+				split[i] = split[i].substr(0, 1).toUpperCase() + split[i].substr(1);
+			}
+			output += split[i];
+		}
+		return output;
+	}
 
-    function convertElementToModel(element){
-        var name = element.tagName;
-        if(!name){
-            return null;
-        }
-        name = name.toLowerCase();
-        if(!$widget.hasWidget(name)){
-            return null;
-        }
-        var model = {
-                style:{}
-        };
-        model.type = name;
-        // attributes
-        _.forEach(element.attributes, function(attr){
-            if(attr.name !== 'style'){
-                model[attr.name] = attr.value;
-            }
-        })
-        //style
-        for(var i = 0; i < element.style.length; i++){
-            var sname = element.style.item(i);
-            model.style[cssNameToJsName(sname)] = element.style.getPropertyValue(sname);
-        }
-        // html
-        if($widget.isWidgetLeaf(name)){
-            model['html'] = element.innerHTML;
-        } else {
-            model.children = [];
-            _.forEach(element.children, function(childelement){
-                model.children.push(convertElementToModel(childelement));
-            })
-        }
-        return model;
-    }
+	function convertElementToModel(element){
+		var name = element.tagName;
+		if(!name){
+			return null;
+		}
+		name = name.toLowerCase();
+		if(!$widget.hasWidget(name)){
+			return null;
+		}
+		var model = {
+				style:{}
+		};
+		model.type = name;
+		// attributes
+		_.forEach(element.attributes, function(attr){
+			if(attr.name !== 'style'){
+				model[attr.name] = attr.value;
+			}
+		});
+		//style
+		for(var i = 0; i < element.style.length; i++){
+			var sname = element.style.item(i);
+			model.style[cssNameToJsName(sname)] = element.style.getPropertyValue(sname);
+		}
+		if($widget.isWidgetLeaf(name)){
+			// html
+			model.html = element.innerHTML;
+			if(model.type === 'pre'){
+				model.text = element.innerText;
+			}
+		} else {
+			model.children = [];
+			_.forEach(element.children, function(childelement){
+				var childWidget = convertElementToModel(childelement);
+				if(childWidget){
+					model.children.push(childWidget);
+				}
+			});
+			if(model.type === 'li' && model.children.length === 0){
+				model.children.push({
+					type: 'p',
+					html: element.innerText
+				});
+			}
+		}
+		return model;
+	}
 
-    function Converter(){
-        WbConverterAbstract.apply(this, ['text/html']);
-    };
-    Converter.prototype = new WbConverterAbstract();
+	function Converter(){
+		WbConverterAbstract.apply(this, ['text/html']);
+	}
+	Converter.prototype = new WbConverterAbstract();
 
-    Converter.prototype.encode = function(){
-        var widgets = Array.prototype.slice.call(arguments) || [];
-        var data = '';
-        while(widgets.length){
-            var widget = widgets.pop();
-            data += widget.getElement().prop('outerHTML'); + '\n';
-        }
-        return data;
-    };
+	Converter.prototype.encode = function(){
+		var widgets = Array.prototype.slice.call(arguments) || [];
+		var data = '';
+		while(widgets.length){
+			var widget = widgets.pop();
+			data += widget.getElement().prop('outerHTML') + '\n';
+		}
+		return data;
+	};
 
-    Converter.prototype.decode = function(data){
-        var widgets = [];
-        try{
-            var element = angular.element(data);
-            for(var i = 0; i < element.length; i++){
-                var model = convertElementToModel(element[i]);
-                if(model){
-                    widgets.push(model);
-                }
-            }
-        } catch(ex){
-            console.error(ex);
-        }
-        return widgets;
-    };
+	Converter.prototype.decode = function(data){
+		var widgets = [];
+		try{
+			var element = angular.element(data);
+			for(var i = 0; i < element.length; i++){
+				var model = convertElementToModel(element[i]);
+				if(model){
+					widgets.push(model);
+				}
+			}
+		} catch(ex){
+//			console.error(ex);
+		}
+		return widgets;
+	};
 
 
-    return Converter;
+	return Converter;
 });

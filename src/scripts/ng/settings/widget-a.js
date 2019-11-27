@@ -25,35 +25,27 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Controllers
- * @name MbSettingACtrl
+ * @name WbSettingACtrl
  * @description Manage Widget A 
  * 
  */
-.controller('MbSettingACtrl', function () {
-	
-	var attrs = [
-		// id
-		'download',
-		'href',
-		'hreflang',
-		'media',
-		'ping',
-		'referrerpolicy',
-		'rel',
-		'target',
-		'type',
-		];
+.controller('WbSettingACtrl', function () {
 
 	/*
 	 * Initial the setting editor
 	 */
 	this.init = function () {
-		/*
-		 * Load data of the widget
-		 */
-		var ctrl = this;
-		angular.forEach(attrs, function(attr){
-			ctrl[attr] = ctrl.getProperty(attr);
-		});
+		this.trackAttributes([
+			// id
+			'download',
+			'href',
+			'hreflang',
+			'media',
+			'ping',
+			'referrerpolicy',
+			'rel',
+			'target',
+			'type',
+			]);
 	};
 });

@@ -63,10 +63,10 @@ angular.module('am-wb-core')//
      * @param model Object to set into the group
      */
     WbWidgetGroupCtrl.prototype.setModel = function (model) {
-        this.setState('init');
         if (model === this.model) {
             return;
         }
+        this.setState('init');
         this.model = model;
         this.fire('modelChanged');
 
@@ -74,10 +74,6 @@ angular.module('am-wb-core')//
         return this.loadWidgets()
         .then(function(){
             return ctrl;
-        })
-        .finally(function () {
-            ctrl.fire('loaded');
-            ctrl.setState('ready');
         });
     };
 
@@ -148,8 +144,8 @@ angular.module('am-wb-core')//
     WbWidgetGroupCtrl.prototype.removeChildren = function(){
         // remove all children
         var widgets = _.clone(this.getChildren());
-        angular.forEach(widgets, function (widget) {
-            widget.delete();
+        _.forEach(widgets, function (w) {
+            w.delete();
         });
     };
 
@@ -160,10 +156,16 @@ angular.module('am-wb-core')//
             widget.destroy();
         });
         this.childWidgets = [];
+        var ctrl = this;
+        var loadState = function () {
+            ctrl.fire('loaded');
+            ctrl.setState('ready');
+        };
 
         // check for new child
         if (!this.model || !angular.isArray(this.model.children)) {
-            return $q.resolve();
+            return $q.resolve()
+            .finally(loadState);
         }
 
         // create child
@@ -178,15 +180,16 @@ angular.module('am-wb-core')//
             compilesJob.push(job);
         });
 
-        var ctrl = this;
         return $q.all(compilesJob)//
         .then(function () {
             var $element = parentWidget.getElement();
+            $element.empty();
             parentWidget.childWidgets.forEach(function (widget) {
                 widget.setEditable(ctrl.isEditable());
                 $element.append(widget.getElement());
             });
-        });
+        })
+        .finally(loadState);
     };
 
 
@@ -299,7 +302,7 @@ angular.module('am-wb-core')//
         .then(function(){
             return widgets;
         });
-    }
+    };
 
     WbWidgetGroupCtrl.prototype.__cleanInsertIndex = function(index){
         if(!angular.isDefined(index) || index > this.childWidgets.length){
@@ -379,12 +382,12 @@ angular.module('am-wb-core')//
 
     WbWidgetGroupCtrl.prototype.isLeaf = function(){
         return false;
-    }
+    };
     
     WbWidgetGroupCtrl.prototype.isHorizontal = function(){
         var direction = this.getModelProperty('style.flexDirection') || this.getProperty('style.flexDirection');
         return direction === 'row';
-    }
+    };
 
     return WbWidgetGroupCtrl;
 });

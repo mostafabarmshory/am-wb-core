@@ -72,51 +72,61 @@ If the state of the widget is going to change then a event of stateChanged will 
 - border-collapse
 - border-spacing
 
-- border-bottom
-- border-bottom-width
-- border-bottom-style
-- border-bottom-color
+- borderBottom
+- borderBottom-width
+- borderBottom-style
+- borderBottom-color
 
-- border-left
-- border-left-width
-- border-left-style (required)
-- border-left-color
+- borderLeft
+- borderLeft-width
+- borderLeft-style (required)
+- borderLeft-color
 
-- border-right
-- border-right-width
-- border-right-style (required)
-- border-right-color
+- borderRight
+- borderRight-width
+- borderRight-style (required)
+- borderRight-color
 
-- border-top
-- border-top-width
-- border-top-style (required)
-- border-top-color
+- borderTop
+- borderTop-width
+- borderTop-style (required)
+- borderTop-color
 
 ##### Radius
 
-- border-radius
-- border-top-right-radius
-- border-top-left-radius
-- border-bottom-left-radius
-- border-bottom-right-radius
+- borderRadius
+- borderTopRightRadius
+- borderTopLeftRadius
+- borderBottomLeftRadius
+- borderBottomRightRadius
 
 ##### Image
 
-- border-image
-- border-image-source
-- border-image-slice
-- border-image-width
-- border-image-outset
-- border-image-repeat
+- borderImage
+- borderImageSource
+- borderImageSlice
+- borderImageWidth
+- borderImageOutset
+- borderImageRepeat
 
 
 ### layout
 
+#### Layout
+
 - display
 - order
-- z-index
+- zIndex
 - clear
 - float
+
+##### zIndex
+
+The zIndex property specifies the stack order of an widget.
+
+An widget with greater stack order is always in front of an widget with a lower stack order.
+
+Note: z-index only works on positioned widget (position: absolute, position: relative, position: fixed, or position: sticky).
 
 #### Position
 
@@ -125,102 +135,121 @@ If the state of the widget is going to change then a event of stateChanged will 
 - left
 - right
 - top
+
+##### Position
+
+The position property specifies the type of positioning method used for an widget (static, relative, absolute, fixed, or sticky).
+
+- Default value:	static
+- Inherited:	no
+- Animatable:	no
+
+- static	Widget render in order, as they appear in the document flow	
+- absolute	The widget is positioned relative to its first positioned (not static) ancestor element	
+- fixed	The widget is positioned relative to the browser window	
+- relative	The widget is positioned relative to its normal position, so "left:20px" adds 20 pixels to the widget`s LEFT position
+- sticky	The widget is positioned based on the user's scroll position
+- initial	Sets this property to its default value. Read about initial	
+- inherit	Inherits this property from its parent element
+
+A sticky widget toggles between relative and fixed, depending on the scroll position. It is positioned relative until a given offset position is met in the viewport - then it "sticks" in place (like position:fixed).
+
+Note: Sticky not supported in IE/Edge 15 or earlier. Supported in Safari from version 6.1.	
  
 #### overflow
 
 - overflow
-- overflow-x
-- overflow-y
-- scroll-behavior
+- overflowX
+- overflowY
+- scrollBehavior
  
 #### Print
 
-- page-break-after
-- page-break-before
-- page-break-inside
+- pageBreakAfter
+- pageBreakBefore
+- pageBreakInside
  
 
 #### Flex
 
-- align-content
-- align-items
-- align-self
-- justify-content
+- alignContent
+- alignItems
+- alignSelf
+- justifyContent
 - flex
-- flex-basis
-- flex-direction
-- flex-grow
-- flex-shrink
-- flex-basis
-- flex-wrap
+- flexBasis
+- flexDirection
+- flexGrow
+- flexShrink
+- flexWrap
 
 
 #### grid
 
 - grid
-- grid-area
-- grid-auto-columns
-- grid-auto-flow
-- grid-auto-rows
-- grid-column
-- grid-column-end
-- grid-column-gap
-- grid-column-start
-- grid-gap
-- grid-row
-- grid-row-end
-- grid-row-gap
-- grid-row-start
-- grid-template
-- grid-template-areas
-- grid-template-columns
-- grid-template-rows
+- gridArea
+- gridAutoColumns
+- gridAutoFlow
+- gridAutoRows
+- gridColumn
+- gridColumnEnd
+- gridColumnGap
+- gridColumnStart
+- gridGap
+- gridRow
+- gridRowEnd
+- gridRowGap
+- gridRowStart
+- gridTemplate
+- gridTemplateAreas
+- gridTemplateColumns
+- gridTemplateRows
 
 
 #### column view
 
 - columns
-- column-width
-- column-count
-- column-span
-- column-fill
-- column-gap
-- column-rule
-- column-rule-color
-- column-rule-style
-- column-rule-width
+- columnWidth
+- columnCount
+- columnSpan
+- columnFill
+- columnGap
+- columnRule
+- columnRuleColor
+- columnRuleStyle
+- columnRuleWidth
 
 
 
 ### Size
  
  - margin
- - margin-top
- - margin-right
- - margin-bottom
- - margin-left
+ - marginTop
+ - marginRight
+ - marginBottom
+ - marginLeft
  
  - padding
- - padding-top
- - padding-right
- - padding-bottom
- - padding-left
+ - paddingTop
+ - paddingRight
+ - paddingBottom
+ - paddingLeft
  
  - resize
  - height
- - max-height
- - min-height
+ - maxHeight
+ - minHeight
  - width
- - max-width
- - min-width
+ - maxWidth
+ - minWidth
  
 ### multimedia
 
  - clip
- - clip-path
+ - clipPath
  - filter
- - object-fit
- - object-position
+ - objectFit
+ - objectPosition
 
 ### General?
 
@@ -229,13 +258,13 @@ If the state of the widget is going to change then a event of stateChanged will 
 - opacity
 - visibility
 - color
-- mix-blend-mode
+- mixBlendMode
 - isolation
 
 #### mouse
 
 - cursor
-- pointer-events
+- pointerEvents
 
 
 
@@ -245,48 +274,48 @@ If the state of the widget is going to change then a event of stateChanged will 
 #### writing
 
 hyphens
-letter-spacing
-line-height
+letterSpacing
+lineHeight
 quotes
-tab-size
-vertical-align
-white-space
-word-break
-word-spacing
-word-wrap
-writing-mode
-user-select
+tabSize
+verticalAlign
+whiteSpace
+wordBreak
+wordSpacing
+wordWrap
+writingMode
+userSelect
 
 #### Text
 
-text-align-last
-text-decoration
-text-decoration-color
-text-decoration-line
-text-decoration-style
-text-indent
-text-justify
-text-overflow
-text-shadow
-text-transform
+textAlign-last
+textDecoration
+textDecorationColor
+textDecorationLine
+textDecorationStyle
+textIndent
+textJustify
+textOverflow
+textShadow
+textTransform
 
 #### Local
 
 direction
-unicode-bidi
+unicodeBidi
 
  
 #### font
 
 font
-font-family
-font-kerning
-font-size
-font-size-adjust
-font-stretch
-font-style
-font-variant
-font-weight
+fontFamily
+fontKerning
+fontSize
+fontSizeAdjust
+fontStretch
+fontStyle
+fontVariant
+fontWeight
 
 
 ### list (ul, ol)

@@ -30,5 +30,21 @@ angular.module('am-wb-core')//
  * 
  */
 .controller('WbSettingStyleAnimationCtrl', function () {
-	
+
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            'animation',
+            'animationName',
+            'animationDuration',
+            'animationDelay',
+            'animationDirection',
+            'animationIterationCount',
+            'animationTimingFunction',
+            'animationFillMode',
+            'animationPlayState',
+            ]);
+    };
 });

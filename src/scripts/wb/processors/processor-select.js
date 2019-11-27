@@ -28,113 +28,169 @@ angular.module('am-wb-core')//
  * @description Widget processor
  * 
  */
-.factory('WbProcessorSelect', function ($widget, WbProcessorAbstract) {
-    'use strict';
+.factory('WbProcessorSelect', function ($rootScope, $widget, WbProcessorAbstract) {
+	'use strict';
 
-    function Processor(){
-        WbProcessorAbstract.apply(this);
-        this.selectedWidgets = [];
-        this.callbacks = {
-                'selectionChange':[]
-        };
+	function Processor(){
+		WbProcessorAbstract.apply(this);
+		this.selectedWidgets = [];
+		this.callbacks = {
+				'selectionChange':[]
+		};
 
-        var ctrl = this;
-        this.clickListener = function($event){
-            var widget = $event.source;
+		var ctrl = this;
+		this.clickListener = function($event){
+			ctrl.lock = true;
+			var widget = $event.source;
+			try{
+				if(!widget.isSilent()){
+					if(!widget.isSelected()){
+						widget.setSelected(true);
+						if($event.shiftKey){
+							ctrl.selectedWidgets.push(widget);
+						} else {
+							_.forEach(ctrl.selectedWidgets, function(widget){
+								widget.setSelected(false);
+							});
+							ctrl.selectedWidgets = [widget];
+						}
+						$event.widgets = ctrl.selectedWidgets;
+						ctrl.fire('selectionChange', $event);
+						$rootScope.$digest();
+					}
+					$event.preventDefault();
+					$event.stopPropagation();
+				}
+			} catch(ex){
+				log.error({
+					source: 'WbProcessorSelect',
+					message: 'fail to selec a widget type:' + widget.getType(),
+					error: ex
+				});
+			} finally {
+				delete ctrl.lock;
+			}
+		};
 
-            widget.setSelected(true);
-            if($event.shiftKey){
-                ctrl.selectedWidgets.push(widget);
-            } else {
-                _.forEach(ctrl.selectedWidgets, function(widget){
-                    widget.setSelected(false);
-                });
-                ctrl.selectedWidgets = [widget];
-            }
-            $event.stopPropagation();
-            $event.preventDefault();
-            
-            $event.widgets = ctrl.selectedWidgets;
-            ctrl.fire('selectionChange', $event);
-        }
+		this.dblclickListener = function($event){
+			try{
+				ctrl.lock = true;
+				var widget = $event.source;
+				if(!widget.isSilent()){
+					_.forEach(ctrl.selectedWidgets, function(widget){
+						widget.setSelected(false);
+					});
+					
+					widget.setSelected(true, $event);
 
-        this.dblclickListener = function($event){
-            var widget = $event.source;
-            
-            widget.setSelected(true, $event);
-            $event.stopPropagation();
-            $event.preventDefault();
+					// clear selection
+					ctrl.selectedWidgets = [widget];
 
-            // clear selection
-            _.forEach(ctrl.selectedWidgets, function(widget){
-                widget.setSelected(false);
-            });
-            ctrl.selectedWidgets = [widget];
+					// Open an editor 
+					var editor = $widget.getEditor(widget);
+					editor.show();
 
-            // Open an editor 
-            var editor = $widget.getEditor(widget);
-            editor.show();
-            
-            $event.widgets = ctrl.selectedWidgets;
-            ctrl.fire('selectionChange', $event);
-        }
-    };
-    Processor.prototype = new WbProcessorAbstract();
-    Processor.prototype.process = function(widget, event){
-        if(event.type !== 'stateChanged') {
-            return;
-        }
-        if(widget.state === 'edit') {
-            widget.on('click', this.clickListener);
-            widget.on('dblclick', this.dblclickListener);
-        } else {
-            widget.off('click', this.clickListener);
-            widget.off('dblclick', this.dblclickListener);
-        }
-    };
+					$event.widgets = ctrl.selectedWidgets;
+					ctrl.fire('selectionChange', $event);
 
-    Processor.prototype.getSelectedWidgets = function(){
-        return this.selectedWidgets || [];
-    };
+					$event.preventDefault();
+					$event.stopPropagation();
+					$rootScope.$digest();
+				}
+			} catch(ex){
+				log.error({
+					source: 'WbProcessorSelect',
+					message: 'fail to open editor for a widget of type:' + widget.getType(),
+					error: ex
+				});
+			} finally {
+				delete ctrl.lock;
+			}
+		};
 
-    Processor.prototype.on = function(event, callback){
-        this.callbacks[event].push(callback);
-    };
+		this.selectionListener = function($event){
+			if(ctrl.lock){
+				return;
+			}
+			var widget = $event.source;
 
-    Processor.prototype.off = function(event, callback){
-        var index = this.callbacks[event].indexOf(callback);
-        if(index > -1){
-            this.callbacks[event].slice(index, 1);
-        }
-    };
-    
+			// clear selection
+			// TODO: maso, 2019: check if shift key is hold
+			_.forEach(ctrl.selectedWidgets, function(widget){
+				widget.setSelected(false);
+			});
+			ctrl.selectedWidgets = [widget];
 
-    Processor.prototype.fire = function (type, params) {
-        params = params || {};
-        
-        // 1- Call processors
-        var event = _.merge({
-            source: this,
-            type: type
-        }, params || {});
+			$event.widgets = ctrl.selectedWidgets;
+			ctrl.fire('selectionChange', $event);
+			$rootScope.$digest();
+		};
+	}
+	Processor.prototype = new WbProcessorAbstract();
+	Processor.prototype.process = function(widget, event){
+		if(event.type !== 'stateChanged') {
+			return;
+		}
+		if(widget.state === 'edit') {
+			widget.on('click', this.clickListener);
+			widget.on('dblclick', this.dblclickListener);
+			widget.on('select', this.selectionListener);
+		} else {
+			widget.off('click', this.clickListener);
+			widget.off('dblclick', this.dblclickListener);
+			widget.off('select', this.selectionListener);
+		}
+	};
 
-        // 2- call listeners
-        if (!angular.isDefined(this.callbacks[type])) {
-            return;
-        }
-        var callbacks = this.callbacks[type];
-        var resultData = null;
-        for(var i = 0; i < callbacks.length; i++){
-            // TODO: maso, 2018: check if the event is stopped to propagate
-            try {
-                resultData = callbacks[i](event) || resultData;
-            } catch (error) {
-                // NOTE: remove on release
-                console.log(error);
-            }
-        }
-        return resultData;
-    };
+	Processor.prototype.getSelectedWidgets = function(){
+		return this.selectedWidgets || [];
+	};
 
-    return Processor;
+	Processor.prototype.on = function(event, callback){
+		this.callbacks[event].push(callback);
+	};
+
+	Processor.prototype.off = function(event, callback){
+		var index = this.callbacks[event].indexOf(callback);
+		if(index > -1){
+			this.callbacks[event].slice(index, 1);
+		}
+	};
+
+	Processor.prototype.fire = function (type, params) {
+		params = params || {};
+
+		// 1- Call processors
+		var event = _.merge({
+			source: this,
+			type: type
+		}, params || {});
+
+		// 2- call listeners
+		if (!angular.isDefined(this.callbacks[type])) {
+			return;
+		}
+		var callbacks = this.callbacks[type];
+		var resultData = null;
+		for(var i = 0; i < callbacks.length; i++){
+			// TODO: maso, 2018: check if the event is stopped to propagate
+			try {
+				resultData = callbacks[i](event) || resultData;
+			} catch (error) {
+				// NOTE: remove on release
+//				console.log(error);
+			}
+		}
+		return resultData;
+	};
+
+
+	/**
+	 * Enable the processor
+	 */
+	Processor.prototype.setEnable = function(enable){
+		this.enable = enable;
+	};
+
+	return Processor;
 });

@@ -1,0 +1,23 @@
+{
+	"type": "div",
+	"style": {
+		"padding": "5px",
+		"margin": "0px",
+		"background": "pink",
+		"flexGrow": 2,
+		"flexShrink": 2,
+		"flexBasis": "auto",
+		"display": "flex",
+		"flexDirection": "row",
+		"justifyContent": "center",
+		"alignItems": "center"
+	},
+	"children": [{
+		"type": "meta",
+		"name": "test",
+		"content":"test meat content"
+	},{
+		"type": "source",
+		"src": "test src"
+	}]
+}

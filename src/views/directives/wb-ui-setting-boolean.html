@@ -5,12 +5,9 @@
 		<label translate>{{::title}}</label>
 		<wb-icon size="1em">info</wb-icon>
 	</field-description>
-	<div
-		class="boolean">
-		<input 
-			ng-model="value"
-			ng-change="setValue(value)"
-			aria-label="set {{::title}} true or false"
-			type="checkbox">
-	</div>
+	<input 
+		ng-model="value"
+		ng-change="setValue(value)"
+		aria-label="set {{::title}} true or false"
+		type="checkbox">
 </field>

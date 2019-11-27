@@ -35,7 +35,7 @@ angular.module('am-wb-core')//
 
     function Converter(){
         WbConverterAbstract.apply(this, ['text/plain']);
-    };
+    }
     Converter.prototype = new WbConverterAbstract();
 
     Converter.prototype.encode = function(){

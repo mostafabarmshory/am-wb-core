@@ -18,8 +18,8 @@
 
         <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
         <!-- bower:css -->
-        <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
         <link rel="stylesheet" href="bower_components/jspanel4x/dist/jspanel.css" />
+        <link rel="stylesheet" href="bower_components/angular-material/angular-material.css" />
         <link rel="stylesheet" href="bower_components/md-color-picker/dist/md-color-picker.css" />
         <link rel="stylesheet" href="bower_components/json-formatter/dist/json-formatter.css" />
         <!-- endbower -->
@@ -32,13 +32,14 @@
         <link rel="stylesheet" href="styles/font-svg.css">
         <link rel="stylesheet" href="styles/hack-jsPanel-content.css">
         <link rel="stylesheet" href="styles/hack-jsPanel.css">
+        <link rel="stylesheet" href="styles/hack-old-wb1-a-padding.css">
         <link rel="stylesheet" href="styles/hack-tinymce5-inline-toolbar.css">
         <link rel="stylesheet" href="styles/md-expansion-panel.css">
         <link rel="stylesheet" href="styles/prism.css">
-        <link rel="stylesheet" href="styles/setting-layout.css">
         <link rel="stylesheet" href="styles/typography.css">
         <link rel="stylesheet" href="styles/wb-dnd.css">
         <link rel="stylesheet" href="styles/wb-icon.css">
+        <link rel="stylesheet" href="styles/wb-layers.css">
         <link rel="stylesheet" href="styles/wb-text.css">
         <link rel="stylesheet" href="styles/wb-ui-choose.css">
         <link rel="stylesheet" href="styles/wb-ui-setting-image.css">
@@ -53,7 +54,8 @@
     </head>
     <body
 		layout="column">
-		<md-toolbar>
+		<md-toolbar
+			class="wb-layer-tool-bottom">
 			<div layout-align="center center" layout="row">
 				<md-toolbar-filler layout="row" layout-align="center center">
 					<wb-icon>list</wb-icon>
@@ -77,8 +79,17 @@
 					<md-option ng-value="'examples/larg-text.json'">Larg text</md-option>
 					<md-option ng-value="'examples/hx.json'">Headers</md-option>
 					<md-option ng-value="'examples/row.json'">Row</md-option>
+					<md-option ng-value="'examples/section.json'">Sections</md-option>
+					<md-option ng-value="'examples/image.json'">Image</md-option>
+					<md-option ng-value="'examples/iframe.json'">IFrame</md-option>
+					<md-option ng-value="'examples/list.json'">List</md-option>
+					<md-option ng-value="'examples/unvisible.json'">Unvisible</md-option>
+					<md-option ng-value="'examples/picture.json'">Picture</md-option>
+					<md-option ng-value="'examples/audio.json'">Audio</md-option>
+					<md-option ng-value="'examples/video.json'">Video</md-option>
 				</md-select>
 			</div>
+			<div id="demo-widget-editor-toolbar"></div>
 		</md-toolbar>
 <!-- 		<fieldset -->
 <!-- 			layout="column" -->
@@ -125,6 +136,7 @@
 			layout="row"
 			flex>
 			<md-toolbar
+				class="wb-layer-tool-bottom"
 				ng-show="ctrl.editable"
 				flex="5">
 				<div layout="column" layout-align="center center">
@@ -178,25 +190,26 @@
         <!-- build:js(src) scripts/vendor.js -->
         <!-- bower:js -->
         <script src="bower_components/jquery/dist/jquery.js"></script>
+        <script src="bower_components/lodash/lodash.js"></script>
+        <script src="bower_components/flux/dist/Flux.js"></script>
+        <script src="bower_components/object-path/index.js"></script>
+        <script src="bower_components/jspanel4x/dist/jspanel.js"></script>
+        <script src="bower_components/tinymce/tinymce.js"></script>
+        <script src="bower_components/tinycolor/tinycolor.js"></script>
         <script src="bower_components/angular/angular.js"></script>
         <script src="bower_components/angular-animate/angular-animate.js"></script>
         <script src="bower_components/angular-aria/angular-aria.js"></script>
         <script src="bower_components/angular-messages/angular-messages.js"></script>
+        <script src="bower_components/angular-material/angular-material.js"></script>
+        <script src="bower_components/md-color-picker/dist/md-color-picker.js"></script>
         <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
-        <script src="bower_components/lodash/lodash.js"></script>
-        <script src="bower_components/flux/dist/Flux.js"></script>
-        <script src="bower_components/object-path/index.js"></script>
-        <script src="bower_components/angular-material/angular-material.js"></script>
-        <script src="bower_components/tinymce/tinymce.js"></script>
         <script src="bower_components/angular-translate/angular-translate.js"></script>
-        <script src="bower_components/jspanel4x/dist/jspanel.js"></script>
         <script src="bower_components/weakmap-polyfill/weakmap-polyfill.js"></script>
-        <script src="bower_components/tinycolor/tinycolor.js"></script>
-        <script src="bower_components/md-color-picker/dist/md-color-picker.js"></script>
         <script src="bower_components/mustache.js/mustache.js"></script>
         <script src="bower_components/ngstorage/ngStorage.js"></script>
         <script src="bower_components/moment/moment.js"></script>
+        <script src="bower_components/loglevel/dist/loglevel.min.js"></script>
         <script src="bower_components/angular-mocks/angular-mocks.js"></script>
         <script src="bower_components/json-formatter/dist/json-formatter.js"></script>
         <!-- endbower -->
@@ -206,6 +219,7 @@
         <!-- injector:js -->
         <script src="libs/ResizeObserver.js"></script>
         <script src="libs/anime.js"></script>
+        <script src="libs/machina.js"></script>
         <script src="libs/prism.js"></script>
         <script src="scripts/app.js"></script>
         <script src="scripts/ng/configs/icons.js"></script>
@@ -267,9 +281,14 @@
         <script src="scripts/ng/settings/style-size.js"></script>
         <script src="scripts/ng/settings/style-text.js"></script>
         <script src="scripts/ng/settings/widget-a.js"></script>
+        <script src="scripts/ng/settings/widget-audio.js"></script>
         <script src="scripts/ng/settings/widget-general.js"></script>
+        <script src="scripts/ng/settings/widget-iframe.js"></script>
         <script src="scripts/ng/settings/widget-img.js"></script>
         <script src="scripts/ng/settings/widget-microdata.js"></script>
+        <script src="scripts/ng/settings/widget-picture.js"></script>
+        <script src="scripts/ng/settings/widget-source.js"></script>
+        <script src="scripts/ng/settings/widget-video.js"></script>
         <script src="scripts/wb/converters/converter-abstract.js"></script>
         <script src="scripts/wb/converters/converter-dom.js"></script>
         <script src="scripts/wb/converters/converter-text.js"></script>
@@ -277,7 +296,8 @@
         <script src="scripts/wb/editors/widget-editor-code.js"></script>
         <script src="scripts/wb/editors/widget-editor-deprecated.js"></script>
         <script src="scripts/wb/editors/widget-editor-fake.js"></script>
-        <script src="scripts/wb/editors/widget-editor-tinymce.js"></script>
+        <script src="scripts/wb/editors/widget-editor-tinymce-section.js"></script>
+        <script src="scripts/wb/editors/widget-editor-tinymce-singleLine.js"></script>
         <script src="scripts/wb/editors/widget-editor.js"></script>
         <script src="scripts/wb/locators/widget-locator-abstract.js"></script>
         <script src="scripts/wb/locators/widget-locator-bound.js"></script>
@@ -296,6 +316,7 @@
         <script src="scripts/wb/widgets/0-abstract.js"></script>
         <script src="scripts/wb/widgets/1-group.js"></script>
         <script src="scripts/wb/widgets/2-abstract-html.js"></script>
+        <script src="scripts/wb/widgets/3-unvisible.js"></script>
         <script src="scripts/wb/widgets/a.js"></script>
         <script src="scripts/wb/widgets/address.js"></script>
         <script src="scripts/wb/widgets/applet.js"></script>
@@ -321,12 +342,7 @@
         <script src="scripts/wb/widgets/form.js"></script>
         <script src="scripts/wb/widgets/frame.js"></script>
         <script src="scripts/wb/widgets/frameset.js"></script>
-        <script src="scripts/wb/widgets/h1.js"></script>
-        <script src="scripts/wb/widgets/h2.js"></script>
-        <script src="scripts/wb/widgets/h3.js"></script>
-        <script src="scripts/wb/widgets/h4.js"></script>
-        <script src="scripts/wb/widgets/h5.js"></script>
-        <script src="scripts/wb/widgets/h6.js"></script>
+        <script src="scripts/wb/widgets/h.js"></script>
         <script src="scripts/wb/widgets/header.js"></script>
         <script src="scripts/wb/widgets/hr.js"></script>
         <script src="scripts/wb/widgets/iframe.js"></script>

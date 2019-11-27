@@ -29,111 +29,151 @@ angular.module('am-wb-core')
  * Load widgets
  */
 .run(function ($settings) {
-    /************************************************************************
-     * Model and Widgets
-     ************************************************************************/
-    $settings.addPage({
-        type: 'general',
-        label: 'Model',
-        icon: 'opacity',
-        templateUrl: 'views/settings/wb-widget-general.html',
-        controllerAs: 'ctrl',
-        controller: 'WbSettingGeneralCtrl',
-    })
-    .addPage({
-        type: 'a',
-        label: 'Link',
-        description: 'Manage link in the current widget.',
-        icon: 'settings',
-        templateUrl: 'views/settings/wb-widget-a.html',
-        controllerAs: 'ctrl',
-        controller: 'WbSettingACtrl',
-        targets: ['a']
-    })
-    .addPage({
-        type: 'img',
-        label: 'Image',
-        description: 'Manage image widget settings.',
-        icon: 'settings',
-        templateUrl: 'views/settings/wb-widget-img.html',
-        controllerAs: 'ctrl',
-        controller: 'WbSettingWidgetImgCtrl',
-        targets: ['img']
-    })
-    .addPage({
-        type: 'microdata',
-        label: 'Microdata',
-        templateUrl: 'views/settings/wb-widget-microdata.html',
-        controllerAs: 'ctrl',
-        controller: 'WbSettingWidgetMicrodataCtrl'
-    });
-        
-    
-    /************************************************************************
-     * Style
-     ************************************************************************/
-    $settings.addPage({
-        type: 'style.animation',
-        label: 'Animation',
-        icon: 'opacity',
-        templateUrl: 'views/settings/wb-style-animation.html',
-        controllerAs: 'ctrl',
-        controller: 'WbSettingStyleAnimationCtrl',
-    })
-    .addPage({
-        type: 'style.background',
-        label: 'Background',
-        icon: 'opacity',
-        templateUrl: 'views/settings/wb-style-background.html',
-        controllerAs: 'ctrl',
-        controller: 'WbSettingStyleBackgroundCtrl',
-    })
-    .addPage({
-        type: 'style.border',
-        label: 'Border',
-        icon: 'opacity',
-        templateUrl: 'views/settings/wb-style-border.html',
-        controllerAs: 'ctrl',
-        controller: 'WbSettingStyleBorderCtrl',
-    })
-    .addPage({
-        type: 'style.general',
-        label: 'General',
-        icon: 'opacity',
-        templateUrl: 'views/settings/wb-style-general.html',
-        controllerAs: 'ctrl',
-        controller: 'WbSettingStyleGeneralCtrl',
-    })
-    .addPage({
-        type: 'style.layout',
-        label: 'Layout',
-        icon: 'opacity',
-        templateUrl: 'views/settings/wb-style-layout.html',
-        controllerAs: 'ctrl',
-        controller: 'WbSettingStyleLayoutCtrl',
-    })
-    .addPage({
-        type: 'style.media',
-        label: 'Medai',
-        icon: 'opacity',
-        templateUrl: 'views/settings/wb-style-media.html',
-        controllerAs: 'ctrl',
-        controller: 'WbSettingStyleMediaCtrl',
-    })
-    .addPage({
-        type: 'style.size',
-        label: 'Size',
-        icon: 'opacity',
-        templateUrl: 'views/settings/wb-style-size.html',
-        controllerAs: 'ctrl',
-        controller: 'WbSettingStyleSizeCtrl',
-    })
-    .addPage({
-        type: 'style.text',
-        label: 'Text',
-        icon: 'opacity',
-        templateUrl: 'views/settings/wb-style-text.html',
-        controllerAs: 'ctrl',
-        controller: 'WbSettingStyleTextCtrl',
-    });
+	/************************************************************************
+	 * Model and Widgets
+	 ************************************************************************/
+	$settings.addPage({
+		type: 'general',
+		label: 'Model',
+		icon: 'opacity',
+		templateUrl: 'views/settings/wb-widget-general.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingGeneralCtrl',
+	})
+	.addPage({
+		type: 'a',
+		label: 'Link',
+		description: 'Manage link in the current widget.',
+		icon: 'settings',
+		templateUrl: 'views/settings/wb-widget-a.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingACtrl',
+		targets: ['a']
+	})
+	.addPage({
+		type: 'img',
+		label: 'Image',
+		description: 'Manage image widget settings.',
+		icon: 'settings',
+		templateUrl: 'views/settings/wb-widget-img.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetImgCtrl',
+		targets: ['img']
+	})
+	.addPage({
+		type: 'microdata',
+		label: 'Microdata',
+		templateUrl: 'views/settings/wb-widget-microdata.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetMicrodataCtrl'
+	})
+	.addPage({
+		type: 'iframe',
+		label: 'Frame',
+		templateUrl: 'views/settings/wb-widget-iframe.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetIFrameCtrl',
+		targets: ['iframe']
+	})
+	.addPage({
+		type: 'source',
+		label: 'Source',
+		templateUrl: 'views/settings/wb-widget-source.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetSourceCtrl',
+		targets: ['source']
+	})
+	.addPage({
+		type: 'picture',
+		label: 'Picture',
+		templateUrl: 'views/settings/wb-widget-picture.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetPictureCtrl',
+		targets: ['picture']
+	})
+	.addPage({
+		type: 'video',
+		label: 'Video',
+		templateUrl: 'views/settings/wb-widget-video.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetVideoCtrl',
+		targets: ['video']
+	})
+	.addPage({
+		type: 'audio',
+		label: 'Audio',
+		templateUrl: 'views/settings/wb-widget-audio.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetAudioCtrl',
+		targets: ['audio']
+	});
+
+
+	/************************************************************************
+	 * Style
+	 ************************************************************************/
+	$settings.addPage({
+		type: 'style.animation',
+		label: 'Animation',
+		icon: 'opacity',
+		templateUrl: 'views/settings/wb-style-animation.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingStyleAnimationCtrl',
+	})
+	.addPage({
+		type: 'style.background',
+		label: 'Background',
+		icon: 'opacity',
+		templateUrl: 'views/settings/wb-style-background.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingStyleBackgroundCtrl',
+	})
+	.addPage({
+		type: 'style.border',
+		label: 'Border',
+		icon: 'opacity',
+		templateUrl: 'views/settings/wb-style-border.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingStyleBorderCtrl',
+	})
+	.addPage({
+		type: 'style.general',
+		label: 'General',
+		icon: 'opacity',
+		templateUrl: 'views/settings/wb-style-general.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingStyleGeneralCtrl',
+	})
+	.addPage({
+		type: 'style.layout',
+		label: 'Layout',
+		icon: 'opacity',
+		templateUrl: 'views/settings/wb-style-layout.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingStyleLayoutCtrl',
+	})
+	.addPage({
+		type: 'style.media',
+		label: 'Medai',
+		icon: 'opacity',
+		templateUrl: 'views/settings/wb-style-media.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingStyleMediaCtrl',
+	})
+	.addPage({
+		type: 'style.size',
+		label: 'Size',
+		icon: 'opacity',
+		templateUrl: 'views/settings/wb-style-size.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingStyleSizeCtrl',
+	})
+	.addPage({
+		type: 'style.text',
+		label: 'Text',
+		icon: 'opacity',
+		templateUrl: 'views/settings/wb-style-text.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingStyleTextCtrl',
+	});
 });

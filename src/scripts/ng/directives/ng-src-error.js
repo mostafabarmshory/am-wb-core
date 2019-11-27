@@ -52,10 +52,10 @@ angular.module('am-wb-core')
     return {
         link : function (scope, element, attrs) {
             element.bind('error', function () {
-                if (attrs.src != attrs.ngSrcError) {
+                if (attrs.src !== attrs.ngSrcError) {
                     attrs.$set('src', attrs.ngSrcError);
                 }
             });
         }
-    }
+    };
 });

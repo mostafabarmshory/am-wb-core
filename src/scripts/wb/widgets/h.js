@@ -24,15 +24,15 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Widgets
- * @name h5
- * @description Manage a widget
+ * @name h 
+ * @description Manage header (h1..h6)
  */
-.factory('WbWidgetH5', function (WbWidgetAbstractHtml) {
+.factory('WbWidgetH', function (WbWidgetAbstractHtml) {
     'use strict';
     function Widget($element, $parent){
         WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    };
+        this.addElementAttributes('align');
+    }
     Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
     return Widget;
 });

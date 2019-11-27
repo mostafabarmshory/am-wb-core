@@ -1,17 +1,18 @@
 <field
 	layout="row"
 	layout-align="start center">
-	<field-description flex>
+	<field-description>
 		<label translate>{{::title}}</label>
 <!-- 		<wb-icon size="1em">info</wb-icon> -->
 	</field-description>
-	<div
-		class="text"
-		layout="row">
-		<input 
-			ng-model="value"
-			ng-change="setValue(value)"
-			aria-label="set {{::title}} true or false"
-			type="text">
-	</div>
+	<input 
+		ng-model="value"
+		ng-change="setValue(value)"
+		aria-label="set {{::title}} true or false"
+		type="text"
+		flex/>
+	<wb-icon 
+		ng-if="resourceType"
+		ng-click="openResource()"
+		size="1em">more_horiz</wb-icon>
 </field>

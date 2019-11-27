@@ -19,20 +19,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+'use strict';
 
 angular.module('am-wb-core')//
 
 /**
  * @ngdoc Widgets
- * @name h3
- * @description Manage a widget
+ * @name meta
+ * @description Manage a meta data 
+ * 
+ * In seo (or equivalient usecase) 
+ * 
  */
-.factory('WbWidgetH3', function (WbWidgetAbstractHtml) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    };
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
+.factory('WbWidgetUnvisible', function (WbWidgetAbstractHtml) {
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		var ctrl = this;
+		function updateView(){
+			var str = 'Unvisible Widget (' + ctrl.getType() + ')';
+			if(_.isFunction(ctrl.toString)){
+				str = ctrl.toString();
+			}
+			ctrl.getElement().html(str);
+		}
+		this.on('stateChanged', function(){
+			var element = ctrl.getElement();
+			if(ctrl.state === 'edit'){
+				element.show();
+				element.css({
+					minHeight: '60px',
+					minWidth: '60px',
+					padding: '16px'
+				});
+				return;
+			}
+			ctrl.getElement().hide();
+		});
+		updateView();
+	}
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	return Widget;
 });
+

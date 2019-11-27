@@ -55,7 +55,7 @@ describe('WbWidget converter WbConverterDom ', function () {
         expect(result[0].children[0].children[0].src).toBe('test/path.svg');
     });
 
-    it('should encode lit of html widgets', function (done) {
+    it('should encode list of html widgets', function (done) {
         // Create new instance
         var model = {
                 type: 'div',
@@ -79,5 +79,37 @@ describe('WbWidget converter WbConverterDom ', function () {
             done();
         });
         $rootScope.$apply();
+    });
+
+    it('should converte pre and its text', function () {
+        // Create new instance
+        var data = '<pre>hi</pre>';
+        var converter = new WbConverterDom();
+        var result = converter.decode(data);
+        expect(result.length).toBe(1);
+        expect(result[0].type).toBe('pre');
+        expect(result[0].text).toBe('hi');
+    });
+    it('should converte li and its text', function () {
+    	// Create new instance
+    	var data = '<li>hi</li>';
+    	var converter = new WbConverterDom();
+    	var result = converter.decode(data);
+    	expect(result.length).toBe(1);
+    	expect(result[0].type).toBe('li');
+    	expect(result[0].children.length).toBe(1);
+    	expect(result[0].children[0].type).toBe('p');
+    	expect(result[0].children[0].html).toBe('hi');
+    });
+    it('should converte li and its child', function () {
+    	// Create new instance
+    	var data = '<li><p>hi</p></li>';
+    	var converter = new WbConverterDom();
+    	var result = converter.decode(data);
+    	expect(result.length).toBe(1);
+    	expect(result[0].type).toBe('li');
+    	expect(result[0].children.length).toBe(1);
+    	expect(result[0].children[0].type).toBe('p');
+    	expect(result[0].children[0].html).toBe('hi');
     });
 });

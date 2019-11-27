@@ -19,20 +19,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+'use strict';
 
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Widgets
- * @name h2
- * @description Manage a widget
+ * @ngdoc Settings
+ * @name WbSettingWidgetIFrameCtrl
+ * @description Manage IFrame widget 
+ * 
  */
-.factory('WbWidgetH2', function (WbWidgetAbstractHtml) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes();
+.controller('WbSettingWidgetIFrameCtrl', function () {
+
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackAttributes(['name', 'src', 'srcdoc', 'sandbox']);
     };
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
 });

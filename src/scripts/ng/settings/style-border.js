@@ -30,5 +30,61 @@ angular.module('am-wb-core')//
  * 
  */
 .controller('WbSettingStyleBorderCtrl', function () {
-	
+
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            'border',
+            'borderWidth',
+            'borderStyle',
+            'borderColor',
+            'borderCollapse',
+            'borderSpacing',
+
+            'borderTop',
+            'borderTopWidth',
+            'borderTopStyle',
+            'borderTopColor',
+
+            'borderRight',
+            'borderRightWidth',
+            'borderRightStyle',
+            'borderRightColor',
+
+            'borderBttom',
+            'borderBttomWidth',
+            'borderBttomStyle',
+            'borderBttomColor',
+
+            'borderLeft',
+            'borderLeftWidth',
+            'borderLeftStyle',
+            'borderLeftColor',
+
+            'borderRadius',
+            'borderTopRightRadius',
+            'borderTopLeftRadius',
+            'borderBottomLeftRadius',
+            'borderBottomRightRadius',
+
+            'borderImage',
+            'borderImageSource',
+            'borderImageSlice',
+            'borderImageWidth',
+            'borderImageOutset',
+            'borderImageRepeat',
+
+            'outline',
+            'outlineOffset',
+            'outlineWidth',
+            'outlineStyle',
+            'outlineColor',
+
+            'boxDecorationBreak',
+            'boxShadow',
+            'boxSizing'
+            ]);
+    };
 });

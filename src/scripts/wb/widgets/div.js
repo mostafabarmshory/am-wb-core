@@ -32,7 +32,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetGroup.apply(this, [$element, $parent]);
         this.addElementAttributes();
-    };
+    }
     Widget.prototype = Object.create(WbWidgetGroup.prototype);
     return Widget;
 });

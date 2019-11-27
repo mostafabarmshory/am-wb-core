@@ -35,84 +35,84 @@ angular.module('am-wb-core')
  */
 .directive('wbSettingPanelGroup', function($settings, $widget) {
 
-	/**
-	 * Init settings
-	 */
-	function postLink($scope, $element, $attrs, $ctrls) {
+    /**
+     * Init settings
+     */
+    function postLink($scope, $element, $attrs, $ctrls) {
 
-		// Load ngModel
-		var ngModelCtrl = $ctrls[0];
-		var settingMap = [];
-		$scope.settings = [];
+        // Load ngModel
+        var ngModelCtrl = $ctrls[0];
+        var settingMap = [];
+        $scope.settings = [];
 
-		/**
-		 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-		 * 
-		 * @returns
-		 */
-		function loadSetting(wbWidget) {
+        /**
+         * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+         * 
+         * @returns
+         */
+        function loadSetting(wbWidget) {
 
-			// hide all settings
-			var i;
-			for(i = 0; i < $scope.settings.length; i++){
-				$scope.settings[i].visible = false;
-			}
-			
-			if(!wbWidget || (angular.isArray(wbWidget) && wbWidget.length < 1)){
-			    $scope.wbModel = null;
-			    return;
-			}
+            // hide all settings
+            var i;
+            for(i = 0; i < $scope.settings.length; i++){
+                $scope.settings[i].visible = false;
+            }
 
-			// load pages
-			var widget = $widget.getWidget(wbWidget.getModel());
-			var settingKeys = $settings.getSettingsFor(widget);
+            if(!wbWidget || (angular.isArray(wbWidget) && wbWidget.length < 1)){
+                $scope.wbModel = null;
+                return;
+            }
 
-			// visible new ones
-			for(i = 0; i < settingKeys.length; i++){
-				var key = settingKeys[i].type;
-				if(!settingMap[key]){
-					var setting = settingKeys[i];
-					settingMap[key] = angular.copy(setting);
-					$scope.settings.push(settingMap[key]);
-				}
-				settingMap[key].visible = true;
-			}
-			
-			// set model in view
-			$scope.wbModel = wbWidget;
-		}
+            // load pages
+            var widget = $widget.getWidget(wbWidget.getModel());
+            var settingKeys = $settings.getSettingsFor(widget);
 
-		ngModelCtrl.$render = function() {
-			if(ngModelCtrl.$viewValue) {
-				var model = ngModelCtrl.$viewValue;
-				if(angular.isArray(model) && model.length){
-					loadSetting(model[0]);
-				} else {
-					loadSetting(model);
-				}
-			}
-		};
-		
-		
-		$element.on('keypress keyup keydown paste copy', function(event){
-			event.stopPropagation();
-		});
-	}
-	
-	return {
-		restrict : 'E',
-		replace: true,
-		templateUrl: function($element, $attr){
-			var link = 'views/directives/wb-setting-panel-';
-			if(angular.isDefined($attr.wbTabMode)){
-				link += 'tabs.html';
-			} else {
-				link += 'expansion.html';
-			}
-			return link;
-		},
-		scope : {},
-		link : postLink,
-		require:['ngModel']
-	};
+            // visible new ones
+            for(i = 0; i < settingKeys.length; i++){
+                var key = settingKeys[i].type;
+                if(!settingMap[key]){
+                    var setting = settingKeys[i];
+                    settingMap[key] = angular.copy(setting);
+                    $scope.settings.push(settingMap[key]);
+                }
+                settingMap[key].visible = true;
+            }
+
+            // set model in view
+            $scope.wbModel = wbWidget;
+        }
+
+        ngModelCtrl.$render = function() {
+            if(ngModelCtrl.$viewValue) {
+                var model = ngModelCtrl.$viewValue;
+                if(angular.isArray(model) && model.length){
+                    loadSetting(model[0]);
+                } else {
+                    loadSetting(model);
+                }
+            }
+        };
+
+
+        $element.on('keypress keyup keydown paste copy', function(event){
+            event.stopPropagation();
+        });
+    }
+
+    return {
+        restrict : 'E',
+        replace: true,
+        templateUrl: function($element, $attr){
+            var link = 'views/directives/wb-setting-panel-';
+            if(angular.isDefined($attr.wbTabMode)){
+                link += 'tabs.html';
+            } else {
+                link += 'expansion.html';
+            }
+            return link;
+        },
+        scope : {},
+        link : postLink,
+        require:['ngModel']
+    };
 });

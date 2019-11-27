@@ -36,7 +36,7 @@ angular.module('am-wb-core')//
     function Widget($element, $parent){
         WbWidgetAbstractHtml.apply(this, [$element, $parent]);
         this.addElementAttributes('name', 'src', 'srcdoc', 'sandbox');
-    };
+    }
     // extend functionality
     Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
     return Widget;

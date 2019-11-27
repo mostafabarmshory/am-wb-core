@@ -1,0 +1,27 @@
+{
+	"type": "div",
+	"style": {
+		"padding": "16px",
+		"margin": "0px",
+		"background": "pink",
+		"display": "flex",
+		"flexGrow": 1,
+		"flexShrink": 2,
+		"flexBasis": "0px",
+		"flexDirection": "row",
+		"overflowY": "auto",
+		"maxWidth": "100vw"
+	},
+	"children": [{
+		"type": "iframe",
+		"src": "https://www.farsnews.ir",
+		"style": {
+			"padding": "16px",
+			"margin": "16px",
+			"background": "red",
+			"flexGrow": 1,
+			"flexShrink": 1,
+			"flexBasis": "0px"
+		}
+	}]
+}

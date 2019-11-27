@@ -34,4 +34,20 @@ angular.module('am-wb-core')//
  * 
  */
 .controller('WbSettingStyleGeneralCtrl', function () {
+
+    /*
+     * Initial the setting editor
+     */
+    this.init = function () {
+        this.trackStyles([
+            'opacity',
+            'visibility',
+            'color',
+            'mixBlendMode',
+            'isolation',
+
+            'cursor',
+            'pointerEvents',
+            ]);
+    };
 });

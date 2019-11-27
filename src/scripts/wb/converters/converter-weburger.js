@@ -30,12 +30,12 @@ angular.module('am-wb-core')//
  * A converter are responsible to encode and decode a widget.
  * 
  */
-.factory('WbConverterWeburger', function (WbConverterAbstract, $widget) {
+.factory('WbConverterWeburger', function (WbConverterAbstract) {
     'use strict';
 
     function Converter(){
         WbConverterAbstract.apply(this, ['application/json']);
-    };
+    }
     Converter.prototype = new WbConverterAbstract();
 
     Converter.prototype.encode = function(){

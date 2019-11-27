@@ -50,12 +50,13 @@ angular.module('am-wb-core')//
                 var params = _.join(_.concat(
                         ['$widget', '$event'], // dynamic data
                         $widget.getProvidersKey()));
+                /*jslint evil: true */
                 widget.eventFunctions[type] = new Function(params, ucode);// code
             }catch(ex){
-                console.error({
-                    message: 'Fail to load user function',
-                    original: ex
-                });
+//                console.error({
+//                    message: 'Fail to load user function',
+//                    original: ex
+//                });
             }
         }
         eventFunction = widget.eventFunctions[type];
@@ -67,15 +68,15 @@ angular.module('am-wb-core')//
                 }, $widget.getProviders());
                 return $injector.invoke(eventFunction, widget, locals);
             } catch(ex){
-                console.error({
-                    original: ex,
-                    message: 'faile to run the event code of the widget',
-                    type: type,
-                    event: event
-                });
+//                console.error({
+//                    original: ex,
+//                    message: 'faile to run the event code of the widget',
+//                    type: type,
+//                    event: event
+//                });
             }
         }
-    };
+    }
 
     function loadWidgetEventsHandlers(widget){
         widget.__eventListeners = {
@@ -156,7 +157,7 @@ angular.module('am-wb-core')//
 
     function Processor(){
         WbProcessorAbstract.apply(this);
-    };
+    }
 
     // extend functionality
     Processor.prototype = new WbProcessorAbstract();

@@ -53,7 +53,7 @@ angular.module('am-wb-core')//
         var ctrl = this;
         function eventHandler(event){
             if(event.key === 'inputType'){
-                ctrl.setElementAttribute('type', value);
+                ctrl.setElementAttribute('type', event.value);
             }
         }
         // listen on change

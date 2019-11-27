@@ -124,6 +124,69 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
     };
     
     this.init();
+})
+
+
+/***********************************************************************
+ * Editors
+ ***********************************************************************/
+.run(function ($widget) {
+
+	/***************************************
+	 * Section editor
+	 * 
+	 *  A section is combination of blocks
+	 * widgets such as h, p, and pre. This 
+	 * is an editor to edit the section.
+	 ***************************************/
+	$widget.setEditor('section', {
+		type: 'WidgetEditorTinymceSection',
+		options:{
+			inline: true,
+			menubar: false,
+			plugins: ['link', 'lists', 'powerpaste', 'autolink'],
+			// Toolbar
+			toolbar: ['close save | undo redo | bold italic underline | fontselect fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+			fixed_toolbar_container: '#demo-widget-editor-toolbar',
+			toolbar_drawer: 'floating'
+		}
+	});
+
+	/***************************************
+	 * Single line editor
+	 * 
+	 *  Single line editor is used for nay widget
+	 * with html property.
+	 ***************************************/
+	var lineWidgetsTypes = [
+		'h1','h2','h3','h4','h5','h6', 
+		'li',
+		'button',
+		'a',
+		'p',
+	];
+	_.forEach(lineWidgetsTypes, function(type){
+		$widget.setEditor(type, {
+			type: 'WidgetEditorTinymceSingleLine',
+			options:{
+				property: 'html',
+				inline: true,
+				menubar: false,
+				plugins: ['autolink'],
+				valid_elements: 'strong,em,span[style],a[href]',
+				// Toolbar
+				toolbar: 'close save | undo redo | bold italic underline | widgetalignleft widgetaligncenter widgetalignjustify widgetalignright ',
+				fixed_toolbar_container: '#demo-widget-editor-toolbar'
+			}
+		});
+	});
+
+	/************************************
+	 * Code editor
+	 * 
+	 ************************************/
+	$widget.setEditor('pre', {
+		type: 'WidgetEditorCode',
+		options: {}
+	});
 });
-
-
