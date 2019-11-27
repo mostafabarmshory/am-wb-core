@@ -55,7 +55,7 @@ angular.module('am-wb-core')//
         var ctrl = this;
         $resource.get('code', {
             data: {
-                code: ctrl.widget.html(),
+                code: ctrl.widget.text(),
                 languages: [{
                     text: 'HTML/XML',
                     value: 'markup'
@@ -71,7 +71,7 @@ angular.module('am-wb-core')//
             }
         })
         .then(function(value){
-            ctrl.widget.html(value.code);
+            ctrl.widget.text(value.code);
         });
     };
     editor.prototype.isHidden = function(){};

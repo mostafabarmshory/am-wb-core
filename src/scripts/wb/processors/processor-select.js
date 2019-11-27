@@ -40,9 +40,9 @@ angular.module('am-wb-core')//
 
 		var ctrl = this;
 		this.clickListener = function($event){
+			ctrl.lock = true;
+			var widget = $event.source;
 			try{
-				ctrl.lock = true;
-				var widget = $event.source;
 				if(!widget.isSilent()){
 					if(!widget.isSelected()){
 						widget.setSelected(true);
@@ -61,6 +61,12 @@ angular.module('am-wb-core')//
 					$event.preventDefault();
 					$event.stopPropagation();
 				}
+			} catch(ex){
+				log.error({
+					source: 'WbProcessorSelect',
+					message: 'fail to selec a widget type:' + widget.getType(),
+					error: ex
+				});
 			} finally {
 				delete ctrl.lock;
 			}
@@ -91,8 +97,12 @@ angular.module('am-wb-core')//
 					$event.stopPropagation();
 					$rootScope.$digest();
 				}
-			} catch(ex) {
-				$widget.log(ex);
+			} catch(ex){
+				log.error({
+					source: 'WbProcessorSelect',
+					message: 'fail to open editor for a widget of type:' + widget.getType(),
+					error: ex
+				});
 			} finally {
 				delete ctrl.lock;
 			}

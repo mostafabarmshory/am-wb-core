@@ -244,20 +244,27 @@ angular.module('am-wb-core')//
             ctrl.stylesValue[styleKey] = widget.getModelProperty('style.'+styleKey);
         });
     };
-    /***************************************************************
+    /* **************************************************************
      * attribute utilities
-     ***************************************************************/
+     * **************************************************************/
     /**
      * Adds list of attributes to track
      * 
      * @memberof WbSettingPageCtrl
-     * @param attributes {[string]} to track
+     * @param {string[]} attributes to track
      */
     this.trackAttributes = function(attributes){
         this.attributes = attributes || [];
         this.loadAttributes();
     };
 
+    /**
+     * Adds key,value as attribute to the page
+     * 
+     * @memberof WbSettingPageCtrl
+     * @param {string} key to use
+     * @param {string} value to set for the key
+     */
     this.setAttribute = function (key, value) {
         if (!this.widget) {
             return;
@@ -266,20 +273,26 @@ angular.module('am-wb-core')//
         this.widget.setModelProperty(key, value);
     };
 
+    /**
+     * Gets attribute from the current widget
+     * 
+     * @memberof WbSettingPageCtrl
+     * @param {string} key to use
+     */
     this.getAttribute = function (key) {
         if (!this.widget) {
             return;
         }
         return this.widget.getModelProperty(key);
     };
-    /***************************************************************
+    /* **************************************************************
      * style utilities
-     ***************************************************************/
+     * **************************************************************/
     /**
      * Adds list of styles to track
      * 
      * @memberof WbSettingPageCtrl
-     * @param styles {[string]} to track
+     * @param {string[]} styles to track
      */
     this.trackStyles = function(styles){
         this.styles = styles || [];

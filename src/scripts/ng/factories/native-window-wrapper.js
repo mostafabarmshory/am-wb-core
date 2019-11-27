@@ -284,7 +284,7 @@ angular.module('am-wb-core')
 		return $q.resolve({
 			source: path
 		});
-	}
+	};
 
 	/**
 	 * Check if the library is loaded
@@ -353,7 +353,7 @@ angular.module('am-wb-core')
 		item.element.parentNode.removeChild(item.element);
 		this.styles[path] = undefined;
 		$q.resolve(item);
-	}
+	};
 
 	/**
 	 * Check if the style is loaded

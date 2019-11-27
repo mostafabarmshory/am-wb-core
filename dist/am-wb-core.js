@@ -9124,7 +9124,7 @@ angular.module('am-wb-core')
 		return $q.resolve({
 			source: path
 		});
-	}
+	};
 
 	/**
 	 * Check if the library is loaded
@@ -9193,7 +9193,7 @@ angular.module('am-wb-core')
 		item.element.parentNode.removeChild(item.element);
 		this.styles[path] = undefined;
 		$q.resolve(item);
-	}
+	};
 
 	/**
 	 * Check if the style is loaded
@@ -14076,20 +14076,27 @@ angular.module('am-wb-core')//
             ctrl.stylesValue[styleKey] = widget.getModelProperty('style.'+styleKey);
         });
     };
-    /***************************************************************
+    /* **************************************************************
      * attribute utilities
-     ***************************************************************/
+     * **************************************************************/
     /**
      * Adds list of attributes to track
      * 
      * @memberof WbSettingPageCtrl
-     * @param attributes {[string]} to track
+     * @param {string[]} attributes to track
      */
     this.trackAttributes = function(attributes){
         this.attributes = attributes || [];
         this.loadAttributes();
     };
 
+    /**
+     * Adds key,value as attribute to the page
+     * 
+     * @memberof WbSettingPageCtrl
+     * @param {string} key to use
+     * @param {string} value to set for the key
+     */
     this.setAttribute = function (key, value) {
         if (!this.widget) {
             return;
@@ -14098,20 +14105,26 @@ angular.module('am-wb-core')//
         this.widget.setModelProperty(key, value);
     };
 
+    /**
+     * Gets attribute from the current widget
+     * 
+     * @memberof WbSettingPageCtrl
+     * @param {string} key to use
+     */
     this.getAttribute = function (key) {
         if (!this.widget) {
             return;
         }
         return this.widget.getModelProperty(key);
     };
-    /***************************************************************
+    /* **************************************************************
      * style utilities
-     ***************************************************************/
+     * **************************************************************/
     /**
      * Adds list of styles to track
      * 
      * @memberof WbSettingPageCtrl
-     * @param styles {[string]} to track
+     * @param {string[]} styles to track
      */
     this.trackStyles = function(styles){
         this.styles = styles || [];
@@ -15549,7 +15562,7 @@ angular.module('am-wb-core')//
         var ctrl = this;
         $resource.get('code', {
             data: {
-                code: ctrl.widget.html(),
+                code: ctrl.widget.text(),
                 languages: [{
                     text: 'HTML/XML',
                     value: 'markup'
@@ -15565,7 +15578,7 @@ angular.module('am-wb-core')//
             }
         })
         .then(function(value){
-            ctrl.widget.html(value.code);
+            ctrl.widget.text(value.code);
         });
     };
     editor.prototype.isHidden = function(){};
@@ -18083,9 +18096,9 @@ angular.module('am-wb-core')//
 
 		var ctrl = this;
 		this.clickListener = function($event){
+			ctrl.lock = true;
+			var widget = $event.source;
 			try{
-				ctrl.lock = true;
-				var widget = $event.source;
 				if(!widget.isSilent()){
 					if(!widget.isSelected()){
 						widget.setSelected(true);
@@ -18104,6 +18117,12 @@ angular.module('am-wb-core')//
 					$event.preventDefault();
 					$event.stopPropagation();
 				}
+			} catch(ex){
+				log.error({
+					source: 'WbProcessorSelect',
+					message: 'fail to selec a widget type:' + widget.getType(),
+					error: ex
+				});
 			} finally {
 				delete ctrl.lock;
 			}
@@ -18134,8 +18153,12 @@ angular.module('am-wb-core')//
 					$event.stopPropagation();
 					$rootScope.$digest();
 				}
-			} catch(ex) {
-				$widget.log(ex);
+			} catch(ex){
+				log.error({
+					source: 'WbProcessorSelect',
+					message: 'fail to open editor for a widget of type:' + widget.getType(),
+					error: ex
+				});
 			} finally {
 				delete ctrl.lock;
 			}

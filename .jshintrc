@@ -29,6 +29,7 @@
 	"IntersectionObserver": false,
 	"moment": false,
 	"Flux": false,
-	"ace": false
+	"ace": false,
+	"log": false
   }
 }
