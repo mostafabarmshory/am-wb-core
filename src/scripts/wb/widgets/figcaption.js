@@ -27,12 +27,12 @@ angular.module('am-wb-core')//
  * @name figcaption
  * @description Manage a widget
  */
-.factory('WbWidgetFigcaption', function (WbWidgetAbstract) {
+.factory('WbWidgetFigcaption', function (WbWidgetAbstractHtml) {
     'use strict';
     function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
+    	WbWidgetAbstractHtml.apply(this, [$element, $parent]);
         this.addElementAttributes();
     }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
     return Widget;
 });

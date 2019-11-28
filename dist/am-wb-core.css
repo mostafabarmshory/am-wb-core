@@ -1109,6 +1109,7 @@ field {
 field-description {
 /* 	min-width: 100px; */
 /* 	width: auto; */
+	overflow: hidden;
 	width: 5em;
 }
 

@@ -455,7 +455,11 @@ angular.module('am-wb-core')
 		help: 'http://dpq.co.ir/more-information-img',
 		model: {
 			html: 'img',
-			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+			src: 'resources/wb-brand-3.0.png',
+			style: {
+				width: '80%',
+				maxWidth: '500px'
+			}
 		},
 		controllerAs: 'ctrl',
 		controller: 'WbWidgetImg',
