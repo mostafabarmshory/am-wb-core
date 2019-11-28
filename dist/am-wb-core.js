@@ -6399,79 +6399,77 @@ angular.module('am-wb-core')
  */
 .directive('wbSettingPage', function ($widget, $settings, $wbUtil, $controller, $compile, $mdTheming) {
 
-    function postLink($scope, $element, $attrs, $ctrls) {
-        var wbWidget = null;
-        var settingCtrl = null;
+	function postLink($scope, $element, $attrs, $ctrls) {
+		var widgets = [];
+		var settingCtrl = null;
 
-        function loadSetting(page) {
-            return $wbUtil.getTemplateFor(page)
-            .then(function (templateSrc) {
-                var element = angular.element(templateSrc);
-                var scope = $scope.$new();
-                var controller = $controller('WbSettingPageCtrl',{
-                    $scope: scope,
-                    $element: element
-                });
-                if (angular.isDefined(page.controller)) {
-                    controller = angular.extend(controller, $controller(page.controller, {
-                        $scope: scope,
-                        $element: element
-                    }));
-                    if (page.controllerAs) {
-                        scope[page.controllerAs] = controller;
-                    }
-                    element.data('$ngControllerController', controller);
-                }
-                $compile(element)(scope);
-                $mdTheming(element);
-                $element.empty();
-                $element.append(element);
-                try{
-                    if(_.isFunction(controller.init)){
-                        controller.init();
-                    }
-                } catch(ex){
-                    // TODO:
-                }
-                return controller;
-            });
-        }
+		function loadSetting(page) {
+			return $wbUtil.getTemplateFor(page)
+			.then(function (templateSrc) {
+				var element = angular.element(templateSrc);
+				var scope = $scope.$new();
+				var controller = $controller('WbSettingPageCtrl',{
+					$scope: scope,
+					$element: element
+				});
+				if (angular.isDefined(page.controller)) {
+					controller = angular.extend(controller, $controller(page.controller, {
+						$scope: scope,
+						$element: element
+					}));
+					if (page.controllerAs) {
+						scope[page.controllerAs] = controller;
+					}
+					element.data('$ngControllerController', controller);
+				}
+				$compile(element)(scope);
+				$mdTheming(element);
+				$element.empty();
+				$element.append(element);
+				try{
+					if(_.isFunction(controller.init)){
+						controller.init();
+					}
+				} catch(ex){
+					// TODO:
+				}
+				return controller;
+			});
+		}
 
-        $scope.$watch('type', function (type) {
-            if (!type) {
-                return;
-            }
-            var setting = $settings.getPage(type);
-            loadSetting(setting)//
-            .then(function(ctrl){
-                settingCtrl = ctrl;
-                if(wbWidget) {
-                    settingCtrl.setWidget(wbWidget);
-                }
-            });
-        });
+		$scope.$watch('type', function (type) {
+			if (!type) {
+				return;
+			}
+			var setting = $settings.getPage(type);
+			loadSetting(setting)//
+			.then(function(ctrl){
+				settingCtrl = ctrl;
+				ctrl.setWidget(widgets);
+			});
+		});
 
-        // Load ngModel
-        var ngModelCtrl = $ctrls[0];
-        ngModelCtrl.$render = function () {
-            wbWidget = ngModelCtrl.$viewValue;
-            if(settingCtrl) {
-                settingCtrl.setWidget(wbWidget);
-            }
-        };
-    }
+		// Load ngModel
+		var ngModelCtrl = $ctrls[0];
+		ngModelCtrl.$render = function () {
+			widgets = ngModelCtrl.$viewValue;
+			if(settingCtrl) {
+				settingCtrl.setWidget(widgets);
+			}
+		};
+	}
 
-    // create directive
-    return {
-        restrict: 'E',
-        replace: true,
-        template: '<div layout="column"></div>',
-        link: postLink,
-        scope: {
-            type: '@wbType'
-        },
-        require: ['ngModel']
-    };
+	// create directive
+	return {
+		restrict: 'E',
+		replace: true,
+		template: '<div layout="column"></div>',
+		link: postLink,
+		scope: {
+			type: '@wbType'
+		},
+		require: ['ngModel']
+	};
 });
 
 /* 
@@ -6511,86 +6509,90 @@ angular.module('am-wb-core')
  */
 .directive('wbSettingPanelGroup', function($settings, $widget) {
 
-    /**
-     * Init settings
-     */
-    function postLink($scope, $element, $attrs, $ctrls) {
+	/**
+	 * Init settings
+	 */
+	function postLink($scope, $element, $attrs, $ctrls) {
 
-        // Load ngModel
-        var ngModelCtrl = $ctrls[0];
-        var settingMap = [];
-        $scope.settings = [];
+		// Load ngModel
+		var ngModelCtrl = $ctrls[0];
+		var settingMap = [];
+		$scope.settings = [];
 
-        /**
-         * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-         * 
-         * @returns
-         */
-        function loadSetting(wbWidget) {
+		/**
+		 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+		 * 
+		 * @returns
+		 */
+		function loadSetting(widgets) {
 
-            // hide all settings
-            var i;
-            for(i = 0; i < $scope.settings.length; i++){
-                $scope.settings[i].visible = false;
-            }
+			// hide all settings
+			var i;
+			for(i = 0; i < $scope.settings.length; i++){
+				$scope.settings[i].visible = false;
+			}
 
-            if(!wbWidget || (angular.isArray(wbWidget) && wbWidget.length < 1)){
-                $scope.wbModel = null;
-                return;
-            }
+			if(_.isEmpty(widgets)){
+				$scope.wbModel = null;
+				return;
+			}
 
-            // load pages
-            var widget = $widget.getWidget(wbWidget.getModel());
-            var settingKeys = $settings.getSettingsFor(widget);
+			// load pages
+			var settingKeys = [];
+			_.forEach(widgets, function(widget){
+				var widgetDef = $widget.getWidget(widget.getModel());
+				var settingKeysOfWidget = $settings.getSettingsFor(widgetDef);
+				if(_.isEmpty(settingKeys)){
+					settingKeys = settingKeysOfWidget;
+				} else {
+					settingKeys = _.intersection(settingKeys, settingKeysOfWidget);
+				}
+			});
 
-            // visible new ones
-            for(i = 0; i < settingKeys.length; i++){
-                var key = settingKeys[i].type;
-                if(!settingMap[key]){
-                    var setting = settingKeys[i];
-                    settingMap[key] = angular.copy(setting);
-                    $scope.settings.push(settingMap[key]);
-                }
-                settingMap[key].visible = true;
-            }
+			// visible new ones
+			for(i = 0; i < settingKeys.length; i++){
+				var key = settingKeys[i].type;
+				if(!settingMap[key]){
+					var setting = settingKeys[i];
+					settingMap[key] = angular.copy(setting);
+					$scope.settings.push(settingMap[key]);
+				}
+				settingMap[key].visible = true;
+			}
 
-            // set model in view
-            $scope.wbModel = wbWidget;
-        }
+			// set model in view
+			$scope.wbModel = widgets;
+		}
 
-        ngModelCtrl.$render = function() {
-            if(ngModelCtrl.$viewValue) {
-                var model = ngModelCtrl.$viewValue;
-                if(angular.isArray(model) && model.length){
-                    loadSetting(model[0]);
-                } else {
-                    loadSetting(model);
-                }
-            }
-        };
+		ngModelCtrl.$render = function() {
+			if(ngModelCtrl.$viewValue) {
+				var widgets = ngModelCtrl.$viewValue;
+				loadSetting(widgets);
+			}
+		};
 
 
-        $element.on('keypress keyup keydown paste copy', function(event){
-            event.stopPropagation();
-        });
-    }
+		$element.on('keypress keyup keydown paste copy', function(event){
+			event.stopPropagation();
+		});
+	}
 
-    return {
-        restrict : 'E',
-        replace: true,
-        templateUrl: function($element, $attr){
-            var link = 'views/directives/wb-setting-panel-';
-            if(angular.isDefined($attr.wbTabMode)){
-                link += 'tabs.html';
-            } else {
-                link += 'expansion.html';
-            }
-            return link;
-        },
-        scope : {},
-        link : postLink,
-        require:['ngModel']
-    };
+	return {
+		restrict : 'E',
+		replace: true,
+		templateUrl: function($element, $attr){
+			var link = 'views/directives/wb-setting-panel-';
+			if(angular.isDefined($attr.wbTabMode)){
+				link += 'tabs.html';
+			} else {
+				link += 'expansion.html';
+			}
+			return link;
+		},
+		scope : {},
+		link : postLink,
+		require:['ngModel']
+	};
 });
 
 /* 
@@ -11111,8 +11113,9 @@ angular.module('am-wb-core')
 	$widget//
 	.setProvider('$http', $http)
 	.setProvider('$window', $wbWindow)
-	.setProvider('$dispatcher', $dispatcher)
+	.setProvider('$location', $wbWindow)
 	.setProvider('$routeParams', $routeParams)
+	.setProvider('$dispatcher', $dispatcher)
 	.setProvider('$storage', $storage)
 	.setProvider('$timeout', $WbProviderTimeout)
 	.setProvider('$local', $wbLocal)
@@ -13846,285 +13849,264 @@ angular.module('am-wb-core')//
  * utilities.
  * 
  */
-.controller('WbSettingPageCtrl', function () {
-    /*
-     * Attributes
-     */
-    this.widget = null;
-    this.attributes = [];
-    this.attributesValue = {};
-    this.styles = [];
-    this.stylesValue = {};
-    this.callbacks = {
-            widgetChanged: []
-    };
+.controller('WbSettingPageCtrl', function (WbObservableObject) {
+	// extend from observable object
+	angular.extend(this, WbObservableObject.prototype);
+	WbObservableObject.apply(this);
+	/*
+	 * Attributes
+	 */
+	this.widgets = [];
+	this.attributes = [];
+	this.attributesValue = {};
+	this.styles = [];
+	this.stylesValue = {};
+	this.callbacks = {
+			widgetChanged: []
+	};
 
-    /********************************************************
-     * Widget management
-     ********************************************************/
-    /**
-     * Sets new widget into the setting page
-     * 
-     * Note: the old widget will be removed from the view and the
-     * new one is connect.
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param widget {Widget} to track
-     */
-    this.setWidget = function (widget) {
-        var oldWidget = this.widget;
-        this.disconnect();
-        this.widget = widget;
-        this.connect();
-        // load values
-        this.loadAttributes();
-        this.loadStyles();
-        // propagate the change
-        this.fire('widgetChanged', {
-            value: widget,
-            oldValue: oldWidget
-        });
-    };
+	/********************************************************
+	 * Widget management
+	 ********************************************************/
+	/**
+	 * Sets new widgets list into the setting page
+	 * 
+	 * Note: the old widgets will be removed from the view and the
+	 * new one is connect.
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param widget {Widget} to track
+	 */
+	this.setWidget = function (widgets) {
+		widgets =  widgets || [];
+		if(!_.isArray(widgets)){
+			widgets = [widgets];
+		}
+		var oldWidgets = this.widgets;
+		this.disconnect();
+		this.widgets = widgets;
+		this.connect();
+		// load values
+		this.loadAttributes();
+		this.loadStyles();
+		// propagate the change
+		this.fire('widgetChanged', {
+			value: widgets,
+			oldValue: oldWidgets
+		});
+	};
 
-    /**
-     * Gets the current widget 
-     * 
-     * @memberof WbSettingPageCtrl
-     * @return the current widget
-     */
-    this.getWidget = function () {
-        return this.widget;
-    };
+	/**
+	 * Gets the current widgets list 
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @return the current widget
+	 */
+	this.getWidgets = function () {
+		return this.widgets;
+	};
 
-    /**
-     * Checks if the current widget is the root
-     * 
-     * @memberof WbSettingPageCtrl
-     * @return true if the widget is root
-     */
-    this.isRootWidget = function () {
-        var widget = this.getWidget();
-        if (!widget) {
-            return false;
-        }
-        return widget.isRoot();
-    };
+	/**
+	 * Checks if the current widget can contain others
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @return true if the widget is a container
+	 */
+	this.isContainerWidget = function(){
+		var widgets = this.getWidgets();
+		if(widgets.length === 0 || widgets.length > 1){
+			return false;
+		}
+		var widget = widgets[0];
+		return !widget.isLeaf();
+	};
 
-    /**
-     * Checks if the current widget can contain others
-     * 
-     * @memberof WbSettingPageCtrl
-     * @return true if the widget is a container
-     */
-    this.isContainerWidget = function(){
-        var widget = this.getWidget();
-        if (!widget) {
-            return false;
-        }
-        return !widget.isLeaf();
-    };
+	/**
+	 * Removes listeners to the widget
+	 * 
+	 * The controller track the widget changes by adding listener into it. This
+	 * function removes all listener.
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 */
+	this.disconnect = function(){
+		var widgets = this.getWidgets();
+		if(_.isEmpty(widgets) || !_.isFunction(this.widgetListener)){
+			return;
+		}
+		var ctrl = this;
+		_.forEach(widgets, function(widget){
+			widget.off('modelUpdated', ctrl.widgetListener);
+		});
+	};
 
-    /**
-     * Removes listeners to the widget
-     * 
-     * The controller track the widget changes by adding listener into it. This
-     * function removes all listener.
-     * 
-     * @memberof WbSettingPageCtrl
-     */
-    this.disconnect = function(){
-        var widget = this.getWidget();
-        if(_.isEmpty(widget) || !_.isFunction(this.widgetListener)){
-            return;
-        }
-        widget.off('modelUpdated', this.widgetListener);
-    };
+	/**
+	 * Adds listeners to the widget
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 */
+	this.connect= function(){
+		var widgets = this.getWidgets();
+		if(_.isEmpty(widgets)){
+			return;
+		}
+		if(_.isEmpty(this.widgetListeners)){
+			var ctrl = this;
+			this.widgetListener = function($event) {
+				if(ctrl.isSilent()){
+					return;
+				}
+				if($event.type === 'modelUpdated'){
+					ctrl.updateValues($event.key);
+				}
+			};
+		}
+		// Adding listeners
+		_.forEach(widgets, function(widget){
+			widget.on('modelUpdated', ctrl.widgetListener);
+		});
+	};
 
-    /**
-     * Adds listeners to the widget
-     * 
-     * @memberof WbSettingPageCtrl
-     */
-    this.connect= function(){
-        var widget = this.getWidget();
-        if(_.isEmpty(widget)){
-            return;
-        }
-        if(_.isEmpty(this.widgetListener)){
-            var ctrl = this;
-            this.widgetListener = function($event) {
-                var widget = ctrl.widget;
-                if($event.type === 'modelUpdated'){
-                    var key = $event.key;
-                    // load property
-                    if(_.includes(ctrl.attributes, key)){
-                        ctrl.attributesValue[key] = widget.getModelProperty(key);
-                        return;
-                    }
-                    
-                    // load style
-                    if(key.startsWith('style.')){
-                        var styleKey =  key.substring(6);
-                        if(_.includes(ctrl.styles, styleKey)){
-                            ctrl.stylesValue[styleKey] = widget.getModelProperty(key);
-                        }
-                        return;
-                    }
-                }
-            };
-        }
-        widget.on('modelUpdated', this.widgetListener);
-    };
 
-    /*
-     * INTERNAL
-     */
-    this.fire = function (key, event){
-        _.forEach(this.callbacks[key], function(callback){
-            try{
-                callback.apply(callback, [event]);
-            } catch(ex){
-//                console.error(ex);
-            }
-        });
-    };
+	this.updateValues = function(keys){
+		if(_.isUndefined(keys)){
+			return;
+		}
+		if(!_.isArray(keys)){
+			keys = [keys];
+		}
+		var widgets = this.widgets;
+		var firstFit = widgets.length > 1;
+		var ctrl = this;
+		var attrs = this.attributesValue;
+		var styles = this.stylesValue;
+		_.forEach(keys, function(key){
+			_.forEach(widgets, function(widget){
+				// load attribute
+				if(_.includes(ctrl.attributes, key)){
+					if(!firstFit || _.isUndefined(attrs[key])){
+						attrs[key] = widget.getModelProperty(key);
+					}
+					return;
+				}
+				// load style
+				if(!key.startsWith('style.')){
+					return;
+				}
+				var stylekey =  key.substring(6);
+				if(_.includes(ctrl.styles, stylekey)){
+					if(!firstFit || _.isUndefined(styles[key])){
+						styles[stylekey] = widget.getModelProperty(key);
+					}
+				}
+			});
+		});
+	};
 
-    /**
-     * Adds listeners to the widget
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param key {string} of the event
-     * @param callback {Function} to call on event
-     */
-    this.on = function(key, callback){
-        this.callbacks[key].push(callback);
-    };
+	/***************************************************************
+	 * Track widget changes
+	 ***************************************************************/
 
-    /**
-     * Adds listeners to the widget
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param key {string} of the event
-     * @param callback {Function} to call on event
-     */
-    this.off = function(key, callback) {
-        _.remove(this.callbacks[key], function(cl){
-            return cl === callback;
-        });
-    };
+	/*
+	 * INTERNAL
+	 */
+	this.loadAttributes= function(){
+		// 0- clean
+		this.attributesValue = {};
+		this.updateValues(this.attributes);
+	};
 
-    /***************************************************************
-     * Track widget changes
-     ***************************************************************/
+	/*
+	 * INTERNAL
+	 */
+	this.loadStyles= function(){
+		// 0- clean
+		this.stylesValue = {};
+		this.updateValues(_.map(this.styles, function(styleKey){
+			return 'style.'+styleKey;
+		}));
+	};
 
-    /*
-     * INTERNAL
-     */
-    this.loadAttributes= function(){
-        // 0- clean
-        this.attributesValue = {};
+	this.setSilent = function(silent){
+		this._silent = silent;
+	};
 
-        // 1- check
-        var widget = this.getWidget();
-        if(_.isEmpty(widget)){
-            return;
-        }
+	this.isSilent = function(){
+		return this._silent;
+	};
 
-        // 2- load
-        var ctrl = this;
-        _.forEach(this.attributes, function(attrKey){
-            ctrl.attributesValue[attrKey] = widget.getModelProperty(attrKey);
-        });
-    };
+	/* **************************************************************
+	 * attribute utilities
+	 * **************************************************************/
+	/**
+	 * Adds list of attributes to track
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param {string[]} attributes to track
+	 */
+	this.trackAttributes = function(attributes){
+		this.attributes = attributes || [];
+		this.loadAttributes();
+	};
 
-    /*
-     * INTERNAL
-     */
-    this.loadStyles= function(){
-        // 0- clean
-        this.stylesValue = {};
+	/**
+	 * Adds key,value as attribute to the page
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param {string} key to use
+	 * @param {string} value to set for the key
+	 */
+	this.setAttribute = function (key, value) {
+		if (_.isEmpty(this.widgets)) {
+			return;
+		}
+		this.setSilent(true);
+		try{
+			this.attributesValue[key] = value;
+			_.forEach(this.widgets, function(widget){
+				widget.setModelProperty(key, value);
+			});
+		} finally {
+			this.setSilent(false);
+		}
+	};
 
-        // 1- check
-        var widget = this.getWidget();
-        if(_.isEmpty(widget)){
-            return;
-        }
+	/* **************************************************************
+	 * style utilities
+	 * **************************************************************/
+	/**
+	 * Adds list of styles to track
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param {string[]} styles to track
+	 */
+	this.trackStyles = function(styles){
+		this.styles = styles || [];
+		this.loadStyles();
+	};
 
-        // 2- load
-        var ctrl = this;
-        _.forEach(this.styles, function(styleKey){
-            ctrl.stylesValue[styleKey] = widget.getModelProperty('style.'+styleKey);
-        });
-    };
-    /* **************************************************************
-     * attribute utilities
-     * **************************************************************/
-    /**
-     * Adds list of attributes to track
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param {string[]} attributes to track
-     */
-    this.trackAttributes = function(attributes){
-        this.attributes = attributes || [];
-        this.loadAttributes();
-    };
+	/**
+	 * Adds key,value as style to the widget
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param {string} key to use
+	 * @param {string} value to set for the key
+	 */
+	this.setStyle = function (key, value) {
+		if (_.isEmpty(this.widgets)) {
+			return;
+		}
+		this.stylesValue[key] = value;
+		this.setSilent(true);
+		try{
+			_.forEach(this.widgets, function(widget){
+				widget.setModelProperty('style.' + key, value);
+			});
+		} finally {
+			this.setSilent(false);
+		}
+	};
 
-    /**
-     * Adds key,value as attribute to the page
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param {string} key to use
-     * @param {string} value to set for the key
-     */
-    this.setAttribute = function (key, value) {
-        if (!this.widget) {
-            return;
-        }
-        this.attributesValue[key] = value;
-        this.widget.setModelProperty(key, value);
-    };
-
-    /**
-     * Gets attribute from the current widget
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param {string} key to use
-     */
-    this.getAttribute = function (key) {
-        if (!this.widget) {
-            return;
-        }
-        return this.widget.getModelProperty(key);
-    };
-    /* **************************************************************
-     * style utilities
-     * **************************************************************/
-    /**
-     * Adds list of styles to track
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param {string[]} styles to track
-     */
-    this.trackStyles = function(styles){
-        this.styles = styles || [];
-        this.loadStyles();
-    };
-    
-    this.setStyle = function (key, value) {
-        if (!this.widget) {
-            return;
-        }
-        this.stylesValue[key] = value;
-        this.widget.setModelProperty('style.' + key, value);
-    };
-
-    this.getStyle = function (key) {
-        if (!this.widget) {
-            return;
-        }
-        return this.widget.getModelProperty('style.' + key);
-    };
 });
 
 /*
@@ -15117,6 +15099,140 @@ angular.module('am-wb-core')//
     };
 });
 
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+angular.module('am-wb-core')
+
+.factory('WbObservableObject', function() {
+	'use strict';
+
+	function ObservableObject() {
+		this.silent = false;
+		this.callbacks = {};
+	}
+
+	/**
+	 * Set widget silent
+	 * 
+	 * @memberof AmhObservableObject
+	 */
+	ObservableObject.prototype.setSilent = function(silent) {
+		this.silent = silent;
+	};
+
+	/**
+	 * Checks if the element is silent
+	 * 
+	 * @memberof AmhObservableObject
+	 */
+	ObservableObject.prototype.isSilent = function() {
+		return this.silent;
+	};
+
+	/**
+	 * Adds new callback of type
+	 * 
+	 * @param typeof
+	 *            the event
+	 * @param callback
+	 *            to call on the event
+	 * @memberof AmhObservableObject
+	 */
+	ObservableObject.prototype.on = function (type, callback) {
+		if (!angular.isFunction(callback)) {
+			throw {
+				message: 'Callback must be a function'
+			};
+		}
+		var callbacks = this.callbacks;
+		if (!angular.isArray(callbacks[type])) {
+			callbacks[type] = [];
+		}
+		if(callbacks[type].includes(callback)){
+			return;
+		}
+		callbacks[type].push(callback);
+	};
+
+	/**
+	 * Remove the callback
+	 * 
+	 * @param type
+	 *            of the event
+	 * @param callback
+	 *            to remove
+	 * @memberof AmhObservableObject
+	 */
+	ObservableObject.prototype.off = function (type, callback) {
+		var callbacks = this.callbacks;
+		if (!angular.isArray(callbacks[type])) {
+			return;
+		}
+		var index = callbacks[type].indexOf(callback);
+		if (index > -1) {
+			callbacks[type].splice(index, 1);
+		}
+	};
+
+	/**
+	 * Call all callbacks on the given event type.
+	 * 
+	 * Before callbacks, widget processors will process the widget and event.
+	 * 
+	 * @param type
+	 *            of the event
+	 * @param params
+	 *            to add to the event
+	 * @memberof AmhObservableObject
+	 */
+	ObservableObject.prototype.fire = function (type, params) {
+		// 1- Call processors
+		var event = _.merge({
+			source: this,
+			type: type
+		}, params || {});
+		var callbacks = this.callbacks;
+
+		// 2- call listeners
+		if (this.isSilent() || !angular.isDefined(callbacks[type])) {
+			return;
+		}
+		var cl = callbacks[type];
+		for(var i = 0; i < cl.length; i++){
+			// TODO: maso, 2018: check if the event is stopped to propagate
+			try {
+				cl[i].apply(cl[i], [event]);
+			} catch (error) {
+				log.error({
+					source: 'ObservableObject',
+					message: 'The listener throw an unexpected exception.',
+					exception: error
+				});
+			}
+		}
+	};
+	
+	return ObservableObject;
+});
 /*
  * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
  * 
@@ -18178,7 +18294,7 @@ angular.module('am-wb-core')//
 	};
 
 	Processor.prototype.getSelectedWidgets = function(){
-		return this.selectedWidgets || [];
+		return _.clone(this.selectedWidgets || []);
 	};
 
 	Processor.prototype.on = function(event, callback){
@@ -20504,7 +20620,7 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Widgets
- * @name AbstractHtml
+ * @name WbWidgetAbstractHtml
  * @description Manage a widget with html text.
  * 
  * Most of textual widgets (such as h1..h6, p, a, html) just used html
@@ -21012,14 +21128,14 @@ angular.module('am-wb-core')//
  * @name button
  * @description Manage a widget
  */
-.factory('WbWidgetButton', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetButton', function (WbWidgetAbstractHtml) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	return Widget;
 });
 
 /*
@@ -21442,13 +21558,13 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetFigcaption', function (WbWidgetAbstractHtml) {
-    'use strict';
-    function Widget($element, $parent){
-    	WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	return Widget;
 });
 
 /*

@@ -25,7 +25,7 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Widgets
- * @name AbstractHtml
+ * @name WbWidgetAbstractHtml
  * @description Manage a widget with html text.
  * 
  * Most of textual widgets (such as h1..h6, p, a, html) just used html

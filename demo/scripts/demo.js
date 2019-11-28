@@ -173,10 +173,10 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 				property: 'html',
 				inline: true,
 				menubar: false,
-				plugins: ['autolink'],
+				plugins: ['fullscreen', 'autolink'],
 				valid_elements: 'strong,em,span[style],a[href]',
 				// Toolbar
-				toolbar: 'close save | undo redo | bold italic underline | widgetalignleft widgetaligncenter widgetalignjustify widgetalignright ',
+				toolbar: 'close save | undo redo | bold italic underline | widgetalignleft widgetaligncenter widgetalignjustify widgetalignright | fullscreen',
 				fixed_toolbar_container: '#demo-widget-editor-toolbar'
 			}
 		});
