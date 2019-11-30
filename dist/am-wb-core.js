@@ -11109,11 +11109,15 @@ angular.module('am-wb-core')
 /***********************************************************************
  * Providers
  ***********************************************************************/
-.run(function ($widget, $http, $mdMedia, $wbWindow, $wbLocal, $WbProviderTimeout, $dispatcher, $storage, $routeParams) {
+.run(function (
+		/* angularjs */ $location, $http, $routeParams, 
+		/* WB        */ $widget, $mdMedia, 
+		$wbWindow, $wbLocal, $WbProviderTimeout, 
+		$dispatcher, $storage) {
 	$widget//
 	.setProvider('$http', $http)
 	.setProvider('$window', $wbWindow)
-	.setProvider('$location', $wbWindow)
+	.setProvider('$location', $location)
 	.setProvider('$routeParams', $routeParams)
 	.setProvider('$dispatcher', $dispatcher)
 	.setProvider('$storage', $storage)
@@ -21635,13 +21639,13 @@ angular.module('am-wb-core')//
  * @name footer
  * @description Manage a widget
  */
-.factory('WbWidgetFooter', function (WbWidgetAbstract) {
+.factory('WbWidgetFooter', function (WbWidgetGroup) {
 	'use strict';
 	function Widget($element, $parent){
-		WbWidgetAbstract.apply(this, [$element, $parent]);
+		WbWidgetGroup.apply(this, [$element, $parent]);
 		this.addElementAttributes();
 	}
-	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
 	return Widget;
 });
 
@@ -22275,14 +22279,14 @@ angular.module('am-wb-core')//
  * @name main
  * @description Manage a widget
  */
-.factory('WbWidgetMain', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetMain', function (WbWidgetGroup) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetGroup.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+	return Widget;
 });
 
 /*
@@ -22442,14 +22446,14 @@ angular.module('am-wb-core')//
  * @name nav
  * @description Manage a widget
  */
-.factory('WbWidgetNav', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetNav', function (WbWidgetGroup) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetGroup.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+	return Widget;
 });
 
 /*

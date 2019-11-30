@@ -27,12 +27,12 @@ angular.module('am-wb-core')//
  * @name nav
  * @description Manage a widget
  */
-.factory('WbWidgetNav', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetNav', function (WbWidgetGroup) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetGroup.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+	return Widget;
 });
