@@ -52,18 +52,16 @@ describe('Abstract WbSettingPageCtrl controller', function () {
         });
 
         expect(_.isFunction(controller.setWidget)).toBe(true);
-        expect(_.isFunction(controller.getWidget)).toBe(true);
+        expect(_.isFunction(controller.getWidgets)).toBe(true);
 
         expect(_.isFunction(controller.off)).toBe(true);
         expect(_.isFunction(controller.on)).toBe(true);
 
         expect(_.isFunction(controller.trackAttributes)).toBe(true);
         expect(_.isFunction(controller.setAttribute)).toBe(true);
-        expect(_.isFunction(controller.getAttribute)).toBe(true);
 
         expect(_.isFunction(controller.trackStyles)).toBe(true);
         expect(_.isFunction(controller.setStyle)).toBe(true);
-        expect(_.isFunction(controller.getStyle)).toBe(true);
     });
 
     it('should load attributes at advance', function (done) {
@@ -99,7 +97,6 @@ describe('Abstract WbSettingPageCtrl controller', function () {
             $element: element
         });
         controller.trackAttributes(['id', 'name', 'html']);
-        expect(controller.isRootWidget()).toBe(false);
         expect(controller.isContainerWidget()).toBe(false);
         var model = {
                 type: 'div',
@@ -110,16 +107,13 @@ describe('Abstract WbSettingPageCtrl controller', function () {
         $widget.compile(model)
         .then(function(widget){
             controller.setWidget(widget);
-            expect(controller.isRootWidget()).toBe(true);
             expect(controller.isContainerWidget()).toBe(true);
             
             controller.setWidget(widget.getChildren()[0]);
-            expect(controller.isRootWidget()).toBe(false);
             expect(controller.isContainerWidget()).toBe(false);
             
 
             controller.setWidget();
-            expect(controller.isRootWidget()).toBe(false);
             expect(controller.isContainerWidget()).toBe(false);
             
             done();
@@ -184,7 +178,6 @@ describe('Abstract WbSettingPageCtrl controller', function () {
             controller.setStyle('background', 'black');
             expect(controller.stylesValue.background).toBe('black');
             expect(widget.getModelProperty('style.background')).toBe('black');
-            
 
             controller.setAttribute('id', 'xxx');
             expect(controller.attributesValue.id).toBe('xxx');
@@ -218,8 +211,8 @@ describe('Abstract WbSettingPageCtrl controller', function () {
         .then(function(widget){
             controller.setStyle('color', 'a');
             controller.setAttribute('id', 'yyy');
-            expect(controller.getStyle('color')).toBe(undefined);
-            expect(controller.getAttribute('id')).toBe(undefined);
+            expect(controller.stylesValue['color']).toBe(undefined);
+            expect(controller.attributesValue['id']).toBe(undefined);
             
             controller.setWidget(widget);
             expect(controller.stylesValue.color).toBe(model.style.color);
@@ -229,9 +222,7 @@ describe('Abstract WbSettingPageCtrl controller', function () {
             widget.setModelProperty('style.color', 'red');
             
             expect(controller.stylesValue.color).toBe('red');
-            expect(controller.getStyle('color')).toBe('red');
             expect(controller.attributesValue.id).toBe('xxx');
-            expect(controller.getAttribute('id')).toBe('xxx');
             
             done();
         });

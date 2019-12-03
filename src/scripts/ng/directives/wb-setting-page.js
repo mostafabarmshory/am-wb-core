@@ -33,77 +33,75 @@ angular.module('am-wb-core')
  */
 .directive('wbSettingPage', function ($widget, $settings, $wbUtil, $controller, $compile, $mdTheming) {
 
-    function postLink($scope, $element, $attrs, $ctrls) {
-        var wbWidget = null;
-        var settingCtrl = null;
+	function postLink($scope, $element, $attrs, $ctrls) {
+		var widgets = [];
+		var settingCtrl = null;
 
-        function loadSetting(page) {
-            return $wbUtil.getTemplateFor(page)
-            .then(function (templateSrc) {
-                var element = angular.element(templateSrc);
-                var scope = $scope.$new();
-                var controller = $controller('WbSettingPageCtrl',{
-                    $scope: scope,
-                    $element: element
-                });
-                if (angular.isDefined(page.controller)) {
-                    controller = angular.extend(controller, $controller(page.controller, {
-                        $scope: scope,
-                        $element: element
-                    }));
-                    if (page.controllerAs) {
-                        scope[page.controllerAs] = controller;
-                    }
-                    element.data('$ngControllerController', controller);
-                }
-                $compile(element)(scope);
-                $mdTheming(element);
-                $element.empty();
-                $element.append(element);
-                try{
-                    if(_.isFunction(controller.init)){
-                        controller.init();
-                    }
-                } catch(ex){
-                    // TODO:
-                }
-                return controller;
-            });
-        }
+		function loadSetting(page) {
+			return $wbUtil.getTemplateFor(page)
+			.then(function (templateSrc) {
+				var element = angular.element(templateSrc);
+				var scope = $scope.$new();
+				var controller = $controller('WbSettingPageCtrl',{
+					$scope: scope,
+					$element: element
+				});
+				if (angular.isDefined(page.controller)) {
+					controller = angular.extend(controller, $controller(page.controller, {
+						$scope: scope,
+						$element: element
+					}));
+					if (page.controllerAs) {
+						scope[page.controllerAs] = controller;
+					}
+					element.data('$ngControllerController', controller);
+				}
+				$compile(element)(scope);
+				$mdTheming(element);
+				$element.empty();
+				$element.append(element);
+				try{
+					if(_.isFunction(controller.init)){
+						controller.init();
+					}
+				} catch(ex){
+					// TODO:
+				}
+				return controller;
+			});
+		}
 
-        $scope.$watch('type', function (type) {
-            if (!type) {
-                return;
-            }
-            var setting = $settings.getPage(type);
-            loadSetting(setting)//
-            .then(function(ctrl){
-                settingCtrl = ctrl;
-                if(wbWidget) {
-                    settingCtrl.setWidget(wbWidget);
-                }
-            });
-        });
+		$scope.$watch('type', function (type) {
+			if (!type) {
+				return;
+			}
+			var setting = $settings.getPage(type);
+			loadSetting(setting)//
+			.then(function(ctrl){
+				settingCtrl = ctrl;
+				ctrl.setWidget(widgets);
+			});
+		});
 
-        // Load ngModel
-        var ngModelCtrl = $ctrls[0];
-        ngModelCtrl.$render = function () {
-            wbWidget = ngModelCtrl.$viewValue;
-            if(settingCtrl) {
-                settingCtrl.setWidget(wbWidget);
-            }
-        };
-    }
+		// Load ngModel
+		var ngModelCtrl = $ctrls[0];
+		ngModelCtrl.$render = function () {
+			widgets = ngModelCtrl.$viewValue;
+			if(settingCtrl) {
+				settingCtrl.setWidget(widgets);
+			}
+		};
+	}
 
-    // create directive
-    return {
-        restrict: 'E',
-        replace: true,
-        template: '<div layout="column"></div>',
-        link: postLink,
-        scope: {
-            type: '@wbType'
-        },
-        require: ['ngModel']
-    };
+	// create directive
+	return {
+		restrict: 'E',
+		replace: true,
+		template: '<div layout="column"></div>',
+		link: postLink,
+		scope: {
+			type: '@wbType'
+		},
+		require: ['ngModel']
+	};
 });

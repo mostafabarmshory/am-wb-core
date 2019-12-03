@@ -32,98 +32,98 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 
 
 .controller('MyTestEditorCtrl', function($scope, $http, $widget, $wbUtil,
-        // new model
-        WbProcessorLocator, WbProcessorSelect, WbProcessorDnd) {
-    'use strict';
-    
-    var locatorProcessor;
-    var selectProcessor;
-    var dndProcessor;
+		// new model
+		WbProcessorLocator, WbProcessorSelect, WbProcessorDnd) {
+	'use strict';
 
-    /*
-     * Set data model
-     */
-    this.setDocumentPath = function(path){
-        var ctrl = this;
-        $http.get(path)
-        .then(function(res) {
-            ctrl.model = $wbUtil.clean(res.data);
-        });
-    }
+	var locatorProcessor;
+	var selectProcessor;
+	var dndProcessor;
 
-    this.toggleEditable = function(){
-        this.editable = !this.editable;
-        if(this.editable) {
-            this.initEditor();
-        }
-        this.getRootWidget().setEditable(this.editable);
-    };
+	/*
+	 * Set data model
+	 */
+	this.setDocumentPath = function(path){
+		var ctrl = this;
+		$http.get(path)
+		.then(function(res) {
+			ctrl.model = $wbUtil.clean(res.data);
+		});
+	}
 
-    this.setRootWidget = function(rootWidget){
-        this.rootWidget = rootWidget;
-    }
+	this.toggleEditable = function(){
+		this.editable = !this.editable;
+		if(this.editable) {
+			this.initEditor();
+		}
+		this.getRootWidget().setEditable(this.editable);
+	};
 
-    this.getRootWidget = function(){
-        return this.rootWidget;
-    }
+	this.setRootWidget = function(rootWidget){
+		this.rootWidget = rootWidget;
+	}
 
-    this.initEditor = function(){
-        if(!locatorProcessor){
-            locatorProcessor = new WbProcessorLocator();
-            $widget.setProcessor('locator', locatorProcessor);
-            locatorProcessor.setEnable(true);
-        }
-        if(!selectProcessor){
-            selectProcessor = new WbProcessorSelect();
-            $widget.setProcessor('select', selectProcessor);
-            var ctrl = this;
-            selectProcessor.on('selectionChange', function(){
-                ctrl.selectedWidgets = selectProcessor.getSelectedWidgets();
-                $scope.$digest();
-            });
-        }
-        
-        if(!dndProcessor){
-            dndProcessor = new WbProcessorDnd();
-            $widget.setProcessor('dnd', dndProcessor);
-        }
-    }
+	this.getRootWidget = function(){
+		return this.rootWidget;
+	}
 
-    this.init = function(){
-        var ctrl = this;
-        // load widgets
-        $widget.widgets()
-        .then(function(list){
-            ctrl.widgets = list.items;
-        });
-        
-        $scope.actions = [{
-            icon: 'delete',
-            run: function(){
-                var widgets = selectProcessor.getSelectedWidgets();
-                for(var i = 0; i < widgets.length; i++){
-                    widgets[i].delete();
-                }
-            }
-        },{
-            icon: 'edit',
-            run: function(){
-                ctrl.toggleEditable();
-            }
-        }];
+	this.initEditor = function(){
+		if(!locatorProcessor){
+			locatorProcessor = new WbProcessorLocator();
+			$widget.setProcessor('locator', locatorProcessor);
+			locatorProcessor.setEnable(true);
+		}
+		if(!selectProcessor){
+			selectProcessor = new WbProcessorSelect();
+			$widget.setProcessor('select', selectProcessor);
+			var ctrl = this;
+			selectProcessor.on('selectionChange', function(){
+				ctrl.selectedWidgets = selectProcessor.getSelectedWidgets();
+				$scope.$digest();
+			});
+		}
 
-        
-        $scope.$on('$destroy', function(){
-            if(locatorProcessor){
-                locatorProcessor.setEnable(false);
-            }
-            if(selectProcessor){
-                selectProcessor.setEnable(false);
-            }
-        });
-    };
-    
-    this.init();
+		if(!dndProcessor){
+			dndProcessor = new WbProcessorDnd();
+			$widget.setProcessor('dnd', dndProcessor);
+		}
+	}
+
+	this.init = function(){
+		var ctrl = this;
+		// load widgets
+		$widget.widgets()
+		.then(function(list){
+			ctrl.widgets = list.items;
+		});
+
+		$scope.actions = [{
+			icon: 'delete',
+			run: function(){
+				var widgets = selectProcessor.getSelectedWidgets();
+				for(var i = 0; i < widgets.length; i++){
+					widgets[i].delete();
+				}
+			}
+		},{
+			icon: 'edit',
+			run: function(){
+				ctrl.toggleEditable();
+			}
+		}];
+
+
+		$scope.$on('$destroy', function(){
+			if(locatorProcessor){
+				locatorProcessor.setEnable(false);
+			}
+			if(selectProcessor){
+				selectProcessor.setEnable(false);
+			}
+		});
+	};
+
+	this.init();
 })
 
 
@@ -164,7 +164,8 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 		'button',
 		'a',
 		'p',
-	];
+		'figcaption',
+		];
 	_.forEach(lineWidgetsTypes, function(type){
 		$widget.setEditor(type, {
 			type: 'WidgetEditorTinymceSingleLine',
@@ -172,10 +173,10 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 				property: 'html',
 				inline: true,
 				menubar: false,
-				plugins: ['autolink'],
+				plugins: ['fullscreen', 'autolink'],
 				valid_elements: 'strong,em,span[style],a[href]',
 				// Toolbar
-				toolbar: 'close save | undo redo | bold italic underline | widgetalignleft widgetaligncenter widgetalignjustify widgetalignright ',
+				toolbar: 'close save | undo redo | bold italic underline | widgetalignleft widgetaligncenter widgetalignjustify widgetalignright | fullscreen',
 				fixed_toolbar_container: '#demo-widget-editor-toolbar'
 			}
 		});

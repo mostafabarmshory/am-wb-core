@@ -47,30 +47,6 @@ angular.module('am-wb-core')
 			// new models
 			'image-url', 'vedio-url', 'audio-url', 'page-url']
 	});
-	$resource.newPage({
-		type : 'wb-sheet',
-		icon : 'border_all',
-		label : 'Sheet',
-		templateUrl : 'views/resources/wb-sheet.html',
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			$scope.$watch('value', function(value) {
-				if (angular.isDefined(value)) {
-					$scope.$parent.setValue(value);
-				} else {
-					$scope.$parent.setValue({
-						'key' : 'value',
-						'values' : [ [ 1, 2 ], [ 1, 2 ] ]
-					});
-				}
-			}, true);
-		},
-		controllerAs: 'ctrl',
-		tags : [ 'data' ]
-	});
-
 
 	$resource.newPage({
 		type : 'script',

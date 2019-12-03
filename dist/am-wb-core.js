@@ -6399,79 +6399,77 @@ angular.module('am-wb-core')
  */
 .directive('wbSettingPage', function ($widget, $settings, $wbUtil, $controller, $compile, $mdTheming) {
 
-    function postLink($scope, $element, $attrs, $ctrls) {
-        var wbWidget = null;
-        var settingCtrl = null;
+	function postLink($scope, $element, $attrs, $ctrls) {
+		var widgets = [];
+		var settingCtrl = null;
 
-        function loadSetting(page) {
-            return $wbUtil.getTemplateFor(page)
-            .then(function (templateSrc) {
-                var element = angular.element(templateSrc);
-                var scope = $scope.$new();
-                var controller = $controller('WbSettingPageCtrl',{
-                    $scope: scope,
-                    $element: element
-                });
-                if (angular.isDefined(page.controller)) {
-                    controller = angular.extend(controller, $controller(page.controller, {
-                        $scope: scope,
-                        $element: element
-                    }));
-                    if (page.controllerAs) {
-                        scope[page.controllerAs] = controller;
-                    }
-                    element.data('$ngControllerController', controller);
-                }
-                $compile(element)(scope);
-                $mdTheming(element);
-                $element.empty();
-                $element.append(element);
-                try{
-                    if(_.isFunction(controller.init)){
-                        controller.init();
-                    }
-                } catch(ex){
-                    // TODO:
-                }
-                return controller;
-            });
-        }
+		function loadSetting(page) {
+			return $wbUtil.getTemplateFor(page)
+			.then(function (templateSrc) {
+				var element = angular.element(templateSrc);
+				var scope = $scope.$new();
+				var controller = $controller('WbSettingPageCtrl',{
+					$scope: scope,
+					$element: element
+				});
+				if (angular.isDefined(page.controller)) {
+					controller = angular.extend(controller, $controller(page.controller, {
+						$scope: scope,
+						$element: element
+					}));
+					if (page.controllerAs) {
+						scope[page.controllerAs] = controller;
+					}
+					element.data('$ngControllerController', controller);
+				}
+				$compile(element)(scope);
+				$mdTheming(element);
+				$element.empty();
+				$element.append(element);
+				try{
+					if(_.isFunction(controller.init)){
+						controller.init();
+					}
+				} catch(ex){
+					// TODO:
+				}
+				return controller;
+			});
+		}
 
-        $scope.$watch('type', function (type) {
-            if (!type) {
-                return;
-            }
-            var setting = $settings.getPage(type);
-            loadSetting(setting)//
-            .then(function(ctrl){
-                settingCtrl = ctrl;
-                if(wbWidget) {
-                    settingCtrl.setWidget(wbWidget);
-                }
-            });
-        });
+		$scope.$watch('type', function (type) {
+			if (!type) {
+				return;
+			}
+			var setting = $settings.getPage(type);
+			loadSetting(setting)//
+			.then(function(ctrl){
+				settingCtrl = ctrl;
+				ctrl.setWidget(widgets);
+			});
+		});
 
-        // Load ngModel
-        var ngModelCtrl = $ctrls[0];
-        ngModelCtrl.$render = function () {
-            wbWidget = ngModelCtrl.$viewValue;
-            if(settingCtrl) {
-                settingCtrl.setWidget(wbWidget);
-            }
-        };
-    }
+		// Load ngModel
+		var ngModelCtrl = $ctrls[0];
+		ngModelCtrl.$render = function () {
+			widgets = ngModelCtrl.$viewValue;
+			if(settingCtrl) {
+				settingCtrl.setWidget(widgets);
+			}
+		};
+	}
 
-    // create directive
-    return {
-        restrict: 'E',
-        replace: true,
-        template: '<div layout="column"></div>',
-        link: postLink,
-        scope: {
-            type: '@wbType'
-        },
-        require: ['ngModel']
-    };
+	// create directive
+	return {
+		restrict: 'E',
+		replace: true,
+		template: '<div layout="column"></div>',
+		link: postLink,
+		scope: {
+			type: '@wbType'
+		},
+		require: ['ngModel']
+	};
 });
 
 /* 
@@ -6511,86 +6509,90 @@ angular.module('am-wb-core')
  */
 .directive('wbSettingPanelGroup', function($settings, $widget) {
 
-    /**
-     * Init settings
-     */
-    function postLink($scope, $element, $attrs, $ctrls) {
+	/**
+	 * Init settings
+	 */
+	function postLink($scope, $element, $attrs, $ctrls) {
 
-        // Load ngModel
-        var ngModelCtrl = $ctrls[0];
-        var settingMap = [];
-        $scope.settings = [];
+		// Load ngModel
+		var ngModelCtrl = $ctrls[0];
+		var settingMap = [];
+		$scope.settings = [];
 
-        /**
-         * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-         * 
-         * @returns
-         */
-        function loadSetting(wbWidget) {
+		/**
+		 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+		 * 
+		 * @returns
+		 */
+		function loadSetting(widgets) {
 
-            // hide all settings
-            var i;
-            for(i = 0; i < $scope.settings.length; i++){
-                $scope.settings[i].visible = false;
-            }
+			// hide all settings
+			var i;
+			for(i = 0; i < $scope.settings.length; i++){
+				$scope.settings[i].visible = false;
+			}
 
-            if(!wbWidget || (angular.isArray(wbWidget) && wbWidget.length < 1)){
-                $scope.wbModel = null;
-                return;
-            }
+			if(_.isEmpty(widgets)){
+				$scope.wbModel = null;
+				return;
+			}
 
-            // load pages
-            var widget = $widget.getWidget(wbWidget.getModel());
-            var settingKeys = $settings.getSettingsFor(widget);
+			// load pages
+			var settingKeys = [];
+			_.forEach(widgets, function(widget){
+				var widgetDef = $widget.getWidget(widget.getModel());
+				var settingKeysOfWidget = $settings.getSettingsFor(widgetDef);
+				if(_.isEmpty(settingKeys)){
+					settingKeys = settingKeysOfWidget;
+				} else {
+					settingKeys = _.intersection(settingKeys, settingKeysOfWidget);
+				}
+			});
 
-            // visible new ones
-            for(i = 0; i < settingKeys.length; i++){
-                var key = settingKeys[i].type;
-                if(!settingMap[key]){
-                    var setting = settingKeys[i];
-                    settingMap[key] = angular.copy(setting);
-                    $scope.settings.push(settingMap[key]);
-                }
-                settingMap[key].visible = true;
-            }
+			// visible new ones
+			for(i = 0; i < settingKeys.length; i++){
+				var key = settingKeys[i].type;
+				if(!settingMap[key]){
+					var setting = settingKeys[i];
+					settingMap[key] = angular.copy(setting);
+					$scope.settings.push(settingMap[key]);
+				}
+				settingMap[key].visible = true;
+			}
 
-            // set model in view
-            $scope.wbModel = wbWidget;
-        }
+			// set model in view
+			$scope.wbModel = widgets;
+		}
 
-        ngModelCtrl.$render = function() {
-            if(ngModelCtrl.$viewValue) {
-                var model = ngModelCtrl.$viewValue;
-                if(angular.isArray(model) && model.length){
-                    loadSetting(model[0]);
-                } else {
-                    loadSetting(model);
-                }
-            }
-        };
+		ngModelCtrl.$render = function() {
+			if(ngModelCtrl.$viewValue) {
+				var widgets = ngModelCtrl.$viewValue;
+				loadSetting(widgets);
+			}
+		};
 
 
-        $element.on('keypress keyup keydown paste copy', function(event){
-            event.stopPropagation();
-        });
-    }
+		$element.on('keypress keyup keydown paste copy', function(event){
+			event.stopPropagation();
+		});
+	}
 
-    return {
-        restrict : 'E',
-        replace: true,
-        templateUrl: function($element, $attr){
-            var link = 'views/directives/wb-setting-panel-';
-            if(angular.isDefined($attr.wbTabMode)){
-                link += 'tabs.html';
-            } else {
-                link += 'expansion.html';
-            }
-            return link;
-        },
-        scope : {},
-        link : postLink,
-        require:['ngModel']
-    };
+	return {
+		restrict : 'E',
+		replace: true,
+		templateUrl: function($element, $attr){
+			var link = 'views/directives/wb-setting-panel-';
+			if(angular.isDefined($attr.wbTabMode)){
+				link += 'tabs.html';
+			} else {
+				link += 'expansion.html';
+			}
+			return link;
+		},
+		scope : {},
+		link : postLink,
+		require:['ngModel']
+	};
 });
 
 /* 
@@ -10777,30 +10779,6 @@ angular.module('am-wb-core')
 			// new models
 			'image-url', 'vedio-url', 'audio-url', 'page-url']
 	});
-	$resource.newPage({
-		type : 'wb-sheet',
-		icon : 'border_all',
-		label : 'Sheet',
-		templateUrl : 'views/resources/wb-sheet.html',
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			$scope.$watch('value', function(value) {
-				if (angular.isDefined(value)) {
-					$scope.$parent.setValue(value);
-				} else {
-					$scope.$parent.setValue({
-						'key' : 'value',
-						'values' : [ [ 1, 2 ], [ 1, 2 ] ]
-					});
-				}
-			}, true);
-		},
-		controllerAs: 'ctrl',
-		tags : [ 'data' ]
-	});
-
 
 	$resource.newPage({
 		type : 'script',
@@ -11131,12 +11109,17 @@ angular.module('am-wb-core')
 /***********************************************************************
  * Providers
  ***********************************************************************/
-.run(function ($widget, $http, $mdMedia, $wbWindow, $wbLocal, $WbProviderTimeout, $dispatcher, $storage, $routeParams) {
+.run(function (
+		/* angularjs */ $location, $http, $routeParams, 
+		/* WB        */ $widget, $mdMedia, 
+		$wbWindow, $wbLocal, $WbProviderTimeout, 
+		$dispatcher, $storage) {
 	$widget//
 	.setProvider('$http', $http)
 	.setProvider('$window', $wbWindow)
-	.setProvider('$dispatcher', $dispatcher)
+	.setProvider('$location', $location)
 	.setProvider('$routeParams', $routeParams)
+	.setProvider('$dispatcher', $dispatcher)
 	.setProvider('$storage', $storage)
 	.setProvider('$timeout', $WbProviderTimeout)
 	.setProvider('$local', $wbLocal)
@@ -11540,7 +11523,11 @@ angular.module('am-wb-core')
 		help: 'http://dpq.co.ir/more-information-img',
 		model: {
 			html: 'img',
-			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+			src: 'resources/wb-brand-3.0.png',
+			style: {
+				width: '80%',
+				maxWidth: '500px'
+			}
 		},
 		controllerAs: 'ctrl',
 		controller: 'WbWidgetImg',
@@ -13866,285 +13853,264 @@ angular.module('am-wb-core')//
  * utilities.
  * 
  */
-.controller('WbSettingPageCtrl', function () {
-    /*
-     * Attributes
-     */
-    this.widget = null;
-    this.attributes = [];
-    this.attributesValue = {};
-    this.styles = [];
-    this.stylesValue = {};
-    this.callbacks = {
-            widgetChanged: []
-    };
+.controller('WbSettingPageCtrl', function (WbObservableObject) {
+	// extend from observable object
+	angular.extend(this, WbObservableObject.prototype);
+	WbObservableObject.apply(this);
+	/*
+	 * Attributes
+	 */
+	this.widgets = [];
+	this.attributes = [];
+	this.attributesValue = {};
+	this.styles = [];
+	this.stylesValue = {};
+	this.callbacks = {
+			widgetChanged: []
+	};
 
-    /********************************************************
-     * Widget management
-     ********************************************************/
-    /**
-     * Sets new widget into the setting page
-     * 
-     * Note: the old widget will be removed from the view and the
-     * new one is connect.
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param widget {Widget} to track
-     */
-    this.setWidget = function (widget) {
-        var oldWidget = this.widget;
-        this.disconnect();
-        this.widget = widget;
-        this.connect();
-        // load values
-        this.loadAttributes();
-        this.loadStyles();
-        // propagate the change
-        this.fire('widgetChanged', {
-            value: widget,
-            oldValue: oldWidget
-        });
-    };
+	/********************************************************
+	 * Widget management
+	 ********************************************************/
+	/**
+	 * Sets new widgets list into the setting page
+	 * 
+	 * Note: the old widgets will be removed from the view and the
+	 * new one is connect.
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param widget {Widget} to track
+	 */
+	this.setWidget = function (widgets) {
+		widgets =  widgets || [];
+		if(!_.isArray(widgets)){
+			widgets = [widgets];
+		}
+		var oldWidgets = this.widgets;
+		this.disconnect();
+		this.widgets = widgets;
+		this.connect();
+		// load values
+		this.loadAttributes();
+		this.loadStyles();
+		// propagate the change
+		this.fire('widgetChanged', {
+			value: widgets,
+			oldValue: oldWidgets
+		});
+	};
 
-    /**
-     * Gets the current widget 
-     * 
-     * @memberof WbSettingPageCtrl
-     * @return the current widget
-     */
-    this.getWidget = function () {
-        return this.widget;
-    };
+	/**
+	 * Gets the current widgets list 
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @return the current widget
+	 */
+	this.getWidgets = function () {
+		return this.widgets;
+	};
 
-    /**
-     * Checks if the current widget is the root
-     * 
-     * @memberof WbSettingPageCtrl
-     * @return true if the widget is root
-     */
-    this.isRootWidget = function () {
-        var widget = this.getWidget();
-        if (!widget) {
-            return false;
-        }
-        return widget.isRoot();
-    };
+	/**
+	 * Checks if the current widget can contain others
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @return true if the widget is a container
+	 */
+	this.isContainerWidget = function(){
+		var widgets = this.getWidgets();
+		if(widgets.length === 0 || widgets.length > 1){
+			return false;
+		}
+		var widget = widgets[0];
+		return !widget.isLeaf();
+	};
 
-    /**
-     * Checks if the current widget can contain others
-     * 
-     * @memberof WbSettingPageCtrl
-     * @return true if the widget is a container
-     */
-    this.isContainerWidget = function(){
-        var widget = this.getWidget();
-        if (!widget) {
-            return false;
-        }
-        return !widget.isLeaf();
-    };
+	/**
+	 * Removes listeners to the widget
+	 * 
+	 * The controller track the widget changes by adding listener into it. This
+	 * function removes all listener.
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 */
+	this.disconnect = function(){
+		var widgets = this.getWidgets();
+		if(_.isEmpty(widgets) || !_.isFunction(this.widgetListener)){
+			return;
+		}
+		var ctrl = this;
+		_.forEach(widgets, function(widget){
+			widget.off('modelUpdated', ctrl.widgetListener);
+		});
+	};
 
-    /**
-     * Removes listeners to the widget
-     * 
-     * The controller track the widget changes by adding listener into it. This
-     * function removes all listener.
-     * 
-     * @memberof WbSettingPageCtrl
-     */
-    this.disconnect = function(){
-        var widget = this.getWidget();
-        if(_.isEmpty(widget) || !_.isFunction(this.widgetListener)){
-            return;
-        }
-        widget.off('modelUpdated', this.widgetListener);
-    };
+	/**
+	 * Adds listeners to the widget
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 */
+	this.connect= function(){
+		var widgets = this.getWidgets();
+		if(_.isEmpty(widgets)){
+			return;
+		}
+		if(_.isEmpty(this.widgetListeners)){
+			var ctrl = this;
+			this.widgetListener = function($event) {
+				if(ctrl.isSilent()){
+					return;
+				}
+				if($event.type === 'modelUpdated'){
+					ctrl.updateValues($event.key);
+				}
+			};
+		}
+		// Adding listeners
+		_.forEach(widgets, function(widget){
+			widget.on('modelUpdated', ctrl.widgetListener);
+		});
+	};
 
-    /**
-     * Adds listeners to the widget
-     * 
-     * @memberof WbSettingPageCtrl
-     */
-    this.connect= function(){
-        var widget = this.getWidget();
-        if(_.isEmpty(widget)){
-            return;
-        }
-        if(_.isEmpty(this.widgetListener)){
-            var ctrl = this;
-            this.widgetListener = function($event) {
-                var widget = ctrl.widget;
-                if($event.type === 'modelUpdated'){
-                    var key = $event.key;
-                    // load property
-                    if(_.includes(ctrl.attributes, key)){
-                        ctrl.attributesValue[key] = widget.getModelProperty(key);
-                        return;
-                    }
-                    
-                    // load style
-                    if(key.startsWith('style.')){
-                        var styleKey =  key.substring(6);
-                        if(_.includes(ctrl.styles, styleKey)){
-                            ctrl.stylesValue[styleKey] = widget.getModelProperty(key);
-                        }
-                        return;
-                    }
-                }
-            };
-        }
-        widget.on('modelUpdated', this.widgetListener);
-    };
 
-    /*
-     * INTERNAL
-     */
-    this.fire = function (key, event){
-        _.forEach(this.callbacks[key], function(callback){
-            try{
-                callback.apply(callback, [event]);
-            } catch(ex){
-//                console.error(ex);
-            }
-        });
-    };
+	this.updateValues = function(keys){
+		if(_.isUndefined(keys)){
+			return;
+		}
+		if(!_.isArray(keys)){
+			keys = [keys];
+		}
+		var widgets = this.widgets;
+		var firstFit = widgets.length > 1;
+		var ctrl = this;
+		var attrs = this.attributesValue;
+		var styles = this.stylesValue;
+		_.forEach(keys, function(key){
+			_.forEach(widgets, function(widget){
+				// load attribute
+				if(_.includes(ctrl.attributes, key)){
+					if(!firstFit || _.isUndefined(attrs[key])){
+						attrs[key] = widget.getModelProperty(key);
+					}
+					return;
+				}
+				// load style
+				if(!key.startsWith('style.')){
+					return;
+				}
+				var stylekey =  key.substring(6);
+				if(_.includes(ctrl.styles, stylekey)){
+					if(!firstFit || _.isUndefined(styles[key])){
+						styles[stylekey] = widget.getModelProperty(key);
+					}
+				}
+			});
+		});
+	};
 
-    /**
-     * Adds listeners to the widget
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param key {string} of the event
-     * @param callback {Function} to call on event
-     */
-    this.on = function(key, callback){
-        this.callbacks[key].push(callback);
-    };
+	/***************************************************************
+	 * Track widget changes
+	 ***************************************************************/
 
-    /**
-     * Adds listeners to the widget
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param key {string} of the event
-     * @param callback {Function} to call on event
-     */
-    this.off = function(key, callback) {
-        _.remove(this.callbacks[key], function(cl){
-            return cl === callback;
-        });
-    };
+	/*
+	 * INTERNAL
+	 */
+	this.loadAttributes= function(){
+		// 0- clean
+		this.attributesValue = {};
+		this.updateValues(this.attributes);
+	};
 
-    /***************************************************************
-     * Track widget changes
-     ***************************************************************/
+	/*
+	 * INTERNAL
+	 */
+	this.loadStyles= function(){
+		// 0- clean
+		this.stylesValue = {};
+		this.updateValues(_.map(this.styles, function(styleKey){
+			return 'style.'+styleKey;
+		}));
+	};
 
-    /*
-     * INTERNAL
-     */
-    this.loadAttributes= function(){
-        // 0- clean
-        this.attributesValue = {};
+	this.setSilent = function(silent){
+		this._silent = silent;
+	};
 
-        // 1- check
-        var widget = this.getWidget();
-        if(_.isEmpty(widget)){
-            return;
-        }
+	this.isSilent = function(){
+		return this._silent;
+	};
 
-        // 2- load
-        var ctrl = this;
-        _.forEach(this.attributes, function(attrKey){
-            ctrl.attributesValue[attrKey] = widget.getModelProperty(attrKey);
-        });
-    };
+	/* **************************************************************
+	 * attribute utilities
+	 * **************************************************************/
+	/**
+	 * Adds list of attributes to track
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param {string[]} attributes to track
+	 */
+	this.trackAttributes = function(attributes){
+		this.attributes = attributes || [];
+		this.loadAttributes();
+	};
 
-    /*
-     * INTERNAL
-     */
-    this.loadStyles= function(){
-        // 0- clean
-        this.stylesValue = {};
+	/**
+	 * Adds key,value as attribute to the page
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param {string} key to use
+	 * @param {string} value to set for the key
+	 */
+	this.setAttribute = function (key, value) {
+		if (_.isEmpty(this.widgets)) {
+			return;
+		}
+		this.setSilent(true);
+		try{
+			this.attributesValue[key] = value;
+			_.forEach(this.widgets, function(widget){
+				widget.setModelProperty(key, value);
+			});
+		} finally {
+			this.setSilent(false);
+		}
+	};
 
-        // 1- check
-        var widget = this.getWidget();
-        if(_.isEmpty(widget)){
-            return;
-        }
+	/* **************************************************************
+	 * style utilities
+	 * **************************************************************/
+	/**
+	 * Adds list of styles to track
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param {string[]} styles to track
+	 */
+	this.trackStyles = function(styles){
+		this.styles = styles || [];
+		this.loadStyles();
+	};
 
-        // 2- load
-        var ctrl = this;
-        _.forEach(this.styles, function(styleKey){
-            ctrl.stylesValue[styleKey] = widget.getModelProperty('style.'+styleKey);
-        });
-    };
-    /* **************************************************************
-     * attribute utilities
-     * **************************************************************/
-    /**
-     * Adds list of attributes to track
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param {string[]} attributes to track
-     */
-    this.trackAttributes = function(attributes){
-        this.attributes = attributes || [];
-        this.loadAttributes();
-    };
+	/**
+	 * Adds key,value as style to the widget
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param {string} key to use
+	 * @param {string} value to set for the key
+	 */
+	this.setStyle = function (key, value) {
+		if (_.isEmpty(this.widgets)) {
+			return;
+		}
+		this.stylesValue[key] = value;
+		this.setSilent(true);
+		try{
+			_.forEach(this.widgets, function(widget){
+				widget.setModelProperty('style.' + key, value);
+			});
+		} finally {
+			this.setSilent(false);
+		}
+	};
 
-    /**
-     * Adds key,value as attribute to the page
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param {string} key to use
-     * @param {string} value to set for the key
-     */
-    this.setAttribute = function (key, value) {
-        if (!this.widget) {
-            return;
-        }
-        this.attributesValue[key] = value;
-        this.widget.setModelProperty(key, value);
-    };
-
-    /**
-     * Gets attribute from the current widget
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param {string} key to use
-     */
-    this.getAttribute = function (key) {
-        if (!this.widget) {
-            return;
-        }
-        return this.widget.getModelProperty(key);
-    };
-    /* **************************************************************
-     * style utilities
-     * **************************************************************/
-    /**
-     * Adds list of styles to track
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param {string[]} styles to track
-     */
-    this.trackStyles = function(styles){
-        this.styles = styles || [];
-        this.loadStyles();
-    };
-    
-    this.setStyle = function (key, value) {
-        if (!this.widget) {
-            return;
-        }
-        this.stylesValue[key] = value;
-        this.widget.setModelProperty('style.' + key, value);
-    };
-
-    this.getStyle = function (key) {
-        if (!this.widget) {
-            return;
-        }
-        return this.widget.getModelProperty('style.' + key);
-    };
 });
 
 /*
@@ -15158,7 +15124,140 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+angular.module('am-wb-core')
 
+.factory('WbObservableObject', function() {
+	'use strict';
+
+	function ObservableObject() {
+		this.silent = false;
+		this.callbacks = {};
+	}
+
+	/**
+	 * Set widget silent
+	 * 
+	 * @memberof AmhObservableObject
+	 */
+	ObservableObject.prototype.setSilent = function(silent) {
+		this.silent = silent;
+	};
+
+	/**
+	 * Checks if the element is silent
+	 * 
+	 * @memberof AmhObservableObject
+	 */
+	ObservableObject.prototype.isSilent = function() {
+		return this.silent;
+	};
+
+	/**
+	 * Adds new callback of type
+	 * 
+	 * @param typeof
+	 *            the event
+	 * @param callback
+	 *            to call on the event
+	 * @memberof AmhObservableObject
+	 */
+	ObservableObject.prototype.on = function (type, callback) {
+		if (!angular.isFunction(callback)) {
+			throw {
+				message: 'Callback must be a function'
+			};
+		}
+		var callbacks = this.callbacks;
+		if (!angular.isArray(callbacks[type])) {
+			callbacks[type] = [];
+		}
+		if(callbacks[type].includes(callback)){
+			return;
+		}
+		callbacks[type].push(callback);
+	};
+
+	/**
+	 * Remove the callback
+	 * 
+	 * @param type
+	 *            of the event
+	 * @param callback
+	 *            to remove
+	 * @memberof AmhObservableObject
+	 */
+	ObservableObject.prototype.off = function (type, callback) {
+		var callbacks = this.callbacks;
+		if (!angular.isArray(callbacks[type])) {
+			return;
+		}
+		var index = callbacks[type].indexOf(callback);
+		if (index > -1) {
+			callbacks[type].splice(index, 1);
+		}
+	};
+
+	/**
+	 * Call all callbacks on the given event type.
+	 * 
+	 * Before callbacks, widget processors will process the widget and event.
+	 * 
+	 * @param type
+	 *            of the event
+	 * @param params
+	 *            to add to the event
+	 * @memberof AmhObservableObject
+	 */
+	ObservableObject.prototype.fire = function (type, params) {
+		// 1- Call processors
+		var event = _.merge({
+			source: this,
+			type: type
+		}, params || {});
+		var callbacks = this.callbacks;
+
+		// 2- call listeners
+		if (this.isSilent() || !angular.isDefined(callbacks[type])) {
+			return;
+		}
+		var cl = callbacks[type];
+		for(var i = 0; i < cl.length; i++){
+			// TODO: maso, 2018: check if the event is stopped to propagate
+			try {
+				cl[i].apply(cl[i], [event]);
+			} catch (error) {
+				log.error({
+					source: 'ObservableObject',
+					message: 'The listener throw an unexpected exception.',
+					exception: error
+				});
+			}
+		}
+	};
+	
+	return ObservableObject;
+});
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 angular.module('am-wb-core')//
 
 /**
@@ -18199,7 +18298,7 @@ angular.module('am-wb-core')//
 	};
 
 	Processor.prototype.getSelectedWidgets = function(){
-		return this.selectedWidgets || [];
+		return _.clone(this.selectedWidgets || []);
 	};
 
 	Processor.prototype.on = function(event, callback){
@@ -20525,7 +20624,7 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Widgets
- * @name AbstractHtml
+ * @name WbWidgetAbstractHtml
  * @description Manage a widget with html text.
  * 
  * Most of textual widgets (such as h1..h6, p, a, html) just used html
@@ -21033,14 +21132,14 @@ angular.module('am-wb-core')//
  * @name button
  * @description Manage a widget
  */
-.factory('WbWidgetButton', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetButton', function (WbWidgetAbstractHtml) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	return Widget;
 });
 
 /*
@@ -21462,14 +21561,14 @@ angular.module('am-wb-core')//
  * @name figcaption
  * @description Manage a widget
  */
-.factory('WbWidgetFigcaption', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetFigcaption', function (WbWidgetAbstractHtml) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	return Widget;
 });
 
 /*
@@ -21501,14 +21600,14 @@ angular.module('am-wb-core')//
  * @name figure
  * @description Manage a widget
  */
-.factory('WbWidgetFigure', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetFigure', function (WbWidgetGroup) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetGroup.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+	return Widget;
 });
 
 /*
@@ -21540,14 +21639,14 @@ angular.module('am-wb-core')//
  * @name footer
  * @description Manage a widget
  */
-.factory('WbWidgetFooter', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetFooter', function (WbWidgetGroup) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetGroup.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+	return Widget;
 });
 
 /*
@@ -22180,14 +22279,14 @@ angular.module('am-wb-core')//
  * @name main
  * @description Manage a widget
  */
-.factory('WbWidgetMain', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetMain', function (WbWidgetGroup) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetGroup.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+	return Widget;
 });
 
 /*
@@ -22347,14 +22446,14 @@ angular.module('am-wb-core')//
  * @name nav
  * @description Manage a widget
  */
-.factory('WbWidgetNav', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetNav', function (WbWidgetGroup) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetGroup.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+	return Widget;
 });
 
 /*
@@ -23507,7 +23606,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-style-background.html',
-    "<fieldset layout=column> <legend translate>Background</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.background ng-change=\"ctrl.setStyle('background', ctrl.stylesValue.background)\" wb-title=Background wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-color ng-model=ctrl.stylesValue.backgroundColor ng-change=\"ctrl.setStyle('backgroundColor', ctrl.stylesValue.backgroundColor)\" wb-title=Color wb-description=\"\" wb-action-clean> </wb-ui-setting-color> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundImage ng-change=\"ctrl.setStyle('backgroundImage', ctrl.stylesValue.backgroundImage)\" wb-title=Image wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundPosition ng-change=\"ctrl.setStyle('backgroundPosition', ctrl.stylesValue.backgroundPosition)\" wb-title=Position wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundSize ng-change=\"ctrl.setStyle('backgroundSize', ctrl.stylesValue.backgroundSize)\" wb-title=Size wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundRepeat ng-change=\"ctrl.setStyle('backgroundRepeat', ctrl.stylesValue.backgroundRepeat)\" wb-title=Repeat wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundOrigin ng-change=\"ctrl.setStyle('backgroundOrigin', ctrl.stylesValue.backgroundOrigin)\" wb-title=Origin wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundClip ng-change=\"ctrl.setStyle('backgroundClip', ctrl.stylesValue.backgroundClip)\" wb-title=Clip wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundAttachment ng-change=\"ctrl.setStyle('backgroundAttachment', ctrl.stylesValue.backgroundAttachment)\" wb-title=Attachment wb-description=\"\" wb-action-clean> </wb-ui-setting-text> </fieldset>"
+    "<fieldset layout=column> <legend translate>Background</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.background ng-change=\"ctrl.setStyle('background', ctrl.stylesValue.background)\" wb-title=Background wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-color ng-model=ctrl.stylesValue.backgroundColor ng-change=\"ctrl.setStyle('backgroundColor', ctrl.stylesValue.backgroundColor)\" wb-title=Color wb-description=\"\" wb-action-clean> </wb-ui-setting-color> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundImage ng-change=\"ctrl.setStyle('backgroundImage', ctrl.stylesValue.backgroundImage)\" wb-title=Image wb-description=\"\" wb-resource-type=image-url wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundPosition ng-change=\"ctrl.setStyle('backgroundPosition', ctrl.stylesValue.backgroundPosition)\" wb-title=Position wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundSize ng-change=\"ctrl.setStyle('backgroundSize', ctrl.stylesValue.backgroundSize)\" wb-title=Size wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundRepeat ng-change=\"ctrl.setStyle('backgroundRepeat', ctrl.stylesValue.backgroundRepeat)\" wb-title=Repeat wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundOrigin ng-change=\"ctrl.setStyle('backgroundOrigin', ctrl.stylesValue.backgroundOrigin)\" wb-title=Origin wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundClip ng-change=\"ctrl.setStyle('backgroundClip', ctrl.stylesValue.backgroundClip)\" wb-title=Clip wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.backgroundAttachment ng-change=\"ctrl.setStyle('backgroundAttachment', ctrl.stylesValue.backgroundAttachment)\" wb-title=Attachment wb-description=\"\" wb-action-clean> </wb-ui-setting-text> </fieldset>"
   );
 
 
@@ -23522,7 +23621,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-style-layout.html',
-    "<fieldset layout=column> <legend translate>Layout</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.display ng-change=\"ctrl.setStyle('display', ctrl.stylesValue.display)\" wb-title=display wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.order ng-change=\"ctrl.setStyle('order', ctrl.stylesValue.order)\" wb-title=order wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.zIndex ng-change=\"ctrl.setStyle('zIndex', ctrl.stylesValue.zIndex)\" wb-title=zIndex wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.clear ng-change=\"ctrl.setStyle('clear', ctrl.stylesValue.clear)\" wb-title=clear wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.float ng-change=\"ctrl.setStyle('float', ctrl.stylesValue.float)\" wb-title=float wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Position</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.position ng-change=\"ctrl.setStyle('position', ctrl.stylesValue.position)\" wb-title=position wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.bottom ng-change=\"ctrl.setStyle('bottom', ctrl.stylesValue.bottom)\" wb-title=bottom wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.left ng-change=\"ctrl.setStyle('left', ctrl.stylesValue.left)\" wb-title=left wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.right ng-change=\"ctrl.setStyle('right', ctrl.stylesValue.right)\" wb-title=right wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.top ng-change=\"ctrl.setStyle('top', ctrl.stylesValue.top)\" wb-title=top wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>overflow</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.overflow ng-change=\"ctrl.setStyle('overflow', ctrl.stylesValue.overflow)\" wb-title=overflow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.overflowX ng-change=\"ctrl.setStyle('overflowX', ctrl.stylesValue.overflowX)\" wb-title=overflowX wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.overflowY ng-change=\"ctrl.setStyle('overflowY', ctrl.stylesValue.overflowY)\" wb-title=overflowY wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.scrollBehavior ng-change=\"ctrl.setStyle('scrollBehavior', ctrl.stylesValue.scrollBehavior)\" wb-title=scrollBehavior wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Print</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.pageBreakAfter ng-change=\"ctrl.setStyle('pageBreakAfter', ctrl.stylesValue.pageBreakAfter)\" wb-title=pageBreakAfter wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.pageBreakBefore ng-change=\"ctrl.setStyle('pageBreakBefore', ctrl.stylesValue.pageBreakBefore)\" wb-title=pageBreakBefore wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.pageBreakInside ng-change=\"ctrl.setStyle('pageBreakInside', ctrl.stylesValue.pageBreakInside)\" wb-title=pageBreakInside wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Flex</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.alignContent ng-change=\"ctrl.setStyle('alignContent', ctrl.stylesValue.alignContent)\" wb-title=alignContent wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.alignItems ng-change=\"ctrl.setStyle('alignItems', ctrl.stylesValue.alignItems)\" wb-title=alignItems wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.alignSelf ng-change=\"ctrl.setStyle('alignSelf', ctrl.stylesValue.alignSelf)\" wb-title=alignSelf wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.justifyContent ng-change=\"ctrl.setStyle('justifyContent', ctrl.stylesValue.justifyContent)\" wb-title=justifyContent wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flex ng-change=\"ctrl.setStyle('flex', ctrl.stylesValue.flex)\" wb-title=flex wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flexBasis ng-change=\"ctrl.setStyle('flexBasis', ctrl.stylesValue.flexBasis)\" wb-title=flexBasis wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flexDirection ng-change=\"ctrl.setStyle('flexDirection', ctrl.stylesValue.flexDirection)\" wb-title=flexDirection wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flexGrow ng-change=\"ctrl.setStyle('flexGrow', ctrl.stylesValue.flexGrow)\" wb-title=flexGrow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flexShrink ng-change=\"ctrl.setStyle('flexShrink', ctrl.stylesValue.flexShrink)\" wb-title=flexShrink wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flexBasis ng-change=\"ctrl.setStyle('flexBasis', ctrl.stylesValue.flexBasis)\" wb-title=flexBasis wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flexWrap ng-change=\"ctrl.setStyle('flexWrap', ctrl.stylesValue.flexWrap)\" wb-title=flexWrap wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Grid</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.grid ng-change=\"ctrl.setStyle('grid', ctrl.stylesValue.grid)\" wb-title=grid wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridArea ng-change=\"ctrl.setStyle('gridArea', ctrl.stylesValue.gridArea)\" wb-title=gridArea wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridAutoColumns ng-change=\"ctrl.setStyle('gridAutoColumns', ctrl.stylesValue.gridAutoColumns)\" wb-title=gridAutoColumns wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridAutoFlow ng-change=\"ctrl.setStyle('gridAutoFlow', ctrl.stylesValue.gridAutoFlow)\" wb-title=gridAutoFlow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridAutoRows ng-change=\"ctrl.setStyle('gridAutoRows', ctrl.stylesValue.gridAutoRows)\" wb-title=gridAutoRows wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridColumn ng-change=\"ctrl.setStyle('gridColumn', ctrl.stylesValue.gridColumn)\" wb-title=gridColumn wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridColumnEnd ng-change=\"ctrl.setStyle('gridColumnEnd', ctrl.stylesValue.gridColumnEnd)\" wb-title=gridColumnEnd wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridColumnGap ng-change=\"ctrl.setStyle('gridColumnGap', ctrl.stylesValue.gridColumnGap)\" wb-title=gridColumnGap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridColumnStart ng-change=\"ctrl.setStyle('gridColumnStart', ctrl.stylesValue.gridColumnStart)\" wb-title=gridColumnStart wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridGap ng-change=\"ctrl.setStyle('gridGap', ctrl.stylesValue.gridGap)\" wb-title=gridGap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridRow ng-change=\"ctrl.setStyle('gridRow', ctrl.stylesValue.gridRow)\" wb-title=gridRow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridRowEnd ng-change=\"ctrl.setStyle('gridRowEnd', ctrl.stylesValue.gridRowEnd)\" wb-title=gridRowEnd wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridRowGap ng-change=\"ctrl.setStyle('gridRowGap', ctrl.stylesValue.gridRowGap)\" wb-title=gridRowGap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridRowStart ng-change=\"ctrl.setStyle('gridRowStart', ctrl.stylesValue.gridRowStart)\" wb-title=gridRowStart wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridTemplate ng-change=\"ctrl.setStyle('gridTemplate', ctrl.stylesValue.gridTemplate)\" wb-title=gridTemplate wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridTemplateAreas ng-change=\"ctrl.setStyle('gridTemplateAreas', ctrl.stylesValue.gridTemplateAreas)\" wb-title=gridTemplateAreas wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridTemplateColumns ng-change=\"ctrl.setStyle('gridTemplateColumns', ctrl.stylesValue.gridTemplateColumns)\" wb-title=gridTemplateColumns wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridTemplateRows ng-change=\"ctrl.setStyle('gridTemplateRows', ctrl.stylesValue.gridTemplateRows)\" wb-title=gridTemplateRows wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Column</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.columns ng-change=\"ctrl.setStyle('columns', ctrl.stylesValue.columns)\" wb-title=columns wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnWidth ng-change=\"ctrl.setStyle('columnWidth', ctrl.stylesValue.columnWidth)\" wb-title=columnWidth wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnCount ng-change=\"ctrl.setStyle('columnCount', ctrl.stylesValue.columnCount)\" wb-title=columnCount wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnSpan ng-change=\"ctrl.setStyle('columnSpan', ctrl.stylesValue.columnSpan)\" wb-title=columnSpan wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnFill ng-change=\"ctrl.setStyle('columnFill', ctrl.stylesValue.columnFill)\" wb-title=columnFill wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnGap ng-change=\"ctrl.setStyle('columnGap', ctrl.stylesValue.columnGap)\" wb-title=columnGap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnRule ng-change=\"ctrl.setStyle('columnRule', ctrl.stylesValue.columnRule)\" wb-title=columnRule wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-color ng-model=ctrl.stylesValue.columnRuleColor ng-change=\"ctrl.setStyle('columnRuleColor', ctrl.stylesValue.columnRuleColor)\" wb-title=columnRuleColor wb-description=\"\"> </wb-ui-setting-color> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnRuleStyle ng-change=\"ctrl.setStyle('columnRuleStyle', ctrl.stylesValue.columnRuleStyle)\" wb-title=columnRuleStyle wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnRuleWidth ng-change=\"ctrl.setStyle('columnRuleWidth', ctrl.stylesValue.columnRuleWidth)\" wb-title=columnRuleWidth wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+    "<fieldset layout=column> <legend translate>Layout</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.display ng-change=\"ctrl.setStyle('display', ctrl.stylesValue.display)\" wb-title=display wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.order ng-change=\"ctrl.setStyle('order', ctrl.stylesValue.order)\" wb-title=order wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.zIndex ng-change=\"ctrl.setStyle('zIndex', ctrl.stylesValue.zIndex)\" wb-title=zIndex wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.clear ng-change=\"ctrl.setStyle('clear', ctrl.stylesValue.clear)\" wb-title=clear wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.float ng-change=\"ctrl.setStyle('float', ctrl.stylesValue.float)\" wb-title=float wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Position</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.position ng-change=\"ctrl.setStyle('position', ctrl.stylesValue.position)\" wb-title=position wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.bottom ng-change=\"ctrl.setStyle('bottom', ctrl.stylesValue.bottom)\" wb-title=bottom wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.left ng-change=\"ctrl.setStyle('left', ctrl.stylesValue.left)\" wb-title=left wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.right ng-change=\"ctrl.setStyle('right', ctrl.stylesValue.right)\" wb-title=right wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.top ng-change=\"ctrl.setStyle('top', ctrl.stylesValue.top)\" wb-title=top wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>overflow</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.overflow ng-change=\"ctrl.setStyle('overflow', ctrl.stylesValue.overflow)\" wb-title=overflow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.overflowX ng-change=\"ctrl.setStyle('overflowX', ctrl.stylesValue.overflowX)\" wb-title=overflowX wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.overflowY ng-change=\"ctrl.setStyle('overflowY', ctrl.stylesValue.overflowY)\" wb-title=overflowY wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.scrollBehavior ng-change=\"ctrl.setStyle('scrollBehavior', ctrl.stylesValue.scrollBehavior)\" wb-title=scrollBehavior wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Print</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.pageBreakAfter ng-change=\"ctrl.setStyle('pageBreakAfter', ctrl.stylesValue.pageBreakAfter)\" wb-title=pageBreakAfter wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.pageBreakBefore ng-change=\"ctrl.setStyle('pageBreakBefore', ctrl.stylesValue.pageBreakBefore)\" wb-title=pageBreakBefore wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.pageBreakInside ng-change=\"ctrl.setStyle('pageBreakInside', ctrl.stylesValue.pageBreakInside)\" wb-title=pageBreakInside wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Flex</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.alignContent ng-change=\"ctrl.setStyle('alignContent', ctrl.stylesValue.alignContent)\" wb-title=alignContent wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.alignItems ng-change=\"ctrl.setStyle('alignItems', ctrl.stylesValue.alignItems)\" wb-title=alignItems wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.alignSelf ng-change=\"ctrl.setStyle('alignSelf', ctrl.stylesValue.alignSelf)\" wb-title=alignSelf wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.justifyContent ng-change=\"ctrl.setStyle('justifyContent', ctrl.stylesValue.justifyContent)\" wb-title=justifyContent wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flex ng-change=\"ctrl.setStyle('flex', ctrl.stylesValue.flex)\" wb-title=flex wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flexBasis ng-change=\"ctrl.setStyle('flexBasis', ctrl.stylesValue.flexBasis)\" wb-title=flexBasis wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flexDirection ng-change=\"ctrl.setStyle('flexDirection', ctrl.stylesValue.flexDirection)\" wb-title=flexDirection wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flexGrow ng-change=\"ctrl.setStyle('flexGrow', ctrl.stylesValue.flexGrow)\" wb-title=flexGrow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flexShrink ng-change=\"ctrl.setStyle('flexShrink', ctrl.stylesValue.flexShrink)\" wb-title=flexShrink wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.flexWrap ng-change=\"ctrl.setStyle('flexWrap', ctrl.stylesValue.flexWrap)\" wb-title=flexWrap wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Grid</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.grid ng-change=\"ctrl.setStyle('grid', ctrl.stylesValue.grid)\" wb-title=grid wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridArea ng-change=\"ctrl.setStyle('gridArea', ctrl.stylesValue.gridArea)\" wb-title=gridArea wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridAutoColumns ng-change=\"ctrl.setStyle('gridAutoColumns', ctrl.stylesValue.gridAutoColumns)\" wb-title=gridAutoColumns wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridAutoFlow ng-change=\"ctrl.setStyle('gridAutoFlow', ctrl.stylesValue.gridAutoFlow)\" wb-title=gridAutoFlow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridAutoRows ng-change=\"ctrl.setStyle('gridAutoRows', ctrl.stylesValue.gridAutoRows)\" wb-title=gridAutoRows wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridColumn ng-change=\"ctrl.setStyle('gridColumn', ctrl.stylesValue.gridColumn)\" wb-title=gridColumn wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridColumnEnd ng-change=\"ctrl.setStyle('gridColumnEnd', ctrl.stylesValue.gridColumnEnd)\" wb-title=gridColumnEnd wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridColumnGap ng-change=\"ctrl.setStyle('gridColumnGap', ctrl.stylesValue.gridColumnGap)\" wb-title=gridColumnGap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridColumnStart ng-change=\"ctrl.setStyle('gridColumnStart', ctrl.stylesValue.gridColumnStart)\" wb-title=gridColumnStart wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridGap ng-change=\"ctrl.setStyle('gridGap', ctrl.stylesValue.gridGap)\" wb-title=gridGap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridRow ng-change=\"ctrl.setStyle('gridRow', ctrl.stylesValue.gridRow)\" wb-title=gridRow wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridRowEnd ng-change=\"ctrl.setStyle('gridRowEnd', ctrl.stylesValue.gridRowEnd)\" wb-title=gridRowEnd wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridRowGap ng-change=\"ctrl.setStyle('gridRowGap', ctrl.stylesValue.gridRowGap)\" wb-title=gridRowGap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridRowStart ng-change=\"ctrl.setStyle('gridRowStart', ctrl.stylesValue.gridRowStart)\" wb-title=gridRowStart wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridTemplate ng-change=\"ctrl.setStyle('gridTemplate', ctrl.stylesValue.gridTemplate)\" wb-title=gridTemplate wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridTemplateAreas ng-change=\"ctrl.setStyle('gridTemplateAreas', ctrl.stylesValue.gridTemplateAreas)\" wb-title=gridTemplateAreas wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridTemplateColumns ng-change=\"ctrl.setStyle('gridTemplateColumns', ctrl.stylesValue.gridTemplateColumns)\" wb-title=gridTemplateColumns wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.gridTemplateRows ng-change=\"ctrl.setStyle('gridTemplateRows', ctrl.stylesValue.gridTemplateRows)\" wb-title=gridTemplateRows wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Column</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.columns ng-change=\"ctrl.setStyle('columns', ctrl.stylesValue.columns)\" wb-title=columns wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnWidth ng-change=\"ctrl.setStyle('columnWidth', ctrl.stylesValue.columnWidth)\" wb-title=columnWidth wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnCount ng-change=\"ctrl.setStyle('columnCount', ctrl.stylesValue.columnCount)\" wb-title=columnCount wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnSpan ng-change=\"ctrl.setStyle('columnSpan', ctrl.stylesValue.columnSpan)\" wb-title=columnSpan wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnFill ng-change=\"ctrl.setStyle('columnFill', ctrl.stylesValue.columnFill)\" wb-title=columnFill wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnGap ng-change=\"ctrl.setStyle('columnGap', ctrl.stylesValue.columnGap)\" wb-title=columnGap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnRule ng-change=\"ctrl.setStyle('columnRule', ctrl.stylesValue.columnRule)\" wb-title=columnRule wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-color ng-model=ctrl.stylesValue.columnRuleColor ng-change=\"ctrl.setStyle('columnRuleColor', ctrl.stylesValue.columnRuleColor)\" wb-title=columnRuleColor wb-description=\"\"> </wb-ui-setting-color> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnRuleStyle ng-change=\"ctrl.setStyle('columnRuleStyle', ctrl.stylesValue.columnRuleStyle)\" wb-title=columnRuleStyle wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.columnRuleWidth ng-change=\"ctrl.setStyle('columnRuleWidth', ctrl.stylesValue.columnRuleWidth)\" wb-title=columnRuleWidth wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
   );
 
 
@@ -23585,7 +23684,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-widget-img.html',
-    "<fieldset layout=column> <legend translate>Image</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.alt ng-change=\"ctrl.setAttribute('alt', ctrl.attributesValue.alt)\" wb-title=alg wb-description=\"Defines an alternative text description of the image.\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.crossorigin ng-change=\"ctrl.setAttribute('crossorigin', ctrl.attributesValue.crossorigin)\" wb-title=crossorigin wb-description=\"Indicates if the fetching of the image must be done using CORS.\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.longdesc ng-change=\"ctrl.setAttribute('longdesc', ctrl.attributesValue.longdesc)\" wb-title=longdesc wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Source</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"Path of the image\" wb-resource-type=image-url> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.srcset ng-change=\"ctrl.setAttribute('srcset', ctrl.attributesValue.srcset)\" wb-title=srcset wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Map</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.ismap ng-change=\"ctrl.setAttribute('ismap', ctrl.attributesValue.ismap)\" wb-title=ismap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.usemap ng-change=\"ctrl.setAttribute('usemap', ctrl.attributesValue.usemap)\" wb-title=usemap wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Size</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.size ng-change=\"ctrl.setAttribute('size', ctrl.attributesValue.size)\" wb-title=size wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.height ng-change=\"ctrl.setAttribute('height', ctrl.attributesValue.height)\" wb-title=height wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.width ng-change=\"ctrl.setAttribute('width', ctrl.attributesValue.width)\" wb-title=width wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+    "<fieldset layout=column> <legend translate>Image</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.alt ng-change=\"ctrl.setAttribute('alt', ctrl.attributesValue.alt)\" wb-title=Alternative wb-description=\"Defines an alternative text description of the image.\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.crossorigin ng-change=\"ctrl.setAttribute('crossorigin', ctrl.attributesValue.crossorigin)\" wb-title=\"Cross Oorigin\" wb-description=\"Indicates if the fetching of the image must be done using CORS.\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.longdesc ng-change=\"ctrl.setAttribute('longdesc', ctrl.attributesValue.longdesc)\" wb-title=\"Long Description\" wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Source</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=Source wb-description=\"Path of the image\" wb-resource-type=image-url> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.srcset ng-change=\"ctrl.setAttribute('srcset', ctrl.attributesValue.srcset)\" wb-title=\"Source Set\" wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Map</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.ismap ng-change=\"ctrl.setAttribute('ismap', ctrl.attributesValue.ismap)\" wb-title=\"Is Map\" wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.usemap ng-change=\"ctrl.setAttribute('usemap', ctrl.attributesValue.usemap)\" wb-title=\"Use Map\" wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Size</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.size ng-change=\"ctrl.setAttribute('size', ctrl.attributesValue.size)\" wb-title=Size wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.height ng-change=\"ctrl.setAttribute('height', ctrl.attributesValue.height)\" wb-title=Height wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.width ng-change=\"ctrl.setAttribute('width', ctrl.attributesValue.width)\" wb-title=Width wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
   );
 
 

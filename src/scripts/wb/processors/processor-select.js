@@ -143,7 +143,7 @@ angular.module('am-wb-core')//
 	};
 
 	Processor.prototype.getSelectedWidgets = function(){
-		return this.selectedWidgets || [];
+		return _.clone(this.selectedWidgets || []);
 	};
 
 	Processor.prototype.on = function(event, callback){

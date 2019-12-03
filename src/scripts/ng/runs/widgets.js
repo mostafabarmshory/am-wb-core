@@ -46,12 +46,17 @@ angular.module('am-wb-core')
 /***********************************************************************
  * Providers
  ***********************************************************************/
-.run(function ($widget, $http, $mdMedia, $wbWindow, $wbLocal, $WbProviderTimeout, $dispatcher, $storage, $routeParams) {
+.run(function (
+		/* angularjs */ $location, $http, $routeParams, 
+		/* WB        */ $widget, $mdMedia, 
+		$wbWindow, $wbLocal, $WbProviderTimeout, 
+		$dispatcher, $storage) {
 	$widget//
 	.setProvider('$http', $http)
 	.setProvider('$window', $wbWindow)
-	.setProvider('$dispatcher', $dispatcher)
+	.setProvider('$location', $location)
 	.setProvider('$routeParams', $routeParams)
+	.setProvider('$dispatcher', $dispatcher)
 	.setProvider('$storage', $storage)
 	.setProvider('$timeout', $WbProviderTimeout)
 	.setProvider('$local', $wbLocal)
@@ -455,7 +460,11 @@ angular.module('am-wb-core')
 		help: 'http://dpq.co.ir/more-information-img',
 		model: {
 			html: 'img',
-			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+			src: 'resources/wb-brand-3.0.png',
+			style: {
+				width: '80%',
+				maxWidth: '500px'
+			}
 		},
 		controllerAs: 'ctrl',
 		controller: 'WbWidgetImg',

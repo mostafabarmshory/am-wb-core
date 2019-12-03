@@ -34,283 +34,262 @@ angular.module('am-wb-core')//
  * utilities.
  * 
  */
-.controller('WbSettingPageCtrl', function () {
-    /*
-     * Attributes
-     */
-    this.widget = null;
-    this.attributes = [];
-    this.attributesValue = {};
-    this.styles = [];
-    this.stylesValue = {};
-    this.callbacks = {
-            widgetChanged: []
-    };
+.controller('WbSettingPageCtrl', function (WbObservableObject) {
+	// extend from observable object
+	angular.extend(this, WbObservableObject.prototype);
+	WbObservableObject.apply(this);
+	/*
+	 * Attributes
+	 */
+	this.widgets = [];
+	this.attributes = [];
+	this.attributesValue = {};
+	this.styles = [];
+	this.stylesValue = {};
+	this.callbacks = {
+			widgetChanged: []
+	};
 
-    /********************************************************
-     * Widget management
-     ********************************************************/
-    /**
-     * Sets new widget into the setting page
-     * 
-     * Note: the old widget will be removed from the view and the
-     * new one is connect.
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param widget {Widget} to track
-     */
-    this.setWidget = function (widget) {
-        var oldWidget = this.widget;
-        this.disconnect();
-        this.widget = widget;
-        this.connect();
-        // load values
-        this.loadAttributes();
-        this.loadStyles();
-        // propagate the change
-        this.fire('widgetChanged', {
-            value: widget,
-            oldValue: oldWidget
-        });
-    };
+	/********************************************************
+	 * Widget management
+	 ********************************************************/
+	/**
+	 * Sets new widgets list into the setting page
+	 * 
+	 * Note: the old widgets will be removed from the view and the
+	 * new one is connect.
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param widget {Widget} to track
+	 */
+	this.setWidget = function (widgets) {
+		widgets =  widgets || [];
+		if(!_.isArray(widgets)){
+			widgets = [widgets];
+		}
+		var oldWidgets = this.widgets;
+		this.disconnect();
+		this.widgets = widgets;
+		this.connect();
+		// load values
+		this.loadAttributes();
+		this.loadStyles();
+		// propagate the change
+		this.fire('widgetChanged', {
+			value: widgets,
+			oldValue: oldWidgets
+		});
+	};
 
-    /**
-     * Gets the current widget 
-     * 
-     * @memberof WbSettingPageCtrl
-     * @return the current widget
-     */
-    this.getWidget = function () {
-        return this.widget;
-    };
+	/**
+	 * Gets the current widgets list 
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @return the current widget
+	 */
+	this.getWidgets = function () {
+		return this.widgets;
+	};
 
-    /**
-     * Checks if the current widget is the root
-     * 
-     * @memberof WbSettingPageCtrl
-     * @return true if the widget is root
-     */
-    this.isRootWidget = function () {
-        var widget = this.getWidget();
-        if (!widget) {
-            return false;
-        }
-        return widget.isRoot();
-    };
+	/**
+	 * Checks if the current widget can contain others
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @return true if the widget is a container
+	 */
+	this.isContainerWidget = function(){
+		var widgets = this.getWidgets();
+		if(widgets.length === 0 || widgets.length > 1){
+			return false;
+		}
+		var widget = widgets[0];
+		return !widget.isLeaf();
+	};
 
-    /**
-     * Checks if the current widget can contain others
-     * 
-     * @memberof WbSettingPageCtrl
-     * @return true if the widget is a container
-     */
-    this.isContainerWidget = function(){
-        var widget = this.getWidget();
-        if (!widget) {
-            return false;
-        }
-        return !widget.isLeaf();
-    };
+	/**
+	 * Removes listeners to the widget
+	 * 
+	 * The controller track the widget changes by adding listener into it. This
+	 * function removes all listener.
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 */
+	this.disconnect = function(){
+		var widgets = this.getWidgets();
+		if(_.isEmpty(widgets) || !_.isFunction(this.widgetListener)){
+			return;
+		}
+		var ctrl = this;
+		_.forEach(widgets, function(widget){
+			widget.off('modelUpdated', ctrl.widgetListener);
+		});
+	};
 
-    /**
-     * Removes listeners to the widget
-     * 
-     * The controller track the widget changes by adding listener into it. This
-     * function removes all listener.
-     * 
-     * @memberof WbSettingPageCtrl
-     */
-    this.disconnect = function(){
-        var widget = this.getWidget();
-        if(_.isEmpty(widget) || !_.isFunction(this.widgetListener)){
-            return;
-        }
-        widget.off('modelUpdated', this.widgetListener);
-    };
+	/**
+	 * Adds listeners to the widget
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 */
+	this.connect= function(){
+		var widgets = this.getWidgets();
+		if(_.isEmpty(widgets)){
+			return;
+		}
+		if(_.isEmpty(this.widgetListeners)){
+			var ctrl = this;
+			this.widgetListener = function($event) {
+				if(ctrl.isSilent()){
+					return;
+				}
+				if($event.type === 'modelUpdated'){
+					ctrl.updateValues($event.key);
+				}
+			};
+		}
+		// Adding listeners
+		_.forEach(widgets, function(widget){
+			widget.on('modelUpdated', ctrl.widgetListener);
+		});
+	};
 
-    /**
-     * Adds listeners to the widget
-     * 
-     * @memberof WbSettingPageCtrl
-     */
-    this.connect= function(){
-        var widget = this.getWidget();
-        if(_.isEmpty(widget)){
-            return;
-        }
-        if(_.isEmpty(this.widgetListener)){
-            var ctrl = this;
-            this.widgetListener = function($event) {
-                var widget = ctrl.widget;
-                if($event.type === 'modelUpdated'){
-                    var key = $event.key;
-                    // load property
-                    if(_.includes(ctrl.attributes, key)){
-                        ctrl.attributesValue[key] = widget.getModelProperty(key);
-                        return;
-                    }
-                    
-                    // load style
-                    if(key.startsWith('style.')){
-                        var styleKey =  key.substring(6);
-                        if(_.includes(ctrl.styles, styleKey)){
-                            ctrl.stylesValue[styleKey] = widget.getModelProperty(key);
-                        }
-                        return;
-                    }
-                }
-            };
-        }
-        widget.on('modelUpdated', this.widgetListener);
-    };
 
-    /*
-     * INTERNAL
-     */
-    this.fire = function (key, event){
-        _.forEach(this.callbacks[key], function(callback){
-            try{
-                callback.apply(callback, [event]);
-            } catch(ex){
-//                console.error(ex);
-            }
-        });
-    };
+	this.updateValues = function(keys){
+		if(_.isUndefined(keys)){
+			return;
+		}
+		if(!_.isArray(keys)){
+			keys = [keys];
+		}
+		var widgets = this.widgets;
+		var firstFit = widgets.length > 1;
+		var ctrl = this;
+		var attrs = this.attributesValue;
+		var styles = this.stylesValue;
+		_.forEach(keys, function(key){
+			_.forEach(widgets, function(widget){
+				// load attribute
+				if(_.includes(ctrl.attributes, key)){
+					if(!firstFit || _.isUndefined(attrs[key])){
+						attrs[key] = widget.getModelProperty(key);
+					}
+					return;
+				}
+				// load style
+				if(!key.startsWith('style.')){
+					return;
+				}
+				var stylekey =  key.substring(6);
+				if(_.includes(ctrl.styles, stylekey)){
+					if(!firstFit || _.isUndefined(styles[key])){
+						styles[stylekey] = widget.getModelProperty(key);
+					}
+				}
+			});
+		});
+	};
 
-    /**
-     * Adds listeners to the widget
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param key {string} of the event
-     * @param callback {Function} to call on event
-     */
-    this.on = function(key, callback){
-        this.callbacks[key].push(callback);
-    };
+	/***************************************************************
+	 * Track widget changes
+	 ***************************************************************/
 
-    /**
-     * Adds listeners to the widget
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param key {string} of the event
-     * @param callback {Function} to call on event
-     */
-    this.off = function(key, callback) {
-        _.remove(this.callbacks[key], function(cl){
-            return cl === callback;
-        });
-    };
+	/*
+	 * INTERNAL
+	 */
+	this.loadAttributes= function(){
+		// 0- clean
+		this.attributesValue = {};
+		this.updateValues(this.attributes);
+	};
 
-    /***************************************************************
-     * Track widget changes
-     ***************************************************************/
+	/*
+	 * INTERNAL
+	 */
+	this.loadStyles= function(){
+		// 0- clean
+		this.stylesValue = {};
+		this.updateValues(_.map(this.styles, function(styleKey){
+			return 'style.'+styleKey;
+		}));
+	};
 
-    /*
-     * INTERNAL
-     */
-    this.loadAttributes= function(){
-        // 0- clean
-        this.attributesValue = {};
+	this.setSilent = function(silent){
+		this._silent = silent;
+	};
 
-        // 1- check
-        var widget = this.getWidget();
-        if(_.isEmpty(widget)){
-            return;
-        }
+	this.isSilent = function(){
+		return this._silent;
+	};
 
-        // 2- load
-        var ctrl = this;
-        _.forEach(this.attributes, function(attrKey){
-            ctrl.attributesValue[attrKey] = widget.getModelProperty(attrKey);
-        });
-    };
+	/* **************************************************************
+	 * attribute utilities
+	 * **************************************************************/
+	/**
+	 * Adds list of attributes to track
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param {string[]} attributes to track
+	 */
+	this.trackAttributes = function(attributes){
+		this.attributes = attributes || [];
+		this.loadAttributes();
+	};
 
-    /*
-     * INTERNAL
-     */
-    this.loadStyles= function(){
-        // 0- clean
-        this.stylesValue = {};
+	/**
+	 * Adds key,value as attribute to the page
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param {string} key to use
+	 * @param {string} value to set for the key
+	 */
+	this.setAttribute = function (key, value) {
+		if (_.isEmpty(this.widgets)) {
+			return;
+		}
+		this.setSilent(true);
+		try{
+			this.attributesValue[key] = value;
+			_.forEach(this.widgets, function(widget){
+				widget.setModelProperty(key, value);
+			});
+		} finally {
+			this.setSilent(false);
+		}
+	};
 
-        // 1- check
-        var widget = this.getWidget();
-        if(_.isEmpty(widget)){
-            return;
-        }
+	/* **************************************************************
+	 * style utilities
+	 * **************************************************************/
+	/**
+	 * Adds list of styles to track
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param {string[]} styles to track
+	 */
+	this.trackStyles = function(styles){
+		this.styles = styles || [];
+		this.loadStyles();
+	};
 
-        // 2- load
-        var ctrl = this;
-        _.forEach(this.styles, function(styleKey){
-            ctrl.stylesValue[styleKey] = widget.getModelProperty('style.'+styleKey);
-        });
-    };
-    /* **************************************************************
-     * attribute utilities
-     * **************************************************************/
-    /**
-     * Adds list of attributes to track
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param {string[]} attributes to track
-     */
-    this.trackAttributes = function(attributes){
-        this.attributes = attributes || [];
-        this.loadAttributes();
-    };
+	/**
+	 * Adds key,value as style to the widget
+	 * 
+	 * @memberof WbSettingPageCtrl
+	 * @param {string} key to use
+	 * @param {string} value to set for the key
+	 */
+	this.setStyle = function (key, value) {
+		if (_.isEmpty(this.widgets)) {
+			return;
+		}
+		this.stylesValue[key] = value;
+		this.setSilent(true);
+		try{
+			_.forEach(this.widgets, function(widget){
+				widget.setModelProperty('style.' + key, value);
+			});
+		} finally {
+			this.setSilent(false);
+		}
+	};
 
-    /**
-     * Adds key,value as attribute to the page
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param {string} key to use
-     * @param {string} value to set for the key
-     */
-    this.setAttribute = function (key, value) {
-        if (!this.widget) {
-            return;
-        }
-        this.attributesValue[key] = value;
-        this.widget.setModelProperty(key, value);
-    };
-
-    /**
-     * Gets attribute from the current widget
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param {string} key to use
-     */
-    this.getAttribute = function (key) {
-        if (!this.widget) {
-            return;
-        }
-        return this.widget.getModelProperty(key);
-    };
-    /* **************************************************************
-     * style utilities
-     * **************************************************************/
-    /**
-     * Adds list of styles to track
-     * 
-     * @memberof WbSettingPageCtrl
-     * @param {string[]} styles to track
-     */
-    this.trackStyles = function(styles){
-        this.styles = styles || [];
-        this.loadStyles();
-    };
-    
-    this.setStyle = function (key, value) {
-        if (!this.widget) {
-            return;
-        }
-        this.stylesValue[key] = value;
-        this.widget.setModelProperty('style.' + key, value);
-    };
-
-    this.getStyle = function (key) {
-        if (!this.widget) {
-            return;
-        }
-        return this.widget.getModelProperty('style.' + key);
-    };
 });
