@@ -10901,15 +10901,27 @@ angular.module('am-wb-core')
 		type: 'img',
 		label: 'Image',
 		description: 'Manage image widget settings.',
-		icon: 'settings',
+		icon: 'insert_photo',
 		templateUrl: 'views/settings/wb-widget-img.html',
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetImgCtrl',
 		targets: ['img']
 	})
 	.addPage({
+		type: 'input',
+		label: 'Input',
+		description: 'Manage input widget settings.',
+		icon: 'input',
+		templateUrl: 'views/settings/wb-widget-input.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetInputCtrl',
+		targets: ['input']
+	})
+	.addPage({
 		type: 'microdata',
 		label: 'Microdata',
+		description: 'Manage widget microdata.',
+		icon: 'label_important',
 		templateUrl: 'views/settings/wb-widget-microdata.html',
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetMicrodataCtrl'
@@ -10917,6 +10929,8 @@ angular.module('am-wb-core')
 	.addPage({
 		type: 'iframe',
 		label: 'Frame',
+		description: 'Manges IFrame attributes',
+		icon: 'filter_frames',
 		templateUrl: 'views/settings/wb-widget-iframe.html',
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetIFrameCtrl',
@@ -14921,6 +14935,55 @@ angular.module('am-wb-core')//
             'width',
         ]);
     };
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Settings
+ * @name WbSettingWidgetInputCtrl
+ * @description Manage Widget input
+ * 
+ */
+.controller('WbSettingWidgetInputCtrl', function () {
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		this.trackAttributes(['accept', 'alt',
+			'autocomplete', 'autofocus', 'checked',
+			'dirname', 'disabled', 
+			'form', 'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget',
+			'height', 'list','max',
+			'maxlength', 'min', 'multiple', 'name',
+			'pattern', 'placeholder', 'readonly',
+			'required', 'size', 'src', 'step', 'inputType',
+			'value', 'width']);
+	};
 });
 
 /*
@@ -22004,53 +22067,55 @@ angular.module('am-wb-core')//
  * clients.
  * 
  */
-.factory('WbWidgetInput', function (WbWidgetAbstractHtml) {
-    /**
-     * Creates new instance of the group
-     * 
-     * @memberof WbWidgetGroupCtrl
-     * @ngInject
-     */
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes('accept', 'alt',
-                'autocomplete', 'autofocus', 'checked',
-                'dirname', 'disabled', 'form', 'max',
-                'maxlength', 'min', 'multiple', 'name',
-                'pattern', 'placeholder', 'readonly',
-                'required', 'size', 'src', 'step', 'inputType',
-                'value');
-        // init input
-        var ctrl = this;
-        function eventHandler(event){
-            if(event.key === 'inputType'){
-                ctrl.setElementAttribute('type', event.value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-    }
+.factory('WbWidgetInput', function (WbWidgetAbstract) {
+	/**
+	 * Creates new instance of the group
+	 * 
+	 * @memberof WbWidgetGroupCtrl
+	 * @ngInject
+	 */
+	function Widget($element, $parent){
+		WbWidgetAbstract.apply(this, [$element, $parent]);
+		this.addElementAttributes('accept', 'alt',
+				'autocomplete', 'autofocus', 'checked',
+				'dirname', 'disabled', 
+				'form', 'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget',
+				'height', 'list','max',
+				'maxlength', 'min', 'multiple', 'name',
+				'pattern', 'placeholder', 'readonly',
+				'required', 'size', 'src', 'step', 'inputType',
+				'value', 'width');
+		// init input
+		var ctrl = this;
+		function eventHandler(event){
+			if(event.key === 'inputType'){
+				ctrl.setElementAttribute('type', event.value);
+			}
+		}
+		// listen on change
+		this.on('modelUpdated', eventHandler);
+		this.on('runtimeModelUpdated', eventHandler);
+	}
 
-    // extend functionality
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
 
 
-    /**
-     * Gets value of the input
-     * 
-     * @memberof input
-     */
-    Widget.prototype.val = function(){
-        var value = arguments[0];
-        if(value){
-            this.setElementAttribute('value', value);
-        }
-        var element = this.getElement();
-        return element.val.apply(element, arguments);
-    };
+	/**
+	 * Gets value of the input
+	 * 
+	 * @memberof input
+	 */
+	Widget.prototype.val = function(){
+		var value = arguments[0];
+		if(value){
+			this.setElementAttribute('value', value);
+		}
+		var element = this.getElement();
+		return element.val.apply(element, arguments);
+	};
 
-    return Widget;
+	return Widget;
 });
 
 /*
@@ -23690,30 +23755,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-widget-input.html',
-    "<fieldset layout=column> <md-input-container style=\"margin: 0px;margin-top: 10px\" ng-repeat=\"name in [\n" +
-    "\t\t\t\t'accept',\n" +
-    "\t\t\t\t'alt', \n" +
-    "\t\t\t\t'autocomplete', \n" +
-    "\t\t\t\t'autofocus', \n" +
-    "\t\t\t\t'checked', \n" +
-    "\t\t\t\t'dirname', \n" +
-    "\t\t\t\t'disabled', \n" +
-    "\t\t\t\t'form',\n" +
-    "\t\t\t\t'max', \n" +
-    "\t\t\t\t'maxlength', \n" +
-    "\t\t\t\t'min', \n" +
-    "\t\t\t\t'multiple',\n" +
-    "\t\t\t\t'name', \n" +
-    "\t\t\t\t'pattern', \n" +
-    "\t\t\t\t'placeholder', \n" +
-    "\t\t\t\t'readonly', \n" +
-    "\t\t\t\t'required', \n" +
-    "\t\t\t\t'size', \n" +
-    "\t\t\t\t'src', \n" +
-    "\t\t\t\t'step',\n" +
-    "\t\t\t\t'inputType',\n" +
-    "\t\t\t\t'value',\n" +
-    "\t\t\t\t]\"> <label translate=\"\">{{name}}</label> <input ng-model=ctrl[name] ng-change=\"ctrl.setProperty(name, ctrl[name])\"> </md-input-container> </fieldset>"
+    "<fieldset layout=column> <legend translate>Data Validation</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.accept ng-change=\"ctrl.setAttribute('accept', ctrl.attributesValue.accept)\" wb-title=accept wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.alt ng-change=\"ctrl.setAttribute('alt', ctrl.attributesValue.alt)\" wb-title=alt wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.autocomplete ng-change=\"ctrl.setAttribute('autocomplete', ctrl.attributesValue.autocomplete)\" wb-title=autocomplete wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.autofocus ng-change=\"ctrl.setAttribute('autofocus', ctrl.attributesValue.autofocus)\" wb-title=autofocus wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.checked ng-change=\"ctrl.setAttribute('checked', ctrl.attributesValue.checked)\" wb-title=checked wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.dirname ng-change=\"ctrl.setAttribute('dirname', ctrl.attributesValue.dirname)\" wb-title=dirname wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.disabled ng-change=\"ctrl.setAttribute('disabled', ctrl.attributesValue.disabled)\" wb-title=disabled wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.list ng-change=\"ctrl.setAttribute('list', ctrl.attributesValue.list)\" wb-title=list wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.max ng-change=\"ctrl.setAttribute('max', ctrl.attributesValue.max)\" wb-title=max wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.maxlength ng-change=\"ctrl.setAttribute('maxlength', ctrl.attributesValue.maxlength)\" wb-title=maxlength wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.min ng-change=\"ctrl.setAttribute('min', ctrl.attributesValue.min)\" wb-title=min wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.multiple ng-change=\"ctrl.setAttribute('multiple', ctrl.attributesValue.multiple)\" wb-title=multiple wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.name ng-change=\"ctrl.setAttribute('name', ctrl.attributesValue.name)\" wb-title=name wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.pattern ng-change=\"ctrl.setAttribute('pattern', ctrl.attributesValue.pattern)\" wb-title=pattern wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.placeholder ng-change=\"ctrl.setAttribute('placeholder', ctrl.attributesValue.placeholder)\" wb-title=placeholder wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.readonly ng-change=\"ctrl.setAttribute('readonly', ctrl.attributesValue.readonly)\" wb-title=readonly wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.required ng-change=\"ctrl.setAttribute('required', ctrl.attributesValue.required)\" wb-title=required wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.step ng-change=\"ctrl.setAttribute('step', ctrl.attributesValue.step)\" wb-title=step wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.inputType ng-change=\"ctrl.setAttribute('inputType', ctrl.attributesValue.inputType)\" wb-title=type wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.value ng-change=\"ctrl.setAttribute('value', ctrl.attributesValue.value)\" wb-title=value wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Form</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.form ng-change=\"ctrl.setAttribute('form', ctrl.attributesValue.form)\" wb-title=form wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.formaction ng-change=\"ctrl.setAttribute('formaction', ctrl.attributesValue.formaction)\" wb-title=formaction wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.formenctype ng-change=\"ctrl.setAttribute('formenctype', ctrl.attributesValue.formenctype)\" wb-title=formenctype wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.formmethod ng-change=\"ctrl.setAttribute('formmethod', ctrl.attributesValue.formmethod)\" wb-title=formmethod wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.formnovalidate ng-change=\"ctrl.setAttribute('formnovalidate', ctrl.attributesValue.formnovalidate)\" wb-title=formnovalidate wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.formtarget ng-change=\"ctrl.setAttribute('formtarget', ctrl.attributesValue.formtarget)\" wb-title=formtarget wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Size</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.size ng-change=\"ctrl.setAttribute('size', ctrl.attributesValue.size)\" wb-title=size wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.height ng-change=\"ctrl.setAttribute('height', ctrl.attributesValue.height)\" wb-title=height wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.width ng-change=\"ctrl.setAttribute('width', ctrl.attributesValue.width)\" wb-title=width wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
   );
 
 

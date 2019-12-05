@@ -33,51 +33,53 @@ angular.module('am-wb-core')//
  * clients.
  * 
  */
-.factory('WbWidgetInput', function (WbWidgetAbstractHtml) {
-    /**
-     * Creates new instance of the group
-     * 
-     * @memberof WbWidgetGroupCtrl
-     * @ngInject
-     */
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes('accept', 'alt',
-                'autocomplete', 'autofocus', 'checked',
-                'dirname', 'disabled', 'form', 'max',
-                'maxlength', 'min', 'multiple', 'name',
-                'pattern', 'placeholder', 'readonly',
-                'required', 'size', 'src', 'step', 'inputType',
-                'value');
-        // init input
-        var ctrl = this;
-        function eventHandler(event){
-            if(event.key === 'inputType'){
-                ctrl.setElementAttribute('type', event.value);
-            }
-        }
-        // listen on change
-        this.on('modelUpdated', eventHandler);
-        this.on('runtimeModelUpdated', eventHandler);
-    }
+.factory('WbWidgetInput', function (WbWidgetAbstract) {
+	/**
+	 * Creates new instance of the group
+	 * 
+	 * @memberof WbWidgetGroupCtrl
+	 * @ngInject
+	 */
+	function Widget($element, $parent){
+		WbWidgetAbstract.apply(this, [$element, $parent]);
+		this.addElementAttributes('accept', 'alt',
+				'autocomplete', 'autofocus', 'checked',
+				'dirname', 'disabled', 
+				'form', 'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget',
+				'height', 'list','max',
+				'maxlength', 'min', 'multiple', 'name',
+				'pattern', 'placeholder', 'readonly',
+				'required', 'size', 'src', 'step', 'inputType',
+				'value', 'width');
+		// init input
+		var ctrl = this;
+		function eventHandler(event){
+			if(event.key === 'inputType'){
+				ctrl.setElementAttribute('type', event.value);
+			}
+		}
+		// listen on change
+		this.on('modelUpdated', eventHandler);
+		this.on('runtimeModelUpdated', eventHandler);
+	}
 
-    // extend functionality
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
 
 
-    /**
-     * Gets value of the input
-     * 
-     * @memberof input
-     */
-    Widget.prototype.val = function(){
-        var value = arguments[0];
-        if(value){
-            this.setElementAttribute('value', value);
-        }
-        var element = this.getElement();
-        return element.val.apply(element, arguments);
-    };
+	/**
+	 * Gets value of the input
+	 * 
+	 * @memberof input
+	 */
+	Widget.prototype.val = function(){
+		var value = arguments[0];
+		if(value){
+			this.setElementAttribute('value', value);
+		}
+		var element = this.getElement();
+		return element.val.apply(element, arguments);
+	};
 
-    return Widget;
+	return Widget;
 });
