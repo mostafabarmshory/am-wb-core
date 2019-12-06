@@ -17284,16 +17284,19 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Processor
- * @name WbProcessorStyle
- * @description Widget processor
+ * @name WbProcessorAbstract
+ * @description Abstract widget processor 
  * 
  */
-.factory('WbProcessorAbstract', function () {
-    'use strict';
+.factory('WbProcessorAbstract', function (WbObservableObject) {
+	'use strict';
 
-    function Processor(){}
+	function Processor(){
+		WbObservableObject.apply(this, arguments);
+	}
+	Processor.prototype = new WbObservableObject();
 
-    return Processor;
+	return Processor;
 });
 
 /*
@@ -18249,37 +18252,29 @@ angular.module('am-wb-core')//
  */
 .factory('WbProcessorSelect', function ($rootScope, $widget, WbProcessorAbstract) {
 	'use strict';
+	var EVENT_TYPE_SELECTION_CHANGE = 'selectionChange';
 
 	function Processor(){
-		WbProcessorAbstract.apply(this);
+		WbProcessorAbstract.apply(this, arguments);
 		this.selectedWidgets = [];
-		this.callbacks = {
-				'selectionChange':[]
-		};
 
 		var ctrl = this;
 		this.clickListener = function($event){
-			ctrl.lock = true;
 			var widget = $event.source;
+			if(ctrl.lock || widget.isSilent() || widget.isSelected()){
+				return;
+			}
+			ctrl.lock = true;
 			try{
-				if(!widget.isSilent()){
-					if(!widget.isSelected()){
-						widget.setSelected(true);
-						if($event.shiftKey){
-							ctrl.selectedWidgets.push(widget);
-						} else {
-							_.forEach(ctrl.selectedWidgets, function(widget){
-								widget.setSelected(false);
-							});
-							ctrl.selectedWidgets = [widget];
-						}
-						$event.widgets = ctrl.selectedWidgets;
-						ctrl.fire('selectionChange', $event);
-						$rootScope.$digest();
-					}
-					$event.preventDefault();
-					$event.stopPropagation();
+				if($event.shiftKey){
+					ctrl.addSelectedWidgets(widget);
+				} else {
+					ctrl.setSelectedWidgets(widget);
 				}
+				$event.preventDefault();
+				$event.stopPropagation();
+				
+				$rootScope.$digest();
 			} catch(ex){
 				log.error({
 					source: 'WbProcessorSelect',
@@ -18292,30 +18287,21 @@ angular.module('am-wb-core')//
 		};
 
 		this.dblclickListener = function($event){
+			var widget = $event.source;
+			if(ctrl.lock || widget.isSilent()){
+				return;
+			}
+			ctrl.lock = true;
 			try{
-				ctrl.lock = true;
-				var widget = $event.source;
-				if(!widget.isSilent()){
-					_.forEach(ctrl.selectedWidgets, function(widget){
-						widget.setSelected(false);
-					});
-					
-					widget.setSelected(true, $event);
+				ctrl.setSelectedWidgets(widget);
+				// Open an editor 
+				var editor = $widget.getEditor(widget);
+				editor.show();
 
-					// clear selection
-					ctrl.selectedWidgets = [widget];
+				$event.preventDefault();
+				$event.stopPropagation();
 
-					// Open an editor 
-					var editor = $widget.getEditor(widget);
-					editor.show();
-
-					$event.widgets = ctrl.selectedWidgets;
-					ctrl.fire('selectionChange', $event);
-
-					$event.preventDefault();
-					$event.stopPropagation();
-					$rootScope.$digest();
-				}
+				$rootScope.$digest();
 			} catch(ex){
 				log.error({
 					source: 'WbProcessorSelect',
@@ -18328,24 +18314,20 @@ angular.module('am-wb-core')//
 		};
 
 		this.selectionListener = function($event){
-			if(ctrl.lock){
+			var widget = $event.source;
+			if(ctrl.lock || widget.isSilent()){
 				return;
 			}
-			var widget = $event.source;
-
-			// clear selection
-			// TODO: maso, 2019: check if shift key is hold
-			_.forEach(ctrl.selectedWidgets, function(widget){
-				widget.setSelected(false);
-			});
-			ctrl.selectedWidgets = [widget];
-
-			$event.widgets = ctrl.selectedWidgets;
-			ctrl.fire('selectionChange', $event);
-			$rootScope.$digest();
+			ctrl.setSelectedWidgets(widget);
 		};
 	}
 	Processor.prototype = new WbProcessorAbstract();
+
+	/**
+	 * Processes the widget based on event
+	 * 
+	 * @memberof WbProcessorSelect
+	 */
 	Processor.prototype.process = function(widget, event){
 		if(event.type !== 'stateChanged') {
 			return;
@@ -18361,54 +18343,57 @@ angular.module('am-wb-core')//
 		}
 	};
 
-	Processor.prototype.getSelectedWidgets = function(){
-		return _.clone(this.selectedWidgets || []);
-	};
-
-	Processor.prototype.on = function(event, callback){
-		this.callbacks[event].push(callback);
-	};
-
-	Processor.prototype.off = function(event, callback){
-		var index = this.callbacks[event].indexOf(callback);
-		if(index > -1){
-			this.callbacks[event].slice(index, 1);
-		}
-	};
-
-	Processor.prototype.fire = function (type, params) {
-		params = params || {};
-
-		// 1- Call processors
-		var event = _.merge({
-			source: this,
-			type: type
-		}, params || {});
-
-		// 2- call listeners
-		if (!angular.isDefined(this.callbacks[type])) {
-			return;
-		}
-		var callbacks = this.callbacks[type];
-		var resultData = null;
-		for(var i = 0; i < callbacks.length; i++){
-			// TODO: maso, 2018: check if the event is stopped to propagate
-			try {
-				resultData = callbacks[i](event) || resultData;
-			} catch (error) {
-				// NOTE: remove on release
-//				console.log(error);
-			}
-		}
-		return resultData;
-	};
-
-
 	/**
 	 * Enable the processor
+	 * 
+	 * @memberof WbProcessorSelect
 	 */
 	Processor.prototype.setEnable = function(enable){
 		this.enable = enable;
+	};
+
+	/**
+	 * Sets selected widgets
+	 * 
+	 * @memberof WbProcessorSelect
+	 */
+	Processor.prototype.setSelectedWidgets = function(widgets){
+		if(!_.isArray(widgets)){
+			widgets = [...arguments];
+		}
+
+		try{
+			this.lock = true;
+			_.forEach(this.selectedWidgets, function(widget){
+				if(!_.includes(widgets, widget)){
+					widget.setSelected(false);
+				}
+			});
+	
+			// clear selection
+			// TODO: maso, 2019: check if shift key is hold
+			this.selectedWidgets = widgets;
+			_.forEach(this.selectedWidgets, function(widget){
+				widget.setSelected(true);
+			});
+		} finally{
+			this.lock = false;
+		}
+
+		this.fire(EVENT_TYPE_SELECTION_CHANGE, {
+			widgets: this.selectedWidgets
+		});
+	};
+
+	Processor.prototype.addSelectedWidgets = function(widgets){
+		if(!_.isArray(widgets)){
+			widgets = [...arguments];
+		}
+		this.setSelectedWidgets(_.concat(this.selectedWidgets, widgets));
+	};
+
+	Processor.prototype.getSelectedWidgets = function(){
+		return _.clone(this.selectedWidgets || []);
 	};
 
 	return Processor;
