@@ -827,6 +827,32 @@ angular.module('am-wb-core')
 		controller: 'WbWidgetQ', 
 	});
 	$widget.newWidget({
+		type: 's',
+		title: 'S',
+		icon: 'wb-widget-s',
+		description: 'The widget is used to define text that is no longer correct.',
+		groups: ['basic'],
+		template: '<s></s>',
+		help: 'http://dpq.co.ir/more-information-s',
+		model: {
+			html: 'Text'
+		},
+		controller: 'WbWidgetS', 
+	});
+	$widget.newWidget({
+		type: 'samp',
+		title: 'Samp',
+		icon: 'wb-widget-samp',
+		description: 'It defines sample output from a computer program.',
+		groups: ['basic'],
+		template: '<samp></samp>',
+		help: 'http://dpq.co.ir/more-information-samp',
+		model: {
+			html: 'Text'
+		},
+		controller: 'WbWidgetSamp', 
+	});
+	$widget.newWidget({
 		type: 'script',
 		title: 'script',
 		label: 'script',
@@ -861,6 +887,19 @@ angular.module('am-wb-core')
 		controller: 'WbWidgetSelect', 
 	});
 	$widget.newWidget({
+		type: 'small',
+		title: 'Small',
+		icon: 'wb-widget-small',
+		description: 'The widget defines smaller text.',
+		groups: ['basic'],
+		template: '<small></small>',
+		help: 'http://dpq.co.ir/more-information-small',
+		model: {
+			html: 'Small text'
+		},
+		controller: 'WbWidgetSmall', 
+	});
+	$widget.newWidget({
 		type: 'source',
 		title: 'Source',
 		label: 'source',
@@ -874,6 +913,32 @@ angular.module('am-wb-core')
 			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
 		},
 		controller: 'WbWidgetSource', 
+	});
+	$widget.newWidget({
+		type: 'span',
+		title: 'Span',
+		icon: 'wb-widget-span',
+		description: 'The widget is used to group inline-elements in a document.',
+		groups: ['basic'],
+		template: '<span></span>',
+		help: 'http://weburger.ir/more-information-span',
+		model: {
+			html: 'Text'
+		},
+		controller: 'WbWidgetSpan', 
+	});
+	$widget.newWidget({
+		type: 'strong',
+		title: 'Strong',
+		icon: 'wb-widget-strong',
+		description: 'The widget defines strong emphasized text.',
+		groups: ['basic'],
+		template: '<strong></strong>',
+		help: 'http://dpq.co.ir/more-information-script',
+		model: {
+			html: 'Text'
+		},
+		controller: 'WbWidgetStrong', 
 	});
 	$widget.newWidget({
 		type: 'style',
@@ -980,5 +1045,4 @@ angular.module('am-wb-core')
 		controller: 'WbWidgetVideo', 
 		isLeaf: false
 	});
-
 });

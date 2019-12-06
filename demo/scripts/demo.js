@@ -166,7 +166,9 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 		'a',
 		'p',
 		'figcaption',
-		'i', 'em', 'strong', 'mark', 'cite', 'dfn', 'span', 'small'
+		'i', 'em', 
+		's', 'samp', 'small', 'span', 'strong', 
+		'mark', 'cite', 'dfn'
 		];
 	_.forEach(lineWidgetsTypes, function(type){
 		$widget.setEditor(type, {

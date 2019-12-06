@@ -11904,6 +11904,32 @@ angular.module('am-wb-core')
 		controller: 'WbWidgetQ', 
 	});
 	$widget.newWidget({
+		type: 's',
+		title: 'S',
+		icon: 'wb-widget-s',
+		description: 'The widget is used to define text that is no longer correct.',
+		groups: ['basic'],
+		template: '<s></s>',
+		help: 'http://dpq.co.ir/more-information-s',
+		model: {
+			html: 'Text'
+		},
+		controller: 'WbWidgetS', 
+	});
+	$widget.newWidget({
+		type: 'samp',
+		title: 'Samp',
+		icon: 'wb-widget-samp',
+		description: 'It defines sample output from a computer program.',
+		groups: ['basic'],
+		template: '<samp></samp>',
+		help: 'http://dpq.co.ir/more-information-samp',
+		model: {
+			html: 'Text'
+		},
+		controller: 'WbWidgetSamp', 
+	});
+	$widget.newWidget({
 		type: 'script',
 		title: 'script',
 		label: 'script',
@@ -11938,6 +11964,19 @@ angular.module('am-wb-core')
 		controller: 'WbWidgetSelect', 
 	});
 	$widget.newWidget({
+		type: 'small',
+		title: 'Small',
+		icon: 'wb-widget-small',
+		description: 'The widget defines smaller text.',
+		groups: ['basic'],
+		template: '<small></small>',
+		help: 'http://dpq.co.ir/more-information-small',
+		model: {
+			html: 'Small text'
+		},
+		controller: 'WbWidgetSmall', 
+	});
+	$widget.newWidget({
 		type: 'source',
 		title: 'Source',
 		label: 'source',
@@ -11951,6 +11990,32 @@ angular.module('am-wb-core')
 			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
 		},
 		controller: 'WbWidgetSource', 
+	});
+	$widget.newWidget({
+		type: 'span',
+		title: 'Span',
+		icon: 'wb-widget-span',
+		description: 'The widget is used to group inline-elements in a document.',
+		groups: ['basic'],
+		template: '<span></span>',
+		help: 'http://weburger.ir/more-information-span',
+		model: {
+			html: 'Text'
+		},
+		controller: 'WbWidgetSpan', 
+	});
+	$widget.newWidget({
+		type: 'strong',
+		title: 'Strong',
+		icon: 'wb-widget-strong',
+		description: 'The widget defines strong emphasized text.',
+		groups: ['basic'],
+		template: '<strong></strong>',
+		help: 'http://dpq.co.ir/more-information-script',
+		model: {
+			html: 'Text'
+		},
+		controller: 'WbWidgetStrong', 
 	});
 	$widget.newWidget({
 		type: 'style',
@@ -12057,7 +12122,6 @@ angular.module('am-wb-core')
 		controller: 'WbWidgetVideo', 
 		isLeaf: false
 	});
-
 });
 
 /* 
@@ -23117,6 +23181,84 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Widgets
+ * @name s
+ * @description Manage a widget
+ */
+.factory('WbWidgetS', function (WbWidgetAbstractHtml) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name WbWidgetSamp
+ * @description Manage a widget
+ */
+.factory('WbWidgetSamp', function (WbWidgetAbstractHtml) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
  * @name script
  * @description Manage a widget
  */
@@ -23229,6 +23371,45 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name small
+ * @description Manage a widget
+ */
+.factory('WbWidgetSmall', function (WbWidgetAbstractHtml) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 'use strict';
 
 angular.module('am-wb-core')//
@@ -23267,6 +23448,84 @@ angular.module('am-wb-core')//
 	Widget.prototype.toString = function(){
 		return 'src:' + this.getProperty('sourceType') || this.getModelProperty('sourceType');
 	};
+	return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name span
+ * @description Manage a widget
+ */
+.factory('WbWidgetSpan', function (WbWidgetAbstractHtml) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name strong
+ * @description Manage a widget
+ */
+.factory('WbWidgetStrong', function (WbWidgetAbstractHtml) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
 	return Widget;
 });
 
