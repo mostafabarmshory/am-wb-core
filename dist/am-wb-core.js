@@ -11504,6 +11504,26 @@ angular.module('am-wb-core')
 	});
 	$widget.newWidget({
 		// widget description
+		type: 'i',
+		title: 'Italics',
+		description: 'The widget defines a part of text in an alternate voice or mood.',
+		icon: 'wb-widget-i',
+		groups: ['basic'],
+		model: {
+			name: 'i',
+			html: 'Text'
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-i',
+		// functional properties
+		template: '<i></i>',
+		controllerAs: 'ctrl',
+		controller: 'WbWidgetI',
+		isLeaf: true,
+	});
+	$widget.newWidget({
+		// widget description
 		type: 'iframe',
 		title: 'Inline Frame',
 		description: 'Add inline frame to show another document within current one.',
@@ -15979,6 +15999,10 @@ angular.module('am-wb-core')//
 					}
 				});
 
+//				editor.on('focusout', function(){
+//					ctrl.closeWithoutSave();
+//				});
+				
 				editor.on('keydown', function(e) {
 					if (e.keyCode === 27) { // escape
 						ctrl.closeWithoutSave();
@@ -16155,6 +16179,10 @@ angular.module('am-wb-core')//
 					}
 				});
 
+//				editor.on('focusout', function(){
+//					ctrl.closeWithoutSave();
+//				});
+				
 				editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
 					event.stopPropagation();
 					editor.save();
@@ -21923,13 +21951,52 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetHr', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetAbstract.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+	return Widget;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widgets
+ * @name i
+ * @description Manage a widget
+ */
+.factory('WbWidgetI', function (WbWidgetAbstractHtml) {
+	'use strict';
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	return Widget;
 });
 
 /*
@@ -21967,13 +22034,13 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbWidgetIframe', function (WbWidgetAbstractHtml) {
-    function Widget($element, $parent){
-        WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-        this.addElementAttributes('name', 'src', 'srcdoc', 'sandbox');
-    }
-    // extend functionality
-    Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-    return Widget;
+	function Widget($element, $parent){
+		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
+		this.addElementAttributes('name', 'src', 'srcdoc', 'sandbox');
+	}
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
+	return Widget;
 });
 
 /*

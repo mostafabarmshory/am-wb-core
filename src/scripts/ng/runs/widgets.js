@@ -427,6 +427,26 @@ angular.module('am-wb-core')
 	});
 	$widget.newWidget({
 		// widget description
+		type: 'i',
+		title: 'Italics',
+		description: 'The widget defines a part of text in an alternate voice or mood.',
+		icon: 'wb-widget-i',
+		groups: ['basic'],
+		model: {
+			name: 'i',
+			html: 'Text'
+		},
+		// help id
+		help: 'http://dpq.co.ir',
+		helpId: 'wb-widget-i',
+		// functional properties
+		template: '<i></i>',
+		controllerAs: 'ctrl',
+		controller: 'WbWidgetI',
+		isLeaf: true,
+	});
+	$widget.newWidget({
+		// widget description
 		type: 'iframe',
 		title: 'Inline Frame',
 		description: 'Add inline frame to show another document within current one.',
