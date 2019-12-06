@@ -144,9 +144,10 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 		options:{
 			inline: true,
 			menubar: false,
+			inline_boundaries: false,
 			plugins: ['link', 'lists', 'powerpaste', 'autolink'],
 			// Toolbar
-			toolbar: ['close save | undo redo | bold italic underline | fontselect fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+			toolbar: ['close save | undo redo | bold italic underline link | fontselect fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
 			fixed_toolbar_container: '#demo-widget-editor-toolbar',
 			toolbar_drawer: 'floating'
 		}
@@ -173,11 +174,12 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 				property: 'html',
 				inline: true,
 				menubar: false,
-				plugins: ['fullscreen', 'autolink'],
-				valid_elements: 'strong,em,span[style],a[href]',
+				inline_boundaries: false,
+				plugins: ['link'],
 				// Toolbar
-				toolbar: 'close save | undo redo | bold italic underline | widgetalignleft widgetaligncenter widgetalignjustify widgetalignright | fullscreen',
-				fixed_toolbar_container: '#demo-widget-editor-toolbar'
+				toolbar: 'close save | undo redo | bold italic underline link| fontselect fontsizeselect | forecolor backcolor | widgetalignleft widgetaligncenter widgetalignjustify widgetalignright ',
+				fixed_toolbar_container: '#demo-widget-editor-toolbar',
+			    toolbar_drawer: 'floating'
 			}
 		});
 	});

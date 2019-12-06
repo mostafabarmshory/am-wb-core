@@ -103,6 +103,10 @@ angular.module('am-wb-core')//
 					}
 				});
 
+//				editor.on('focusout', function(){
+//					ctrl.closeWithoutSave();
+//				});
+				
 				editor.on('keydown', function(e) {
 					if (e.keyCode === 27) { // escape
 						ctrl.closeWithoutSave();

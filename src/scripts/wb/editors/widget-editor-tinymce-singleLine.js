@@ -105,6 +105,10 @@ angular.module('am-wb-core')//
 					}
 				});
 
+//				editor.on('focusout', function(){
+//					ctrl.closeWithoutSave();
+//				});
+				
 				editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
 					event.stopPropagation();
 					editor.save();
