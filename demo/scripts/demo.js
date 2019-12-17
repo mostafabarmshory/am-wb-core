@@ -127,6 +127,7 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 })
 
 
+
 /***********************************************************************
  * Editors
  ***********************************************************************/
@@ -145,9 +146,10 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 			inline: true,
 			menubar: false,
 			inline_boundaries: false,
-			plugins: ['link', 'lists', 'powerpaste', 'autolink'],
+			plugins: ['link', 'lists', 'powerpaste', 'autolink', 'code'],
+			valid_elements: '*[*]',
 			// Toolbar
-			toolbar: ['close save | undo redo | bold italic underline link | fontselect fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+			toolbar: ['close save code | undo redo | bold italic underline link | fontselect fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
 			fixed_toolbar_container: '#demo-widget-editor-toolbar',
 			toolbar_drawer: 'floating'
 		}
@@ -178,9 +180,10 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 				inline: true,
 				menubar: false,
 				inline_boundaries: false,
-				plugins: ['link'],
+				plugins: ['link', 'code'],
+				valid_elements: '*[*]',
 				// Toolbar
-				toolbar: 'close save | undo redo | bold italic underline link| fontselect fontsizeselect | forecolor backcolor | widgetalignleft widgetaligncenter widgetalignjustify widgetalignright ',
+				toolbar: 'close save code| undo redo | bold italic underline link| fontselect fontsizeselect | forecolor backcolor | widgetalignleft widgetaligncenter widgetalignjustify widgetalignright ',
 				fixed_toolbar_container: '#demo-widget-editor-toolbar',
 			    toolbar_drawer: 'floating'
 			}

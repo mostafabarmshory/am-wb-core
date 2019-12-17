@@ -129,7 +129,7 @@ angular.module('am-wb-core')//
 				//
 				// Save button to save and close the editor
 				editor.ui.registry.addButton('save', {
-					text: 'save',
+//					text: 'save',
 					icon: 'save',
 					tooltip: 'Save current changes and close the editor',
 					onAction: function() {
@@ -138,7 +138,7 @@ angular.module('am-wb-core')//
 				});
 				// close button
 				editor.ui.registry.addButton('close', {
-					text: 'close',
+//					text: 'close',
 					icon: 'close',
 					tooltip: 'Close and discards changes',
 					onAction: function() {
