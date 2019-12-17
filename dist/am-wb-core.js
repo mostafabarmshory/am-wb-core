@@ -23986,7 +23986,7 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('views/settings/wb-style-animation.html',
-    "<fieldset layout=column> <legend translate>Animation</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.animation ng-change=\"ctrl.setStyle('animation', ctrl.stylesValue.animation)\" wb-title=Animation wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationName ng-change=\"ctrl.setStyle('animationName', ctrl.stylesValue.animationName)\" wb-title=Name wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationDuration ng-change=\"ctrl.setStyle('animationDuration', ctrl.stylesValue.animationDuration)\" wb-title=Duration wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationTimingFunction ng-change=\"ctrl.setStyle('animationTimingFunction', ctrl.stylesValue.animationTimingFunction)\" wb-title=\"Timing Function\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationDelay ng-change=\"ctrl.setStyle('animationDelay', ctrl.stylesValue.animationDelay)\" wb-title=Delay wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationIterationCount ng-change=\"ctrl.setStyle('animationIterationCount', ctrl.stylesValue.animationIterationCount)\" wb-title=\"Iteration Count\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationDirection ng-change=\"ctrl.setStyle('animationDirection', ctrl.stylesValue.animationDirection)\" wb-title=Direction wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationFillMode ng-change=\"ctrl.setStyle('animationFillMode', ctrl.stylesValue.animationFillMode)\" wb-title=\"Fill Mode\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationPlayState ng-change=\"ctrl.setStyle('animationPlayState', ctrl.stylesValue.animationPlayState)\" wb-title=\"Play State\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> </fieldset>"
+    "<fieldset layout=column> <legend translate>Animation</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.animation ng-change=\"ctrl.setStyle('animation', ctrl.stylesValue.animation)\" wb-title=Animation wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationName ng-change=\"ctrl.setStyle('animationName', ctrl.stylesValue.animationName)\" wb-title=Name wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationDuration ng-change=\"ctrl.setStyle('animationDuration', ctrl.stylesValue.animationDuration)\" wb-title=Duration wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationTimingFunction ng-change=\"ctrl.setStyle('animationTimingFunction', ctrl.stylesValue.animationTimingFunction)\" wb-title=\"Timing Function\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationDelay ng-change=\"ctrl.setStyle('animationDelay', ctrl.stylesValue.animationDelay)\" wb-title=Delay wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationIterationCount ng-change=\"ctrl.setStyle('animationIterationCount', ctrl.stylesValue.animationIterationCount)\" wb-title=\"Iteration Count\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationDirection ng-change=\"ctrl.setStyle('animationDirection', ctrl.stylesValue.animationDirection)\" wb-title=Direction wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationFillMode ng-change=\"ctrl.setStyle('animationFillMode', ctrl.stylesValue.animationFillMode)\" wb-title=\"Fill Mode\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.animationPlayState ng-change=\"ctrl.setStyle('animationPlayState', ctrl.stylesValue.animationPlayState)\" wb-title=\"Play State\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Transform</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.transform ng-change=\"ctrl.setStyle('transform', ctrl.stylesValue.transform)\" wb-title=\"Play State\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.transformOrigin ng-change=\"ctrl.setStyle('transformOrigin', ctrl.stylesValue.transformOrigin)\" wb-title=\"Play State\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.transformStyle ng-change=\"ctrl.setStyle('transformStyle', ctrl.stylesValue.transformStyle)\" wb-title=\"Play State\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Transition</legend> <wb-ui-setting-text ng-model=ctrl.stylesValue.transition ng-change=\"ctrl.setStyle('transition', ctrl.stylesValue.transition)\" wb-title=\"Play State\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.transitionProperty ng-change=\"ctrl.setStyle('transitionProperty', ctrl.stylesValue.transitionProperty)\" wb-title=\"Play State\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.transitionDuration ng-change=\"ctrl.setStyle('transitionDuration', ctrl.stylesValue.transitionDuration)\" wb-title=\"Play State\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.transitionTimingFunction ng-change=\"ctrl.setStyle('transitionTimingFunction', ctrl.stylesValue.transitionTimingFunction)\" wb-title=\"Play State\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.stylesValue.transitionDelay ng-change=\"ctrl.setStyle('transitionDelay', ctrl.stylesValue.transitionDelay)\" wb-title=\"Play State\" wb-description=\"\" wb-action-clean> </wb-ui-setting-text> </fieldset>"
   );
 
 
@@ -24095,61 +24095,6 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/settings/wb-widget-video.html',
     "<fieldset layout=column> <legend translate>audio</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.autoplay ng-change=\"ctrl.setAttribute('autoplay', ctrl.attributesValue.autoplay)\" wb-title=autoplay wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.controls ng-change=\"ctrl.setAttribute('controls', ctrl.attributesValue.controls)\" wb-title=controls wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.loop ng-change=\"ctrl.setAttribute('loop', ctrl.attributesValue.loop)\" wb-title=loop wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.muted ng-change=\"ctrl.setAttribute('muted', ctrl.attributesValue.muted)\" wb-title=muted wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.preload ng-change=\"ctrl.setAttribute('preload', ctrl.attributesValue.preload)\" wb-title=preload wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.height ng-change=\"ctrl.setAttribute('height', ctrl.attributesValue.height)\" wb-title=height wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.poster ng-change=\"ctrl.setAttribute('poster', ctrl.attributesValue.poster)\" wb-title=poster wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.usemap ng-change=\"ctrl.setAttribute('usemap', ctrl.attributesValue.usemap)\" wb-title=usemap wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.width ng-change=\"ctrl.setAttribute('width', ctrl.attributesValue.width)\" wb-title=width wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
-  );
-
-
-  $templateCache.put('views/widgets/wb-html.html',
-    "<div>  <div ng-if=!ctrl.isEditable() ng-bind-html=\"ctrl.text | wbunsafe\" class=\"wb-widget-fill wb-widget-text\"> </div> <div ng-if=ctrl.isEditable() ui-tinymce=\"{\n" +
-    "\t        selector : 'div.tinymce', \n" +
-    "\t        menubar: true,\n" +
-    "\t        inline: true,\n" +
-    "\t        theme: 'modern',\n" +
-    "\t        plugins : [\n" +
-    "\t            'advlist',\n" +
-    "\t            'autolink',\n" +
-    "\t            'autoresize',\n" +
-    "\t            'autosave',\n" +
-    "\t            'bbcode',\n" +
-    "\t            'charmap',\n" +
-    "\t            'code',\n" +
-    "\t            'codesample',\n" +
-    "\t            'colorpicker',\n" +
-    "\t            'contextmenu',\n" +
-    "\t            'directionality',\n" +
-    "\t            'emoticons',\n" +
-    "\t            'hr',\n" +
-    "\t            'image',\n" +
-    "\t            'imagetools',\n" +
-    "\t            'importcss',\n" +
-    "\t            'insertdatetime',\n" +
-    "\t            'legacyoutput',\n" +
-    "\t            'link',\n" +
-    "\t            'lists',\n" +
-    "\t            'media',\n" +
-    "\t            'nonbreaking',\n" +
-    "\t            'noneditable',\n" +
-    "\t            'paste',\n" +
-    "\t            'save',\n" +
-    "\t            'searchreplace',\n" +
-    "\t            'spellchecker',\n" +
-    "\t            'tabfocus',\n" +
-    "\t            'table',\n" +
-    "\t            'template',\n" +
-    "\t            'textcolor',\n" +
-    "\t            'textpattern',\n" +
-    "\t            'toc',\n" +
-    "\t            'visualblocks'\n" +
-    "\t        ],\n" +
-    "\t        toolbar: [\n" +
-    "\t            'fullscreen | undo redo | bold italic underline | formatselect fontselect fontsizeselect | visualblocks',\n" +
-    "\t            'forecolor backcolor | ltr rtl | alignleft aligncenter alignjustify alignright alignfull | numlist bullist outdent indent'\n" +
-    "\t        ],\n" +
-    "\t        powerpaste_word_import: 'clean',\n" +
-    "\t        powerpaste_html_import: 'clean',\n" +
-    "\t        link_assume_external_targets: false,\n" +
-    "\t        convert_urls: false,\n" +
-    "\t        format: 'raw',\n" +
-    "\t    }\" ng-model=ctrl.text ng-model-options=\"{debounce: { 'default': 500, 'blur': 0, '*': 1000 }, updateOn: 'default blur click'}\" ng-change=\"ctrl.setModelProperty('text', ctrl.text)\" class=\"wb-widget-fill tinymce wb-widget-text\" ng-keydown=$event.stopPropagation();> </div> </div>"
   );
 
 }]);
