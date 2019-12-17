@@ -38,6 +38,16 @@ angular.module('am-wb-core')//
 
 		var ctrl = this;
 		this.clickListener = function($event){
+			try{
+				$event.preventDefault();
+				$event.stopPropagation();
+			} catch(ex){
+				log.error({
+					source: 'WbProcessorSelect',
+					message: 'fail to stop event propagation (click)',
+					error: ex
+				});
+			}
 			var widget = $event.source;
 			if(ctrl.lock || widget.isSilent() || widget.isSelected()){
 				return;
@@ -49,9 +59,7 @@ angular.module('am-wb-core')//
 				} else {
 					ctrl.setSelectedWidgets(widget);
 				}
-				$event.preventDefault();
-				$event.stopPropagation();
-				
+
 				$rootScope.$digest();
 			} catch(ex){
 				log.error({
@@ -147,7 +155,7 @@ angular.module('am-wb-core')//
 					widget.setSelected(false);
 				}
 			});
-	
+
 			// clear selection
 			// TODO: maso, 2019: check if shift key is hold
 			this.selectedWidgets = widgets;
