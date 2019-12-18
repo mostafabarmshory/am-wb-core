@@ -131,7 +131,50 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 /***********************************************************************
  * Editors
  ***********************************************************************/
-.run(function ($widget) {
+.run(function ($widget, $resource) {
+
+	/*
+	 * 
+	 * meta.type: file, image, media
+	 */
+	function filePickerCallback(callback, value, meta) {
+		// Provide file and text for the link dialog
+		if (meta.filetype == 'file') {
+			return $resource.get('url', {
+				value: value
+			})
+			.then(function(url){
+				callback(url, {
+					text: 'My text'
+				});
+			});
+		}
+
+		// Provide image and alt text for the image dialog
+		if (meta.filetype == 'image') {
+			return $resource.get('image-url', {
+				value: value
+			})
+			.then(function(url){
+				callback(url, {
+					alt: 'My text'
+				});
+			});
+		}
+
+		// Provide alternative source and posted for the media dialog
+		if (meta.filetype == 'media') {
+			return $resource.get('media', {
+				value: value
+			})
+			.then(function(url){
+				callback(url, {
+					source2: 'alt.ogg', 
+					poster: 'image.jpg'
+				});
+			});
+		}
+	}
 
 	/***************************************
 	 * Section editor
@@ -146,12 +189,23 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 			inline: true,
 			menubar: false,
 			inline_boundaries: false,
-			plugins: ['link', 'lists', 'powerpaste', 'autolink', 'code'],
+			plugins: ['link', 'lists', 'powerpaste', 'autolink', 'code', 'image'],
 			valid_elements: '*[*]',
 			// Toolbar
-			toolbar: ['close save code | undo redo | bold italic underline link | fontselect fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
+			toolbar: ['close save code | image | undo redo | bold italic underline link | fontselect fontsizeselect | forecolor backcolor | alignleft aligncenter alignright alignfull | numlist bullist outdent indent'],
 			fixed_toolbar_container: '#demo-widget-editor-toolbar',
-			toolbar_drawer: 'floating'
+			toolbar_drawer: 'floating',
+			// multimedia and file
+			file_picker_callback: filePickerCallback,
+			file_picker_types: 'file image media',
+			// Image
+			image_caption: true,
+			image_advtab: true,
+			image_description: true,
+			image_dimensions: true,
+			image_uploadtab: true,
+//			image_list: imageList,
+//			images_upload_handler: imagesUploadHandler
 		}
 	});
 
@@ -180,12 +234,23 @@ angular.module('am-wb-coreTest', [ 'am-wb-core', 'jsonFormatter',])//
 				inline: true,
 				menubar: false,
 				inline_boundaries: false,
-				plugins: ['link', 'code'],
+				plugins: ['link', 'code', 'image'],
 				valid_elements: '*[*]',
 				// Toolbar
-				toolbar: 'close save code| undo redo | bold italic underline link| fontselect fontsizeselect | forecolor backcolor | widgetalignleft widgetaligncenter widgetalignjustify widgetalignright ',
+				toolbar: 'close save code | image | undo redo | bold italic underline link| fontselect fontsizeselect | forecolor backcolor | widgetalignleft widgetaligncenter widgetalignjustify widgetalignright ',
 				fixed_toolbar_container: '#demo-widget-editor-toolbar',
-			    toolbar_drawer: 'floating'
+				toolbar_drawer: 'floating',
+				// multimedia and file
+				file_picker_callback: filePickerCallback,
+				file_picker_types: 'file image media',
+				// Image
+				image_caption: true,
+				image_advtab: true,
+				image_description: true,
+				image_dimensions: true,
+				image_uploadtab: true,
+//				image_list: imageList,
+//				images_upload_handler: imagesUploadHandler
 			}
 		});
 	});
