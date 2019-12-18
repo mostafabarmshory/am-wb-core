@@ -24,14 +24,17 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Processor
- * @name WbProcessorStyle
- * @description Widget processor
+ * @name WbProcessorAbstract
+ * @description Abstract widget processor 
  * 
  */
-.factory('WbProcessorAbstract', function () {
-    'use strict';
+.factory('WbProcessorAbstract', function (WbObservableObject) {
+	'use strict';
 
-    function Processor(){}
+	function Processor(){
+		WbObservableObject.apply(this, arguments);
+	}
+	Processor.prototype = new WbObservableObject();
 
-    return Processor;
+	return Processor;
 });

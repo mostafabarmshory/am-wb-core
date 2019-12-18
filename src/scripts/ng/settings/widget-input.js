@@ -24,20 +24,25 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Widgets
- * @name iframe
- * @description Manage an iframe
- * 
- * Iframe is a widget to incloud other pages as a part of current page. This widget is
- * used as Iframe manager.
+ * @ngdoc Settings
+ * @name WbSettingWidgetInputCtrl
+ * @description Manage Widget input
  * 
  */
-.factory('WbWidgetIframe', function (WbWidgetAbstractHtml) {
-	function Widget($element, $parent){
-		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-		this.addElementAttributes('name', 'src', 'srcdoc', 'sandbox');
-	}
-	// extend functionality
-	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-	return Widget;
+.controller('WbSettingWidgetInputCtrl', function () {
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		this.trackAttributes(['accept', 'alt',
+			'autocomplete', 'autofocus', 'checked',
+			'dirname', 'disabled', 
+			'form', 'formaction', 'formenctype', 'formmethod', 'formnovalidate', 'formtarget',
+			'height', 'list','max',
+			'maxlength', 'min', 'multiple', 'name',
+			'pattern', 'placeholder', 'readonly',
+			'required', 'size', 'src', 'step', 'inputType',
+			'value', 'width']);
+	};
 });

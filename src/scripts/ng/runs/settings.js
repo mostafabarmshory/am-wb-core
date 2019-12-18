@@ -54,15 +54,27 @@ angular.module('am-wb-core')
 		type: 'img',
 		label: 'Image',
 		description: 'Manage image widget settings.',
-		icon: 'settings',
+		icon: 'insert_photo',
 		templateUrl: 'views/settings/wb-widget-img.html',
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetImgCtrl',
 		targets: ['img']
 	})
 	.addPage({
+		type: 'input',
+		label: 'Input',
+		description: 'Manage input widget settings.',
+		icon: 'input',
+		templateUrl: 'views/settings/wb-widget-input.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetInputCtrl',
+		targets: ['input']
+	})
+	.addPage({
 		type: 'microdata',
 		label: 'Microdata',
+		description: 'Manage widget microdata.',
+		icon: 'label_important',
 		templateUrl: 'views/settings/wb-widget-microdata.html',
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetMicrodataCtrl'
@@ -70,6 +82,8 @@ angular.module('am-wb-core')
 	.addPage({
 		type: 'iframe',
 		label: 'Frame',
+		description: 'Manges IFrame attributes',
+		icon: 'filter_frames',
 		templateUrl: 'views/settings/wb-widget-iframe.html',
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetIFrameCtrl',

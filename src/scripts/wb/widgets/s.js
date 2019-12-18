@@ -19,25 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
 /**
  * @ngdoc Widgets
- * @name iframe
- * @description Manage an iframe
- * 
- * Iframe is a widget to incloud other pages as a part of current page. This widget is
- * used as Iframe manager.
- * 
+ * @name s
+ * @description Manage a widget
  */
-.factory('WbWidgetIframe', function (WbWidgetAbstractHtml) {
+.factory('WbWidgetS', function (WbWidgetAbstractHtml) {
+	'use strict';
 	function Widget($element, $parent){
 		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-		this.addElementAttributes('name', 'src', 'srcdoc', 'sandbox');
+		this.addElementAttributes();
 	}
-	// extend functionality
 	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
 	return Widget;
 });

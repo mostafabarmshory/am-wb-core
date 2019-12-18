@@ -50,7 +50,8 @@ angular.module('am-wb-core')//
             'writingMode',
             'userSelect',
             // Text
-            'textAlign-last',
+            'textAlign',
+            'textAlignLast',
             'textDecoration',
             'textDecorationColor',
             'textDecorationLine',
