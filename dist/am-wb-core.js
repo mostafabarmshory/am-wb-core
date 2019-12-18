@@ -19085,8 +19085,10 @@ angular.module('am-wb-core')
 			try{
 				processor.process(widget, event);
 			} catch (ex){
-//				console.error('Fail to run the processor');
-//				console.error(ex);
+				log.error({
+					message: 'Fail to run the processor',
+					exception: ex
+				});
 			}
 		});
 	};
