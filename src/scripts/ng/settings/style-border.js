@@ -53,10 +53,10 @@ angular.module('am-wb-core')//
             'borderRightStyle',
             'borderRightColor',
 
-            'borderBttom',
-            'borderBttomWidth',
-            'borderBttomStyle',
-            'borderBttomColor',
+            'borderBottom',
+            'borderBottomWidth',
+            'borderBottomStyle',
+            'borderBottomColor',
 
             'borderLeft',
             'borderLeftWidth',
