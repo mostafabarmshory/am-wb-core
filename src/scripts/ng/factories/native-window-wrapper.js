@@ -368,67 +368,6 @@ angular.module('am-wb-core')
 		return false;
 	};
 
-	/**
-	 * Loads font
-	 * 
-	 * In some cases you are about to load font and use in your page design. This
-	 * function is about to load font into your application window.
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @path path of font
-	 * @return promise to load the font
-	 */
-	nativeWindowWrapper.prototype.loadFont = function(family, source, descriptors){
-		if(this.isFontLoaded(source)){
-			return $q.resolve({
-				message: 'isload'
-			});
-		}
-		var def = $q.defer();
-
-		var ctrl = this;
-		var junction_font = new FontFace(family, source, descriptors);
-		junction_font.load()
-		.then(function(loaded_face) {
-			document.fonts.add(loaded_face);
-			ctrl.fonts[source] = true;
-			def.resolve({
-				'message': 'isload',
-				'source': source,
-				'family': family
-			});
-			if (!$rootScope.$$phase) {
-				$rootScope.$digest();
-			}
-		})
-		.catch(function(error) {
-			// error occurred
-			def.reject(error    );
-			if (!$rootScope.$$phase) {
-				$rootScope.$digest();
-			}
-		});
-		return def.promise;
-	};
-
-	nativeWindowWrapper.prototype.removeFont = function(path){
-		return $q.resolve({
-			source: path
-		});
-	};
-
-	/**
-	 * Check if the library is loaded
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @return true if the library is loaded
-	 */
-	nativeWindowWrapper.prototype.isFontLoaded = function(source){
-		if(this.fonts[source]){
-			return true;
-		}
-		return false;
-	};
 
 	/**
 	 * Set meta
@@ -441,6 +380,14 @@ angular.module('am-wb-core')
 		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
 		var headElement = this.getHeadElement();
 		var elements = headElement.find('meta[name='+searchkey+']');
+		// remove element
+		if(_.isUndefined(value)){
+			if(elements.length){
+				elements.remove();
+			}
+			return;
+		}
+		// update element
 		var metaElement;
 		if(elements.length === 0){
 			// title element not found
@@ -449,7 +396,17 @@ angular.module('am-wb-core')
 		} else {
 			metaElement = angular.element(elements[0]);
 		}
-		metaElement.attr('content', value);
+		metaElement.attr('content', value) ;
+	};
+	
+	nativeWindowWrapper.prototype.getMeta = function (key){
+		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
+		var headElement = this.getHeadElement();
+		var elements = headElement.find('meta[name='+searchkey+']');
+		if(elements.length === 0){
+			return;
+		}
+		return elements.attr('content') ;
 	};
 
 	/**

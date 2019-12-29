@@ -9143,67 +9143,6 @@ angular.module('am-wb-core')
 		return false;
 	};
 
-	/**
-	 * Loads font
-	 * 
-	 * In some cases you are about to load font and use in your page design. This
-	 * function is about to load font into your application window.
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @path path of font
-	 * @return promise to load the font
-	 */
-	nativeWindowWrapper.prototype.loadFont = function(family, source, descriptors){
-		if(this.isFontLoaded(source)){
-			return $q.resolve({
-				message: 'isload'
-			});
-		}
-		var def = $q.defer();
-
-		var ctrl = this;
-		var junction_font = new FontFace(family, source, descriptors);
-		junction_font.load()
-		.then(function(loaded_face) {
-			document.fonts.add(loaded_face);
-			ctrl.fonts[source] = true;
-			def.resolve({
-				'message': 'isload',
-				'source': source,
-				'family': family
-			});
-			if (!$rootScope.$$phase) {
-				$rootScope.$digest();
-			}
-		})
-		.catch(function(error) {
-			// error occurred
-			def.reject(error    );
-			if (!$rootScope.$$phase) {
-				$rootScope.$digest();
-			}
-		});
-		return def.promise;
-	};
-
-	nativeWindowWrapper.prototype.removeFont = function(path){
-		return $q.resolve({
-			source: path
-		});
-	};
-
-	/**
-	 * Check if the library is loaded
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @return true if the library is loaded
-	 */
-	nativeWindowWrapper.prototype.isFontLoaded = function(source){
-		if(this.fonts[source]){
-			return true;
-		}
-		return false;
-	};
 
 	/**
 	 * Set meta
@@ -9216,6 +9155,14 @@ angular.module('am-wb-core')
 		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
 		var headElement = this.getHeadElement();
 		var elements = headElement.find('meta[name='+searchkey+']');
+		// remove element
+		if(_.isUndefined(value)){
+			if(elements.length){
+				elements.remove();
+			}
+			return;
+		}
+		// update element
 		var metaElement;
 		if(elements.length === 0){
 			// title element not found
@@ -9224,7 +9171,17 @@ angular.module('am-wb-core')
 		} else {
 			metaElement = angular.element(elements[0]);
 		}
-		metaElement.attr('content', value);
+		metaElement.attr('content', value) ;
+	};
+	
+	nativeWindowWrapper.prototype.getMeta = function (key){
+		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
+		var headElement = this.getHeadElement();
+		var elements = headElement.find('meta[name='+searchkey+']');
+		if(elements.length === 0){
+			return;
+		}
+		return elements.attr('content') ;
 	};
 
 	/**
@@ -12710,47 +12667,6 @@ angular.module('am-wb-core')
 
 /**
  * @ngdoc Services
- * @name $$wbCrypto
- * @description Crypto services
- * 
- * Deprecated : use $wbWindow
- */
-.service('$wbLibs', function($wbWindow) {
-	this.load = function(path){
-		return $wbWindow.loadLibrary(path);
-	};
-    return this;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-angular.module('am-wb-core')
-
-/**
- * @ngdoc Services
  * @name $wbLocal
  * @description manage localization of widgets
  * 
@@ -12868,7 +12784,7 @@ angular.module('am-wb-core')
  * This is a service to get resources. 
  * 
  */
-.service('$resource', function($wbUi, $rootScope) {
+.service('$resource', function($mdDialog, $rootScope) {
 	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
 	var resourcePages = {};
 	/*
@@ -12926,7 +12842,7 @@ angular.module('am-wb-core')
 		this.getValue = function(){
 			return $scope.value;
 		};
-		
+
 		/**
 		 * encapsulate template srce with panel widget template.
 		 * 
@@ -13014,7 +12930,7 @@ angular.module('am-wb-core')
 		if(pages.length){
 			loadPage(pages[0]);
 		}
-		
+
 		var ctrl = this;
 		$scope.setValue = function(value){
 			return ctrl.setValue(value);
@@ -13079,7 +12995,7 @@ angular.module('am-wb-core')
 			pages = resourcePages;
 		}
 		var tmplUrl = pages.length > 1 ? 'views/dialogs/wb-select-resource.html' : 'views/dialogs/wb-select-resource-single-page.html';
-		return $wbUi.openDialog({
+		return $mdDialog.openDialog({
 			controller : ResourceCtrl,
 			templateUrl : tmplUrl,
 			parent : angular.element(document.body),
@@ -13380,105 +13296,6 @@ angular.module('am-wb-core')
     // return a new instance of the service
     return new UITinymceService();
 });
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
-
-/**
- * @ngdoc Services
- * @name $wbUi
- * @description UI utilities management
- * 
- */
-angular.module('am-wb-core')
-.service('$wbUi', function($mdDialog, $q, $http) {
-
-	var _templates = [];
-	var service = this;
-
-
-	/**
-	 * Opens dialog
-	 * @returns
-	 */
-	function openDialog(dialogData){
-		return $mdDialog.show(dialogData);
-	}
-
-
-	/**
-	 * Get list of registered templates
-	 * 
-	 * @memberof $wbUi
-	 */
-	function templates(){
-		return $q.when({
-			items: _templates
-		});
-	}
-
-	/**
-	 * Gets list of templates
-	 */
-	function getTemplates(){
-		return _templates;
-	}
-
-	/**
-	 * Adds new template
-	 * 
-	 * @memberof $wbUi
-	 */
-	function newTemplate(template){
-		_templates.push(template);
-		return service;
-	}
-
-
-	/**
-	 * Load a template
-	 * 
-	 * @memberof $wbUi
-	 */
-	function loadTemplate(template){
-		// TODO: maso, 2018: check if template is a function
-		if(angular.isDefined(_templates.template)){
-			return $q.when(JSON.parse(_templates.template));
-		}
-		return $http.get(template.templateUrl)
-		.then(function(res){
-			return res.data;
-		});
-	}
-	
-	service.openDialog = openDialog;
-	service.templates = templates;
-	service.getTemplates = getTemplates;
-	service.newTemplate = newTemplate;
-	service.loadTemplate = loadTemplate;
-});
-
 /* 
  * The MIT License (MIT)
  * 
