@@ -56,7 +56,7 @@ angular.module('am-wb-core')
 		/*
 		 * @ngInject
 		 */
-		controller : function($scope, $wbLibs, $element) {
+		controller : function($scope, $wbWindow, $element) {
 			var ctrl = this;
 			this.value = $scope.value || {
 				code: '',
@@ -103,7 +103,7 @@ angular.module('am-wb-core')
 			};
 
 //			var ctrl = this;
-			$wbLibs.load('resources/libs/ace.js')
+			$wbWindow.loadLibrary('resources/libs/ace.js')
 			.then(function(){
 				ctrl.setEditor(ace.edit($element.find('div#am-wb-resources-script-editor')[0]));
 			});
