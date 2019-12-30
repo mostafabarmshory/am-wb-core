@@ -69,10 +69,18 @@ angular.module('am-wb-core')//
 	 * @memberof WidgetEditorTinymceSingleLine
 	 */
 	Editor.prototype.hide = function () {
+		// remove all tinymce editor
+		for (var i = tinymce.editors.length - 1 ; i > -1 ; i--) {
+			var ed_id = tinymce.editors[i].id;
+			tinyMCE.execCommand('mceRemoveEditor', true, ed_id);
+		}
+
+		// check current editor
 		if (this.isHidden()) {
 			return;
 		}
 		this._hide = true;
+		// TODO: fire state changed
 		if(this.tinyEditor){
 			this.tinyEditor.remove();
 			delete this.tinyEditor;
@@ -106,9 +114,9 @@ angular.module('am-wb-core')//
 				});
 
 //				editor.on('focusout', function(){
-//					ctrl.closeWithoutSave();
+//				ctrl.closeWithoutSave();
 //				});
-				
+
 				editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
 					event.stopPropagation();
 					editor.save();
@@ -123,7 +131,7 @@ angular.module('am-wb-core')//
 					editor.save();
 					ctrl.updateView(editor);
 				});
-				
+
 				//
 				// Adding custom actions
 				//
@@ -145,7 +153,7 @@ angular.module('am-wb-core')//
 						ctrl.closeWithoutSave();
 					}
 				});
-				
+
 //				alignleft aligncenter alignjustify alignright alignfull
 				// style.textAlign: left, center, right, justify;
 				_.forEach(['widgetalignleft', 'widgetaligncenter', 'widgetalignjustify', 'widgetalignright'], function(action){

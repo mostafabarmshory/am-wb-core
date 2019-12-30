@@ -33,7 +33,7 @@ angular.module('am-wb-core')
  * This is a service to get resources. 
  * 
  */
-.service('$resource', function($wbUi, $rootScope) {
+.service('$resource', function($mdDialog, $rootScope) {
 	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
 	var resourcePages = {};
 	/*
@@ -91,7 +91,7 @@ angular.module('am-wb-core')
 		this.getValue = function(){
 			return $scope.value;
 		};
-		
+
 		/**
 		 * encapsulate template srce with panel widget template.
 		 * 
@@ -179,7 +179,7 @@ angular.module('am-wb-core')
 		if(pages.length){
 			loadPage(pages[0]);
 		}
-		
+
 		var ctrl = this;
 		$scope.setValue = function(value){
 			return ctrl.setValue(value);
@@ -244,7 +244,7 @@ angular.module('am-wb-core')
 			pages = resourcePages;
 		}
 		var tmplUrl = pages.length > 1 ? 'views/dialogs/wb-select-resource.html' : 'views/dialogs/wb-select-resource-single-page.html';
-		return $wbUi.openDialog({
+		return $mdDialog.show({
 			controller : ResourceCtrl,
 			templateUrl : tmplUrl,
 			parent : angular.element(document.body),

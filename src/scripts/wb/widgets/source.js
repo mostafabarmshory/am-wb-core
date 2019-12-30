@@ -29,7 +29,7 @@ angular.module('am-wb-core')//
  * @description Manage resource
  * 
  */
-.factory('WbWidgetSource', function (WbWidgetUnvisible) {
+.factory('WbWidgetSource', function (WbWidgetAbstract) {
 
 	/**
 	 * Creates new instance of the group
@@ -37,7 +37,7 @@ angular.module('am-wb-core')//
 	 * @memberof WbWidgetSource
 	 */
 	function Widget($element, $parent){
-		WbWidgetUnvisible.apply(this, [$element, $parent]);
+		WbWidgetAbstract.apply(this, [$element, $parent]);
 		this.addElementAttributes('src', 'srcset', 'media', 'sizes', 'sourceType');
 
 		// init input
@@ -53,9 +53,6 @@ angular.module('am-wb-core')//
 	}
 
 	// extend functionality
-	Widget.prototype = Object.create(WbWidgetUnvisible.prototype);
-	Widget.prototype.toString = function(){
-		return 'src:' + this.getProperty('sourceType') || this.getModelProperty('sourceType');
-	};
+	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
 	return Widget;
 });

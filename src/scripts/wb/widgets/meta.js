@@ -31,19 +31,14 @@ angular.module('am-wb-core')//
  * In seo (or equivalient usecase) 
  * 
  */
-.factory('WbWidgetMeta', function (WbWidgetUnvisible) {
+.factory('WbWidgetMeta', function (WbWidgetAbstract) {
 
 	function Widget($element, $parent){
-		WbWidgetUnvisible.apply(this, [$element, $parent]);
+		WbWidgetAbstract.apply(this, [$element, $parent]);
 		this.addElementAttributes('charset', 'content', 'http-equiv', 'name');
 	}
 	// extend functionality
-	Widget.prototype = Object.create(WbWidgetUnvisible.prototype);
-	Widget.prototype.toString = function(){
-		var name = this.getProperty('name') || this.getModelProperty('name');
-		var content = this.getProperty('content') || this.getModelProperty('content');
-		return name + ':' + content;
-	};
+	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
 	return Widget;
 });
 

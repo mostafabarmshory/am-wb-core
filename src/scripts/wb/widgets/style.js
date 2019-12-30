@@ -30,9 +30,42 @@ angular.module('am-wb-core')//
 .factory('WbWidgetStyle', function (WbWidgetAbstract) {
     'use strict';
     function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
+
+		// call super constractor
+		WbWidgetAbstract.apply(this, [$element, $parent]);
+		this.addElementAttributes('text');
+		var ctrl = this;
+
+		/*
+		 * set element attribute
+		 */
+		function eventHandler(event){
+			if(event.key === 'text'){
+				var value = ctrl.getProperty(event.key) || ctrl.getModelProperty(event.key);
+				ctrl.getElement().text(value);
+			}
+		}
+
+		// listen on change
+		this.on('modelUpdated', eventHandler);
+		this.on('runtimeModelUpdated', eventHandler);
     }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+
+	/**
+	 * Gets value of the input
+	 * 
+	 * @memberof pre
+	 */
+	Widget.prototype.text = function(){
+		var value = arguments[0];
+		if(value){
+			this.setElementAttribute('text', value);
+		}
+		var element = this.getElement();
+		return element.text.apply(element, arguments);
+	};
+
+	return Widget;
 });
