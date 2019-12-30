@@ -63,11 +63,19 @@ angular.module('am-wb-core')//
 	 * Remove editor
 	 */
 	Editor.prototype.hide = function () {
+		// remove all tinymce editor
+		for (var i = tinymce.editors.length - 1 ; i > -1 ; i--) {
+		    var ed_id = tinymce.editors[i].id;
+		    tinyMCE.execCommand('mceRemoveEditor', true, ed_id);
+		}
+		
+		// set hidern
 		if (this.isHidden()) {
 			return;
 		}
 		this._hide = true;
-		tinymce.remove(this.widget.getElement().getPath());
+		
+		// TODO: fire state changed
 	};
 
 	/**
