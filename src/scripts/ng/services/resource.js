@@ -244,7 +244,7 @@ angular.module('am-wb-core')
 			pages = resourcePages;
 		}
 		var tmplUrl = pages.length > 1 ? 'views/dialogs/wb-select-resource.html' : 'views/dialogs/wb-select-resource-single-page.html';
-		return $mdDialog.openDialog({
+		return $mdDialog.show({
 			controller : ResourceCtrl,
 			templateUrl : tmplUrl,
 			parent : angular.element(document.body),

@@ -12995,7 +12995,7 @@ angular.module('am-wb-core')
 			pages = resourcePages;
 		}
 		var tmplUrl = pages.length > 1 ? 'views/dialogs/wb-select-resource.html' : 'views/dialogs/wb-select-resource-single-page.html';
-		return $mdDialog.openDialog({
+		return $mdDialog.show({
 			controller : ResourceCtrl,
 			templateUrl : tmplUrl,
 			parent : angular.element(document.body),
@@ -15575,7 +15575,7 @@ angular.module('am-wb-core')//
             }
         })
         .then(function(value){
-            ctrl.widget.text(value.code);
+            ctrl.widget.setModelProperty('text', value.code);
         });
     };
     editor.prototype.isHidden = function(){};
@@ -15775,16 +15775,16 @@ angular.module('am-wb-core')//
 	Editor.prototype.hide = function () {
 		// remove all tinymce editor
 		for (var i = tinymce.editors.length - 1 ; i > -1 ; i--) {
-		    var ed_id = tinymce.editors[i].id;
-		    tinyMCE.execCommand('mceRemoveEditor', true, ed_id);
+			var ed_id = tinymce.editors[i].id;
+			tinyMCE.execCommand('mceRemoveEditor', true, ed_id);
 		}
-		
+
 		// set hidern
 		if (this.isHidden()) {
 			return;
 		}
 		this._hide = true;
-		
+
 		// TODO: fire state changed
 	};
 
@@ -15822,9 +15822,9 @@ angular.module('am-wb-core')//
 				});
 
 //				editor.on('focusout', function(){
-//					ctrl.closeWithoutSave();
+//				ctrl.closeWithoutSave();
 //				});
-				
+
 				editor.on('keydown', function(e) {
 					if (e.keyCode === 27) { // escape
 						ctrl.closeWithoutSave();
@@ -15967,10 +15967,10 @@ angular.module('am-wb-core')//
 	Editor.prototype.hide = function () {
 		// remove all tinymce editor
 		for (var i = tinymce.editors.length - 1 ; i > -1 ; i--) {
-		    var ed_id = tinymce.editors[i].id;
-		    tinyMCE.execCommand('mceRemoveEditor', true, ed_id);
+			var ed_id = tinymce.editors[i].id;
+			tinyMCE.execCommand('mceRemoveEditor', true, ed_id);
 		}
-		
+
 		// check current editor
 		if (this.isHidden()) {
 			return;
@@ -16010,9 +16010,9 @@ angular.module('am-wb-core')//
 				});
 
 //				editor.on('focusout', function(){
-//					ctrl.closeWithoutSave();
+//				ctrl.closeWithoutSave();
 //				});
-				
+
 				editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
 					event.stopPropagation();
 					editor.save();
@@ -16027,7 +16027,7 @@ angular.module('am-wb-core')//
 					editor.save();
 					ctrl.updateView(editor);
 				});
-				
+
 				//
 				// Adding custom actions
 				//
@@ -16049,7 +16049,7 @@ angular.module('am-wb-core')//
 						ctrl.closeWithoutSave();
 					}
 				});
-				
+
 //				alignleft aligncenter alignjustify alignright alignfull
 				// style.textAlign: left, center, right, justify;
 				_.forEach(['widgetalignleft', 'widgetaligncenter', 'widgetalignjustify', 'widgetalignright'], function(action){
@@ -20619,71 +20619,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Widgets
- * @name meta
- * @description Manage a meta data 
- * 
- * In seo (or equivalient usecase) 
- * 
- */
-.factory('WbWidgetUnvisible', function (WbWidgetAbstractHtml) {
-	function Widget($element, $parent){
-		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
-		var ctrl = this;
-		function updateView(){
-			var str = 'Unvisible Widget (' + ctrl.getType() + ')';
-			if(_.isFunction(ctrl.toString)){
-				str = ctrl.toString();
-			}
-			ctrl.getElement().html(str);
-		}
-		this.on('stateChanged', function(){
-			var element = ctrl.getElement();
-			if(ctrl.state === 'edit'){
-				element.show();
-				element.css({
-					minHeight: '60px',
-					minWidth: '60px',
-					padding: '16px'
-				});
-				return;
-			}
-			ctrl.getElement().hide();
-		});
-		updateView();
-	}
-	// extend functionality
-	Widget.prototype = Object.create(WbWidgetAbstractHtml.prototype);
-	return Widget;
-});
-
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 
 angular.module('am-wb-core')//
 
@@ -22319,19 +22254,14 @@ angular.module('am-wb-core')//
  * In seo (or equivalient usecase) 
  * 
  */
-.factory('WbWidgetMeta', function (WbWidgetUnvisible) {
+.factory('WbWidgetMeta', function (WbWidgetAbstract) {
 
 	function Widget($element, $parent){
-		WbWidgetUnvisible.apply(this, [$element, $parent]);
+		WbWidgetAbstract.apply(this, [$element, $parent]);
 		this.addElementAttributes('charset', 'content', 'http-equiv', 'name');
 	}
 	// extend functionality
-	Widget.prototype = Object.create(WbWidgetUnvisible.prototype);
-	Widget.prototype.toString = function(){
-		var name = this.getProperty('name') || this.getModelProperty('name');
-		var content = this.getProperty('content') || this.getModelProperty('content');
-		return name + ':' + content;
-	};
+	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
 	return Widget;
 });
 
@@ -23196,7 +23126,7 @@ angular.module('am-wb-core')//
  * @description Manage resource
  * 
  */
-.factory('WbWidgetSource', function (WbWidgetUnvisible) {
+.factory('WbWidgetSource', function (WbWidgetAbstract) {
 
 	/**
 	 * Creates new instance of the group
@@ -23204,7 +23134,7 @@ angular.module('am-wb-core')//
 	 * @memberof WbWidgetSource
 	 */
 	function Widget($element, $parent){
-		WbWidgetUnvisible.apply(this, [$element, $parent]);
+		WbWidgetAbstract.apply(this, [$element, $parent]);
 		this.addElementAttributes('src', 'srcset', 'media', 'sizes', 'sourceType');
 
 		// init input
@@ -23220,10 +23150,7 @@ angular.module('am-wb-core')//
 	}
 
 	// extend functionality
-	Widget.prototype = Object.create(WbWidgetUnvisible.prototype);
-	Widget.prototype.toString = function(){
-		return 'src:' + this.getProperty('sourceType') || this.getModelProperty('sourceType');
-	};
+	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
 	return Widget;
 });
 
@@ -23337,11 +23264,44 @@ angular.module('am-wb-core')//
 .factory('WbWidgetStyle', function (WbWidgetAbstract) {
     'use strict';
     function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
+
+		// call super constractor
+		WbWidgetAbstract.apply(this, [$element, $parent]);
+		this.addElementAttributes('text');
+		var ctrl = this;
+
+		/*
+		 * set element attribute
+		 */
+		function eventHandler(event){
+			if(event.key === 'text'){
+				var value = ctrl.getProperty(event.key) || ctrl.getModelProperty(event.key);
+				ctrl.getElement().text(value);
+			}
+		}
+
+		// listen on change
+		this.on('modelUpdated', eventHandler);
+		this.on('runtimeModelUpdated', eventHandler);
     }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+	// extend functionality
+	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
+
+	/**
+	 * Gets value of the input
+	 * 
+	 * @memberof pre
+	 */
+	Widget.prototype.text = function(){
+		var value = arguments[0];
+		if(value){
+			this.setElementAttribute('text', value);
+		}
+		var element = this.getElement();
+		return element.text.apply(element, arguments);
+	};
+
+	return Widget;
 });
 
 /*

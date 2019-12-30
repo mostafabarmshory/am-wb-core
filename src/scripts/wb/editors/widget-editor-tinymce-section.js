@@ -65,16 +65,16 @@ angular.module('am-wb-core')//
 	Editor.prototype.hide = function () {
 		// remove all tinymce editor
 		for (var i = tinymce.editors.length - 1 ; i > -1 ; i--) {
-		    var ed_id = tinymce.editors[i].id;
-		    tinyMCE.execCommand('mceRemoveEditor', true, ed_id);
+			var ed_id = tinymce.editors[i].id;
+			tinyMCE.execCommand('mceRemoveEditor', true, ed_id);
 		}
-		
+
 		// set hidern
 		if (this.isHidden()) {
 			return;
 		}
 		this._hide = true;
-		
+
 		// TODO: fire state changed
 	};
 
@@ -112,9 +112,9 @@ angular.module('am-wb-core')//
 				});
 
 //				editor.on('focusout', function(){
-//					ctrl.closeWithoutSave();
+//				ctrl.closeWithoutSave();
 //				});
-				
+
 				editor.on('keydown', function(e) {
 					if (e.keyCode === 27) { // escape
 						ctrl.closeWithoutSave();

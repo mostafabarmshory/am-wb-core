@@ -71,7 +71,7 @@ angular.module('am-wb-core')//
             }
         })
         .then(function(value){
-            ctrl.widget.text(value.code);
+            ctrl.widget.setModelProperty('text', value.code);
         });
     };
     editor.prototype.isHidden = function(){};
