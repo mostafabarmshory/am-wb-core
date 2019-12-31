@@ -10827,6 +10827,16 @@ angular.module('am-wb-core')
 		targets: ['iframe']
 	})
 	.addPage({
+		type: 'form',
+		label: 'Form',
+		description: 'Manges form attributes',
+		icon: 'filter_frames',
+		templateUrl: 'views/settings/wb-widget-form.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetFormCtrl',
+		targets: ['form']
+	})
+	.addPage({
 		type: 'source',
 		label: 'Source',
 		templateUrl: 'views/settings/wb-widget-source.html',
@@ -14643,6 +14653,48 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Settings
+ * @name WbSettingWidgetFormCtrl
+ * @description Manage Widget form
+ * 
+ */
+.controller('WbSettingWidgetFormCtrl', function () {
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		this.trackAttributes(['acceptCharset', 'action', 'autocomplete', 'off',
+			'enctype', 'method', 'name', 'novalidate', 'target']);
+	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 angular.module('am-wb-core')//
 
@@ -15286,9 +15338,14 @@ angular.module('am-wb-core')//
 		model.type = name;
 		// attributes
 		_.forEach(element.attributes, function(attr){
-			if(attr.name !== 'style'){
-				model[attr.name] = attr.value;
+			if(attr.name == 'style'){
+				return;
 			}
+			if(attr.name == 'type'){
+				model[model.type+'Type'] = attr.value;
+				return;
+			}
+			model[attr.name] = attr.value;
 		});
 		//style
 		for(var i = 0; i < element.style.length; i++){
@@ -21534,7 +21591,8 @@ angular.module('am-wb-core')//
 	'use strict';
 	function Widget($element, $parent){
 		WbWidgetGroup.apply(this, [$element, $parent]);
-		this.addElementAttributes();
+		this.addElementAttributes('acceptCharset', 'action', 'autocomplete', 'off',
+				'enctype', 'method', 'name', 'novalidate', 'target');
 	}
 	Widget.prototype = Object.create(WbWidgetGroup.prototype);
 	return Widget;
@@ -23760,6 +23818,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/settings/wb-widget-audio.html',
     "<fieldset layout=column> <legend translate>audio</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.autoplay ng-change=\"ctrl.setAttribute('autoplay', ctrl.attributesValue.autoplay)\" wb-title=autoplay wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.controls ng-change=\"ctrl.setAttribute('controls', ctrl.attributesValue.controls)\" wb-title=controls wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.loop ng-change=\"ctrl.setAttribute('loop', ctrl.attributesValue.loop)\" wb-title=loop wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.muted ng-change=\"ctrl.setAttribute('muted', ctrl.attributesValue.muted)\" wb-title=muted wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.preload ng-change=\"ctrl.setAttribute('preload', ctrl.attributesValue.preload)\" wb-title=preload wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-widget-form.html',
+    "<fieldset layout=column> <legend translate>Form</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.acceptCharset ng-change=\"ctrl.setAttribute('acceptCharset', ctrl.attributesValue.acceptCharset)\" wb-title=acceptCharset wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.action ng-change=\"ctrl.setAttribute('action', ctrl.attributesValue.action)\" wb-title=action wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.autocomplete ng-change=\"ctrl.setAttribute('autocomplete', ctrl.attributesValue.autocomplete)\" wb-title=autocomplete wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.off ng-change=\"ctrl.setAttribute('off', ctrl.attributesValue.off)\" wb-title=off wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.enctype ng-change=\"ctrl.setAttribute('enctype', ctrl.attributesValue.enctype)\" wb-title=enctype wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.method ng-change=\"ctrl.setAttribute('method', ctrl.attributesValue.method)\" wb-title=method wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.name ng-change=\"ctrl.setAttribute('name', ctrl.attributesValue.name)\" wb-title=name wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.novalidate ng-change=\"ctrl.setAttribute('novalidate', ctrl.attributesValue.novalidate)\" wb-title=novalidate wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.target ng-change=\"ctrl.setAttribute('target', ctrl.attributesValue.target)\" wb-title=target wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
   );
 
 

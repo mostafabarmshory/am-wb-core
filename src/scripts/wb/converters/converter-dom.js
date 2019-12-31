@@ -62,9 +62,14 @@ angular.module('am-wb-core')//
 		model.type = name;
 		// attributes
 		_.forEach(element.attributes, function(attr){
-			if(attr.name !== 'style'){
-				model[attr.name] = attr.value;
+			if(attr.name == 'style'){
+				return;
 			}
+			if(attr.name == 'type'){
+				model[model.type+'Type'] = attr.value;
+				return;
+			}
+			model[attr.name] = attr.value;
 		});
 		//style
 		for(var i = 0; i < element.style.length; i++){
@@ -129,3 +134,4 @@ angular.module('am-wb-core')//
 
 	return Converter;
 });
+

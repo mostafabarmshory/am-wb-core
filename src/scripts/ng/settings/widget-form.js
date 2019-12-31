@@ -19,21 +19,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+'use strict';
 
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Widgets
- * @name form
- * @description Manage a widget
+ * @ngdoc Settings
+ * @name WbSettingWidgetFormCtrl
+ * @description Manage Widget form
+ * 
  */
-.factory('WbWidgetForm', function (WbWidgetGroup) {
-	'use strict';
-	function Widget($element, $parent){
-		WbWidgetGroup.apply(this, [$element, $parent]);
-		this.addElementAttributes('acceptCharset', 'action', 'autocomplete', 'off',
-				'enctype', 'method', 'name', 'novalidate', 'target');
-	}
-	Widget.prototype = Object.create(WbWidgetGroup.prototype);
-	return Widget;
+.controller('WbSettingWidgetFormCtrl', function () {
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		this.trackAttributes(['acceptCharset', 'action', 'autocomplete', 'off',
+			'enctype', 'method', 'name', 'novalidate', 'target']);
+	};
 });

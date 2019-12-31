@@ -90,6 +90,16 @@ angular.module('am-wb-core')
 		targets: ['iframe']
 	})
 	.addPage({
+		type: 'form',
+		label: 'Form',
+		description: 'Manges form attributes',
+		icon: 'filter_frames',
+		templateUrl: 'views/settings/wb-widget-form.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetFormCtrl',
+		targets: ['form']
+	})
+	.addPage({
 		type: 'source',
 		label: 'Source',
 		templateUrl: 'views/settings/wb-widget-source.html',
