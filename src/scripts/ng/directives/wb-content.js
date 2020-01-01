@@ -53,8 +53,10 @@ angular.module('am-wb-core')
             }
 
             // 0- remove old
+            var editable = false;
             if(rootWidget){
-                rootWidget.delete();
+            	editable = rootWidget.isEditable();
+                rootWidget.destroy();
             }
             $element.empty();
 
@@ -62,6 +64,7 @@ angular.module('am-wb-core')
             $widget.compile(model, null, $element)
             .then(function(widget){
                 rootWidget = widget;
+                rootWidget.setEditable(editable);
                 $element.trigger('load', widget);
             }, function(error){
                 $element.error(error);

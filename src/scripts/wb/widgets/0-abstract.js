@@ -226,6 +226,7 @@ angular.module('am-wb-core')//
 		var options = {
 				root: null,
 				rootMargin: '0px',
+				threshold: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 		};
 
 		this.intersectionObserver = new IntersectionObserver(function ($event) {
@@ -502,9 +503,13 @@ angular.module('am-wb-core')//
 	 * @memberof WbAbstractWidget
 	 */
 	WbWidgetAbstract.prototype.destroy = function ($event) {
+		// remove scope
+		this.fire('destroy', $event);
+		
 		// remove callbacks
 		this.callbacks = [];
 		this.actions = [];
+		this.model = null;
 
 		// destroy children
 		angular.forEach(this.childWidgets, function (widget) {
@@ -513,12 +518,10 @@ angular.module('am-wb-core')//
 		this.childWidgets = [];
 
 		// destroy view
-		var $element = this.getElement();
-		$element.remove();
-		$element = null;
-
-		// remove scope
-		this.fire('destroy', $event);
+		if(!this.isRoot()){
+			var $element = this.getElement();
+			$element.remove();
+		}
 	};
 
 	/**
