@@ -74,9 +74,6 @@ angular.module('am-wb-core')
 		description: 'A widget to add external link. It is used as block item.',
 		icon: 'wb-widget-a',
 		groups: ['basic'],
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-a',
 		// functional properties
 		template: '<a></a>',
 		model: {
@@ -92,13 +89,10 @@ angular.module('am-wb-core')
 		description: 'description.',
 		icon: 'wb-widget-address',
 		groups: ['basic'],
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-address',
 		// functional properties
 		template: '<address></address>',
 		controller: 'WbWidgetAddress',
-		isLeaf: true
+		isLeaf: false
 	});
 	$widget.newWidget({
 		// widget description
@@ -107,9 +101,6 @@ angular.module('am-wb-core')
 		description: 'applet.',
 		icon: 'wb-widget-applet',
 		groups: ['basic'],
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-applet',
 		// functional properties
 		template: '<applet></applet>',
 		controller: 'WbWidgetApplet',
@@ -122,9 +113,6 @@ angular.module('am-wb-core')
 		description: 'area',
 		icon: 'wb-widget-area',
 		groups: ['basic'],
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-area',
 		// functional properties
 		template: '<area></area>',
 		controller: 'WbWidgetArea'
@@ -136,9 +124,6 @@ angular.module('am-wb-core')
 		description: 'article',
 		icon: 'wb-widget-article',
 		groups: ['basic'],
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-article',
 		// functional properties
 		template: '<article></article>',
 		controller: 'WbWidgetArticle'
@@ -150,9 +135,6 @@ angular.module('am-wb-core')
 		description: 'aside',
 		icon: 'wb-widget-aside',
 		groups: ['basic'],
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-aside',
 		// functional properties
 		template: '<aside></aside>',
 		controller: 'WbWidgetAside'
@@ -165,7 +147,6 @@ angular.module('am-wb-core')
 		description: 'This widget is used to add audio in the document.',
 		groups: ['basic'],
 		template: '<audio></audio>',
-		help: 'http://dpq.co.ir/more-information-audio',
 		model: {
 			media: '(min-width: 650px)',
 			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
@@ -181,7 +162,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<blockquote></blockquote>',
-		help: 'http://dpq.co.ir/more-information-blockquote',
 		controller: 'WbWidgetBlockquote',
 		isLeaf: true, 
 	});
@@ -193,7 +173,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<button></button>',
-		help: 'http://dpq.co.ir/more-information-button',
 		controller: 'WbWidgetButton',
 		isLeaf: true, 
 	});
@@ -205,7 +184,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<canvas></canvas>',
-		help: 'http://dpq.co.ir/more-information-canvas',
 		controller: 'WbWidgetCanvas',
 		isLeaf: true, 
 	});
@@ -217,7 +195,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<datalist></datalist>',
-		help: 'http://dpq.co.ir/more-information-datalist',
 		controller: 'WbWidgetDatalist', 
 	});
 	$widget.newWidget({
@@ -228,7 +205,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<dd></dd>',
-		help: 'http://dpq.co.ir/more-information-dd',
 		controller: 'WbWidgetDd', 
 	});
 	$widget.newWidget({
@@ -239,7 +215,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<details></details>',
-		help: 'http://dpq.co.ir/more-information-details',
 		controller: 'WbWidgetDetails', 
 	});
 	$widget.newWidget({
@@ -250,7 +225,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<dialog></dialog>',
-		help: 'http://dpq.co.ir/more-information-dialog',
 		controller: 'WbWidgetDialog', 
 	});
 	$widget.newWidget({
@@ -261,7 +235,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<div></div>',
-		help: 'http://dpq.co.ir/more-information-div',
 		controller: 'WbWidgetDiv',
 		isLeaf: false
 	});
@@ -273,7 +246,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<dl></dl>',
-		help: 'http://dpq.co.ir/more-information-dl',
 		controller: 'WbWidgetDl', 
 	});
 	$widget.newWidget({
@@ -284,7 +256,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<dt></dt>',
-		help: 'http://dpq.co.ir/more-information-dt',
 		controller: 'WbWidgetDt', 
 	});
 	$widget.newWidget({
@@ -409,7 +380,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<header></header>',
-		help: 'http://dpq.co.ir/more-information-header',
 		controller: 'WbWidgetHeader', 
 		isLeaf: false
 	});
@@ -421,7 +391,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<hr></hr>',
-		help: 'http://dpq.co.ir/more-information-hr',
 		controller: 'WbWidgetHr',
 		isLeaf: true, 
 	});
@@ -522,7 +491,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<kbd></kbd>',
-		help: 'http://dpq.co.ir/more-information-kbd',
 		controller: 'WbWidgetKbd', 
 	});
 	$widget.newWidget({
@@ -533,7 +501,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<label></label>',
-		help: 'http://dpq.co.ir/more-information-label',
 		controller: 'WbWidgetLabel',
 		isLeaf: true, 
 	});
@@ -545,7 +512,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<legend></legend>',
-		help: 'http://dpq.co.ir/more-information-label',
 		controller: 'WbWidgetLegend',
 		isLeaf: true, 
 	});
@@ -557,7 +523,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<li></li>',
-		help: 'http://dpq.co.ir/more-information-li',
 		controller: 'WbWidgetLi',
 		isLeaf: false, 
 	});
