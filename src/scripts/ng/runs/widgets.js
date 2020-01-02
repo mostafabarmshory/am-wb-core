@@ -47,7 +47,7 @@ angular.module('am-wb-core')
  * Providers
  ***********************************************************************/
 .run(function (
-		/* angularjs */ $location, $http, $routeParams, 
+		/* angularjs */ $location, $http, 
 		/* WB        */ $widget, $mdMedia, 
 		$wbWindow, $wbLocal, $WbProviderTimeout, 
 		$dispatcher, $storage) {
@@ -55,7 +55,6 @@ angular.module('am-wb-core')
 	.setProvider('$http', $http)
 	.setProvider('$window', $wbWindow)
 	.setProvider('$location', $location)
-	.setProvider('$routeParams', $routeParams)
 	.setProvider('$dispatcher', $dispatcher)
 	.setProvider('$storage', $storage)
 	.setProvider('$timeout', $WbProviderTimeout)

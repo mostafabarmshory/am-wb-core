@@ -31,7 +31,6 @@
     "angular-aria": "1.7.x",
     "angular-messages": "1.7.x",
     "angular-sanitize": "1.7.x",
-    "angular-route": "1.7.x",
     "angular-material": "1.1.x",
     "angular-translate": "2.18.x",
     "weakmap-polyfill": "2.0.x",

@@ -54,7 +54,6 @@ angular.module('am-wb-core', [
 	'ngAnimate',
 	'ngAria',
 	'ngSanitize',
-	'ngRoute', 
 
 	// editor
 	'ngMaterial',
