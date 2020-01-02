@@ -37,7 +37,6 @@ angular.module('am-wb-core')
 		this.location = nativeWindow.location;
 		this.libs = {};
 		this.styles = {};
-		this.fonts = {};
 	};
 
 
