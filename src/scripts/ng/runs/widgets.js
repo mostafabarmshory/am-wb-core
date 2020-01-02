@@ -363,9 +363,6 @@ angular.module('am-wb-core')
 					padding: '8px'
 				}
 			},
-			// help id
-			help: 'http://dpq.co.ir',
-			helpId: 'wb-widget-hx',
 			// functional properties
 			template: '<h' +i +'></h' + i + '>',
 			controller:'WbWidgetH',
@@ -446,7 +443,6 @@ angular.module('am-wb-core')
 		description: 'A widget to insert an link to page.',
 		groups: ['basic'],
 		template: '<img></img>',
-		help: 'http://dpq.co.ir/more-information-img',
 		model: {
 			html: 'img',
 			src: 'resources/wb-brand-3.0.png',
@@ -534,7 +530,6 @@ angular.module('am-wb-core')
 		description: 'A widget to insert an link to page.',
 		groups: ['basic'],
 		template: '<link></link>',
-		help: 'http://dpq.co.ir/more-information-link',
 		model: {
 			html: 'Link',
 			url: 'http://www.gitlab.com/am-wb/am-wb-common'
@@ -551,7 +546,6 @@ angular.module('am-wb-core')
 		description: 'A widget to insert an link to page.',
 		groups: ['basic'],
 		template: '<main></main>',
-		help: 'http://dpq.co.ir/more-information-main',
 		controller: 'WbWidgetMain', 
 		isLeaf: false
 	});
@@ -563,7 +557,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<map></map>',
-		help: 'http://dpq.co.ir/more-information-map',
 		controller: 'WbWidgetMap', 
 		isLeaf: false
 	});
@@ -590,9 +583,6 @@ angular.module('am-wb-core')
 				padding:  '8px'
 			}
 		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-meta',
 		// functional properties
 		template: '<meta></meta>',
 		controllerAs: 'ctrl',
@@ -606,7 +596,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<meter></meter>',
-		help: 'http://dpq.co.ir/more-information-meter',
 		controller: 'WbWidgetMeter', 
 	});
 	$widget.newWidget({
@@ -617,7 +606,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<nav></nav>',
-		help: 'http://dpq.co.ir/more-information-nav',
 		controller: 'WbWidgetNav', 
 		isLeaf: false
 	});
@@ -629,7 +617,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<noscript></noscript>',
-		help: 'http://dpq.co.ir/more-information-noscript',
 		controller: 'WbWidgetNoscript', 
 	});
 	$widget.newWidget({
@@ -640,7 +627,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<object></object>',
-		help: 'http://dpq.co.ir/more-information-object',
 		controller: 'WbWidgetObject', 
 		isLeaf: false
 	});
@@ -652,7 +638,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<ol></ol>',
-		help: 'http://dpq.co.ir/more-information-ol',
 		controller: 'WbWidgetOl', 
 		isLeaf: false
 	});
@@ -664,7 +649,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<optgroup></optgroup>',
-		help: 'http://dpq.co.ir/more-information-optgroup',
 		controller: 'WbWidgetOptgroup', 
 		isLeaf: false
 	});
@@ -676,7 +660,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<option></option>',
-		help: 'http://dpq.co.ir/more-information-option',
 		controller: 'WbWidgetOption', 
 	});
 	$widget.newWidget({
@@ -687,7 +670,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<output></output>',
-		help: 'http://dpq.co.ir/more-information-output',
 		controller: 'WbWidgetOutput', 
 	});
 	$widget.newWidget({
@@ -703,9 +685,6 @@ angular.module('am-wb-core')
 				padding: '8px'
 			}
 		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-p',
 		// functional properties
 		template: '<p></p>',
 		controllerAs: 'ctrl',
@@ -720,7 +699,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<param></param>',
-		help: 'http://dpq.co.ir/more-information-param',
 		controller: 'WbWidgetParam',
 		isLeaf: true, 
 	});
@@ -732,7 +710,6 @@ angular.module('am-wb-core')
 		description: 'This widget is used to add picture in the document.',
 		groups: ['basic'],
 		template: '<picture></picture>',
-		help: 'http://dpq.co.ir/more-information-picture',
 		model: {
 			media: '(min-width: 650px)',
 			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
@@ -748,7 +725,6 @@ angular.module('am-wb-core')
 		description: 'A widget to insert an Preformatted text to page.',
 		groups: ['basic'],
 		template: '<pre></pre>',
-		help: 'http://dpq.co.ir/more-information-pre',
 		model: {
 			html: 'class A {\n\tint a;\n}',
 		},
@@ -773,9 +749,6 @@ angular.module('am-wb-core')
 				}
 			}
 		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-progress',
 		// functional properties
 		template: '<progress value="22" max="100"></progress>',
 		controller: 'WbWidgetProgress'
@@ -788,7 +761,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<q></q>',
-		help: 'http://dpq.co.ir/more-information-q',
 		controller: 'WbWidgetQ', 
 	});
 	$widget.newWidget({
@@ -798,7 +770,6 @@ angular.module('am-wb-core')
 		description: 'The widget is used to define text that is no longer correct.',
 		groups: ['basic'],
 		template: '<s></s>',
-		help: 'http://dpq.co.ir/more-information-s',
 		model: {
 			html: 'Text'
 		},
@@ -811,7 +782,6 @@ angular.module('am-wb-core')
 		description: 'It defines sample output from a computer program.',
 		groups: ['basic'],
 		template: '<samp></samp>',
-		help: 'http://dpq.co.ir/more-information-samp',
 		model: {
 			html: 'Text'
 		},
@@ -825,7 +795,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<script></script>',
-		help: 'http://dpq.co.ir/more-information-script',
 		controller: 'WbWidgetScript', 
 	});
 	$widget.newWidget({
@@ -836,7 +805,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<section></section>',
-		help: 'http://dpq.co.ir/more-information-section',
 		controller: 'WbWidgetSection', 
 		isLeaf: false
 	});
@@ -848,7 +816,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<select></select>',
-		help: 'http://dpq.co.ir/more-information-select',
 		controller: 'WbWidgetSelect', 
 	});
 	$widget.newWidget({
@@ -858,7 +825,6 @@ angular.module('am-wb-core')
 		description: 'The widget defines smaller text.',
 		groups: ['basic'],
 		template: '<small></small>',
-		help: 'http://dpq.co.ir/more-information-small',
 		model: {
 			html: 'Small text'
 		},
@@ -872,7 +838,6 @@ angular.module('am-wb-core')
 		description: 'This widget is used to add source in the document.',
 		groups: ['basic'],
 		template: '<source></source>',
-		help: 'http://dpq.co.ir/more-information-source',
 		model: {
 			media: '(min-width: 650px)',
 			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
@@ -886,7 +851,6 @@ angular.module('am-wb-core')
 		description: 'The widget is used to group inline-elements in a document.',
 		groups: ['basic'],
 		template: '<span></span>',
-		help: 'http://weburger.ir/more-information-span',
 		model: {
 			html: 'Text'
 		},
@@ -899,7 +863,6 @@ angular.module('am-wb-core')
 		description: 'The widget defines strong emphasized text.',
 		groups: ['basic'],
 		template: '<strong></strong>',
-		help: 'http://dpq.co.ir/more-information-script',
 		model: {
 			html: 'Text'
 		},
@@ -913,7 +876,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<style></style>',
-		help: 'http://dpq.co.ir/more-information-style',
 		controller: 'WbWidgetStyle', 
 	});
 	$widget.newWidget({
@@ -924,7 +886,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<summary></summary>',
-		help: 'http://dpq.co.ir/more-information-summary',
 		controller: 'WbWidgetSummary', 
 		isLeaf: false
 	});
@@ -936,7 +897,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<svg></svg>',
-		help: 'http://dpq.co.ir/more-information-svg',
 		controller: 'WbWidgetSvg', 
 	});
 	$widget.newWidget({
@@ -947,7 +907,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<template></template>',
-		help: 'http://dpq.co.ir/more-information-template',
 		controller: 'WbWidgetTemplate', 
 		isLeaf: false
 	});
@@ -990,7 +949,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<ul></ul>',
-		help: 'http://dpq.co.ir/more-information-ul',
 		controller: 'WbWidgetUl', 
 		isLeaf: false
 	});
@@ -1002,7 +960,6 @@ angular.module('am-wb-core')
 		description: 'This widget is used to add video in the document.',
 		groups: ['basic'],
 		template: '<video></video>',
-		help: 'http://dpq.co.ir/more-information-audio',
 		model: {
 			media: '(min-width: 650px)',
 			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'

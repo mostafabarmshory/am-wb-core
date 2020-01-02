@@ -78,12 +78,12 @@ angular.module('am-wb-core')
 				this.value.code = code;
 				$scope.$parent.setValue(this.value);
 			};
-			
+
 			this.setLanguage = function(language){
 				this.value.code = language;
 				$scope.$parent.setValue(this.value);
 			};
-			
+
 			this.setEditor = function(editor) {
 				this.editor = editor;
 				editor.setOptions({

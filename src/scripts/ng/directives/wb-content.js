@@ -39,43 +39,43 @@ angular.module('am-wb-core')
  * will be evaluated in non edit mode.
  */
 .directive('wbContent', function($widget) {
-    /*
-     * Link widget view
-     */
-    function wbGroupLink($scope, $element, $attrs, ctrls) {
-        var rootWidget;
-        var ngModelCtrl = ctrls[0];
-        // Load ngModel
-        ngModelCtrl.$render = function() {
-            var model = ngModelCtrl.$viewValue;
-            if (!model) {
-                return;
-            }
+	/*
+	 * Link widget view
+	 */
+	function wbGroupLink($scope, $element, $attrs, ctrls) {
+		var rootWidget;
+		var ngModelCtrl = ctrls[0];
+		// Load ngModel
+		ngModelCtrl.$render = function() {
+			var model = ngModelCtrl.$viewValue;
+			if (!model) {
+				return;
+			}
 
-            // 0- remove old
-            var editable = false;
-            if(rootWidget){
-            	editable = rootWidget.isEditable();
-                rootWidget.destroy();
-            }
-            $element.empty();
+			// 0- remove old
+			var editable = false;
+			if(rootWidget){
+				editable = rootWidget.isEditable();
+				rootWidget.destroy();
+			}
+			$element.empty();
 
-            // 1- create widget
-            $widget.compile(model, null, $element)
-            .then(function(widget){
-                rootWidget = widget;
-                rootWidget.setEditable(editable);
-                $element.trigger('load', widget);
-            }, function(error){
-                $element.error(error);
-            });
-        };
-    }
+			// 1- create widget
+			$widget.compile(model, null, $element)
+			.then(function(widget){
+				rootWidget = widget;
+				rootWidget.setEditable(editable);
+				$element.trigger('load', widget);
+			}, function(error){
+				$element.error(error);
+			});
+		};
+	}
 
-    return {
-        restrict : 'EA',
-        scope : true,
-        link : wbGroupLink,
-        require: ['?ngModel']
-    };
+	return {
+		restrict : 'EA',
+		scope : true,
+		link : wbGroupLink,
+		require: ['?ngModel']
+	};
 });

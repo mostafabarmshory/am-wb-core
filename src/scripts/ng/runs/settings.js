@@ -48,7 +48,7 @@ angular.module('am-wb-core')
 		templateUrl: 'views/settings/wb-widget-a.html',
 		controllerAs: 'ctrl',
 		controller: 'WbSettingACtrl',
-		targets: ['a']
+		targets: ['^a$']
 	})
 	.addPage({
 		type: 'img',
