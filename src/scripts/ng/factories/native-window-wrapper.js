@@ -24,7 +24,7 @@
 
 angular.module('am-wb-core')
 .factory('NativeWindowWrapper', function($q, $injector, $rootScope) {
-	'use strict';
+	
 
 	/**
 	 * @ngdoc Factory

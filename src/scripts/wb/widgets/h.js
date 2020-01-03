@@ -28,7 +28,6 @@ angular.module('am-wb-core')//
  * @description Manage header (h1..h6)
  */
 .factory('WbWidgetH', function (WbWidgetAbstractHtml) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstractHtml.apply(this, [$element, $parent]);
         this.addElementAttributes('align');

@@ -29,7 +29,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbProcessorEvent', function (WbProcessorAbstract, $widget, $injector) {
-    'use strict';
 
     /**
      * Loads events for the widget

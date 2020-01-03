@@ -31,7 +31,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbConverterDom', function (WbConverterAbstract, $widget) {
-	'use strict';
 	function cssNameToJsName(name)
 	{
 		var split = name.split('-');

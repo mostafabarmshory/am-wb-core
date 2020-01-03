@@ -31,7 +31,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbConverterWeburger', function (WbConverterAbstract) {
-    'use strict';
 
     function Converter(){
         WbConverterAbstract.apply(this, ['application/json']);

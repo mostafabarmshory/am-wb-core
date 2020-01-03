@@ -28,7 +28,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetUl', function (WbWidgetGroup) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetGroup.apply(this, [$element, $parent]);
 		this.addElementAttributes();

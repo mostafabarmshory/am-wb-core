@@ -35,7 +35,7 @@ angular.module('am-wb-core') //
  * 
  */
 .service('$dispatcher', function() {
-	'use strict';
+	
 
 	/*
 	 * List of all dispatcher

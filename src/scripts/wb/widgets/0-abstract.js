@@ -75,7 +75,6 @@ angular.module('am-wb-core')//
  * </ul>
  */
 .factory('WbWidgetAbstract', function($widget, $wbWindow, $objectPath){
-	'use strict';
 
 	function debounce(func, wait) {
 		var timeout;

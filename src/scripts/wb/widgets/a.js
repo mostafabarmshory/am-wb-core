@@ -29,7 +29,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbWidgetA', function (WbWidgetAbstractHtml) {
-    'use strict';
 
     /**
      * Creates new instance of the group

@@ -29,7 +29,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbProcessorSelect', function ($rootScope, $widget, WbProcessorAbstract) {
-	'use strict';
 	var EVENT_TYPE_SELECTION_CHANGE = 'selectionChange';
 
 	function Processor(){

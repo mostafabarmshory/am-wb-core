@@ -27,7 +27,7 @@ angular.module('am-wb-core')
  * A service is used to create unique ID's, this prevents duplicate ID's if there are multiple editors on screen.
  */
 .service('uiTinymceService', function() {
-    'use strict';
+    
     var UITinymceService = function() {
         var ID_ATTR = 'ui-tinymce';
         // uniqueId keeps track of the latest assigned ID

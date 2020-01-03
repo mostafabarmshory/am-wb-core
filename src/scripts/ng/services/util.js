@@ -27,7 +27,7 @@
  */
 angular.module('am-wb-core')
 .service('$wbUtil', function ($q, $http, $templateRequest, $sce, WbConverterDom) {
-	'use strict';
+	
 	var converterDom = new WbConverterDom();
 
 	function getTemplateOf(page)

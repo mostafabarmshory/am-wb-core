@@ -29,7 +29,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbProcessorStyle', function ($wbUtil, WbProcessorAbstract) {
-    'use strict';
     
     function loadStyle(widget, keys) {
         var element = widget.getElement();

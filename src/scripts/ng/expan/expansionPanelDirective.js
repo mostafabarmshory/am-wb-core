@@ -14,7 +14,7 @@ angular.module('am-wb-core')
  **/
 .directive('mdExpansionPanel', function() {
 
-    'use strict';
+    
     var ANIMATION_TIME = 180; //ms
 
     function compile(tElement, tAttrs) {

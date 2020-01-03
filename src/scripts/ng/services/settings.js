@@ -32,7 +32,7 @@ angular.module('am-wb-core')
  * 
  */
 .service('$settings', function() {
-	'use strict';
+	
 	/**
 	 * Setting page storage
 	 * 

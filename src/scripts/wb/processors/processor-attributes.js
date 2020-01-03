@@ -30,7 +30,6 @@ angular.module('am-wb-core')
  * 
  */
 .factory('WbProcessorAttribute', function (WbProcessorAbstract) {
-	'use strict';
 
 	function setWidgetElementAttribute(widget, key, value){
 		if(widget.isEditable() && (key === 'draggable' || key === 'dropzone')){

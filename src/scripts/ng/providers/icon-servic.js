@@ -8,7 +8,7 @@
 
 angular.module('ngMdIcons', [])
 .provider('wbIconService', function () {
-	'use strict';
+	
 	var provider, service;
 
 	var shapes = {};
