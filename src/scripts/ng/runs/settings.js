@@ -80,6 +80,14 @@ angular.module('am-wb-core')
 		controller: 'WbSettingWidgetMicrodataCtrl'
 	})
 	.addPage({
+		type: 'meta',
+		label: 'Meta',
+		icon: 'label_important',
+		templateUrl: 'views/settings/wb-widget-meta.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetMetaCtrl'
+	})
+	.addPage({
 		type: 'iframe',
 		label: 'Frame',
 		description: 'Manges IFrame attributes',
