@@ -29,7 +29,6 @@ angular.module('am-wb-core')//
  * 
  */
 .controller('WbSettingGeneralCtrl', function () {
-    'use strict';
     /*
      * Initial the setting editor
      */

@@ -28,10 +28,10 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetForm', function (WbWidgetGroup) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetGroup.apply(this, [$element, $parent]);
-		this.addElementAttributes();
+		this.addElementAttributes('acceptCharset', 'action', 'autocomplete', 'off',
+				'enctype', 'method', 'name', 'novalidate', 'target');
 	}
 	Widget.prototype = Object.create(WbWidgetGroup.prototype);
 	return Widget;

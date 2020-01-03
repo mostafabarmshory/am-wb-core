@@ -36,7 +36,7 @@
 // * 
 // */
 //.factory('TinymcePluginCodesample', function ($resource) {
-//	'use strict';
+//	
 //	var languages;
 //	var defaultLanguages = [{
 //		text: 'HTML/XML',

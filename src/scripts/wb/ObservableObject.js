@@ -22,7 +22,6 @@
 angular.module('am-wb-core')
 
 .factory('WbObservableObject', function() {
-	'use strict';
 
 	function ObservableObject() {
 		this.silent = false;

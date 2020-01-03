@@ -33,7 +33,7 @@ angular.module('am-wb-core')
  * The base of this implementation is https://jspanel.de/api.html
  */
 .service('$wbFloat', function($q, $wbUtil, $rootScope, $compile, $controller) {
-	'use strict';
+	
 
 	/**
 	 * @ngdoc Factory

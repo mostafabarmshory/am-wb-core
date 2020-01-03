@@ -31,7 +31,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbConverterText', function (WbConverterAbstract) {
-    'use strict';
 
     function Converter(){
         WbConverterAbstract.apply(this, ['text/plain']);

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -48,7 +48,7 @@ angular.module('am-wb-core')
 		templateUrl: 'views/settings/wb-widget-a.html',
 		controllerAs: 'ctrl',
 		controller: 'WbSettingACtrl',
-		targets: ['a']
+		targets: ['^a$']
 	})
 	.addPage({
 		type: 'img',
@@ -80,6 +80,14 @@ angular.module('am-wb-core')
 		controller: 'WbSettingWidgetMicrodataCtrl'
 	})
 	.addPage({
+		type: 'meta',
+		label: 'Meta',
+		icon: 'label_important',
+		templateUrl: 'views/settings/wb-widget-meta.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetMetaCtrl'
+	})
+	.addPage({
 		type: 'iframe',
 		label: 'Frame',
 		description: 'Manges IFrame attributes',
@@ -88,6 +96,16 @@ angular.module('am-wb-core')
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetIFrameCtrl',
 		targets: ['iframe']
+	})
+	.addPage({
+		type: 'form',
+		label: 'Form',
+		description: 'Manges form attributes',
+		icon: 'filter_frames',
+		templateUrl: 'views/settings/wb-widget-form.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetFormCtrl',
+		targets: ['form']
 	})
 	.addPage({
 		type: 'source',

@@ -29,7 +29,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbProcessorLocator', function ($wbUtil, WbProcessorAbstract, WidgetLocatorManager) {
-    'use strict';
     function Processor(){
         WbProcessorAbstract.apply(this);
         this.widgetLocator = new WidgetLocatorManager();

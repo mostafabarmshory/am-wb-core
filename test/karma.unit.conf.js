@@ -43,7 +43,6 @@ module.exports = function(config) {
 			'bower_components/angular-material/angular-material.js',
 			'bower_components/md-color-picker/dist/md-color-picker.js',
 			'bower_components/angular-sanitize/angular-sanitize.js',
-			'bower_components/angular-route/angular-route.js',
 			'bower_components/angular-translate/angular-translate.js',
 			'bower_components/weakmap-polyfill/weakmap-polyfill.js',
 			'bower_components/mustache.js/mustache.js',

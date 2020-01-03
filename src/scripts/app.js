@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 jQuery.fn.extend({
 	getPath: function () {
@@ -54,7 +53,6 @@ angular.module('am-wb-core', [
 	'ngAnimate',
 	'ngAria',
 	'ngSanitize',
-	'ngRoute', 
 
 	// editor
 	'ngMaterial',

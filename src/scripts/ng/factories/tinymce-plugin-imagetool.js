@@ -30,7 +30,7 @@
 // * 
 // */
 //.factory('TinymcePluginImageTool', function ($resource) {
-//	'use strict';
+//	
 //
 //	var tinymcePluginImageTool = function (editor/*, pluginUrl*/) {
 //		var factory = this;

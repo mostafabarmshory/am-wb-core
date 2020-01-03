@@ -37,7 +37,7 @@
 // * default_link_target: 
 // */
 //.factory('TinymcePluginLink', function ($resource) {
-//	'use strict';
+//	
 //	
 //
 //	var attachState = {};

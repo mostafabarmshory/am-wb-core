@@ -24,7 +24,7 @@
 
 angular.module('am-wb-core')
 .factory('WbDialogWindow', function($wbWindow, $document, $wbFloat) {
-    'use strict';
+    
 
 
     // Utils

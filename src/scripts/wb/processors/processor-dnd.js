@@ -29,7 +29,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbProcessorDnd', function (WbProcessorAbstract, $widget) {
-    'use strict';
 
     // In standard-compliant browsers we use a custom mime type and also encode the dnd-type in it.
     // However, IE and Edge only support a limited number of mime types. The workarounds are described

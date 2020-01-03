@@ -36,7 +36,6 @@ angular.module('am-wb-core')//
  * @see document/widgets-microdata.md
  */
 .factory('WbProcessorMicrodata', function (WbProcessorAbstract) {
-    'use strict';
 
     var microdataAttributes = [
         'itemscope', // groups list of item properties

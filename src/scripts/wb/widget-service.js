@@ -34,7 +34,6 @@ angular.module('am-wb-core')
 .service('$widget', function($sce, $templateRequest,
 		$q, $injector,
 		WidgetEditorFake) {
-	'use strict';
 
 	var _group_repo = [];
 	var contentElementAsso = [];

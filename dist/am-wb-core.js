@@ -4073,7 +4073,6 @@ Prism.languages.js = Prism.languages.javascript;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 jQuery.fn.extend({
 	getPath: function () {
@@ -4106,7 +4105,6 @@ angular.module('am-wb-core', [
 	'ngAnimate',
 	'ngAria',
 	'ngSanitize',
-	'ngRoute', 
 
 	// editor
 	'ngMaterial',
@@ -4248,7 +4246,7 @@ angular.module('am-wb-core', [
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 /**
  * @ngdoc module
@@ -5383,7 +5381,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 /**
@@ -5451,7 +5449,7 @@ angular.module('am-wb-core')
 angular.module('ui.tinymce', [])
 .value('uiTinymceConfig', {})
 .directive('uiTinymce', function($rootScope, $compile, $timeout, $window, $sce, uiTinymceConfig, uiTinymceService) {
-	'use strict';
+	
 	uiTinymceConfig = uiTinymceConfig || {};
 
 	if (uiTinymceConfig.baseUrl) {
@@ -5682,7 +5680,7 @@ angular.module('ui.tinymce', [])
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 /**
@@ -5700,42 +5698,45 @@ angular.module('am-wb-core')
  * will be evaluated in non edit mode.
  */
 .directive('wbContent', function($widget) {
-    /*
-     * Link widget view
-     */
-    function wbGroupLink($scope, $element, $attrs, ctrls) {
-        var rootWidget;
-        var ngModelCtrl = ctrls[0];
-        // Load ngModel
-        ngModelCtrl.$render = function() {
-            var model = ngModelCtrl.$viewValue;
-            if (!model) {
-                return;
-            }
+	/*
+	 * Link widget view
+	 */
+	function wbGroupLink($scope, $element, $attrs, ctrls) {
+		var rootWidget;
+		var ngModelCtrl = ctrls[0];
+		// Load ngModel
+		ngModelCtrl.$render = function() {
+			var model = ngModelCtrl.$viewValue;
+			if (!model) {
+				return;
+			}
 
-            // 0- remove old
-            if(rootWidget){
-                rootWidget.delete();
-            }
-            $element.empty();
+			// 0- remove old
+			var editable = false;
+			if(rootWidget){
+				editable = rootWidget.isEditable();
+				rootWidget.destroy();
+			}
+			$element.empty();
 
-            // 1- create widget
-            $widget.compile(model, null, $element)
-            .then(function(widget){
-                rootWidget = widget;
-                $element.trigger('load', widget);
-            }, function(error){
-                $element.error(error);
-            });
-        };
-    }
+			// 1- create widget
+			$widget.compile(model, null, $element)
+			.then(function(widget){
+				rootWidget = widget;
+				rootWidget.setEditable(editable);
+				$element.trigger('load', widget);
+			}, function(error){
+				$element.error(error);
+			});
+		};
+	}
 
-    return {
-        restrict : 'EA',
-        scope : true,
-        link : wbGroupLink,
-        require: ['?ngModel']
-    };
+	return {
+		restrict : 'EA',
+		scope : true,
+		link : wbGroupLink,
+		require: ['?ngModel']
+	};
 });
 
 /* 
@@ -5761,7 +5762,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -5950,7 +5951,7 @@ angular.module('am-wb-core')
  * SOFTWARE.
  */
 
-'use strict';
+
 angular.module('am-wb-core')
 
 
@@ -6137,7 +6138,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -6186,7 +6187,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -6230,7 +6231,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -6282,7 +6283,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -6328,7 +6329,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -6387,7 +6388,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -6495,7 +6496,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -6877,7 +6878,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -6999,7 +7000,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -7060,7 +7061,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -7208,7 +7209,7 @@ angular.module('am-wb-core')
  **/
 .directive('mdExpansionPanel', function() {
 
-    'use strict';
+    
     var ANIMATION_TIME = 180; //ms
 
     function compile(tElement, tAttrs) {
@@ -8411,7 +8412,7 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 .factory('WbDialogWindow', function($wbWindow, $document, $wbFloat) {
-    'use strict';
+    
 
 
     // Utils
@@ -8799,7 +8800,7 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')
 .factory('NativeWindowWrapper', function($q, $injector, $rootScope) {
-	'use strict';
+	
 
 	/**
 	 * @ngdoc Factory
@@ -8812,7 +8813,6 @@ angular.module('am-wb-core')
 		this.location = nativeWindow.location;
 		this.libs = {};
 		this.styles = {};
-		this.fonts = {};
 	};
 
 
@@ -9290,7 +9290,7 @@ angular.module('am-wb-core')
 // * 
 // */
 //.factory('TinymcePluginCodesample', function ($resource) {
-//	'use strict';
+//	
 //	var languages;
 //	var defaultLanguages = [{
 //		text: 'HTML/XML',
@@ -9571,7 +9571,7 @@ angular.module('am-wb-core')
 // * 
 // */
 //.factory('TinymcePluginImageTool', function ($resource) {
-//	'use strict';
+//	
 //
 //	var tinymcePluginImageTool = function (editor/*, pluginUrl*/) {
 //		var factory = this;
@@ -9670,7 +9670,7 @@ angular.module('am-wb-core')
 // * default_link_target: 
 // */
 //.factory('TinymcePluginLink', function ($resource) {
-//	'use strict';
+//	
 //	
 //
 //	var attachState = {};
@@ -10454,7 +10454,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -10498,7 +10498,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -10523,7 +10523,7 @@ angular.module('am-wb-core')
 
 angular.module('ngMdIcons', [])
 .provider('wbIconService', function () {
-	'use strict';
+	
 	var provider, service;
 
 	var shapes = {};
@@ -10643,7 +10643,7 @@ angular.module('ngMdIcons', [])
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -10700,12 +10700,12 @@ angular.module('am-wb-core')
 				this.value.code = code;
 				$scope.$parent.setValue(this.value);
 			};
-			
+
 			this.setLanguage = function(language){
 				this.value.code = language;
 				$scope.$parent.setValue(this.value);
 			};
-			
+
 			this.setEditor = function(editor) {
 				this.editor = editor;
 				editor.setOptions({
@@ -10758,7 +10758,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -10785,7 +10785,7 @@ angular.module('am-wb-core')
 		templateUrl: 'views/settings/wb-widget-a.html',
 		controllerAs: 'ctrl',
 		controller: 'WbSettingACtrl',
-		targets: ['a']
+		targets: ['^a$']
 	})
 	.addPage({
 		type: 'img',
@@ -10817,6 +10817,14 @@ angular.module('am-wb-core')
 		controller: 'WbSettingWidgetMicrodataCtrl'
 	})
 	.addPage({
+		type: 'meta',
+		label: 'Meta',
+		icon: 'label_important',
+		templateUrl: 'views/settings/wb-widget-meta.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetMetaCtrl'
+	})
+	.addPage({
 		type: 'iframe',
 		label: 'Frame',
 		description: 'Manges IFrame attributes',
@@ -10825,6 +10833,16 @@ angular.module('am-wb-core')
 		controllerAs: 'ctrl',
 		controller: 'WbSettingWidgetIFrameCtrl',
 		targets: ['iframe']
+	})
+	.addPage({
+		type: 'form',
+		label: 'Form',
+		description: 'Manges form attributes',
+		icon: 'filter_frames',
+		templateUrl: 'views/settings/wb-widget-form.html',
+		controllerAs: 'ctrl',
+		controller: 'WbSettingWidgetFormCtrl',
+		targets: ['form']
 	})
 	.addPage({
 		type: 'source',
@@ -10929,7 +10947,44 @@ angular.module('am-wb-core')
 	});
 });
 
+///* 
+// * The MIT License (MIT)
+// * 
+// * Copyright (c) 2016 weburger
+// * 
+// * Permission is hereby granted, free of charge, to any person obtaining a copy
+// * of this software and associated documentation files (the "Software"), to deal
+// * in the Software without restriction, including without limitation the rights
+// * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// * copies of the Software, and to permit persons to whom the Software is
+// * furnished to do so, subject to the following conditions:
+// * 
+// * The above copyright notice and this permission notice shall be included in all
+// * copies or substantial portions of the Software.
+// * 
+// * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// * SOFTWARE.
+// */
+//angular.module('am-wb-core')
+//
+///*
+// * Load default resources
+// */
+//.run(function(/*$resource, TinymcePluginImageTool, TinymcePluginCodesample, TinymcePluginLink*/) {
+////	var pluginManager = tinymce.PluginManager;
+//	// XXX: maso, 2019: update to tinymce5
+////	pluginManager.add('codesample', TinymcePluginCodesample);
+////	pluginManager.add('image', TinymcePluginImageTool);
+////	pluginManager.add('link', TinymcePluginLink);
+//});
+
 /* 
+
  * The MIT License (MIT)
  * 
  * Copyright (c) 2016 weburger
@@ -10952,44 +11007,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-angular.module('am-wb-core')
 
-/*
- * Load default resources
- */
-.run(function(/*$resource, TinymcePluginImageTool, TinymcePluginCodesample, TinymcePluginLink*/) {
-//	var pluginManager = tinymce.PluginManager;
-	// XXX: maso, 2019: update to tinymce5
-//	pluginManager.add('codesample', TinymcePluginCodesample);
-//	pluginManager.add('image', TinymcePluginImageTool);
-//	pluginManager.add('link', TinymcePluginLink);
-});
-
-/* 
-
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-'use strict';
 
 angular.module('am-wb-core')
 
@@ -11014,7 +11032,7 @@ angular.module('am-wb-core')
  * Providers
  ***********************************************************************/
 .run(function (
-		/* angularjs */ $location, $http, $routeParams, 
+		/* angularjs */ $location, $http, 
 		/* WB        */ $widget, $mdMedia, 
 		$wbWindow, $wbLocal, $WbProviderTimeout, 
 		$dispatcher, $storage) {
@@ -11022,7 +11040,6 @@ angular.module('am-wb-core')
 	.setProvider('$http', $http)
 	.setProvider('$window', $wbWindow)
 	.setProvider('$location', $location)
-	.setProvider('$routeParams', $routeParams)
 	.setProvider('$dispatcher', $dispatcher)
 	.setProvider('$storage', $storage)
 	.setProvider('$timeout', $WbProviderTimeout)
@@ -11041,9 +11058,6 @@ angular.module('am-wb-core')
 		description: 'A widget to add external link. It is used as block item.',
 		icon: 'wb-widget-a',
 		groups: ['basic'],
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-a',
 		// functional properties
 		template: '<a></a>',
 		model: {
@@ -11059,13 +11073,10 @@ angular.module('am-wb-core')
 		description: 'description.',
 		icon: 'wb-widget-address',
 		groups: ['basic'],
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-address',
 		// functional properties
 		template: '<address></address>',
 		controller: 'WbWidgetAddress',
-		isLeaf: true
+		isLeaf: false
 	});
 	$widget.newWidget({
 		// widget description
@@ -11074,9 +11085,6 @@ angular.module('am-wb-core')
 		description: 'applet.',
 		icon: 'wb-widget-applet',
 		groups: ['basic'],
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-applet',
 		// functional properties
 		template: '<applet></applet>',
 		controller: 'WbWidgetApplet',
@@ -11089,9 +11097,6 @@ angular.module('am-wb-core')
 		description: 'area',
 		icon: 'wb-widget-area',
 		groups: ['basic'],
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-area',
 		// functional properties
 		template: '<area></area>',
 		controller: 'WbWidgetArea'
@@ -11103,9 +11108,6 @@ angular.module('am-wb-core')
 		description: 'article',
 		icon: 'wb-widget-article',
 		groups: ['basic'],
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-article',
 		// functional properties
 		template: '<article></article>',
 		controller: 'WbWidgetArticle'
@@ -11117,9 +11119,6 @@ angular.module('am-wb-core')
 		description: 'aside',
 		icon: 'wb-widget-aside',
 		groups: ['basic'],
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-aside',
 		// functional properties
 		template: '<aside></aside>',
 		controller: 'WbWidgetAside'
@@ -11132,7 +11131,6 @@ angular.module('am-wb-core')
 		description: 'This widget is used to add audio in the document.',
 		groups: ['basic'],
 		template: '<audio></audio>',
-		help: 'http://dpq.co.ir/more-information-audio',
 		model: {
 			media: '(min-width: 650px)',
 			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
@@ -11148,7 +11146,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<blockquote></blockquote>',
-		help: 'http://dpq.co.ir/more-information-blockquote',
 		controller: 'WbWidgetBlockquote',
 		isLeaf: true, 
 	});
@@ -11160,7 +11157,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<button></button>',
-		help: 'http://dpq.co.ir/more-information-button',
 		controller: 'WbWidgetButton',
 		isLeaf: true, 
 	});
@@ -11172,7 +11168,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<canvas></canvas>',
-		help: 'http://dpq.co.ir/more-information-canvas',
 		controller: 'WbWidgetCanvas',
 		isLeaf: true, 
 	});
@@ -11184,7 +11179,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<datalist></datalist>',
-		help: 'http://dpq.co.ir/more-information-datalist',
 		controller: 'WbWidgetDatalist', 
 	});
 	$widget.newWidget({
@@ -11195,7 +11189,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<dd></dd>',
-		help: 'http://dpq.co.ir/more-information-dd',
 		controller: 'WbWidgetDd', 
 	});
 	$widget.newWidget({
@@ -11206,7 +11199,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<details></details>',
-		help: 'http://dpq.co.ir/more-information-details',
 		controller: 'WbWidgetDetails', 
 	});
 	$widget.newWidget({
@@ -11217,7 +11209,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<dialog></dialog>',
-		help: 'http://dpq.co.ir/more-information-dialog',
 		controller: 'WbWidgetDialog', 
 	});
 	$widget.newWidget({
@@ -11228,7 +11219,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<div></div>',
-		help: 'http://dpq.co.ir/more-information-div',
 		controller: 'WbWidgetDiv',
 		isLeaf: false
 	});
@@ -11240,7 +11230,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<dl></dl>',
-		help: 'http://dpq.co.ir/more-information-dl',
 		controller: 'WbWidgetDl', 
 	});
 	$widget.newWidget({
@@ -11251,7 +11240,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<dt></dt>',
-		help: 'http://dpq.co.ir/more-information-dt',
 		controller: 'WbWidgetDt', 
 	});
 	$widget.newWidget({
@@ -11359,9 +11347,6 @@ angular.module('am-wb-core')
 					padding: '8px'
 				}
 			},
-			// help id
-			help: 'http://dpq.co.ir',
-			helpId: 'wb-widget-hx',
 			// functional properties
 			template: '<h' +i +'></h' + i + '>',
 			controller:'WbWidgetH',
@@ -11376,7 +11361,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<header></header>',
-		help: 'http://dpq.co.ir/more-information-header',
 		controller: 'WbWidgetHeader', 
 		isLeaf: false
 	});
@@ -11388,7 +11372,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<hr></hr>',
-		help: 'http://dpq.co.ir/more-information-hr',
 		controller: 'WbWidgetHr',
 		isLeaf: true, 
 	});
@@ -11444,7 +11427,6 @@ angular.module('am-wb-core')
 		description: 'A widget to insert an link to page.',
 		groups: ['basic'],
 		template: '<img></img>',
-		help: 'http://dpq.co.ir/more-information-img',
 		model: {
 			html: 'img',
 			src: 'resources/wb-brand-3.0.png',
@@ -11489,7 +11471,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<kbd></kbd>',
-		help: 'http://dpq.co.ir/more-information-kbd',
 		controller: 'WbWidgetKbd', 
 	});
 	$widget.newWidget({
@@ -11500,7 +11481,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<label></label>',
-		help: 'http://dpq.co.ir/more-information-label',
 		controller: 'WbWidgetLabel',
 		isLeaf: true, 
 	});
@@ -11512,7 +11492,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<legend></legend>',
-		help: 'http://dpq.co.ir/more-information-label',
 		controller: 'WbWidgetLegend',
 		isLeaf: true, 
 	});
@@ -11524,7 +11503,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<li></li>',
-		help: 'http://dpq.co.ir/more-information-li',
 		controller: 'WbWidgetLi',
 		isLeaf: false, 
 	});
@@ -11536,7 +11514,6 @@ angular.module('am-wb-core')
 		description: 'A widget to insert an link to page.',
 		groups: ['basic'],
 		template: '<link></link>',
-		help: 'http://dpq.co.ir/more-information-link',
 		model: {
 			html: 'Link',
 			url: 'http://www.gitlab.com/am-wb/am-wb-common'
@@ -11553,7 +11530,6 @@ angular.module('am-wb-core')
 		description: 'A widget to insert an link to page.',
 		groups: ['basic'],
 		template: '<main></main>',
-		help: 'http://dpq.co.ir/more-information-main',
 		controller: 'WbWidgetMain', 
 		isLeaf: false
 	});
@@ -11565,7 +11541,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<map></map>',
-		help: 'http://dpq.co.ir/more-information-map',
 		controller: 'WbWidgetMap', 
 		isLeaf: false
 	});
@@ -11592,9 +11567,6 @@ angular.module('am-wb-core')
 				padding:  '8px'
 			}
 		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-meta',
 		// functional properties
 		template: '<meta></meta>',
 		controllerAs: 'ctrl',
@@ -11608,7 +11580,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<meter></meter>',
-		help: 'http://dpq.co.ir/more-information-meter',
 		controller: 'WbWidgetMeter', 
 	});
 	$widget.newWidget({
@@ -11619,7 +11590,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<nav></nav>',
-		help: 'http://dpq.co.ir/more-information-nav',
 		controller: 'WbWidgetNav', 
 		isLeaf: false
 	});
@@ -11631,7 +11601,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<noscript></noscript>',
-		help: 'http://dpq.co.ir/more-information-noscript',
 		controller: 'WbWidgetNoscript', 
 	});
 	$widget.newWidget({
@@ -11642,7 +11611,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<object></object>',
-		help: 'http://dpq.co.ir/more-information-object',
 		controller: 'WbWidgetObject', 
 		isLeaf: false
 	});
@@ -11654,7 +11622,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<ol></ol>',
-		help: 'http://dpq.co.ir/more-information-ol',
 		controller: 'WbWidgetOl', 
 		isLeaf: false
 	});
@@ -11666,7 +11633,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<optgroup></optgroup>',
-		help: 'http://dpq.co.ir/more-information-optgroup',
 		controller: 'WbWidgetOptgroup', 
 		isLeaf: false
 	});
@@ -11678,7 +11644,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<option></option>',
-		help: 'http://dpq.co.ir/more-information-option',
 		controller: 'WbWidgetOption', 
 	});
 	$widget.newWidget({
@@ -11689,7 +11654,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<output></output>',
-		help: 'http://dpq.co.ir/more-information-output',
 		controller: 'WbWidgetOutput', 
 	});
 	$widget.newWidget({
@@ -11705,9 +11669,6 @@ angular.module('am-wb-core')
 				padding: '8px'
 			}
 		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-p',
 		// functional properties
 		template: '<p></p>',
 		controllerAs: 'ctrl',
@@ -11722,7 +11683,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<param></param>',
-		help: 'http://dpq.co.ir/more-information-param',
 		controller: 'WbWidgetParam',
 		isLeaf: true, 
 	});
@@ -11734,7 +11694,6 @@ angular.module('am-wb-core')
 		description: 'This widget is used to add picture in the document.',
 		groups: ['basic'],
 		template: '<picture></picture>',
-		help: 'http://dpq.co.ir/more-information-picture',
 		model: {
 			media: '(min-width: 650px)',
 			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
@@ -11750,7 +11709,6 @@ angular.module('am-wb-core')
 		description: 'A widget to insert an Preformatted text to page.',
 		groups: ['basic'],
 		template: '<pre></pre>',
-		help: 'http://dpq.co.ir/more-information-pre',
 		model: {
 			html: 'class A {\n\tint a;\n}',
 		},
@@ -11775,9 +11733,6 @@ angular.module('am-wb-core')
 				}
 			}
 		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-progress',
 		// functional properties
 		template: '<progress value="22" max="100"></progress>',
 		controller: 'WbWidgetProgress'
@@ -11790,7 +11745,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<q></q>',
-		help: 'http://dpq.co.ir/more-information-q',
 		controller: 'WbWidgetQ', 
 	});
 	$widget.newWidget({
@@ -11800,7 +11754,6 @@ angular.module('am-wb-core')
 		description: 'The widget is used to define text that is no longer correct.',
 		groups: ['basic'],
 		template: '<s></s>',
-		help: 'http://dpq.co.ir/more-information-s',
 		model: {
 			html: 'Text'
 		},
@@ -11813,7 +11766,6 @@ angular.module('am-wb-core')
 		description: 'It defines sample output from a computer program.',
 		groups: ['basic'],
 		template: '<samp></samp>',
-		help: 'http://dpq.co.ir/more-information-samp',
 		model: {
 			html: 'Text'
 		},
@@ -11827,7 +11779,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<script></script>',
-		help: 'http://dpq.co.ir/more-information-script',
 		controller: 'WbWidgetScript', 
 	});
 	$widget.newWidget({
@@ -11838,7 +11789,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<section></section>',
-		help: 'http://dpq.co.ir/more-information-section',
 		controller: 'WbWidgetSection', 
 		isLeaf: false
 	});
@@ -11850,7 +11800,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<select></select>',
-		help: 'http://dpq.co.ir/more-information-select',
 		controller: 'WbWidgetSelect', 
 	});
 	$widget.newWidget({
@@ -11860,7 +11809,6 @@ angular.module('am-wb-core')
 		description: 'The widget defines smaller text.',
 		groups: ['basic'],
 		template: '<small></small>',
-		help: 'http://dpq.co.ir/more-information-small',
 		model: {
 			html: 'Small text'
 		},
@@ -11874,7 +11822,6 @@ angular.module('am-wb-core')
 		description: 'This widget is used to add source in the document.',
 		groups: ['basic'],
 		template: '<source></source>',
-		help: 'http://dpq.co.ir/more-information-source',
 		model: {
 			media: '(min-width: 650px)',
 			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
@@ -11888,7 +11835,6 @@ angular.module('am-wb-core')
 		description: 'The widget is used to group inline-elements in a document.',
 		groups: ['basic'],
 		template: '<span></span>',
-		help: 'http://weburger.ir/more-information-span',
 		model: {
 			html: 'Text'
 		},
@@ -11901,7 +11847,6 @@ angular.module('am-wb-core')
 		description: 'The widget defines strong emphasized text.',
 		groups: ['basic'],
 		template: '<strong></strong>',
-		help: 'http://dpq.co.ir/more-information-script',
 		model: {
 			html: 'Text'
 		},
@@ -11915,7 +11860,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<style></style>',
-		help: 'http://dpq.co.ir/more-information-style',
 		controller: 'WbWidgetStyle', 
 	});
 	$widget.newWidget({
@@ -11926,7 +11870,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<summary></summary>',
-		help: 'http://dpq.co.ir/more-information-summary',
 		controller: 'WbWidgetSummary', 
 		isLeaf: false
 	});
@@ -11938,7 +11881,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<svg></svg>',
-		help: 'http://dpq.co.ir/more-information-svg',
 		controller: 'WbWidgetSvg', 
 	});
 	$widget.newWidget({
@@ -11949,7 +11891,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<template></template>',
-		help: 'http://dpq.co.ir/more-information-template',
 		controller: 'WbWidgetTemplate', 
 		isLeaf: false
 	});
@@ -11992,7 +11933,6 @@ angular.module('am-wb-core')
 		description: 'description',
 		groups: ['basic'],
 		template: '<ul></ul>',
-		help: 'http://dpq.co.ir/more-information-ul',
 		controller: 'WbWidgetUl', 
 		isLeaf: false
 	});
@@ -12004,7 +11944,6 @@ angular.module('am-wb-core')
 		description: 'This widget is used to add video in the document.',
 		groups: ['basic'],
 		template: '<video></video>',
-		help: 'http://dpq.co.ir/more-information-audio',
 		model: {
 			media: '(min-width: 650px)',
 			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
@@ -12037,7 +11976,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 /* eslint no-bitwise: 0 */
 angular.module('am-wb-core')
@@ -12282,7 +12221,7 @@ angular.module('am-wb-core') //
  * 
  */
 .service('$dispatcher', function() {
-	'use strict';
+	
 
 	/*
 	 * List of all dispatcher
@@ -12388,7 +12327,7 @@ angular.module('am-wb-core')
  * The base of this implementation is https://jspanel.de/api.html
  */
 .service('$wbFloat', function($q, $wbUtil, $rootScope, $compile, $controller) {
-	'use strict';
+	
 
 	/**
 	 * @ngdoc Factory
@@ -12661,7 +12600,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -12772,7 +12711,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -13053,131 +12992,131 @@ angular.module('am-wb-core')
  * 
  */
 .service('$settings', function() {
-    'use strict';
-    /**
-     * Setting page storage
-     * 
-     */
-    var settingPages = [];
+	
+	/**
+	 * Setting page storage
+	 * 
+	 */
+	var settingPages = [];
 
-    var notFound = {
-            label : 'Settings not found',
-            templateUrl : 'views/settings/wb-notfound.html'
-    };
-    
-    function pageMatchWith(page, widgetDescription){
-        if(_.isUndefined(page.targets) || page.targets.length === 0){
-            return true;
-        }
-        for(var i = 0; i < page.targets.length; i++){
-            var patt = new RegExp(page.targets[i]);
-            if(patt.test(widgetDescription.type)){
-                return true;
-            }
-        }
-        return false;
-    }
+	var notFound = {
+			label : 'Settings not found',
+			templateUrl : 'views/settings/wb-notfound.html'
+	};
 
-    /**
-     * Fetchs a setting page with the given type
-     * 
-     * @memberof $settings
-     * @param model
-     * @returns
-     */
-    this.getPage = function (type) {
-        var pageResult = notFound;
-        _.forEach(settingPages, function(settingPage){
-            if (type === settingPage.type) {
-                pageResult = settingPage;
-            }
-        });
-        return pageResult;
-    };
+	function pageMatchWith(page, widgetDescription){
+		if(_.isUndefined(page.targets) || page.targets.length === 0){
+			return true;
+		}
+		for(var i = 0; i < page.targets.length; i++){
+			var patt = new RegExp(page.targets[i]);
+			if(patt.test(widgetDescription.type)){
+				return true;
+			}
+		}
+		return false;
+	}
 
-    /**
-     * 
-     * @memberof $settings
-     * @param page type
-     * @returns
-     */
-    this.removePage = function (type) {
-        settingPages=  _.remove(settingPages, function(page) {
-            return type === page.type;
-        });
-        this.settingPagesCach = [];
-        return this;
-    };
+	/**
+	 * Fetchs a setting page with the given type
+	 * 
+	 * @memberof $settings
+	 * @param model
+	 * @returns
+	 */
+	this.getPage = function (type) {
+		var pageResult = notFound;
+		_.forEach(settingPages, function(settingPage){
+			if (type === settingPage.type) {
+				pageResult = settingPage;
+			}
+		});
+		return pageResult;
+	};
 
-    /**
-     * Adds new setting page.
-     * 
-     * @memberof $settings
-     * @returns
-     */
-    this.addPage = function (page) {
-        settingPages.push(page);
-        this.settingPagesCach = [];
-        return this;
-    };
-    
-    /**
-     * Set new setting page.
-     * 
-     * @memberof $settings
-     * @returns
-     */
-    this.setPage = function (page) {
-        this.remvoePage(page.type);
-        return this.addPage(page);
-    };
+	/**
+	 * 
+	 * @memberof $settings
+	 * @param page type
+	 * @returns
+	 */
+	this.removePage = function (type) {
+		settingPages=  _.remove(settingPages, function(page) {
+			return type === page.type;
+		});
+		this.settingPagesCach = [];
+		return this;
+	};
 
-    /**
-     * Finds and lists all setting pages.
-     * 
-     * @memberof $settings
-     * @returns
-     */
-    this.getPages = function () {
-        return _.clone(settingPages);
-    };
+	/**
+	 * Adds new setting page.
+	 * 
+	 * @memberof $settings
+	 * @returns
+	 */
+	this.addPage = function (page) {
+		settingPages.push(page);
+		this.settingPagesCach = [];
+		return this;
+	};
 
-    /**
-     * Finds and lists all setting pages.
-     * 
-     * @deprecated
-     * @memberof $settings
-     * @returns
-     */
-    this.pages = this.getPages;
+	/**
+	 * Set new setting page.
+	 * 
+	 * @memberof $settings
+	 * @returns
+	 */
+	this.setPage = function (page) {
+		this.remvoePage(page.type);
+		return this.addPage(page);
+	};
 
-    /**
-     * Defines default settings for widget
-     * 
-     * @memberof $settings
-     * @param widget
-     * @returns
-     */
-    this.getSettingsFor = function (widgetDescription) {
-        // if it was cached before
-        this.settingPagesCach = this.settingPagesCach || {};
-        if(_.has(this.settingPagesCach, widgetDescription.type)){
-            return this.settingPagesCach[widgetDescription.type];
-        }
+	/**
+	 * Finds and lists all setting pages.
+	 * 
+	 * @memberof $settings
+	 * @returns
+	 */
+	this.getPages = function () {
+		return _.clone(settingPages);
+	};
 
-        // create list
-        var widgetSettings = [];
-        _.forEach(settingPages, function(page){
-            if(pageMatchWith(page, widgetDescription)){
-                widgetSettings.push(page);
-            }
-        });
+	/**
+	 * Finds and lists all setting pages.
+	 * 
+	 * @deprecated
+	 * @memberof $settings
+	 * @returns
+	 */
+	this.pages = this.getPages;
 
-        // put into cache
-        this.settingPagesCach[widgetDescription.type] =  widgetSettings;
+	/**
+	 * Defines default settings for widget
+	 * 
+	 * @memberof $settings
+	 * @param widget
+	 * @returns
+	 */
+	this.getSettingsFor = function (widgetDescription) {
+		// if it was cached before
+		this.settingPagesCach = this.settingPagesCach || {};
+		if(_.has(this.settingPagesCach, widgetDescription.type)){
+			return this.settingPagesCach[widgetDescription.type];
+		}
 
-        return widgetSettings;
-    };
+		// create list
+		var widgetSettings = [];
+		_.forEach(settingPages, function(page){
+			if(pageMatchWith(page, widgetDescription)){
+				widgetSettings.push(page);
+			}
+		});
+
+		// put into cache
+		this.settingPagesCach[widgetDescription.type] =  widgetSettings;
+
+		return widgetSettings;
+	};
 });
 
 /* 
@@ -13203,7 +13142,7 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
 
 angular.module('am-wb-core')
 
@@ -13278,7 +13217,7 @@ angular.module('am-wb-core')
  * A service is used to create unique ID's, this prevents duplicate ID's if there are multiple editors on screen.
  */
 .service('uiTinymceService', function() {
-    'use strict';
+    
     var UITinymceService = function() {
         var ID_ATTR = 'ui-tinymce';
         // uniqueId keeps track of the latest assigned ID
@@ -13324,308 +13263,349 @@ angular.module('am-wb-core')
  * Utility class of WB
  */
 angular.module('am-wb-core')
-.service('$wbUtil', function ($q, $templateRequest, $sce, WbConverterDom) {
-    'use strict';
-    var converterDom = new WbConverterDom();
-    var service = this;
+.service('$wbUtil', function ($q, $http, $templateRequest, $sce, WbConverterDom) {
+	
+	var converterDom = new WbConverterDom();
 
-    function getTemplateOf(page)
-    {
-        var template = page.template;
-        var templateUrl = page.templateUrl;
-        if (angular.isDefined(template)) {
-            if (angular.isFunction(template)) {
-                template = template(page.params || page);
-            }
-        } else if (angular.isDefined(templateUrl)) {
-            if (angular.isFunction(templateUrl)) {
-                templateUrl = templateUrl(page.params);
-            }
-            if (angular.isDefined(templateUrl)) {
-                page.loadedTemplateUrl = $sce.valueOf(templateUrl);
-                template = $templateRequest(templateUrl);
-            }
-        }
-        return template;
-    }
+	function getTemplateOf(page)
+	{
+		var template = page.template;
+		var templateUrl = page.templateUrl;
+		if (angular.isDefined(template)) {
+			if (angular.isFunction(template)) {
+				template = template(page.params || page);
+			}
+		} else if (angular.isDefined(templateUrl)) {
+			if (angular.isFunction(templateUrl)) {
+				templateUrl = templateUrl(page.params);
+			}
+			if (angular.isDefined(templateUrl)) {
+				page.loadedTemplateUrl = $sce.valueOf(templateUrl);
+				template = $templateRequest(templateUrl);
+			}
+		}
+		return template;
+	}
 
-    /**
-     * Loading template of the page
-     * 
-     * @name getTemplateFor
-     * @memberof $wbUtil
-     * @param page
-     *            {object} properties of a page, widget , ..
-     * @return promise to load template on resolve.
-     */
-    function getTemplateFor(page)
-    {
-        return $q.when(getTemplateOf(page));
-    }
+	/**
+	 * Loading template of the page
+	 * 
+	 * @name getTemplateFor
+	 * @memberof $wbUtil
+	 * @param page
+	 *            {object} properties of a page, widget , ..
+	 * @return promise to load template on resolve.
+	 */
+	function getTemplateFor(page)
+	{
+		return $q.when(getTemplateOf(page));
+	}
 
 
-    function cleanEvetns(model)
-    {
-        if(model.on){
-            delete model.event;
-            return;
-        }
+	function cleanEvetns(model)
+	{
+		if(model.on){
+			delete model.event;
+			return;
+		}
 
-        // event
-        if (!model.event) {
-            model.event = {};
-        }
+		// event
+		if (!model.event) {
+			model.event = {};
+		}
 
-        // load legecy events
-        if(model.event.failure){
-            model.event.error = model.event.failure;
-            delete model.event.failure;
-        }
+		// load legecy events
+		if(model.event.failure){
+			model.event.error = model.event.failure;
+			delete model.event.failure;
+		}
 
-        if(model.event){
-            model.on = model.event;
-            delete model.event;
-        }
-        
-        // add a note to all event 
-        if(model.on){
-            _.forOwn(model.on, function(value, key) { 
-                model.on[key] = '/* code style is deprecated. see http://www.viraweb123.ir/amh-blog/content/wb-v4-release */ \n' + value;
-            } );
-        }
-    }
+		if(model.event){
+			model.on = model.event;
+			delete model.event;
+		}
 
-    function cleanLayout(model)
+		// add a note to all event 
+		if(model.on){
+			_.forOwn(model.on, function(value, key) { 
+				model.on[key] = '/* code style is deprecated. see http://www.viraweb123.ir/amh-blog/content/wb-v4-release */ \n' + value;
+			} );
+		}
+	}
 
-    {
-        if (model.style.layout) {
-            if(model.style.layout.align_self){
-                model.style.alignSelf = model.style.layout.align_self;
-            }
-            if(model.style.layout.direction){
-                model.style.display = 'flex';
+	function cleanLayout(model)
 
-//              model.style.flex
-                model.style.flexGrow = model.style.layout.grow;
-                model.style.flexShrink = model.style.layout.shrink;
-                model.style.flexBasis = model.style.layout.basis;
+	{
+		if (model.style.layout) {
+			if(model.style.layout.align_self){
+				model.style.alignSelf = model.style.layout.align_self;
+			}
+			if(model.style.layout.direction){
+				model.style.display = 'flex';
 
-//              model.style.flexFlow
-                model.style.flexDirection = model.style.layout.direction;
-                model.style.flexWrap = model.style.layout.wrap ? 'wrap' : 'no-wrap';
-                model.style.justifyContent = model.style.layout.justify;
-                if(model.style.justifyContent === 'end' || model.style.justifyContent === 'end' ){
-                    model.style.justifyContent = 'flex-' + model.style.justifyContent;
-                }
-//              alignContent = ??
-                model.style.alignItems = model.style.layout.align;
-                model.style.order = model.style.layout.order;
-            }
-            delete model.style.layout;
-            return;
-        }
-    }
+//				model.style.flex
+				model.style.flexGrow = model.style.layout.grow;
+				model.style.flexShrink = model.style.layout.shrink;
+				model.style.flexBasis = model.style.layout.basis;
 
-    function cleanSize(model)
-    {
-        // w1 style.size -> w4
-        if (model.style.size) {
-            model.style.width = model.style.size.width;
-            model.style.minWidth = model.style.size.minWidth;
-            model.style.maxWidth = model.style.size.maxWidth;
+//				model.style.flexFlow
+				model.style.flexDirection = model.style.layout.direction;
+				model.style.flexWrap = model.style.layout.wrap ? 'wrap' : 'no-wrap';
+				model.style.justifyContent = model.style.layout.justify;
+				if(model.style.justifyContent === 'end' || model.style.justifyContent === 'end' ){
+					model.style.justifyContent = 'flex-' + model.style.justifyContent;
+				}
+//				alignContent = ??
+				model.style.alignItems = model.style.layout.align;
+				model.style.order = model.style.layout.order;
+			}
+			delete model.style.layout;
+			return;
+		}
+	}
 
-            model.style.height = model.style.size.height;
-            model.style.minHeight = model.style.size.minHeight;
-            model.style.maxHeight = model.style.size.maxHeight;
-            delete model.style.size;
-        }
-    }
+	function cleanSize(model)
+	{
+		// w1 style.size -> w4
+		if (model.style.size) {
+			model.style.width = model.style.size.width;
+			model.style.minWidth = model.style.size.minWidth;
+			model.style.maxWidth = model.style.size.maxWidth;
 
-    function cleanBackground(model)
-    {
-        if (model.style.background) {
-            if(model.style.background.image) {
-                model.style.backgroundImage = 'url("' + model.style.background.image + '")';
-            }
-            model.style.backgroundColor = model.style.background.color;
-            model.style.backgroundSize = model.style.background.size;
-            model.style.backgroundRepeat = model.style.background.repeat;
-            model.style.backgroundOrigin = model.style.background.origin;
-            model.style.backgroundPosition = model.style.background.position;
-            delete model.style.background;
-            return;
-        }
-    }
+			model.style.height = model.style.size.height;
+			model.style.minHeight = model.style.size.minHeight;
+			model.style.maxHeight = model.style.size.maxHeight;
+			delete model.style.size;
+		}
+	}
 
-    function cleanBorder(model)
-    {
-        // w1 border -> w4
-        if (model.style.border) {
-            model.style.borderStyle = model.style.border.style;
-            model.style.borderColor = model.style.border.color;
-            model.style.borderWidth = model.style.border.width;
-            model.style.borderRadius = model.style.border.radius;
-            delete model.style.border;
-            return;
-        }
-    }
+	function cleanBackground(model)
+	{
+		if (model.style.background) {
+			if(model.style.background.image) {
+				model.style.backgroundImage = 'url("' + model.style.background.image + '")';
+			}
+			model.style.backgroundColor = model.style.background.color;
+			model.style.backgroundSize = model.style.background.size;
+			model.style.backgroundRepeat = model.style.background.repeat;
+			model.style.backgroundOrigin = model.style.background.origin;
+			model.style.backgroundPosition = model.style.background.position;
+			delete model.style.background;
+			return;
+		}
+	}
 
-    function cleanSpace(model)
-    {
-        // Padding from W0 -> w4
-        if (model.style.padding && angular.isObject(model.style.padding)) {
-            var padding = '';
-            if (model.style.padding.isUniform) {
-                padding = model.style.padding.uniform;
-            } else {
-                padding = model.style.padding.top || '0px' + ' ' +
-                model.style.padding.right || '0px' + ' ' +
-                model.style.padding.bottom || '0px' + ' ' +
-                model.style.padding.left || '0px' + ' ';
-            }
-            model.style.padding = padding;
-        }
+	function cleanBorder(model)
+	{
+		// w1 border -> w4
+		if (model.style.border) {
+			model.style.borderStyle = model.style.border.style;
+			model.style.borderColor = model.style.border.color;
+			model.style.borderWidth = model.style.border.width;
+			model.style.borderRadius = model.style.border.radius;
+			delete model.style.border;
+			return;
+		}
+	}
 
-        // Margin from W0 -> w4
-        if (model.style.margin && angular.isObject(model.style.margin)) {
-            var margin = '';
-            if (model.style.margin.isUniform) {
-                margin = model.style.margin.uniform;
-            } else {
-                margin = model.style.margin.top || '0px' + ' ' +
-                model.style.margin.right || '0px' + ' ' +
-                model.style.margin.bottom || '0px' + ' ' +
-                model.style.margin.left || '0px' + ' ';
-            }
-            model.style.margin = margin;
-        }
-    }
+	function cleanSpace(model)
+	{
+		// Padding from W0 -> w4
+		if (model.style.padding && angular.isObject(model.style.padding)) {
+			var padding = '';
+			if (model.style.padding.isUniform) {
+				padding = model.style.padding.uniform;
+			} else {
+				padding = model.style.padding.top || '0px' + ' ' +
+				model.style.padding.right || '0px' + ' ' +
+				model.style.padding.bottom || '0px' + ' ' +
+				model.style.padding.left || '0px' + ' ';
+			}
+			model.style.padding = padding;
+		}
 
-    function cleanAlign(/*model*/)
-    {
-//      if (!model.style.align) {
-//      model.style.align = {};
-//      }
-    }
+		// Margin from W0 -> w4
+		if (model.style.margin && angular.isObject(model.style.margin)) {
+			var margin = '';
+			if (model.style.margin.isUniform) {
+				margin = model.style.margin.uniform;
+			} else {
+				margin = model.style.margin.top || '0px' + ' ' +
+				model.style.margin.right || '0px' + ' ' +
+				model.style.margin.bottom || '0px' + ' ' +
+				model.style.margin.left || '0px' + ' ';
+			}
+			model.style.margin = margin;
+		}
+	}
 
-    function cleanOverflow(model){
-        if(model.style.overflow){
-            model.style.overflowX = model.style.overflow.x;
-            model.style.overflowY = model.style.overflow.y;
-        }
-    }
+	function cleanAlign(/*model*/)
+	{
+//		if (!model.style.align) {
+//		model.style.align = {};
+//		}
+	}
 
-    function cleanShadow(model){
-        //h-offset v-offset blur spread color
-        if(model.style.shadows){
-            var boxShadows = [];
-            _.forEach(model.style.shadows, function(shadow){
-                var sh = shadow.hShift + ' ' + 
-                shadow.vShift + ' ' + 
-                shadow.blur + ' ' + 
-                shadow.spread + ' ' + 
-                shadow.color;
-                if(shadow.inset){
-                    sh += ' ' + 'inset';
-                }
-                boxShadows.push(sh);
-            });
-            model.style.boxShadow = _.join(boxShadows);
-            delete model.style.shadows;
-            return;
-        }
-    }
+	function cleanOverflow(model){
+		if(model.style.overflow){
+			model.style.overflowX = model.style.overflow.x;
+			model.style.overflowY = model.style.overflow.y;
+		}
+	}
 
-    function cleanStyle(model)
-    {
-        if (!angular.isObject(model.style)) {
-            model.style = {};
-        }
-        cleanLayout(model);
-        cleanSize(model);
-        cleanBackground(model);
-        cleanBorder(model);
-        cleanSpace(model);
-        cleanAlign(model);
-        cleanOverflow(model);
-        cleanShadow(model);
-    }
+	function cleanShadow(model){
+		//h-offset v-offset blur spread color
+		if(model.style.shadows){
+			var boxShadows = [];
+			_.forEach(model.style.shadows, function(shadow){
+				var sh = shadow.hShift + ' ' + 
+				shadow.vShift + ' ' + 
+				shadow.blur + ' ' + 
+				shadow.spread + ' ' + 
+				shadow.color;
+				if(shadow.inset){
+					sh += ' ' + 'inset';
+				}
+				boxShadows.push(sh);
+			});
+			model.style.boxShadow = _.join(boxShadows);
+			delete model.style.shadows;
+			return;
+		}
+	}
 
-    function cleanType(model){
-        if(model.type === 'Group'){
-            model.type = 'div';
-        }
-        if(model.type === 'Import'){
-            model.type = 'import';
-        }
-        if(model.type === 'Link') {
-            model.type = 'a';
-            model.html = model.title;
-            model.href = model.url;
-            model.style.text = {
-                    align: 'center'
-            };
-            model.style.cursor = 'pointer';
+	function cleanStyle(model)
+	{
+		if (!angular.isObject(model.style)) {
+			model.style = {};
+		}
+		cleanLayout(model);
+		cleanSize(model);
+		cleanBackground(model);
+		cleanBorder(model);
+		cleanSpace(model);
+		cleanAlign(model);
+		cleanOverflow(model);
+		cleanShadow(model);
+	}
 
-            delete model.title;
-            delete model.url;
-        }
-        if(model.type === 'Image'){
-            model.type = 'img';
-            model.src = model.url;
+	function cleanType(model){
+		if(model.type === 'Group'){
+			model.type = 'div';
+		}
+		if(model.type === 'Import'){
+			model.type = 'import';
+		}
+		if(model.type === 'Link') {
+			model.type = 'a';
+			model.html = model.title;
+			model.href = model.url;
+			model.style.text = {
+					align: 'center'
+			};
+			model.style.cursor = 'pointer';
 
-            delete model.url;
-        }
-        if(model.type === 'HtmlText'){
-            model.html = model.text;
-            delete model.text;
-        }
-        if(model.type === 'HtmlText'){
-            model.type = 'section';
-            model.children = converterDom.decode(model.html);
-            delete model.html;
-        }
-    }
+			delete model.title;
+			delete model.url;
+		}
+		if(model.type === 'Image'){
+			model.type = 'img';
+			model.src = model.url;
 
-    function cleanInternal(model)
-    {
-        delete model.version;
-        cleanEvetns(model);
-        cleanStyle(model);
-        if(_.isArray(model.contents)){
-            model.children = model.contents;
-            delete model.contents;
-        }
-        if (_.isArray(model.children) && model.children.length) {
-            _.forEach(model.children, cleanInternal);
-        }
-        cleanType(model);
-        return model;
-    }
+			delete model.url;
+		}
+		if(model.type === 'HtmlText'){
+			model.html = model.text;
+			delete model.text;
+		}
+		if(model.type === 'HtmlText'){
+			model.type = 'section';
+			model.children = converterDom.decode(model.html);
+			delete model.html;
+		}
+	}
 
-    /**
-     * Clean data model
-     * @name clean 
-     * @param {object} model 
-     * @param {type} force
-     */
-    function clean(model, force)
-    {
-        if (!model.type || model.type === 'Page' || model.type === 'Group') {
-            model.type = 'div';
-        }
-        if (model.version === 'wb4' && !force) {
-            return model;
-        }
-        var newModel = cleanInternal(model);
-        newModel.version = 'wb4';
-        return newModel;
-    }
+	function cleanInternal(model)
+	{
+		delete model.version;
+		cleanEvetns(model);
+		cleanStyle(model);
+		if(_.isArray(model.contents)){
+			model.children = model.contents;
+			delete model.contents;
+		}
+		if (_.isArray(model.children) && model.children.length) {
+			_.forEach(model.children, cleanInternal);
+		}
+		cleanType(model);
+		return model;
+	}
 
-    service.clean = clean;
+	/**
+	 * Clean data model
+	 * @name clean 
+	 * @param {object} model 
+	 * @param {type} force
+	 */
+	function clean(model, force)
+	{
+		if (!model.type || model.type === 'Page' || model.type === 'Group') {
+			model.type = 'div';
+		}
+		if (model.version === 'wb4' && !force) {
+			return model;
+		}
+		var newModel = cleanInternal(model);
+		newModel.version = 'wb4';
+		return newModel;
+	}
 
-    service.getTemplateFor = getTemplateFor;
-    service.getTemplateOf = getTemplateOf;
+	this.clean = clean;
+
+	this.getTemplateFor = getTemplateFor;
+	this.getTemplateOf = getTemplateOf;
+
+	this.findWidgetModelById = function(model, id) {
+		if (model.id === id) {
+			return model;
+		}
+		if (_.isArray(model.children)) {
+			for (var i = 0; i < model.children.length; i++) {
+				var child = this.findWidgetModelById(model.children[i], id);
+				if (child) {
+					return child;
+				}
+			}
+		}
+		return null;
+	};
+
+	this.replaceWidgetModelById = function(model, id, newModel) {
+		if(!model){
+			return newModel;
+		}
+		if (_.isArray(model.children)) {
+			for (var i = 0; i < model.children.length; i++) {
+				if(model.children[i].id === id){
+					model.children[i] = newModel;
+					return;
+				}
+				this.replaceWidgetModelById(model.children[i], id, newModel);
+			}
+		}
+	};
+
+	this.downloadWidgetModel = function(url, id) {
+		var ctrl = this;
+		return $templateRequest(url)
+		.then(function (template) {
+			var obj = ctrl.clean(angular.fromJson(template));
+			if (!id) {
+				return obj;
+			}
+			return ctrl.findWidgetModelById(obj, id);
+		});
+	};
 });
 
 /* 
@@ -13660,7 +13640,7 @@ angular.module('am-wb-core')
  * 
  */
 .service('$wbWindow', function($window, NativeWindowWrapper) {
-    'use strict';
+    
     var currentWindow = new NativeWindowWrapper($window);
     return currentWindow;
 });
@@ -13686,7 +13666,6 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -13982,7 +13961,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14033,7 +14011,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14090,7 +14067,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14181,7 +14157,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14235,7 +14210,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14361,7 +14335,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14408,7 +14381,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14467,7 +14439,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14549,7 +14520,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14601,7 +14571,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14648,12 +14617,52 @@ angular.module('am-wb-core')//
 
 /**
  * @ngdoc Settings
+ * @name WbSettingWidgetFormCtrl
+ * @description Manage Widget form
+ * 
+ */
+.controller('WbSettingWidgetFormCtrl', function () {
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		this.trackAttributes(['acceptCharset', 'action', 'autocomplete', 'off',
+			'enctype', 'method', 'name', 'novalidate', 'target']);
+	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Settings
  * @name WbSettingGeneralCtrl
  * @description Manage Widget general attributes
  * 
  */
 .controller('WbSettingGeneralCtrl', function () {
-    'use strict';
     /*
      * Initial the setting editor
      */
@@ -14698,7 +14707,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14739,7 +14747,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14792,7 +14799,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14841,7 +14847,47 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Controllers
+ * @name WbSettingWidgetMetaCtrl
+ * @description Manage a widget with html text.
+ * 
+ * 
+ */
+.controller('WbSettingWidgetMetaCtrl', function () {
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		this.trackAttributes(['charset', 'content', 'httpEquiv', 'name']);
+	};
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 angular.module('am-wb-core')//
 
@@ -14895,7 +14941,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -14938,8 +14983,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
-
 angular.module('am-wb-core')//
 
 /**
@@ -14979,8 +15022,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
-
 angular.module('am-wb-core')//
 
 /**
@@ -15025,7 +15066,6 @@ angular.module('am-wb-core')//
 angular.module('am-wb-core')
 
 .factory('WbObservableObject', function() {
-	'use strict';
 
 	function ObservableObject() {
 		this.silent = false;
@@ -15167,7 +15207,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbConverterAbstract', function () {
-    'use strict';
 
     /**
      * Creates new instance of the converter
@@ -15255,7 +15294,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbConverterDom', function (WbConverterAbstract, $widget) {
-	'use strict';
 	function cssNameToJsName(name)
 	{
 		var split = name.split('-');
@@ -15286,9 +15324,14 @@ angular.module('am-wb-core')//
 		model.type = name;
 		// attributes
 		_.forEach(element.attributes, function(attr){
-			if(attr.name !== 'style'){
-				model[attr.name] = attr.value;
+			if(attr.name == 'style'){
+				return;
 			}
+			if(attr.name == 'type'){
+				model[model.type+'Type'] = attr.value;
+				return;
+			}
+			model[attr.name] = attr.value;
 		});
 		//style
 		for(var i = 0; i < element.style.length; i++){
@@ -15354,6 +15397,7 @@ angular.module('am-wb-core')//
 	return Converter;
 });
 
+
 /*
  * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
  * 
@@ -15387,7 +15431,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbConverterText', function (WbConverterAbstract) {
-    'use strict';
 
     function Converter(){
         WbConverterAbstract.apply(this, ['text/plain']);
@@ -15462,7 +15505,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbConverterWeburger', function (WbConverterAbstract) {
-    'use strict';
 
     function Converter(){
         WbConverterAbstract.apply(this, ['application/json']);
@@ -15525,7 +15567,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -15607,7 +15648,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -15668,7 +15708,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -15731,7 +15770,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -15917,7 +15955,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -16146,7 +16183,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -16345,7 +16381,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -16533,7 +16568,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 
 angular.module('am-wb-core')//
@@ -16627,7 +16661,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular
 .module('am-wb-core')
@@ -16961,7 +16994,6 @@ angular
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 
 angular.module('am-wb-core')//
@@ -17147,7 +17179,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbProcessorAbstract', function (WbObservableObject) {
-	'use strict';
 
 	function Processor(){
 		WbObservableObject.apply(this, arguments);
@@ -17189,7 +17220,6 @@ angular.module('am-wb-core')
  * 
  */
 .factory('WbProcessorAttribute', function (WbProcessorAbstract) {
-	'use strict';
 
 	function setWidgetElementAttribute(widget, key, value){
 		if(widget.isEditable() && (key === 'draggable' || key === 'dropzone')){
@@ -17271,7 +17301,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbProcessorDnd', function (WbProcessorAbstract, $widget) {
-    'use strict';
 
     // In standard-compliant browsers we use a custom mime type and also encode the dnd-type in it.
     // However, IE and Edge only support a limited number of mime types. The workarounds are described
@@ -17761,7 +17790,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbProcessorEvent', function (WbProcessorAbstract, $widget, $injector) {
-    'use strict';
 
     /**
      * Loads events for the widget
@@ -17945,7 +17973,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbProcessorLocator', function ($wbUtil, WbProcessorAbstract, WidgetLocatorManager) {
-    'use strict';
     function Processor(){
         WbProcessorAbstract.apply(this);
         this.widgetLocator = new WidgetLocatorManager();
@@ -18029,7 +18056,6 @@ angular.module('am-wb-core')//
  * @see document/widgets-microdata.md
  */
 .factory('WbProcessorMicrodata', function (WbProcessorAbstract) {
-    'use strict';
 
     var microdataAttributes = [
         'itemscope', // groups list of item properties
@@ -18109,7 +18135,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbProcessorSelect', function ($rootScope, $widget, WbProcessorAbstract) {
-	'use strict';
 	var EVENT_TYPE_SELECTION_CHANGE = 'selectionChange';
 
 	function Processor(){
@@ -18296,7 +18321,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbProcessorStyle', function ($wbUtil, WbProcessorAbstract) {
-    'use strict';
     
     function loadStyle(widget, keys) {
         var element = widget.getElement();
@@ -18362,7 +18386,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 /**
  * @ngdoc Services
@@ -18445,7 +18468,6 @@ angular.module('am-wb-core')
 .service('$widget', function($sce, $templateRequest,
 		$q, $injector,
 		WidgetEditorFake) {
-	'use strict';
 
 	var _group_repo = [];
 	var contentElementAsso = [];
@@ -19070,7 +19092,6 @@ angular.module('am-wb-core')//
  * </ul>
  */
 .factory('WbWidgetAbstract', function($widget, $wbWindow, $objectPath){
-	'use strict';
 
 	function debounce(func, wait) {
 		var timeout;
@@ -19221,6 +19242,7 @@ angular.module('am-wb-core')//
 		var options = {
 				root: null,
 				rootMargin: '0px',
+				threshold: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 		};
 
 		this.intersectionObserver = new IntersectionObserver(function ($event) {
@@ -19497,9 +19519,13 @@ angular.module('am-wb-core')//
 	 * @memberof WbAbstractWidget
 	 */
 	WbWidgetAbstract.prototype.destroy = function ($event) {
+		// remove scope
+		this.fire('destroy', $event);
+		
 		// remove callbacks
 		this.callbacks = [];
 		this.actions = [];
+		this.model = null;
 
 		// destroy children
 		angular.forEach(this.childWidgets, function (widget) {
@@ -19508,12 +19534,10 @@ angular.module('am-wb-core')//
 		this.childWidgets = [];
 
 		// destroy view
-		var $element = this.getElement();
-		$element.remove();
-		$element = null;
-
-		// remove scope
-		this.fire('destroy', $event);
+		if(!this.isRoot()){
+			var $element = this.getElement();
+			$element.remove();
+		}
 	};
 
 	/**
@@ -20142,9 +20166,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
-
-
 //submit the controller
 angular.module('am-wb-core')//
 /**
@@ -20535,8 +20556,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
-
 angular.module('am-wb-core')//
 
 /**
@@ -20629,7 +20648,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbWidgetA', function (WbWidgetAbstractHtml) {
-    'use strict';
 
     /**
      * Creates new instance of the group
@@ -20702,14 +20720,13 @@ angular.module('am-wb-core')//
  * @name address
  * @description Manage a widget
  */
-.factory('WbWidgetAddress', function (WbWidgetAbstract) {
-    'use strict';
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.factory('WbWidgetAddress', function (WbWidgetGroup) {
+	function Widget($element, $parent){
+		WbWidgetGroup.apply(this, [$element, $parent]);
+		this.addElementAttributes();
+	}
+	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+	return Widget;
 });
 
 /*
@@ -20742,7 +20759,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetApplet', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -20781,7 +20797,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetArea', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -20820,7 +20835,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetArticle', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -20859,7 +20873,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetAside', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -20889,8 +20902,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
-
 angular.module('am-wb-core')//
 
 /**
@@ -20946,7 +20957,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetBlockquote', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -20985,7 +20995,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetButton', function (WbWidgetAbstractHtml) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -21024,7 +21033,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetCanvas', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21063,7 +21071,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetDatalist', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21102,7 +21109,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetDd', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21141,7 +21147,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetDetails', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21180,7 +21185,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetDialog', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21219,7 +21223,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetDiv', function (WbWidgetGroup) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetGroup.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21258,7 +21261,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetDl', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21297,7 +21299,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetDt', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21336,7 +21337,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetEmbed', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21375,7 +21375,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetFieldset', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21414,7 +21413,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetFigcaption', function (WbWidgetAbstractHtml) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -21453,7 +21451,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetFigure', function (WbWidgetGroup) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetGroup.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -21492,7 +21489,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetFooter', function (WbWidgetGroup) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetGroup.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -21531,10 +21527,10 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetForm', function (WbWidgetGroup) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetGroup.apply(this, [$element, $parent]);
-		this.addElementAttributes();
+		this.addElementAttributes('acceptCharset', 'action', 'autocomplete', 'off',
+				'enctype', 'method', 'name', 'novalidate', 'target');
 	}
 	Widget.prototype = Object.create(WbWidgetGroup.prototype);
 	return Widget;
@@ -21570,7 +21566,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetFrame', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21609,7 +21604,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetFrameset', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21648,7 +21642,6 @@ angular.module('am-wb-core')//
  * @description Manage header (h1..h6)
  */
 .factory('WbWidgetH', function (WbWidgetAbstractHtml) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstractHtml.apply(this, [$element, $parent]);
         this.addElementAttributes('align');
@@ -21687,7 +21680,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetHeader', function (WbWidgetGroup) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetGroup.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -21726,7 +21718,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetHr', function (WbWidgetAbstract) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetAbstract.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -21765,7 +21756,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetI', function (WbWidgetAbstractHtml) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -21795,7 +21785,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -21839,7 +21828,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')
 /**
@@ -21880,7 +21868,6 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -21975,7 +21962,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetKbd', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -22014,7 +22000,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetLabel', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -22053,7 +22038,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetLegend', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -22092,7 +22076,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetLi', function (WbWidgetGroup) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetGroup.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -22122,7 +22105,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -22173,7 +22155,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetMain', function (WbWidgetGroup) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetGroup.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -22212,7 +22193,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetMap', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -22242,7 +22222,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -22258,7 +22237,7 @@ angular.module('am-wb-core')//
 
 	function Widget($element, $parent){
 		WbWidgetAbstract.apply(this, [$element, $parent]);
-		this.addElementAttributes('charset', 'content', 'http-equiv', 'name');
+		this.addElementAttributes('charset', 'content', 'httpEquiv', 'name');
 	}
 	// extend functionality
 	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
@@ -22296,7 +22275,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetMeter', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -22335,7 +22313,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetNav', function (WbWidgetGroup) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetGroup.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -22374,7 +22351,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetNoscript', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -22413,7 +22389,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetObject', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -22452,7 +22427,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetOl', function (WbWidgetGroup) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetGroup.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -22491,7 +22465,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetOptgroup', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -22530,7 +22503,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetOption', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -22569,7 +22541,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetOutput', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -22599,7 +22570,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -22647,7 +22617,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetParam', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -22677,7 +22646,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -22722,7 +22690,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -22802,7 +22769,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -22852,7 +22818,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetQ', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -22891,7 +22856,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetS', function (WbWidgetAbstractHtml) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -22930,7 +22894,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetSamp', function (WbWidgetAbstractHtml) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -22969,7 +22932,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetScript', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -23008,7 +22970,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetSection', function (WbWidgetGroup) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetGroup.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -23047,7 +23008,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetSelect', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -23086,7 +23046,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetSmall', function (WbWidgetAbstractHtml) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -23116,7 +23075,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -23184,7 +23142,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetSpan', function (WbWidgetAbstractHtml) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -23223,7 +23180,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetStrong', function (WbWidgetAbstractHtml) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetAbstractHtml.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -23262,7 +23218,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetStyle', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
 
 		// call super constractor
@@ -23334,7 +23289,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetSummary', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -23373,7 +23327,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetSvg', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -23412,7 +23365,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetTemplate', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -23442,7 +23394,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
 
 angular.module('am-wb-core')//
 
@@ -23521,7 +23472,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetTrack', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
         WbWidgetAbstract.apply(this, [$element, $parent]);
         this.addElementAttributes();
@@ -23560,7 +23510,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetUl', function (WbWidgetGroup) {
-	'use strict';
 	function Widget($element, $parent){
 		WbWidgetGroup.apply(this, [$element, $parent]);
 		this.addElementAttributes();
@@ -23590,8 +23539,6 @@ angular.module('am-wb-core')//
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-'use strict';
-
 angular.module('am-wb-core')//
 
 /**
@@ -23763,6 +23710,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('views/settings/wb-widget-form.html',
+    "<fieldset layout=column> <legend translate>Form</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.acceptCharset ng-change=\"ctrl.setAttribute('acceptCharset', ctrl.attributesValue.acceptCharset)\" wb-title=acceptCharset wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.action ng-change=\"ctrl.setAttribute('action', ctrl.attributesValue.action)\" wb-title=action wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.autocomplete ng-change=\"ctrl.setAttribute('autocomplete', ctrl.attributesValue.autocomplete)\" wb-title=autocomplete wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.off ng-change=\"ctrl.setAttribute('off', ctrl.attributesValue.off)\" wb-title=off wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.enctype ng-change=\"ctrl.setAttribute('enctype', ctrl.attributesValue.enctype)\" wb-title=enctype wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.method ng-change=\"ctrl.setAttribute('method', ctrl.attributesValue.method)\" wb-title=method wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.name ng-change=\"ctrl.setAttribute('name', ctrl.attributesValue.name)\" wb-title=name wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.novalidate ng-change=\"ctrl.setAttribute('novalidate', ctrl.attributesValue.novalidate)\" wb-title=novalidate wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.target ng-change=\"ctrl.setAttribute('target', ctrl.attributesValue.target)\" wb-title=target wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+  );
+
+
   $templateCache.put('views/settings/wb-widget-general.html',
     "<fieldset layout=column> <legend translate>Access</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.id ng-change=\"ctrl.setAttribute('id', ctrl.attributesValue.id)\" wb-title=ID wb-description=\"Specifies a unique id for an element\" wb-action-clean wb-action-more=ctrl.generateRandomId()> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.accesskey ng-change=\"ctrl.setAttribute('accesskey', ctrl.attributesValue.accesskey)\" wb-title=Accesskey wb-icon=\"\" wb-description=\"Specifies a shortcut key to activate/focus an element\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.title ng-change=\"ctrl.setAttribute('title', ctrl.attributesValue.title)\" wb-title=Title wb-description=\"Specifies extra information about an element\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.name ng-change=\"ctrl.setAttribute('name', ctrl.attributesValue.name)\" wb-title=Name wb-description=\"Specifies a unique id for an element\" wb-action-clean> </wb-ui-setting-text> <wb-ui-setting-number ng-model=ctrl.attributesValue.tabindex ng-change=\"ctrl.setAttribute('tabindex', ctrl.attributesValue.tabindex)\" wb-title=\"Tab Index\" wb-description=\"Specifies the tabbing order of an element\" wb-action-clean wb-min=1> </wb-ui-setting-number> </fieldset> <fieldset layout=column> <legend translate>Edit</legend> <wb-ui-setting-boolean ng-model=ctrl.attributesValue.contenteditable ng-change=\"ctrl.setAttribute('contenteditable', ctrl.attributesValue.contenteditable)\" wb-title=\"Content Is Editable\" wb-description=\"Specifies whether the content of an element is editable or not\" wb-action-clean> </wb-ui-setting-boolean> <wb-ui-setting-boolean ng-model=ctrl.attributesValue.draggable ng-change=\"ctrl.setAttribute('draggable', ctrl.attributesValue.draggable)\" wb-title=\"Content Is Editable\" wb-description=\"Specifies whether an element is draggable or not\" wb-action-clean> </wb-ui-setting-boolean> <wb-ui-setting-select ng-model=ctrl.attributesValue.dropzone ng-change=\"ctrl.setAttribute('dropzone', ctrl.attributesValue.dropzone)\" wb-title=\"Drop Zone\" wb-description=\"Specifies whether the dragged data is copied, moved, or linked, when dropped\" wb-action-clean wb-items=\"[{\n" +
     "\t\t\tvalue: 'copy',\n" +
@@ -23803,6 +23755,11 @@ angular.module('am-wb-core').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('views/settings/wb-widget-input.html',
     "<fieldset layout=column> <legend translate>Data Validation</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.accept ng-change=\"ctrl.setAttribute('accept', ctrl.attributesValue.accept)\" wb-title=accept wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.alt ng-change=\"ctrl.setAttribute('alt', ctrl.attributesValue.alt)\" wb-title=alt wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.autocomplete ng-change=\"ctrl.setAttribute('autocomplete', ctrl.attributesValue.autocomplete)\" wb-title=autocomplete wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.autofocus ng-change=\"ctrl.setAttribute('autofocus', ctrl.attributesValue.autofocus)\" wb-title=autofocus wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.checked ng-change=\"ctrl.setAttribute('checked', ctrl.attributesValue.checked)\" wb-title=checked wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.dirname ng-change=\"ctrl.setAttribute('dirname', ctrl.attributesValue.dirname)\" wb-title=dirname wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.disabled ng-change=\"ctrl.setAttribute('disabled', ctrl.attributesValue.disabled)\" wb-title=disabled wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.list ng-change=\"ctrl.setAttribute('list', ctrl.attributesValue.list)\" wb-title=list wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.max ng-change=\"ctrl.setAttribute('max', ctrl.attributesValue.max)\" wb-title=max wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.maxlength ng-change=\"ctrl.setAttribute('maxlength', ctrl.attributesValue.maxlength)\" wb-title=maxlength wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.min ng-change=\"ctrl.setAttribute('min', ctrl.attributesValue.min)\" wb-title=min wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.multiple ng-change=\"ctrl.setAttribute('multiple', ctrl.attributesValue.multiple)\" wb-title=multiple wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.name ng-change=\"ctrl.setAttribute('name', ctrl.attributesValue.name)\" wb-title=name wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.pattern ng-change=\"ctrl.setAttribute('pattern', ctrl.attributesValue.pattern)\" wb-title=pattern wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.placeholder ng-change=\"ctrl.setAttribute('placeholder', ctrl.attributesValue.placeholder)\" wb-title=placeholder wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.readonly ng-change=\"ctrl.setAttribute('readonly', ctrl.attributesValue.readonly)\" wb-title=readonly wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.required ng-change=\"ctrl.setAttribute('required', ctrl.attributesValue.required)\" wb-title=required wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.src ng-change=\"ctrl.setAttribute('src', ctrl.attributesValue.src)\" wb-title=src wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.step ng-change=\"ctrl.setAttribute('step', ctrl.attributesValue.step)\" wb-title=step wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.inputType ng-change=\"ctrl.setAttribute('inputType', ctrl.attributesValue.inputType)\" wb-title=type wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.value ng-change=\"ctrl.setAttribute('value', ctrl.attributesValue.value)\" wb-title=value wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Form</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.form ng-change=\"ctrl.setAttribute('form', ctrl.attributesValue.form)\" wb-title=form wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.formaction ng-change=\"ctrl.setAttribute('formaction', ctrl.attributesValue.formaction)\" wb-title=formaction wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.formenctype ng-change=\"ctrl.setAttribute('formenctype', ctrl.attributesValue.formenctype)\" wb-title=formenctype wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.formmethod ng-change=\"ctrl.setAttribute('formmethod', ctrl.attributesValue.formmethod)\" wb-title=formmethod wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.formnovalidate ng-change=\"ctrl.setAttribute('formnovalidate', ctrl.attributesValue.formnovalidate)\" wb-title=formnovalidate wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.formtarget ng-change=\"ctrl.setAttribute('formtarget', ctrl.attributesValue.formtarget)\" wb-title=formtarget wb-description=\"\"> </wb-ui-setting-text> </fieldset> <fieldset layout=column> <legend translate>Size</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.size ng-change=\"ctrl.setAttribute('size', ctrl.attributesValue.size)\" wb-title=size wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.height ng-change=\"ctrl.setAttribute('height', ctrl.attributesValue.height)\" wb-title=height wb-description=\"\"> </wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.width ng-change=\"ctrl.setAttribute('width', ctrl.attributesValue.width)\" wb-title=width wb-description=\"\"> </wb-ui-setting-text> </fieldset>"
+  );
+
+
+  $templateCache.put('views/settings/wb-widget-meta.html',
+    "<fieldset layout=column style=\"padding: 0px\"> <legend translate=\"\">Meta</legend> <wb-ui-setting-text ng-model=ctrl.attributesValue.name ng-change=\"ctrl.setAttribute('name', ctrl.attributesValue.name)\" wb-title=Name wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.content ng-change=\"ctrl.setAttribute('content', ctrl.attributesValue.content)\" wb-title=Content wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.charset ng-change=\"ctrl.setAttribute('charset', ctrl.attributesValue.charset)\" wb-title=Charset wb-description=\"\"></wb-ui-setting-text> <wb-ui-setting-text ng-model=ctrl.attributesValue.httpEquiv ng-change=\"ctrl.setAttribute('httpEquiv', ctrl.attributesValue.httpEquiv)\" wb-title=\"HTTP equiv\" wb-description=\"\"></wb-ui-setting-text> </fieldset>"
   );
 
 

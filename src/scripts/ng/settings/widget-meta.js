@@ -23,15 +23,18 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Widgets
- * @name script
- * @description Manage a widget
+ * @ngdoc Controllers
+ * @name WbSettingWidgetMetaCtrl
+ * @description Manage a widget with html text.
+ * 
+ * 
  */
-.factory('WbWidgetScript', function (WbWidgetAbstract) {
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.controller('WbSettingWidgetMetaCtrl', function () {
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		this.trackAttributes(['charset', 'content', 'httpEquiv', 'name']);
+	};
 });

@@ -30,7 +30,7 @@ angular.module('am-wb-core')
  * 
  */
 .service('$wbWindow', function($window, NativeWindowWrapper) {
-    'use strict';
+    
     var currentWindow = new NativeWindowWrapper($window);
     return currentWindow;
 });

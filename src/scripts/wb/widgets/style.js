@@ -28,7 +28,6 @@ angular.module('am-wb-core')//
  * @description Manage a widget
  */
 .factory('WbWidgetStyle', function (WbWidgetAbstract) {
-    'use strict';
     function Widget($element, $parent){
 
 		// call super constractor

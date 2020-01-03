@@ -29,7 +29,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbProcessorAbstract', function (WbObservableObject) {
-	'use strict';
 
 	function Processor(){
 		WbObservableObject.apply(this, arguments);

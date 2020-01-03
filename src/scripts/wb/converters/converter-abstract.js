@@ -30,7 +30,6 @@ angular.module('am-wb-core')//
  * 
  */
 .factory('WbConverterAbstract', function () {
-    'use strict';
 
     /**
      * Creates new instance of the converter

@@ -23,15 +23,18 @@
 angular.module('am-wb-core')//
 
 /**
- * @ngdoc Widgets
- * @name script
- * @description Manage a widget
+ * @ngdoc Settings
+ * @name WbSettingWidgetFormCtrl
+ * @description Manage Widget form
+ * 
  */
-.factory('WbWidgetScript', function (WbWidgetAbstract) {
-    function Widget($element, $parent){
-        WbWidgetAbstract.apply(this, [$element, $parent]);
-        this.addElementAttributes();
-    }
-    Widget.prototype = Object.create(WbWidgetAbstract.prototype);
-    return Widget;
+.controller('WbSettingWidgetFormCtrl', function () {
+
+	/*
+	 * Initial the setting editor
+	 */
+	this.init = function () {
+		this.trackAttributes(['acceptCharset', 'action', 'autocomplete', 'off',
+			'enctype', 'method', 'name', 'novalidate', 'target']);
+	};
 });
