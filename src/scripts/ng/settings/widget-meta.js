@@ -35,6 +35,6 @@ angular.module('am-wb-core')//
 	 * Initial the setting editor
 	 */
 	this.init = function () {
-		this.trackAttributes(['charset', 'content', 'http-equiv', 'name']);
+		this.trackAttributes(['charset', 'content', 'httpEquiv', 'name']);
 	};
 });

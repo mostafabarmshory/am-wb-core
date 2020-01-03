@@ -34,7 +34,7 @@ angular.module('am-wb-core')//
 
 	function Widget($element, $parent){
 		WbWidgetAbstract.apply(this, [$element, $parent]);
-		this.addElementAttributes('charset', 'content', 'http-equiv', 'name');
+		this.addElementAttributes('charset', 'content', 'httpEquiv', 'name');
 	}
 	// extend functionality
 	Widget.prototype = Object.create(WbWidgetAbstract.prototype);
