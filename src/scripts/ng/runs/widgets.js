@@ -37,9 +37,8 @@ angular.module('am-wb-core')
 /***********************************************************************
  * Processors
  ***********************************************************************/
-.run(function ($widget, WbProcessorMicrodata, WbProcessorStyle, WbProcessorEvent, WbProcessorAttribute) {
+.run(function ($widget, WbProcessorMicrodata, WbProcessorEvent, WbProcessorAttribute) {
 	$widget.setProcessor('microdata', new WbProcessorMicrodata());
-	$widget.setProcessor('style', new WbProcessorStyle());
 	$widget.setProcessor('event', new WbProcessorEvent());
 	$widget.setProcessor('attribut', new WbProcessorAttribute());
 })

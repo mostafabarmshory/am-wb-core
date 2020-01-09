@@ -31,9 +31,9 @@ describe('WbWidget processor attributes ', function () {
 
     // load the service's module
     beforeEach(module('am-wb-core'));
-    beforeEach(inject(function (_$widget_, _WbProcessorStyle_, _$rootScope_) {
+    beforeEach(inject(function (_$widget_, _WbProcessorAttribute_, _$rootScope_) {
         $widget = _$widget_;
-        processor = new _WbProcessorStyle_();
+        processor = new _WbProcessorAttribute_();
         $rootScope = _$rootScope_;
     }));
 
@@ -78,6 +78,49 @@ describe('WbWidget processor attributes ', function () {
             
             widget.setProperty('name', 'pink');
             expect(widget.getElement().attr('name')).toBe('pink');
+            
+            done();
+        });
+        $rootScope.$apply();
+    });
+
+
+    it('should load style on model changed', function (done) {
+        // Create new instance
+        var model = {
+                type: 'div',
+                id: 'test',
+                style: {
+                    backgroundColor: 'red'
+                }
+        };
+        $widget.compile(model)
+        .then(function(widget){
+            expect(widget.getElement().css('background-color')).toBe('red');
+            done();
+        });
+        $rootScope.$apply();
+    });
+    
+    it('should load style on model update', function (done) {
+        // Create new instance
+        var model = {
+                type: 'div',
+                id: 'test',
+                style: {
+                    backgroundColor: 'red'
+                }
+        };
+        $widget.compile(model)
+        .then(function(widget){
+            expect(widget.getElement().css('background-color')).toBe('red');
+            
+            widget.setModelProperty('style.backgroundColor', 'black');
+            expect(widget.getElement().css('backgroundColor')).toBe('black');
+            expect(widget.getElement().css('background-color')).toBe('black');
+            
+            widget.setProperty('style.backgroundColor', 'pink');
+            expect(widget.getElement().css('background-color')).toBe('pink');
             
             done();
         });

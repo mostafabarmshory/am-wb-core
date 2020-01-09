@@ -32,9 +32,9 @@ describe('WbWidget converter WbConverterText ', function () {
 
     // load the service's module
     beforeEach(module('am-wb-core'));
-    beforeEach(inject(function (_$widget_, _WbProcessorStyle_, _$rootScope_, _WbConverterText_) {
+    beforeEach(inject(function (_$widget_, _WbProcessorAttribute_, _$rootScope_, _WbConverterText_) {
         $widget = _$widget_;
-        processor = new _WbProcessorStyle_();
+        processor = new _WbProcessorAttribute_();
         $rootScope = _$rootScope_;
         WbConverterText = _WbConverterText_;
     }));
