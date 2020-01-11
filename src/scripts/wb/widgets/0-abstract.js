@@ -806,6 +806,9 @@ angular.module('am-wb-core')//
      * @memberof WbAbstractWidget
      */
     WbWidgetAbstract.prototype.setState = function (state) {
+        if(state === this.state){
+            return;
+        }
         var oldState = this.state;
         this.state = state;
         this.fire('stateChanged', {

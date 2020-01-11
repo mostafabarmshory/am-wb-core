@@ -13,6 +13,7 @@
 		"alignItems": "center"
 	},
 	"on": {
+		"init": "alert('event init');",
 		"click":"$widget.setProperty('style.background', 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) +')');"
 	},
 	"children": [{
