@@ -1,0 +1,32 @@
+{
+	"type": "div",
+	"style": {
+		"padding": "5px",
+		"margin": "0px",
+		"background": "pink",
+		"flexGrow": 2,
+		"flexShrink": 2,
+		"flexBasis": "auto",
+		"display": "flex",
+		"flexDirection": "row",
+		"justifyContent": "center",
+		"alignItems": "center"
+	},
+	"on": {
+		"init":"$widget.getChildById('input').on('change', function(){alert('input changed');});"
+	},
+	"children": [{
+		"type": "h1",
+		"html": "Center header",
+		"style": {
+			"margin": "0px"
+		}
+	},{
+		"id": "input",
+		"type": "input",
+		"inputType": "text",
+		"on": {
+			"keyup":"alert('input changed');"
+		}
+	}]
+}

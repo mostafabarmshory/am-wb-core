@@ -45,7 +45,7 @@ angular.module('am-wb-core')//
                 if(!ucode){
                     return;
                 }
-                ucode += '\n//@ sourceURL=wb-widget-'+ widget.getId() + '-' + type + '.js';
+                ucode += '\n//@ sourceURL=wb-'+ widget.getId() + '-' + type + '.js';
                 var params = _.join(_.concat(
                         ['$widget', '$event'], // dynamic data
                         $widget.getProvidersKey()));
@@ -131,7 +131,24 @@ angular.module('am-wb-core')//
                 unload: function ($event) {
                     return evalWidgetEvent(widget, 'unload', $event);
                 },
+                
+                
+                change: function ($event) {
+                    return evalWidgetEvent(widget, 'change', $event);
+                },
 
+                /*
+                 * Keyboard events
+                 */
+                keyup: function ($event) {
+                    return evalWidgetEvent(widget, 'keyup', $event);
+                },
+                keydown: function ($event) {
+                    return evalWidgetEvent(widget, 'keydown', $event);
+                },
+                keypress: function ($event) {
+                    return evalWidgetEvent(widget, 'keypress', $event);
+                },
 
         };
         angular.forEach(widget.__eventListeners, function (listener, key) {
