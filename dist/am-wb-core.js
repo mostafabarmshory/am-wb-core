@@ -5358,6 +5358,375 @@ angular.module('am-wb-core')
 
 });
 
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Converter
+ * @name WbConverter
+ * @description Widget converter
+ * 
+ * A converter are responsible to encode and decode a widget.
+ * 
+ */
+.factory('WbConverterAbstract', function () {
+
+    /**
+     * Creates new instance of the converter
+     * 
+     * @memberof WbConverter
+     */
+    function Converter(mimetype){
+        this.mimetype = mimetype || 'text/plain';
+    }
+    
+    /**
+     * Convert widgets into data
+     * 
+     * @param widget {Widget} to convert
+     * @return string of data
+     * @memberof WbConverter
+     */
+    Converter.prototype.encode = function(){};
+    
+    /**
+     * Converts the input data into list of widgets
+     * 
+     * @param data {string} to convert
+     * @returns list of widgets
+     * @memberof WbConverter
+     */
+    Converter.prototype.decode = function(){};
+    
+    /**
+     * Get the data mimetype
+     * 
+     * When widgets are converted into data, then the data can transfer anywhere, but
+     * data type is very important to recover. 
+     * 
+     * @memberof WbConverter
+     */
+    Converter.prototype.getMimetype = function(){
+        return this.mimetype;
+    };
+
+    /**
+     * Sets the data mimetype
+     * 
+     * NOTE: this is not global
+     * 
+     * @memberof WbConverter
+     */
+    Converter.prototype.setMimetype = function(mimetype){
+        this.mimetype = mimetype;
+    };
+    
+    return Converter;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Converter
+ * @name WbConverterDom
+ * @description Widget converter
+ * 
+ * A converter are responsible to encode and decode a widget.
+ * 
+ */
+.factory('WbConverterDom', function (WbConverterAbstract, $widget) {
+	function cssNameToJsName(name)
+	{
+		var split = name.split('-');
+		var output = '';
+		for(var i = 0; i < split.length; i++)
+		{
+			if (i > 0 && split[i].length > 0 && !(i === 1 && split[i] === 'ms'))
+			{
+				split[i] = split[i].substr(0, 1).toUpperCase() + split[i].substr(1);
+			}
+			output += split[i];
+		}
+		return output;
+	}
+
+	function convertElementToModel(element){
+		var name = element.tagName;
+		if(!name){
+			return null;
+		}
+		name = name.toLowerCase();
+		if(!$widget.hasWidget(name)){
+			return null;
+		}
+		var model = {
+				style:{}
+		};
+		model.type = name;
+		// attributes
+		_.forEach(element.attributes, function(attr){
+			if(attr.name == 'style'){
+				return;
+			}
+			if(attr.name == 'type'){
+				model[model.type+'Type'] = attr.value;
+				return;
+			}
+			model[attr.name] = attr.value;
+		});
+		//style
+		for(var i = 0; i < element.style.length; i++){
+			var sname = element.style.item(i);
+			model.style[cssNameToJsName(sname)] = element.style.getPropertyValue(sname);
+		}
+		if($widget.isWidgetLeaf(name)){
+			// html
+			model.html = element.innerHTML;
+			if(model.type === 'pre'){
+				model.text = element.innerText;
+			}
+		} else {
+			model.children = [];
+			_.forEach(element.children, function(childelement){
+				var childWidget = convertElementToModel(childelement);
+				if(childWidget){
+					model.children.push(childWidget);
+				}
+			});
+			if(model.type === 'li' && model.children.length === 0){
+				model.children.push({
+					type: 'p',
+					html: element.innerText
+				});
+			}
+		}
+		return model;
+	}
+
+	function Converter(){
+		WbConverterAbstract.apply(this, ['text/html']);
+	}
+	Converter.prototype = new WbConverterAbstract();
+
+	Converter.prototype.encode = function(){
+		var widgets = Array.prototype.slice.call(arguments) || [];
+		var data = '';
+		while(widgets.length){
+			var widget = widgets.pop();
+			data += widget.getElement().prop('outerHTML') + '\n';
+		}
+		return data;
+	};
+
+	Converter.prototype.decode = function(data){
+		var widgets = [];
+		try{
+			var element = angular.element(data);
+			for(var i = 0; i < element.length; i++){
+				var model = convertElementToModel(element[i]);
+				if(model){
+					widgets.push(model);
+				}
+			}
+		} catch(ex){
+//			console.error(ex);
+		}
+		return widgets;
+	};
+
+
+	return Converter;
+});
+
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Converter
+ * @name WbConverter
+ * @description Widget converter
+ * 
+ * A converter are responsible to encode and decode a widget.
+ * 
+ */
+.factory('WbConverterText', function (WbConverterAbstract) {
+
+    function Converter(){
+        WbConverterAbstract.apply(this, ['text/plain']);
+    }
+    Converter.prototype = new WbConverterAbstract();
+
+    Converter.prototype.encode = function(){
+        var widgets = Array.prototype.slice.call(arguments) || [];
+        var data = '';
+        while(widgets.length){
+            var widget = widgets.pop();
+            if(widget.isLeaf()){
+                if(widget.html){
+                    data += widget.html() + '\n';
+                }
+            } else {
+                widgets.push.apply(widgets, widget.getChildren());
+            }
+        }
+        return data;
+    };
+
+    Converter.prototype.decode = function(data){
+        var widgets = [];
+        data = data.split('\n');
+        _.forEach(data, function(item){
+            item = _.trim(item);
+            if(item.length){ 
+                widgets.push({
+                    type: 'p',
+                    html: item
+                });
+            }
+        });
+        return widgets;
+    };
+
+
+    return Converter;
+});
+
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Converter
+ * @name WbConverterWeburger
+ * @description Widget converter
+ * 
+ * A converter are responsible to encode and decode a widget.
+ * 
+ */
+.factory('WbConverterWeburger', function (WbConverterAbstract) {
+
+    function Converter(){
+        WbConverterAbstract.apply(this, ['application/json']);
+    }
+    Converter.prototype = new WbConverterAbstract();
+
+    Converter.prototype.encode = function(){
+        var widgets = Array.prototype.slice.call(arguments) || [];
+        if(widgets.length === 1){
+            return JSON.stringify(widgets[0].getModel());
+        }
+        var models = [];
+        _.forEach(widgets, function(widget){
+            models.push(widget.getModel());
+        });
+        return JSON.stringify(models);
+    };
+
+    Converter.prototype.decode = function(data){
+        var widgets = [];
+        try{
+            var model = JSON.parse(data);
+            if(angular.isArray(model)){
+                widgets = model;
+            } else {
+                widgets = [];
+                widgets.push(model);
+            }
+            // TODO: clean each item
+        } catch(ex){
+            // TODO:
+        }
+        return widgets;
+    };
+
+
+    return Converter;
+});
+
 /* 
  * The MIT License (MIT)
  * 
@@ -7099,6 +7468,820 @@ angular.module('am-wb-core')
         }
     };
 });
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name WidgetEditorFake
+ * @description Editor of a widget
+ * 
+ */
+
+.factory('WidgetEditorCode', function ($resource, WidgetEditor) {
+
+    /**
+     * TODO: maso, 2019: extends WidgetEditorFake
+     * 
+     * Creates new instace of an editor
+     */
+    function editor(widget, options) {
+        options = options || {};
+        WidgetEditor.apply(this, [widget, options]);
+    }
+    
+    editor.prototype = new WidgetEditor();
+
+
+    editor.prototype.setActive = function(){}; 
+    editor.prototype.isActive = function(){};
+    editor.prototype.save = function(){};
+    editor.prototype.hide = function(){};
+    editor.prototype.show = function(){
+        var ctrl = this;
+        $resource.get('code', {
+            data: {
+                code: ctrl.widget.text(),
+                languages: [{
+                    text: 'HTML/XML',
+                    value: 'markup'
+                },
+                {
+                    text: 'JavaScript',
+                    value: 'javascript'
+                },
+                {
+                    text: 'CSS',
+                    value: 'css'
+                }]
+            }
+        })
+        .then(function(value){
+            ctrl.widget.setModelProperty('text', value.code);
+        });
+    };
+    editor.prototype.isHidden = function(){};
+    
+//  the editor type
+    return editor;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name WidgetEditorFake
+ * @description Editor of a widget
+ * 
+ */
+
+.factory('WidgetEditorDeprecated', function ($window, WidgetEditor) {
+
+    /**
+     * TODO: maso, 2019: extends WidgetEditorFake
+     * 
+     * Creates new instace of an editor
+     */
+    function Editor(widget, options) {
+        options = options || {};
+        WidgetEditor.apply(this, [widget, options]);
+    }
+    Editor.prototype = Object.create(WidgetEditor.prototype);
+
+
+    Editor.prototype.setActive = function(){}; 
+    Editor.prototype.isActive = function(){};
+    Editor.prototype.save = function(){};
+    Editor.prototype.hide = function(){};
+    Editor.prototype.show = function(){
+        $window.alert('This widget type is deprecated. This will be removed in the next major version.');
+    };
+    Editor.prototype.isHidden = function(){};
+
+//  the editor type
+    return Editor;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name WidgetEditorFake
+ * @description Editor of a widget
+ * 
+ */
+
+
+
+.factory('WidgetEditorFake', function () {
+
+    /**
+     * TODO: maso, 2019: extends WidgetEditorFake
+     * 
+     * Creates new instace of an editor
+     */
+    function editor() {}
+    
+    editor.prototype.destroy = function(){};
+    editor.prototype.fire = function(){}; // internal
+    editor.prototype.setActive = function(){}; // focus|skipFocuse
+    editor.prototype.isActive = function(){};
+    editor.prototype.getWidget = function(){};
+    editor.prototype.setDirty = function(){};
+    editor.prototype.isDirty = function(){};
+    editor.prototype.save = function(){};
+    editor.prototype.hide = function(){};
+    editor.prototype.show = function(){};
+    editor.prototype.isHidden = function(){};
+    editor.prototype.Off = function(){};
+    editor.prototype.On = function(){};
+
+    // the editor type
+    return editor;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Editor
+ * @name WidgetEditorTinymceSection
+ * @description Editor of a section
+ * 
+ *  Section is list of html widgets such as a, p, pre, and h. This editor allow
+ * you to edit a section as a simple text. All entered text converted into a 
+ * common widgets and stored into the section.
+ */
+
+.factory('WidgetEditorTinymceSection', function ($widget, WidgetEditor) {
+
+	/**
+	 * TODO: maso, 2019: extends WidgetEditorFake
+	 * 
+	 * Creates new instace of an editor
+	 */
+	function Editor(widget, options) {
+		options = options || {};
+		WidgetEditor.apply(this, [widget, options]);
+	}
+
+	Editor.prototype = new WidgetEditor();
+
+	/**
+	 * remove all resources
+	 * 
+	 * @memberof WidgetEditorTinymce
+	 */
+	Editor.prototype.destroy = function () {
+		WidgetEditor.prototype.destroy.call(this);
+		this.hide();
+	};
+
+	/**
+	 * Remove editor
+	 */
+	Editor.prototype.hide = function () {
+		// remove all tinymce editor
+		for (var i = tinymce.editors.length - 1 ; i > -1 ; i--) {
+			var ed_id = tinymce.editors[i].id;
+			tinyMCE.execCommand('mceRemoveEditor', true, ed_id);
+		}
+
+		// set hidern
+		if (this.isHidden()) {
+			return;
+		}
+		this._hide = true;
+
+		// TODO: fire state changed
+	};
+
+	/**
+	 * Run and display editor for the current widget
+	 */
+	Editor.prototype.show = function () {
+		this._hide = false;
+		var ctrl = this;
+		var widget = this.getWidget();
+		var element = widget.getElement();
+		var selectorPath = element.getPath();
+		tinymce.init(_.merge(this.options, {
+			selector : selectorPath,
+			themes : 'modern',
+			setup: function (editor) {
+
+				// Save button to save and close the editor
+				editor.ui.registry.addButton('save', {
+//					text: 'save',
+					icon: 'save',
+					tooltip: 'Save current changes and close the editor',
+					onAction: function() {
+						ctrl.saveAndClose();
+					}
+				});
+				// close button
+				editor.ui.registry.addButton('close', {
+//					text: 'close',
+					icon: 'close',
+					tooltip: 'Close and discards changes',
+					onAction: function() {
+						ctrl.closeWithoutSave();
+					}
+				});
+
+//				editor.on('focusout', function(){
+//				ctrl.closeWithoutSave();
+//				});
+
+				editor.on('keydown', function(e) {
+					if (e.keyCode === 27) { // escape
+						ctrl.closeWithoutSave();
+						return false;
+					}
+				});
+
+				editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
+					event.stopPropagation();
+					editor.save();
+				});
+
+				// Update model when:
+				// - a button has been clicked [ExecCommand]
+				// - the editor content has been modified [change]
+				// - the node has changed [NodeChange]
+				// - an object has been resized (table, image) [ObjectResized]
+				editor.on('ExecCommand change NodeChange ObjectResized', function() {
+					editor.save();
+					ctrl.updateView(editor);
+				});
+			}
+		}))
+		.then(function () {
+			element.focus();
+		});
+	};
+
+	Editor.prototype.isHidden = function () {
+		return this._hide;
+	};
+
+	/**
+	 * Read value from element and set into the element
+	 */
+	Editor.prototype.updateView = function (editor) {
+		var content = editor.getContent({
+			format : this.options.format || 'html'
+		}).trim();
+		this._content = content;
+		this.setDirty(true);
+	};
+
+
+	Editor.prototype.closeWithoutSave = function(){
+		this.setDirty(false);
+		this.hide();
+		// reset old value
+		var widget = this.widget;
+		widget.loadWidgets();
+	};
+
+	Editor.prototype.saveAndClose = function(){
+		this.hide();
+		if(this.isDirty()){
+			var widget = this.widget;
+			var converter = $widget.getConverter('text/html');
+			var widgets = converter.decode(this._content);
+			widget.removeChildren();
+			widget.getElement().empty();
+			widget.addChildrenModel(0, widgets);
+			this.setDirty(false);
+		}
+	};
+
+//	the editor type
+	return Editor;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Widget Editor
+ * @name WidgetEditorTinymceSingleLine
+ * @description A single line text editor
+ * 
+ *  In a single line editor you are allowed to set a text property into a widget. For
+ * example you can change text of a header. Some key and actions are reserved:
+ * 
+ * - Enter: save and close the editor
+ * - ESC: close editor without save
+ * 
+ * 
+ */
+
+.factory('WidgetEditorTinymceSingleLine', function ($sce, WidgetEditor) {
+
+	/**
+	 * TODO: maso, 2019: extends WidgetEditorFake
+	 * 
+	 * Creates new instace of an editor
+	 */
+	function Editor(widget, options) {
+		options = options || {};
+		WidgetEditor.apply(this, [widget, options]);
+	}
+
+	Editor.prototype = new WidgetEditor();
+
+	/**
+	 * remove all resources
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
+	 */
+	Editor.prototype.destroy = function () {
+		this.hide();
+		WidgetEditor.prototype.destroy.call(this);
+	};
+
+	/**
+	 * Remove editor
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
+	 */
+	Editor.prototype.hide = function () {
+		// remove all tinymce editor
+		for (var i = tinymce.editors.length - 1 ; i > -1 ; i--) {
+			var ed_id = tinymce.editors[i].id;
+			tinyMCE.execCommand('mceRemoveEditor', true, ed_id);
+		}
+
+		// check current editor
+		if (this.isHidden()) {
+			return;
+		}
+		this._hide = true;
+		// TODO: fire state changed
+		if(this.tinyEditor){
+			this.tinyEditor.remove();
+			delete this.tinyEditor;
+		}
+	};
+
+	/**
+	 * Run and display editor for the current widget
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
+	 */
+	Editor.prototype.show = function () {
+		this._hide = false;
+		var ctrl = this;
+		var widget = this.getWidget();
+		var element = widget.getElement();
+		tinymce.init(_.merge(this.options, {
+			selector : element.getPath(),
+			themes : 'modern',
+			setup: function (editor) {
+				ctrl.tinyEditor = editor;
+				editor.on('keydown', function(e) {
+					if (e.keyCode === 27) { // escape
+						ctrl.closeWithoutSave();
+						return false;
+					}
+					if (e.keyCode === 13){
+						ctrl.saveAndClose();
+						return false;
+					}
+				});
+
+//				editor.on('focusout', function(){
+//				ctrl.closeWithoutSave();
+//				});
+
+				editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
+					event.stopPropagation();
+					editor.save();
+				});
+
+				// Update model when:
+				// - a button has been clicked [ExecCommand]
+				// - the editor content has been modified [change]
+				// - the node has changed [NodeChange]
+				// - an object has been resized (table, image) [ObjectResized]
+				editor.on('ExecCommand change NodeChange ObjectResized', function() {
+					editor.save();
+					ctrl.updateView(editor);
+				});
+
+				//
+				// Adding custom actions
+				//
+				// Save button to save and close the editor
+				editor.ui.registry.addButton('save', {
+//					text: 'save',
+					icon: 'save',
+					tooltip: 'Save current changes and close the editor',
+					onAction: function() {
+						ctrl.saveAndClose();
+					}
+				});
+				// close button
+				editor.ui.registry.addButton('close', {
+//					text: 'close',
+					icon: 'close',
+					tooltip: 'Close and discards changes',
+					onAction: function() {
+						ctrl.closeWithoutSave();
+					}
+				});
+
+//				alignleft aligncenter alignjustify alignright alignfull
+				// style.textAlign: left, center, right, justify;
+				_.forEach(['widgetalignleft', 'widgetaligncenter', 'widgetalignjustify', 'widgetalignright'], function(action){
+					editor.ui.registry.addButton(action, {
+						icon: 'align-' + action.substring(11),
+						onAction: function() {
+							ctrl.widget.setModelProperty('style.textAlign', action.substring(11));
+						}
+					});
+				});
+			}
+		}))
+		.then(function () {
+			element.focus();
+		});
+	};
+
+	/**
+	 * Checks if the editor is hiden
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
+	 */
+	Editor.prototype.isHidden = function () {
+		return this._hide;
+	};
+
+	/**
+	 * Read value from element and set into the element
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
+	 */
+	Editor.prototype.updateView = function (editor) {
+		var content = editor.getContent({
+			format : this.options.format || 'html'
+		}).trim();
+		this._content = content;
+		this.setDirty(true);
+	};
+
+	/**
+	 * Close editor and discards changes
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
+	 */
+	Editor.prototype.closeWithoutSave = function(){
+		this.setDirty(false);
+		this.hide();
+		// reset old value
+		var widget = this.widget;
+		widget.fire('modelUpdated', {
+			key: this.options.property,
+			oldValue: '',
+			value: this.widget.getModelProperty(this.options.property)
+		});
+	};
+
+	/**
+	 * Save and close the editor
+	 * 
+	 * @memberof WidgetEditorTinymceSingleLine
+	 */
+	Editor.prototype.saveAndClose = function(){
+		// remove editor
+		if(this.isDirty()){
+			this.widget.setModelProperty(this.options.property, this._content);
+		}
+		this.hide();
+	};
+
+//	the editor type
+	return Editor;
+});
+
+/* 
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2016 weburger
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+angular.module('am-wb-core')//
+
+/**
+ * @ngdoc Factories
+ * @name WidgetEditor
+ * @description Editor of a widget
+ * 
+ * 
+ * ## Events
+ * 
+ * - Click    native  Fires when the editor is clicked.
+ * - DblClick    native  Fires when the editor is double-clicked.
+ * - MouseDown   native  Fires when the mouse button is pressed down inside the editor.
+ * - MouseUp native  Fires when a mouse button is released inside the editor.
+ * - MouseMove   native  Fires when the mouse is moved within the editor.
+ * - MouseOver   native  Fires when a new element is being hovered within the editor.
+ * - MouseOut    native  Fires when an element is no longer being hovered within the editor.
+ * - MouseEnter  native  Fires when the mouse enters the editor.
+ * - MouseLeave  native  Fires when the mouse leaves the editor.
+ * - KeyDown native  Fires when a key is pressed within the editor.
+ * - KeyPress    native  Fires when a key is pressed within the editor.
+ * - KeyUp   native  Fires when a key is released within the editor.
+ * - ContextMenu native  Fires when the context menu is invoked within the editor.
+ * - Paste   native  Fires when a paste is done within the editor.
+ * - Init    core    Fires when the editor is initialized.
+ * - Focus   core    Fires when the editor is focused.
+ * - Blur    core    Fires when the editor is blurred.
+ * - BeforeSetContent    core    Fires before the content is set to the editor.
+ * - SetContent  core    Fires after the content is set to the editor.
+ * - GetContent  core    Fires after the content is extracted from the editor.
+ * - PreProcess  core    Fires when the contents in the editor are being serialized.
+ * - PostProcess core    Fires when the contents in the editor are being serialized.
+ * - NodeChange  core    Fires when selection inside the editor is changed.
+ * - Undo    core    Fires when the contents have been reverted to a previous state.
+ * - Redo    core    Fires to revert the effects of an Undo event.
+ * - Change  core    Fires when undo level is added to the editor.
+ * - Dirty   core    Fires when editor contents are being considered dirty.
+ * - Remove  core    Fires when the editor is removed.
+ * - ExecCommand core    Fires after a command has been executed.
+ * - PastePreProcess paste   Fires when contents are pasted into the editor.
+ * - PastePostProcess    paste   Fires when contents are pasted into the editor.
+ */
+
+
+
+.factory('WidgetEditor', function () {
+
+    /**
+     * Creates new instace of an editor
+     */
+    function Editor(widget, options) {
+        this.callbacks = [];
+        this.widget = widget;
+        this.options = options;
+    }
+
+    /**
+     * Remove all resources
+     * 
+     * @mrmberof WidgetEditor
+     */
+    Editor.prototype.destroy = function(){
+        this.callbacks = [];
+        delete this.widget;
+        delete this.options;
+    };
+
+    /**
+     * Get the widget of the editor
+     * 
+     * @mrmberof WidgetEditor
+     */
+    Editor.prototype.getWidget = function(){
+        return this.widget;
+    };
+
+    /**
+     * Set the widget as dirty widget
+     * 
+     * @mrmberof WidgetEditor
+     */
+    Editor.prototype.setDirty = function(dirty){
+        if(typeof(dirty) !== 'undefined'){
+            this.dirty = dirty;
+        } else {
+            this.dirty = true;
+        }
+    };
+
+    /**
+     * Check if the widget is dirty
+     * 
+     * @mrmberof WidgetEditor
+     */
+    Editor.prototype.isDirty = function(){
+        return this.dirty;
+    };
+
+    /**
+     * Remove callbak from specific type
+     * 
+     * @param type {string} the event name
+     * @param callback {function} the function
+     * @mrmberof WidgetEditor
+     */
+    Editor.prototype.off = function(type, callback){
+        if (!angular.isArray(this.callbacks[type])) {
+            return;
+        }
+        var callbacks = this.callbacks[type];
+        var index = callbacks.indexOf(callback);
+        if (index > -1) {
+            callbacks.splice(index, 1);
+        }
+    };
+
+    /**
+     * Add a callback function to the editor
+     * 
+     * @param type {string} the event name
+     * @param callback {function} the function
+     * @mrmberof WidgetEditor
+     */
+    Editor.prototype.on = function(type, callback){
+        if (!angular.isArray(this.callbacks[type])) {
+            this.callbacks[type] = [];
+        }
+        if(!_.includes(this.callbacks[type], callback)){
+            this.callbacks[type].push(callback);
+        }
+    };
+
+    /**
+     * Fire the event
+     * 
+     * @param type {string} the event name
+     * @param param {object} event params
+     * @mrmberof WidgetEditor
+     */
+    Editor.prototype.fire = function(type, params){
+        // TODO: maso, 2018: create event object
+        var event = _.merge({
+            source: this,
+            type: type
+        }, params || {});
+
+        // fire
+        var callbacks = this.callbacks[type] || [];
+        for(var i = 0; i < callbacks.length; i++){
+            // TODO: maso, 2018: check if the event is stopped to propagate
+            try {
+                callbacks[i](event);
+            } catch (error) {
+                // NOTE: remove on release
+//                console.log(error);
+            }
+        }
+    }; // internal
+
+
+
+
+
+    Editor.prototype.setActive = function(){}; // focus|skipFocuse
+    Editor.prototype.isActive = function(){};
+    Editor.prototype.save = function(){};
+    Editor.prototype.hide = function(){};
+    Editor.prototype.show = function(){};
+    Editor.prototype.isHidden = function(){};
+
+    // the editor type
+    return Editor;
+});
+
 
 
 
@@ -15174,1189 +16357,6 @@ angular.module('am-wb-core')
 	
 	return ObservableObject;
 });
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Converter
- * @name WbConverter
- * @description Widget converter
- * 
- * A converter are responsible to encode and decode a widget.
- * 
- */
-.factory('WbConverterAbstract', function () {
-
-    /**
-     * Creates new instance of the converter
-     * 
-     * @memberof WbConverter
-     */
-    function Converter(mimetype){
-        this.mimetype = mimetype || 'text/plain';
-    }
-    
-    /**
-     * Convert widgets into data
-     * 
-     * @param widget {Widget} to convert
-     * @return string of data
-     * @memberof WbConverter
-     */
-    Converter.prototype.encode = function(){};
-    
-    /**
-     * Converts the input data into list of widgets
-     * 
-     * @param data {string} to convert
-     * @returns list of widgets
-     * @memberof WbConverter
-     */
-    Converter.prototype.decode = function(){};
-    
-    /**
-     * Get the data mimetype
-     * 
-     * When widgets are converted into data, then the data can transfer anywhere, but
-     * data type is very important to recover. 
-     * 
-     * @memberof WbConverter
-     */
-    Converter.prototype.getMimetype = function(){
-        return this.mimetype;
-    };
-
-    /**
-     * Sets the data mimetype
-     * 
-     * NOTE: this is not global
-     * 
-     * @memberof WbConverter
-     */
-    Converter.prototype.setMimetype = function(mimetype){
-        this.mimetype = mimetype;
-    };
-    
-    return Converter;
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Converter
- * @name WbConverterDom
- * @description Widget converter
- * 
- * A converter are responsible to encode and decode a widget.
- * 
- */
-.factory('WbConverterDom', function (WbConverterAbstract, $widget) {
-	function cssNameToJsName(name)
-	{
-		var split = name.split('-');
-		var output = '';
-		for(var i = 0; i < split.length; i++)
-		{
-			if (i > 0 && split[i].length > 0 && !(i === 1 && split[i] === 'ms'))
-			{
-				split[i] = split[i].substr(0, 1).toUpperCase() + split[i].substr(1);
-			}
-			output += split[i];
-		}
-		return output;
-	}
-
-	function convertElementToModel(element){
-		var name = element.tagName;
-		if(!name){
-			return null;
-		}
-		name = name.toLowerCase();
-		if(!$widget.hasWidget(name)){
-			return null;
-		}
-		var model = {
-				style:{}
-		};
-		model.type = name;
-		// attributes
-		_.forEach(element.attributes, function(attr){
-			if(attr.name == 'style'){
-				return;
-			}
-			if(attr.name == 'type'){
-				model[model.type+'Type'] = attr.value;
-				return;
-			}
-			model[attr.name] = attr.value;
-		});
-		//style
-		for(var i = 0; i < element.style.length; i++){
-			var sname = element.style.item(i);
-			model.style[cssNameToJsName(sname)] = element.style.getPropertyValue(sname);
-		}
-		if($widget.isWidgetLeaf(name)){
-			// html
-			model.html = element.innerHTML;
-			if(model.type === 'pre'){
-				model.text = element.innerText;
-			}
-		} else {
-			model.children = [];
-			_.forEach(element.children, function(childelement){
-				var childWidget = convertElementToModel(childelement);
-				if(childWidget){
-					model.children.push(childWidget);
-				}
-			});
-			if(model.type === 'li' && model.children.length === 0){
-				model.children.push({
-					type: 'p',
-					html: element.innerText
-				});
-			}
-		}
-		return model;
-	}
-
-	function Converter(){
-		WbConverterAbstract.apply(this, ['text/html']);
-	}
-	Converter.prototype = new WbConverterAbstract();
-
-	Converter.prototype.encode = function(){
-		var widgets = Array.prototype.slice.call(arguments) || [];
-		var data = '';
-		while(widgets.length){
-			var widget = widgets.pop();
-			data += widget.getElement().prop('outerHTML') + '\n';
-		}
-		return data;
-	};
-
-	Converter.prototype.decode = function(data){
-		var widgets = [];
-		try{
-			var element = angular.element(data);
-			for(var i = 0; i < element.length; i++){
-				var model = convertElementToModel(element[i]);
-				if(model){
-					widgets.push(model);
-				}
-			}
-		} catch(ex){
-//			console.error(ex);
-		}
-		return widgets;
-	};
-
-
-	return Converter;
-});
-
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Converter
- * @name WbConverter
- * @description Widget converter
- * 
- * A converter are responsible to encode and decode a widget.
- * 
- */
-.factory('WbConverterText', function (WbConverterAbstract) {
-
-    function Converter(){
-        WbConverterAbstract.apply(this, ['text/plain']);
-    }
-    Converter.prototype = new WbConverterAbstract();
-
-    Converter.prototype.encode = function(){
-        var widgets = Array.prototype.slice.call(arguments) || [];
-        var data = '';
-        while(widgets.length){
-            var widget = widgets.pop();
-            if(widget.isLeaf()){
-                if(widget.html){
-                    data += widget.html() + '\n';
-                }
-            } else {
-                widgets.push.apply(widgets, widget.getChildren());
-            }
-        }
-        return data;
-    };
-
-    Converter.prototype.decode = function(data){
-        var widgets = [];
-        data = data.split('\n');
-        _.forEach(data, function(item){
-            item = _.trim(item);
-            if(item.length){ 
-                widgets.push({
-                    type: 'p',
-                    html: item
-                });
-            }
-        });
-        return widgets;
-    };
-
-
-    return Converter;
-});
-
-/*
- * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Converter
- * @name WbConverterWeburger
- * @description Widget converter
- * 
- * A converter are responsible to encode and decode a widget.
- * 
- */
-.factory('WbConverterWeburger', function (WbConverterAbstract) {
-
-    function Converter(){
-        WbConverterAbstract.apply(this, ['application/json']);
-    }
-    Converter.prototype = new WbConverterAbstract();
-
-    Converter.prototype.encode = function(){
-        var widgets = Array.prototype.slice.call(arguments) || [];
-        if(widgets.length === 1){
-            return JSON.stringify(widgets[0].getModel());
-        }
-        var models = [];
-        _.forEach(widgets, function(widget){
-            models.push(widget.getModel());
-        });
-        return JSON.stringify(models);
-    };
-
-    Converter.prototype.decode = function(data){
-        var widgets = [];
-        try{
-            var model = JSON.parse(data);
-            if(angular.isArray(model)){
-                widgets = model;
-            } else {
-                widgets = [];
-                widgets.push(model);
-            }
-            // TODO: clean each item
-        } catch(ex){
-            // TODO:
-        }
-        return widgets;
-    };
-
-
-    return Converter;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name WidgetEditorFake
- * @description Editor of a widget
- * 
- */
-
-.factory('WidgetEditorCode', function ($resource, WidgetEditor) {
-
-    /**
-     * TODO: maso, 2019: extends WidgetEditorFake
-     * 
-     * Creates new instace of an editor
-     */
-    function editor(widget, options) {
-        options = options || {};
-        WidgetEditor.apply(this, [widget, options]);
-    }
-    
-    editor.prototype = new WidgetEditor();
-
-
-    editor.prototype.setActive = function(){}; 
-    editor.prototype.isActive = function(){};
-    editor.prototype.save = function(){};
-    editor.prototype.hide = function(){};
-    editor.prototype.show = function(){
-        var ctrl = this;
-        $resource.get('code', {
-            data: {
-                code: ctrl.widget.text(),
-                languages: [{
-                    text: 'HTML/XML',
-                    value: 'markup'
-                },
-                {
-                    text: 'JavaScript',
-                    value: 'javascript'
-                },
-                {
-                    text: 'CSS',
-                    value: 'css'
-                }]
-            }
-        })
-        .then(function(value){
-            ctrl.widget.setModelProperty('text', value.code);
-        });
-    };
-    editor.prototype.isHidden = function(){};
-    
-//  the editor type
-    return editor;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name WidgetEditorFake
- * @description Editor of a widget
- * 
- */
-
-.factory('WidgetEditorDeprecated', function ($window, WidgetEditor) {
-
-    /**
-     * TODO: maso, 2019: extends WidgetEditorFake
-     * 
-     * Creates new instace of an editor
-     */
-    function Editor(widget, options) {
-        options = options || {};
-        WidgetEditor.apply(this, [widget, options]);
-    }
-    Editor.prototype = Object.create(WidgetEditor.prototype);
-
-
-    Editor.prototype.setActive = function(){}; 
-    Editor.prototype.isActive = function(){};
-    Editor.prototype.save = function(){};
-    Editor.prototype.hide = function(){};
-    Editor.prototype.show = function(){
-        $window.alert('This widget type is deprecated. This will be removed in the next major version.');
-    };
-    Editor.prototype.isHidden = function(){};
-
-//  the editor type
-    return Editor;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name WidgetEditorFake
- * @description Editor of a widget
- * 
- */
-
-
-
-.factory('WidgetEditorFake', function () {
-
-    /**
-     * TODO: maso, 2019: extends WidgetEditorFake
-     * 
-     * Creates new instace of an editor
-     */
-    function editor() {}
-    
-    editor.prototype.destroy = function(){};
-    editor.prototype.fire = function(){}; // internal
-    editor.prototype.setActive = function(){}; // focus|skipFocuse
-    editor.prototype.isActive = function(){};
-    editor.prototype.getWidget = function(){};
-    editor.prototype.setDirty = function(){};
-    editor.prototype.isDirty = function(){};
-    editor.prototype.save = function(){};
-    editor.prototype.hide = function(){};
-    editor.prototype.show = function(){};
-    editor.prototype.isHidden = function(){};
-    editor.prototype.Off = function(){};
-    editor.prototype.On = function(){};
-
-    // the editor type
-    return editor;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Editor
- * @name WidgetEditorTinymceSection
- * @description Editor of a section
- * 
- *  Section is list of html widgets such as a, p, pre, and h. This editor allow
- * you to edit a section as a simple text. All entered text converted into a 
- * common widgets and stored into the section.
- */
-
-.factory('WidgetEditorTinymceSection', function ($widget, WidgetEditor) {
-
-	/**
-	 * TODO: maso, 2019: extends WidgetEditorFake
-	 * 
-	 * Creates new instace of an editor
-	 */
-	function Editor(widget, options) {
-		options = options || {};
-		WidgetEditor.apply(this, [widget, options]);
-	}
-
-	Editor.prototype = new WidgetEditor();
-
-	/**
-	 * remove all resources
-	 * 
-	 * @memberof WidgetEditorTinymce
-	 */
-	Editor.prototype.destroy = function () {
-		WidgetEditor.prototype.destroy.call(this);
-		this.hide();
-	};
-
-	/**
-	 * Remove editor
-	 */
-	Editor.prototype.hide = function () {
-		// remove all tinymce editor
-		for (var i = tinymce.editors.length - 1 ; i > -1 ; i--) {
-			var ed_id = tinymce.editors[i].id;
-			tinyMCE.execCommand('mceRemoveEditor', true, ed_id);
-		}
-
-		// set hidern
-		if (this.isHidden()) {
-			return;
-		}
-		this._hide = true;
-
-		// TODO: fire state changed
-	};
-
-	/**
-	 * Run and display editor for the current widget
-	 */
-	Editor.prototype.show = function () {
-		this._hide = false;
-		var ctrl = this;
-		var widget = this.getWidget();
-		var element = widget.getElement();
-		var selectorPath = element.getPath();
-		tinymce.init(_.merge(this.options, {
-			selector : selectorPath,
-			themes : 'modern',
-			setup: function (editor) {
-
-				// Save button to save and close the editor
-				editor.ui.registry.addButton('save', {
-//					text: 'save',
-					icon: 'save',
-					tooltip: 'Save current changes and close the editor',
-					onAction: function() {
-						ctrl.saveAndClose();
-					}
-				});
-				// close button
-				editor.ui.registry.addButton('close', {
-//					text: 'close',
-					icon: 'close',
-					tooltip: 'Close and discards changes',
-					onAction: function() {
-						ctrl.closeWithoutSave();
-					}
-				});
-
-//				editor.on('focusout', function(){
-//				ctrl.closeWithoutSave();
-//				});
-
-				editor.on('keydown', function(e) {
-					if (e.keyCode === 27) { // escape
-						ctrl.closeWithoutSave();
-						return false;
-					}
-				});
-
-				editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
-					event.stopPropagation();
-					editor.save();
-				});
-
-				// Update model when:
-				// - a button has been clicked [ExecCommand]
-				// - the editor content has been modified [change]
-				// - the node has changed [NodeChange]
-				// - an object has been resized (table, image) [ObjectResized]
-				editor.on('ExecCommand change NodeChange ObjectResized', function() {
-					editor.save();
-					ctrl.updateView(editor);
-				});
-			}
-		}))
-		.then(function () {
-			element.focus();
-		});
-	};
-
-	Editor.prototype.isHidden = function () {
-		return this._hide;
-	};
-
-	/**
-	 * Read value from element and set into the element
-	 */
-	Editor.prototype.updateView = function (editor) {
-		var content = editor.getContent({
-			format : this.options.format || 'html'
-		}).trim();
-		this._content = content;
-		this.setDirty(true);
-	};
-
-
-	Editor.prototype.closeWithoutSave = function(){
-		this.setDirty(false);
-		this.hide();
-		// reset old value
-		var widget = this.widget;
-		widget.loadWidgets();
-	};
-
-	Editor.prototype.saveAndClose = function(){
-		this.hide();
-		if(this.isDirty()){
-			var widget = this.widget;
-			var converter = $widget.getConverter('text/html');
-			var widgets = converter.decode(this._content);
-			widget.removeChildren();
-			widget.getElement().empty();
-			widget.addChildrenModel(0, widgets);
-			this.setDirty(false);
-		}
-	};
-
-//	the editor type
-	return Editor;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Widget Editor
- * @name WidgetEditorTinymceSingleLine
- * @description A single line text editor
- * 
- *  In a single line editor you are allowed to set a text property into a widget. For
- * example you can change text of a header. Some key and actions are reserved:
- * 
- * - Enter: save and close the editor
- * - ESC: close editor without save
- * 
- * 
- */
-
-.factory('WidgetEditorTinymceSingleLine', function ($sce, WidgetEditor) {
-
-	/**
-	 * TODO: maso, 2019: extends WidgetEditorFake
-	 * 
-	 * Creates new instace of an editor
-	 */
-	function Editor(widget, options) {
-		options = options || {};
-		WidgetEditor.apply(this, [widget, options]);
-	}
-
-	Editor.prototype = new WidgetEditor();
-
-	/**
-	 * remove all resources
-	 * 
-	 * @memberof WidgetEditorTinymceSingleLine
-	 */
-	Editor.prototype.destroy = function () {
-		this.hide();
-		WidgetEditor.prototype.destroy.call(this);
-	};
-
-	/**
-	 * Remove editor
-	 * 
-	 * @memberof WidgetEditorTinymceSingleLine
-	 */
-	Editor.prototype.hide = function () {
-		// remove all tinymce editor
-		for (var i = tinymce.editors.length - 1 ; i > -1 ; i--) {
-			var ed_id = tinymce.editors[i].id;
-			tinyMCE.execCommand('mceRemoveEditor', true, ed_id);
-		}
-
-		// check current editor
-		if (this.isHidden()) {
-			return;
-		}
-		this._hide = true;
-		// TODO: fire state changed
-		if(this.tinyEditor){
-			this.tinyEditor.remove();
-			delete this.tinyEditor;
-		}
-	};
-
-	/**
-	 * Run and display editor for the current widget
-	 * 
-	 * @memberof WidgetEditorTinymceSingleLine
-	 */
-	Editor.prototype.show = function () {
-		this._hide = false;
-		var ctrl = this;
-		var widget = this.getWidget();
-		var element = widget.getElement();
-		tinymce.init(_.merge(this.options, {
-			selector : element.getPath(),
-			themes : 'modern',
-			setup: function (editor) {
-				ctrl.tinyEditor = editor;
-				editor.on('keydown', function(e) {
-					if (e.keyCode === 27) { // escape
-						ctrl.closeWithoutSave();
-						return false;
-					}
-					if (e.keyCode === 13){
-						ctrl.saveAndClose();
-						return false;
-					}
-				});
-
-//				editor.on('focusout', function(){
-//				ctrl.closeWithoutSave();
-//				});
-
-				editor.on('KeyDown KeyUp KeyPress Paste Copy', function(event){
-					event.stopPropagation();
-					editor.save();
-				});
-
-				// Update model when:
-				// - a button has been clicked [ExecCommand]
-				// - the editor content has been modified [change]
-				// - the node has changed [NodeChange]
-				// - an object has been resized (table, image) [ObjectResized]
-				editor.on('ExecCommand change NodeChange ObjectResized', function() {
-					editor.save();
-					ctrl.updateView(editor);
-				});
-
-				//
-				// Adding custom actions
-				//
-				// Save button to save and close the editor
-				editor.ui.registry.addButton('save', {
-//					text: 'save',
-					icon: 'save',
-					tooltip: 'Save current changes and close the editor',
-					onAction: function() {
-						ctrl.saveAndClose();
-					}
-				});
-				// close button
-				editor.ui.registry.addButton('close', {
-//					text: 'close',
-					icon: 'close',
-					tooltip: 'Close and discards changes',
-					onAction: function() {
-						ctrl.closeWithoutSave();
-					}
-				});
-
-//				alignleft aligncenter alignjustify alignright alignfull
-				// style.textAlign: left, center, right, justify;
-				_.forEach(['widgetalignleft', 'widgetaligncenter', 'widgetalignjustify', 'widgetalignright'], function(action){
-					editor.ui.registry.addButton(action, {
-						icon: 'align-' + action.substring(11),
-						onAction: function() {
-							ctrl.widget.setModelProperty('style.textAlign', action.substring(11));
-						}
-					});
-				});
-			}
-		}))
-		.then(function () {
-			element.focus();
-		});
-	};
-
-	/**
-	 * Checks if the editor is hiden
-	 * 
-	 * @memberof WidgetEditorTinymceSingleLine
-	 */
-	Editor.prototype.isHidden = function () {
-		return this._hide;
-	};
-
-	/**
-	 * Read value from element and set into the element
-	 * 
-	 * @memberof WidgetEditorTinymceSingleLine
-	 */
-	Editor.prototype.updateView = function (editor) {
-		var content = editor.getContent({
-			format : this.options.format || 'html'
-		}).trim();
-		this._content = content;
-		this.setDirty(true);
-	};
-
-	/**
-	 * Close editor and discards changes
-	 * 
-	 * @memberof WidgetEditorTinymceSingleLine
-	 */
-	Editor.prototype.closeWithoutSave = function(){
-		this.setDirty(false);
-		this.hide();
-		// reset old value
-		var widget = this.widget;
-		widget.fire('modelUpdated', {
-			key: this.options.property,
-			oldValue: '',
-			value: this.widget.getModelProperty(this.options.property)
-		});
-	};
-
-	/**
-	 * Save and close the editor
-	 * 
-	 * @memberof WidgetEditorTinymceSingleLine
-	 */
-	Editor.prototype.saveAndClose = function(){
-		// remove editor
-		if(this.isDirty()){
-			this.widget.setModelProperty(this.options.property, this._content);
-		}
-		this.hide();
-	};
-
-//	the editor type
-	return Editor;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
-angular.module('am-wb-core')//
-
-/**
- * @ngdoc Factories
- * @name WidgetEditor
- * @description Editor of a widget
- * 
- * 
- * ## Events
- * 
- * - Click    native  Fires when the editor is clicked.
- * - DblClick    native  Fires when the editor is double-clicked.
- * - MouseDown   native  Fires when the mouse button is pressed down inside the editor.
- * - MouseUp native  Fires when a mouse button is released inside the editor.
- * - MouseMove   native  Fires when the mouse is moved within the editor.
- * - MouseOver   native  Fires when a new element is being hovered within the editor.
- * - MouseOut    native  Fires when an element is no longer being hovered within the editor.
- * - MouseEnter  native  Fires when the mouse enters the editor.
- * - MouseLeave  native  Fires when the mouse leaves the editor.
- * - KeyDown native  Fires when a key is pressed within the editor.
- * - KeyPress    native  Fires when a key is pressed within the editor.
- * - KeyUp   native  Fires when a key is released within the editor.
- * - ContextMenu native  Fires when the context menu is invoked within the editor.
- * - Paste   native  Fires when a paste is done within the editor.
- * - Init    core    Fires when the editor is initialized.
- * - Focus   core    Fires when the editor is focused.
- * - Blur    core    Fires when the editor is blurred.
- * - BeforeSetContent    core    Fires before the content is set to the editor.
- * - SetContent  core    Fires after the content is set to the editor.
- * - GetContent  core    Fires after the content is extracted from the editor.
- * - PreProcess  core    Fires when the contents in the editor are being serialized.
- * - PostProcess core    Fires when the contents in the editor are being serialized.
- * - NodeChange  core    Fires when selection inside the editor is changed.
- * - Undo    core    Fires when the contents have been reverted to a previous state.
- * - Redo    core    Fires to revert the effects of an Undo event.
- * - Change  core    Fires when undo level is added to the editor.
- * - Dirty   core    Fires when editor contents are being considered dirty.
- * - Remove  core    Fires when the editor is removed.
- * - ExecCommand core    Fires after a command has been executed.
- * - PastePreProcess paste   Fires when contents are pasted into the editor.
- * - PastePostProcess    paste   Fires when contents are pasted into the editor.
- */
-
-
-
-.factory('WidgetEditor', function () {
-
-    /**
-     * Creates new instace of an editor
-     */
-    function Editor(widget, options) {
-        this.callbacks = [];
-        this.widget = widget;
-        this.options = options;
-    }
-
-    /**
-     * Remove all resources
-     * 
-     * @mrmberof WidgetEditor
-     */
-    Editor.prototype.destroy = function(){
-        this.callbacks = [];
-        delete this.widget;
-        delete this.options;
-    };
-
-    /**
-     * Get the widget of the editor
-     * 
-     * @mrmberof WidgetEditor
-     */
-    Editor.prototype.getWidget = function(){
-        return this.widget;
-    };
-
-    /**
-     * Set the widget as dirty widget
-     * 
-     * @mrmberof WidgetEditor
-     */
-    Editor.prototype.setDirty = function(dirty){
-        if(typeof(dirty) !== 'undefined'){
-            this.dirty = dirty;
-        } else {
-            this.dirty = true;
-        }
-    };
-
-    /**
-     * Check if the widget is dirty
-     * 
-     * @mrmberof WidgetEditor
-     */
-    Editor.prototype.isDirty = function(){
-        return this.dirty;
-    };
-
-    /**
-     * Remove callbak from specific type
-     * 
-     * @param type {string} the event name
-     * @param callback {function} the function
-     * @mrmberof WidgetEditor
-     */
-    Editor.prototype.off = function(type, callback){
-        if (!angular.isArray(this.callbacks[type])) {
-            return;
-        }
-        var callbacks = this.callbacks[type];
-        var index = callbacks.indexOf(callback);
-        if (index > -1) {
-            callbacks.splice(index, 1);
-        }
-    };
-
-    /**
-     * Add a callback function to the editor
-     * 
-     * @param type {string} the event name
-     * @param callback {function} the function
-     * @mrmberof WidgetEditor
-     */
-    Editor.prototype.on = function(type, callback){
-        if (!angular.isArray(this.callbacks[type])) {
-            this.callbacks[type] = [];
-        }
-        if(!_.includes(this.callbacks[type], callback)){
-            this.callbacks[type].push(callback);
-        }
-    };
-
-    /**
-     * Fire the event
-     * 
-     * @param type {string} the event name
-     * @param param {object} event params
-     * @mrmberof WidgetEditor
-     */
-    Editor.prototype.fire = function(type, params){
-        // TODO: maso, 2018: create event object
-        var event = _.merge({
-            source: this,
-            type: type
-        }, params || {});
-
-        // fire
-        var callbacks = this.callbacks[type] || [];
-        for(var i = 0; i < callbacks.length; i++){
-            // TODO: maso, 2018: check if the event is stopped to propagate
-            try {
-                callbacks[i](event);
-            } catch (error) {
-                // NOTE: remove on release
-//                console.log(error);
-            }
-        }
-    }; // internal
-
-
-
-
-
-    Editor.prototype.setActive = function(){}; // focus|skipFocuse
-    Editor.prototype.isActive = function(){};
-    Editor.prototype.save = function(){};
-    Editor.prototype.hide = function(){};
-    Editor.prototype.show = function(){};
-    Editor.prototype.isHidden = function(){};
-
-    // the editor type
-    return Editor;
-});
-
 /* 
  * The MIT License (MIT)
  * 
@@ -17866,7 +17866,7 @@ angular.module('am-wb-core')//
                 if(!ucode){
                     return;
                 }
-                ucode += '\n//@ sourceURL=wb-widget-'+ widget.getId() + '-' + type + '.js';
+                ucode += '\n//@ sourceURL=wb-'+ widget.getId() + '-' + type + '.js';
                 var params = _.join(_.concat(
                         ['$widget', '$event'], // dynamic data
                         $widget.getProvidersKey()));
@@ -17952,7 +17952,24 @@ angular.module('am-wb-core')//
                 unload: function ($event) {
                     return evalWidgetEvent(widget, 'unload', $event);
                 },
+                
+                
+                change: function ($event) {
+                    return evalWidgetEvent(widget, 'change', $event);
+                },
 
+                /*
+                 * Keyboard events
+                 */
+                keyup: function ($event) {
+                    return evalWidgetEvent(widget, 'keyup', $event);
+                },
+                keydown: function ($event) {
+                    return evalWidgetEvent(widget, 'keydown', $event);
+                },
+                keypress: function ($event) {
+                    return evalWidgetEvent(widget, 'keypress', $event);
+                },
 
         };
         angular.forEach(widget.__eventListeners, function (listener, key) {
@@ -19213,6 +19230,23 @@ angular.module('am-wb-core')//
                 drop: function ($event) {
                     ctrl.fire('drop', $event);
                 },
+                
+                change: function ($event) {
+                    ctrl.fire('change', $event);
+                },
+                
+                /*
+                 * Keyboard events
+                 */
+                keyup: function ($event) {
+                    ctrl.fire('keyup', $event);
+                },
+                keydown: function ($event) {
+                    ctrl.fire('keydown', $event);
+                },
+                keypress: function ($event) {
+                    ctrl.fire('keypress', $event);
+                },
 
         };
 
@@ -19793,6 +19827,9 @@ angular.module('am-wb-core')//
      * @memberof WbAbstractWidget
      */
     WbWidgetAbstract.prototype.setState = function (state) {
+        if(state === this.state){
+            return;
+        }
         var oldState = this.state;
         this.state = state;
         this.fire('stateChanged', {

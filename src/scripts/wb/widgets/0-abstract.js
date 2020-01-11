@@ -209,6 +209,23 @@ angular.module('am-wb-core')//
                 drop: function ($event) {
                     ctrl.fire('drop', $event);
                 },
+                
+                change: function ($event) {
+                    ctrl.fire('change', $event);
+                },
+                
+                /*
+                 * Keyboard events
+                 */
+                keyup: function ($event) {
+                    ctrl.fire('keyup', $event);
+                },
+                keydown: function ($event) {
+                    ctrl.fire('keydown', $event);
+                },
+                keypress: function ($event) {
+                    ctrl.fire('keypress', $event);
+                },
 
         };
 
@@ -789,6 +806,9 @@ angular.module('am-wb-core')//
      * @memberof WbAbstractWidget
      */
     WbWidgetAbstract.prototype.setState = function (state) {
+        if(state === this.state){
+            return;
+        }
         var oldState = this.state;
         this.state = state;
         this.fire('stateChanged', {

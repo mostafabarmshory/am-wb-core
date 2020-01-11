@@ -13,14 +13,20 @@
 		"alignItems": "center"
 	},
 	"on": {
-		"init": "alert('event init');",
-		"click":"$widget.setProperty('style.background', 'rgb(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) +')');"
+		"init":"$widget.getChildById('input').on('change', function(){alert('input changed');});"
 	},
 	"children": [{
 		"type": "h1",
 		"html": "Center header",
 		"style": {
 			"margin": "0px"
+		}
+	},{
+		"id": "input",
+		"type": "input",
+		"inputType": "text",
+		"on": {
+			"keyup":"alert('input changed');"
 		}
 	}]
 }
