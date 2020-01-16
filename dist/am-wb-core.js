@@ -11834,88 +11834,89 @@ angular.module('am-wb-core')
  * Load default resources
  */
 .run(function($resource) {
-	$resource.newPage({
-		type : 'wb-url',
-		icon: 'link',
-		label : 'URL',
-		templateUrl : 'views/resources/wb-url.html',
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope) {
-			$scope.$watch('value', function(value) {
-				$scope.$parent.setValue(value);
-			});
-		},
-		controllerAs: 'ctrl',
-		tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url', 'link',
-			// new models
-			'image-url', 'vedio-url', 'audio-url', 'page-url']
-	});
+    $resource.newPage({
+        type : 'wb-url',
+        icon: 'link',
+        label : 'URL',
+        templateUrl : 'views/resources/wb-url.html',
+        /*
+         * @ngInject
+         */
+        controller : function($scope) {
+            $scope.$watch('value', function(value) {
+                $scope.$parent.setValue(value);
+            });
+        },
+        controllerAs: 'ctrl',
+        tags : [ 'file', 'image', 'vedio', 'audio', 'page', 'url', 'link',
+            'avatar', 'thumbnail',
+            // new models
+            'image-url', 'vedio-url', 'audio-url', 'page-url']
+    });
 
-	$resource.newPage({
-		type : 'script',
-		icon : 'script',
-		label : 'Script',
-		templateUrl : 'views/resources/wb-event-code-editor.html',
-		/*
-		 * @ngInject
-		 */
-		controller : function($scope, $wbWindow, $element) {
-			var ctrl = this;
-			this.value = $scope.value || {
-				code: '',
-				language: 'javascript',
-				languages: [{
-					text: 'HTML/XML',
-					value: 'markup'
-				},
-				{
-					text: 'JavaScript',
-					value: 'javascript'
-				},
-				{
-					text: 'CSS',
-					value: 'css'
-				}]
-			};
-			this.setCode = function(code) {
-				this.value.code = code;
-				$scope.$parent.setValue(this.value);
-			};
+    $resource.newPage({
+        type : 'script',
+        icon : 'script',
+        label : 'Script',
+        templateUrl : 'views/resources/wb-event-code-editor.html',
+        /*
+         * @ngInject
+         */
+        controller : function($scope, $wbWindow, $element) {
+            var ctrl = this;
+            this.value = $scope.value || {
+                code: '',
+                language: 'javascript',
+                languages: [{
+                    text: 'HTML/XML',
+                    value: 'markup'
+                },
+                {
+                    text: 'JavaScript',
+                    value: 'javascript'
+                },
+                {
+                    text: 'CSS',
+                    value: 'css'
+                }]
+            };
+            this.setCode = function(code) {
+                this.value.code = code;
+                $scope.$parent.setValue(this.value);
+            };
 
-			this.setLanguage = function(language){
-				this.value.code = language;
-				$scope.$parent.setValue(this.value);
-			};
+            this.setLanguage = function(language){
+                this.value.code = language;
+                $scope.$parent.setValue(this.value);
+            };
 
-			this.setEditor = function(editor) {
-				this.editor = editor;
-				editor.setOptions({
-					enableBasicAutocompletion: true, 
-					enableLiveAutocompletion: true, 
-					showPrintMargin: false, 
-					maxLines: Infinity,
-					fontSize: '100%'
-				});
-				$scope.editor = editor;
-//				editor.setTheme('resources/libs/ace/theme/chrome');
-//				editor.session.setMode('resources/libs/ace/mode/javascript');
-				editor.setValue(ctrl.value.code || '');
-				editor.on('change', function(){
-					ctrl.setCode(editor.getValue());
-				});
-			};
+            this.setEditor = function(editor) {
+                this.editor = editor;
+                editor.setOptions({
+                    enableBasicAutocompletion: true, 
+                    enableLiveAutocompletion: true, 
+                    showPrintMargin: false, 
+                    maxLines: Infinity,
+                    fontSize: '100%'
+                });
+                $scope.editor = editor;
+//              editor.setTheme('resources/libs/ace/theme/chrome');
+//              editor.session.setMode('resources/libs/ace/mode/javascript');
+                editor.setValue(ctrl.value.code || '');
+                editor.on('change', function(){
+                    ctrl.setCode(editor.getValue());
+                });
+            };
 
-//			var ctrl = this;
-			$wbWindow.loadLibrary('resources/libs/ace.js')
-			.then(function(){
-				ctrl.setEditor(ace.edit($element.find('div#am-wb-resources-script-editor')[0]));
-			});
-		},
-		controllerAs: 'ctrl',
-		tags : [ 'code', 'script']
-	});
+//          var ctrl = this;
+            $wbWindow.loadLibrary('resources/libs/ace.js')
+            .then(function(){
+                ctrl.setEditor(ace.edit($element.find('div#am-wb-resources-script-editor')[0]));
+            });
+        },
+        controllerAs: 'ctrl',
+        tags : [ 'code', 'script']
+    });
 });
 
 /* 
@@ -13906,238 +13907,244 @@ angular.module('am-wb-core')
  * 
  */
 .service('$resource', function($mdDialog, $rootScope) {
-	var CHILDREN_AUNCHOR = 'wb-select-resource-children';
-	var resourcePages = {};
-	/*
-	 * Manages resource dialog
-	 * @ngInject
-	 */
-	function ResourceCtrl($scope,  $mdDialog, $wbUtil,
-			$q, $controller, $compile, pages, style, data, $element, $window) {
+    var CHILDREN_AUNCHOR = 'wb-select-resource-children';
+    var resourcePages = {};
+    /*
+     * Manages resource dialog
+     * @ngInject
+     */
+    function ResourceCtrl($scope,  $mdDialog, $wbUtil,
+            $q, $controller, $compile, pages, style, data, $element, $window) {
 
-		$scope.value = angular.copy(data);
-		$scope.style = style;
-		var currentScope = null;
+        $scope.value = angular.copy(data);
+        $scope.style = style;
+        var currentScope = null;
 
-		function hide() {
-			$mdDialog.hide();
-		}
+        function hide() {
+            $mdDialog.hide();
+        }
 
-		function cancel() {
-			return $mdDialog.cancel();
-		}
+        function cancel() {
+            return $mdDialog.cancel();
+        }
 
-		/**
-		 * Answer the dialog
-		 * 
-		 * If there is an answer function in the current page controller
-		 * then the result of the answer function will be returned as 
-		 * the main result.
-		 * 
-		 * @memberof WbResourceCtrl
-		 */
-		function answer() {
-			$scope.loadingAnswer = true;
-			var res = null;
-			if(currentScope && angular.isFunction(currentScope.answer)){
-				res =  $q.when(currentScope.answer())
-				.then($mdDialog.hide);
-			} else {
-				res = $mdDialog.hide($scope.value);
-			}
-			return res.finally(function(){
-				$scope.loadingAnswer = false;
-			});
-		}
+        /**
+         * Answer the dialog
+         * 
+         * If there is an answer function in the current page controller
+         * then the result of the answer function will be returned as 
+         * the main result.
+         * 
+         * @memberof WbResourceCtrl
+         */
+        function answer() {
+            $scope.loadingAnswer = true;
+            var res = null;
+            if(currentScope && angular.isFunction(currentScope.answer)){
+                res =  $q.when(currentScope.answer())
+                .then($mdDialog.hide);
+            } else {
+                res = $mdDialog.hide($scope.value);
+            }
+            return res.finally(function(){
+                $scope.loadingAnswer = false;
+            });
+        }
 
-		/*
-		 * Sets value to the real var
-		 */
-		this.setValue = function(value){
-			$scope.value = value;
-		};
+        /*
+         * Sets value to the real var
+         */
+        this.setValue = function(value){
+            $scope.value = value;
+        };
 
-		/*
-		 * Gets current value
-		 */
-		this.getValue = function(){
-			return $scope.value;
-		};
+        /*
+         * Gets current value
+         */
+        this.getValue = function(){
+            return $scope.value;
+        };
 
-		/**
-		 * encapsulate template srce with panel widget template.
-		 * 
-		 * @param page
-		 *            setting page config
-		 * @param tempateSrc
-		 *            setting page html template
-		 * @returns encapsulate html template
-		 */
-		function _encapsulatePanel(page, template) {
-			// TODO: maso, 2017: pass all paramter to the setting
-			// panel.
-			return template;
-		}
+        /**
+         * encapsulate template srce with panel widget template.
+         * 
+         * @param page
+         *            setting page config
+         * @param tempateSrc
+         *            setting page html template
+         * @returns encapsulate html template
+         */
+        function _encapsulatePanel(page, template) {
+            // TODO: maso, 2017: pass all paramter to the setting
+            // panel.
+            return template;
+        }
 
-		/**
-		 * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
-		 * 
-		 * @returns
-		 */
-		function loadPage(page) {
-			var jobs = [];
-			var pages2 = [];
+        /**
+         * تنظیمات را به عنوان تنظیم‌های جاری سیستم لود می‌کند.
+         * 
+         * @returns
+         */
+        function loadPage(page) {
+            var jobs = [];
+            var pages2 = [];
 
-			$scope._selectedIndex = pages.indexOf(page);
+            $scope._selectedIndex = pages.indexOf(page);
 
-			// 1- Find element
-			var target = $element.find('#' + CHILDREN_AUNCHOR);
+            // 1- Find element
+            var target = $element.find('#' + CHILDREN_AUNCHOR);
 
-			// 2- Clear childrens
-			target.empty();
-			currentScope = null;
-
-
-			// 3- load pages
-//			var page = pages[index];
-			var template = $wbUtil.getTemplateFor(page);
-			if (angular.isDefined(template)) {
-				jobs.push($q.when(template).then(function(templateSrc) {
-					templateSrc = _encapsulatePanel(page, templateSrc);
-					var element = angular.element(templateSrc);
-					var scope = $rootScope.$new(false, $scope);
-					currentScope = scope;
-					scope.page = page;
-					scope.value = $scope.value;
-					if (angular.isDefined(page.controller)) {
-						var controller = $controller(page.controller, {
-							$scope : scope,
-							$element : element,
-							style: style,
-							data: data
-						});
-						if (page.controllerAs) {
-							scope[page.controllerAs] = controller;
-						}
-					}
-					$compile(element)(scope);
-					pages2.push(element);
-				}));
-			}
-
-			$q.all(jobs).then(function() {
-				angular.forEach(pages2, function(element) {
-					target.append(element);
-				});
-			});
-		}
-
-		if(angular.isFunction($window.openHelp)){
-			$scope.openHelp = function($event){
-				cancel().then(function(){
-					$window.openHelp(pages[$scope._selectedIndex], $event);
-				});
-			};
-		}
-
-		$scope.pages = pages;
-
-		$scope.loadPage = loadPage;
-
-		$scope.hide = hide;
-		$scope.cancel = cancel;
-		$scope.answer = answer;
-
-		if(pages.length){
-			loadPage(pages[0]);
-		}
-
-		var ctrl = this;
-		$scope.setValue = function(value){
-			return ctrl.setValue(value);
-		};
-	}
+            // 2- Clear childrens
+            target.empty();
+            currentScope = null;
 
 
-	/**
-	 * Fetches a page.
-	 * 
-	 * @param model
-	 * @returns
-	 */
-	function page(type) {
-		// TODO: maso, 2018: replace with not found resource
-		var widget = null;
-		if (type in resourcePages) {
-			widget = resourcePages[type];
-		}
-		return widget;
-	}
+            // 3- load pages
+//          var page = pages[index];
+            var template = $wbUtil.getTemplateFor(page);
+            if (angular.isDefined(template)) {
+                jobs.push($q.when(template).then(function(templateSrc) {
+                    templateSrc = _encapsulatePanel(page, templateSrc);
+                    var element = angular.element(templateSrc);
+                    var scope = $rootScope.$new(false, $scope);
+                    currentScope = scope;
+                    scope.page = page;
+                    scope.value = $scope.value;
+                    if (angular.isDefined(page.controller)) {
+                        var controller = $controller(page.controller, {
+                            $scope : scope,
+                            $element : element,
+                            style: style,
+                            data: data
+                        });
+                        if (page.controllerAs) {
+                            scope[page.controllerAs] = controller;
+                        }
+                    }
+                    $compile(element)(scope);
+                    pages2.push(element);
+                }));
+            }
 
-	/**
-	 * Adds new page.
-	 * 
-	 * @returns
-	 */
-	function newPage(page) {
-		resourcePages[page.type] = page;
-	}
+            $q.all(jobs).then(function() {
+                angular.forEach(pages2, function(element) {
+                    target.append(element);
+                });
+            });
+        }
 
-	/**
-	 * Finds and lists all pages.
-	 * 
-	 * @returns
-	 */
-	function pages() {
-		// TODO: maso, 1395:
-	}
+        if(angular.isFunction($window.openHelp)){
+            $scope.openHelp = function($event){
+                cancel().then(function(){
+                    $window.openHelp(pages[$scope._selectedIndex], $event);
+                });
+            };
+        }
 
-	/**
-	 * Get a resource 
-	 * 
-	 * - option.data: current value of the date
-	 * - option.style: style of the dialog (title, descritpion, image, ..)
-	 * 
-	 * @param tags
-	 * @returns
-	 */
-	function get(tag, option){
-		if(!option){
-			option = {};
-		}
-		var pages = [];
-		if(tag){
-			angular.forEach(resourcePages, function(page) {
-				if(angular.isArray(page.tags) && page.tags.includes(tag)){
-					this.push(page);
-				}
-			}, pages);
-		} else {
-			pages = resourcePages;
-		}
-		var tmplUrl = pages.length > 1 ? 'views/dialogs/wb-select-resource.html' : 'views/dialogs/wb-select-resource-single-page.html';
-		return $mdDialog.show({
-			controller : ResourceCtrl,
-			templateUrl : tmplUrl,
-			parent : angular.element(document.body),
-			clickOutsideToClose : false,
-			fullscreen : true,
-			multiple:true,
-			locals : {
-				'pages' : pages,
-				'style' : option.style || {
-					title: tag
-				},
-				'data' : option.data || {}
-			}
-		});
-	}
+        $scope.pages = pages;
+
+        $scope.loadPage = loadPage;
+
+        $scope.hide = hide;
+        $scope.cancel = cancel;
+        $scope.answer = answer;
+
+        if(pages.length){
+            loadPage(pages[0]);
+        }
+
+        var ctrl = this;
+        $scope.setValue = function(value){
+            return ctrl.setValue(value);
+        };
+    }
 
 
-	this.get = get;
-	this.newPage = newPage;
-	this.page = page;
-	this.pages = pages;
+    /**
+     * Fetches a page.
+     * 
+     * @param model
+     * @returns
+     */
+    function page(type) {
+        // TODO: maso, 2018: replace with not found resource
+        var widget = null;
+        if (type in resourcePages) {
+            widget = resourcePages[type];
+        }
+        return widget;
+    }
+
+    /**
+     * Adds new page.
+     * 
+     * @returns
+     */
+    function newPage(page) {
+        resourcePages[page.type] = page;
+    }
+
+    /**
+     * Finds and lists all pages.
+     * 
+     * @returns
+     */
+    function pages() {
+        // TODO: maso, 1395:
+    }
+
+    function getPages(tag){
+        var pages = [];
+        angular.forEach(resourcePages, function(page) {
+            if(angular.isArray(page.tags) && page.tags.includes(tag)){
+                this.push(page);
+            }
+        }, pages);
+        return pages;
+    }
+
+    /**
+     * Get a resource 
+     * 
+     * - option.data: current value of the date
+     * - option.style: style of the dialog (title, descritpion, image, ..)
+     * 
+     * @param tags
+     * @returns
+     */
+    function get(tag, option){
+        if(!option){
+            option = {};
+        }
+        var pages = getPages(tag);
+        var tmplUrl = pages.length > 1 ? 'views/dialogs/wb-select-resource.html' : 'views/dialogs/wb-select-resource-single-page.html';
+        return $mdDialog.show({
+            controller : ResourceCtrl,
+            templateUrl : tmplUrl,
+            parent : angular.element(document.body),
+            clickOutsideToClose : false,
+            fullscreen : true,
+            multiple:true,
+            locals : {
+                'pages' : pages,
+                'style' : option.style || {
+                    title: tag
+                },
+                'data' : option.data || {}
+            }
+        });
+    }
+
+    this.hasPeagFor = function(tag){
+        var pages = getPages(tag);
+        return pages.length > 0;
+    };
+
+
+    this.get = get;
+    this.newPage = newPage;
+    this.page = page;
+    this.pages = pages;
 });
 
 /* 
