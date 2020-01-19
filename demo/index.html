@@ -1,6 +1,5 @@
 <!doctype html>
 <html
-    ng-controller="MyTestEditorCtrl as ctrl"
     ng-app="am-wb-coreTest">
     <head>
         <meta charset="utf-8">
@@ -27,165 +26,14 @@
 
         <!-- build:css({.tmp/serve,src}) styles/app.css -->
         <!-- injector:css -->
-        <link rel="stylesheet" href="styles/dialogs.css">
-        <link rel="stylesheet" href="styles/font-icon.css">
-        <link rel="stylesheet" href="styles/font-svg.css">
-        <link rel="stylesheet" href="styles/hack-jsPanel-content.css">
-        <link rel="stylesheet" href="styles/hack-jsPanel.css">
-        <link rel="stylesheet" href="styles/hack-old-wb1-a-padding.css">
-        <link rel="stylesheet" href="styles/hack-tinymce5-inline-toolbar.css">
-        <link rel="stylesheet" href="styles/md-expansion-panel.css">
-        <link rel="stylesheet" href="styles/prism.css">
-        <link rel="stylesheet" href="styles/typography.css">
-        <link rel="stylesheet" href="styles/wb-dnd.css">
-        <link rel="stylesheet" href="styles/wb-icon.css">
-        <link rel="stylesheet" href="styles/wb-layers.css">
-        <link rel="stylesheet" href="styles/wb-text.css">
-        <link rel="stylesheet" href="styles/wb-ui-choose.css">
-        <link rel="stylesheet" href="styles/wb-ui-setting-image.css">
-        <link rel="stylesheet" href="styles/wb-ui-setting.css">
-        <link rel="stylesheet" href="styles/wb-widget.css">
-        <link rel="stylesheet" href="styles/wb-widgets-module.css">
-        <link rel="stylesheet" href="styles/widget-text.css">
         <link rel="stylesheet" href="styles/font-awesome.css">
         <link rel="stylesheet" href="styles/main.css">
         <!-- endinjector -->
         <!-- endbuild -->
-    </head>
-    <body
-		layout="column">
-		<md-toolbar
-			class="wb-layer-tool-bottom">
-			<div layout-align="center center" layout="row">
-				<md-toolbar-filler layout="row" layout-align="center center">
-					<wb-icon>list</wb-icon>
-				</md-toolbar-filler>
-				<h2 class="md-toolbar-tools">
-					<span>Weburger Demo</span>
-				</h2>
-				<md-button
-					class="md-icon-button"
-					ng-repeat="action in actions"
-					ng-click="action.run()">
-					<wb-icon icon="{{action.icon}}"></wb-icon>
-				</md-button>
-				<span flex></span>
-				<md-select 
-					style="margin: 0px;"
-					ng-model="examplePath"
-					ng-change="ctrl.setDocumentPath(examplePath)">
-					<md-option ng-value="'examples/empty.json'">Empty</md-option>
-					<md-option ng-value="'examples/center.json'">Center</md-option>
-					<md-option ng-value="'examples/larg-text.json'">Larg text</md-option>
-					<md-option ng-value="'examples/hx.json'">Headers</md-option>
-					<md-option ng-value="'examples/row.json'">Row</md-option>
-					<md-option ng-value="'examples/section.json'">Sections</md-option>
-					<md-option ng-value="'examples/image.json'">Image</md-option>
-					<md-option ng-value="'examples/iframe.json'">IFrame</md-option>
-					<md-option ng-value="'examples/list.json'">List</md-option>
-					<md-option ng-value="'examples/unvisible.json'">Unvisible</md-option>
-					<md-option ng-value="'examples/picture.json'">Picture</md-option>
-					<md-option ng-value="'examples/audio.json'">Audio</md-option>
-					<md-option ng-value="'examples/video.json'">Video</md-option>
-					<md-option ng-value="'examples/input.json'">Input Change</md-option>
-				</md-select>
-			</div>
-			<div id="demo-widget-editor-toolbar"></div>
-		</md-toolbar>
-<!-- 		<fieldset -->
-<!-- 			layout="column" -->
-<!-- 			style="max-width: 150px; background: black; color: white; font-size: 10px;"> -->
-<!-- 			boolean:{{booleanValue}}</br> -->
-<!-- 			color:{{colorValue}}<br/> -->
-<!-- 			length:{{lengthValue}}<br/> -->
-<!-- 			number:{{numberValue}}<br/> -->
-<!-- 			select:{{selectValue}}<br/> -->
-<!-- 			text:{{textValue}}<br/> -->
-<!-- 			<hr/> -->
-<!-- 			<wb-ui-setting-boolean -->
-<!-- 				wb-title="Boolean setting" -->
-<!-- 				wb-description="You can edit boolean valus" -->
-<!-- 				ng-model="booleanValue"> -->
-<!-- 			</wb-ui-setting-boolean> -->
-<!-- 			<wb-ui-setting-color -->
-<!-- 				wb-title="Color picker" -->
-<!-- 				wb-description="Select a color value" -->
-<!-- 				ng-model="colorValue"> -->
-<!-- 			</wb-ui-setting-color> -->
-<!-- 			<wb-ui-setting-length -->
-<!-- 				wb-title="Leng value" -->
-<!-- 				wb-description="Select a length" -->
-<!-- 				ng-model="lengthValue"> -->
-<!-- 			</wb-ui-setting-length> -->
-<!-- 			<wb-ui-setting-number -->
-<!-- 				wb-title="Number value" -->
-<!-- 				wb-description="Sets a number value" -->
-<!-- 				ng-model="numberValue"> -->
-<!-- 			</wb-ui-setting-number> -->
-<!-- 			<wb-ui-setting-select -->
-<!-- 				wb-title="Select value" -->
-<!-- 				wb-description="Select an item from list" -->
-<!-- 				ng-model="selectValue"> -->
-<!-- 			</wb-ui-setting-select> -->
-<!-- 			<wb-ui-setting-text -->
-<!-- 				wb-title="Text value" -->
-<!-- 				wb-description="Text value to set from client" -->
-<!-- 				ng-model="textValue"> -->
-<!-- 			</wb-ui-setting-text> -->
-<!-- 		</fieldset> -->
-		<div
-			layout="row"
-			flex>
-			<md-toolbar
-				class="wb-layer-tool-bottom"
-				ng-show="ctrl.editable"
-				flex="5">
-				<div layout="column" layout-align="center center">
-					<md-button
-						style="padding: 0px; margin: 0px;"
-						class="md-icon-button"
-						ng-click="showWidgets = !showWidgets">
-						<wb-icon>add</wb-icon>
-					</md-button>
-					<md-button
-						style="padding: 0px; margin: 0px;"
-						class="md-icon-button"
-						ng-click="showSettings = !showSettings">
-						<wb-icon>settings</wb-icon>
-					</md-button>
-					<md-button
-						style="padding: 0px; margin: 0px;"
-						class="md-icon-button"
-						ng-click="showEvents = !showEvents">
-						<wb-icon>event</wb-icon>
-					</md-button>
-				</div>
-			</md-toolbar>
-			<md-content
-				ng-show="ctrl.editable && (showWidgets || showSettings || showEvents)"
-				flex="25">
-				<wb-widgets-explorer 
-					ng-show="showWidgets"
-					ng-model="ctrl.widgets">
-				</wb-widgets-explorer>
-				<wb-setting-panel-group
-					ng-show="showSettings"
-					ng-model="ctrl.selectedWidgets">
-				</wb-setting-panel-group>
-				<wb-event-panel 
-					ng-show="showEvents"
-					ng-model="ctrl.selectedWidgets">
-				</wb-event-panel>
-			</md-content>
-			<div
-				wb-content
-				wb-on-load="ctrl.setRootWidget($data)"
-				wb-on-error="alert('fail to load the model')"
-				ng-model="ctrl.model"
-				ng-model-options="{ debounce: 100 }"
-				ng-change="ctrl.setDerty(true)"></div>
-		</div>
-
+        
+        
+        
+        
 
 
         <!-- build:js(src) scripts/vendor.js -->
@@ -218,179 +66,98 @@
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
         <!-- injector:js -->
         <script src="libs/ResizeObserver.js"></script>
-        <script src="libs/anime.js"></script>
-        <script src="libs/machina.js"></script>
-        <script src="libs/prism.js"></script>
         <script src="scripts/app.js"></script>
-        <script src="scripts/ng/configs/icons.js"></script>
-        <script src="scripts/ng/converters/converter-abstract.js"></script>
-        <script src="scripts/ng/converters/converter-dom.js"></script>
-        <script src="scripts/ng/converters/converter-text.js"></script>
-        <script src="scripts/ng/converters/converter-weburger.js"></script>
-        <script src="scripts/ng/directives/ng-src-error.js"></script>
-        <script src="scripts/ng/directives/tinymce.js"></script>
-        <script src="scripts/ng/directives/wb-content.js"></script>
-        <script src="scripts/ng/directives/wb-event-panel.js"></script>
-        <script src="scripts/ng/directives/wb-icon.js"></script>
-        <script src="scripts/ng/directives/wb-on-dragstart.js"></script>
-        <script src="scripts/ng/directives/wb-on-enter.js"></script>
-        <script src="scripts/ng/directives/wb-on-error.js"></script>
-        <script src="scripts/ng/directives/wb-on-esc.js"></script>
-        <script src="scripts/ng/directives/wb-on-load.js"></script>
-        <script src="scripts/ng/directives/wb-setting-page.js"></script>
-        <script src="scripts/ng/directives/wb-setting-panel-group.js"></script>
-        <script src="scripts/ng/directives/wb-ui-setting.js"></script>
-        <script src="scripts/ng/directives/wb-widgets-explorer.js"></script>
-        <script src="scripts/ng/directives/wb-widgets-list.js"></script>
-        <script src="scripts/ng/directives/wb-widgets-module.js"></script>
-        <script src="scripts/ng/editors/widget-editor-code.js"></script>
-        <script src="scripts/ng/editors/widget-editor-deprecated.js"></script>
-        <script src="scripts/ng/editors/widget-editor-fake.js"></script>
-        <script src="scripts/ng/editors/widget-editor-tinymce-section.js"></script>
-        <script src="scripts/ng/editors/widget-editor-tinymce-singleLine.js"></script>
-        <script src="scripts/ng/editors/widget-editor.js"></script>
-        <script src="scripts/ng/expan/expansionPanelCollapsedDirective.js"></script>
-        <script src="scripts/ng/expan/expansionPanelDirective.js"></script>
-        <script src="scripts/ng/expan/expansionPanelExpandedDirective.js"></script>
-        <script src="scripts/ng/expan/expansionPanelFooterDirective.js"></script>
-        <script src="scripts/ng/expan/expansionPanelGroupDirective.js"></script>
-        <script src="scripts/ng/expan/expansionPanelGroupService.js"></script>
-        <script src="scripts/ng/expan/expansionPanelHeaderDirective.js"></script>
-        <script src="scripts/ng/expan/expansionPanelService.js"></script>
-        <script src="scripts/ng/factories/dialog-window.js"></script>
-        <script src="scripts/ng/factories/native-window-wrapper.js"></script>
-        <script src="scripts/ng/factories/tinymce-plugin-codesample.js"></script>
-        <script src="scripts/ng/factories/tinymce-plugin-imagetool.js"></script>
-        <script src="scripts/ng/factories/tinymce-plugin-link.js"></script>
-        <script src="scripts/ng/filters/wb-md5.js"></script>
-        <script src="scripts/ng/filters/wb-unsafe.js"></script>
-        <script src="scripts/ng/providers/icon-servic.js"></script>
-        <script src="scripts/ng/runs/resources.js"></script>
-        <script src="scripts/ng/runs/settings.js"></script>
-        <script src="scripts/ng/runs/tinymc.js"></script>
-        <script src="scripts/ng/runs/widgets.js"></script>
-        <script src="scripts/ng/services/crypto.js"></script>
-        <script src="scripts/ng/services/dispatcher.js"></script>
-        <script src="scripts/ng/services/float.js"></script>
-        <script src="scripts/ng/services/local.js"></script>
-        <script src="scripts/ng/services/resource.js"></script>
-        <script src="scripts/ng/services/settings.js"></script>
-        <script src="scripts/ng/services/storage.js"></script>
-        <script src="scripts/ng/services/ui-tinymce-service.js"></script>
-        <script src="scripts/ng/services/util.js"></script>
-        <script src="scripts/ng/services/window.js"></script>
-        <script src="scripts/ng/settings/abstract-page.js"></script>
-        <script src="scripts/ng/settings/style-animation.js"></script>
-        <script src="scripts/ng/settings/style-background.js"></script>
-        <script src="scripts/ng/settings/style-border.js"></script>
-        <script src="scripts/ng/settings/style-generall.js"></script>
-        <script src="scripts/ng/settings/style-layout.js"></script>
-        <script src="scripts/ng/settings/style-media.js"></script>
-        <script src="scripts/ng/settings/style-size.js"></script>
-        <script src="scripts/ng/settings/style-text.js"></script>
-        <script src="scripts/ng/settings/widget-a.js"></script>
-        <script src="scripts/ng/settings/widget-audio.js"></script>
-        <script src="scripts/ng/settings/widget-form.js"></script>
-        <script src="scripts/ng/settings/widget-general.js"></script>
-        <script src="scripts/ng/settings/widget-iframe.js"></script>
-        <script src="scripts/ng/settings/widget-img.js"></script>
-        <script src="scripts/ng/settings/widget-input.js"></script>
-        <script src="scripts/ng/settings/widget-meta.js"></script>
-        <script src="scripts/ng/settings/widget-microdata.js"></script>
-        <script src="scripts/ng/settings/widget-picture.js"></script>
-        <script src="scripts/ng/settings/widget-source.js"></script>
-        <script src="scripts/ng/settings/widget-video.js"></script>
-        <script src="scripts/wb/ObservableObject.js"></script>
-        <script src="scripts/wb/locators/widget-locator-abstract.js"></script>
-        <script src="scripts/wb/locators/widget-locator-bound.js"></script>
-        <script src="scripts/wb/locators/widget-locator-manager.js"></script>
-        <script src="scripts/wb/locators/widget-locator-selection.js"></script>
-        <script src="scripts/wb/processors/processor-abstract.js"></script>
-        <script src="scripts/wb/processors/processor-attributes.js"></script>
-        <script src="scripts/wb/processors/processor-dnd.js"></script>
-        <script src="scripts/wb/processors/processor-event.js"></script>
-        <script src="scripts/wb/processors/processor-locator.js"></script>
-        <script src="scripts/wb/processors/processor-microdata.js"></script>
-        <script src="scripts/wb/processors/processor-select.js"></script>
-        <script src="scripts/wb/providers/timeout.js"></script>
-        <script src="scripts/wb/widget-service.js"></script>
-        <script src="scripts/wb/widgets/0-abstract.js"></script>
-        <script src="scripts/wb/widgets/1-group.js"></script>
-        <script src="scripts/wb/widgets/2-abstract-html.js"></script>
-        <script src="scripts/wb/widgets/a.js"></script>
-        <script src="scripts/wb/widgets/address.js"></script>
-        <script src="scripts/wb/widgets/applet.js"></script>
-        <script src="scripts/wb/widgets/area.js"></script>
-        <script src="scripts/wb/widgets/article.js"></script>
-        <script src="scripts/wb/widgets/aside.js"></script>
-        <script src="scripts/wb/widgets/audio.js"></script>
-        <script src="scripts/wb/widgets/blockquote.js"></script>
-        <script src="scripts/wb/widgets/button.js"></script>
-        <script src="scripts/wb/widgets/canvas.js"></script>
-        <script src="scripts/wb/widgets/datalist.js"></script>
-        <script src="scripts/wb/widgets/dd.js"></script>
-        <script src="scripts/wb/widgets/details.js"></script>
-        <script src="scripts/wb/widgets/dialog.js"></script>
-        <script src="scripts/wb/widgets/div.js"></script>
-        <script src="scripts/wb/widgets/dl.js"></script>
-        <script src="scripts/wb/widgets/dt.js"></script>
-        <script src="scripts/wb/widgets/embed.js"></script>
-        <script src="scripts/wb/widgets/fieldset.js"></script>
-        <script src="scripts/wb/widgets/figcaption.js"></script>
-        <script src="scripts/wb/widgets/figure.js"></script>
-        <script src="scripts/wb/widgets/footer.js"></script>
-        <script src="scripts/wb/widgets/form.js"></script>
-        <script src="scripts/wb/widgets/frame.js"></script>
-        <script src="scripts/wb/widgets/frameset.js"></script>
-        <script src="scripts/wb/widgets/h.js"></script>
-        <script src="scripts/wb/widgets/header.js"></script>
-        <script src="scripts/wb/widgets/hr.js"></script>
-        <script src="scripts/wb/widgets/i.js"></script>
-        <script src="scripts/wb/widgets/iframe.js"></script>
-        <script src="scripts/wb/widgets/img.js"></script>
-        <script src="scripts/wb/widgets/input.js"></script>
-        <script src="scripts/wb/widgets/kbd.js"></script>
-        <script src="scripts/wb/widgets/label.js"></script>
-        <script src="scripts/wb/widgets/legend.js"></script>
-        <script src="scripts/wb/widgets/li.js"></script>
-        <script src="scripts/wb/widgets/link.js"></script>
-        <script src="scripts/wb/widgets/main.js"></script>
-        <script src="scripts/wb/widgets/map.js"></script>
-        <script src="scripts/wb/widgets/meta.js"></script>
-        <script src="scripts/wb/widgets/meter.js"></script>
-        <script src="scripts/wb/widgets/nav.js"></script>
-        <script src="scripts/wb/widgets/noscript.js"></script>
-        <script src="scripts/wb/widgets/object.js"></script>
-        <script src="scripts/wb/widgets/ol.js"></script>
-        <script src="scripts/wb/widgets/optgroup.js"></script>
-        <script src="scripts/wb/widgets/option.js"></script>
-        <script src="scripts/wb/widgets/output.js"></script>
-        <script src="scripts/wb/widgets/p.js"></script>
-        <script src="scripts/wb/widgets/param.js"></script>
-        <script src="scripts/wb/widgets/picture.js"></script>
-        <script src="scripts/wb/widgets/pre.js"></script>
-        <script src="scripts/wb/widgets/progress.js"></script>
-        <script src="scripts/wb/widgets/q.js"></script>
-        <script src="scripts/wb/widgets/s.js"></script>
-        <script src="scripts/wb/widgets/samp.js"></script>
-        <script src="scripts/wb/widgets/script.js"></script>
-        <script src="scripts/wb/widgets/section.js"></script>
-        <script src="scripts/wb/widgets/select.js"></script>
-        <script src="scripts/wb/widgets/small.js"></script>
-        <script src="scripts/wb/widgets/source.js"></script>
-        <script src="scripts/wb/widgets/span.js"></script>
-        <script src="scripts/wb/widgets/strong.js"></script>
-        <script src="scripts/wb/widgets/style.js"></script>
-        <script src="scripts/wb/widgets/summary.js"></script>
-        <script src="scripts/wb/widgets/svg.js"></script>
-        <script src="scripts/wb/widgets/template.js"></script>
-        <script src="scripts/wb/widgets/textarea.js"></script>
-        <script src="scripts/wb/widgets/track.js"></script>
-        <script src="scripts/wb/widgets/ul.js"></script>
-        <script src="scripts/wb/widgets/video.js"></script>
+        <script src="scripts/editors/widget-editor.js"></script>
+        <script src="scripts/factories/ObservableObject.js"></script>
+        <script src="scripts/factories/native-window-wrapper.js"></script>
+        <script src="scripts/processors/processor-abstract.js"></script>
+        <script src="scripts/processors/processor-attributes.js"></script>
+        <script src="scripts/processors/processor-event.js"></script>
+        <script src="scripts/processors/processor-microdata.js"></script>
+        <script src="scripts/runs/widgets.js"></script>
+        <script src="scripts/services/dispatcher.js"></script>
+        <script src="scripts/services/media.js"></script>
+        <script src="scripts/services/storage.js"></script>
+        <script src="scripts/services/util.js"></script>
+        <script src="scripts/services/widget-service.js"></script>
+        <script src="scripts/services/window.js"></script>
+        <script src="scripts/widgets/0-abstract.js"></script>
+        <script src="scripts/widgets/1-group.js"></script>
+        <script src="scripts/widgets/2-abstract-html.js"></script>
+        <script src="scripts/widgets/a.js"></script>
+        <script src="scripts/widgets/address.js"></script>
+        <script src="scripts/widgets/applet.js"></script>
+        <script src="scripts/widgets/area.js"></script>
+        <script src="scripts/widgets/article.js"></script>
+        <script src="scripts/widgets/aside.js"></script>
+        <script src="scripts/widgets/audio.js"></script>
+        <script src="scripts/widgets/blockquote.js"></script>
+        <script src="scripts/widgets/button.js"></script>
+        <script src="scripts/widgets/canvas.js"></script>
+        <script src="scripts/widgets/datalist.js"></script>
+        <script src="scripts/widgets/dd.js"></script>
+        <script src="scripts/widgets/details.js"></script>
+        <script src="scripts/widgets/dialog.js"></script>
+        <script src="scripts/widgets/div.js"></script>
+        <script src="scripts/widgets/dl.js"></script>
+        <script src="scripts/widgets/dt.js"></script>
+        <script src="scripts/widgets/embed.js"></script>
+        <script src="scripts/widgets/fieldset.js"></script>
+        <script src="scripts/widgets/figcaption.js"></script>
+        <script src="scripts/widgets/figure.js"></script>
+        <script src="scripts/widgets/footer.js"></script>
+        <script src="scripts/widgets/form.js"></script>
+        <script src="scripts/widgets/frame.js"></script>
+        <script src="scripts/widgets/frameset.js"></script>
+        <script src="scripts/widgets/h.js"></script>
+        <script src="scripts/widgets/header.js"></script>
+        <script src="scripts/widgets/hr.js"></script>
+        <script src="scripts/widgets/i.js"></script>
+        <script src="scripts/widgets/iframe.js"></script>
+        <script src="scripts/widgets/img.js"></script>
+        <script src="scripts/widgets/input.js"></script>
+        <script src="scripts/widgets/kbd.js"></script>
+        <script src="scripts/widgets/label.js"></script>
+        <script src="scripts/widgets/legend.js"></script>
+        <script src="scripts/widgets/li.js"></script>
+        <script src="scripts/widgets/link.js"></script>
+        <script src="scripts/widgets/main.js"></script>
+        <script src="scripts/widgets/map.js"></script>
+        <script src="scripts/widgets/meta.js"></script>
+        <script src="scripts/widgets/meter.js"></script>
+        <script src="scripts/widgets/nav.js"></script>
+        <script src="scripts/widgets/noscript.js"></script>
+        <script src="scripts/widgets/object.js"></script>
+        <script src="scripts/widgets/ol.js"></script>
+        <script src="scripts/widgets/optgroup.js"></script>
+        <script src="scripts/widgets/option.js"></script>
+        <script src="scripts/widgets/output.js"></script>
+        <script src="scripts/widgets/p.js"></script>
+        <script src="scripts/widgets/param.js"></script>
+        <script src="scripts/widgets/picture.js"></script>
+        <script src="scripts/widgets/pre.js"></script>
+        <script src="scripts/widgets/progress.js"></script>
+        <script src="scripts/widgets/q.js"></script>
+        <script src="scripts/widgets/s.js"></script>
+        <script src="scripts/widgets/samp.js"></script>
+        <script src="scripts/widgets/script.js"></script>
+        <script src="scripts/widgets/section.js"></script>
+        <script src="scripts/widgets/select.js"></script>
+        <script src="scripts/widgets/small.js"></script>
+        <script src="scripts/widgets/source.js"></script>
+        <script src="scripts/widgets/span.js"></script>
+        <script src="scripts/widgets/strong.js"></script>
+        <script src="scripts/widgets/style.js"></script>
+        <script src="scripts/widgets/summary.js"></script>
+        <script src="scripts/widgets/svg.js"></script>
+        <script src="scripts/widgets/template.js"></script>
+        <script src="scripts/widgets/textarea.js"></script>
+        <script src="scripts/widgets/track.js"></script>
+        <script src="scripts/widgets/ul.js"></script>
+        <script src="scripts/widgets/video.js"></script>
         <script src="scripts/demo.js"></script>
         <!-- endinjector -->
         <!-- endbuild -->
-
-    </body>
+    </head>
+    <body ng-controller="MyTestEditorCtrl as ctrl"></body>
 </html>

@@ -16,8 +16,7 @@
   ],
   "license": "MIT",
   "main": [
-    "dist/am-wb-core.js",
-    "dist/am-wb-core.css"
+    "dist/am-wb-core.js"
   ],
   "dependencies": {
     "jquery": "3.4.x",

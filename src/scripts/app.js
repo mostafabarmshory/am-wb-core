@@ -49,18 +49,18 @@ jQuery.fn.extend({
 
 angular.module('am-wb-core', [
 	// base
-	'ngMessages',
-	'ngAnimate',
-	'ngAria',
-	'ngSanitize',
+//	'ngMessages',
+//	'ngAnimate',
+//	'ngAria',
+//	'ngSanitize',
 
 	// editor
-	'ngMaterial',
-	'ngMdIcons',
-	'mdColorPicker',
-	'pascalprecht.translate',
+//	'ngMaterial',
+//	'ngMdIcons',
+//	'mdColorPicker',
+//	'pascalprecht.translate',
 
-	'ngStorage', // https://github.com/gsklee/ngStorage
+//	'ngStorage', // https://github.com/gsklee/ngStorage
 ])
 
 /**
