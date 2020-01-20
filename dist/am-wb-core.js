@@ -3302,11 +3302,11 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-angular.module('am-wb-core') //
+
 
 /**
  * @ngdoc Services
- * @name $dispatcher
+ * @name $wbDispatcher
  * @description a wrapper of FLUX
  * 
  * 
@@ -3317,77 +3317,81 @@ angular.module('am-wb-core') //
  * callbacks have been executed.
  * 
  */
-.service('$wbDispatcher', function() {
-	
+function WbDispatcher() {
+    
 
-	/*
-	 * List of all dispatcher
-	 */
-	var dispatchers = {};
+    /*
+     * List of all dispatcher
+     */
+    var dispatchers = {};
 
-	/*
-	 * Finds dispatcher for the type
-	 */
-	function getDispatcherFor(type) {
-		if (!dispatchers[type]) {
-			dispatchers[type] = new Flux.Dispatcher();
-		}
-		return dispatchers[type];
-	}
+    /*
+     * Finds dispatcher for the type
+     */
+    function getDispatcherFor(type) {
+        if (!dispatchers[type]) {
+            dispatchers[type] = new Flux.Dispatcher();
+        }
+        return dispatchers[type];
+    }
 
-	/**
-	 * Registers a callback to be invoked with every dispatched payload. Returns
-	 * a token that can be used with `waitFor()`.
-	 * 
-	 * This payload is digested by both stores:
-	 * 
-	 * @example 
-	 * dispatchToken = $ispatcher.register('action.type', function(payload) { 
-	 * 	if (payload.actionType === 'country-update') { 
-	 * 		CountryStore.country = payload.selectedCountry; 
-	 * 	} 
-	 * });
-	 * 
-	 * @param callback function to add 
-	 */
-	this.on = function(type, callback) {
-		return getDispatcherFor(type).register(callback);
-	};
+    /**
+     * Registers a callback to be invoked with every dispatched payload. Returns
+     * a token that can be used with `waitFor()`.
+     * 
+     * This payload is digested by both stores:
+     * 
+     * @example 
+     * dispatchToken = $ispatcher.register('action.type', function(payload) { 
+     *  if (payload.actionType === 'country-update') { 
+     *      CountryStore.country = payload.selectedCountry; 
+     *  } 
+     * });
+     * 
+     * @param callback function to add 
+     */
+    this.on = function(type, callback) {
+        return getDispatcherFor(type).register(callback);
+    };
 
-	/** 
-	 * Removes a callback based on its token. 
-	 */
-	this.off = function(type, id) {
-		return getDispatcherFor(type).unregister(id);
-	};
+    /** 
+     * Removes a callback based on its token. 
+     */
+    this.off = function(type, id) {
+        return getDispatcherFor(type).unregister(id);
+    };
 
-	/**
-	 * Waits for the callbacks specified to be invoked before continuing
-	 * execution of the current callback. This method should only be used by a
-	 * callback in response to a dispatched payload.
-	 */
-	this.waitFor = function(type, ids) {
-		return getDispatcherFor(type).waitFor(ids);
-	};
+    /**
+     * Waits for the callbacks specified to be invoked before continuing
+     * execution of the current callback. This method should only be used by a
+     * callback in response to a dispatched payload.
+     */
+    this.waitFor = function(type, ids) {
+        return getDispatcherFor(type).waitFor(ids);
+    };
 
-	/**
-	 * Dispatches a payload to all registered callbacks.
-	 * 
-	 *  Payload contains key and values. You may add extra values to the 
-	 * payload.
-	 * 
-	 */
-	this.dispatch = function(type, payload) {
-		return getDispatcherFor(type).dispatch(payload);
-	};
+    /**
+     * Dispatches a payload to all registered callbacks.
+     * 
+     *  Payload contains key and values. You may add extra values to the 
+     * payload.
+     * 
+     */
+    this.dispatch = function(type, payload) {
+        return getDispatcherFor(type).dispatch(payload);
+    };
 
-	/**
-	 * Is this Dispatcher currently dispatching.
-	 */
-	this.isDispatching = function(type) {
-		return getDispatcherFor(type).isDispatching();
-	};
-});
+    /**
+     * Is this Dispatcher currently dispatching.
+     */
+    this.isDispatching = function(type) {
+        return getDispatcherFor(type).isDispatching();
+    };
+}
+
+angular.module('am-wb-core')
+.service('$dispatcher', WbDispatcher)
+.service('$wbDispatcher', WbDispatcher);
 
 
 angular.module('am-wb-core') //
