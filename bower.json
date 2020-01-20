@@ -1,7 +1,7 @@
 {
   "name": "am-wb-core",
   "moduleName": "am-wb-core",
-  "version": "3.1.4",
+  "version": "4.0.0",
   "authors": [
     "Mostafa Barmshory <mostafa.barmshory@dpq.co.ir>",
     "Hadi mansouri <mohammad.hadi.mansouri@dpq.co.ir>",
@@ -16,32 +16,18 @@
   ],
   "license": "MIT",
   "main": [
-    "dist/am-wb-core.js",
-    "dist/am-wb-core.css"
+    "dist/am-wb-core.js"
   ],
   "dependencies": {
     "jquery": "3.4.x",
     "lodash": "4.x",
     "flux": "3.1.x",
     "object-path": "^0.11.0",
-    "jspanel4x": "master",
-    "tinymce": "5.x",
-    "md-color-picker": "https://github.com/mostafabarmshory/md-color-picker.git#0.2.x",
-    "angular-animate": "1.7.x",
-    "angular-aria": "1.7.x",
-    "angular-messages": "1.7.x",
-    "angular-sanitize": "1.7.x",
-    "angular-material": "1.1.x",
-    "angular-translate": "2.18.x",
-    "weakmap-polyfill": "2.0.x",
     "mustache.js": "2.3.x",
-    "ngstorage": "0.3.x",
-    "moment": "^2.24.0",
-    "loglevel": "^1.6.6"
+    "angular": "1.7.x"
   },
   "devDependencies": {
-    "angular-mocks": "1.7.x",
-    "json-formatter": "0.7.x"
+    "angular-mocks": "1.7.x"
   },
   "resolutions": {
     "angular": "1.7.x"

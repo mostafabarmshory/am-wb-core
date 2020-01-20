@@ -669,7 +669,7 @@ module.exports = function(grunt) {
         'ngAnnotate', //
         'copy:dist', //
         'uglify', //
-        'cssmin' //
+//        'cssmin' //
         ]);
 
     grunt.registerTask('default', [ //
