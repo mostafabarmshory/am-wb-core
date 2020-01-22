@@ -1,17 +1,16 @@
 {
   "name": "am-wb-core",
   "moduleName": "am-wb-core",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "authors": [
     "Mostafa Barmshory <mostafa.barmshory@dpq.co.ir>",
     "Hadi mansouri <mohammad.hadi.mansouri@dpq.co.ir>"
   ],
   "moduleType": [],
   "keywords": [
-    "Material",
+    "Weburger",
     "Widget",
-    "AngularJS",
-    "Pluf"
+    "AngularJS"
   ],
   "license": "MIT",
   "main": [
