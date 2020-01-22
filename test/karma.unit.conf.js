@@ -32,7 +32,6 @@ module.exports = function(config) {
 			'bower_components/jquery/dist/jquery.js',
 			'bower_components/lodash/lodash.js',
 			'bower_components/flux/dist/Flux.js',
-			'bower_components/object-path/index.js',
 			'bower_components/mustache.js/mustache.js',
 			'bower_components/angular/angular.js',
 			'bower_components/angular-mocks/angular-mocks.js',

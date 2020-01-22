@@ -38,17 +38,50 @@ angular.module('am-wb-core')
  * Providers
  ***********************************************************************/
 .run(function (
-		/* angularjs */ $location, $http, $timeout,
-		/* WB        */ $widget, $wbMedia, $wbWindow, $wbStorage, $wbDispatcher) {
+		/* angularjs */ $anchorScroll, $animate, $cacheFactory,
+		$document, $exceptionHandler, $filter, $http, $httpParamSerializer,
+		$httpParamSerializerJQLike, $interpolate, $interval, $locale, $location, 
+		$log, $parse, $q, $rootElement, $sce, $templateCache, $templateRequest,
+		$timeout, $window,
+		/* WB        */ $widget, $wbMedia, $wbStorage, $wbDispatcher) {
 	$widget//
 	
+	
+	
+	
 	// AngularJS
+	.setProvider('$anchorScroll', $anchorScroll)
+	.setProvider('$animate', $animate)
+//	.setProvider('$animateCss', $animateCss)
+	.setProvider('$cacheFactory', $cacheFactory)
+//	.setProvider('$compile', $window)
+//	.setProvider('$controller', $window)
+	.setProvider('$document', $document)
+	.setProvider('$exceptionHandler', $exceptionHandler)
+	.setProvider('$filter', $filter)
 	.setProvider('$http', $http)
+//	.setProvider('$httpBackend', $window)
+	.setProvider('$httpParamSerializer', $httpParamSerializer)
+	.setProvider('$httpParamSerializerJQLike', $httpParamSerializerJQLike)
+	.setProvider('$interpolate', $interpolate)
+	.setProvider('$interval', $interval)
+//	.setProvider('$jsonpCallbacks', $window)
+	.setProvider('$locale', $locale)
 	.setProvider('$location', $location)
+	.setProvider('$log', $log)
+	.setProvider('$parse', $parse)
+	.setProvider('$q', $q)
+	.setProvider('$rootElement', $rootElement)
+//	.setProvider('$rootScope', $window)
+	.setProvider('$sce', $sce)
+//	.setProvider('$sceDelegate', $window)
+	.setProvider('$templateCache', $templateCache)
+	.setProvider('$templateRequest', $templateRequest)
 	.setProvider('$timeout', $timeout)
+	.setProvider('$window', $window)
+//	.setProvider('$xhrFactory', $window)
 
 	// wb-core
-	.setProvider('$window', $wbWindow)
 	.setProvider('$dispatcher', $wbDispatcher)
 	.setProvider('$storage', $wbStorage)
 	.setProvider('$media', $wbMedia);
@@ -887,4 +920,35 @@ angular.module('am-wb-core')
 		controller: 'WbWidgetVideo', 
 		isLeaf: false
 	});
+	
+
+    $widget.newWidget({
+        // widget description
+        type: 'ObjectCollection',
+        title: 'Object collection',
+        description: 'A widget to show a collection of items',
+        groups: ['seen'],
+        icon: 'pages',
+        model: '',
+        // functional properties
+        help: '',
+        helpId: 'wb-seen-widget-collection',
+        template: '<div></div>',
+        controller: 'AmWbSeenCollectionWidget'
+    });
+    
+    $widget.newWidget({
+        type: 'import',
+        title: 'Import',
+        description: 'Import a part of other content',
+        groups: ['commons'],
+        icon: 'import_export',
+        setting: ['import'],
+        // help
+        help: '',
+        helpId: '',
+        // functional (page)
+        template: '<div></div>',
+        controller: 'WbWidgetSeenImport'
+    });
 });

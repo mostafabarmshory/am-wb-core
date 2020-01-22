@@ -28,7 +28,8 @@
 		"Flux": true,
 		"ace": true,
 		"log": true,
-		"tinyMCE": true
+		"tinyMCE": true,
+		"$": true
 	},
 	"extends": "eslint:recommended",
 	"parserOptions": {
