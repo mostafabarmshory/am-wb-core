@@ -30,6 +30,8 @@
 	"moment": false,
 	"Flux": false,
 	"ace": false,
-	"log": false
+	"log": false,
+	"$": false,
+	"_": false
   }
 }

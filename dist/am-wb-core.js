@@ -963,31 +963,6 @@
  * SOFTWARE.
  */
 
-jQuery.fn.extend({
-	getPath: function () {
-		var path, node = this;
-		while (node.length) {
-			var realNode = node[0], name = realNode.localName;
-			if (!name) { 
-				break;
-			}
-			name = name.toLowerCase();
-			var parent = node.parent();
-			var sameTagSiblings = parent.children(name);
-			if (sameTagSiblings.length > 1) { 
-				var allSiblings = parent.children();
-				var index = allSiblings.index(realNode) + 1;
-				if (index > 1) {
-					name += ':nth-child(' + index + ')';
-				}
-			}
-			path = name + (path ? '>' + path : '');
-			node = parent;
-		}
-		return path;
-	}
-});
-
 angular.module('am-wb-core', [
 	// base
 //	'ngMessages',
@@ -1002,115 +977,7 @@ angular.module('am-wb-core', [
 //	'pascalprecht.translate',
 
 //	'ngStorage', // https://github.com/gsklee/ngStorage
-])
-
-/**
- * @ngdoc Service
- * @name $ObjectPath
- * 
- * Utility to access object properties
- */
-.service('$objectPath', function(){
-
-	this.proxy = function(object){
-		return objectPath(object);
-	};
-
-	/**
-	 * @name has
-	 * @memberof $ObjectPath
-	 */
-	this.has = function(key){
-		return objectPath.has(key);
-	};
-
-	/**
-	 * @name ensureExists
-	 * @memberof $ObjectPath
-	 */
-	this.ensureExists = function(obj, path, value){
-		objectPath.ensureExists(obj, path, value);
-	};
-
-	/**
-	 * @name set
-	 * @memberof $ObjectPath
-	 */
-	this.set = function(obj, path, value, doNotReplace){ 
-		return objectPath.set(obj, path, value, doNotReplace); 
-	};
-
-	/**
-	 * @name hainserts
-	 * @memberof $ObjectPath
-	 */
-	this.insert = function(obj, path, value, at){
-		return objectPath.insert(obj, path, value, at); 
-	};
-
-	/**
-	 * @name haemptys
-	 * @memberof $ObjectPath
-	 * 
-	 * empty a given path (but do not delete it) depending on their type,so it
-	 * retains reference to objects and arrays.
-	 * 
-	 * functions that are not inherited from prototype are set to null.
-	 * 
-	 * object instances are considered objects and just own property names are
-	 * deleted
-	 */
-	this.empty = function(obj, path) {
-		return objectPath.empty(obj, path);
-	};
-
-	/**
-	 * @name push
-	 * @memberof $ObjectPath
-	 * 
-	 * example:
-	 * 
-	 * $ObjectPath.push(obj, 'a.b', 'a', 'b', 'c', 'd');
-	 */
-	this.push = function(obj, path /*, values */){
-		return objectPath.push(obj, path /*, values */); 
-	};
-
-	/**
-	 * @name coalesce
-	 * @memberof $ObjectPath
-	 * 
-	 * get the first non-undefined value
-	 * 
-	 * objectPath.coalesce(obj, ['a.z', 'a.d'], 'default');
-	 */
-	this.coalesce = function(obj, paths, defaultValue){
-		return objectPath.coalesce(obj, paths, defaultValue); 
-	};
-
-	/**
-	 * @name get
-	 * @memberof $ObjectPath
-	 * 
-	 * get deep property
-	 * 
-	 * objectPath.get(obj, "a.b");  //returns "d"
-	 * objectPath.get(obj, ["a", "dot.dot"]);  //returns "key"
-	 * objectPath.get(obj, 'a.\u1200');  //returns "unicode key"
-	 */
-	this.get = function(obj, path, defaultValue){
-		return objectPath.get(obj, path, defaultValue); 
-	};
-
-	/**
-	 * @name del
-	 * @memberof $ObjectPath
-	 */
-	this.del = function(obj, path){
-		return objectPath.del(obj, path);
-	};
-});
-
+]);
 
 /* 
  * The MIT License (MIT)
@@ -1443,6 +1310,160 @@ angular.module('am-wb-core')
 	
 	return ObservableObject;
 });
+
+angular.module('am-wb-core') //
+
+/**
+ * @ngdoc Services
+ * @name $dispatcher
+ * @description a wrapper of FLUX
+ * 
+ * 
+ * Dispatcher is used to broadcast payloads to registered callbacks. This is
+ * different from generic pub-sub systems in two ways: - Callbacks are not
+ * subscribed to particular events. Every payload is dispatched to every
+ * registered callback. - Callbacks can be deferred in whole or part until other
+ * callbacks have been executed.
+ * 
+ */
+.factory('$wbMedia', function (
+        /* angularjs */ $rootScope, $window) {
+    
+    /**
+     * As defined in core/style/variables.scss
+     *
+     * $layout-breakpoint-xs:     600px !default;
+     * $layout-breakpoint-sm:     960px !default;
+     * $layout-breakpoint-md:     1280px !default;
+     * $layout-breakpoint-lg:     1920px !default;
+     *
+     */
+    var MEDIA = {
+      'xs'        : '(max-width: 599px)'                         ,
+      'gt-xs'     : '(min-width: 600px)'                         ,
+      'sm'        : '(min-width: 600px) and (max-width: 959px)'  ,
+      'gt-sm'     : '(min-width: 960px)'                         ,
+      'md'        : '(min-width: 960px) and (max-width: 1279px)' ,
+      'gt-md'     : '(min-width: 1280px)'                        ,
+      'lg'        : '(min-width: 1280px) and (max-width: 1919px)',
+      'gt-lg'     : '(min-width: 1920px)'                        ,
+      'xl'        : '(min-width: 1920px)'                        ,
+      'landscape' : '(orientation: landscape)'                   ,
+      'portrait'  : '(orientation: portrait)'                    ,
+      'print' : 'print'
+    };
+
+    var MEDIA_PRIORITY = [
+      'xl',
+      'gt-lg',
+      'lg',
+      'gt-md',
+      'md',
+      'gt-sm',
+      'sm',
+      'gt-xs',
+      'xs',
+      'landscape',
+      'portrait',
+      'print'
+    ];
+    
+    var queries = {};
+    var mqls = {};
+    var results = {};
+    var normalizeCache = {};
+
+    $mdMedia.getResponsiveAttribute = getResponsiveAttribute;
+    $mdMedia.getQuery = getQuery;
+    $mdMedia.watchResponsiveAttributes = watchResponsiveAttributes;
+
+    return $mdMedia;
+
+    function $mdMedia(query) {
+        var validated = queries[query];
+        if (angular.isUndefined(validated)) {
+            validated = queries[query] = validate(query);
+        }
+
+        var result = results[validated];
+        if (angular.isUndefined(result)) {
+            result = add(validated);
+        }
+
+        return result;
+    }
+
+    function validate(query) {
+        return MEDIA[query] ||
+        ((query.charAt(0) !== '(') ? ('(' + query + ')') : query);
+    }
+
+    function add(query) {
+        var result = mqls[query];
+        if (!result) {
+            result = mqls[query] = $window.matchMedia(query);
+        }
+
+        result.addListener(onQueryChange);
+        return (results[result.media] = !!result.matches);
+    }
+
+    function onQueryChange(query) {
+        $rootScope.$evalAsync(function() {
+            results[query.media] = !!query.matches;
+        });
+    }
+
+    function getQuery(name) {
+        return mqls[name];
+    }
+
+    function getResponsiveAttribute(attrs, attrName) {
+        for (var i = 0; i < MEDIA_PRIORITY.length; i++) {
+            var mediaName = MEDIA_PRIORITY[i];
+            if (!mqls[queries[mediaName]].matches) {
+                continue;
+            }
+
+            var normalizedName = getNormalizedName(attrs, attrName + '-' + mediaName);
+            if (attrs[normalizedName]) {
+                return attrs[normalizedName];
+            }
+        }
+
+        // fallback on unprefixed
+        return attrs[getNormalizedName(attrs, attrName)];
+    }
+
+    function watchResponsiveAttributes(attrNames, attrs, watchFn) {
+        var unwatchFns = [];
+        attrNames.forEach(function(attrName) {
+            var normalizedName = getNormalizedName(attrs, attrName);
+            if (angular.isDefined(attrs[normalizedName])) {
+                unwatchFns.push(
+                        attrs.$observe(normalizedName, angular.bind(void 0, watchFn, null)));
+            }
+
+            for (var mediaName in MEDIA) {
+                normalizedName = getNormalizedName(attrs, attrName + '-' + mediaName);
+                if (angular.isDefined(attrs[normalizedName])) {
+                    unwatchFns.push(
+                            attrs.$observe(normalizedName, angular.bind(void 0, watchFn, mediaName)));
+                }
+            }
+        });
+
+        return function unwatch() {
+            unwatchFns.forEach(function(fn) { fn(); });
+        };
+    }
+
+    // Improves performance dramatically
+    function getNormalizedName(attrs, attrName) {
+        return normalizeCache[attrName] ||
+        (normalizeCache[attrName] = attrs.$normalize(attrName));
+    }
+});
 /* 
  * The MIT License (MIT)
  * 
@@ -1466,460 +1487,263 @@ angular.module('am-wb-core')
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+//
+//angular.module('am-wb-core')
+//.factory('NativeWindowWrapper', function($q, $injector, $rootScope) {
+//	
+//
+//	/**
+//	 * @ngdoc Factory
+//	 * @name WbDialogWindow
+//	 * @description WbDialogWindow a dialog manager
+//	 * 
+//	 */
+//	var nativeWindowWrapper = function(nativeWindow){
+//		this.nw = nativeWindow;
+//		this.location = nativeWindow.location;
+//		this.libs = {};
+//		this.styles = {};
+//	};
+//
+//
+//	/********************************************************************
+//	 * Utilitiey
+//	 ********************************************************************/
+//	var WbDialogWindow;
+//
+//
+//	/*
+//	 * Open a float based on options
+//	 */
+//	function openFloatPanel(parent, options) {
+//		if(!WbDialogWindow){
+//			WbDialogWindow = $injector.get('WbDialogWindow');
+//		}
+//
+//		var window = new WbDialogWindow(parent);
+//		window.setTitle(options.name);
+//		window.setLanguage(options.language);
+//		if(options.position){
+//			window.setPosition(options.position.x, options.position.y);
+//		}
+//		window.setCloseOnEscape(options.closeOnEscape);
+//		if(angular.isDefined(options.showTitle)) {
+//			window.setTitleVisible(options.showTitle);
+//		}
+//		if(angular.isDefined(options.size)) {
+//			var size = options.size;
+//			window.setWidth(size.width);
+//			window.setHeight(size.height);
+//		}
+//		if(angular.isDefined(options.showTitle)){
+//			window.setTitleVisible(options.showTitle);
+//		}
+//		window.setVisible(true);
+//
+//		if(angular.isString(options.url)){
+//			// Open URL
+//			window.write('<iframe style="width:100%; height: 100%;" src="'+options.url+'"></iframe>');
+//		} else if(angular.isObject(options.url)){
+//			var view = options.url;
+//			if(view.type === 'view'){
+//				window.setView(view);
+//			}
+//		} else {
+//			throw {
+//				message: 'Not supported type of URL',
+//				url: options.url
+//			};
+//		}
+//
+//
+//		return window;
+//	}
+//
+//	/*
+//	 * Convert to window option
+//	 */
+//	function convertToWindowOption(/*options*/) {
+//		return '';
+//	}
+//
+//	/*
+//	 * Open window based on options
+//	 */
+//	function openWindow(window, options) {
+//		// check input url
+//		if(!angular.isString(options.url)){
+//			throw {
+//				message: 'Impossible to open window with weburger'
+//			};
+//		}
+//		var windowNative = window.open(
+//				options.url, 
+//				options.name, 
+//				convertToWindowOption(options), 
+//				options.replace);
+//		return new nativeWindowWrapper(windowNative);
+//	}
+//
+//	/********************************************************************
+//	 * 
+//	 ********************************************************************/
+//	/**
+//	 * Gets parent of the window
+//	 * 
+//	 * @memberof NativeWindowWrapper
+//	 * @return parent
+//	 */
+//	nativeWindowWrapper.prototype.getParent = function(){
+//		return this.nw.parent;
+//	};
+//
+//	nativeWindowWrapper.prototype.getDocument = function(){
+//		return this.nw.document;
+//	};
+//
+//	nativeWindowWrapper.prototype.getHeadElement = function(){
+//		if(this._he) {
+//			return this._he;
+//		}
+//		var document = this.getDocument();
+//		this._he = angular.element(document.getElementsByTagName('head')[0]);
+//		return this._he;
+//	};
+//
+//	nativeWindowWrapper.prototype.getBodyElement = function(){
+//		if(this._be) {
+//			return this._be;
+//		}
+//		var document = this.getDocument();
+//		this._be = angular.element(document.getElementsByTagName('body')[0]);
+//		return this._be;
+//	};
+//
+//	nativeWindowWrapper.prototype.getLocation = function(){
+//		return this.nw.location;
+//	};
+//
+//	/**
+//	 * Sets title of the window
+//	 * 
+//	 * @memberof NativeWindowWrapper
+//	 * @params title {string} the window title
+//	 */
+//	nativeWindowWrapper.prototype.setTitle = function(title){
+//		var document = this.getDocument();
+//		document.title = title;
+//	};
+//
+//	/**
+//	 * Sets title of the window
+//	 * 
+//	 * @memberof NativeWindowWrapper
+//	 * @return {string} the window title
+//	 */
+//	nativeWindowWrapper.prototype.getTitle = function(){
+//		var document = this.getDocument();
+//		return document.title;
+//	};
+//
+//
+//	/**
+//	 * Sets language of the window
+//	 * 
+//	 */
+//	nativeWindowWrapper.prototype.setLanguage = function(language){
+//		var bodyElement = this.getBodyElement();
+//		bodyElement.attr('lang', language);
+//	};
+//
+//	/**
+//	 * Gets language of the window
+//	 * 
+//	 */
+//	nativeWindowWrapper.prototype.getLanguage = function(){
+//		var bodyElement = this.getBodyElement();
+//		return bodyElement.attr('lang');
+//	};
+//
+//
+//	/**
+//	 * 
+//	 * The open() method opens a new browser window, or a new tab, depending 
+//	 * on your browser settings.
+//	 * 
+//	 * Tip: Use the close() method to close the window.
+//	 * 
+//	 * @memberof NativeWindowWrapper
+//	 * @return window object
+//	 */
+//	nativeWindowWrapper.prototype.open = function(url, name, options, replace){
+//		// check options
+//		options = options || {
+//			internal: false
+//		};
+//		options.url = url;
+//		options.name = name;
+//		options.replace = replace;
+//		//open
+//		if(options.internal){
+//			return openFloatPanel(this, options);
+//		}
+//		return openWindow(this.nw, options);
+//	};
+//
+//	/**
+//	 * Close current window
+//	 * 
+//	 * @memberof NativeWindowWrapper
+//	 */
+//	nativeWindowWrapper.prototype.close = function(){
+//		this.nw.close();
+//		// TODO: maso, 2019: remove all resources
+//	};
 
-angular.module('am-wb-core')
-.factory('NativeWindowWrapper', function($q, $injector, $rootScope) {
-	
-
-	/**
-	 * @ngdoc Factory
-	 * @name WbDialogWindow
-	 * @description WbDialogWindow a dialog manager
-	 * 
-	 */
-	var nativeWindowWrapper = function(nativeWindow){
-		this.nw = nativeWindow;
-		this.location = nativeWindow.location;
-		this.libs = {};
-		this.styles = {};
-	};
-
-
-	/********************************************************************
-	 * Utilitiey
-	 ********************************************************************/
-	var WbDialogWindow;
-
-
-	/*
-	 * Open a float based on options
-	 */
-	function openFloatPanel(parent, options) {
-		if(!WbDialogWindow){
-			WbDialogWindow = $injector.get('WbDialogWindow');
-		}
-
-		var window = new WbDialogWindow(parent);
-		window.setTitle(options.name);
-		window.setLanguage(options.language);
-		if(options.position){
-			window.setPosition(options.position.x, options.position.y);
-		}
-		window.setCloseOnEscape(options.closeOnEscape);
-		if(angular.isDefined(options.showTitle)) {
-			window.setTitleVisible(options.showTitle);
-		}
-		if(angular.isDefined(options.size)) {
-			var size = options.size;
-			window.setWidth(size.width);
-			window.setHeight(size.height);
-		}
-		if(angular.isDefined(options.showTitle)){
-			window.setTitleVisible(options.showTitle);
-		}
-		window.setVisible(true);
-
-		if(angular.isString(options.url)){
-			// Open URL
-			window.write('<iframe style="width:100%; height: 100%;" src="'+options.url+'"></iframe>');
-		} else if(angular.isObject(options.url)){
-			var view = options.url;
-			if(view.type === 'view'){
-				window.setView(view);
-			}
-		} else {
-			throw {
-				message: 'Not supported type of URL',
-				url: options.url
-			};
-		}
-
-
-		return window;
-	}
-
-	/*
-	 * Convert to window option
-	 */
-	function convertToWindowOption(/*options*/) {
-		return '';
-	}
-
-	/*
-	 * Open window based on options
-	 */
-	function openWindow(window, options) {
-		// check input url
-		if(!angular.isString(options.url)){
-			throw {
-				message: 'Impossible to open window with weburger'
-			};
-		}
-		var windowNative = window.open(
-				options.url, 
-				options.name, 
-				convertToWindowOption(options), 
-				options.replace);
-		return new nativeWindowWrapper(windowNative);
-	}
-
-	/********************************************************************
-	 * 
-	 ********************************************************************/
-	/**
-	 * Gets parent of the window
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @return parent
-	 */
-	nativeWindowWrapper.prototype.getParent = function(){
-		return this.nw.parent;
-	};
-
-	nativeWindowWrapper.prototype.getDocument = function(){
-		return this.nw.document;
-	};
-
-	nativeWindowWrapper.prototype.getHeadElement = function(){
-		if(this._he) {
-			return this._he;
-		}
-		var document = this.getDocument();
-		this._he = angular.element(document.getElementsByTagName('head')[0]);
-		return this._he;
-	};
-
-	nativeWindowWrapper.prototype.getBodyElement = function(){
-		if(this._be) {
-			return this._be;
-		}
-		var document = this.getDocument();
-		this._be = angular.element(document.getElementsByTagName('body')[0]);
-		return this._be;
-	};
-
-	nativeWindowWrapper.prototype.getLocation = function(){
-		return this.nw.location;
-	};
-
-	/**
-	 * Sets title of the window
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @params title {string} the window title
-	 */
-	nativeWindowWrapper.prototype.setTitle = function(title){
-		var document = this.getDocument();
-		document.title = title;
-	};
-
-	/**
-	 * Sets title of the window
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @return {string} the window title
-	 */
-	nativeWindowWrapper.prototype.getTitle = function(){
-		var document = this.getDocument();
-		return document.title;
-	};
-
-
-	/**
-	 * Sets language of the window
-	 * 
-	 */
-	nativeWindowWrapper.prototype.setLanguage = function(language){
-		var bodyElement = this.getBodyElement();
-		bodyElement.attr('lang', language);
-	};
-
-	/**
-	 * Gets language of the window
-	 * 
-	 */
-	nativeWindowWrapper.prototype.getLanguage = function(){
-		var bodyElement = this.getBodyElement();
-		return bodyElement.attr('lang');
-	};
-
-
-	/**
-	 * 
-	 * The open() method opens a new browser window, or a new tab, depending 
-	 * on your browser settings.
-	 * 
-	 * Tip: Use the close() method to close the window.
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @return window object
-	 */
-	nativeWindowWrapper.prototype.open = function(url, name, options, replace){
-		// check options
-		options = options || {
-			internal: false
-		};
-		options.url = url;
-		options.name = name;
-		options.replace = replace;
-		//open
-		if(options.internal){
-			return openFloatPanel(this, options);
-		}
-		return openWindow(this.nw, options);
-	};
-
-	/**
-	 * Close current window
-	 * 
-	 * @memberof NativeWindowWrapper
-	 */
-	nativeWindowWrapper.prototype.close = function(){
-		this.nw.close();
-		// TODO: maso, 2019: remove all resources
-	};
-
-
-	/**
-	 * Loads a library
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @path path of library
-	 * @return promise to load the library
-	 */
-	nativeWindowWrapper.prototype.loadLibrary = function(path){
-		if(this.libs[path]){
-			return $q.resolve({
-				message: 'isload'
-			});
-		}
-		var defer = $q.defer();
-
-		var document = this.getDocument();
-		var script = document.createElement('script');
-		script.src = path;
-		script.async=1;
-		var ctrl = this;
-		script.onload = function(){
-			ctrl.libs[path] = true;
-			defer.resolve({
-				path: path,
-				message: 'loaded'
-			});
-			if (!$rootScope.$$phase) {
-				$rootScope.$digest();
-			}
-		};
-		script.onerror = function() {
-			ctrl.libs[path] = false;
-			defer.reject({
-				path: path,
-				message: 'fail'
-			});
-			if (!$rootScope.$$phase) {
-				$rootScope.$digest();
-			}
-		};
-		document.getElementsByTagName('head')[0].appendChild(script);
-		return defer.promise;
-	};
-
-	nativeWindowWrapper.prototype.removeLibrary = function(path){
-		return $q.resolve({
-			source: path
-		});
-	};
-
-	/**
-	 * Check if the library is loaded
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @return true if the library is loaded
-	 */
-	nativeWindowWrapper.prototype.isLibraryLoaded = function(path){
-		if(this.libs[path]){
-			return true;
-		}
-		return false;
-	};
-
-	/**
-	 * Loads a style
-	 * 
-	 * loads css 
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @path path of library
-	 * @return promise to load the library
-	 */
-	nativeWindowWrapper.prototype.loadStyle = function(path){
-		if(this.styles[path]){
-			return $q.resolve(this.styles[path]);
-		}
-		var defer = $q.defer();
-
-		var document = this.getDocument();
-		var style = document.createElement('link');
-		style.setAttribute('rel', 'stylesheet');
-		style.setAttribute('type', 'text/css');
-		style.setAttribute('href', path);
-		var ctrl = this;
-		style.onload = function(){
-			ctrl.styles[path] = {
-					element: style,
-					path: path
-			};
-			defer.resolve(ctrl.styles[path]);
-			if (!$rootScope.$$phase) {
-				$rootScope.$digest();
-			}
-		};
-		style.onerror = function() {
-			ctrl.styles[path] = undefined;
-			defer.reject({
-				path: path,
-				message: 'fail'
-			});
-			if (!$rootScope.$$phase) {
-				$rootScope.$digest();
-			}
-		};
-		document.getElementsByTagName('head')[0].appendChild(style);
-		ctrl.styles[path] = defer.promise;
-		return ctrl.styles[path];
-	};
-
-	nativeWindowWrapper.prototype.removeStyle = function(path){
-		if(!this.isStyleLoaded(path)){
-			return $q.resolve({});
-		}
-		var item = this.styles[path];
-		item.element.parentNode.removeChild(item.element);
-		this.styles[path] = undefined;
-		$q.resolve(item);
-	};
-
-	/**
-	 * Check if the style is loaded
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @return true if the library is loaded
-	 */
-	nativeWindowWrapper.prototype.isStyleLoaded = function(path){
-		if(this.styles[path]){
-			return true;
-		}
-		return false;
-	};
-
-
-	/**
-	 * Set meta
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @params key {string} the key of meta
-	 * @params value {string} the value of meta
-	 */
-	nativeWindowWrapper.prototype.setMeta = function (key, value){
-		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
-		var headElement = this.getHeadElement();
-		var elements = headElement.find('meta[name='+searchkey+']');
-		// remove element
-		if(_.isUndefined(value)){
-			if(elements.length){
-				elements.remove();
-			}
-			return;
-		}
-		// update element
-		var metaElement;
-		if(elements.length === 0){
-			// title element not found
-			metaElement = angular.element('<meta name=\''+key+'\' content=\'\' />');
-			headElement.append(metaElement);
-		} else {
-			metaElement = angular.element(elements[0]);
-		}
-		metaElement.attr('content', value) ;
-	};
-	
-	nativeWindowWrapper.prototype.getMeta = function (key){
-		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
-		var headElement = this.getHeadElement();
-		var elements = headElement.find('meta[name='+searchkey+']');
-		if(elements.length === 0){
-			return;
-		}
-		return elements.attr('content') ;
-	};
-
-	/**
-	 * Set link
-	 * 
-	 * @memberof NativeWindowWrapper
-	 * @params key {string} the key of meta
-	 * @params data {string} the value of meta
-	 */
-	nativeWindowWrapper.prototype.setLink = function(key, data){
-		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
-		var headElement = this.getHeadElement();
-		var elements = headElement.find('link[key='+searchkey+']');
-		var metaElement;
-		if(elements.length === 0){
-			// title element not found
-			metaElement = angular.element('<link key=\''+key+'\' />');
-			headElement.append(metaElement);
-		} else {
-			metaElement = angular.element(elements[0]);
-		}
-		for (var property in data) {
-			metaElement.attr(property, data[property]);
-		}
-	};
-
-
-	nativeWindowWrapper.prototype.setWidth = function(width){
-		this.resizeTo(width, this.getHeight());
-	};
-
-	nativeWindowWrapper.prototype.getWidth = function(){
-		return this.nw.innerWidth;
-	};
-
-	nativeWindowWrapper.prototype.setHeight = function(height){
-		this.resizeTo(this.getWidth(), height);
-	};
-
-	nativeWindowWrapper.prototype.getHeight = function(){
-		return this.nw.innerHeight;
-	};
-
-	nativeWindowWrapper.prototype.resizeTo = function(width, height) {
-		this.nw.resizeTo(width, height);
-	};
-
-	/**
-	 * Sets position of the window
-	 */
-	nativeWindowWrapper.prototype.setPosition = function(x, y) {
-		this.x = x;
-		this.y = y;
-		// TODO: maso, 2019: set position of the window
-	};
-
-	/**
-	 * Gets current position of the window
-	 */
-	nativeWindowWrapper.prototype.getPosition = function() {
-		return {
-			x: this.x,
-			y: this.y
-		};
-		// TODO: maso, 2019: set position of the window
-	};
-
-	return nativeWindowWrapper;
-});
+//
+//
+//	nativeWindowWrapper.prototype.setWidth = function(width){
+//		this.resizeTo(width, this.getHeight());
+//	};
+//
+//	nativeWindowWrapper.prototype.getWidth = function(){
+//		return this.nw.innerWidth;
+//	};
+//
+//	nativeWindowWrapper.prototype.setHeight = function(height){
+//		this.resizeTo(this.getWidth(), height);
+//	};
+//
+//	nativeWindowWrapper.prototype.getHeight = function(){
+//		return this.nw.innerHeight;
+//	};
+//
+//	nativeWindowWrapper.prototype.resizeTo = function(width, height) {
+//		this.nw.resizeTo(width, height);
+//	};
+//
+//	/**
+//	 * Sets position of the window
+//	 */
+//	nativeWindowWrapper.prototype.setPosition = function(x, y) {
+//		this.x = x;
+//		this.y = y;
+//		// TODO: maso, 2019: set position of the window
+//	};
+//
+//	/**
+//	 * Gets current position of the window
+//	 */
+//	nativeWindowWrapper.prototype.getPosition = function() {
+//		return {
+//			x: this.x,
+//			y: this.y
+//		};
+//		// TODO: maso, 2019: set position of the window
+//	};
+//
+//	return nativeWindowWrapper;
+//});
 
 /*
  * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
@@ -2390,6 +2214,209 @@ angular.module('am-wb-core')//
     return Processor;
 });
 
+
+angular.module('am-wb-core') //
+
+.run(function($window, $q, $rootScope){
+
+	var libs = {};
+	var styles = {};
+
+	/**
+	 * Loads a library
+	 * 
+	 * @memberof NativeWindowWrapper
+	 * @path path of library
+	 * @return promise to load the library
+	 */
+	$window.loadLibrary = function(path){
+		if(libs[path]){
+			return $q.resolve({
+				message: 'isload'
+			});
+		}
+		var defer = $q.defer();
+
+//		var document = this.getDocument();
+		var script = document.createElement('script');
+		script.src = path;
+		script.async=1;
+		script.onload = function(){
+			libs[path] = true;
+			defer.resolve({
+				path: path,
+				message: 'loaded'
+			});
+			if (!$rootScope.$$phase) {
+				$rootScope.$digest();
+			}
+		};
+		script.onerror = function() {
+			libs[path] = false;
+			defer.reject({
+				path: path,
+				message: 'fail'
+			});
+			if (!$rootScope.$$phase) {
+				$rootScope.$digest();
+			}
+		};
+		document.getElementsByTagName('head')[0].appendChild(script);
+		return defer.promise;
+	};
+
+	$window.removeLibrary = function(path){
+		return $q.resolve({
+			source: path
+		});
+	};
+
+	/**
+	 * Check if the library is loaded
+	 * 
+	 * @memberof NativeWindowWrapper
+	 * @return true if the library is loaded
+	 */
+	$window.isLibraryLoaded = function(path){
+		if(libs[path]){
+			return true;
+		}
+		return false;
+	};
+
+	/**
+	 * Loads a style
+	 * 
+	 * loads css 
+	 * 
+	 * @memberof NativeWindowWrapper
+	 * @path path of library
+	 * @return promise to load the library
+	 */
+	$window.loadStyle = function(path){
+		if(styles[path]){
+			return $q.resolve(styles[path]);
+		}
+		var defer = $q.defer();
+
+//		var document = this.getDocument();
+		var style = document.createElement('link');
+		style.setAttribute('rel', 'stylesheet');
+		style.setAttribute('type', 'text/css');
+		style.setAttribute('href', path);
+		style.onload = function(){
+			styles[path] = {
+					element: style,
+					path: path
+			};
+			defer.resolve(styles[path]);
+			if (!$rootScope.$$phase) {
+				$rootScope.$digest();
+			}
+		};
+		style.onerror = function() {
+			styles[path] = undefined;
+			defer.reject({
+				path: path,
+				message: 'fail'
+			});
+			if (!$rootScope.$$phase) {
+				$rootScope.$digest();
+			}
+		};
+		document.getElementsByTagName('head')[0].appendChild(style);
+		styles[path] = defer.promise;
+		return styles[path];
+	};
+
+	$window.removeStyle = function(path){
+		if(!this.isStyleLoaded(path)){
+			return $q.resolve({});
+		}
+		var item = styles[path];
+		item.element.parentNode.removeChild(item.element);
+		styles[path] = undefined;
+		$q.resolve(item);
+	};
+
+	/**
+	 * Check if the style is loaded
+	 * 
+	 * @memberof NativeWindowWrapper
+	 * @return true if the library is loaded
+	 */
+	$window.isStyleLoaded = function(path){
+		if(styles[path]){
+			return true;
+		}
+		return false;
+	};
+
+
+	/**
+	 * Set meta
+	 * 
+	 * @memberof NativeWindowWrapper
+	 * @params key {string} the key of meta
+	 * @params value {string} the value of meta
+	 */
+	$window.setMeta = function (key, value){
+		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
+		var headElement = this.getHeadElement();
+		var elements = headElement.find('meta[name='+searchkey+']');
+		// remove element
+		if(_.isUndefined(value)){
+			if(elements.length){
+				elements.remove();
+			}
+			return;
+		}
+		// update element
+		var metaElement;
+		if(elements.length === 0){
+			// title element not found
+			metaElement = angular.element('<meta name=\''+key+'\' content=\'\' />');
+			headElement.append(metaElement);
+		} else {
+			metaElement = angular.element(elements[0]);
+		}
+		metaElement.attr('content', value) ;
+	};
+	
+	$window.getMeta = function (key){
+		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
+		var headElement = this.getHeadElement();
+		var elements = headElement.find('meta[name='+searchkey+']');
+		if(elements.length === 0){
+			return;
+		}
+		return elements.attr('content') ;
+	};
+
+	/**
+	 * Set link
+	 * 
+	 * @memberof NativeWindowWrapper
+	 * @params key {string} the key of meta
+	 * @params data {string} the value of meta
+	 */
+	$window.setLink = function(key, data){
+		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
+		var headElement = this.getHeadElement();
+		var elements = headElement.find('link[key='+searchkey+']');
+		var metaElement;
+		if(elements.length === 0){
+			// title element not found
+			metaElement = angular.element('<link key=\''+key+'\' />');
+			headElement.append(metaElement);
+		} else {
+			metaElement = angular.element(elements[0]);
+		}
+		for (var property in data) {
+			metaElement.attr(property, data[property]);
+		}
+	};
+});
 /* 
 
  * The MIT License (MIT)
@@ -2430,17 +2457,50 @@ angular.module('am-wb-core')
  * Providers
  ***********************************************************************/
 .run(function (
-		/* angularjs */ $location, $http, $timeout,
-		/* WB        */ $widget, $wbMedia, $wbWindow, $wbStorage, $wbDispatcher) {
+		/* angularjs */ $anchorScroll, $animate, $cacheFactory,
+		$document, $exceptionHandler, $filter, $http, $httpParamSerializer,
+		$httpParamSerializerJQLike, $interpolate, $interval, $locale, $location, 
+		$log, $parse, $q, $rootElement, $sce, $templateCache, $templateRequest,
+		$timeout, $window,
+		/* WB        */ $widget, $wbMedia, $wbStorage, $wbDispatcher) {
 	$widget//
 	
+	
+	
+	
 	// AngularJS
+	.setProvider('$anchorScroll', $anchorScroll)
+	.setProvider('$animate', $animate)
+//	.setProvider('$animateCss', $animateCss)
+	.setProvider('$cacheFactory', $cacheFactory)
+//	.setProvider('$compile', $window)
+//	.setProvider('$controller', $window)
+	.setProvider('$document', $document)
+	.setProvider('$exceptionHandler', $exceptionHandler)
+	.setProvider('$filter', $filter)
 	.setProvider('$http', $http)
+//	.setProvider('$httpBackend', $window)
+	.setProvider('$httpParamSerializer', $httpParamSerializer)
+	.setProvider('$httpParamSerializerJQLike', $httpParamSerializerJQLike)
+	.setProvider('$interpolate', $interpolate)
+	.setProvider('$interval', $interval)
+//	.setProvider('$jsonpCallbacks', $window)
+	.setProvider('$locale', $locale)
 	.setProvider('$location', $location)
+	.setProvider('$log', $log)
+	.setProvider('$parse', $parse)
+	.setProvider('$q', $q)
+	.setProvider('$rootElement', $rootElement)
+//	.setProvider('$rootScope', $window)
+	.setProvider('$sce', $sce)
+//	.setProvider('$sceDelegate', $window)
+	.setProvider('$templateCache', $templateCache)
+	.setProvider('$templateRequest', $templateRequest)
 	.setProvider('$timeout', $timeout)
+	.setProvider('$window', $window)
+//	.setProvider('$xhrFactory', $window)
 
 	// wb-core
-	.setProvider('$window', $wbWindow)
 	.setProvider('$dispatcher', $wbDispatcher)
 	.setProvider('$storage', $wbStorage)
 	.setProvider('$media', $wbMedia);
@@ -3393,23 +3453,328 @@ angular.module('am-wb-core')
 .service('$dispatcher', WbDispatcher)
 .service('$wbDispatcher', WbDispatcher);
 
-
-angular.module('am-wb-core') //
+/*
+ * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 /**
- * @ngdoc Services
- * @name $dispatcher
- * @description a wrapper of FLUX
+ * @ngdoc Service
+ * @name $ObjectPath
  * 
- * 
- * Dispatcher is used to broadcast payloads to registered callbacks. This is
- * different from generic pub-sub systems in two ways: - Callbacks are not
- * subscribed to particular events. Every payload is dispatched to every
- * registered callback. - Callbacks can be deferred in whole or part until other
- * callbacks have been executed.
- * 
+ * Utility to access object properties
  */
-.service('$wbMedia', function() {});
+angular.module('am-wb-core').service('$objectPath', function(){
+	var _hasOwnProperty = Object.prototype.hasOwnProperty;
+	var options = {
+//			includeInheritedProps: false,
+	};
+
+	function getKey(key){
+		var intKey = parseInt(key);
+		if (intKey.toString() === key) {
+			return intKey;
+		}
+		return key;
+	}
+
+
+	function getShallowProperty(obj, prop) {
+		if(options.includeInheritedProps || (typeof prop === 'number' && _.isArray(obj)) || obj.hasOwnProperty(prop)) {
+			return obj[prop];
+		}
+	}
+
+	function set(obj, path, value, doNotReplace){
+		if (typeof path === 'number') {
+			path = [path];
+		}
+		if (!path || path.length === 0) {
+			return obj;
+		}
+		if (typeof path === 'string') {
+			return set(obj, path.split('.').map(getKey), value, doNotReplace);
+		}
+		var currentPath = path[0];
+		var currentValue = getShallowProperty(obj, currentPath);
+		if (path.length === 1) {
+			if (currentValue === void 0 || !doNotReplace) {
+				obj[currentPath] = value;
+			}
+			return currentValue;
+		}
+
+		if (currentValue === void 0) {
+			//check if we assume an array
+			if(typeof path[1] === 'number') {
+				obj[currentPath] = [];
+			} else {
+				obj[currentPath] = {};
+			}
+		}
+
+		return set(obj[currentPath], path.slice(1), value, doNotReplace);
+	}
+
+	/**
+	 * @name has
+	 * @memberof $ObjectPath
+	 */
+	this.has = function (obj, path) {
+		if (obj == null) {
+			return false;
+		}
+
+		if (typeof path === 'number') {
+			path = [path];
+		} else if (typeof path === 'string') {
+			path = path.split('.');
+		}
+
+		if (!path || path.length === 0) {
+			return false;
+		}
+
+		for (var i = 0; i < path.length; i++) {
+			var j = getKey(path[i]);
+			if((typeof j === 'number' && _.isArray(obj) && j < obj.length) ||
+					(options.includeInheritedProps ? (j in Object(obj)) : _hasOwnProperty.call(obj, j))) {
+				obj = obj[j];
+			} else {
+				return false;
+			}
+		}
+
+		return true;
+	};
+
+	/**
+	 * @name ensureExists
+	 * @memberof $ObjectPath
+	 */
+	this.ensureExists = function (obj, path, value){
+		return set(obj, path, value, true);
+	};
+
+	/**
+	 * @name set
+	 * @memberof $ObjectPath
+	 */
+	this.set = function (obj, path, value, doNotReplace){
+		return set(obj, path, value, doNotReplace);
+	};
+
+	/**
+	 * @name insert
+	 * @memberof $ObjectPath
+	 */
+	this.insert = function (obj, path, value, at){
+		var arr = this.get(obj, path);
+		at = ~~at;
+		if (!_.isArray(arr)) {
+			arr = [];
+			this.set(obj, path, arr);
+		}
+		arr.splice(at, 0, value);
+	};
+
+
+	/**
+	 * @name haemptys
+	 * @memberof $ObjectPath
+	 * 
+	 * empty a given path (but do not delete it) depending on their type,so it
+	 * retains reference to objects and arrays.
+	 * 
+	 * functions that are not inherited from prototype are set to null.
+	 * 
+	 * object instances are considered objects and just own property names are
+	 * deleted
+	 */
+	this.empty = function(obj, path) {
+		if (_.isEmpty(path)) {
+			return void 0;
+		}
+		if (obj == null) {
+			return void 0;
+		}
+
+		var value, i;
+		if (!(value = this.get(obj, path))) {
+			return void 0;
+		}
+
+		if (typeof value === 'string') {
+			return this.set(obj, path, '');
+		} else if (_.isBoolean(value)) {
+			return this.set(obj, path, false);
+		} else if (typeof value === 'number') {
+			return this.set(obj, path, 0);
+		} else if (_.isArray(value)) {
+			value.length = 0;
+		} else if (_.isObject(value)) {
+			for (i in value) {
+				if (_hasOwnProperty.call(value, i)) {
+					delete value[i];
+				}
+			}
+		} else {
+			return this.set(obj, path, null);
+		}
+	};
+
+
+	/**
+	 * @name push
+	 * @memberof $ObjectPath
+	 * 
+	 * example:
+	 * 
+	 * $ObjectPath.push(obj, 'a.b', 'a', 'b', 'c', 'd');
+	 */
+	this.push = function (obj, path /*, values */){
+		var arr = this.get(obj, path);
+		if (!_.isArray(arr)) {
+			arr = [];
+			this.set(obj, path, arr);
+		}
+
+		arr.push.apply(arr, Array.prototype.slice.call(arguments, 2));
+	};
+
+	/**
+	 * @name coalesce
+	 * @memberof $ObjectPath
+	 * 
+	 * get the first non-undefined value
+	 * 
+	 * objectPath.coalesce(obj, ['a.z', 'a.d'], 'default');
+	 */
+	this.coalesce = function (obj, paths, defaultValue) {
+		var value;
+
+		for (var i = 0, len = paths.length; i < len; i++) {
+			if ((value = this.get(obj, paths[i])) !== void 0) {
+				return value;
+			}
+		}
+
+		return defaultValue;
+	};
+
+
+	/**
+	 * @name get
+	 * @memberof $ObjectPath
+	 * 
+	 * get deep property
+	 * 
+	 * objectPath.get(obj, "a.b");  //returns "d"
+	 * objectPath.get(obj, ["a", "dot.dot"]);  //returns "key"
+	 * objectPath.get(obj, 'a.\u1200');  //returns "unicode key"
+	 */
+	this.get = function (obj, path, defaultValue){
+		if (typeof path === 'number') {
+			path = [path];
+		}
+		if (!path || path.length === 0) {
+			return obj;
+		}
+		if (obj == null) {
+			return defaultValue;
+		}
+		if (typeof path === 'string') {
+			return this.get(obj, path.split('.'), defaultValue);
+		}
+
+		var currentPath = getKey(path[0]);
+		var nextObj = getShallowProperty(obj, currentPath);
+		if (nextObj === void 0) {
+			return defaultValue;
+		}
+
+		if (path.length === 1) {
+			return nextObj;
+		}
+
+		return this.get(obj[currentPath], path.slice(1), defaultValue);
+	};
+
+	/**
+	 * @name del
+	 * @memberof $ObjectPath
+	 */
+	this.del = function del(obj, path) {
+		if (typeof path === 'number') {
+			path = [path];
+		}
+
+		if (obj == null) {
+			return obj;
+		}
+
+		if (_.isEmpty(path)) {
+			return obj;
+		}
+		if(typeof path === 'string') {
+			return this.del(obj, path.split('.'));
+		}
+
+		var currentPath = getKey(path[0]);
+		var currentVal = getShallowProperty(obj, currentPath);
+		if(currentVal == null) {
+			return currentVal;
+		}
+
+		if(path.length === 1) {
+			if (_.isArray(obj)) {
+				obj.splice(currentPath, 1);
+			} else {
+				delete obj[currentPath];
+			}
+		} else {
+			if (obj[currentPath] !== void 0) {
+				return this.del(obj[currentPath], path.slice(1));
+			}
+		}
+
+		return obj;
+	};
+
+	//
+//		var objectPath = function(obj) {
+//			return Object.keys(objectPath).reduce(function(proxy, prop) {
+//				if(prop === 'create') {
+//					return proxy;
+//				}
+	//
+//				/*istanbul ignore else*/
+//				if (typeof objectPath[prop] === 'function') {
+//					proxy[prop] = objectPath[prop].bind(objectPath, obj);
+//				}
+	//
+//				return proxy;
+//			}, {});
+//		};
+
+});
 
 angular.module('am-wb-core') //
 
@@ -4371,43 +4736,6 @@ angular.module('am-wb-core')
  * SOFTWARE.
  */
 
-angular.module('am-wb-core')
-/**
- * @ngdoc Services
- * @name $wbWindow
- * @description The main window manager
- * 
- */
-.service('$wbWindow', function($window, NativeWindowWrapper) {
-    
-    var currentWindow = new NativeWindowWrapper($window);
-    return currentWindow;
-});
-
-/* 
- * The MIT License (MIT)
- * 
- * Copyright (c) 2016 weburger
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 
 
 //submit the controller
@@ -4460,7 +4788,7 @@ angular.module('am-wb-core')//
  * <li>widgetSelected</li>
  * </ul>
  */
-.factory('WbWidgetAbstract', function($widget, $wbWindow, $objectPath){
+.factory('WbWidgetAbstract', function($widget, $window, $objectPath){
 
     function debounce(func, wait) {
         var timeout;
@@ -5497,7 +5825,7 @@ angular.module('am-wb-core')//
      * @return window of the current widget or from the root
      */
     WbWidgetAbstract.prototype.getWindow = function () {
-        return this.window || this.getRoot().getWindow() || $wbWindow;
+        return this.window || this.getRoot().getWindow() || $window;
     };
 
 

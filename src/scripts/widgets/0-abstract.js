@@ -74,7 +74,7 @@ angular.module('am-wb-core')//
  * <li>widgetSelected</li>
  * </ul>
  */
-.factory('WbWidgetAbstract', function($widget, $wbWindow, $objectPath){
+.factory('WbWidgetAbstract', function($widget, $window, $objectPath){
 
     function debounce(func, wait) {
         var timeout;
@@ -1111,7 +1111,7 @@ angular.module('am-wb-core')//
      * @return window of the current widget or from the root
      */
     WbWidgetAbstract.prototype.getWindow = function () {
-        return this.window || this.getRoot().getWindow() || $wbWindow;
+        return this.window || this.getRoot().getWindow() || $window;
     };
 
 

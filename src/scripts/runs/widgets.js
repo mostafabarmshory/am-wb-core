@@ -38,17 +38,50 @@ angular.module('am-wb-core')
  * Providers
  ***********************************************************************/
 .run(function (
-		/* angularjs */ $location, $http, $timeout,
-		/* WB        */ $widget, $wbMedia, $wbWindow, $wbStorage, $wbDispatcher) {
+		/* angularjs */ $anchorScroll, $animate, $cacheFactory,
+		$document, $exceptionHandler, $filter, $http, $httpParamSerializer,
+		$httpParamSerializerJQLike, $interpolate, $interval, $locale, $location, 
+		$log, $parse, $q, $rootElement, $sce, $templateCache, $templateRequest,
+		$timeout, $window,
+		/* WB        */ $widget, $wbMedia, $wbStorage, $wbDispatcher) {
 	$widget//
 	
+	
+	
+	
 	// AngularJS
+	.setProvider('$anchorScroll', $anchorScroll)
+	.setProvider('$animate', $animate)
+//	.setProvider('$animateCss', $animateCss)
+	.setProvider('$cacheFactory', $cacheFactory)
+//	.setProvider('$compile', $window)
+//	.setProvider('$controller', $window)
+	.setProvider('$document', $document)
+	.setProvider('$exceptionHandler', $exceptionHandler)
+	.setProvider('$filter', $filter)
 	.setProvider('$http', $http)
+//	.setProvider('$httpBackend', $window)
+	.setProvider('$httpParamSerializer', $httpParamSerializer)
+	.setProvider('$httpParamSerializerJQLike', $httpParamSerializerJQLike)
+	.setProvider('$interpolate', $interpolate)
+	.setProvider('$interval', $interval)
+//	.setProvider('$jsonpCallbacks', $window)
+	.setProvider('$locale', $locale)
 	.setProvider('$location', $location)
+	.setProvider('$log', $log)
+	.setProvider('$parse', $parse)
+	.setProvider('$q', $q)
+	.setProvider('$rootElement', $rootElement)
+//	.setProvider('$rootScope', $window)
+	.setProvider('$sce', $sce)
+//	.setProvider('$sceDelegate', $window)
+	.setProvider('$templateCache', $templateCache)
+	.setProvider('$templateRequest', $templateRequest)
 	.setProvider('$timeout', $timeout)
+	.setProvider('$window', $window)
+//	.setProvider('$xhrFactory', $window)
 
 	// wb-core
-	.setProvider('$window', $wbWindow)
 	.setProvider('$dispatcher', $wbDispatcher)
 	.setProvider('$storage', $wbStorage)
 	.setProvider('$media', $wbMedia);
