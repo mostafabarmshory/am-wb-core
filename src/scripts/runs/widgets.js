@@ -920,4 +920,35 @@ angular.module('am-wb-core')
 		controller: 'WbWidgetVideo', 
 		isLeaf: false
 	});
+	
+
+    $widget.newWidget({
+        // widget description
+        type: 'ObjectCollection',
+        title: 'Object collection',
+        description: 'A widget to show a collection of items',
+        groups: ['seen'],
+        icon: 'pages',
+        model: '',
+        // functional properties
+        help: '',
+        helpId: 'wb-seen-widget-collection',
+        template: '<div></div>',
+        controller: 'AmWbSeenCollectionWidget'
+    });
+    
+    $widget.newWidget({
+        type: 'import',
+        title: 'Import',
+        description: 'Import a part of other content',
+        groups: ['commons'],
+        icon: 'import_export',
+        setting: ['import'],
+        // help
+        help: '',
+        helpId: '',
+        // functional (page)
+        template: '<div></div>',
+        controller: 'WbWidgetSeenImport'
+    });
 });
