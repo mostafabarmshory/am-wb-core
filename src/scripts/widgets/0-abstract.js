@@ -74,7 +74,7 @@ angular.module('am-wb-core')//
  * <li>widgetSelected</li>
  * </ul>
  */
-.factory('WbWidgetAbstract', function($widget, $window, $objectPath){
+.factory('WbWidgetAbstract', function($widget, $window, $objectPath, $log){
 
     function debounce(func, wait) {
         var timeout;
@@ -715,7 +715,7 @@ angular.module('am-wb-core')//
                 resultData = callbacks[i](event) || resultData;
             } catch (error) {
                 // NOTE: remove on release
-//              console.log(error);
+              $log.log(error);
             }
         }
         return resultData;
