@@ -5,23 +5,12 @@
 	<projects>
 	</projects>
 	<buildSpec>
-		<buildCommand>
-			<name>org.python.pydev.PyDevBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
-			<name>org.eclipse.wst.validation.validationbuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1528927900152</id>
+			<id>1579967462747</id>
 			<name></name>
 			<type>10</type>
 			<matcher>
