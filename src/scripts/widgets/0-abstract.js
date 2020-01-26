@@ -126,7 +126,7 @@ angular.module('am-wb-core')//
          * 
          * @memberof WbAbstractWidget
          */
-        this.state = 'init';
+        this.state;
 
         this.actions = [];
         this.callbacks = [];
