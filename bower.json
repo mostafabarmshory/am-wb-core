@@ -1,3 +1,4 @@
+
 {
   "name": "am-wb-core",
   "moduleName": "am-wb-core",
@@ -13,9 +14,7 @@
     "AngularJS"
   ],
   "license": "MIT",
-  "main": [
-    "dist/am-wb-core.js"
-  ],
+  "main": ["dist/am-wb-core.min.js"],
   "dependencies": {
     "jquery": "3.4.x",
     "lodash": "4.x",
