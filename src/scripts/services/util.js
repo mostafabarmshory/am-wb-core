@@ -346,18 +346,25 @@ angular.module('am-wb-core')
 	};
 
 	this.replaceWidgetModelById = function(model, id, newModel) {
-		if(!model){
+		if(!model || model.id == id){
 			return newModel;
 		}
 		if (_.isArray(model.children)) {
 			for (var i = 0; i < model.children.length; i++) {
 				if(model.children[i].id === id){
 					model.children[i] = newModel;
-					return;
+					return model;
 				}
-				this.replaceWidgetModelById(model.children[i], id, newModel);
+			}
+			for (i = 0; i < model.children.length; i++) {
+				var genModel = this.replaceWidgetModelById(model.children[i], id, newModel);
+				if(genModel){
+					return model;
+				}
 			}
 		}
+		
+		return;
 	};
 
 	this.downloadWidgetModel = function(url, id) {

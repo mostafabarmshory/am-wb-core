@@ -136,6 +136,9 @@ angular.module('am-wb-core')//
                 change: function ($event) {
                     return evalWidgetEvent(widget, 'change', $event);
                 },
+                input: function ($event) {
+                    return evalWidgetEvent(widget, 'input', $event);
+                },
 
                 /*
                  * Keyboard events

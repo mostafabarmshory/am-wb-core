@@ -2052,6 +2052,9 @@ angular.module('am-wb-core')//
                 change: function ($event) {
                     return evalWidgetEvent(widget, 'change', $event);
                 },
+                input: function ($event) {
+                    return evalWidgetEvent(widget, 'input', $event);
+                },
 
                 /*
                  * Keyboard events
@@ -2349,7 +2352,7 @@ angular.module('am-wb-core') //
 	$window.setMeta = function (key, value){
 		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
 		var headElement = $('head');
-		var elements = headElement.find('meta[name='+searchkey+']');
+		var elements = headElement.find('meta[name="'+searchkey+'"]');
 		// remove element
 		if(_.isUndefined(value)){
 			if(elements.length){
@@ -2372,7 +2375,7 @@ angular.module('am-wb-core') //
 	$window.getMeta = function (key){
 		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
 		var headElement = $('head');
-		var elements = headElement.find('meta[name='+searchkey+']');
+		var elements = headElement.find('meta[name="'+searchkey+'"]');
 		if(elements.length === 0){
 			return;
 		}
@@ -4157,18 +4160,25 @@ angular.module('am-wb-core')
 	};
 
 	this.replaceWidgetModelById = function(model, id, newModel) {
-		if(!model){
+		if(!model || model.id == id){
 			return newModel;
 		}
 		if (_.isArray(model.children)) {
 			for (var i = 0; i < model.children.length; i++) {
 				if(model.children[i].id === id){
 					model.children[i] = newModel;
-					return;
+					return model;
 				}
-				this.replaceWidgetModelById(model.children[i], id, newModel);
+			}
+			for (i = 0; i < model.children.length; i++) {
+				var genModel = this.replaceWidgetModelById(model.children[i], id, newModel);
+				if(genModel){
+					return model;
+				}
 			}
 		}
+		
+		return;
 	};
 
 	this.downloadWidgetModel = function(url, id) {
@@ -4857,7 +4867,7 @@ angular.module('am-wb-core')//
          * 
          * @memberof WbAbstractWidget
          */
-        this.state = 'init';
+        this.state;
 
         this.actions = [];
         this.callbacks = [];
@@ -4943,6 +4953,9 @@ angular.module('am-wb-core')//
                 
                 change: function ($event) {
                     ctrl.fire('change', $event);
+                },
+                input: function ($event) {
+                    ctrl.fire('input', $event);
                 },
                 
                 /*

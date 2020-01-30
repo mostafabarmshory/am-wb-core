@@ -126,7 +126,7 @@ angular.module('am-wb-core')//
          * 
          * @memberof WbAbstractWidget
          */
-        this.state = 'init';
+        this.state;
 
         this.actions = [];
         this.callbacks = [];
@@ -212,6 +212,9 @@ angular.module('am-wb-core')//
                 
                 change: function ($event) {
                     ctrl.fire('change', $event);
+                },
+                input: function ($event) {
+                    ctrl.fire('input', $event);
                 },
                 
                 /*
