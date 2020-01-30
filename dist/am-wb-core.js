@@ -2352,7 +2352,7 @@ angular.module('am-wb-core') //
 	$window.setMeta = function (key, value){
 		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
 		var headElement = $('head');
-		var elements = headElement.find('meta[name='+searchkey+']');
+		var elements = headElement.find('meta[name="'+searchkey+'"]');
 		// remove element
 		if(_.isUndefined(value)){
 			if(elements.length){
@@ -2375,7 +2375,7 @@ angular.module('am-wb-core') //
 	$window.getMeta = function (key){
 		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
 		var headElement = $('head');
-		var elements = headElement.find('meta[name='+searchkey+']');
+		var elements = headElement.find('meta[name="'+searchkey+'"]');
 		if(elements.length === 0){
 			return;
 		}
