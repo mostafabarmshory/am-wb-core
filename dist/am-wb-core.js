@@ -4170,7 +4170,7 @@ angular.module('am-wb-core')
 					return model;
 				}
 			}
-			for (var i = 0; i < model.children.length; i++) {
+			for (i = 0; i < model.children.length; i++) {
 				var genModel = this.replaceWidgetModelById(model.children[i], id, newModel);
 				if(genModel){
 					return model;
