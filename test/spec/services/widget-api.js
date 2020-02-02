@@ -224,4 +224,18 @@ describe('Service $widget', function () {
 
 		expect($widget.getProviders()).not.toBe(undefined);
 	});
+	
+	it('should overrid widget definitions ', function () {
+		$widget.newWidget({
+			type: 'xxx',
+			id: '1'
+		});
+		expect($widget.getWidget('xxx').id).toBe('1');
+
+		$widget.newWidget({
+			type: 'xxx',
+			id: '2'
+		});
+		expect($widget.getWidget('xxx').id).toBe('2');
+	});
 });
