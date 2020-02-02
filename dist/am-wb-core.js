@@ -2434,932 +2434,928 @@ angular.module('am-wb-core') //
 
 angular.module('am-wb-core')
 
-/***********************************************************************
- * Processors
- ***********************************************************************/
-.run(function ($widget, WbProcessorMicrodata, WbProcessorEvent, WbProcessorAttribute) {
-	$widget.setProcessor('microdata', new WbProcessorMicrodata());
-	$widget.setProcessor('event', new WbProcessorEvent());
-	$widget.setProcessor('attribut', new WbProcessorAttribute());
-})
-/***********************************************************************
- * Providers
- ***********************************************************************/
-.run(function (
+	/***********************************************************************
+	 * Processors
+	 ***********************************************************************/
+	.run(function($widget, WbProcessorMicrodata, WbProcessorEvent, WbProcessorAttribute) {
+		$widget.setProcessor('microdata', new WbProcessorMicrodata());
+		$widget.setProcessor('event', new WbProcessorEvent());
+		$widget.setProcessor('attribut', new WbProcessorAttribute());
+	})
+	/***********************************************************************
+	 * Providers
+	 ***********************************************************************/
+	.run(function(
 		/* angularjs */ $anchorScroll, $animate, $cacheFactory,
 		$document, $exceptionHandler, $filter, $http, $httpParamSerializer,
-		$httpParamSerializerJQLike, $interpolate, $interval, $locale, $location, 
+		$httpParamSerializerJQLike, $interpolate, $interval, $locale, $location,
 		$log, $parse, $q, $rootElement, $sce, $templateCache, $templateRequest,
 		$timeout, $window,
 		/* WB        */ $widget, $wbMedia, $wbStorage, $wbDispatcher) {
-	$widget//
-	
-	
-	
-	
-	// AngularJS
-	.setProvider('$anchorScroll', $anchorScroll)
-	.setProvider('$animate', $animate)
-//	.setProvider('$animateCss', $animateCss)
-	.setProvider('$cacheFactory', $cacheFactory)
-//	.setProvider('$compile', $window)
-//	.setProvider('$controller', $window)
-	.setProvider('$document', $document)
-	.setProvider('$exceptionHandler', $exceptionHandler)
-	.setProvider('$filter', $filter)
-	.setProvider('$http', $http)
-//	.setProvider('$httpBackend', $window)
-	.setProvider('$httpParamSerializer', $httpParamSerializer)
-	.setProvider('$httpParamSerializerJQLike', $httpParamSerializerJQLike)
-	.setProvider('$interpolate', $interpolate)
-	.setProvider('$interval', $interval)
-//	.setProvider('$jsonpCallbacks', $window)
-	.setProvider('$locale', $locale)
-	.setProvider('$location', $location)
-	.setProvider('$log', $log)
-	.setProvider('$parse', $parse)
-	.setProvider('$q', $q)
-	.setProvider('$rootElement', $rootElement)
-//	.setProvider('$rootScope', $window)
-	.setProvider('$sce', $sce)
-//	.setProvider('$sceDelegate', $window)
-	.setProvider('$templateCache', $templateCache)
-	.setProvider('$templateRequest', $templateRequest)
-	.setProvider('$timeout', $timeout)
-	.setProvider('$window', $window)
-//	.setProvider('$xhrFactory', $window)
+		$widget//
+			// AngularJS
+			.setProvider('$anchorScroll', $anchorScroll)
+			.setProvider('$animate', $animate)
+			//	.setProvider('$animateCss', $animateCss)
+			.setProvider('$cacheFactory', $cacheFactory)
+			//	.setProvider('$compile', $window)
+			//	.setProvider('$controller', $window)
+			.setProvider('$document', $document)
+			.setProvider('$exceptionHandler', $exceptionHandler)
+			.setProvider('$filter', $filter)
+			.setProvider('$http', $http)
+			//	.setProvider('$httpBackend', $window)
+			.setProvider('$httpParamSerializer', $httpParamSerializer)
+			.setProvider('$httpParamSerializerJQLike', $httpParamSerializerJQLike)
+			.setProvider('$interpolate', $interpolate)
+			.setProvider('$interval', $interval)
+			//	.setProvider('$jsonpCallbacks', $window)
+			.setProvider('$locale', $locale)
+			.setProvider('$location', $location)
+			.setProvider('$log', $log)
+			.setProvider('$parse', $parse)
+			.setProvider('$q', $q)
+			.setProvider('$rootElement', $rootElement)
+			//	.setProvider('$rootScope', $window)
+			.setProvider('$sce', $sce)
+			//	.setProvider('$sceDelegate', $window)
+			.setProvider('$templateCache', $templateCache)
+			.setProvider('$templateRequest', $templateRequest)
+			.setProvider('$timeout', $timeout)
+			.setProvider('$window', $window)
+			//	.setProvider('$xhrFactory', $window)
 
-	// wb-core
-	.setProvider('$dispatcher', $wbDispatcher)
-	.setProvider('$storage', $wbStorage)
-	.setProvider('$media', $wbMedia);
-})
+			// wb-core
+			.setProvider('$dispatcher', $wbDispatcher)
+			.setProvider('$storage', $wbStorage)
+			.setProvider('$media', $wbMedia);
+	})
 
-/***********************************************************************
- * Widgets
- ***********************************************************************/
-.run(function ($widget) {
-	$widget.newWidget({
-		// widget description
-		type: 'a',
-		title: 'A link',
-		description: 'A widget to add external link. It is used as block item.',
-		icon: 'wb-widget-a',
-		groups: ['basic'],
-		// functional properties
-		model: {
-			html: 'Link title'
-		},
-		controller: 'WbWidgetA',
-		isLeaf: true
-	});
-	$widget.newWidget({
-		// widget description
-		type: 'address',
-		title: 'address',
-		description: 'description.',
-		icon: 'wb-widget-address',
-		groups: ['basic'],
-		// functional properties
-		controller: 'WbWidgetAddress',
-		isLeaf: false
-	});
-	$widget.newWidget({
-		// widget description
-		type: 'applet',
-		title: 'applet',
-		description: 'applet.',
-		icon: 'wb-widget-applet',
-		groups: ['basic'],
-		// functional properties
-		controller: 'WbWidgetApplet',
-		isLeaf: true
-	});
-	$widget.newWidget({
-		// widget description
-		type: 'area',
-		title: 'area',
-		description: 'area',
-		icon: 'wb-widget-area',
-		groups: ['basic'],
-		// functional properties
-		controller: 'WbWidgetArea'
-	});
-	$widget.newWidget({
-		// widget description
-		type: 'article',
-		title: 'article',
-		description: 'article',
-		icon: 'wb-widget-article',
-		groups: ['basic'],
-		// functional properties
-		controller: 'WbWidgetArticle'
-	});
-	$widget.newWidget({
-		// widget description
-		type: 'aside',
-		title: 'aside',
-		description: 'aside',
-		icon: 'wb-widget-aside',
-		groups: ['basic'],
-		// functional properties
-		controller: 'WbWidgetAside'
-	});
-	$widget.newWidget({
-		type: 'audio',
-		title: 'Audio',
-		label: 'audio',
-		icon: 'wb-widget-audio',
-		description: 'This widget is used to add audio in the document.',
-		groups: ['basic'],
-		model: {
-			media: '(min-width: 650px)',
-			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
-		},
-		controller: 'WbWidgetAudio', 
-		isLeaf: false, 
-	});
-	$widget.newWidget({
-		type: 'blockquote',
-		title: 'blockquote',
-		label: 'blockquote',
-		icon: 'wb-widget-blockquote',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetBlockquote',
-		isLeaf: true, 
-	});
-	$widget.newWidget({
-		type: 'button',
-		title: 'button',
-		label: 'button',
-		icon: 'wb-widget-button',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetButton',
-		isLeaf: true, 
-	});
-	$widget.newWidget({
-		type: 'canvas',
-		title: 'canvas',
-		label: 'canvas',
-		icon: 'wb-widget-canvas',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetCanvas',
-		isLeaf: true, 
-	});
-	$widget.newWidget({
-		type: 'datalist',
-		title: 'datalist',
-		label: 'datalist',
-		icon: 'wb-widget-datalist',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetDatalist', 
-	});
-	$widget.newWidget({
-		type: 'dd',
-		title: 'dd',
-		label: 'dd',
-		icon: 'wb-widget-dd',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetDd', 
-	});
-	$widget.newWidget({
-		type: 'details',
-		title: 'details',
-		label: 'details',
-		icon: 'wb-widget-details',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetDetails', 
-	});
-	$widget.newWidget({
-		type: 'dialog',
-		title: 'dialog',
-		label: 'dialog',
-		icon: 'wb-widget-dialog',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetDialog', 
-	});
-	$widget.newWidget({
-		type: 'div',
-		title: 'div',
-		label: 'div',
-		icon: 'wb-widget-div',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetDiv',
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'dl',
-		title: 'dl',
-		label: 'dl',
-		icon: 'wb-widget-dl',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetDl', 
-	});
-	$widget.newWidget({
-		type: 'dt',
-		title: 'dt',
-		label: 'dt',
-		icon: 'wb-widget-dt',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetDt', 
-	});
-	$widget.newWidget({
-		type: 'embed',
-		title: 'embed',
-		label: 'embed',
-		icon: 'wb-widget-embed',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-embed',
-		controller: 'WbWidgetEmbed', 
-	});
-	$widget.newWidget({
-		type: 'fieldset',
-		title: 'fieldset',
-		label: 'fieldset',
-		icon: 'wb-widget-fieldset',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-fieldset',
-		controller: 'WbWidgetFieldset', 
-	});
-	$widget.newWidget({
-		type: 'figcaption',
-		title: 'figcaption',
-		label: 'figcaption',
-		icon: 'wb-widget-figcaption',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-figcaption',
-		controller: 'WbWidgetFigcaption', 
-	});
-	$widget.newWidget({
-		type: 'figure',
-		title: 'figure',
-		label: 'figure',
-		icon: 'wb-widget-figure',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-figure',
-		controller: 'WbWidgetFigure', 
-	});
-	$widget.newWidget({
-		type: 'footer',
-		title: 'footer',
-		label: 'footer',
-		icon: 'wb-widget-footer',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-footer',
-		controller: 'WbWidgetFooter', 
-	});
-	$widget.newWidget({
-		type: 'form',
-		title: 'form',
-		label: 'form',
-		icon: 'wb-widget-form',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-form',
-		controller: 'WbWidgetForm', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'frame',
-		title: 'frame',
-		label: 'frame',
-		icon: 'wb-widget-form',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-frame',
-		controller: 'WbWidgetFrame', 
-	});
-	$widget.newWidget({
-		type: 'frameset',
-		title: 'frameset',
-		label: 'frameset',
-		icon: 'wb-widget-frameset',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-frameset',
-		controller: 'WbWidgetFrameset', 
-		isLeaf: false
-	});
-	for(var i = 1; i < 7; i++){
-		var type = 'h'+i;
+	/***********************************************************************
+	 * Widgets
+	 ***********************************************************************/
+	.run(function($widget) {
 		$widget.newWidget({
 			// widget description
-			type: type,
-			title: 'Header Level '+i,
-			description: 'A header widget',
-			icon: 'wb-widget-h'+i,
+			type: 'a',
+			title: 'A link',
+			description: 'A widget to add external link. It is used as block item.',
+			icon: 'wb-widget-a',
+			groups: ['basic'],
+			// functional properties
+			model: {
+				html: 'Link title'
+			},
+			controller: 'WbWidgetA',
+			isLeaf: true
+		});
+		$widget.newWidget({
+			// widget description
+			type: 'address',
+			title: 'address',
+			description: 'description.',
+			icon: 'wb-widget-address',
+			groups: ['basic'],
+			// functional properties
+			controller: 'WbWidgetAddress',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			// widget description
+			type: 'applet',
+			title: 'applet',
+			description: 'applet.',
+			icon: 'wb-widget-applet',
+			groups: ['basic'],
+			// functional properties
+			controller: 'WbWidgetApplet',
+			isLeaf: true
+		});
+		$widget.newWidget({
+			// widget description
+			type: 'area',
+			title: 'area',
+			description: 'area',
+			icon: 'wb-widget-area',
+			groups: ['basic'],
+			// functional properties
+			controller: 'WbWidgetArea'
+		});
+		$widget.newWidget({
+			// widget description
+			type: 'article',
+			title: 'article',
+			description: 'article',
+			icon: 'wb-widget-article',
+			groups: ['basic'],
+			// functional properties
+			controller: 'WbWidgetArticle'
+		});
+		$widget.newWidget({
+			// widget description
+			type: 'aside',
+			title: 'aside',
+			description: 'aside',
+			icon: 'wb-widget-aside',
+			groups: ['basic'],
+			// functional properties
+			controller: 'WbWidgetAside'
+		});
+		$widget.newWidget({
+			type: 'audio',
+			title: 'Audio',
+			label: 'audio',
+			icon: 'wb-widget-audio',
+			description: 'This widget is used to add audio in the document.',
 			groups: ['basic'],
 			model: {
-				name: 'Header-'+i,
+				media: '(min-width: 650px)',
+				src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+			},
+			controller: 'WbWidgetAudio',
+			isLeaf: false,
+		});
+		$widget.newWidget({
+			type: 'blockquote',
+			title: 'blockquote',
+			label: 'blockquote',
+			icon: 'wb-widget-blockquote',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetBlockquote',
+			isLeaf: true,
+		});
+		$widget.newWidget({
+			type: 'button',
+			title: 'button',
+			label: 'button',
+			icon: 'wb-widget-button',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetButton',
+			isLeaf: true,
+		});
+		$widget.newWidget({
+			type: 'canvas',
+			title: 'canvas',
+			label: 'canvas',
+			icon: 'wb-widget-canvas',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetCanvas',
+			isLeaf: true,
+		});
+		$widget.newWidget({
+			type: 'datalist',
+			title: 'datalist',
+			label: 'datalist',
+			icon: 'wb-widget-datalist',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetDatalist',
+		});
+		$widget.newWidget({
+			type: 'dd',
+			title: 'dd',
+			label: 'dd',
+			icon: 'wb-widget-dd',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetDd',
+		});
+		$widget.newWidget({
+			type: 'details',
+			title: 'details',
+			label: 'details',
+			icon: 'wb-widget-details',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetDetails',
+		});
+		$widget.newWidget({
+			type: 'dialog',
+			title: 'dialog',
+			label: 'dialog',
+			icon: 'wb-widget-dialog',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetDialog',
+		});
+		$widget.newWidget({
+			type: 'div',
+			title: 'div',
+			label: 'div',
+			icon: 'wb-widget-div',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetDiv',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			type: 'dl',
+			title: 'dl',
+			label: 'dl',
+			icon: 'wb-widget-dl',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetDl',
+		});
+		$widget.newWidget({
+			type: 'dt',
+			title: 'dt',
+			label: 'dt',
+			icon: 'wb-widget-dt',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetDt',
+		});
+		$widget.newWidget({
+			type: 'embed',
+			title: 'embed',
+			label: 'embed',
+			icon: 'wb-widget-embed',
+			description: 'description',
+			groups: ['basic'],
+			help: 'http://dpq.co.ir/more-information-embed',
+			controller: 'WbWidgetEmbed',
+		});
+		$widget.newWidget({
+			type: 'fieldset',
+			title: 'fieldset',
+			label: 'fieldset',
+			icon: 'wb-widget-fieldset',
+			description: 'description',
+			groups: ['basic'],
+			help: 'http://dpq.co.ir/more-information-fieldset',
+			controller: 'WbWidgetFieldset',
+		});
+		$widget.newWidget({
+			type: 'figcaption',
+			title: 'figcaption',
+			label: 'figcaption',
+			icon: 'wb-widget-figcaption',
+			description: 'description',
+			groups: ['basic'],
+			help: 'http://dpq.co.ir/more-information-figcaption',
+			controller: 'WbWidgetFigcaption',
+		});
+		$widget.newWidget({
+			type: 'figure',
+			title: 'figure',
+			label: 'figure',
+			icon: 'wb-widget-figure',
+			description: 'description',
+			groups: ['basic'],
+			help: 'http://dpq.co.ir/more-information-figure',
+			controller: 'WbWidgetFigure',
+		});
+		$widget.newWidget({
+			type: 'footer',
+			title: 'footer',
+			label: 'footer',
+			icon: 'wb-widget-footer',
+			description: 'description',
+			groups: ['basic'],
+			help: 'http://dpq.co.ir/more-information-footer',
+			controller: 'WbWidgetFooter',
+		});
+		$widget.newWidget({
+			type: 'form',
+			title: 'form',
+			label: 'form',
+			icon: 'wb-widget-form',
+			description: 'description',
+			groups: ['basic'],
+			help: 'http://dpq.co.ir/more-information-form',
+			controller: 'WbWidgetForm',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			type: 'frame',
+			title: 'frame',
+			label: 'frame',
+			icon: 'wb-widget-form',
+			description: 'description',
+			groups: ['basic'],
+			help: 'http://dpq.co.ir/more-information-frame',
+			controller: 'WbWidgetFrame',
+		});
+		$widget.newWidget({
+			type: 'frameset',
+			title: 'frameset',
+			label: 'frameset',
+			icon: 'wb-widget-frameset',
+			description: 'description',
+			groups: ['basic'],
+			help: 'http://dpq.co.ir/more-information-frameset',
+			controller: 'WbWidgetFrameset',
+			isLeaf: false
+		});
+		for (var i = 1; i < 7; i++) {
+			var type = 'h' + i;
+			$widget.newWidget({
+				// widget description
+				type: type,
+				title: 'Header Level ' + i,
+				description: 'A header widget',
+				icon: 'wb-widget-h' + i,
+				groups: ['basic'],
+				model: {
+					name: 'Header-' + i,
+					style: {
+						padding: '8px'
+					}
+				},
+				// functional properties
+				controller: 'WbWidgetH',
+				isLeaf: true
+			});
+		}
+		$widget.newWidget({
+			type: 'header',
+			title: 'header',
+			label: 'header',
+			icon: 'wb-widget-header',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetHeader',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			type: 'hr',
+			title: 'hr',
+			label: 'hr',
+			icon: 'wb-widget-hr',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetHr',
+			isLeaf: true,
+		});
+		$widget.newWidget({
+			// widget description
+			type: 'i',
+			title: 'Italics',
+			description: 'The widget defines a part of text in an alternate voice or mood.',
+			icon: 'wb-widget-i',
+			groups: ['basic'],
+			model: {
+				name: 'i',
+				html: 'Text'
+			},
+			// help id
+			help: 'http://dpq.co.ir',
+			helpId: 'wb-widget-i',
+			// functional properties
+			controllerAs: 'ctrl',
+			controller: 'WbWidgetI',
+			isLeaf: true,
+		});
+		$widget.newWidget({
+			// widget description
+			type: 'iframe',
+			title: 'Inline Frame',
+			description: 'Add inline frame to show another document within current one.',
+			icon: 'wb-widget-iframe',
+			groups: ['basic'],
+			model: {
+				name: 'iframe',
+				sandbox: 'allow-same-origin allow-scripts',
+				src: 'https://www.google.com',
+				style: {
+					padding: '8px'
+				}
+			},
+			// help id
+			help: 'http://dpq.co.ir',
+			helpId: 'wb-widget-iframe',
+			// functional properties
+			controllerAs: 'ctrl',
+			controller: 'WbWidgetIframe',
+			isLeaf: true,
+		});
+		$widget.newWidget({
+			type: 'img',
+			title: 'Image',
+			label: 'image',
+			icon: 'wb-widget-img',
+			description: 'A widget to insert an link to page.',
+			groups: ['basic'],
+			model: {
+				html: 'img',
+				src: 'resources/wb-brand-3.0.png',
+				style: {
+					width: '80%',
+					maxWidth: '500px'
+				}
+			},
+			controllerAs: 'ctrl',
+			controller: 'WbWidgetImg',
+			isLeaf: true,
+		});
+		$widget.newWidget({
+			// widget description
+			type: 'input',
+			title: 'Input field',
+			description: 'A widget to get data from users.',
+			icon: 'wb-widget-input',
+			groups: ['basic'],
+			model: {
+				name: 'input',
+				sandbox: 'allow-same-origin allow-scripts',
+				src: 'https://www.google.com',
+				style: {
+					padding: '8px'
+				}
+			},
+			// help id
+			help: 'http://dpq.co.ir',
+			helpId: 'wb-widget-input',
+			// functional properties
+			controller: 'WbWidgetInput',
+			controllerAs: 'ctrl',
+			isLeaf: true,
+		});
+		$widget.newWidget({
+			type: 'kbd',
+			title: 'kbd',
+			label: 'kbd',
+			icon: 'wb-widget-kbd',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetKbd',
+		});
+		$widget.newWidget({
+			type: 'label',
+			title: 'label',
+			label: 'label',
+			icon: 'wb-widget-label',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetLabel',
+			isLeaf: true,
+		});
+		$widget.newWidget({
+			type: 'legend',
+			title: 'legend',
+			label: 'legend',
+			icon: 'wb-widget-legend',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetLegend',
+			isLeaf: true,
+		});
+		$widget.newWidget({
+			type: 'li',
+			title: 'li',
+			label: 'li',
+			icon: 'wb-widget-li',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetLi',
+			isLeaf: false,
+		});
+		$widget.newWidget({
+			type: 'link',
+			title: 'Link',
+			label: 'link',
+			icon: 'wb-widget-link',
+			description: 'A widget to insert an link to page.',
+			groups: ['basic'],
+			model: {
+				html: 'Link',
+				url: 'http://www.gitlab.com/am-wb/am-wb-common'
+			},
+			controllerAs: 'ctrl',
+			controller: 'WbWidgetLink',
+			isLeaf: true,
+		});
+		$widget.newWidget({
+			type: 'main',
+			title: 'main',
+			label: 'main',
+			icon: 'wb-widget-main',
+			description: 'A widget to insert an link to page.',
+			groups: ['basic'],
+			controller: 'WbWidgetMain',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			type: 'map',
+			title: 'map',
+			label: 'map',
+			icon: 'wb-widget-map',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetMap',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			// widget description
+			type: 'meta',
+			title: 'Meta',
+			description: 'A widget to add meta data.',
+			icon: 'wb-widget-meta',
+			groups: ['basic'],
+			model: {
+				name: 'name',
+				content: 'content',
+				style: {
+					margin: '8px',
+					background: {
+						color: '#313131',
+					},
+					border: {
+						style: 'dotted',
+						color: '#afafaf'
+					},
+					color: '#ffffff',
+					padding: '8px'
+				}
+			},
+			// functional properties
+			controllerAs: 'ctrl',
+			controller: 'WbWidgetMeta'
+		});
+		$widget.newWidget({
+			type: 'meter',
+			title: 'meter',
+			label: 'meter',
+			icon: 'wb-widget-meter',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetMeter',
+		});
+		$widget.newWidget({
+			type: 'nav',
+			title: 'nav',
+			label: 'nav',
+			icon: 'wb-widget-nav',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetNav',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			type: 'noscript',
+			title: 'noscript',
+			label: 'noscript',
+			icon: 'wb-widget-noscript',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetNoscript',
+		});
+		$widget.newWidget({
+			type: 'object',
+			title: 'object',
+			label: 'object',
+			icon: 'wb-widget-object',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetObject',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			type: 'ol',
+			title: 'ol',
+			label: 'ol',
+			icon: 'wb-widget-ol',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetOl',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			type: 'optgroup',
+			title: 'optgroup',
+			label: 'optgroup',
+			icon: 'wb-widget-optgroup',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetOptgroup',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			type: 'option',
+			title: 'option',
+			label: 'option',
+			icon: 'wb-widget-option',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetOption',
+		});
+		$widget.newWidget({
+			type: 'output',
+			title: 'output',
+			label: 'output',
+			icon: 'wb-widget-output',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetOutput',
+		});
+		$widget.newWidget({
+			// widget description
+			type: 'p',
+			title: 'Paragraph',
+			description: 'A widget to add paragraph.',
+			icon: 'wb-widget-p',
+			groups: ['basic'],
+			model: {
+				name: 'Pragraph',
 				style: {
 					padding: '8px'
 				}
 			},
 			// functional properties
-			controller:'WbWidgetH',
+			controllerAs: 'ctrl',
+			controller: 'WbWidgetP',
 			isLeaf: true
 		});
-	}
-	$widget.newWidget({
-		type: 'header',
-		title: 'header',
-		label: 'header',
-		icon: 'wb-widget-header',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetHeader', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'hr',
-		title: 'hr',
-		label: 'hr',
-		icon: 'wb-widget-hr',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetHr',
-		isLeaf: true, 
-	});
-	$widget.newWidget({
-		// widget description
-		type: 'i',
-		title: 'Italics',
-		description: 'The widget defines a part of text in an alternate voice or mood.',
-		icon: 'wb-widget-i',
-		groups: ['basic'],
-		model: {
-			name: 'i',
-			html: 'Text'
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-i',
-		// functional properties
-		controllerAs: 'ctrl',
-		controller: 'WbWidgetI',
-		isLeaf: true,
-	});
-	$widget.newWidget({
-		// widget description
-		type: 'iframe',
-		title: 'Inline Frame',
-		description: 'Add inline frame to show another document within current one.',
-		icon: 'wb-widget-iframe',
-		groups: ['basic'],
-		model: {
-			name: 'iframe',
-			sandbox: 'allow-same-origin allow-scripts',
-			src: 'https://www.google.com',
-			style: {
-				padding: '8px'
-			}
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-iframe',
-		// functional properties
-		controllerAs: 'ctrl',
-		controller: 'WbWidgetIframe',
-		isLeaf: true,
-	});
-	$widget.newWidget({
-		type: 'img',
-		title: 'Image',
-		label: 'image',
-		icon: 'wb-widget-img',
-		description: 'A widget to insert an link to page.',
-		groups: ['basic'],
-		model: {
-			html: 'img',
-			src: 'resources/wb-brand-3.0.png',
-			style: {
-				width: '80%',
-				maxWidth: '500px'
-			}
-		},
-		controllerAs: 'ctrl',
-		controller: 'WbWidgetImg',
-		isLeaf: true, 
-	});
-	$widget.newWidget({
-		// widget description
-		type: 'input',
-		title: 'Input field',
-		description: 'A widget to get data from users.',
-		icon: 'wb-widget-input',
-		groups: ['basic'],
-		model: {
-			name: 'input',
-			sandbox: 'allow-same-origin allow-scripts',
-			src: 'https://www.google.com',
-			style: {
-				padding: '8px'
-			}
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-input',
-		// functional properties
-		controller: 'WbWidgetInput',
-		controllerAs: 'ctrl',
-		isLeaf: true,
-	});
-	$widget.newWidget({
-		type: 'kbd',
-		title: 'kbd',
-		label: 'kbd',
-		icon: 'wb-widget-kbd',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetKbd', 
-	});
-	$widget.newWidget({
-		type: 'label',
-		title: 'label',
-		label: 'label',
-		icon: 'wb-widget-label',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetLabel',
-		isLeaf: true, 
-	});
-	$widget.newWidget({
-		type: 'legend',
-		title: 'legend',
-		label: 'legend',
-		icon: 'wb-widget-legend',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetLegend',
-		isLeaf: true, 
-	});
-	$widget.newWidget({
-		type: 'li',
-		title: 'li',
-		label: 'li',
-		icon: 'wb-widget-li',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetLi',
-		isLeaf: false, 
-	});
-	$widget.newWidget({
-		type: 'link',
-		title: 'Link',
-		label: 'link',
-		icon: 'wb-widget-link',
-		description: 'A widget to insert an link to page.',
-		groups: ['basic'],
-		model: {
-			html: 'Link',
-			url: 'http://www.gitlab.com/am-wb/am-wb-common'
-		},
-		controllerAs: 'ctrl',
-		controller: 'WbWidgetLink',
-		isLeaf: true, 
-	});
-	$widget.newWidget({
-		type: 'main',
-		title: 'main',
-		label: 'main',
-		icon: 'wb-widget-main',
-		description: 'A widget to insert an link to page.',
-		groups: ['basic'],
-		controller: 'WbWidgetMain', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'map',
-		title: 'map',
-		label: 'map',
-		icon: 'wb-widget-map',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetMap', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		// widget description
-		type: 'meta',
-		title: 'Meta',
-		description: 'A widget to add meta data.',
-		icon: 'wb-widget-meta',
-		groups: ['basic'],
-		model: {
-			name: 'name',
-			content: 'content',
-			style: {
-				margin: '8px',
-				background: {
-					color: '#313131',
-				},
-				border: {
-					style:  'dotted',
-					color:  '#afafaf'
-				},
-				color:  '#ffffff',
-				padding:  '8px'
-			}
-		},
-		// functional properties
-		controllerAs: 'ctrl',
-		controller: 'WbWidgetMeta'
-	});
-	$widget.newWidget({
-		type: 'meter',
-		title: 'meter',
-		label: 'meter',
-		icon: 'wb-widget-meter',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetMeter', 
-	});
-	$widget.newWidget({
-		type: 'nav',
-		title: 'nav',
-		label: 'nav',
-		icon: 'wb-widget-nav',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetNav', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'noscript',
-		title: 'noscript',
-		label: 'noscript',
-		icon: 'wb-widget-noscript',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetNoscript', 
-	});
-	$widget.newWidget({
-		type: 'object',
-		title: 'object',
-		label: 'object',
-		icon: 'wb-widget-object',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetObject', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'ol',
-		title: 'ol',
-		label: 'ol',
-		icon: 'wb-widget-ol',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetOl', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'optgroup',
-		title: 'optgroup',
-		label: 'optgroup',
-		icon: 'wb-widget-optgroup',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetOptgroup', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'option',
-		title: 'option',
-		label: 'option',
-		icon: 'wb-widget-option',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetOption', 
-	});
-	$widget.newWidget({
-		type: 'output',
-		title: 'output',
-		label: 'output',
-		icon: 'wb-widget-output',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetOutput', 
-	});
-	$widget.newWidget({
-		// widget description
-		type: 'p',
-		title: 'Paragraph',
-		description: 'A widget to add paragraph.',
-		icon: 'wb-widget-p',
-		groups: ['basic'],
-		model: {
-			name: 'Pragraph',
-			style: {
-				padding: '8px'
-			}
-		},
-		// functional properties
-		controllerAs: 'ctrl',
-		controller: 'WbWidgetP',
-		isLeaf: true
-	});
-	$widget.newWidget({
-		type: 'param',
-		title: 'param',
-		label: 'param',
-		icon: 'wb-widget-param',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetParam',
-		isLeaf: true, 
-	});
-	$widget.newWidget({
-		type: 'picture',
-		title: 'Picture',
-		label: 'picture',
-		icon: 'wb-widget-picture',
-		description: 'This widget is used to add picture in the document.',
-		groups: ['basic'],
-		model: {
-			media: '(min-width: 650px)',
-			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
-		},
-		controller: 'WbWidgetPicture', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'pre',
-		title: 'Preformatted',
-		label: 'preformatted',
-		icon: 'wb-widget-pre',
-		description: 'A widget to insert an Preformatted text to page.',
-		groups: ['basic'],
-		model: {
-			html: 'class A {\n\tint a;\n}',
-		},
-		controller: 'WbWidgetPre', 
-		controllerAs: 'ctrl', 
-		isLeaf: true
-	});
-	$widget.newWidget({
-		// widget description
-		type: 'progress',
-		title: 'Progress',
-		description: 'A widget to add progress.',
-		icon: 'wb-widget-progress',
-		groups: ['basic'],
-		model: {
-			name: 'progress',
-			style: {
-				padding: '8px',
-				margin: '8px',
-				size: {
-					height: '30px'
+		$widget.newWidget({
+			type: 'param',
+			title: 'param',
+			label: 'param',
+			icon: 'wb-widget-param',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetParam',
+			isLeaf: true,
+		});
+		$widget.newWidget({
+			type: 'picture',
+			title: 'Picture',
+			label: 'picture',
+			icon: 'wb-widget-picture',
+			description: 'This widget is used to add picture in the document.',
+			groups: ['basic'],
+			model: {
+				media: '(min-width: 650px)',
+				src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+			},
+			controller: 'WbWidgetPicture',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			type: 'pre',
+			title: 'Preformatted',
+			label: 'preformatted',
+			icon: 'wb-widget-pre',
+			description: 'A widget to insert an Preformatted text to page.',
+			groups: ['basic'],
+			model: {
+				html: 'class A {\n\tint a;\n}',
+			},
+			controller: 'WbWidgetPre',
+			controllerAs: 'ctrl',
+			isLeaf: true
+		});
+		$widget.newWidget({
+			// widget description
+			type: 'progress',
+			title: 'Progress',
+			description: 'A widget to add progress.',
+			icon: 'wb-widget-progress',
+			groups: ['basic'],
+			model: {
+				name: 'progress',
+				style: {
+					padding: '8px',
+					margin: '8px',
+					size: {
+						height: '30px'
+					}
 				}
-			}
-		},
-		// functional properties
-		controller: 'WbWidgetProgress'
-	});
-	$widget.newWidget({
-		type: 'q',
-		title: 'q',
-		label: 'q',
-		icon: 'wb-widget-q',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetQ', 
-	});
-	$widget.newWidget({
-		type: 's',
-		title: 'S',
-		icon: 'wb-widget-s',
-		description: 'The widget is used to define text that is no longer correct.',
-		groups: ['basic'],
-		model: {
-			html: 'Text'
-		},
-		controller: 'WbWidgetS', 
-	});
-	$widget.newWidget({
-		type: 'samp',
-		title: 'Samp',
-		icon: 'wb-widget-samp',
-		description: 'It defines sample output from a computer program.',
-		groups: ['basic'],
-		model: {
-			html: 'Text'
-		},
-		controller: 'WbWidgetSamp', 
-	});
-	$widget.newWidget({
-		type: 'script',
-		title: 'script',
-		label: 'script',
-		icon: 'wb-widget-script',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetScript', 
-	});
-	$widget.newWidget({
-		type: 'section',
-		title: 'section',
-		label: 'section',
-		icon: 'wb-widget-section',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetSection', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'select',
-		title: 'select',
-		label: 'select',
-		icon: 'wb-widget-select',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetSelect', 
-	});
-	$widget.newWidget({
-		type: 'small',
-		title: 'Small',
-		icon: 'wb-widget-small',
-		description: 'The widget defines smaller text.',
-		groups: ['basic'],
-		model: {
-			html: 'Small text'
-		},
-		controller: 'WbWidgetSmall', 
-	});
-	$widget.newWidget({
-		type: 'source',
-		title: 'Source',
-		label: 'source',
-		icon: 'wb-widget-source',
-		description: 'This widget is used to add source in the document.',
-		groups: ['basic'],
-		model: {
-			media: '(min-width: 650px)',
-			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
-		},
-		controller: 'WbWidgetSource', 
-	});
-	$widget.newWidget({
-		type: 'span',
-		title: 'Span',
-		icon: 'wb-widget-span',
-		description: 'The widget is used to group inline-elements in a document.',
-		groups: ['basic'],
-		model: {
-			html: 'Text'
-		},
-		controller: 'WbWidgetSpan', 
-	});
-	$widget.newWidget({
-		type: 'strong',
-		title: 'Strong',
-		icon: 'wb-widget-strong',
-		description: 'The widget defines strong emphasized text.',
-		groups: ['basic'],
-		model: {
-			html: 'Text'
-		},
-		controller: 'WbWidgetStrong', 
-	});
-	$widget.newWidget({
-		type: 'style',
-		title: 'style',
-		label: 'style',
-		icon: 'wb-widget-style',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetStyle', 
-	});
-	$widget.newWidget({
-		type: 'summary',
-		title: 'summary',
-		label: 'summary',
-		icon: 'wb-widget-summary',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetSummary', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'svg',
-		title: 'svg',
-		label: 'svg',
-		icon: 'wb-widget-svg',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetSvg', 
-	});
-	$widget.newWidget({
-		type: 'template',
-		title: 'template',
-		label: 'template',
-		icon: 'wb-widget-template',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetTemplate', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		// widget description
-		type: 'textarea',
-		title: 'Text Area field',
-		description: 'A widget to get data from users.',
-		icon: 'wb-widget-textarea',
-		groups: ['basic'],
-		model: {
-			name: 'textarea',
-			style: {
-				padding: '8px'
-			}
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-textarea',
-		// functional properties
-		controller: 'WbWidgetTextarea',
-	});
-	$widget.newWidget({
-		type: 'track',
-		title: 'track',
-		label: 'track',
-		icon: 'wb-widget-track',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-track',
-		controller: 'WbWidgetTrack', 
-	});
-	$widget.newWidget({
-		type: 'ul',
-		title: 'ul',
-		label: 'ul',
-		icon: 'wb-widget-ul',
-		description: 'description',
-		groups: ['basic'],
-		controller: 'WbWidgetUl', 
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'video',
-		title: 'Video',
-		label: 'video',
-		icon: 'wb-widget-video',
-		description: 'This widget is used to add video in the document.',
-		groups: ['basic'],
-		model: {
-			media: '(min-width: 650px)',
-			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
-		},
-		controller: 'WbWidgetVideo', 
-		isLeaf: false
-	});
-	
+			},
+			// functional properties
+			controller: 'WbWidgetProgress'
+		});
+		$widget.newWidget({
+			type: 'q',
+			title: 'q',
+			label: 'q',
+			icon: 'wb-widget-q',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetQ',
+		});
+		$widget.newWidget({
+			type: 's',
+			title: 'S',
+			icon: 'wb-widget-s',
+			description: 'The widget is used to define text that is no longer correct.',
+			groups: ['basic'],
+			model: {
+				html: 'Text'
+			},
+			controller: 'WbWidgetS',
+		});
+		$widget.newWidget({
+			type: 'samp',
+			title: 'Samp',
+			icon: 'wb-widget-samp',
+			description: 'It defines sample output from a computer program.',
+			groups: ['basic'],
+			model: {
+				html: 'Text'
+			},
+			controller: 'WbWidgetSamp',
+		});
+		$widget.newWidget({
+			type: 'script',
+			title: 'script',
+			label: 'script',
+			icon: 'wb-widget-script',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetScript',
+		});
+		$widget.newWidget({
+			type: 'section',
+			title: 'section',
+			label: 'section',
+			icon: 'wb-widget-section',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetSection',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			type: 'select',
+			title: 'select',
+			label: 'select',
+			icon: 'wb-widget-select',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetSelect',
+		});
+		$widget.newWidget({
+			type: 'small',
+			title: 'Small',
+			icon: 'wb-widget-small',
+			description: 'The widget defines smaller text.',
+			groups: ['basic'],
+			model: {
+				html: 'Small text'
+			},
+			controller: 'WbWidgetSmall',
+		});
+		$widget.newWidget({
+			type: 'source',
+			title: 'Source',
+			label: 'source',
+			icon: 'wb-widget-source',
+			description: 'This widget is used to add source in the document.',
+			groups: ['basic'],
+			model: {
+				media: '(min-width: 650px)',
+				src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+			},
+			controller: 'WbWidgetSource',
+		});
+		$widget.newWidget({
+			type: 'span',
+			title: 'Span',
+			icon: 'wb-widget-span',
+			description: 'The widget is used to group inline-elements in a document.',
+			groups: ['basic'],
+			model: {
+				html: 'Text'
+			},
+			controller: 'WbWidgetSpan',
+		});
+		$widget.newWidget({
+			type: 'strong',
+			title: 'Strong',
+			icon: 'wb-widget-strong',
+			description: 'The widget defines strong emphasized text.',
+			groups: ['basic'],
+			model: {
+				html: 'Text'
+			},
+			controller: 'WbWidgetStrong',
+		});
+		$widget.newWidget({
+			type: 'style',
+			title: 'style',
+			label: 'style',
+			icon: 'wb-widget-style',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetStyle',
+		});
+		$widget.newWidget({
+			type: 'summary',
+			title: 'summary',
+			label: 'summary',
+			icon: 'wb-widget-summary',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetSummary',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			type: 'svg',
+			title: 'svg',
+			label: 'svg',
+			icon: 'wb-widget-svg',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetSvg',
+		});
+		$widget.newWidget({
+			type: 'template',
+			title: 'template',
+			label: 'template',
+			icon: 'wb-widget-template',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetTemplate',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			// widget description
+			type: 'textarea',
+			title: 'Text Area field',
+			description: 'A widget to get data from users.',
+			icon: 'wb-widget-textarea',
+			groups: ['basic'],
+			model: {
+				name: 'textarea',
+				style: {
+					padding: '8px'
+				}
+			},
+			// help id
+			help: 'http://dpq.co.ir',
+			helpId: 'wb-widget-textarea',
+			// functional properties
+			controller: 'WbWidgetTextarea',
+		});
+		$widget.newWidget({
+			type: 'track',
+			title: 'track',
+			label: 'track',
+			icon: 'wb-widget-track',
+			description: 'description',
+			groups: ['basic'],
+			help: 'http://dpq.co.ir/more-information-track',
+			controller: 'WbWidgetTrack',
+		});
+		$widget.newWidget({
+			type: 'ul',
+			title: 'ul',
+			label: 'ul',
+			icon: 'wb-widget-ul',
+			description: 'description',
+			groups: ['basic'],
+			controller: 'WbWidgetUl',
+			isLeaf: false
+		});
+		$widget.newWidget({
+			type: 'video',
+			title: 'Video',
+			label: 'video',
+			icon: 'wb-widget-video',
+			description: 'This widget is used to add video in the document.',
+			groups: ['basic'],
+			model: {
+				media: '(min-width: 650px)',
+				src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
+			},
+			controller: 'WbWidgetVideo',
+			isLeaf: false
+		});
 
-    $widget.newWidget({
-        // widget description
-        type: 'ObjectCollection',
-        title: 'Object collection',
-        description: 'A widget to show a collection of items',
-        groups: ['seen'],
-        icon: 'pages',
-        model: '',
-        // functional properties
-        help: '',
-        helpId: 'wb-seen-widget-collection',
-        template: '<div></div>',
-        controller: 'AmWbSeenCollectionWidget'
-    });
-    
-    $widget.newWidget({
-        type: 'import',
-        title: 'Import',
-        description: 'Import a part of other content',
-        groups: ['commons'],
-        icon: 'import_export',
-        setting: ['import'],
-        // help
-        help: '',
-        helpId: '',
-        // functional (page)
-        template: '<div></div>',
-        controller: 'WbWidgetSeenImport'
-    });
-});
+
+		$widget.newWidget({
+			// widget description
+			type: 'ObjectCollection',
+			title: 'Object collection',
+			description: 'A widget to show a collection of items',
+			groups: ['seen'],
+			icon: 'pages',
+			model: '',
+			// functional properties
+			help: '',
+			helpId: 'wb-seen-widget-collection',
+			template: '<div></div>',
+			controller: 'AmWbSeenCollectionWidget'
+		});
+
+		$widget.newWidget({
+			type: 'import',
+			title: 'Import',
+			description: 'Import a part of other content',
+			groups: ['commons'],
+			icon: 'import_export',
+			setting: ['import'],
+			// help
+			help: '',
+			helpId: '',
+			// functional (page)
+			template: '<div></div>',
+			controller: 'WbWidgetSeenImport'
+		});
+	});
 
 /*
  * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
@@ -3839,15 +3835,13 @@ angular.module('am-wb-core') //
 /**
  * Utility class of WB
  */
-angular.module('am-wb-core')
-.service('$wbUtil', function (
+angular.module('am-wb-core').service('$wbUtil', function(
         /* AngularJS */ $q, $templateRequest, $sce
-        /* mb-core   */ ) {
-	
-//	var converterDom = new WbConverterDom();
+        /* mb-core   */) {
 
-	function getTemplateOf(page)
-	{
+	//	var converterDom = new WbConverterDom();
+
+	function getTemplateOf(page) {
 		var template = page.template;
 		var templateUrl = page.templateUrl;
 		if (angular.isDefined(template)) {
@@ -3875,15 +3869,13 @@ angular.module('am-wb-core')
 	 *            {object} properties of a page, widget , ..
 	 * @return promise to load template on resolve.
 	 */
-	function getTemplateFor(page)
-	{
+	function getTemplateFor(page) {
 		return $q.when(getTemplateOf(page));
 	}
 
 
-	function cleanEvetns(model)
-	{
-		if(model.on){
+	function cleanEvetns(model) {
+		if (model.on) {
 			delete model.event;
 			return;
 		}
@@ -3894,47 +3886,45 @@ angular.module('am-wb-core')
 		}
 
 		// load legecy events
-		if(model.event.failure){
+		if (model.event.failure) {
 			model.event.error = model.event.failure;
 			delete model.event.failure;
 		}
 
-		if(model.event){
+		if (model.event) {
 			model.on = model.event;
 			delete model.event;
 		}
 
 		// add a note to all event 
-		if(model.on){
-			_.forOwn(model.on, function(value, key) { 
+		if (model.on) {
+			_.forOwn(model.on, function(value, key) {
 				model.on[key] = '/* code style is deprecated. see http://www.viraweb123.ir/amh-blog/content/wb-v4-release */ \n' + value;
-			} );
+			});
 		}
 	}
 
-	function cleanLayout(model)
-
-	{
+	function cleanLayout(model) {
 		if (model.style.layout) {
-			if(model.style.layout.align_self){
+			if (model.style.layout.align_self) {
 				model.style.alignSelf = model.style.layout.align_self;
 			}
-			if(model.style.layout.direction){
+			if (model.style.layout.direction) {
 				model.style.display = 'flex';
 
-//				model.style.flex
+				//				model.style.flex
 				model.style.flexGrow = model.style.layout.grow;
 				model.style.flexShrink = model.style.layout.shrink;
 				model.style.flexBasis = model.style.layout.basis;
 
-//				model.style.flexFlow
+				//				model.style.flexFlow
 				model.style.flexDirection = model.style.layout.direction;
 				model.style.flexWrap = model.style.layout.wrap ? 'wrap' : 'no-wrap';
 				model.style.justifyContent = model.style.layout.justify;
-				if(model.style.justifyContent === 'end' || model.style.justifyContent === 'end' ){
+				if (model.style.justifyContent === 'end' || model.style.justifyContent === 'end') {
 					model.style.justifyContent = 'flex-' + model.style.justifyContent;
 				}
-//				alignContent = ??
+				//				alignContent = ??
 				model.style.alignItems = model.style.layout.align;
 				model.style.order = model.style.layout.order;
 			}
@@ -3943,8 +3933,7 @@ angular.module('am-wb-core')
 		}
 	}
 
-	function cleanSize(model)
-	{
+	function cleanSize(model) {
 		// w1 style.size -> w4
 		if (model.style.size) {
 			model.style.width = model.style.size.width;
@@ -3958,10 +3947,9 @@ angular.module('am-wb-core')
 		}
 	}
 
-	function cleanBackground(model)
-	{
+	function cleanBackground(model) {
 		if (model.style.background) {
-			if(model.style.background.image) {
+			if (model.style.background.image) {
 				model.style.backgroundImage = 'url("' + model.style.background.image + '")';
 			}
 			model.style.backgroundColor = model.style.background.color;
@@ -3974,8 +3962,7 @@ angular.module('am-wb-core')
 		}
 	}
 
-	function cleanBorder(model)
-	{
+	function cleanBorder(model) {
 		// w1 border -> w4
 		if (model.style.border) {
 			model.style.borderStyle = model.style.border.style;
@@ -3987,8 +3974,7 @@ angular.module('am-wb-core')
 		}
 	}
 
-	function cleanSpace(model)
-	{
+	function cleanSpace(model) {
 		// Padding from W0 -> w4
 		if (model.style.padding && angular.isObject(model.style.padding)) {
 			var padding = '';
@@ -3996,9 +3982,9 @@ angular.module('am-wb-core')
 				padding = model.style.padding.uniform;
 			} else {
 				padding = model.style.padding.top || '0px' + ' ' +
-				model.style.padding.right || '0px' + ' ' +
-				model.style.padding.bottom || '0px' + ' ' +
-				model.style.padding.left || '0px' + ' ';
+					model.style.padding.right || '0px' + ' ' +
+					model.style.padding.bottom || '0px' + ' ' +
+					model.style.padding.left || '0px' + ' ';
 			}
 			model.style.padding = padding;
 		}
@@ -4010,39 +3996,38 @@ angular.module('am-wb-core')
 				margin = model.style.margin.uniform;
 			} else {
 				margin = model.style.margin.top || '0px' + ' ' +
-				model.style.margin.right || '0px' + ' ' +
-				model.style.margin.bottom || '0px' + ' ' +
-				model.style.margin.left || '0px' + ' ';
+					model.style.margin.right || '0px' + ' ' +
+					model.style.margin.bottom || '0px' + ' ' +
+					model.style.margin.left || '0px' + ' ';
 			}
 			model.style.margin = margin;
 		}
 	}
 
-	function cleanAlign(/*model*/)
-	{
-//		if (!model.style.align) {
-//		model.style.align = {};
-//		}
+	function cleanAlign(/*model*/) {
+		//		if (!model.style.align) {
+		//		model.style.align = {};
+		//		}
 	}
 
-	function cleanOverflow(model){
-		if(model.style.overflow){
+	function cleanOverflow(model) {
+		if (model.style.overflow) {
 			model.style.overflowX = model.style.overflow.x;
 			model.style.overflowY = model.style.overflow.y;
 		}
 	}
 
-	function cleanShadow(model){
+	function cleanShadow(model) {
 		//h-offset v-offset blur spread color
-		if(model.style.shadows){
+		if (model.style.shadows) {
 			var boxShadows = [];
-			_.forEach(model.style.shadows, function(shadow){
-				var sh = shadow.hShift + ' ' + 
-				shadow.vShift + ' ' + 
-				shadow.blur + ' ' + 
-				shadow.spread + ' ' + 
-				shadow.color;
-				if(shadow.inset){
+			_.forEach(model.style.shadows, function(shadow) {
+				var sh = shadow.hShift + ' ' +
+					shadow.vShift + ' ' +
+					shadow.blur + ' ' +
+					shadow.spread + ' ' +
+					shadow.color;
+				if (shadow.inset) {
 					sh += ' ' + 'inset';
 				}
 				boxShadows.push(sh);
@@ -4053,8 +4038,7 @@ angular.module('am-wb-core')
 		}
 	}
 
-	function cleanStyle(model)
-	{
+	function cleanStyle(model) {
 		if (!angular.isObject(model.style)) {
 			model.style = {};
 		}
@@ -4068,48 +4052,47 @@ angular.module('am-wb-core')
 		cleanShadow(model);
 	}
 
-	function cleanType(model){
-		if(model.type === 'Group'){
+	function cleanType(model) {
+		if (model.type === 'Group') {
 			model.type = 'div';
 		}
-		if(model.type === 'Import'){
+		if (model.type === 'Import') {
 			model.type = 'import';
 		}
-		if(model.type === 'Link') {
+		if (model.type === 'Link') {
 			model.type = 'a';
 			model.html = model.title;
 			model.href = model.url;
 			model.style.text = {
-					align: 'center'
+				align: 'center'
 			};
 			model.style.cursor = 'pointer';
 
 			delete model.title;
 			delete model.url;
 		}
-		if(model.type === 'Image'){
+		if (model.type === 'Image') {
 			model.type = 'img';
 			model.src = model.url;
 
 			delete model.url;
 		}
-		if(model.type === 'HtmlText'){
+		if (model.type === 'HtmlText') {
 			model.html = model.text;
 			delete model.text;
 		}
-//		if(model.type === 'HtmlText'){
-//			model.type = 'section';
-//			model.children = converterDom.decode(model.html);
-//			delete model.html;
-//		}
+		//		if(model.type === 'HtmlText'){
+		//			model.type = 'section';
+		//			model.children = converterDom.decode(model.html);
+		//			delete model.html;
+		//		}
 	}
 
-	function cleanInternal(model)
-	{
+	function cleanInternal(model) {
 		delete model.version;
 		cleanEvetns(model);
 		cleanStyle(model);
-		if(_.isArray(model.contents)){
+		if (_.isArray(model.contents)) {
 			model.children = model.contents;
 			delete model.contents;
 		}
@@ -4126,8 +4109,7 @@ angular.module('am-wb-core')
 	 * @param {object} model 
 	 * @param {type} force
 	 */
-	function clean(model, force)
-	{
+	function clean(model, force) {
 		if (!model.type || model.type === 'Page' || model.type === 'Group') {
 			model.type = 'div';
 		}
@@ -4160,37 +4142,37 @@ angular.module('am-wb-core')
 	};
 
 	this.replaceWidgetModelById = function(model, id, newModel) {
-		if(!model || model.id == id){
+		if (!model || model.id == id) {
 			return newModel;
 		}
 		if (_.isArray(model.children)) {
 			for (var i = 0; i < model.children.length; i++) {
-				if(model.children[i].id === id){
+				if (model.children[i].id === id) {
 					model.children[i] = newModel;
 					return model;
 				}
 			}
 			for (i = 0; i < model.children.length; i++) {
 				var genModel = this.replaceWidgetModelById(model.children[i], id, newModel);
-				if(genModel){
+				if (genModel) {
 					return model;
 				}
 			}
 		}
-		
+
 		return;
 	};
 
 	this.downloadWidgetModel = function(url, id) {
 		var ctrl = this;
 		return $templateRequest(url)
-		.then(function (template) {
-			var obj = ctrl.clean(angular.fromJson(template));
-			if (!id) {
-				return obj;
-			}
-			return ctrl.findWidgetModelById(obj, id);
-		});
+			.then(function(template) {
+				var obj = ctrl.clean(angular.fromJson(template));
+				if (!id) {
+					return obj;
+				}
+				return ctrl.findWidgetModelById(obj, id);
+			});
 	};
 });
 
@@ -4218,7 +4200,7 @@ angular.module('am-wb-core')
  * SOFTWARE.
  */
 
-angular.module('am-wb-core')
+
 
 /**
  * @ngdoc Services
@@ -4227,515 +4209,465 @@ angular.module('am-wb-core')
  * 
  * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
-.service('$widget', function(
-        /* AngularJS */ $q, $injector,
+angular.module('am-wb-core').service('$widget', function(
+        /* AngularJS */ $q, $injector, $log,
         /* wb-core */ WidgetEditor) {
 
-    var _group_repo = [];
-    var contentElementAsso = [];
-    var elementKey = [];
-    var service = this;
+	var _group_repo = [];
+	var service = this;
 
-    /*
-     * List of all widget processor
-     * 
-     * A processor is a function which accepts widget and event then 
-     * update widget based on the event. There are many predefined processor
-     * such as style, microdata, and DND processors.
-     * 
-     */
-    var processors = {};
+	var contentElementAsso = [];
+	var elementKey = [];
 
-    /*
-     * List of converters
-     */
-    var converters = [];
+	var widgetDefinition = {};
 
-    var notFoundWidget = {
-            template : '<div ng-show="wbEditable">Unsuported widget?!</div>',
-            label : 'Not found',
-            description : 'Element not found'
-    };
-    var container = {
-            type : 'Page',
-            label : 'Page',
-            description : 'Panel contains list of widgets.',
-            image : 'images/wb/content.svg'
-    };
+	/*
+	 * List of all widget processor
+	 * 
+	 * A processor is a function which accepts widget and event then 
+	 * update widget based on the event. There are many predefined processor
+	 * such as style, microdata, and DND processors.
+	 * 
+	 */
+	var processors = {};
 
-    function _group(groupId){
-        for(var i = 0; i < _group_repo.length; i++){
-            if(_group_repo[i].id === groupId){
-                return _group_repo[i];
-            }
-        }
-        var group = {
-                id: groupId
-        };
-        _group_repo.push(group);
-        return group;
-    }
+	/*
+	 * List of converters
+	 */
+	var converters = [];
 
-    function _newGroup(group){
-        var g = _group(group.id);
-        angular.extend(g, group);
-    }
+	var notFoundWidget = {
+		template: '<div ng-show="wbEditable">Unsuported widget?!</div>',
+		label: 'Not found',
+		description: 'Element not found'
+	};
 
-    function _groups(){
-        return _group_repo;
-    }
+	function _group(groupId) {
+		for (var i = 0; i < _group_repo.length; i++) {
+			if (_group_repo[i].id === groupId) {
+				return _group_repo[i];
+			}
+		}
+		var group = {
+			id: groupId
+		};
+		_group_repo.push(group);
+		return group;
+	}
 
-    function _widget(model){
-        if (model.type in contentElementAsso) {
-            return contentElementAsso[model.type];
-        }
-        if (model.type === 'Page') {
-            return container;
-        }
-        return notFoundWidget;
-    }
-    /**
-     * Finds a widget related to the input model.
-     * 
-     * Widget type is stored in the widget data model. This function get the
-     * model type from the input data type and return related widget.
-     * 
-     * NotFoundElement widget is returned if the widget type is not found.
-     * 
-     * @memberof $widget
-     * @param model to find a widget
-     * @returns promise to find a widget
-     */
-    function widget(model) {
-        return $q.when(_widget(model));
-    }
+	function _newGroup(group) {
+		var g = _group(group.id);
+		angular.extend(g, group);
+	}
 
-    /**
-     * Returns list of all registerd widgets.
-     * 
-     * @memberof $widget
-     * @returns promise to load all widgets
-     */
-    function widgets() {
-        var list = {};
-        // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-        list.items = [];
-        elementKey.forEach(function(type) {
-            list.items.push(contentElementAsso[type]);
-        });
-        return $q.when(list);
-    }
+	function _groups() {
+		return _group_repo;
+	}
 
-    /**
-     * List of all registered widgets
-     * 
-     * @memberof $widget
-     * @returns keys {array} list of all keys
-     */
-    function getWidgetsKey(){
-        return elementKey;
-    }
+	function _widget(model) {
+		return widgetDefinition[model.type || model] || notFoundWidget;
+	}
+	/**
+	 * Finds a widget related to the input model.
+	 * 
+	 * Widget type is stored in the widget data model. This function get the
+	 * model type from the input data type and return related widget.
+	 * 
+	 * NotFoundElement widget is returned if the widget type is not found.
+	 * 
+	 * @memberof $widget
+	 * @param model to find a widget
+	 * @returns promise to find a widget
+	 */
+	function widget(model) {
+		return $q.when(_widget(model));
+	}
 
-    /**
-     * Registers new widget
-     * 
-     * The old widget will be override if a new widget with the same type is registered.
-     * 
-     * @See the following page for more information:
-     * 
-     *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
-     *    
-     * 
-     * @memberof $widget
-     * @param widget to add
-     * @return the service
-     */
-    function newWidget(widget) {
-        if (hasWidget(widget.type)) {
-            // TODO: maso, 2017: Add log for duplication
-        }
-        // fix widget data
-        widget.model = widget.model || {style:{}};
-        widget.model.type = widget.type;
-        widget.model.name = widget.model.name || widget.title; 
+	/**
+	 * Returns list of all registerd widgets.
+	 * 
+	 * @memberof $widget
+	 * @returns promise to load all widgets
+	 */
+	function widgets() {
+		var list = { items: [] };
+		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+		_.forEach(widgetDefinition, function(widget) {
+			list.items.push(widget);
+		});
+		return $q.when(list);
+	}
 
-        contentElementAsso[widget.type] = widget;
-        elementKey.push(widget.type);
-        return service;
-    }
+	/**
+	 * Registers new widget
+	 * 
+	 * The old widget will be override if a new widget with the same type is registered.
+	 * 
+	 * @See the following page for more information:
+	 * 
+	 *    https://gitlab.com/weburger/angular-material-weburger/wikis/create-new-widget
+	 *    
+	 * 
+	 * @memberof $widget
+	 * @param widget to add
+	 * @return the service
+	 */
+	function newWidget(widget) {
+		if (hasWidget(widget.type)) {
+			$log.warn('Widget is replaced', widget);
+		}
+		// fix widget data
+		widget.model = widget.model || { style: {} };
+		widget.model.type = widget.type;
+		widget.model.name = widget.model.name || widget.title;
 
+		widgetDefinition[widget.type] = widget;
+		return service;
+	}
 
-    function hasWidget(type) {
-        return type in contentElementAsso;
-    }
-    this.hasWidget = hasWidget;
+	function hasWidget(type) {
+		return !_.isUndefined(widgetDefinition[type]);
+	}
 
-    function isWidgetLeaf(name){
-        if (name in contentElementAsso) {
-            return contentElementAsso[name].isLeaf;
-        }
-        return false;
-    }
-    this.isWidgetLeaf = isWidgetLeaf;
+	this.hasWidget = hasWidget;
 
-    /**
-     * Compile element 
-     * 
-     * @name show
-     * @memberof $widget
-     * @param model
-     *            {object}
-     *            <ul>
-     *            <li>templateUrl - {string=}: The URL of a template that will
-     *            be used as the content of the dialog.</li>
-     *            <li>template- {string=}: HTML template to show in the dialog.
-     *            This must be trusted HTML with respect to Angular's $sce
-     *            service. This template should never be constructed with any
-     *            kind of user input or user data.</li>
-     *            <li>contentElement:</li>
-     *            <li>scope - {object=}: the scope to link the template
-     *            controller to. If none is specified, it will create a new
-     *            isolate scope. This scope will be destroyed when the dialog is
-     *            removed unless preserveScope is set to true.</li>
-     *            <li>controller - {function|string=}: The controller to
-     *            associate with the dialog. The controller will be injected
-     *            with the local $mdDialog, which passes along a scope for the
-     *            dialog.</li>
-     *            <li>controllerAs - {string=}: An alias to assign the
-     *            controller to on the scope.</li>
-     *            <li>parent - {element=}: The element to append the dialog to.
-     *            Defaults to appending to the root element of the application.</li>
-     *            </ul>
-     * @param parentWidget
-     *     {WbWidget} the parent
-     * @param preElement {Element} pre build element
-     * @return promise A promise that resolve created element
-     */
-    function compile(model, $parent, preElement){
-        var widgetDescription = _widget(model);
-        var $element;
-        if(preElement){
-            $element = preElement;
-        } else {
-            $element = angular.element('<'+model.type+'></'+model.type+'>');
-        }
-        var Widget = $injector.get(widgetDescription.controller || 'WbWidgetAbstract');
-        var widget = new Widget($element, $parent);
-        $element[0].$$wbController = widget;
-        return $q.resolve(widget.setModel(model));
-    }
+	function isWidgetLeaf(type) {
+		return widgetDefinition[type] && widgetDefinition.isLeaf;
+	}
 
-    /**
-     * Creates new serialized data of widget
-     * 
-     * @memberof $widget
-     * @param widget
-     * @returns
-     */
-    function widgetData(widget){
-        return angular.copy(widget.model);
-    }
+	/**
+	 * Compile element 
+	 * 
+	 * @name show
+	 * @memberof $widget
+	 * @param model
+	 *            {object}
+	 *            <ul>
+	 *            <li>templateUrl - {string=}: The URL of a template that will
+	 *            be used as the content of the dialog.</li>
+	 *            <li>template- {string=}: HTML template to show in the dialog.
+	 *            This must be trusted HTML with respect to Angular's $sce
+	 *            service. This template should never be constructed with any
+	 *            kind of user input or user data.</li>
+	 *            <li>contentElement:</li>
+	 *            <li>scope - {object=}: the scope to link the template
+	 *            controller to. If none is specified, it will create a new
+	 *            isolate scope. This scope will be destroyed when the dialog is
+	 *            removed unless preserveScope is set to true.</li>
+	 *            <li>controller - {function|string=}: The controller to
+	 *            associate with the dialog. The controller will be injected
+	 *            with the local $mdDialog, which passes along a scope for the
+	 *            dialog.</li>
+	 *            <li>controllerAs - {string=}: An alias to assign the
+	 *            controller to on the scope.</li>
+	 *            <li>parent - {element=}: The element to append the dialog to.
+	 *            Defaults to appending to the root element of the application.</li>
+	 *            </ul>
+	 * @param parentWidget
+	 *     {WbWidget} the parent
+	 * @param preElement {Element} pre build element
+	 * @return promise A promise that resolve created element
+	 */
+	function compile(model, $parent, preElement) {
+		var wd = _widget(model);
+		var $element;
+		if (preElement) {
+			$element = preElement;
+		} else {
+			$element = angular.element('<' + model.type + '></' + model.type + '>');
+		}
+		var Widget = $injector.get(wd.controller || 'WbWidgetAbstract');
+		var widget = new Widget($element, $parent);
+		$element[0].$$wbController = widget;
+		return $q.resolve(widget.setModel(model));
+	}
 
-    // widgets
-    service.newWidget = newWidget;
-    service.widget = widget;
-    service.widgets = widgets;
-    service.widgetData = widgetData;
-    service.getWidgetsKey = getWidgetsKey;
+	/**
+	 * Creates new serialized data of widget
+	 * 
+	 * @memberof $widget
+	 * @param widget
+	 * @returns
+	 */
+	function widgetData(widget) {
+		return angular.copy(widget.model);
+	}
 
-    // new api
-    service.getWidget = _widget;
-    service.getWidgets =  function(){
-        var widgets = {};
-        // XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
-        widgets.items = [];
-        elementKey.forEach(function(type) {
-            widgets.items.push(contentElementAsso[type]);
-        });
-        return widgets;
-    };
+	// widgets
+	service.newWidget = newWidget;
+	service.widget = widget;
+	service.widgets = widgets;
+	service.widgetData = widgetData;
+	service.isWidgetLeaf = isWidgetLeaf;
 
-    // widget groups
-    service.group = _group;
-    service.groups = _groups;
-    service.newGroup = _newGroup;
+	// new api
+	service.getWidget = _widget;
+	service.getWidgets = function() {
+		var widgets = {};
+		// XXX: maso, 1395: تعیین خصوصیت‌ها به صورت دستی است
+		widgets.items = [];
+		elementKey.forEach(function(type) {
+			widgets.items.push(contentElementAsso[type]);
+		});
+		return widgets;
+	};
 
-    // utils
-    service.compile = compile;
+	// widget groups
+	service.group = _group;
+	service.groups = _groups;
+	service.newGroup = _newGroup;
 
-    /**
-     * Gets list of all children from the widget
-     * 
-     * The list is consist of all children and sub-children from the given 
-     * widget.
-     * 
-     * @params widget {AbstractWidgetCtrl} the widget
-     * @return List of widgets
-     * @memberof $widget
-     */
-    this.getChildren = function(widget) {
-        // Check if it is group
-        var widgets = [];
-        if(widget.isLeaf()){
-            return widgets;
-        }
+	// utils
+	service.compile = compile;
 
-        // load list of widgets
-        var groups = [];
-        _.forEach(widget.getChildren(), function(child){
-            groups.push(child);
-        });
-        while(groups.length) {
-            widget = groups.pop();
-            widgets.push(widget);
-            if(!widget.isLeaf()){
-                var children = widget.getChildren();
-                for(var i = 0; i < children.length; i++) {
-                    var child = children[i];
-                    groups.push(child);
-                }
-            }
-        }
-        //return the list
-        return widgets;
-    };
+	/**
+	 * Gets list of all children from the widget
+	 * 
+	 * The list is consist of all children and sub-children from the given 
+	 * widget.
+	 * 
+	 * @params widget {AbstractWidgetCtrl} the widget
+	 * @return List of widgets
+	 * @memberof $widget
+	 */
+	this.getChildren = function(widget) {
+		// Check if it is group
+		var widgets = [];
+		if (widget.isLeaf()) {
+			return widgets;
+		}
 
-    // Returns a function, that, as long as it continues to be invoked, will not
-    // be triggered. The function will be called after it stops being called for
-    // N milliseconds. If `immediate` is passed, trigger the function on the
-    // leading edge, instead of the trailing.
-    this.debounce = function (func, wait, immediate) {
-        var timeout;
-        return function() {
-            var context = this;
-            var args = arguments;
-            var later = function() {
-                timeout = null;
-                if (!immediate) {
-                    func.apply(context, args);
-                }
-            };
-            var callNow = immediate && !timeout;
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-            if (callNow) {
-                func.apply(context, args);
-            }
-        };
-    };
+		// load list of widgets
+		var groups = [];
+		_.forEach(widget.getChildren(), function(child) {
+			groups.push(child);
+		});
+		while (groups.length) {
+			widget = groups.pop();
+			widgets.push(widget);
+			if (!widget.isLeaf()) {
+				var children = widget.getChildren();
+				for (var i = 0; i < children.length; i++) {
+					var child = children[i];
+					groups.push(child);
+				}
+			}
+		}
+		//return the list
+		return widgets;
+	};
 
+	/***********************************************
+	 * providers
+	 ***********************************************/
 
-    /***********************************************
-     * providers
-     ***********************************************/
+	var providers = {};
 
-    var providers =  {};
+	/**
+	 * Removes a provider by its key
+	 * 
+	 * @memberof $widget
+	 * @param key {string} of the provider
+	 * @return the provider or null
+	 */
+	this.removeProvider = function(key) {
+		var provider = providers[key];
+		providers[key] = undefined;
+		return provider;
+	};
 
-    /**
-     * Removes a provider by its key
-     * 
-     * @memberof $widget
-     * @param key {string} of the provider
-     * @return the provider or null
-     */
-    this.removeProvider = function(key){
-        var provider = providers[key];
-        providers[key] = undefined;
-        return provider;
-    };
+	/**
+	 * Gets a provider by its key
+	 * 
+	 * @memberof $widget
+	 * @param key {string} of the provider
+	 * @return the provider or null
+	 */
+	this.getProvider = function(key) {
+		return providers[key];
+	};
 
-    /**
-     * Gets a provider by its key
-     * 
-     * @memberof $widget
-     * @param key {string} of the provider
-     * @return the provider or null
-     */
-    this.getProvider = function(key){
-        return providers[key];
-    };
+	/**
+	 * Sets a provider for the specified key
+	 * 
+	 * @memberof $widget
+	 * @para key {string} of the provider
+	 */
+	this.setProvider = function(key, provider) {
+		providers[key] = provider;
+		return this;
+	};
 
-    /**
-     * Sets a provider for the specified key
-     * 
-     * @memberof $widget
-     * @para key {string} of the provider
-     */
-    this.setProvider = function(key, provider){
-        providers[key] = provider;
-        return this;
-    };
+	/**
+	 * Gets the list of providers
+	 * 
+	 * @memberof $widget
+	 * @return list of providers
+	 */
+	this.getProviders = function() {
+		return providers;
+	};
 
-    /**
-     * Gets the list of providers
-     * 
-     * @memberof $widget
-     * @return list of providers
-     */
-    this.getProviders = function(){
-        return providers;
-    };
+	/**
+	 * Sets a provider
+	 * 
+	 * @deprecated use setprovider insted
+	 */
+	this.addProvider = function(key, provider) {
+		return this.setProvider(key, provider);
+	};
 
-    /**
-     * Sets a provider
-     * 
-     * @deprecated use setprovider insted
-     */
-    this.addProvider = function(key, provider){
-        return this.setProvider(key, provider);
-    };
+	/**
+	 * Gets list of providers keys
+	 * 
+	 * @memberof $widget
+	 * @return list of keys
+	 */
+	this.getProvidersKey = function() {
+		return _.keys(providers);
+	};
 
-    /**
-     * Gets list of providers keys
-     * 
-     * @memberof $widget
-     * @return list of keys
-     */
-    this.getProvidersKey = function(){
-        return _.keys(providers);
-    };
-
-    /***********************************************
-     * Editors
-     ***********************************************/
-    var editors = {};
-    var fakeEditor = new WidgetEditor();
+	/***********************************************
+	 * Editors
+	 ***********************************************/
+	var editors = {};
+	var fakeEditor = new WidgetEditor();
 
 
 
-    /**
-     * Set editor of a widgets
-     * 
-     * on double click editors are used to edit the widget.
-     * 
-     * @params type {string} type of the widget
-     * @params editor {Editor} editor
-     * @memberof $widget
-     */
-    this.setEditor = function(type, editor){
-        editors[type] = editor;
-    };
+	/**
+	 * Set editor of a widgets
+	 * 
+	 * on double click editors are used to edit the widget.
+	 * 
+	 * @params type {string} type of the widget
+	 * @params editor {Editor} editor
+	 * @memberof $widget
+	 */
+	this.setEditor = function(type, editor) {
+		editors[type] = editor;
+	};
 
-    /**
-     * Find editor for the given widget
-     * 
-     * @params widget {WbWidget} the widget
-     * @return the editor or fake editor
-     * @memberof $widget
-     */
-    this.getEditor = function(widget){
-        if(widget.$$wbEditor){
-            // return old editor
-            return widget.$$wbEditor;
-        }
-        if(editors[widget.getType()] === undefined){
-            return fakeEditor;
-        }
-        var register = editors[widget.getType()];
-        // create editor
-        var Editor = $injector.get(register.type);
-        var editor = new Editor(widget, register.options || {});
-        var ctrl = this;
-        widget.$$wbEditor = editor;
-        editor.on('destroy', function(){
-            ctrl.removeEditorFromList(editor);
-        });
-        return editor;
-    };
+	/**
+	 * Find editor for the given widget
+	 * 
+	 * @params widget {WbWidget} the widget
+	 * @return the editor or fake editor
+	 * @memberof $widget
+	 */
+	this.getEditor = function(widget) {
+		if (widget.$$wbEditor) {
+			// return old editor
+			return widget.$$wbEditor;
+		}
+		if (editors[widget.getType()] === undefined) {
+			return fakeEditor;
+		}
+		var register = editors[widget.getType()];
+		// create editor
+		var Editor = $injector.get(register.type);
+		var editor = new Editor(widget, register.options || {});
+		var ctrl = this;
+		widget.$$wbEditor = editor;
+		editor.on('destroy', function() {
+			ctrl.removeEditorFromList(editor);
+		});
+		return editor;
+	};
 
-//  this.getEditors = function(){};
-//  this.getActiveEditor = function(){};
-
-
-    /***********************************************
-     * Processors
-     ***********************************************/
-    /**
-     * set a processor of the type
-     * 
-     * @memberof $widget
-     */
-    this.setProcessor = function(type, processor){
-        processors[type] = processor;
-    };
-
-    this.removeProcessor = function(type){
-        processors[type] = undefined;
-    };
-
-    /**
-     * gets processor of the type
-     * 
-     * @memberof $widget
-     */
-    this.getProcessor = function(type) {
-        return processors[type];
-    };
-
-    /**
-     * gets list of processors
-     * 
-     * @memberof $widget
-     */
-    this.getProcessors = function(){
-        return processors;
-    };
+	//  this.getEditors = function(){};
+	//  this.getActiveEditor = function(){};
 
 
-    /**
-     * Apply processor on the given widget
-     * 
-     * @memberof $widget
-     */
-    this.applyProcessors = function(widget, event){
-        event = event || {};
-        angular.forEach(processors, function(processor){
-            try{
-                processor.process(widget, event);
-            } catch (ex){
-                log.error({
-                    message: 'Fail to run the processor',
-                    exception: ex
-                });
-            }
-        });
-    };
+	/***********************************************
+	 * Processors
+	 ***********************************************/
+	/**
+	 * set a processor of the type
+	 * 
+	 * @memberof $widget
+	 */
+	this.setProcessor = function(type, processor) {
+		processors[type] = processor;
+	};
+
+	this.removeProcessor = function(type) {
+		processors[type] = undefined;
+	};
+
+	/**
+	 * gets processor of the type
+	 * 
+	 * @memberof $widget
+	 */
+	this.getProcessor = function(type) {
+		return processors[type];
+	};
+
+	/**
+	 * gets list of processors
+	 * 
+	 * @memberof $widget
+	 */
+	this.getProcessors = function() {
+		return processors;
+	};
 
 
-    /***********************************************
-     * Convertors
-     ***********************************************/
-    this.addConverter = function(converter){
-        converters.push(converter);
-    };
+	/**
+	 * Apply processor on the given widget
+	 * 
+	 * @memberof $widget
+	 */
+	this.applyProcessors = function(widget, event) {
+		event = event || {};
+		angular.forEach(processors, function(processor) {
+			try {
+				processor.process(widget, event);
+			} catch (ex) {
+				log.error({
+					message: 'Fail to run the processor',
+					exception: ex
+				});
+			}
+		});
+	};
 
-    this.getConverters = function(){
-        return converters;
-    };
 
-    this.getConverter = function(mimetype){
-        for(var i = 0; i < converters.length; i++){
-            if(converters[i].getMimetype() === mimetype){
-                return converters[i];
-            }
-        }
-    };
+	/***********************************************
+	 * Convertors
+	 ***********************************************/
+	this.addConverter = function(converter) {
+		converters.push(converter);
+	};
 
-    this.widgetFromPoint = function(x, y){
-        return this.widgetFromElement(document.elementFromPoint(x, y));
-    };
+	this.getConverters = function() {
+		return converters;
+	};
 
-    this.widgetFromElement = function(element){
-        if(!element){
-            return;
-        }
-        do{
-            if(element.$$wbController){
-                return element.$$wbController;
-            }
-            element = element.parentNode;
-        } while(element);
-    };
+	this.getConverter = function(mimetype) {
+		for (var i = 0; i < converters.length; i++) {
+			if (converters[i].getMimetype() === mimetype) {
+				return converters[i];
+			}
+		}
+	};
+
+	this.widgetFromPoint = function(x, y) {
+		return this.widgetFromElement(document.elementFromPoint(x, y));
+	};
+
+	this.widgetFromElement = function(element) {
+		if (!element) {
+			return;
+		}
+		do {
+			if (element.$$wbController) {
+				return element.$$wbController;
+			}
+			element = element.parentNode;
+		} while  (element);
+	};
 
 });
 
