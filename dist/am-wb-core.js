@@ -2432,8 +2432,6 @@ angular.module('am-wb-core') //
  */
 
 
-
-
 /***********************************************************************
  * Processors
  ***********************************************************************/
@@ -2496,898 +2494,338 @@ angular.module('am-wb-core').run(function(
  ***********************************************************************/
 angular.module('am-wb-core').run(function($widget) {
 	$widget.newWidget({
-		// widget description
 		type: 'a',
-		title: 'A link',
-		description: 'A widget to add external link. It is used as block item.',
-		icon: 'wb-widget-a',
-		groups: ['basic'],
-		// functional properties
-		model: {
-			html: 'Link title'
-		},
 		controller: 'WbWidgetA',
-		isLeaf: true
 	});
 	$widget.newWidget({
-		// widget description
 		type: 'address',
-		title: 'address',
-		description: 'description.',
-		icon: 'wb-widget-address',
-		groups: ['basic'],
-		// functional properties
 		controller: 'WbWidgetAddress',
-		isLeaf: false
 	});
 	$widget.newWidget({
-		// widget description
 		type: 'applet',
-		title: 'applet',
-		description: 'applet.',
-		icon: 'wb-widget-applet',
-		groups: ['basic'],
-		// functional properties
 		controller: 'WbWidgetApplet',
-		isLeaf: true
 	});
 	$widget.newWidget({
-		// widget description
 		type: 'area',
-		title: 'area',
-		description: 'area',
-		icon: 'wb-widget-area',
-		groups: ['basic'],
-		// functional properties
 		controller: 'WbWidgetArea'
 	});
 	$widget.newWidget({
-		// widget description
 		type: 'article',
-		title: 'article',
-		description: 'article',
-		icon: 'wb-widget-article',
-		groups: ['basic'],
-		// functional properties
 		controller: 'WbWidgetArticle'
 	});
 	$widget.newWidget({
-		// widget description
 		type: 'aside',
-		title: 'aside',
-		description: 'aside',
-		icon: 'wb-widget-aside',
-		groups: ['basic'],
-		// functional properties
 		controller: 'WbWidgetAside'
 	});
 	$widget.newWidget({
 		type: 'audio',
-		title: 'Audio',
-		label: 'audio',
-		icon: 'wb-widget-audio',
-		description: 'This widget is used to add audio in the document.',
-		groups: ['basic'],
-		model: {
-			media: '(min-width: 650px)',
-			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
-		},
 		controller: 'WbWidgetAudio',
-		isLeaf: false,
 	});
 	$widget.newWidget({
 		type: 'blockquote',
-		title: 'blockquote',
-		label: 'blockquote',
-		icon: 'wb-widget-blockquote',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetBlockquote',
-		isLeaf: true,
 	});
 	$widget.newWidget({
 		type: 'button',
-		title: 'button',
-		label: 'button',
-		icon: 'wb-widget-button',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetButton',
-		isLeaf: true,
 	});
 	$widget.newWidget({
 		type: 'canvas',
-		title: 'canvas',
-		label: 'canvas',
-		icon: 'wb-widget-canvas',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetCanvas',
-		isLeaf: true,
 	});
 	$widget.newWidget({
 		type: 'datalist',
-		title: 'datalist',
-		label: 'datalist',
-		icon: 'wb-widget-datalist',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetDatalist',
 	});
 	$widget.newWidget({
 		type: 'dd',
-		title: 'dd',
-		label: 'dd',
-		icon: 'wb-widget-dd',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetDd',
 	});
 	$widget.newWidget({
 		type: 'details',
-		title: 'details',
-		label: 'details',
-		icon: 'wb-widget-details',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetDetails',
 	});
 	$widget.newWidget({
 		type: 'dialog',
-		title: 'dialog',
-		label: 'dialog',
-		icon: 'wb-widget-dialog',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetDialog',
 	});
 	$widget.newWidget({
 		type: 'div',
-		title: 'div',
-		label: 'div',
-		icon: 'wb-widget-div',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetDiv',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'dl',
-		title: 'dl',
-		label: 'dl',
-		icon: 'wb-widget-dl',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetDl',
 	});
 	$widget.newWidget({
 		type: 'dt',
-		title: 'dt',
-		label: 'dt',
-		icon: 'wb-widget-dt',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetDt',
 	});
 	$widget.newWidget({
 		type: 'embed',
-		title: 'embed',
-		label: 'embed',
-		icon: 'wb-widget-embed',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-embed',
 		controller: 'WbWidgetEmbed',
 	});
 	$widget.newWidget({
 		type: 'fieldset',
-		title: 'fieldset',
-		label: 'fieldset',
-		icon: 'wb-widget-fieldset',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-fieldset',
 		controller: 'WbWidgetFieldset',
 	});
 	$widget.newWidget({
 		type: 'figcaption',
-		title: 'figcaption',
-		label: 'figcaption',
-		icon: 'wb-widget-figcaption',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-figcaption',
 		controller: 'WbWidgetFigcaption',
 	});
 	$widget.newWidget({
 		type: 'figure',
-		title: 'figure',
-		label: 'figure',
-		icon: 'wb-widget-figure',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-figure',
 		controller: 'WbWidgetFigure',
 	});
 	$widget.newWidget({
 		type: 'footer',
-		title: 'footer',
-		label: 'footer',
-		icon: 'wb-widget-footer',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-footer',
 		controller: 'WbWidgetFooter',
 	});
 	$widget.newWidget({
 		type: 'form',
-		title: 'form',
-		label: 'form',
-		icon: 'wb-widget-form',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-form',
 		controller: 'WbWidgetForm',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'frame',
-		title: 'frame',
-		label: 'frame',
-		icon: 'wb-widget-form',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-frame',
 		controller: 'WbWidgetFrame',
 	});
 	$widget.newWidget({
 		type: 'frameset',
-		title: 'frameset',
-		label: 'frameset',
-		icon: 'wb-widget-frameset',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-frameset',
 		controller: 'WbWidgetFrameset',
-		isLeaf: false
 	});
 	for (var i = 1; i < 7; i++) {
-		var type = 'h' + i;
 		$widget.newWidget({
 			// widget description
-			type: type,
-			title: 'Header Level ' + i,
-			description: 'A header widget',
-			icon: 'wb-widget-h' + i,
-			groups: ['basic'],
-			model: {
-				name: 'Header-' + i,
-				style: {
-					padding: '8px'
-				}
-			},
-			// functional properties
+			type: 'h' + i,
 			controller: 'WbWidgetH',
-			isLeaf: true
 		});
 	}
 	$widget.newWidget({
 		type: 'header',
-		title: 'header',
-		label: 'header',
-		icon: 'wb-widget-header',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetHeader',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'hr',
-		title: 'hr',
-		label: 'hr',
-		icon: 'wb-widget-hr',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetHr',
-		isLeaf: true,
 	});
 	$widget.newWidget({
 		// widget description
 		type: 'i',
-		title: 'Italics',
-		description: 'The widget defines a part of text in an alternate voice or mood.',
-		icon: 'wb-widget-i',
-		groups: ['basic'],
-		model: {
-			name: 'i',
-			html: 'Text'
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-i',
-		// functional properties
-		controllerAs: 'ctrl',
 		controller: 'WbWidgetI',
-		isLeaf: true,
 	});
 	$widget.newWidget({
 		// widget description
 		type: 'iframe',
-		title: 'Inline Frame',
-		description: 'Add inline frame to show another document within current one.',
-		icon: 'wb-widget-iframe',
-		groups: ['basic'],
-		model: {
-			name: 'iframe',
-			sandbox: 'allow-same-origin allow-scripts',
-			src: 'https://www.google.com',
-			style: {
-				padding: '8px'
-			}
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-iframe',
-		// functional properties
-		controllerAs: 'ctrl',
 		controller: 'WbWidgetIframe',
-		isLeaf: true,
 	});
 	$widget.newWidget({
 		type: 'img',
-		title: 'Image',
-		label: 'image',
-		icon: 'wb-widget-img',
-		description: 'A widget to insert an link to page.',
-		groups: ['basic'],
-		model: {
-			html: 'img',
-			src: 'resources/wb-brand-3.0.png',
-			style: {
-				width: '80%',
-				maxWidth: '500px'
-			}
-		},
-		controllerAs: 'ctrl',
 		controller: 'WbWidgetImg',
-		isLeaf: true,
 	});
 	$widget.newWidget({
 		// widget description
 		type: 'input',
-		title: 'Input field',
-		description: 'A widget to get data from users.',
-		icon: 'wb-widget-input',
-		groups: ['basic'],
-		model: {
-			name: 'input',
-			sandbox: 'allow-same-origin allow-scripts',
-			src: 'https://www.google.com',
-			style: {
-				padding: '8px'
-			}
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-input',
-		// functional properties
 		controller: 'WbWidgetInput',
-		controllerAs: 'ctrl',
-		isLeaf: true,
 	});
 	$widget.newWidget({
 		type: 'kbd',
-		title: 'kbd',
-		label: 'kbd',
-		icon: 'wb-widget-kbd',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetKbd',
 	});
 	$widget.newWidget({
 		type: 'label',
-		title: 'label',
-		label: 'label',
-		icon: 'wb-widget-label',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetLabel',
-		isLeaf: true,
 	});
 	$widget.newWidget({
 		type: 'legend',
-		title: 'legend',
-		label: 'legend',
-		icon: 'wb-widget-legend',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetLegend',
-		isLeaf: true,
 	});
 	$widget.newWidget({
 		type: 'li',
-		title: 'li',
-		label: 'li',
-		icon: 'wb-widget-li',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetLi',
-		isLeaf: false,
 	});
 	$widget.newWidget({
 		type: 'link',
-		title: 'Link',
-		label: 'link',
-		icon: 'wb-widget-link',
-		description: 'A widget to insert an link to page.',
-		groups: ['basic'],
-		model: {
-			html: 'Link',
-			url: 'http://www.gitlab.com/am-wb/am-wb-common'
-		},
-		controllerAs: 'ctrl',
 		controller: 'WbWidgetLink',
-		isLeaf: true,
 	});
 	$widget.newWidget({
 		type: 'main',
-		title: 'main',
-		label: 'main',
-		icon: 'wb-widget-main',
-		description: 'A widget to insert an link to page.',
-		groups: ['basic'],
 		controller: 'WbWidgetMain',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'map',
-		title: 'map',
-		label: 'map',
-		icon: 'wb-widget-map',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetMap',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		// widget description
 		type: 'meta',
-		title: 'Meta',
-		description: 'A widget to add meta data.',
-		icon: 'wb-widget-meta',
-		groups: ['basic'],
-		model: {
-			name: 'name',
-			content: 'content',
-			style: {
-				margin: '8px',
-				background: {
-					color: '#313131',
-				},
-				border: {
-					style: 'dotted',
-					color: '#afafaf'
-				},
-				color: '#ffffff',
-				padding: '8px'
-			}
-		},
-		// functional properties
-		controllerAs: 'ctrl',
 		controller: 'WbWidgetMeta'
 	});
 	$widget.newWidget({
 		type: 'meter',
-		title: 'meter',
-		label: 'meter',
-		icon: 'wb-widget-meter',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetMeter',
 	});
 	$widget.newWidget({
 		type: 'nav',
-		title: 'nav',
-		label: 'nav',
-		icon: 'wb-widget-nav',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetNav',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'noscript',
-		title: 'noscript',
-		label: 'noscript',
-		icon: 'wb-widget-noscript',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetNoscript',
 	});
 	$widget.newWidget({
 		type: 'object',
-		title: 'object',
-		label: 'object',
-		icon: 'wb-widget-object',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetObject',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'ol',
-		title: 'ol',
-		label: 'ol',
-		icon: 'wb-widget-ol',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetOl',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'optgroup',
-		title: 'optgroup',
-		label: 'optgroup',
-		icon: 'wb-widget-optgroup',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetOptgroup',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'option',
-		title: 'option',
-		label: 'option',
-		icon: 'wb-widget-option',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetOption',
 	});
 	$widget.newWidget({
 		type: 'output',
-		title: 'output',
-		label: 'output',
-		icon: 'wb-widget-output',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetOutput',
 	});
 	$widget.newWidget({
 		// widget description
 		type: 'p',
-		title: 'Paragraph',
-		description: 'A widget to add paragraph.',
-		icon: 'wb-widget-p',
-		groups: ['basic'],
-		model: {
-			name: 'Pragraph',
-			style: {
-				padding: '8px'
-			}
-		},
-		// functional properties
-		controllerAs: 'ctrl',
 		controller: 'WbWidgetP',
-		isLeaf: true
 	});
 	$widget.newWidget({
 		type: 'param',
-		title: 'param',
-		label: 'param',
-		icon: 'wb-widget-param',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetParam',
-		isLeaf: true,
 	});
 	$widget.newWidget({
 		type: 'picture',
-		title: 'Picture',
-		label: 'picture',
-		icon: 'wb-widget-picture',
-		description: 'This widget is used to add picture in the document.',
-		groups: ['basic'],
-		model: {
-			media: '(min-width: 650px)',
-			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
-		},
 		controller: 'WbWidgetPicture',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'pre',
-		title: 'Preformatted',
-		label: 'preformatted',
-		icon: 'wb-widget-pre',
-		description: 'A widget to insert an Preformatted text to page.',
-		groups: ['basic'],
-		model: {
-			html: 'class A {\n\tint a;\n}',
-		},
 		controller: 'WbWidgetPre',
-		controllerAs: 'ctrl',
-		isLeaf: true
 	});
 	$widget.newWidget({
 		// widget description
 		type: 'progress',
-		title: 'Progress',
-		description: 'A widget to add progress.',
-		icon: 'wb-widget-progress',
-		groups: ['basic'],
-		model: {
-			name: 'progress',
-			style: {
-				padding: '8px',
-				margin: '8px',
-				size: {
-					height: '30px'
-				}
-			}
-		},
-		// functional properties
 		controller: 'WbWidgetProgress'
 	});
 	$widget.newWidget({
 		type: 'q',
-		title: 'q',
-		label: 'q',
-		icon: 'wb-widget-q',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetQ',
 	});
 	$widget.newWidget({
 		type: 's',
-		title: 'S',
-		icon: 'wb-widget-s',
-		description: 'The widget is used to define text that is no longer correct.',
-		groups: ['basic'],
-		model: {
-			html: 'Text'
-		},
 		controller: 'WbWidgetS',
 	});
 	$widget.newWidget({
 		type: 'samp',
-		title: 'Samp',
-		icon: 'wb-widget-samp',
-		description: 'It defines sample output from a computer program.',
-		groups: ['basic'],
-		model: {
-			html: 'Text'
-		},
 		controller: 'WbWidgetSamp',
 	});
 	$widget.newWidget({
 		type: 'script',
-		title: 'script',
-		label: 'script',
-		icon: 'wb-widget-script',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetScript',
 	});
 	$widget.newWidget({
 		type: 'section',
-		title: 'section',
-		label: 'section',
-		icon: 'wb-widget-section',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetSection',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'select',
-		title: 'select',
-		label: 'select',
-		icon: 'wb-widget-select',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetSelect',
 	});
 	$widget.newWidget({
 		type: 'small',
-		title: 'Small',
-		icon: 'wb-widget-small',
-		description: 'The widget defines smaller text.',
-		groups: ['basic'],
-		model: {
-			html: 'Small text'
-		},
 		controller: 'WbWidgetSmall',
 	});
 	$widget.newWidget({
 		type: 'source',
-		title: 'Source',
-		label: 'source',
-		icon: 'wb-widget-source',
-		description: 'This widget is used to add source in the document.',
-		groups: ['basic'],
-		model: {
-			media: '(min-width: 650px)',
-			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
-		},
 		controller: 'WbWidgetSource',
 	});
 	$widget.newWidget({
 		type: 'span',
-		title: 'Span',
-		icon: 'wb-widget-span',
-		description: 'The widget is used to group inline-elements in a document.',
-		groups: ['basic'],
-		model: {
-			html: 'Text'
-		},
 		controller: 'WbWidgetSpan',
 	});
 	$widget.newWidget({
 		type: 'strong',
-		title: 'Strong',
-		icon: 'wb-widget-strong',
-		description: 'The widget defines strong emphasized text.',
-		groups: ['basic'],
-		model: {
-			html: 'Text'
-		},
 		controller: 'WbWidgetStrong',
 	});
 	$widget.newWidget({
 		type: 'style',
-		title: 'style',
-		label: 'style',
-		icon: 'wb-widget-style',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetStyle',
 	});
 	$widget.newWidget({
 		type: 'summary',
-		title: 'summary',
-		label: 'summary',
-		icon: 'wb-widget-summary',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetSummary',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'svg',
-		title: 'svg',
-		label: 'svg',
-		icon: 'wb-widget-svg',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetSvg',
 	});
 	$widget.newWidget({
 		type: 'template',
-		title: 'template',
-		label: 'template',
-		icon: 'wb-widget-template',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetTemplate',
-		isLeaf: false
 	});
 	$widget.newWidget({
-		// widget description
 		type: 'textarea',
-		title: 'Text Area field',
-		description: 'A widget to get data from users.',
-		icon: 'wb-widget-textarea',
-		groups: ['basic'],
-		model: {
-			name: 'textarea',
-			style: {
-				padding: '8px'
-			}
-		},
-		// help id
-		help: 'http://dpq.co.ir',
-		helpId: 'wb-widget-textarea',
-		// functional properties
 		controller: 'WbWidgetTextarea',
 	});
 	$widget.newWidget({
 		type: 'track',
-		title: 'track',
-		label: 'track',
-		icon: 'wb-widget-track',
-		description: 'description',
-		groups: ['basic'],
-		help: 'http://dpq.co.ir/more-information-track',
 		controller: 'WbWidgetTrack',
 	});
 	$widget.newWidget({
 		type: 'ul',
-		title: 'ul',
-		label: 'ul',
-		icon: 'wb-widget-ul',
-		description: 'description',
-		groups: ['basic'],
 		controller: 'WbWidgetUl',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'video',
-		title: 'Video',
-		label: 'video',
-		icon: 'wb-widget-video',
-		description: 'This widget is used to add video in the document.',
-		groups: ['basic'],
-		model: {
-			media: '(min-width: 650px)',
-			src: 'http://www.gitlab.com/am-wb/am-wb-commonhttps://unsplash.com/photos/8emNXIvrCL8/download?force=true'
-		},
 		controller: 'WbWidgetVideo',
-		isLeaf: false
 	});
 
 
 	$widget.newWidget({
-		// widget description
 		type: 'ObjectCollection',
-		title: 'Object collection',
-		description: 'A widget to show a collection of items',
-		groups: ['seen'],
-		icon: 'pages',
-		model: '',
-		// functional properties
-		help: '',
-		helpId: 'wb-seen-widget-collection',
 		template: '<div></div>',
 		controller: 'AmWbSeenCollectionWidget'
 	});
 
 	$widget.newWidget({
 		type: 'import',
-		title: 'Import',
-		description: 'Import a part of other content',
-		groups: ['commons'],
-		icon: 'import_export',
-		setting: ['import'],
-		// help
-		help: '',
-		helpId: '',
-		// functional (page)
 		template: '<div></div>',
 		controller: 'WbWidgetSeenImport'
 	});
-	
+
 	//-----------------------------------------------------------------
 	// Table
 	//-----------------------------------------------------------------
 	$widget.newWidget({
 		type: 'table',
 		controller: 'WbWidgetGroup',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'thead',
 		controller: 'WbWidgetGroup',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'tbody',
 		controller: 'WbWidgetGroup',
-		isLeaf: false
-	});
-	$widget.newWidget({
-		type: 'th',
-		controller: 'WbWidgetGroup',
-		isLeaf: false
 	});
 	$widget.newWidget({
 		type: 'tr',
 		controller: 'WbWidgetGroup',
-		isLeaf: false
+	});
+	$widget.newWidget({
+		type: 'th',
+		controller: 'WbWidgetGroup',
 	});
 	$widget.newWidget({
 		type: 'td',
 		controller: 'WbWidgetGroup',
-		isLeaf: false
 	});
 });
 
@@ -4365,9 +3803,6 @@ angular.module('am-wb-core').service('$widget', function(
 
 	this.hasWidget = hasWidget;
 
-	function isWidgetLeaf(type) {
-		return widgetDefinition[type] && widgetDefinition.isLeaf;
-	}
 
 	/**
 	 * Compile element 
@@ -4432,7 +3867,6 @@ angular.module('am-wb-core').service('$widget', function(
 	service.widget = widget;
 	service.widgets = widgets;
 	service.widgetData = widgetData;
-	service.isWidgetLeaf = isWidgetLeaf;
 
 	// new api
 	service.getWidget = _widget;
@@ -4467,9 +3901,6 @@ angular.module('am-wb-core').service('$widget', function(
 	this.getChildren = function(widget) {
 		// Check if it is group
 		var widgets = [];
-		if (widget.isLeaf()) {
-			return widgets;
-		}
 
 		// load list of widgets
 		var groups = [];
@@ -4479,12 +3910,10 @@ angular.module('am-wb-core').service('$widget', function(
 		while (groups.length) {
 			widget = groups.pop();
 			widgets.push(widget);
-			if (!widget.isLeaf()) {
-				var children = widget.getChildren();
-				for (var i = 0; i < children.length; i++) {
-					var child = children[i];
-					groups.push(child);
-				}
+			var children = widget.getChildren();
+			for (var i = 0; i < children.length; i++) {
+				var child = children[i];
+				groups.push(child);
 			}
 		}
 		//return the list
@@ -4700,7 +4129,7 @@ angular.module('am-wb-core').service('$widget', function(
 				return element.$$wbController;
 			}
 			element = element.parentNode;
-		} while  (element);
+		} while (element);
 	};
 
 });
@@ -4733,1125 +4162,1120 @@ angular.module('am-wb-core').service('$widget', function(
 
 //submit the controller
 angular.module('am-wb-core')//
-/**
- * @ngdoc Widgets
- * @name WbWidgetAbstract
- * @descreption Abstract widget
- * 
- * This is an abstract implementation of the widgets. ## Models
- * 
- * The model of the widget is consist of two main part:
- * 
- * <ul>
- * <li>User data</li>
- * <li>Runtime data</li>
- * </ul>
- * 
- * User data is set as input data model and the runtime data is managed by
- * events and user functions.
- * 
- * Finally the combination of user and runtime data is used to update the view.
- * 
- * The setModelProperty changes the user data model.
- * 
- * The setProperty changes the runtime properties.
- *  ## Events
- * 
- * 
- * Here is list of allowed types:
- * 
- * <ul>
- * <li>modelChanged: some properties of the model is changed.</li>
- * <li>modelUpdated: A new data model is replaced with the current one.</li>
- * <li>styleChanged: Computed style of the current widget is update.</li>
- * <li>widgetIsEditable: Widget is in editable state (so the result of
- * isEditable() is true)</li>
- * <li>widgetIsNotEditable: widget is not in editable mode any more(so the
- * result of isEditable() is false)</li>
- * <li>widgetDeleted: the widgets is removed.</li>
- * <li>widgetUnderCursor: The widget is under the mouse</li>
- * <li>widgetSelected: the widget is selected</li>
- * <li>widgetUnselected: the widget is unselected</li>
- * </ul>
- * 
- * Following event propagate on the root too
- * 
- * <ul>
- * <li>widgetUnderCursor</li>
- * <li>widgetSelected</li>
- * </ul>
- */
-.factory('WbWidgetAbstract', function($widget, $window, $objectPath, $log){
+	/**
+	 * @ngdoc Widgets
+	 * @name WbWidgetAbstract
+	 * @descreption Abstract widget
+	 * 
+	 * This is an abstract implementation of the widgets. ## Models
+	 * 
+	 * The model of the widget is consist of two main part:
+	 * 
+	 * <ul>
+	 * <li>User data</li>
+	 * <li>Runtime data</li>
+	 * </ul>
+	 * 
+	 * User data is set as input data model and the runtime data is managed by
+	 * events and user functions.
+	 * 
+	 * Finally the combination of user and runtime data is used to update the view.
+	 * 
+	 * The setModelProperty changes the user data model.
+	 * 
+	 * The setProperty changes the runtime properties.
+	 *  ## Events
+	 * 
+	 * 
+	 * Here is list of allowed types:
+	 * 
+	 * <ul>
+	 * <li>modelChanged: some properties of the model is changed.</li>
+	 * <li>modelUpdated: A new data model is replaced with the current one.</li>
+	 * <li>styleChanged: Computed style of the current widget is update.</li>
+	 * <li>widgetIsEditable: Widget is in editable state (so the result of
+	 * isEditable() is true)</li>
+	 * <li>widgetIsNotEditable: widget is not in editable mode any more(so the
+	 * result of isEditable() is false)</li>
+	 * <li>widgetDeleted: the widgets is removed.</li>
+	 * <li>widgetUnderCursor: The widget is under the mouse</li>
+	 * <li>widgetSelected: the widget is selected</li>
+	 * <li>widgetUnselected: the widget is unselected</li>
+	 * </ul>
+	 * 
+	 * Following event propagate on the root too
+	 * 
+	 * <ul>
+	 * <li>widgetUnderCursor</li>
+	 * <li>widgetSelected</li>
+	 * </ul>
+	 */
+	.factory('WbWidgetAbstract', function($widget, $window, $objectPath, $log) {
 
-    function debounce(func, wait) {
-        var timeout;
-        return function() {
-            var context = this;
-            var args = arguments;
-            var later = function() {
-                timeout = null;
-                func.apply(context, args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
+		function debounce(func, wait) {
+			var timeout;
+			return function() {
+				var context = this;
+				var args = arguments;
+				var later = function() {
+					timeout = null;
+					func.apply(context, args);
+				};
+				clearTimeout(timeout);
+				timeout = setTimeout(later, wait);
+			};
+		}
 
-    function WbWidgetAbstract ($element, $parent){
-        this.elementAttributes = [
-            // identification
-            'id',
-            'name',
-            'title',
-            'class',
-            // access
-            'accesskey',
-            'contenteditable',
-            'hidden',
-            'tabindex',
-            // language
-            'dir',
-            'lang',
-            'translate',
-            'spellcheck',
-            /*
-             * NOTE: We must manage D&D internally to mange user D&D codes
-             * TODO: maso, 2019: move dnd into a processor
-             */
-            'draggable',
-            'dropzone',
-            ];
-        this.$element = $element;
-        this.$parent = $parent;
-        /**
-         * State of the widget
-         * 
-         * - init
-         * - edit
-         * - ready
-         * - deleted
-         * 
-         * @memberof WbAbstractWidget
-         */
-        this.state;
+		function WbWidgetAbstract($element, $parent) {
+			this.elementAttributes = [
+				// identification
+				'id',
+				'name',
+				'title',
+				'class',
+				// access
+				'accesskey',
+				'contenteditable',
+				'hidden',
+				'tabindex',
+				// language
+				'dir',
+				'lang',
+				'translate',
+				'spellcheck',
+				/*
+				 * NOTE: We must manage D&D internally to mange user D&D codes
+				 * TODO: maso, 2019: move dnd into a processor
+				 */
+				'draggable',
+				'dropzone',
+			];
+			this.$element = $element;
+			this.$parent = $parent;
+			/**
+			 * State of the widget
+			 * 
+			 * - init
+			 * - edit
+			 * - ready
+			 * - deleted
+			 * 
+			 * @memberof WbAbstractWidget
+			 */
+			this.state;
 
-        this.actions = [];
-        this.callbacks = [];
-        this.childWidgets = [];
+			this.actions = [];
+			this.callbacks = [];
+			this.childWidgets = [];
 
-        /*
-         * This is a cache of customer function
-         * 
-         */
-        this.eventFunctions = {};
-        this.computedStyle = {};
+			/*
+			 * This is a cache of customer function
+			 * 
+			 */
+			this.eventFunctions = {};
+			this.computedStyle = {};
 
-        // models
-        this.runtimeModel =  {
-                style:{},
-                on: {},
-        };
-        this.model = {};
-        // event listeners
-        var ctrl = this;
-        /*
-         * TODO: maso, 2019: move to event manager.
-         */
-        this.eventListeners = {
-                scroll: function($event){
-                    ctrl.fire('scroll', $event);
-                },
-                click: function ($event) {
-                    ctrl.fire('click', $event);
-                },
-                dblclick: function ($event) {
-                    ctrl.fire('dblclick', $event);
-                },
-                mouseout: function ($event) {
-                    ctrl.fire('mouseout', $event);
-                },
-                mouseover: function ($event) {
-                    ctrl.fire('mouseover', $event);
-                },
-                mousedown: function ($event) {
-                    ctrl.fire('mousedown', $event);
-                },
-                mouseup: function ($event) {
-                    ctrl.fire('mouseup', $event);
-                },
-                mouseenter: function ($event) {
-                    ctrl.fire('mouseenter', $event);
-                },
-                mouseleave: function ($event) {
-                    ctrl.fire('mouseleave', $event);
-                },
+			// models
+			this.runtimeModel = {
+				style: {},
+				on: {},
+			};
+			this.model = {};
+			// event listeners
+			var ctrl = this;
+			/*
+			 * TODO: maso, 2019: move to event manager.
+			 */
+			this.eventListeners = {
+				scroll: function($event) {
+					ctrl.fire('scroll', $event);
+				},
+				click: function($event) {
+					ctrl.fire('click', $event);
+				},
+				dblclick: function($event) {
+					ctrl.fire('dblclick', $event);
+				},
+				mouseout: function($event) {
+					ctrl.fire('mouseout', $event);
+				},
+				mouseover: function($event) {
+					ctrl.fire('mouseover', $event);
+				},
+				mousedown: function($event) {
+					ctrl.fire('mousedown', $event);
+				},
+				mouseup: function($event) {
+					ctrl.fire('mouseup', $event);
+				},
+				mouseenter: function($event) {
+					ctrl.fire('mouseenter', $event);
+				},
+				mouseleave: function($event) {
+					ctrl.fire('mouseleave', $event);
+				},
 
-                // Media events
-                error: function ($event) {
-                    ctrl.fire('error', $event);
-                },
-                success: function ($event) {
-                    ctrl.fire('success', $event);
-                },
-                load: function ($event) {
-                    ctrl.fire('load', $event);
-                },
+				// Media events
+				error: function($event) {
+					ctrl.fire('error', $event);
+				},
+				success: function($event) {
+					ctrl.fire('success', $event);
+				},
+				load: function($event) {
+					ctrl.fire('load', $event);
+				},
 
-                // DND
-                dragstart: function ($event) {
-                    ctrl.fire('dragstart', $event);
-                },
-                dragend: function ($event) {
-                    ctrl.fire('dragend', $event);
-                },
-                dragenter: function ($event) {
-                    ctrl.fire('dragenter', $event);
-                },
-                dragover: function ($event) {
-                    ctrl.fire('dragover', $event);
-                },
-                dragleave: function ($event) {
-                    ctrl.fire('dragleave', $event);
-                },
-                drop: function ($event) {
-                    ctrl.fire('drop', $event);
-                },
-                
-                change: function ($event) {
-                    ctrl.fire('change', $event);
-                },
-                input: function ($event) {
-                    ctrl.fire('input', $event);
-                },
-                
+				// DND
+				dragstart: function($event) {
+					ctrl.fire('dragstart', $event);
+				},
+				dragend: function($event) {
+					ctrl.fire('dragend', $event);
+				},
+				dragenter: function($event) {
+					ctrl.fire('dragenter', $event);
+				},
+				dragover: function($event) {
+					ctrl.fire('dragover', $event);
+				},
+				dragleave: function($event) {
+					ctrl.fire('dragleave', $event);
+				},
+				drop: function($event) {
+					ctrl.fire('drop', $event);
+				},
+
+				change: function($event) {
+					ctrl.fire('change', $event);
+				},
+				input: function($event) {
+					ctrl.fire('input', $event);
+				},
+
                 /*
                  * Keyboard events
                  */
-                keyup: function ($event) {
-                    ctrl.fire('keyup', $event);
-                },
-                keydown: function ($event) {
-                    ctrl.fire('keydown', $event);
-                },
-                keypress: function ($event) {
-                    ctrl.fire('keypress', $event);
-                },
-
-        };
-
-        /*
-         * Add resize observer to the element
-         */
-        this.resizeObserver = new ResizeObserver(debounce(function ($event) {
-            if(angular.isArray($event)){
-                $event = $event[0];
-            }
-            ctrl.fire('resize', $event);
-        }, 300));
-
-        var options = {
-                root: null,
-                rootMargin: '0px',
-                threshold: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-        };
-
-        this.intersectionObserver = new IntersectionObserver(function ($event) {
-            if(_.isArray($event)){
-                $event = $event[0];
-            }
-            ctrl.setIntersecting($event.isIntersecting, $event);
-        }, options);
-
-        this.connect();
-    }
-
-    /**
-     * Returns model of the widget
-     * 
-     * The model is managed by other entity and used as read only part in the
-     * widget.
-     * 
-     * By the way it is supposed that the model is used just in a widget and to
-     * modify the model, a method of the widget is called. In this case the widget
-     * fire the changes of the model.
-     * 
-     * @see #setModelProperty(key, value)
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getModel = function () {
-        return this.model;
-    };
-
-    /**
-     * Sets model of the widget
-     * 
-     * @see #getModel()
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.setModel = function (model) {
-        if (model === this.model) {
-            return;
-        }
-        this.setState('init');
-        this.model = model;
-        this.runtimeModel =  {
-                style:{},
-                on: {},
-        };
-        this.fire('modelChanged');
-        this.setState('ready');
-        return this;
-    };
-
-    /**
-     * Checks if the key exist in the widget model
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.hasModelProperty = function(key){
-        return $objectPath.has(this.getModel(), key);
-    };
-
-    /**
-     * Get model property
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getModelProperty = function(key){
-        return $objectPath.get(this.getModel(), key);
-    };
-
-    /**
-     * Sets new model property value
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.setModelProperty = function (key, value){
-        // create the event
-        var $event = {
-                source: this,
-                key: key,
-                keys: [key],
-                oldValue: this.getModelProperty(key),
-                value: value
-        };
-
-        // check if value changed
-        if(angular.equals($event.oldValue, $event.value)){
-            return;
-        }
-
-        // Set the address
-        if(value){
-            $objectPath.set(this.getModel(), key, value);
-        } else {
-            $objectPath.del(this.getModel(), key);
-        }
-        this.fire('modelUpdated', $event);
-    };
-
-    /**
-     * Gets runtime model
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getRuntimeModel = function () {
-        return this.runtimeModel;
-    };
-
-    /**
-     * Checks if property exist
-     * 
-     * NOTE: just look for runtime property
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.hasProperty = function (key){
-        return $objectPath.has(this.getRuntimeModel(), key);
-    };
-
-    /**
-     * Gets property of the model
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getProperty = function (key){
-        return $objectPath.get(this.getRuntimeModel(), key);
-    };
-
-    /**
-     * Remove property
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.removeProperty = function (key){
-        var model = this.getRuntimeModel();
-        $objectPath.del(model, key);
-    };
-
-    /**
-     * Changes property value
-     * 
-     * If the change cause the view to update then this function will update and
-     * render the view.
-     * 
-     * @memberof WbAbstractWidget
-     * @name setProperty
-     */
-    WbWidgetAbstract.prototype.setProperty = function (key, value){
-        /*
-         * Support old widget scripts
-         */
-        switch(key){
-        case 'style.layout.direction':
-            key = 'style.flexDirection';
-            break;
-        case 'style.background.color':
-            key = 'style.backgroundColor';
-            break;
-        case 'style.size.width':
-            key = 'style.width';
-            break;
-        case 'style.size.height':
-            key = 'style.height';
-            break;
-        }
-        // create the event
-        var $event = {
-                source: this,
-                key: key,
-                keys: [key],
-                oldValue: this.getProperty(key),
-                value: value
-        };
-
-        // check if value changed
-        if(angular.equals($event.oldValue, $event.value)){
-            return;
-        }
-
-        // Set the address
-        var model = this.getRuntimeModel();
-        if(angular.isDefined(value)){
-            $objectPath.set(model, key, value);
-        } else {
-            $objectPath.del(model, key);
-        }
-        this.fire('modelUpdated', $event);
-    };
-
-    /**
-     * Sets or gets style of the widget
-     * 
-     * The function effect on runtime style not the model. To change the model use
-     * #setModelProperty(key,value).
-     * 
-     * NOTE: this function is part of widget API.
-     * 
-     * Set style by key:
-     * 
-     * widget.style('background.color', '#ff00aa');
-     * 
-     * Get style by key:
-     * 
-     * var color = widget.style('background.color');
-     * 
-     * Remove style by key:
-     * 
-     * widget.style('background.color', null);
-     * 
-     * Set style by object:
-     * 
-     * widgt.style({ background: { color: 'red', image: null } });
-     * 
-     * The style object is read only and you can get it as follow:
-     * 
-     * var style = widget.style();
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.style = function (style, value) {
-        // there is no argument so act as get
-        if(!angular.isDefined(style)){
-            return angular.copy(this.getProperty('style'));
-        }
-        // style is a key
-        if(angular.isString(style)){
-            if(angular.isDefined(value)){
-                return this.setStyle(style, value);
-            } else {
-                return this.getStyle(style);
-            }
-        }
-    };
-
-    /**
-     * Sets style of the widget
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.setStyle = function(key, value) {
-        this.setProperty('style.' + key, value);
-    };
-
-    /**
-     * Get style from widget
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getStyle = function(key) {
-        return this.getProperty('style.' + key);
-    };
-
-
-    /**
-     * Delete the widget
-     * 
-     * This function just used in edit mode
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.delete = function () {
-        // remove itself
-        this.fire('delete');
-        this.getParent().removeChild(this);
-    };
-
-    /**
-     * Remove the widgets
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.destroy = function ($event) {
-        // remove scope
-        this.fire('destroy', $event);
-
-        // remove callbacks
-        this.callbacks = [];
-        this.actions = [];
-        this.model = null;
-
-        // destroy children
-        angular.forEach(this.childWidgets, function (widget) {
-            widget.destroy();
-        });
-        this.childWidgets = [];
-
-        // destroy view
-        if(!this.isRoot()){
-            var $element = this.getElement();
-            $element.remove();
-        }
-    };
-
-    /**
-     * Disconnect view with the widget
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.disconnect = function () {
-        var $element = this.getElement();
-        if (!$element) {
-            return;
-        }
-        this.resizeObserver.unobserve($element[0]);
-        this.intersectionObserver.unobserve($element[0]);
-        angular.forEach(this.eventListeners, function (listener, key) {
-            $element.off(key, listener);
-        });
-    };
-
-    /**
-     * Connects view with widget
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.connect = function () {
-        var $element = this.getElement();
-        if (!$element) {
-            return;
-        }
-        angular.forEach(this.eventListeners, function (listener, key) {
-            $element.on(key, listener);
-        });
-        this.resizeObserver.observe($element[0]);
-        this.intersectionObserver.observe($element[0]);
-    };
-
-    /**
-     * Get elements of the widget
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getElement = function () {
-        return this.$element;
-    };
-
-    /**
-     * Sets element attributes
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.setElementAttribute = function(key, value){
-        var $element = this.$element;
-        if(value){
-            $element.attr(key, value);
-        } else {
-            $element.removeAttr(key);
-        }
-    };
-
-    /**
-     * Get element attribute
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getElementAttribute = function(key){
-        return this.$element.attr(key);
-    };
-
-    /**
-     * Remove element attribute
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.removeElementAttribute = function(key){
-        this.$element.removeAttr(key);
-    };
-
-    /**
-     * Set widget silent
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.setSilent = function(silent) {
-        this.silent = silent;
-    };
-
-    /**
-     * Checks if the element is silent
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.isSilent = function() {
-        return this.silent;
-    };
-
-    /**
-     * Adds new callback of type
-     * 
-     * @param typeof
-     *            the event
-     * @param callback
-     *            to call on the event
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.on = function (type, callback) {
-        if (!angular.isFunction(callback)) {
-            throw {
-                message: 'Callback must be a function'
-            };
-        }
-        if (!angular.isArray(this.callbacks[type])) {
-            this.callbacks[type] = [];
-        }
-        if(this.callbacks[type].includes(callback)){
-            return;
-        }
-        this.callbacks[type].push(callback);
-    };
-
-    /**
-     * Remove the callback
-     * 
-     * @param type
-     *            of the event
-     * @param callback
-     *            to remove
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.off = function (type, callback) {
-        if (!angular.isArray(this.callbacks[type])) {
-            return;
-        }
-        // remove callback
-        var callbacks = this.callbacks[type];
-        var index = callbacks.indexOf(callback);
-        if (index > -1) {
-            callbacks.splice(index, 1);
-        }
-    };
-
-    /**
-     * Call all callbacks on the given event type.
-     * 
-     * Before callbacks, widget processors will process the widget and event.
-     * 
-     * @param type
-     *            of the event
-     * @param params
-     *            to add to the event
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.fire = function (type, params) {
-        params = params || {};
-
-        // 1- Call processors
-        var event = params || {};
-        event.source = this;
-        event.type = type;
-        $widget.applyProcessors(this, event);
-
-        // 2- call listeners
-        if (this.isSilent() || !angular.isDefined(this.callbacks[type])) {
-            return;
-        }
-        var callbacks = this.callbacks[type];
-        var resultData = null;
-        for(var i = 0; i < callbacks.length; i++){
-            // TODO: maso, 2018: check if the event is stopped to propagate
-            try {
-                resultData = callbacks[i](event) || resultData;
-            } catch (error) {
-                // NOTE: remove on release
-              $log.log(error);
-            }
-        }
-        return resultData;
-    };
-
-    /**
-     * Gets direction of the widget
-     * 
-     * This function get direction from user model and is equals to:
-     * 
-     * widget.getModelProperty('style.layout.direction');
-     * 
-     * NOTE: default layout direction is column.
-     * 
-     * @returns {WbAbstractWidget.model.style.flexDirection|undefined}
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getDirection = function () {
-        return this.getModelProperty('style.flexDirection') || 'column';
-    };
-
-    /**
-     * Get events of the widget
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getEvent = function () {
-        return this.getModelProperty('on') || {};
-    };
-
-    /**
-     * Get title of the widget
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getTitle = function () {
-        return this.getModelProperty('label');
-    };
-
-    /**
-     * Gets type
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getType = function () {
-        return this.getModelProperty('type');
-    };
-
-    /**
-     * Gets Id of the model
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getId = function () {
-        return this.getModelProperty('id');
-    };
-
-    /**
-     * Gets name of the widget
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getName = function () {
-        return this.getModelProperty('name');
-    };
-
-    /**
-     * Get parent widget
-     * 
-     * Parent widget is called container in this model. It is attached dynamically
-     * on the render phease.
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getParent = function () {
-        return this.$parent;
-    };
-
-    /**
-     * Sets the state of the widget
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.setState = function (state) {
-        if(state === this.state){
-            return;
-        }
-        var oldState = this.state;
-        this.state = state;
-        this.fire('stateChanged', {
-            oldValue: oldState,
-            value: state
-        });
-    };
-
-    /**
-     * Checks if the editable mode is enable
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.isEditable = function () {
-        return this.editable;
-    };
-
-    /**
-     * Set edit mode
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.setEditable = function (editable) {
-        if (this.editable === editable) {
-            return;
-        }
-        this.editable = editable;
-        if (editable) {
-            this.setState('edit');
-        } else {
-            this.setState('ready');
-        }
-        // propagate to child
-        angular.forEach(this.childWidgets, function (widget) {
-            widget.setEditable(editable);
-        });
-    };
-
-    /**
-     * Check if intersecting
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.isIntersecting = function(){
-        return this.intersecting;
-    };
-
-    /**
-     * Set intersecting true
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.setIntersecting = function(intersecting, $event){
-        if(_.isUndefined(this.intersecting)){
-            intersecting = true;
-        }
-        this.intersecting = intersecting;
-        this.fire('intersection', $event);
-    };
-
-    /**
-     * Clone current widget This method works in edit mode only.
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.clone = function () {
-        var $parent = this.getParent();
-        var index = $parent.indexOfChild(this);
-        $parent.addChild(index, angular.copy(this.getModel()));
-    };
-
-    /**
-     * This method moves widget one to next.
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.moveNext = function () {
-        var $parent = this.getParent();
-        $parent.moveChild(this, $parent.indexOfChild(this) + 1);
-    };
-
-    /**
-     * This method moves widget one to before
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.moveBefore = function () {
-        var $parent = this.getParent();
-        $parent.moveChild(this, $parent.indexOfChild(this) - 1);
-    };
-
-    /**
-     * This method moves widget to the first of it's parent
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.moveFirst = function () {
-        var $parent = this.getParent();
-        $parent.moveChild(this, 0);
-    };
-
-    /**
-     * This method moves widget to the last of it's parent
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.moveLast = function () {
-        var $parent = this.getParent();
-        $parent.moveChild(this, $parent.getChildren().length - 1);
-    };
-
-    /**
-     * Checks if the widget is root
-     * 
-     * If there is no parent controller then this is a root one.
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.isRoot = function () {
-        var $parent = this.getParent();
-        return angular.isUndefined($parent) || $parent === null;
-    };
-
-    /**
-     * Gets root widgets of the widget
-     * 
-     * @return the root widget
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getRoot = function () {
-        // check if the root is set
-        if (this.rootWidget) {
-            return this.rootWidget;
-        }
-        // find root if is empty
-        this.rootWidget = this;
-        while (!this.rootWidget.isRoot()) {
-            this.rootWidget = this.rootWidget.getParent();
-        }
-        return this.rootWidget;
-    };
-
-
-    /**
-     * Checks if the widget is selected.
-     * 
-     * NOTE: it is not possible to select root widget
-     * 
-     * @return true if the widget is selected.
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.isSelected = function () {
-        return this.selected;
-    };
-
-    WbWidgetAbstract.prototype.setSelected = function (flag) {
-        if (this.selected === flag) {
-            return;
-        }
-        // fire events
-        this.selected = flag;
-        if (flag) {
-            this.fire('select');
-        } else {
-            this.fire('unselect');
-        }
-    };
-
-    /**
-     * Add new action in actions list
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.addAction = function (action) {
-        this.actions.push(action);
-    };
-
-    /**
-     * Gets widget actions
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getActions = function () {
-        return this.actions;
-    };
-
-    /**
-     * Returns bounding client rectangle to parent
-     * 
-     * @return bounding rectangle
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getBoundingClientRect = function () {
-        var element = this.getElement();
-        if(!element){
-            return {
-                width: 0,
-                height: 0,
-                top: 0,
-                left: 0
-            };
-        }
-
-        var offset = element.offset();
-        var width = element.outerWidth();
-        var height = element.outerHeight();
-
-        return {
-            // rect
-            width: width,
-            height: height,
-            // offset
-            top: offset.top /*+ parseInt(element.css('marginTop'), 10)*/ + element.scrollTop(),
-            left: offset.left /*+ parseInt(element.css('marginLeft'), 10)*/ + element.scrollLeft()
-        };
-    };
-
-
-    /**
-     * Adds animation to the page
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.animate = function (options) {
-        var animation = {
-                targets: this.getRuntimeModel(),
-        };
-
-        // copy animation properties
-        if(options.duration){
-            animation.duration = options.duration;
-        }
-        if(options.loop){
-            animation.loop = options.loop;
-        }
-        if(options.autoplay){
-            animation.autoplay = options.autoplay;
-        }
-        if(options.delay){
-            animation.delay = options.delay;
-        }
-        if(options.easing){
-            animation.easing = options.easing;
-        }
-
-        // Create list of attributes
-        var ctrl = this;
-        var keys = [];
-        for(var key in options){
-            // ignore keys
-            if(_.includes(['duration','loop','autoplay','delay','easing'], key)){
-                continue;
-            }
-            keys.push(key);
-            animation[key] = options[key];
-            // set initial value
-            var val = this.getProperty(key);
-            if(!val) {
-                this.setProperty(key, this.getModelProperty(key));
-            }
-        }
-        animation.update = function() {
-            ctrl.fire('modelUpdated', {
-                keys: keys,
-                value: null,
-                oldValue: null
-            });
-        };
-
-        return anime(animation);
-    };
-
-    /**
-     * Remove animations from the widget
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.removeAnimation = function () {
-        // The animation will not add to element so there is no need to remove
-    };
-
-    /**
-     * Sets window of the widget
-     * 
-     * @memberof WbAbstractWidget
-     * @params window {WbWindow} of the current widget
-     */
-    WbWidgetAbstract.prototype.setWindow = function (window) {
-        this.window = window;
-    };
-
-    /**
-     * Gets window of the widget
-     * 
-     * @memberof WbAbstractWidget
-     * @return window of the current widget or from the root
-     */
-    WbWidgetAbstract.prototype.getWindow = function () {
-        return this.window || this.getRoot().getWindow() || $window;
-    };
-
-
-    /**
-     * Adds attributes into the element attributes
-     * 
-     * $widget.addElementAttributes('a', 'b');
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.addElementAttributes = function(){
-        this.elementAttributes = _.union(this.elementAttributes, arguments);
-    };
-
-    /**
-     * Gets element attributes
-     * 
-     * @memberof WbAbstractWidget
-     */
-    WbWidgetAbstract.prototype.getElementAttributes = function(){
-        return this.elementAttributes;
-    };
-
-    WbWidgetAbstract.prototype.isLeaf = function(){
-        return true;
-    };
-
-    return WbWidgetAbstract;
-
-});
+				keyup: function($event) {
+					ctrl.fire('keyup', $event);
+				},
+				keydown: function($event) {
+					ctrl.fire('keydown', $event);
+				},
+				keypress: function($event) {
+					ctrl.fire('keypress', $event);
+				},
+
+			};
+
+			/*
+			 * Add resize observer to the element
+			 */
+			this.resizeObserver = new ResizeObserver(debounce(function($event) {
+				if (angular.isArray($event)) {
+					$event = $event[0];
+				}
+				ctrl.fire('resize', $event);
+			}, 300));
+
+			var options = {
+				root: null,
+				rootMargin: '0px',
+				threshold: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+			};
+
+			this.intersectionObserver = new IntersectionObserver(function($event) {
+				if (_.isArray($event)) {
+					$event = $event[0];
+				}
+				ctrl.setIntersecting($event.isIntersecting, $event);
+			}, options);
+
+			this.connect();
+		}
+
+		/**
+		 * Returns model of the widget
+		 * 
+		 * The model is managed by other entity and used as read only part in the
+		 * widget.
+		 * 
+		 * By the way it is supposed that the model is used just in a widget and to
+		 * modify the model, a method of the widget is called. In this case the widget
+		 * fire the changes of the model.
+		 * 
+		 * @see #setModelProperty(key, value)
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getModel = function() {
+			return this.model;
+		};
+
+		/**
+		 * Sets model of the widget
+		 * 
+		 * @see #getModel()
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.setModel = function(model) {
+			if (model === this.model) {
+				return;
+			}
+			this.setState('init');
+			this.model = model;
+			this.runtimeModel = {
+				style: {},
+				on: {},
+			};
+			this.fire('modelChanged');
+			this.setState('ready');
+			return this;
+		};
+
+		/**
+		 * Checks if the key exist in the widget model
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.hasModelProperty = function(key) {
+			return $objectPath.has(this.getModel(), key);
+		};
+
+		/**
+		 * Get model property
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getModelProperty = function(key) {
+			return $objectPath.get(this.getModel(), key);
+		};
+
+		/**
+		 * Sets new model property value
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.setModelProperty = function(key, value) {
+			// create the event
+			var $event = {
+				source: this,
+				key: key,
+				keys: [key],
+				oldValue: this.getModelProperty(key),
+				value: value
+			};
+
+			// check if value changed
+			if (angular.equals($event.oldValue, $event.value)) {
+				return;
+			}
+
+			// Set the address
+			if (value) {
+				$objectPath.set(this.getModel(), key, value);
+			} else {
+				$objectPath.del(this.getModel(), key);
+			}
+			this.fire('modelUpdated', $event);
+		};
+
+		/**
+		 * Gets runtime model
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getRuntimeModel = function() {
+			return this.runtimeModel;
+		};
+
+		/**
+		 * Checks if property exist
+		 * 
+		 * NOTE: just look for runtime property
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.hasProperty = function(key) {
+			return $objectPath.has(this.getRuntimeModel(), key);
+		};
+
+		/**
+		 * Gets property of the model
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getProperty = function(key) {
+			return $objectPath.get(this.getRuntimeModel(), key);
+		};
+
+		/**
+		 * Remove property
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.removeProperty = function(key) {
+			var model = this.getRuntimeModel();
+			$objectPath.del(model, key);
+		};
+
+		/**
+		 * Changes property value
+		 * 
+		 * If the change cause the view to update then this function will update and
+		 * render the view.
+		 * 
+		 * @memberof WbAbstractWidget
+		 * @name setProperty
+		 */
+		WbWidgetAbstract.prototype.setProperty = function(key, value) {
+			/*
+			 * Support old widget scripts
+			 */
+			switch (key) {
+				case 'style.layout.direction':
+					key = 'style.flexDirection';
+					break;
+				case 'style.background.color':
+					key = 'style.backgroundColor';
+					break;
+				case 'style.size.width':
+					key = 'style.width';
+					break;
+				case 'style.size.height':
+					key = 'style.height';
+					break;
+			}
+			// create the event
+			var $event = {
+				source: this,
+				key: key,
+				keys: [key],
+				oldValue: this.getProperty(key),
+				value: value
+			};
+
+			// check if value changed
+			if (angular.equals($event.oldValue, $event.value)) {
+				return;
+			}
+
+			// Set the address
+			var model = this.getRuntimeModel();
+			if (angular.isDefined(value)) {
+				$objectPath.set(model, key, value);
+			} else {
+				$objectPath.del(model, key);
+			}
+			this.fire('modelUpdated', $event);
+		};
+
+		/**
+		 * Sets or gets style of the widget
+		 * 
+		 * The function effect on runtime style not the model. To change the model use
+		 * #setModelProperty(key,value).
+		 * 
+		 * NOTE: this function is part of widget API.
+		 * 
+		 * Set style by key:
+		 * 
+		 * widget.style('background.color', '#ff00aa');
+		 * 
+		 * Get style by key:
+		 * 
+		 * var color = widget.style('background.color');
+		 * 
+		 * Remove style by key:
+		 * 
+		 * widget.style('background.color', null);
+		 * 
+		 * Set style by object:
+		 * 
+		 * widgt.style({ background: { color: 'red', image: null } });
+		 * 
+		 * The style object is read only and you can get it as follow:
+		 * 
+		 * var style = widget.style();
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.style = function(style, value) {
+			// there is no argument so act as get
+			if (!angular.isDefined(style)) {
+				return angular.copy(this.getProperty('style'));
+			}
+			// style is a key
+			if (angular.isString(style)) {
+				if (angular.isDefined(value)) {
+					return this.setStyle(style, value);
+				} else {
+					return this.getStyle(style);
+				}
+			}
+		};
+
+		/**
+		 * Sets style of the widget
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.setStyle = function(key, value) {
+			this.setProperty('style.' + key, value);
+		};
+
+		/**
+		 * Get style from widget
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getStyle = function(key) {
+			return this.getProperty('style.' + key);
+		};
+
+
+		/**
+		 * Delete the widget
+		 * 
+		 * This function just used in edit mode
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.delete = function() {
+			// remove itself
+			this.fire('delete');
+			this.getParent().removeChild(this);
+		};
+
+		/**
+		 * Remove the widgets
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.destroy = function($event) {
+			// remove scope
+			this.fire('destroy', $event);
+
+			// remove callbacks
+			this.callbacks = [];
+			this.actions = [];
+			this.model = null;
+
+			// destroy children
+			angular.forEach(this.childWidgets, function(widget) {
+				widget.destroy();
+			});
+			this.childWidgets = [];
+
+			// destroy view
+			if (!this.isRoot()) {
+				var $element = this.getElement();
+				$element.remove();
+			}
+		};
+
+		/**
+		 * Disconnect view with the widget
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.disconnect = function() {
+			var $element = this.getElement();
+			if (!$element) {
+				return;
+			}
+			this.resizeObserver.unobserve($element[0]);
+			this.intersectionObserver.unobserve($element[0]);
+			angular.forEach(this.eventListeners, function(listener, key) {
+				$element.off(key, listener);
+			});
+		};
+
+		/**
+		 * Connects view with widget
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.connect = function() {
+			var $element = this.getElement();
+			if (!$element) {
+				return;
+			}
+			angular.forEach(this.eventListeners, function(listener, key) {
+				$element.on(key, listener);
+			});
+			this.resizeObserver.observe($element[0]);
+			this.intersectionObserver.observe($element[0]);
+		};
+
+		/**
+		 * Get elements of the widget
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getElement = function() {
+			return this.$element;
+		};
+
+		/**
+		 * Sets element attributes
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.setElementAttribute = function(key, value) {
+			var $element = this.$element;
+			if (value) {
+				$element.attr(key, value);
+			} else {
+				$element.removeAttr(key);
+			}
+		};
+
+		/**
+		 * Get element attribute
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getElementAttribute = function(key) {
+			return this.$element.attr(key);
+		};
+
+		/**
+		 * Remove element attribute
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.removeElementAttribute = function(key) {
+			this.$element.removeAttr(key);
+		};
+
+		/**
+		 * Set widget silent
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.setSilent = function(silent) {
+			this.silent = silent;
+		};
+
+		/**
+		 * Checks if the element is silent
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.isSilent = function() {
+			return this.silent;
+		};
+
+		/**
+		 * Adds new callback of type
+		 * 
+		 * @param typeof
+		 *            the event
+		 * @param callback
+		 *            to call on the event
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.on = function(type, callback) {
+			if (!angular.isFunction(callback)) {
+				throw {
+					message: 'Callback must be a function'
+				};
+			}
+			if (!angular.isArray(this.callbacks[type])) {
+				this.callbacks[type] = [];
+			}
+			if (this.callbacks[type].includes(callback)) {
+				return;
+			}
+			this.callbacks[type].push(callback);
+		};
+
+		/**
+		 * Remove the callback
+		 * 
+		 * @param type
+		 *            of the event
+		 * @param callback
+		 *            to remove
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.off = function(type, callback) {
+			if (!angular.isArray(this.callbacks[type])) {
+				return;
+			}
+			// remove callback
+			var callbacks = this.callbacks[type];
+			var index = callbacks.indexOf(callback);
+			if (index > -1) {
+				callbacks.splice(index, 1);
+			}
+		};
+
+		/**
+		 * Call all callbacks on the given event type.
+		 * 
+		 * Before callbacks, widget processors will process the widget and event.
+		 * 
+		 * @param type
+		 *            of the event
+		 * @param params
+		 *            to add to the event
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.fire = function(type, params) {
+			params = params || {};
+
+			// 1- Call processors
+			var event = params || {};
+			event.source = this;
+			event.type = type;
+			$widget.applyProcessors(this, event);
+
+			// 2- call listeners
+			if (this.isSilent() || !angular.isDefined(this.callbacks[type])) {
+				return;
+			}
+			var callbacks = this.callbacks[type];
+			var resultData = null;
+			for (var i = 0; i < callbacks.length; i++) {
+				// TODO: maso, 2018: check if the event is stopped to propagate
+				try {
+					resultData = callbacks[i](event) || resultData;
+				} catch (error) {
+					// NOTE: remove on release
+					$log.log(error);
+				}
+			}
+			return resultData;
+		};
+
+		/**
+		 * Gets direction of the widget
+		 * 
+		 * This function get direction from user model and is equals to:
+		 * 
+		 * widget.getModelProperty('style.layout.direction');
+		 * 
+		 * NOTE: default layout direction is column.
+		 * 
+		 * @returns {WbAbstractWidget.model.style.flexDirection|undefined}
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getDirection = function() {
+			return this.getModelProperty('style.flexDirection') || 'column';
+		};
+
+		/**
+		 * Get events of the widget
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getEvent = function() {
+			return this.getModelProperty('on') || {};
+		};
+
+		/**
+		 * Get title of the widget
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getTitle = function() {
+			return this.getModelProperty('label');
+		};
+
+		/**
+		 * Gets type
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getType = function() {
+			return this.getModelProperty('type');
+		};
+
+		/**
+		 * Gets Id of the model
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getId = function() {
+			return this.getModelProperty('id');
+		};
+
+		/**
+		 * Gets name of the widget
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getName = function() {
+			return this.getModelProperty('name');
+		};
+
+		/**
+		 * Get parent widget
+		 * 
+		 * Parent widget is called container in this model. It is attached dynamically
+		 * on the render phease.
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getParent = function() {
+			return this.$parent;
+		};
+
+		/**
+		 * Sets the state of the widget
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.setState = function(state) {
+			if (state === this.state) {
+				return;
+			}
+			var oldState = this.state;
+			this.state = state;
+			this.fire('stateChanged', {
+				oldValue: oldState,
+				value: state
+			});
+		};
+
+		/**
+		 * Checks if the editable mode is enable
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.isEditable = function() {
+			return this.editable;
+		};
+
+		/**
+		 * Set edit mode
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.setEditable = function(editable) {
+			if (this.editable === editable) {
+				return;
+			}
+			this.editable = editable;
+			if (editable) {
+				this.setState('edit');
+			} else {
+				this.setState('ready');
+			}
+			// propagate to child
+			angular.forEach(this.childWidgets, function(widget) {
+				widget.setEditable(editable);
+			});
+		};
+
+		/**
+		 * Check if intersecting
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.isIntersecting = function() {
+			return this.intersecting;
+		};
+
+		/**
+		 * Set intersecting true
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.setIntersecting = function(intersecting, $event) {
+			if (_.isUndefined(this.intersecting)) {
+				intersecting = true;
+			}
+			this.intersecting = intersecting;
+			this.fire('intersection', $event);
+		};
+
+		/**
+		 * Clone current widget This method works in edit mode only.
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.clone = function() {
+			var $parent = this.getParent();
+			var index = $parent.indexOfChild(this);
+			$parent.addChild(index, angular.copy(this.getModel()));
+		};
+
+		/**
+		 * This method moves widget one to next.
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.moveNext = function() {
+			var $parent = this.getParent();
+			$parent.moveChild(this, $parent.indexOfChild(this) + 1);
+		};
+
+		/**
+		 * This method moves widget one to before
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.moveBefore = function() {
+			var $parent = this.getParent();
+			$parent.moveChild(this, $parent.indexOfChild(this) - 1);
+		};
+
+		/**
+		 * This method moves widget to the first of it's parent
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.moveFirst = function() {
+			var $parent = this.getParent();
+			$parent.moveChild(this, 0);
+		};
+
+		/**
+		 * This method moves widget to the last of it's parent
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.moveLast = function() {
+			var $parent = this.getParent();
+			$parent.moveChild(this, $parent.getChildren().length - 1);
+		};
+
+		/**
+		 * Checks if the widget is root
+		 * 
+		 * If there is no parent controller then this is a root one.
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.isRoot = function() {
+			var $parent = this.getParent();
+			return angular.isUndefined($parent) || $parent === null;
+		};
+
+		/**
+		 * Gets root widgets of the widget
+		 * 
+		 * @return the root widget
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getRoot = function() {
+			// check if the root is set
+			if (this.rootWidget) {
+				return this.rootWidget;
+			}
+			// find root if is empty
+			this.rootWidget = this;
+			while (!this.rootWidget.isRoot()) {
+				this.rootWidget = this.rootWidget.getParent();
+			}
+			return this.rootWidget;
+		};
+
+
+		/**
+		 * Checks if the widget is selected.
+		 * 
+		 * NOTE: it is not possible to select root widget
+		 * 
+		 * @return true if the widget is selected.
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.isSelected = function() {
+			return this.selected;
+		};
+
+		WbWidgetAbstract.prototype.setSelected = function(flag) {
+			if (this.selected === flag) {
+				return;
+			}
+			// fire events
+			this.selected = flag;
+			if (flag) {
+				this.fire('select');
+			} else {
+				this.fire('unselect');
+			}
+		};
+
+		/**
+		 * Add new action in actions list
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.addAction = function(action) {
+			this.actions.push(action);
+		};
+
+		/**
+		 * Gets widget actions
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getActions = function() {
+			return this.actions;
+		};
+
+		/**
+		 * Returns bounding client rectangle to parent
+		 * 
+		 * @return bounding rectangle
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getBoundingClientRect = function() {
+			var element = this.getElement();
+			if (!element) {
+				return {
+					width: 0,
+					height: 0,
+					top: 0,
+					left: 0
+				};
+			}
+
+			var offset = element.offset();
+			var width = element.outerWidth();
+			var height = element.outerHeight();
+
+			return {
+				// rect
+				width: width,
+				height: height,
+				// offset
+				top: offset.top /*+ parseInt(element.css('marginTop'), 10)*/ + element.scrollTop(),
+				left: offset.left /*+ parseInt(element.css('marginLeft'), 10)*/ + element.scrollLeft()
+			};
+		};
+
+
+		/**
+		 * Adds animation to the page
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.animate = function(options) {
+			var animation = {
+				targets: this.getRuntimeModel(),
+			};
+
+			// copy animation properties
+			if (options.duration) {
+				animation.duration = options.duration;
+			}
+			if (options.loop) {
+				animation.loop = options.loop;
+			}
+			if (options.autoplay) {
+				animation.autoplay = options.autoplay;
+			}
+			if (options.delay) {
+				animation.delay = options.delay;
+			}
+			if (options.easing) {
+				animation.easing = options.easing;
+			}
+
+			// Create list of attributes
+			var ctrl = this;
+			var keys = [];
+			for (var key in options) {
+				// ignore keys
+				if (_.includes(['duration', 'loop', 'autoplay', 'delay', 'easing'], key)) {
+					continue;
+				}
+				keys.push(key);
+				animation[key] = options[key];
+				// set initial value
+				var val = this.getProperty(key);
+				if (!val) {
+					this.setProperty(key, this.getModelProperty(key));
+				}
+			}
+			animation.update = function() {
+				ctrl.fire('modelUpdated', {
+					keys: keys,
+					value: null,
+					oldValue: null
+				});
+			};
+
+			return anime(animation);
+		};
+
+		/**
+		 * Remove animations from the widget
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.removeAnimation = function() {
+			// The animation will not add to element so there is no need to remove
+		};
+
+		/**
+		 * Sets window of the widget
+		 * 
+		 * @memberof WbAbstractWidget
+		 * @params window {WbWindow} of the current widget
+		 */
+		WbWidgetAbstract.prototype.setWindow = function(window) {
+			this.window = window;
+		};
+
+		/**
+		 * Gets window of the widget
+		 * 
+		 * @memberof WbAbstractWidget
+		 * @return window of the current widget or from the root
+		 */
+		WbWidgetAbstract.prototype.getWindow = function() {
+			return this.window || this.getRoot().getWindow() || $window;
+		};
+
+
+		/**
+		 * Adds attributes into the element attributes
+		 * 
+		 * $widget.addElementAttributes('a', 'b');
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.addElementAttributes = function() {
+			this.elementAttributes = _.union(this.elementAttributes, arguments);
+		};
+
+		/**
+		 * Gets element attributes
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		WbWidgetAbstract.prototype.getElementAttributes = function() {
+			return this.elementAttributes;
+		};
+
+		return WbWidgetAbstract;
+	});
 
 
 /* 
@@ -5879,371 +5303,366 @@ angular.module('am-wb-core')//
  */
 //submit the controller
 angular.module('am-wb-core')//
-/**
- * @ngdoc Widget
- * @name WbWidgetGroup
- * @description Manages a group widgets
- * 
- * This is a group controller
- * 
- */
-.factory('WbWidgetGroup', function( $wbUtil, $widget, $q, WbWidgetAbstract){
+	/**
+	 * @ngdoc Widget
+	 * @name WbWidgetGroup
+	 * @description Manages a group widgets
+	 * 
+	 * This is a group controller
+	 * 
+	 */
+	.factory('WbWidgetGroup', function($wbUtil, $widget, $q, WbWidgetAbstract) {
 
-    /**
-     * Creates new instance of the group
-     * 
-     * @memberof WbWidgetGroupCtrl
-     * @ngInject
-     */
-    function WbWidgetGroupCtrl($element, $parent){
-        // call super constractor
-        WbWidgetAbstract.apply(this, [$element, $parent]);
+		/**
+		 * Creates new instance of the group
+		 * 
+		 * @memberof WbWidgetGroupCtrl
+		 * @ngInject
+		 */
+		function WbWidgetGroupCtrl($element, $parent) {
+			// call super constractor
+			WbWidgetAbstract.apply(this, [$element, $parent]);
 
-        // init group
-    }
+			// init group
+		}
 
-    // extend functionality
-    WbWidgetGroupCtrl.prototype = Object.create(WbWidgetAbstract.prototype);
-
-
-    /**
-     * Set model to a group
-     * 
-     * Setting model to a group is differs from setting in widget. In group 
-     * we try to load children and finally loading the group itself.
-     * 
-     * @memberof WbWidgetGroupCtrl
-     * @param model Object to set into the group
-     */
-    WbWidgetGroupCtrl.prototype.setModel = function (model) {
-        if (model === this.model) {
-            return;
-        }
-        this.setState('init');
-        this.model = model;
-        this.fire('modelChanged');
-
-        var ctrl = this;
-        return this.loadWidgets()
-        .then(function(){
-            return ctrl;
-        });
-    };
-
-    /**
-     * Delete the widget
-     * 
-     * This function just used in edit mode
-     * 
-     * @memberof WbWidgetGroupCtrl
-     */
-    WbWidgetGroupCtrl.prototype.delete = function () {
-        this.removeChildren();
-        this.fire('delete');
-        if (!this.isRoot()) {
-            this.getParent()
-            .removeChild(this);
-        }
-    };
-
-    WbWidgetGroupCtrl.prototype.getChildById = function (id) {
-        var widgets = this.childWidgets;
-        for (var i = 0; i < widgets.length; i++) {
-            if (widgets[i].getId() === id) {
-                return widgets[i];
-            }
-        }
-    };
-
-    /**
-     * Gets all children of the group
-     * 
-     * @return list of all widgets
-     */
-    WbWidgetGroupCtrl.prototype.getChildren = function () {
-        return this.childWidgets;
-    };
-
-    /**
-     * Removes a widget
-     * 
-     * Data model and visual element related to the input model will be removed.
-     * 
-     * @memberof WbWidgetGroupCtrl
-     */
-    WbWidgetGroupCtrl.prototype.removeChild = function (widget) {
-        var index = this.indexOfChild(widget);
-
-        if (index > -1) {
-            // remove model
-            this.childWidgets.splice(index, 1);
-
-            var model = this.getModel();
-            index = model.children.indexOf(widget.getModel());
-            model.children.splice(index, 1);
-
-            // destroy widget
-            widget.destroy();
-            return true;
-        }
-        return false;
-    };
-
-    /**
-     * Removes all children of the group.
-     * 
-     * @memberof WbWidgetGroupCtrl
-     */
-    WbWidgetGroupCtrl.prototype.removeChildren = function(){
-        // remove all children
-        var widgets = _.clone(this.getChildren());
-        _.forEach(widgets, function (w) {
-            w.delete();
-        });
-    };
+		// extend functionality
+		WbWidgetGroupCtrl.prototype = Object.create(WbWidgetAbstract.prototype);
 
 
-    WbWidgetGroupCtrl.prototype.loadWidgets = function () {
-        // destroy all children
-        angular.forEach(this.childWidgets, function (widget) {
-            widget.destroy();
-        });
-        this.childWidgets = [];
-        var ctrl = this;
-        var loadState = function () {
-            ctrl.fire('loaded');
-            ctrl.setState('ready');
-        };
+		/**
+		 * Set model to a group
+		 * 
+		 * Setting model to a group is differs from setting in widget. In group 
+		 * we try to load children and finally loading the group itself.
+		 * 
+		 * @memberof WbWidgetGroupCtrl
+		 * @param model Object to set into the group
+		 */
+		WbWidgetGroupCtrl.prototype.setModel = function(model) {
+			if (model === this.model) {
+				return;
+			}
+			this.setState('init');
+			this.model = model;
+			this.fire('modelChanged');
 
-        // check for new child
-        if (!this.model || !angular.isArray(this.model.children)) {
-            return $q.resolve()
-            .finally(loadState);
-        }
+			var ctrl = this;
+			return this.loadWidgets()
+				.then(function() {
+					return ctrl;
+				});
+		};
 
-        // create child
-        var parentWidget = this;
+		/**
+		 * Delete the widget
+		 * 
+		 * This function just used in edit mode
+		 * 
+		 * @memberof WbWidgetGroupCtrl
+		 */
+		WbWidgetGroupCtrl.prototype.delete = function() {
+			this.removeChildren();
+			this.fire('delete');
+			if (!this.isRoot()) {
+				this.getParent()
+					.removeChild(this);
+			}
+		};
 
-        var compilesJob = [];
-        this.model.children.forEach(function (item, index) {
-            var job = $widget.compile(item, parentWidget)//
-            .then(function (widget) {
-                parentWidget.childWidgets[index] = widget;
-            });
-            compilesJob.push(job);
-        });
+		WbWidgetGroupCtrl.prototype.getChildById = function(id) {
+			var widgets = this.childWidgets;
+			for (var i = 0; i < widgets.length; i++) {
+				if (widgets[i].getId() === id) {
+					return widgets[i];
+				}
+			}
+		};
 
-        return $q.all(compilesJob)//
-        .then(function () {
-            var $element = parentWidget.getElement();
-            $element.empty();
-            parentWidget.childWidgets.forEach(function (widget) {
-                widget.setEditable(ctrl.isEditable());
-                $element.append(widget.getElement());
-            });
-        })
-        .finally(loadState);
-    };
+		/**
+		 * Gets all children of the group
+		 * 
+		 * @return list of all widgets
+		 */
+		WbWidgetGroupCtrl.prototype.getChildren = function() {
+			return this.childWidgets;
+		};
+
+		/**
+		 * Removes a widget
+		 * 
+		 * Data model and visual element related to the input model will be removed.
+		 * 
+		 * @memberof WbWidgetGroupCtrl
+		 */
+		WbWidgetGroupCtrl.prototype.removeChild = function(widget) {
+			var index = this.indexOfChild(widget);
+
+			if (index > -1) {
+				// remove model
+				this.childWidgets.splice(index, 1);
+
+				var model = this.getModel();
+				index = model.children.indexOf(widget.getModel());
+				model.children.splice(index, 1);
+
+				// destroy widget
+				widget.destroy();
+				return true;
+			}
+			return false;
+		};
+
+		/**
+		 * Removes all children of the group.
+		 * 
+		 * @memberof WbWidgetGroupCtrl
+		 */
+		WbWidgetGroupCtrl.prototype.removeChildren = function() {
+			// remove all children
+			var widgets = _.clone(this.getChildren());
+			_.forEach(widgets, function(w) {
+				w.delete();
+			});
+		};
 
 
-    /**
-     * Adds child model
-     * 
-     * @memberof WbWidgetGroupCtrl
-     */
-    WbWidgetGroupCtrl.prototype.addChildModel = function (index, item) {
-        var model = this.getModel();
-        var ctrl = this;
-        index = this.__cleanInsertIndex(index);
-        // add widget
-        item = $wbUtil.clean(item);
-        return $widget.compile(item, this)//
-        .then(function (newWidget) {
-            if (index < ctrl.childWidgets.length) {
-                newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
-            } else {
-                ctrl.getElement().append(newWidget.getElement());
-            }
-            if(!angular.isArray(model.children)){
-                model.children = [];
-            }
-            model.children.splice(index, 0, item);
-            ctrl.childWidgets.splice(index, 0, newWidget);
+		WbWidgetGroupCtrl.prototype.loadWidgets = function() {
+			// destroy all children
+			angular.forEach(this.childWidgets, function(widget) {
+				widget.destroy();
+			});
+			this.childWidgets = [];
+			var ctrl = this;
+			var loadState = function() {
+				ctrl.fire('loaded');
+				ctrl.setState('ready');
+			};
 
-            // init the widget
-            newWidget.setEditable(ctrl.isEditable());
-            ctrl.fire('newchild', {
-                widgets: [newWidget]
-            });
-            return newWidget;
-        });
-    };
+			// check for new child
+			if (!this.model || !angular.isArray(this.model.children)) {
+				return $q.resolve()
+					.finally(loadState);
+			}
 
-    /**
-     * Adds children at specified index
-     * 
-     * Change data model and the view.
-     * 
-     * @memberof WbWidgetGroupCtrl
-     */
-    WbWidgetGroupCtrl.prototype.addChildrenModel = function (index, children) {
-        var model = this.getModel();
-        var ctrl = this;
-        index = this.__cleanInsertIndex(index);
+			// create child
+			var parentWidget = this;
 
-        // compile all
-        return this.__compileChildren(children)
-        .then(function (widgets) {
-            for(var i = 0; i < widgets.length; i++){
-                var newWidget = widgets[i];
-                
-                var j = i + index;
-                
-                if (j < ctrl.childWidgets.length) {
-                    newWidget.getElement().insertBefore(ctrl.childWidgets[j].getElement());
-                } else {
-                    ctrl.getElement().append(newWidget.getElement());
-                }
-                if(!angular.isArray(model.children)){
-                    model.children = [];
-                }
-                model.children.splice(j, 0, newWidget.getModel());
-                ctrl.childWidgets.splice(j, 0, newWidget);
+			var compilesJob = [];
+			this.model.children.forEach(function(item, index) {
+				var job = $widget.compile(item, parentWidget)//
+					.then(function(widget) {
+						parentWidget.childWidgets[index] = widget;
+					});
+				compilesJob.push(job);
+			});
 
-                // init the widget
-                newWidget.setEditable(ctrl.isEditable());
-            }
-            ctrl.fire('newchild', {
-                widgets: widgets
-            });
-        });
-    };
-    
-    /**
-     * Adds a child model to the group
-     * 
-     * @deprecated
-     */
-    WbWidgetGroupCtrl.prototype.addChild = WbWidgetGroupCtrl.prototype.addChildModel;
-    
-    /**
-     * Adds a children model to the group
-     * 
-     * @deprecated
-     */
-    WbWidgetGroupCtrl.prototype.addChildren = WbWidgetGroupCtrl.prototype.addChildrenModel;
+			return $q.all(compilesJob)//
+				.then(function() {
+					var $element = parentWidget.getElement();
+					$element.empty();
+					parentWidget.childWidgets.forEach(function(widget) {
+						widget.setEditable(ctrl.isEditable());
+						$element.append(widget.getElement());
+					});
+				})
+				.finally(loadState);
+		};
 
-    /*
-     * Internal:
-     * 
-     * convert children model into a list of widgets.
-     */
-    WbWidgetGroupCtrl.prototype.__compileChildren = function(children){
-        var jobs = [];
-        var widgets = [];
-        var ctrl = this;
-        angular.forEach(children, function(item, i){
-            item = $wbUtil.clean(item);
-            jobs.push($widget.compile(item, ctrl)//
-                    .then(function(widget){
-                        widgets[i] = widget;
-                    }));
-        });
 
-        // add widget
-        return $q.all(jobs)//
-        .then(function(){
-            return widgets;
-        });
-    };
+		/**
+		 * Adds child model
+		 * 
+		 * @memberof WbWidgetGroupCtrl
+		 */
+		WbWidgetGroupCtrl.prototype.addChildModel = function(index, item) {
+			var model = this.getModel();
+			var ctrl = this;
+			index = this.__cleanInsertIndex(index);
+			// add widget
+			item = $wbUtil.clean(item);
+			return $widget.compile(item, this)//
+				.then(function(newWidget) {
+					if (index < ctrl.childWidgets.length) {
+						newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
+					} else {
+						ctrl.getElement().append(newWidget.getElement());
+					}
+					if (!angular.isArray(model.children)) {
+						model.children = [];
+					}
+					model.children.splice(index, 0, item);
+					ctrl.childWidgets.splice(index, 0, newWidget);
 
-    WbWidgetGroupCtrl.prototype.__cleanInsertIndex = function(index){
-        if(!angular.isDefined(index) || index > this.childWidgets.length){
-            return this.childWidgets.length;
-        }
-        if(index < 0){
-            return 0;
-        }
-        return index;
-    };
-    
-    /**
-     * Finds index of child element
-     * 
-     * @memberof WbWidgetGroupCtrl
-     */
-    WbWidgetGroupCtrl.prototype.moveChild = function (widget, index) {
-        function arraymove(arr, fromIndex, toIndex) {
-            var element = arr[fromIndex];
-            arr.splice(fromIndex, 1);
-            arr.splice(toIndex, 0, element);
-        }
+					// init the widget
+					newWidget.setEditable(ctrl.isEditable());
+					ctrl.fire('newchild', {
+						widgets: [newWidget]
+					});
+					return newWidget;
+				});
+		};
 
-        if (index < 0 || index > this.getChildren().length - 1 || this.getChildren().length === 1) {
-            return;
-        }
-        if (this.getModel().children.indexOf(widget.getModel()) === index) {
-            return;
-        }
-        var positionWidget = this.getChildren()[index];
-        // move element
-        if (this.getModel().children.indexOf(widget.getModel()) < index) {
-            positionWidget.getElement().after(widget.getElement());
-        } else {
-            positionWidget.getElement().before(widget.getElement());
-        }
+		/**
+		 * Adds children at specified index
+		 * 
+		 * Change data model and the view.
+		 * 
+		 * @memberof WbWidgetGroupCtrl
+		 */
+		WbWidgetGroupCtrl.prototype.addChildrenModel = function(index, children) {
+			var model = this.getModel();
+			var ctrl = this;
+			index = this.__cleanInsertIndex(index);
 
-        // move model
-        arraymove(this.getModel().children, this.getModel().children.indexOf(widget.getModel()), index);
+			// compile all
+			return this.__compileChildren(children)
+				.then(function(widgets) {
+					for (var i = 0; i < widgets.length; i++) {
+						var newWidget = widgets[i];
 
-        // move controller
-        arraymove(this.getChildren(), this.indexOfChild(widget), index);
-    };
+						var j = i + index;
 
-    /**
-     * Finds index of child element
-     * 
-     * @memberof WbWidgetGroupCtrl
-     */
-    WbWidgetGroupCtrl.prototype.indexOfChild = function (widget) {
-        if (!this.childWidgets || !this.childWidgets.length) {
-            return -1;
-        }
-        return this.childWidgets.indexOf(widget);
-    };
+						if (j < ctrl.childWidgets.length) {
+							newWidget.getElement().insertBefore(ctrl.childWidgets[j].getElement());
+						} else {
+							ctrl.getElement().append(newWidget.getElement());
+						}
+						if (!angular.isArray(model.children)) {
+							model.children = [];
+						}
+						model.children.splice(j, 0, newWidget.getModel());
+						ctrl.childWidgets.splice(j, 0, newWidget);
 
-    /**
-     * List of allowed child
-     * 
-     * @memeberof WbWidgetGroupCtrl
-     */
-    WbWidgetGroupCtrl.prototype.getAllowedTypes = function () {
-        return this.allowedTypes;
-    };
+						// init the widget
+						newWidget.setEditable(ctrl.isEditable());
+					}
+					ctrl.fire('newchild', {
+						widgets: widgets
+					});
+				});
+		};
 
-    /**
-     * set acceptable widgets
-     * 
-     * $widget.setAcceptableChild('a', 'b');
-     * 
-     * @memberof WbWidgetGroupCtrl
-     */
-    WbWidgetGroupCtrl.prototype.setAllowedTypes = function () {
-        this.allowedTypes = arguments;
-    };
-    
+		/**
+		 * Adds a child model to the group
+		 * 
+		 * @deprecated
+		 */
+		WbWidgetGroupCtrl.prototype.addChild = WbWidgetGroupCtrl.prototype.addChildModel;
 
-    WbWidgetGroupCtrl.prototype.isLeaf = function(){
-        return false;
-    };
-    
-    WbWidgetGroupCtrl.prototype.isHorizontal = function(){
-        var direction = this.getModelProperty('style.flexDirection') || this.getProperty('style.flexDirection');
-        return direction === 'row';
-    };
+		/**
+		 * Adds a children model to the group
+		 * 
+		 * @deprecated
+		 */
+		WbWidgetGroupCtrl.prototype.addChildren = WbWidgetGroupCtrl.prototype.addChildrenModel;
 
-    return WbWidgetGroupCtrl;
-});
+		/*
+		 * Internal:
+		 * 
+		 * convert children model into a list of widgets.
+		 */
+		WbWidgetGroupCtrl.prototype.__compileChildren = function(children) {
+			var jobs = [];
+			var widgets = [];
+			var ctrl = this;
+			angular.forEach(children, function(item, i) {
+				item = $wbUtil.clean(item);
+				jobs.push($widget.compile(item, ctrl)//
+					.then(function(widget) {
+						widgets[i] = widget;
+					}));
+			});
+
+			// add widget
+			return $q.all(jobs)//
+				.then(function() {
+					return widgets;
+				});
+		};
+
+		WbWidgetGroupCtrl.prototype.__cleanInsertIndex = function(index) {
+			if (!angular.isDefined(index) || index > this.childWidgets.length) {
+				return this.childWidgets.length;
+			}
+			if (index < 0) {
+				return 0;
+			}
+			return index;
+		};
+
+		/**
+		 * Finds index of child element
+		 * 
+		 * @memberof WbWidgetGroupCtrl
+		 */
+		WbWidgetGroupCtrl.prototype.moveChild = function(widget, index) {
+			function arraymove(arr, fromIndex, toIndex) {
+				var element = arr[fromIndex];
+				arr.splice(fromIndex, 1);
+				arr.splice(toIndex, 0, element);
+			}
+
+			if (index < 0 || index > this.getChildren().length - 1 || this.getChildren().length === 1) {
+				return;
+			}
+			if (this.getModel().children.indexOf(widget.getModel()) === index) {
+				return;
+			}
+			var positionWidget = this.getChildren()[index];
+			// move element
+			if (this.getModel().children.indexOf(widget.getModel()) < index) {
+				positionWidget.getElement().after(widget.getElement());
+			} else {
+				positionWidget.getElement().before(widget.getElement());
+			}
+
+			// move model
+			arraymove(this.getModel().children, this.getModel().children.indexOf(widget.getModel()), index);
+
+			// move controller
+			arraymove(this.getChildren(), this.indexOfChild(widget), index);
+		};
+
+		/**
+		 * Finds index of child element
+		 * 
+		 * @memberof WbWidgetGroupCtrl
+		 */
+		WbWidgetGroupCtrl.prototype.indexOfChild = function(widget) {
+			if (!this.childWidgets || !this.childWidgets.length) {
+				return -1;
+			}
+			return this.childWidgets.indexOf(widget);
+		};
+
+		/**
+		 * List of allowed child
+		 * 
+		 * @memeberof WbWidgetGroupCtrl
+		 */
+		WbWidgetGroupCtrl.prototype.getAllowedTypes = function() {
+			return this.allowedTypes;
+		};
+
+		/**
+		 * set acceptable widgets
+		 * 
+		 * $widget.setAcceptableChild('a', 'b');
+		 * 
+		 * @memberof WbWidgetGroupCtrl
+		 */
+		WbWidgetGroupCtrl.prototype.setAllowedTypes = function() {
+			this.allowedTypes = arguments;
+		};
+
+		WbWidgetGroupCtrl.prototype.isHorizontal = function() {
+			var direction = this.getModelProperty('style.flexDirection') || this.getProperty('style.flexDirection');
+			return direction === 'row';
+		};
+
+		return WbWidgetGroupCtrl;
+	});
 
 
 /*
@@ -6776,475 +6195,468 @@ angular.module('am-wb-core')//
  * SOFTWARE.
  */
 angular.module('am-wb-core')
-/**
- * @ngdoc Widgets
- * @name collection
- * @description Collection controller
- * 
- * A widget collection controller
- * 
- */
-.factory('AmWbSeenCollectionWidget', function (
-		/* am-wb-core */ WbWidgetGroup, $wbUtil, 
+	/**
+	 * @ngdoc Widgets
+	 * @name collection
+	 * @description Collection controller
+	 * 
+	 * A widget collection controller
+	 * 
+	 */
+	.factory('AmWbSeenCollectionWidget', function(
+		/* am-wb-core */ WbWidgetGroup, $wbUtil,
 		/* angularjs  */ $q, $http, $log) {
 
 
 
-	function QueryParameter() {
-		// init
-		this.param = {};
-		this.filterMap = {};
-		this.sortMap = {};
-	}
-	
-	QueryParameter.prototype._init_filters = function(){
-		var obj = this.filterMap;
-		var keys = Object.keys(obj);
-		this.param['_px_fk[]'] = [];
-		this.param['_px_fv[]'] = [];
-		for(var i = 0; i < keys.length; i++){
-			var key = keys[i];
-			var values = obj[key];
-			for(var j = 0; j < values.length; j++){
-				var value = values[j];
-				this.param['_px_fk[]'].push(key);
-				this.param['_px_fv[]'].push(value);	
+		function QueryParameter() {
+			// init
+			this.param = {};
+			this.filterMap = {};
+			this.sortMap = {};
+		}
+
+		QueryParameter.prototype._init_filters = function() {
+			var obj = this.filterMap;
+			var keys = Object.keys(obj);
+			this.param['_px_fk[]'] = [];
+			this.param['_px_fv[]'] = [];
+			for (var i = 0; i < keys.length; i++) {
+				var key = keys[i];
+				var values = obj[key];
+				for (var j = 0; j < values.length; j++) {
+					var value = values[j];
+					this.param['_px_fk[]'].push(key);
+					this.param['_px_fv[]'].push(value);
+				}
 			}
-		}
-	};
-	
-	QueryParameter.prototype._init_sorts = function(){
-		var obj = this.sortMap;
-		this.param['_px_sk[]'] = Object.keys(obj);
-		// this.param['_px_so[]'] = Object.values(obj);
-		this.param['_px_so[]'] = [];
-		for(var index=0; index<this.param['_px_sk[]'].length; index++){
-			var key = this.param['_px_sk[]'][index];
-			this.param['_px_so[]'][index] = obj[key];
-		}
-	};
-
-	QueryParameter.prototype.setSize = function(size) {
-		this.param._px_ps = size;
-		return this;
-	};
-
-	QueryParameter.prototype.setQuery  =function(query) {
-		this.param._px_q = query;
-		return this;
-	};
-
-	QueryParameter.prototype.setPage = function($page) {
-		this.param._px_p = $page;
-		return this;
-	};
-
-	QueryParameter.prototype.nextPage = function() {
-		if(!this.param._px_p){
-			this.param._px_p = 1;
-		}
-		this.param._px_p += 1;
-		return this;
-	};
-
-	QueryParameter.prototype.setOrder = function($key, $order) {
-		if(!$order){				
-			this.removeSorter($key, $order);
-		}else{				
-			this.addSorter($key, $order);
-		}
-		this._init_sorts();
-		return this;
-	};
-
-	QueryParameter.prototype.addSorter = function($key, $order){
-		if(!$order){
-			return this;
-		}
-		this.sortMap[$key] = $order;
-		this._init_sorts();
-		return this;
-	};
-
-	QueryParameter.prototype.removeSorter = function($key){
-		delete this.sortMap[$key];
-		this._init_sorts();
-		return this;
-	};
-
-	QueryParameter.prototype.clearSorters = function(){
-		this.sortMap = {};
-	};
-
-	QueryParameter.prototype.setFilter = function($key, $value) {
-		if(!angular.isDefined($value)){				
-			this.removeFilter($key, $value);
-		}else{
-			this.filterMap[$key] = [];
-			this.addFilter($key, $value);
-		}
-		this._init_filters();
-		return this;
-	};
-
-	QueryParameter.prototype.addFilter = function($key, $value){
-		if(!angular.isDefined($value)){				
-			return this;
-		}
-		if(!angular.isArray(this.filterMap[$key])){
-			this.filterMap[$key] = [];
-		}
-		this.filterMap[$key].push($value);
-		this._init_filters();
-		return this;
-	};
-
-	QueryParameter.prototype.removeFilter = function($key){
-		delete this.filterMap[$key];
-		this._init_filters();
-		return this;
-	};
-
-	QueryParameter.prototype.clearFilters = function(){
-		this.filterMap = {};
-	};
-
-	QueryParameter.prototype.getParameter = function() {
-		return this.param;
-	};
-
-	QueryParameter.prototype.put = function(key, value) {
-		this.param[key] = value;
-		return this;
-	};
-
-	QueryParameter.prototype.get = function(key) {
-		return this.param[key];
-	};
-
-
-	// ------------------------------------------------------------------
-	// Utility
-	// ------------------------------------------------------------------
-	/*
-	 * process state
-	 */
-	var STATE_BUSY = 'busy';
-	var STATE_IDEAL = 'ideal';
-	var collectionAttributes = ['url', 'filters', 'sorts', 'query', 'properties', 'template'];
-
-	// ------------------------------------------------------------------
-	// Utility
-	// ------------------------------------------------------------------
-
-	/*
-	 * Creates widgets based on a mix of the template and input data
-	 * 
-	 * #utility
-	 */
-	function createWidgets(items, template) {
-		var widgetList = [];
-		var templateCopy = '';
-		var html;
-		if (!angular.isArray(items)) {
-			return $q.resolve([]); // Empty items?
-		}
-		for (var i = 0; i < items.length; i++) {
-			templateCopy = template;
-			try {
-				html = Mustache.to_html(templateCopy, items[i]);
-				html = JSON.parse(html);
-				html = $wbUtil.clean(html);
-				widgetList.push(html);
-			} catch (e) {
-				$log.error({
-					message: 'Falie to load template',
-					error: e
-				});
-				continue;
-			}
-		}
-		return $q.resolve(widgetList);
-	}
-
-	// ------------------------------------------------------------------
-	// Widget internal
-	//
-	// ------------------------------------------------------------------
-	/*
-	 * TODO: maso, 2018: manage events 
-	 * 
-	 * - collection changes: any part of the query is changed 
-	 * - style changes: internal group style changed 
-	 * - model changes: the whole model changed
-	 */
-
-	function Widget($scope, $element, $parent){
-		WbWidgetGroup.apply(this, [$scope, $element, $parent]);
-		this.setAllowedTypes();
-		this.addElementAttributes('url', 'filters', 'sorts', 'query', 'properties', 'template');
-
-		this._lastResponse;
-		this._state = STATE_IDEAL;
-		var ctrl = this;
-
-		// watch model update
-		function doTask ($event) {
-			// collection updated
-			if (_.includes(collectionAttributes, $event.key)) {
-				ctrl.reloadPage();
-			}
-		}
-
-		ctrl.on('modelUpdated', doTask);
-		ctrl.on('runtimeModelUpdated', doTask);
-		this.on('loaded', function(){
-			ctrl.reloadPage();
-		});
-	}
-	
-	Widget.prototype = Object.create(WbWidgetGroup.prototype);
-
-	/**
-	 * Gets collection from server, creates widgets, and forms the body of widget
-	 * 
-	 * @memberof AmWbSeenCollection
-	 */
-	Widget.prototype.reloadPage = function () {
-		var ctrl = this;
-		if(this._reloading){
-			return this._reloading.finally(function(){
-				return ctrl.reloadPage();
-			});
-		}
-		this.removeChildren();
-		this.getElement().empty();
-		delete this._lastResponse;
-		this._reloading = this.loadNextPage(true)
-		.finally(function(){
-			delete ctrl._reloading;
-		});
-	};
-
-
-	/**
-	 * Load next page 
-	 * 
-	 * @memberof AmWbSeenCollection
-	 * @param replace {boolean} current items or not
-	 * @returns {number} the number of items in each page
-	 */
-	Widget.prototype.loadNextPage = function () {
-		if (!this.hasMorePage()) {
-			return $q.reject({
-				message: 'No more page!?'
-			});
-		}
-		var template = this.getTemplate();
-
-		var ctrl = this;
-		return this.getCollection()//
-		.then(function (res) {
-			ctrl._lastResponse = res.data;
-			return ctrl.fire('success', res) || res.data;
-		}, function (error) {
-			return ctrl.fire('error', error) || error;
-		})
-		.then(function (data) {
-			return createWidgets(data.items || [], template);
-		})//
-		.then(function (children) {
-			return ctrl.addChildren(ctrl.getChildren().length, children)
-			.then(function(){
-				return ctrl.fire('load', {
-					children: children
-				}) || children;
-			});
-		});
-	};
-
-	Widget.prototype.getTemplate = function(){
-		return this.getProperty('template') || this.getModelProperty('template') || {
-			type: 'HtmlText',
-			text: '<h3>Template is not set</h3>'
 		};
-	};
 
-	/*
-	 * Gets collection based on internal configurations.
-	 * 
-	 * This is an internal function
-	 */
-	Widget.prototype.getCollection = function () {
-		// check state
-		if (this._state !== STATE_IDEAL) {
-			return this.lastQuery;
-		}
-
-		var q = new QueryParameter();
-
-		//TODO: maso, 2019: merge runtime and origin model into a new model
-		// like the way used in 'loadStyle' function in 'widgets-ctrl' in am-wb-core module
-
-		// filters
-		var filters = this.getProperty('filters') || this.getModelProperty('filters') || [];
-		angular.forEach(filters, function (filter) {
-			q.addFilter(filter.key, filter.value);
-		});
-
-		// sort
-		var sorts = this.getProperty('sorts') || this.getModelProperty('sorts') || [];
-		angular.forEach(sorts, function (sort) {
-			q.addSorter(sort.key, sort.order);
-		});
-
-		q.setQuery(this.getProperty('query') || this.getModelProperty('query'));
-		q.put('graphql', this.getProperty('properties') || this.getModelProperty('properties'));
-		var url = this.getProperty('url') || this.getModelProperty('url');
-		if (url) {
-			var pageIndex = this.getNextPageIndex();
-			if(pageIndex > 1){
-				q.setPage(pageIndex);
+		QueryParameter.prototype._init_sorts = function() {
+			var obj = this.sortMap;
+			this.param['_px_sk[]'] = Object.keys(obj);
+			// this.param['_px_so[]'] = Object.values(obj);
+			this.param['_px_so[]'] = [];
+			for (var index = 0; index < this.param['_px_sk[]'].length; index++) {
+				var key = this.param['_px_sk[]'][index];
+				this.param['_px_so[]'][index] = obj[key];
 			}
-			this._state = STATE_BUSY;
+		};
+
+		QueryParameter.prototype.setSize = function(size) {
+			this.param._px_ps = size;
+			return this;
+		};
+
+		QueryParameter.prototype.setQuery = function(query) {
+			this.param._px_q = query;
+			return this;
+		};
+
+		QueryParameter.prototype.setPage = function($page) {
+			this.param._px_p = $page;
+			return this;
+		};
+
+		QueryParameter.prototype.nextPage = function() {
+			if (!this.param._px_p) {
+				this.param._px_p = 1;
+			}
+			this.param._px_p += 1;
+			return this;
+		};
+
+		QueryParameter.prototype.setOrder = function($key, $order) {
+			if (!$order) {
+				this.removeSorter($key, $order);
+			} else {
+				this.addSorter($key, $order);
+			}
+			this._init_sorts();
+			return this;
+		};
+
+		QueryParameter.prototype.addSorter = function($key, $order) {
+			if (!$order) {
+				return this;
+			}
+			this.sortMap[$key] = $order;
+			this._init_sorts();
+			return this;
+		};
+
+		QueryParameter.prototype.removeSorter = function($key) {
+			delete this.sortMap[$key];
+			this._init_sorts();
+			return this;
+		};
+
+		QueryParameter.prototype.clearSorters = function() {
+			this.sortMap = {};
+		};
+
+		QueryParameter.prototype.setFilter = function($key, $value) {
+			if (!angular.isDefined($value)) {
+				this.removeFilter($key, $value);
+			} else {
+				this.filterMap[$key] = [];
+				this.addFilter($key, $value);
+			}
+			this._init_filters();
+			return this;
+		};
+
+		QueryParameter.prototype.addFilter = function($key, $value) {
+			if (!angular.isDefined($value)) {
+				return this;
+			}
+			if (!angular.isArray(this.filterMap[$key])) {
+				this.filterMap[$key] = [];
+			}
+			this.filterMap[$key].push($value);
+			this._init_filters();
+			return this;
+		};
+
+		QueryParameter.prototype.removeFilter = function($key) {
+			delete this.filterMap[$key];
+			this._init_filters();
+			return this;
+		};
+
+		QueryParameter.prototype.clearFilters = function() {
+			this.filterMap = {};
+		};
+
+		QueryParameter.prototype.getParameter = function() {
+			return this.param;
+		};
+
+		QueryParameter.prototype.put = function(key, value) {
+			this.param[key] = value;
+			return this;
+		};
+
+		QueryParameter.prototype.get = function(key) {
+			return this.param[key];
+		};
+
+
+		// ------------------------------------------------------------------
+		// Utility
+		// ------------------------------------------------------------------
+		/*
+		 * process state
+		 */
+		var STATE_BUSY = 'busy';
+		var STATE_IDEAL = 'ideal';
+		var collectionAttributes = ['url', 'filters', 'sorts', 'query', 'properties', 'template'];
+
+		// ------------------------------------------------------------------
+		// Utility
+		// ------------------------------------------------------------------
+
+		/*
+		 * Creates widgets based on a mix of the template and input data
+		 * 
+		 * #utility
+		 */
+		function createWidgets(items, template) {
+			var widgetList = [];
+			var templateCopy = '';
+			var html;
+			if (!angular.isArray(items)) {
+				return $q.resolve([]); // Empty items?
+			}
+			for (var i = 0; i < items.length; i++) {
+				templateCopy = template;
+				try {
+					html = Mustache.to_html(templateCopy, items[i]);
+					html = JSON.parse(html);
+					html = $wbUtil.clean(html);
+					widgetList.push(html);
+				} catch (e) {
+					$log.error({
+						message: 'Falie to load template',
+						error: e
+					});
+					continue;
+				}
+			}
+			return $q.resolve(widgetList);
+		}
+
+		// ------------------------------------------------------------------
+		// Widget internal
+		//
+		// ------------------------------------------------------------------
+		/*
+		 * TODO: maso, 2018: manage events 
+		 * 
+		 * - collection changes: any part of the query is changed 
+		 * - style changes: internal group style changed 
+		 * - model changes: the whole model changed
+		 */
+
+		function Widget($scope, $element, $parent) {
+			WbWidgetGroup.apply(this, [$scope, $element, $parent]);
+			this.setAllowedTypes();
+			this.addElementAttributes('url', 'filters', 'sorts', 'query', 'properties', 'template');
+
+			this._lastResponse;
+			this._state = STATE_IDEAL;
 			var ctrl = this;
-			this._lastQuery = $http({
-				method: 'GET',
-				url: url,
-				params: q.getParameter()
-			})
-			.finally(function () {
-				ctrl._state = STATE_IDEAL;
-				delete ctrl.lastQuery;
+
+			// watch model update
+			function doTask($event) {
+				// collection updated
+				if (_.includes(collectionAttributes, $event.key)) {
+					ctrl.reloadPage();
+				}
+			}
+
+			ctrl.on('modelUpdated', doTask);
+			ctrl.on('runtimeModelUpdated', doTask);
+			this.on('loaded', function() {
+				ctrl.reloadPage();
 			});
-		} else {
-			this._lastQuery = $q.reject({
-				message: 'URL is not set',
-				code: 1 // url is not set
+		}
+
+		Widget.prototype = Object.create(WbWidgetGroup.prototype);
+
+		/**
+		 * Gets collection from server, creates widgets, and forms the body of widget
+		 * 
+		 * @memberof AmWbSeenCollection
+		 */
+		Widget.prototype.reloadPage = function() {
+			var ctrl = this;
+			if (this._reloading) {
+				return this._reloading.finally(function() {
+					return ctrl.reloadPage();
+				});
+			}
+			this.removeChildren();
+			this.getElement().empty();
+			delete this._lastResponse;
+			this._reloading = this.loadNextPage(true)
+				.finally(function() {
+					delete ctrl._reloading;
+				});
+		};
+
+
+		/**
+		 * Load next page 
+		 * 
+		 * @memberof AmWbSeenCollection
+		 * @param replace {boolean} current items or not
+		 * @returns {number} the number of items in each page
+		 */
+		Widget.prototype.loadNextPage = function() {
+			if (!this.hasMorePage()) {
+				return $q.reject({
+					message: 'No more page!?'
+				});
+			}
+			var template = this.getTemplate();
+
+			var ctrl = this;
+			return this.getCollection()//
+				.then(function(res) {
+					ctrl._lastResponse = res.data;
+					return ctrl.fire('success', res) || res.data;
+				}, function(error) {
+					return ctrl.fire('error', error) || error;
+				})
+				.then(function(data) {
+					return createWidgets(data.items || [], template);
+				})//
+				.then(function(children) {
+					return ctrl.addChildren(ctrl.getChildren().length, children)
+						.then(function() {
+							return ctrl.fire('load', {
+								children: children
+							}) || children;
+						});
+				});
+		};
+
+		Widget.prototype.getTemplate = function() {
+			return this.getProperty('template') || this.getModelProperty('template') || {
+				type: 'HtmlText',
+				text: '<h3>Template is not set</h3>'
+			};
+		};
+
+		/*
+		 * Gets collection based on internal configurations.
+		 * 
+		 * This is an internal function
+		 */
+		Widget.prototype.getCollection = function() {
+			// check state
+			if (this._state !== STATE_IDEAL) {
+				return this.lastQuery;
+			}
+
+			var q = new QueryParameter();
+
+			//TODO: maso, 2019: merge runtime and origin model into a new model
+			// like the way used in 'loadStyle' function in 'widgets-ctrl' in am-wb-core module
+
+			// filters
+			var filters = this.getProperty('filters') || this.getModelProperty('filters') || [];
+			angular.forEach(filters, function(filter) {
+				q.addFilter(filter.key, filter.value);
 			});
-		}
-		return this._lastQuery;
-	};
+
+			// sort
+			var sorts = this.getProperty('sorts') || this.getModelProperty('sorts') || [];
+			angular.forEach(sorts, function(sort) {
+				q.addSorter(sort.key, sort.order);
+			});
+
+			q.setQuery(this.getProperty('query') || this.getModelProperty('query'));
+			q.put('graphql', this.getProperty('properties') || this.getModelProperty('properties'));
+			var url = this.getProperty('url') || this.getModelProperty('url');
+			if (url) {
+				var pageIndex = this.getNextPageIndex();
+				if (pageIndex > 1) {
+					q.setPage(pageIndex);
+				}
+				this._state = STATE_BUSY;
+				var ctrl = this;
+				this._lastQuery = $http({
+					method: 'GET',
+					url: url,
+					params: q.getParameter()
+				})
+					.finally(function() {
+						ctrl._state = STATE_IDEAL;
+						delete ctrl.lastQuery;
+					});
+			} else {
+				this._lastQuery = $q.reject({
+					message: 'URL is not set',
+					code: 1 // url is not set
+				});
+			}
+			return this._lastQuery;
+		};
 
 
 
-	// ------------------------------------------------------------------
-	// Widget global
-	// ------------------------------------------------------------------
+		// ------------------------------------------------------------------
+		// Widget global
+		// ------------------------------------------------------------------
 
-	/**
-	 * Gets counts of all pages
-	 * 
-	 * @memberof AmWbSeenCollection
-	 * @returns {number} the number of pages 
-	 */
-	Widget.prototype.getPagesCount = function () {
-		if (!this._lastResponse) {
-			return 0;
-		}
-		return this._lastResponse.page_number;
-	};
+		/**
+		 * Gets counts of all pages
+		 * 
+		 * @memberof AmWbSeenCollection
+		 * @returns {number} the number of pages 
+		 */
+		Widget.prototype.getPagesCount = function() {
+			if (!this._lastResponse) {
+				return 0;
+			}
+			return this._lastResponse.page_number;
+		};
 
-	/**
-	 * Gets current page number
-	 * 
-	 * @memberof AmWbSeenCollection
-	 * @returns {number} the current page
-	 */
-	Widget.prototype.getCurrentPage = function () {
-		if (!this._lastResponse) {
-			return 0;
-		}
-		return this._lastResponse.current_page;
-	};
+		/**
+		 * Gets current page number
+		 * 
+		 * @memberof AmWbSeenCollection
+		 * @returns {number} the current page
+		 */
+		Widget.prototype.getCurrentPage = function() {
+			if (!this._lastResponse) {
+				return 0;
+			}
+			return this._lastResponse.current_page;
+		};
 
-	/**
-	 * The number of items per each page
-	 * 
-	 * @memberof AmWbSeenCollection
-	 * @returns {number} the number of items in each page
-	 */
-	Widget.prototype.getItemPerPage = function () {
-		if (!this._lastResponse) {
-			return 0;
-		}
-		return this._lastResponse.items_per_page;
-	};
+		/**
+		 * The number of items per each page
+		 * 
+		 * @memberof AmWbSeenCollection
+		 * @returns {number} the number of items in each page
+		 */
+		Widget.prototype.getItemPerPage = function() {
+			if (!this._lastResponse) {
+				return 0;
+			}
+			return this._lastResponse.items_per_page;
+		};
 
-	/**
-	 * Check if there is more page
-	 * 
-	 * @memberof AmWbSeenCollection
-	 * @returns {boolean} true if there is more page
-	 */
-	Widget.prototype.hasMorePage = function () {
-		if (!this._lastResponse) {
-			return true;
-		}
-		return this._lastResponse.current_page < this._lastResponse.page_number;
-	};
+		/**
+		 * Check if there is more page
+		 * 
+		 * @memberof AmWbSeenCollection
+		 * @returns {boolean} true if there is more page
+		 */
+		Widget.prototype.hasMorePage = function() {
+			if (!this._lastResponse) {
+				return true;
+			}
+			return this._lastResponse.current_page < this._lastResponse.page_number;
+		};
 
-	/**
-	 * Gets next page index
-	 * 
-	 * @memberof AmWbSeenCollection
-	 * @returns {number} next page index
-	 */
-	Widget.prototype.getNextPageIndex = function () {
-		if (!this._lastResponse) {
-			return 1;
-		}
-		return this._lastResponse.current_page + 1;
-	};
+		/**
+		 * Gets next page index
+		 * 
+		 * @memberof AmWbSeenCollection
+		 * @returns {number} next page index
+		 */
+		Widget.prototype.getNextPageIndex = function() {
+			if (!this._lastResponse) {
+				return 1;
+			}
+			return this._lastResponse.current_page + 1;
+		};
 
-	/**
-	 * The current state of the controller
-	 * 
-	 * @memberof AmWbSeenCollection
-	 * @returns {string} current state of the controller
-	 */
-	Widget.prototype.getState = function () {
-		return this._state || STATE_IDEAL;
-	};
+		/**
+		 * The current state of the controller
+		 * 
+		 * @memberof AmWbSeenCollection
+		 * @returns {string} current state of the controller
+		 */
+		Widget.prototype.getState = function() {
+			return this._state || STATE_IDEAL;
+		};
 
 
-	/**
-	 * set acceptable widgets
-	 * 
-	 * $widget.setAcceptableChild('a', 'b');
-	 * 
-	 * @memberof WbWidgetGroupCtrl
-	 */
-	Widget.prototype.setAllowedTypes = function () {
-		this.allowedTypes = [];
-	};
+		/**
+		 * set acceptable widgets
+		 * 
+		 * $widget.setAcceptableChild('a', 'b');
+		 * 
+		 * @memberof WbWidgetGroupCtrl
+		 */
+		Widget.prototype.setAllowedTypes = function() {
+			this.allowedTypes = [];
+		};
 
-	/**
-	 * Set edit mode
-	 * 
-	 * 
-	 * @memberof WbAbstractWidget
-	 */
-	Widget.prototype.setEditable = function (editable) {
-		WbWidgetGroup.prototype.setEditable.apply(this, arguments);
-		// propagate to child
-		var children = this.getChildren();
-		while(!_.isEmpty(children)){
-			var widget = children.pop();
-			widget.setSilent(editable);
-			if(!widget.isLeaf()){
+		/**
+		 * Set edit mode
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		Widget.prototype.setEditable = function(editable) {
+			WbWidgetGroup.prototype.setEditable.apply(this, arguments);
+			// propagate to child
+			var children = this.getChildren();
+			while (!_.isEmpty(children)) {
+				var widget = children.pop();
+				widget.setSilent(editable);
 				children = children.concat(widget.getChildren());
 			}
-		}
-	};
+		};
 
-
-	Widget.prototype.isLeaf = function(){
-		return true;
-	};
-
-	return Widget;
-});
+		return Widget;
+	});
 /*
  * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
  * 
@@ -8075,134 +7487,126 @@ angular.module('am-wb-core')
 
 angular.module('am-wb-core')//
 
-/**
- * @ngdoc Widgets
- * @name import
- * @description Manage a widget
- */
-.factory('WbWidgetSeenImport', function (WbWidgetGroup, $wbUtil, $q) {
-    'use strict';
+	/**
+	 * @ngdoc Widgets
+	 * @name import
+	 * @description Manage a widget
+	 */
+	.factory('WbWidgetSeenImport', function(WbWidgetGroup, $wbUtil, $q) {
+		'use strict';
 
-    /*
-     * Load data from the widget URL
-     */
-    function loadLinks(paths) {
+		/*
+		 * Load data from the widget URL
+		 */
+		function loadLinks(paths) {
 
-        var jobs = [];
-        var models = Array(paths.length);
-        _.forEach(paths, function(path, index){
-            // check parts
-            var parts = path.split('#');
-            var url = parts[0];
-            var id = parts.length > 1 ? parts[1] : undefined;
-            var job = $wbUtil.downloadWidgetModel(url, id)
-            .then(function (model) {
-                models[index] = model;
-            });
-            jobs.push(job);
-        });
+			var jobs = [];
+			var models = Array(paths.length);
+			_.forEach(paths, function(path, index) {
+				// check parts
+				var parts = path.split('#');
+				var url = parts[0];
+				var id = parts.length > 1 ? parts[1] : undefined;
+				var job = $wbUtil.downloadWidgetModel(url, id)
+					.then(function(model) {
+						models[index] = model;
+					});
+				jobs.push(job);
+			});
 
-        function clean(){
-            return _.remove(models, function(model) {
-                return !_.isUndefined(model);
-            });
-        }
-        // TODO: maso, 2019: some models are faild
-        return $q.all(jobs)
-        .then(clean,clean);
-    }
+			function clean() {
+				return _.remove(models, function(model) {
+					return !_.isUndefined(model);
+				});
+			}
+			// TODO: maso, 2019: some models are faild
+			return $q.all(jobs)
+				.then(clean, clean);
+		}
 
-    //-------------------------------------------------------------
-    // Widget
-    //-------------------------------------------------------------
-    function Widget($scope, $element, $parent){
-        WbWidgetGroup.apply(this, [$scope, $element, $parent]);
-        this.setAllowedTypes();
-        this.addElementAttributes('url');
+		//-------------------------------------------------------------
+		// Widget
+		//-------------------------------------------------------------
+		function Widget($scope, $element, $parent) {
+			WbWidgetGroup.apply(this, [$scope, $element, $parent]);
+			this.setAllowedTypes();
+			this.addElementAttributes('url');
 
-        // load widget
-        var ctrl = this;
-        function checkAndUpdateUrl($event) {
-            if ($event.key === 'url') {
-                ctrl.reload();
-            }
-        }
-        this.on('modelUpdated', checkAndUpdateUrl);
-        this.on('runtimeModelUpdated', checkAndUpdateUrl);
-        this.on('modelChanged', function () {
-            ctrl.reload();
-        });
-    }
-    Widget.prototype = Object.create(WbWidgetGroup.prototype);
+			// load widget
+			var ctrl = this;
+			function checkAndUpdateUrl($event) {
+				if ($event.key === 'url') {
+					ctrl.reload();
+				}
+			}
+			this.on('modelUpdated', checkAndUpdateUrl);
+			this.on('runtimeModelUpdated', checkAndUpdateUrl);
+			this.on('modelChanged', function() {
+				ctrl.reload();
+			});
+		}
+		Widget.prototype = Object.create(WbWidgetGroup.prototype);
 
-    Widget.prototype.reload = function (){
-        // check if the url
-        var ctrl = this;
-        ctrl.removeChildren();
-        ctrl.getModel().children = [];
-        var path = this.getProperty('url') || this.getModelProperty('url') || '';
-        path = path.trim();
-        var prom;
-        if(!path){
-            prom = $q.resolve([]);
-        } else {
-            this.paths = path.split(',');
-            prom = loadLinks(this.paths)//
-            .then(function (children) {
-                return ctrl.fire('success', {
-                    children: children
-                }) || children;
-            });
-        }
+		Widget.prototype.reload = function() {
+			// check if the url
+			var ctrl = this;
+			ctrl.removeChildren();
+			ctrl.getModel().children = [];
+			var path = this.getProperty('url') || this.getModelProperty('url') || '';
+			path = path.trim();
+			var prom;
+			if (!path) {
+				prom = $q.resolve([]);
+			} else {
+				this.paths = path.split(',');
+				prom = loadLinks(this.paths)//
+					.then(function(children) {
+						return ctrl.fire('success', {
+							children: children
+						}) || children;
+					});
+			}
 
-        return prom.then(function(children){
-            return ctrl.addChildrenModel(0, children)
-            .finally(function(){
-                ctrl.fire('load', {
-                    children: children
-                }) || children;
-            });
-        });
-    };
+			return prom.then(function(children) {
+				return ctrl.addChildrenModel(0, children)
+					.finally(function() {
+						ctrl.fire('load', {
+							children: children
+						}) || children;
+					});
+			});
+		};
 
-    /**
-     * set acceptable widgets
-     * 
-     * $widget.setAcceptableChild('a', 'b');
-     * 
-     * @memberof WbWidgetGroupCtrl
-     */
-    Widget.prototype.setAllowedTypes = function () {
-        this.allowedTypes = [];
-    };
+		/**
+		 * set acceptable widgets
+		 * 
+		 * $widget.setAcceptableChild('a', 'b');
+		 * 
+		 * @memberof WbWidgetGroupCtrl
+		 */
+		Widget.prototype.setAllowedTypes = function() {
+			this.allowedTypes = [];
+		};
 
+		/**
+		 * Set edit mode
+		 * 
+		 * 
+		 * @memberof WbAbstractWidget
+		 */
+		Widget.prototype.setEditable = function(editable) {
+			WbWidgetGroup.prototype.setEditable.apply(this, arguments);
+			// propagate to child
+			var children = this.getChildren();
+			while (!_.isEmpty(children)) {
+				var widget = children.pop();
+				widget.setSilent(editable);
+				children = children.concat(widget.getChildren());
+			}
+		};
 
-    /**
-     * Set edit mode
-     * 
-     * 
-     * @memberof WbAbstractWidget
-     */
-    Widget.prototype.setEditable = function (editable) {
-        WbWidgetGroup.prototype.setEditable.apply(this, arguments);
-        // propagate to child
-        var children = this.getChildren();
-        while(!_.isEmpty(children)){
-            var widget = children.pop();
-            widget.setSilent(editable);
-            if(!widget.isLeaf()){
-               children = children.concat(widget.getChildren());
-            }
-        }
-    };
-    
-
-    Widget.prototype.isLeaf = function(){
-        return true;
-    };
-
-    return Widget;
-});
+		return Widget;
+	});
 /*
  * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
  * 

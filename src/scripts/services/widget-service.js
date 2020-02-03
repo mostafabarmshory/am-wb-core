@@ -153,9 +153,6 @@ angular.module('am-wb-core').service('$widget', function(
 
 	this.hasWidget = hasWidget;
 
-	function isWidgetLeaf(type) {
-		return widgetDefinition[type] && widgetDefinition.isLeaf;
-	}
 
 	/**
 	 * Compile element 
@@ -220,7 +217,6 @@ angular.module('am-wb-core').service('$widget', function(
 	service.widget = widget;
 	service.widgets = widgets;
 	service.widgetData = widgetData;
-	service.isWidgetLeaf = isWidgetLeaf;
 
 	// new api
 	service.getWidget = _widget;
@@ -255,9 +251,6 @@ angular.module('am-wb-core').service('$widget', function(
 	this.getChildren = function(widget) {
 		// Check if it is group
 		var widgets = [];
-		if (widget.isLeaf()) {
-			return widgets;
-		}
 
 		// load list of widgets
 		var groups = [];
@@ -267,12 +260,10 @@ angular.module('am-wb-core').service('$widget', function(
 		while (groups.length) {
 			widget = groups.pop();
 			widgets.push(widget);
-			if (!widget.isLeaf()) {
-				var children = widget.getChildren();
-				for (var i = 0; i < children.length; i++) {
-					var child = children[i];
-					groups.push(child);
-				}
+			var children = widget.getChildren();
+			for (var i = 0; i < children.length; i++) {
+				var child = children[i];
+				groups.push(child);
 			}
 		}
 		//return the list
@@ -488,7 +479,7 @@ angular.module('am-wb-core').service('$widget', function(
 				return element.$$wbController;
 			}
 			element = element.parentNode;
-		} while  (element);
+		} while (element);
 	};
 
 });
