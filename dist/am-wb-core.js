@@ -2466,18 +2466,11 @@ angular.module('am-wb-core').run(function(
  ***********************************************************************/
 angular.module('am-wb-core').run(function($widget) {
 
-	/***********Containers********** */
-	_.forEach(['address', 'audio', 'datalist', 'div', 'figure', 'footer', 'form', 'frameset', 'header', 'i',
-		'li', 'main', 'map', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'output', 'picture', 'section',
-		'select', 'span', 'template', 'ul', 'video', 'table', 'thead', 'tbody', 'tr', 'th', 'td',], function(type) {
-			$widget.newWidget({
-				type: type,
-				controller: 'WbWidgetContainer',
-			});
-		});
-
 	/***********Normal********** */
 	_.forEach([
+		'address', 'audio', 'datalist', 'div', 'figure', 'footer', 'form', 'frameset', 'header', 'i',
+		'li', 'main',	 'map', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'output', 'picture', 'section',
+		'select', 'span', 'template', 'ul', 'video', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
 		'button', 'figcaption', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'iframe', 'hr', 'img', 'kbd', 'label',
 		'legend', 'link', 'meta', 'meter', 'option', 'p', 'param', 'progress', 'q', 's', 'samp', 'small', 'source', 'summary',
 		'strong', 'svg', 'track', 'textarea', 'a', 'input',
@@ -4949,6 +4942,7 @@ angular.module('am-wb-core').factory('WbWidget', function($widget, $window, $obj
 });
 
 
+
 /* 
  * The MIT License (MIT)
  * 
@@ -5306,31 +5300,6 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
 		return this.childWidgets.indexOf(widget);
 	};
 
-	/**
-	 * List of allowed child
-	 * 
-	 * @memeberof WbWidgetGroupCtrl
-	 */
-	WbWidgetGroupCtrl.prototype.getAllowedTypes = function() {
-		return this.allowedTypes;
-	};
-
-	/**
-	 * set acceptable widgets
-	 * 
-	 * $widget.setAcceptableChild('a', 'b');
-	 * 
-	 * @memberof WbWidgetGroupCtrl
-	 */
-	WbWidgetGroupCtrl.prototype.setAllowedTypes = function() {
-		this.allowedTypes = arguments;
-	};
-
-	WbWidgetGroupCtrl.prototype.isHorizontal = function() {
-		var direction = this.getModelProperty('style.flexDirection') || this.getProperty('style.flexDirection');
-		return direction === 'row';
-	};
-
 	return WbWidgetGroupCtrl;
 });
 
@@ -5367,7 +5336,7 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
  * a widget.
  * 
  */
-angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidget) {
+angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContainer) {
 
     /**
      * Creates new instance 
@@ -5377,7 +5346,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidget) {
 	function Widget($element, $parent) {
 
 		// call super constractor
-		WbWidget.apply(this, [$element, $parent]);
+		WbWidgetContainer.apply(this, [$element, $parent]);
 		var ctrl = this;
 
         /*
@@ -5406,7 +5375,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidget) {
 	}
 
 	// extend functionality
-	Widget.prototype = Object.create(WbWidget.prototype);
+	Widget.prototype = Object.create(WbWidgetContainer.prototype);
 
     /**
      * Gets value of the input
