@@ -1,3 +1,4 @@
+
 /* 
  * The MIT License (MIT)
  * 
@@ -353,31 +354,6 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
 			return -1;
 		}
 		return this.childWidgets.indexOf(widget);
-	};
-
-	/**
-	 * List of allowed child
-	 * 
-	 * @memeberof WbWidgetGroupCtrl
-	 */
-	WbWidgetGroupCtrl.prototype.getAllowedTypes = function() {
-		return this.allowedTypes;
-	};
-
-	/**
-	 * set acceptable widgets
-	 * 
-	 * $widget.setAcceptableChild('a', 'b');
-	 * 
-	 * @memberof WbWidgetGroupCtrl
-	 */
-	WbWidgetGroupCtrl.prototype.setAllowedTypes = function() {
-		this.allowedTypes = arguments;
-	};
-
-	WbWidgetGroupCtrl.prototype.isHorizontal = function() {
-		var direction = this.getModelProperty('style.flexDirection') || this.getProperty('style.flexDirection');
-		return direction === 'row';
 	};
 
 	return WbWidgetGroupCtrl;

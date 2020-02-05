@@ -86,18 +86,11 @@ angular.module('am-wb-core').run(function(
  ***********************************************************************/
 angular.module('am-wb-core').run(function($widget) {
 
-	/***********Containers********** */
-	_.forEach(['address', 'audio', 'datalist', 'div', 'figure', 'footer', 'form', 'frameset', 'header', 'i',
-		'li', 'main', 'map', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'output', 'picture', 'section',
-		'select', 'span', 'template', 'ul', 'video', 'table', 'thead', 'tbody', 'tr', 'th', 'td',], function(type) {
-			$widget.newWidget({
-				type: type,
-				controller: 'WbWidgetContainer',
-			});
-		});
-
 	/***********Normal********** */
 	_.forEach([
+		'address', 'audio', 'datalist', 'div', 'figure', 'footer', 'form', 'frameset', 'header', 'i',
+		'li', 'main',	 'map', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'output', 'picture', 'section',
+		'select', 'span', 'template', 'ul', 'video', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
 		'button', 'figcaption', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'iframe', 'hr', 'img', 'kbd', 'label',
 		'legend', 'link', 'meta', 'meter', 'option', 'p', 'param', 'progress', 'q', 's', 'samp', 'small', 'source', 'summary',
 		'strong', 'svg', 'track', 'textarea', 'a', 'input',

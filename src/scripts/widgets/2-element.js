@@ -30,7 +30,7 @@
  * a widget.
  * 
  */
-angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidget) {
+angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContainer) {
 
     /**
      * Creates new instance 
@@ -40,7 +40,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidget) {
 	function Widget($element, $parent) {
 
 		// call super constractor
-		WbWidget.apply(this, [$element, $parent]);
+		WbWidgetContainer.apply(this, [$element, $parent]);
 		var ctrl = this;
 
         /*
@@ -69,7 +69,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidget) {
 	}
 
 	// extend functionality
-	Widget.prototype = Object.create(WbWidget.prototype);
+	Widget.prototype = Object.create(WbWidgetContainer.prototype);
 
     /**
      * Gets value of the input
