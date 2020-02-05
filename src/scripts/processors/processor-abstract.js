@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-angular.module('am-wb-core')//
 
 /**
  * @ngdoc Processor
@@ -28,9 +27,9 @@ angular.module('am-wb-core')//
  * @description Abstract widget processor 
  * 
  */
-.factory('WbProcessorAbstract', function (WbObservableObject) {
+angular.module('am-wb-core').factory('WbProcessorAbstract', function(WbObservableObject) {
 
-	function Processor(){
+	function Processor() {
 		WbObservableObject.apply(this, arguments);
 	}
 	Processor.prototype = new WbObservableObject();

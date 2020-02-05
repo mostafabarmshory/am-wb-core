@@ -44,17 +44,17 @@ describe('Service $widget', function () {
 			type : 'Group',
 			description : 'Panel contains list of widgets.',
 			template : '<div></div>',
-			controller: 'WbWidgetDiv',
+			controller: 'WbWidgetContainer',
 		});
 		$widget.newWidget({
 			type : 'HtmlText',
 			template : '<div></div>',
-			controller: 'WbWidgetDiv',
+			controller: 'WbWidgetContainer',
 		});
 		$widget.newWidget({
 			type : 'BoostForm',
 			template : '<form></form>',
-			controller: 'WbWidgetDiv',
+			controller: 'WbWidgetContainer',
 			controllerAs: 'ctrl'
 		});
 	});

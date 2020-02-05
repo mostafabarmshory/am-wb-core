@@ -1,7 +1,6 @@
 
-angular.module('am-wb-core') //
 
-.run(function($window, $q, $rootScope){
+angular.module('am-wb-core').run(function($window, $q, $rootScope) {
 
 	var libs = {};
 	var styles = {};
@@ -13,19 +12,19 @@ angular.module('am-wb-core') //
 	 * @path path of library
 	 * @return promise to load the library
 	 */
-	$window.loadLibrary = function(path){
-		if(libs[path]){
+	$window.loadLibrary = function(path) {
+		if (libs[path]) {
 			return $q.resolve({
 				message: 'isload'
 			});
 		}
 		var defer = $q.defer();
 
-//		var document = this.getDocument();
+		//		var document = this.getDocument();
 		var script = document.createElement('script');
 		script.src = path;
-		script.async=1;
-		script.onload = function(){
+		script.async = 1;
+		script.onload = function() {
 			libs[path] = true;
 			defer.resolve({
 				path: path,
@@ -49,7 +48,7 @@ angular.module('am-wb-core') //
 		return defer.promise;
 	};
 
-	$window.removeLibrary = function(path){
+	$window.removeLibrary = function(path) {
 		return $q.resolve({
 			source: path
 		});
@@ -61,8 +60,8 @@ angular.module('am-wb-core') //
 	 * @memberof NativeWindowWrapper
 	 * @return true if the library is loaded
 	 */
-	$window.isLibraryLoaded = function(path){
-		if(libs[path]){
+	$window.isLibraryLoaded = function(path) {
+		if (libs[path]) {
 			return true;
 		}
 		return false;
@@ -77,21 +76,21 @@ angular.module('am-wb-core') //
 	 * @path path of library
 	 * @return promise to load the library
 	 */
-	$window.loadStyle = function(path){
-		if(styles[path]){
+	$window.loadStyle = function(path) {
+		if (styles[path]) {
 			return $q.resolve(styles[path]);
 		}
 		var defer = $q.defer();
 
-//		var document = this.getDocument();
+		//		var document = this.getDocument();
 		var style = document.createElement('link');
 		style.setAttribute('rel', 'stylesheet');
 		style.setAttribute('type', 'text/css');
 		style.setAttribute('href', path);
-		style.onload = function(){
+		style.onload = function() {
 			styles[path] = {
-					element: style,
-					path: path
+				element: style,
+				path: path
 			};
 			defer.resolve(styles[path]);
 			if (!$rootScope.$$phase) {
@@ -113,8 +112,8 @@ angular.module('am-wb-core') //
 		return styles[path];
 	};
 
-	$window.removeStyle = function(path){
-		if(!this.isStyleLoaded(path)){
+	$window.removeStyle = function(path) {
+		if (!this.isStyleLoaded(path)) {
 			return $q.resolve({});
 		}
 		var item = styles[path];
@@ -129,8 +128,8 @@ angular.module('am-wb-core') //
 	 * @memberof NativeWindowWrapper
 	 * @return true if the library is loaded
 	 */
-	$window.isStyleLoaded = function(path){
-		if(styles[path]){
+	$window.isStyleLoaded = function(path) {
+		if (styles[path]) {
 			return true;
 		}
 		return false;
@@ -144,37 +143,37 @@ angular.module('am-wb-core') //
 	 * @params key {string} the key of meta
 	 * @params value {string} the value of meta
 	 */
-	$window.setMeta = function (key, value){
+	$window.setMeta = function(key, value) {
 		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
 		var headElement = $('head');
-		var elements = headElement.find('meta[name="'+searchkey+'"]');
+		var elements = headElement.find('meta[name="' + searchkey + '"]');
 		// remove element
-		if(_.isUndefined(value)){
-			if(elements.length){
+		if (_.isUndefined(value)) {
+			if (elements.length) {
 				elements.remove();
 			}
 			return;
 		}
 		// update element
 		var metaElement;
-		if(elements.length === 0){
+		if (elements.length === 0) {
 			// title element not found
-			metaElement = angular.element('<meta name=\''+key+'\' content=\'\' />');
+			metaElement = angular.element('<meta name=\'' + key + '\' content=\'\' />');
 			headElement.append(metaElement);
 		} else {
 			metaElement = angular.element(elements[0]);
 		}
-		metaElement.attr('content', value) ;
+		metaElement.attr('content', value);
 	};
-	
-	$window.getMeta = function (key){
+
+	$window.getMeta = function(key) {
 		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
 		var headElement = $('head');
-		var elements = headElement.find('meta[name="'+searchkey+'"]');
-		if(elements.length === 0){
+		var elements = headElement.find('meta[name="' + searchkey + '"]');
+		if (elements.length === 0) {
 			return;
 		}
-		return elements.attr('content') ;
+		return elements.attr('content');
 	};
 
 	/**
@@ -184,14 +183,14 @@ angular.module('am-wb-core') //
 	 * @params key {string} the key of meta
 	 * @params data {string} the value of meta
 	 */
-	$window.setLink = function(key, data){
+	$window.setLink = function(key, data) {
 		var searchkey = key.replace(new RegExp(':', 'g'), '\\:');
 		var headElement = $('head');
-		var elements = headElement.find('link[key='+searchkey+']');
+		var elements = headElement.find('link[key=' + searchkey + ']');
 		var metaElement;
-		if(elements.length === 0){
+		if (elements.length === 0) {
 			// title element not found
-			metaElement = angular.element('<link key=\''+key+'\' />');
+			metaElement = angular.element('<link key=\'' + key + '\' />');
 			headElement.append(metaElement);
 		} else {
 			metaElement = angular.element(elements[0]);
