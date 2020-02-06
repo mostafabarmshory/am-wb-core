@@ -3800,6 +3800,7 @@ angular.module('am-wb-core').service('$widget', function(
 
 });
 
+
 /* 
  * The MIT License (MIT)
  * 
@@ -5418,6 +5419,12 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 		var element = this.getElement();
 		return element.val.apply(element, arguments);
 	};
+	
+	// TODO: support:
+	// .attr()
+	// .prop()
+	// .removeAttr()
+	// .removeProp()
 	return Widget;
 });
 
