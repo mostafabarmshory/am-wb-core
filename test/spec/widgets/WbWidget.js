@@ -100,29 +100,6 @@ describe('WbWidget ', function() {
 		});
 	});
 
-	var basicAttributesWrong = [
-		'1accesskey',
-		'xx',
-		'aa aa '
-	];
-	angular.forEach(basicAttributesWrong, function(key) {
-		it('should not set invalid key:' + key + ' from model', function(done) {
-			var root = new MockRootWidget();
-			// Create new instance
-			var model = {
-				type: 'Group',
-				id: 'test'
-			};
-			model[key] = 'test-value';
-			$widget.compile(model, root)
-				.then(function(widget) {
-					expect(widget.getElementAttribute(key)).toBe(undefined);
-					done();
-				});
-			$rootScope.$apply();
-		});
-	});
-
 	var widgetTypes = [
 		'a',
 		'address',

@@ -328,15 +328,22 @@ module.exports = function(grunt) {
                 }
             }
         },
-        uglify : {
-            dist : {
-                files : {
-                    '<%= yeoman.dist %>/<%= yeoman.pkg.name %>.min.js' : [ //
-                        '.tmp/{,*/}*.js' //
-                        ]
-                }
-            }
-        },
+
+
+
+	uglify: {
+		dist: {
+			options: {
+				sourceMap: true,
+				sourceMapName: '<%= yeoman.dist %>/<%= yeoman.pkg.name %>.map'
+			},
+			files: {
+				'<%= yeoman.dist %>/<%= yeoman.pkg.name %>.min.js' : [ //
+					'.tmp/{,*/}*.js' //
+				]
+			}
+		}
+	},
 
         imagemin : {
             dist : {

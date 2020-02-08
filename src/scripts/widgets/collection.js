@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-angular.module('am-wb-core')
+
 /**
  * @ngdoc Widgets
  * @name collection
@@ -30,8 +30,8 @@ angular.module('am-wb-core')
  * A widget collection controller
  * 
  */
-.factory('AmWbSeenCollectionWidget', function (
-		/* am-wb-core */ WbWidgetGroup, $wbUtil, 
+angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
+		/* am-wb-core */ WbWidgetContainer, $wbUtil,
 		/* angularjs  */ $q, $http, $log) {
 
 
@@ -42,29 +42,29 @@ angular.module('am-wb-core')
 		this.filterMap = {};
 		this.sortMap = {};
 	}
-	
-	QueryParameter.prototype._init_filters = function(){
+
+	QueryParameter.prototype._init_filters = function() {
 		var obj = this.filterMap;
 		var keys = Object.keys(obj);
 		this.param['_px_fk[]'] = [];
 		this.param['_px_fv[]'] = [];
-		for(var i = 0; i < keys.length; i++){
+		for (var i = 0; i < keys.length; i++) {
 			var key = keys[i];
 			var values = obj[key];
-			for(var j = 0; j < values.length; j++){
+			for (var j = 0; j < values.length; j++) {
 				var value = values[j];
 				this.param['_px_fk[]'].push(key);
-				this.param['_px_fv[]'].push(value);	
+				this.param['_px_fv[]'].push(value);
 			}
 		}
 	};
-	
-	QueryParameter.prototype._init_sorts = function(){
+
+	QueryParameter.prototype._init_sorts = function() {
 		var obj = this.sortMap;
 		this.param['_px_sk[]'] = Object.keys(obj);
 		// this.param['_px_so[]'] = Object.values(obj);
 		this.param['_px_so[]'] = [];
-		for(var index=0; index<this.param['_px_sk[]'].length; index++){
+		for (var index = 0; index < this.param['_px_sk[]'].length; index++) {
 			var key = this.param['_px_sk[]'][index];
 			this.param['_px_so[]'][index] = obj[key];
 		}
@@ -75,7 +75,7 @@ angular.module('am-wb-core')
 		return this;
 	};
 
-	QueryParameter.prototype.setQuery  =function(query) {
+	QueryParameter.prototype.setQuery = function(query) {
 		this.param._px_q = query;
 		return this;
 	};
@@ -86,7 +86,7 @@ angular.module('am-wb-core')
 	};
 
 	QueryParameter.prototype.nextPage = function() {
-		if(!this.param._px_p){
+		if (!this.param._px_p) {
 			this.param._px_p = 1;
 		}
 		this.param._px_p += 1;
@@ -94,17 +94,17 @@ angular.module('am-wb-core')
 	};
 
 	QueryParameter.prototype.setOrder = function($key, $order) {
-		if(!$order){				
+		if (!$order) {
 			this.removeSorter($key, $order);
-		}else{				
+		} else {
 			this.addSorter($key, $order);
 		}
 		this._init_sorts();
 		return this;
 	};
 
-	QueryParameter.prototype.addSorter = function($key, $order){
-		if(!$order){
+	QueryParameter.prototype.addSorter = function($key, $order) {
+		if (!$order) {
 			return this;
 		}
 		this.sortMap[$key] = $order;
@@ -112,20 +112,20 @@ angular.module('am-wb-core')
 		return this;
 	};
 
-	QueryParameter.prototype.removeSorter = function($key){
+	QueryParameter.prototype.removeSorter = function($key) {
 		delete this.sortMap[$key];
 		this._init_sorts();
 		return this;
 	};
 
-	QueryParameter.prototype.clearSorters = function(){
+	QueryParameter.prototype.clearSorters = function() {
 		this.sortMap = {};
 	};
 
 	QueryParameter.prototype.setFilter = function($key, $value) {
-		if(!angular.isDefined($value)){				
+		if (!angular.isDefined($value)) {
 			this.removeFilter($key, $value);
-		}else{
+		} else {
 			this.filterMap[$key] = [];
 			this.addFilter($key, $value);
 		}
@@ -133,11 +133,11 @@ angular.module('am-wb-core')
 		return this;
 	};
 
-	QueryParameter.prototype.addFilter = function($key, $value){
-		if(!angular.isDefined($value)){				
+	QueryParameter.prototype.addFilter = function($key, $value) {
+		if (!angular.isDefined($value)) {
 			return this;
 		}
-		if(!angular.isArray(this.filterMap[$key])){
+		if (!angular.isArray(this.filterMap[$key])) {
 			this.filterMap[$key] = [];
 		}
 		this.filterMap[$key].push($value);
@@ -145,13 +145,13 @@ angular.module('am-wb-core')
 		return this;
 	};
 
-	QueryParameter.prototype.removeFilter = function($key){
+	QueryParameter.prototype.removeFilter = function($key) {
 		delete this.filterMap[$key];
 		this._init_filters();
 		return this;
 	};
 
-	QueryParameter.prototype.clearFilters = function(){
+	QueryParameter.prototype.clearFilters = function() {
 		this.filterMap = {};
 	};
 
@@ -225,8 +225,8 @@ angular.module('am-wb-core')
 	 * - model changes: the whole model changed
 	 */
 
-	function Widget($scope, $element, $parent){
-		WbWidgetGroup.apply(this, [$scope, $element, $parent]);
+	function Widget($scope, $element, $parent) {
+		WbWidgetContainer.apply(this, [$scope, $element, $parent]);
 		this.setAllowedTypes();
 		this.addElementAttributes('url', 'filters', 'sorts', 'query', 'properties', 'template');
 
@@ -235,7 +235,7 @@ angular.module('am-wb-core')
 		var ctrl = this;
 
 		// watch model update
-		function doTask ($event) {
+		function doTask($event) {
 			// collection updated
 			if (_.includes(collectionAttributes, $event.key)) {
 				ctrl.reloadPage();
@@ -244,22 +244,22 @@ angular.module('am-wb-core')
 
 		ctrl.on('modelUpdated', doTask);
 		ctrl.on('runtimeModelUpdated', doTask);
-		this.on('loaded', function(){
+		this.on('loaded', function() {
 			ctrl.reloadPage();
 		});
 	}
-	
-	Widget.prototype = Object.create(WbWidgetGroup.prototype);
+
+	Widget.prototype = Object.create(WbWidgetContainer.prototype);
 
 	/**
 	 * Gets collection from server, creates widgets, and forms the body of widget
 	 * 
 	 * @memberof AmWbSeenCollection
 	 */
-	Widget.prototype.reloadPage = function () {
+	Widget.prototype.reloadPage = function() {
 		var ctrl = this;
-		if(this._reloading){
-			return this._reloading.finally(function(){
+		if (this._reloading) {
+			return this._reloading.finally(function() {
 				return ctrl.reloadPage();
 			});
 		}
@@ -267,9 +267,9 @@ angular.module('am-wb-core')
 		this.getElement().empty();
 		delete this._lastResponse;
 		this._reloading = this.loadNextPage(true)
-		.finally(function(){
-			delete ctrl._reloading;
-		});
+			.finally(function() {
+				delete ctrl._reloading;
+			});
 	};
 
 
@@ -280,7 +280,7 @@ angular.module('am-wb-core')
 	 * @param replace {boolean} current items or not
 	 * @returns {number} the number of items in each page
 	 */
-	Widget.prototype.loadNextPage = function () {
+	Widget.prototype.loadNextPage = function() {
 		if (!this.hasMorePage()) {
 			return $q.reject({
 				message: 'No more page!?'
@@ -290,26 +290,26 @@ angular.module('am-wb-core')
 
 		var ctrl = this;
 		return this.getCollection()//
-		.then(function (res) {
-			ctrl._lastResponse = res.data;
-			return ctrl.fire('success', res) || res.data;
-		}, function (error) {
-			return ctrl.fire('error', error) || error;
-		})
-		.then(function (data) {
-			return createWidgets(data.items || [], template);
-		})//
-		.then(function (children) {
-			return ctrl.addChildren(ctrl.getChildren().length, children)
-			.then(function(){
-				return ctrl.fire('load', {
-					children: children
-				}) || children;
+			.then(function(res) {
+				ctrl._lastResponse = res.data;
+				return ctrl.fire('success', res) || res.data;
+			}, function(error) {
+				return ctrl.fire('error', error) || error;
+			})
+			.then(function(data) {
+				return createWidgets(data.items || [], template);
+			})//
+			.then(function(children) {
+				return ctrl.addChildren(ctrl.getChildren().length, children)
+					.then(function() {
+						return ctrl.fire('load', {
+							children: children
+						}) || children;
+					});
 			});
-		});
 	};
 
-	Widget.prototype.getTemplate = function(){
+	Widget.prototype.getTemplate = function() {
 		return this.getProperty('template') || this.getModelProperty('template') || {
 			type: 'HtmlText',
 			text: '<h3>Template is not set</h3>'
@@ -321,7 +321,7 @@ angular.module('am-wb-core')
 	 * 
 	 * This is an internal function
 	 */
-	Widget.prototype.getCollection = function () {
+	Widget.prototype.getCollection = function() {
 		// check state
 		if (this._state !== STATE_IDEAL) {
 			return this.lastQuery;
@@ -334,13 +334,13 @@ angular.module('am-wb-core')
 
 		// filters
 		var filters = this.getProperty('filters') || this.getModelProperty('filters') || [];
-		angular.forEach(filters, function (filter) {
+		angular.forEach(filters, function(filter) {
 			q.addFilter(filter.key, filter.value);
 		});
 
 		// sort
 		var sorts = this.getProperty('sorts') || this.getModelProperty('sorts') || [];
-		angular.forEach(sorts, function (sort) {
+		angular.forEach(sorts, function(sort) {
 			q.addSorter(sort.key, sort.order);
 		});
 
@@ -349,7 +349,7 @@ angular.module('am-wb-core')
 		var url = this.getProperty('url') || this.getModelProperty('url');
 		if (url) {
 			var pageIndex = this.getNextPageIndex();
-			if(pageIndex > 1){
+			if (pageIndex > 1) {
 				q.setPage(pageIndex);
 			}
 			this._state = STATE_BUSY;
@@ -359,10 +359,10 @@ angular.module('am-wb-core')
 				url: url,
 				params: q.getParameter()
 			})
-			.finally(function () {
-				ctrl._state = STATE_IDEAL;
-				delete ctrl.lastQuery;
-			});
+				.finally(function() {
+					ctrl._state = STATE_IDEAL;
+					delete ctrl.lastQuery;
+				});
 		} else {
 			this._lastQuery = $q.reject({
 				message: 'URL is not set',
@@ -384,7 +384,7 @@ angular.module('am-wb-core')
 	 * @memberof AmWbSeenCollection
 	 * @returns {number} the number of pages 
 	 */
-	Widget.prototype.getPagesCount = function () {
+	Widget.prototype.getPagesCount = function() {
 		if (!this._lastResponse) {
 			return 0;
 		}
@@ -397,7 +397,7 @@ angular.module('am-wb-core')
 	 * @memberof AmWbSeenCollection
 	 * @returns {number} the current page
 	 */
-	Widget.prototype.getCurrentPage = function () {
+	Widget.prototype.getCurrentPage = function() {
 		if (!this._lastResponse) {
 			return 0;
 		}
@@ -410,7 +410,7 @@ angular.module('am-wb-core')
 	 * @memberof AmWbSeenCollection
 	 * @returns {number} the number of items in each page
 	 */
-	Widget.prototype.getItemPerPage = function () {
+	Widget.prototype.getItemPerPage = function() {
 		if (!this._lastResponse) {
 			return 0;
 		}
@@ -423,7 +423,7 @@ angular.module('am-wb-core')
 	 * @memberof AmWbSeenCollection
 	 * @returns {boolean} true if there is more page
 	 */
-	Widget.prototype.hasMorePage = function () {
+	Widget.prototype.hasMorePage = function() {
 		if (!this._lastResponse) {
 			return true;
 		}
@@ -436,7 +436,7 @@ angular.module('am-wb-core')
 	 * @memberof AmWbSeenCollection
 	 * @returns {number} next page index
 	 */
-	Widget.prototype.getNextPageIndex = function () {
+	Widget.prototype.getNextPageIndex = function() {
 		if (!this._lastResponse) {
 			return 1;
 		}
@@ -449,7 +449,7 @@ angular.module('am-wb-core')
 	 * @memberof AmWbSeenCollection
 	 * @returns {string} current state of the controller
 	 */
-	Widget.prototype.getState = function () {
+	Widget.prototype.getState = function() {
 		return this._state || STATE_IDEAL;
 	};
 
@@ -461,7 +461,7 @@ angular.module('am-wb-core')
 	 * 
 	 * @memberof WbWidgetGroupCtrl
 	 */
-	Widget.prototype.setAllowedTypes = function () {
+	Widget.prototype.setAllowedTypes = function() {
 		this.allowedTypes = [];
 	};
 
@@ -471,22 +471,15 @@ angular.module('am-wb-core')
 	 * 
 	 * @memberof WbAbstractWidget
 	 */
-	Widget.prototype.setEditable = function (editable) {
-		WbWidgetGroup.prototype.setEditable.apply(this, arguments);
+	Widget.prototype.setEditable = function(editable) {
+		WbWidgetContainer.prototype.setEditable.apply(this, arguments);
 		// propagate to child
 		var children = this.getChildren();
-		while(!_.isEmpty(children)){
+		while (!_.isEmpty(children)) {
 			var widget = children.pop();
 			widget.setSilent(editable);
-			if(!widget.isLeaf()){
-				children = children.concat(widget.getChildren());
-			}
+			children = children.concat(widget.getChildren());
 		}
-	};
-
-
-	Widget.prototype.isLeaf = function(){
-		return true;
 	};
 
 	return Widget;

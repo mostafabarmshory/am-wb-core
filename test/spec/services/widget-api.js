@@ -44,17 +44,17 @@ describe('Service $widget', function () {
 			type : 'Group',
 			description : 'Panel contains list of widgets.',
 			template : '<div></div>',
-			controller: 'WbWidgetDiv',
+			controller: 'WbWidgetContainer',
 		});
 		$widget.newWidget({
 			type : 'HtmlText',
 			template : '<div></div>',
-			controller: 'WbWidgetDiv',
+			controller: 'WbWidgetContainer',
 		});
 		$widget.newWidget({
 			type : 'BoostForm',
 			template : '<form></form>',
-			controller: 'WbWidgetDiv',
+			controller: 'WbWidgetContainer',
 			controllerAs: 'ctrl'
 		});
 	});
@@ -223,5 +223,19 @@ describe('Service $widget', function () {
 		expect($widget.getProvidersKey()).toEqual(_.concat(pks,['xxx']));
 
 		expect($widget.getProviders()).not.toBe(undefined);
+	});
+	
+	it('should overrid widget definitions ', function () {
+		$widget.newWidget({
+			type: 'xxx',
+			id: '1'
+		});
+		expect($widget.getWidget('xxx').id).toBe('1');
+
+		$widget.newWidget({
+			type: 'xxx',
+			id: '2'
+		});
+		expect($widget.getWidget('xxx').id).toBe('2');
 	});
 });

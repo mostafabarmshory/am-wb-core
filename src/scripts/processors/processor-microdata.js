@@ -20,8 +20,6 @@
  * SOFTWARE.
  */
 
-angular.module('am-wb-core')//
-
 /**
  * @ngdoc Processor
  * @name WbProcessorMicrodata
@@ -35,51 +33,51 @@ angular.module('am-wb-core')//
  * 
  * @see document/widgets-microdata.md
  */
-.factory('WbProcessorMicrodata', function (WbProcessorAbstract) {
+angular.module('am-wb-core').factory('WbProcessorMicrodata', function(WbProcessorAbstract) {
 
-    var microdataAttributes = [
-        'itemscope', // groups list of item properties
-        'itemtype', // can use if it is item scope
-        'itemprop',
-        'itemref',
-        'itemid',
-        // extera properties
-        'content',
-        'value',
-        ];
+	var microdataAttributes = [
+		'itemscope', // groups list of item properties
+		'itemtype', // can use if it is item scope
+		'itemprop',
+		'itemref',
+		'itemid',
+		// extera properties
+		'content',
+		'value',
+	];
 
-    function loadWidgetAttributes(widget, attributes){
-        var $element = widget.getElement();
-        angular.forEach(attributes, function(key){
-            var value = widget.getProperty(key) || widget.getModelProperty(key);
-            if(value){
-                $element.attr(key, value);
-            } else {
-                $element.removeAttr(key);
-            }
-        });
-    }
+	function loadWidgetAttributes(widget, attributes) {
+		var $element = widget.getElement();
+		angular.forEach(attributes, function(key) {
+			var value = widget.getProperty(key) || widget.getModelProperty(key);
+			if (value) {
+				$element.attr(key, value);
+			} else {
+				$element.removeAttr(key);
+			}
+		});
+	}
 
 
-    function Processor(){
-        WbProcessorAbstract.apply(this);
-    }
+	function Processor() {
+		WbProcessorAbstract.apply(this);
+	}
 
-    // extend functionality
-    Processor.prototype = new WbProcessorAbstract();
+	// extend functionality
+	Processor.prototype = new WbProcessorAbstract();
 
-    Processor.prototype.process = function(widget, event){
-        // 1- Handle model load
-        if(event.type === 'modelChanged' || event.type === 'stateChanged'){
-            loadWidgetAttributes(widget, microdataAttributes);
-            return;
-        }
+	Processor.prototype.process = function(widget, event) {
+		// 1- Handle model load
+		if (event.type === 'modelChanged' || event.type === 'stateChanged') {
+			loadWidgetAttributes(widget, microdataAttributes);
+			return;
+		}
 
-        // 2- Handle model update
-        if(event.type === 'modelUpdated'){
-            loadWidgetAttributes(widget, _.intersection(microdataAttributes, event.keys || [event.key]));
-            return;
-        }
-    };
-    return Processor;
+		// 2- Handle model update
+		if (event.type === 'modelUpdated') {
+			loadWidgetAttributes(widget, _.intersection(microdataAttributes, event.keys || [event.key]));
+			return;
+		}
+	};
+	return Processor;
 });
