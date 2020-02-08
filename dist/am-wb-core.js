@@ -3800,7 +3800,6 @@ angular.module('am-wb-core').service('$widget', function(
 
 });
 
-
 /* 
  * The MIT License (MIT)
  * 
