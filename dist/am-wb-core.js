@@ -1822,27 +1822,29 @@ angular.module('am-wb-core').factory('WbProcessorAttribute', function(WbProcesso
 			// are handled by processors in edit mode
 			return;
 		}
-		if (key === 'style') {
+		if (key === 'style' || key === 'type' || key === 'version') {
 			return;
-		}
-		var $element = widget.getElement();
-		if (value) {
-			$element.attr(key, value);
-		} else {
-			$element.removeAttr(key);
 		}
 		// NOTE: html is special value
 		if (key === 'html') {
-			$element.html(value);
-		}
+			widget.html(value || '');
+		} else
 		if (key === 'text') {
-			$element.text(value);
-		}
+			if(widget.getType() === 'style'){
+				widget.setElementAttribute('type', 'text/css');	
+			}
+			widget.text(value || '');
+		} else
+		if (key === 'value') {
+			widget.val(value || '');
+		} else
 		if (key === 'inputType') {
 			widget.setElementAttribute('type', value);
-		}
-		if (key === 'value') {
-			$element.val(value);
+		} else
+		if (key === 'aType') {
+			widget.setElementAttribute('type', value);
+		} else {
+			widget.setElementAttribute(key, value);
 		}
 	}
 
@@ -1854,10 +1856,9 @@ angular.module('am-wb-core').factory('WbProcessorAttribute', function(WbProcesso
 			});
 			return;
 		}
-		for (var i = 0; i < elementAttributes.length; i++) {
-			var key = elementAttributes[i];
+		_.forEach(elementAttributes, function(key){
 			setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key));
-		}
+		});
 	}
 
 	function Processor() {
@@ -1866,7 +1867,7 @@ angular.module('am-wb-core').factory('WbProcessorAttribute', function(WbProcesso
 	Processor.prototype = new WbProcessorAbstract();
 
 	Processor.prototype.process = function(widget, event) {
-		if (event.type === 'modelChanged') {
+		if (event.type === 'stateChanged' && event.value === 'ready') {
 			setWidgetElementAttributes(widget);
 			loadStyle(widget);
 		} else if (event.type === 'modelUpdated') {
@@ -3754,7 +3755,7 @@ angular.module('am-wb-core').service('$widget', function(
 			try {
 				processor.process(widget, event);
 			} catch (ex) {
-				log.error({
+				$log.error({
 					message: 'Fail to run the processor',
 					exception: ex
 				});
@@ -5385,7 +5386,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 	Widget.prototype.html = function() {
 		var value = arguments[0];
 		if (value) {
-			this.setElementAttribute('html', value);
+			this.setModelProperty('html', value);
 		}
 		var element = this.getElement();
 		return element.html.apply(element, arguments);
@@ -5399,7 +5400,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 	Widget.prototype.text = function() {
 		var value = arguments[0];
 		if (value) {
-			this.setElementAttribute('text', value);
+			this.setModelProperty('text', value);
 		}
 		var element = this.getElement();
 		return element.text.apply(element, arguments);
@@ -5413,7 +5414,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 	Widget.prototype.val = function() {
 		var value = arguments[0];
 		if (value) {
-			this.setElementAttribute('value', value);
+			this.setModelProperty('value', value);
 		}
 		var element = this.getElement();
 		return element.val.apply(element, arguments);
