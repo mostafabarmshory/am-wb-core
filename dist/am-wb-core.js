@@ -5098,6 +5098,8 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
 			widget.destroy();
 		});
 		this.childWidgets = [];
+
+
 		var ctrl = this;
 		var loadState = function() {
 			ctrl.fire('loaded');
@@ -5112,26 +5114,15 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
 
 		// create child
 		var parentWidget = this;
-
-		var compilesJob = [];
-		this.model.children.forEach(function(item, index) {
-			var job = $widget.compile(item, parentWidget)//
-				.then(function(widget) {
-					parentWidget.childWidgets[index] = widget;
-				});
-			compilesJob.push(job);
-		});
-
-		return $q.all(compilesJob)//
-			.then(function() {
-				var $element = parentWidget.getElement();
-				$element.empty();
-				parentWidget.childWidgets.forEach(function(widget) {
-					widget.setEditable(ctrl.isEditable());
-					$element.append(widget.getElement());
-				});
-			})
-			.finally(loadState);
+		return this.__compileChildren(this.model.children).then(function(widgets) {
+			parentWidget.childWidgets = widgets;
+			var $element = parentWidget.getElement();
+			$element.empty();
+			_.forEach(parentWidget.childWidgets, function(widget) {
+				widget.setEditable(ctrl.isEditable());
+				$element.append(widget.getElement());
+			});
+		}).finally(loadState);
 	};
 
 
@@ -5141,31 +5132,8 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
 	 * @memberof WbWidgetGroupCtrl
 	 */
 	WbWidgetGroupCtrl.prototype.addChildModel = function(index, item) {
-		var model = this.getModel();
-		var ctrl = this;
-		index = this.__cleanInsertIndex(index);
-		// add widget
-		item = $wbUtil.clean(item);
-		return $widget.compile(item, this)//
-			.then(function(newWidget) {
-				if (index < ctrl.childWidgets.length) {
-					newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
-				} else {
-					ctrl.getElement().append(newWidget.getElement());
-				}
-				if (!angular.isArray(model.children)) {
-					model.children = [];
-				}
-				model.children.splice(index, 0, item);
-				ctrl.childWidgets.splice(index, 0, newWidget);
-
-				// init the widget
-				newWidget.setEditable(ctrl.isEditable());
-				ctrl.fire('newchild', {
-					widgets: [newWidget]
-				});
-				return newWidget;
-			});
+		var items = [item];
+		return this.addChildrenModel(index, items);
 	};
 
 	/**
@@ -5181,31 +5149,30 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
 		index = this.__cleanInsertIndex(index);
 
 		// compile all
-		return this.__compileChildren(children)
-			.then(function(widgets) {
-				for (var i = 0; i < widgets.length; i++) {
-					var newWidget = widgets[i];
+		return this.__compileChildren(children).then(function(widgets) {
+			for (var i = 0; i < widgets.length; i++) {
+				var newWidget = widgets[i];
 
-					var j = i + index;
+				var j = i + index;
 
-					if (j < ctrl.childWidgets.length) {
-						newWidget.getElement().insertBefore(ctrl.childWidgets[j].getElement());
-					} else {
-						ctrl.getElement().append(newWidget.getElement());
-					}
-					if (!angular.isArray(model.children)) {
-						model.children = [];
-					}
-					model.children.splice(j, 0, newWidget.getModel());
-					ctrl.childWidgets.splice(j, 0, newWidget);
-
-					// init the widget
-					newWidget.setEditable(ctrl.isEditable());
+				if (j < ctrl.childWidgets.length) {
+					newWidget.getElement().insertBefore(ctrl.childWidgets[j].getElement());
+				} else {
+					ctrl.getElement().append(newWidget.getElement());
 				}
-				ctrl.fire('newchild', {
-					widgets: widgets
-				});
+				if (!angular.isArray(model.children)) {
+					model.children = [];
+				}
+				model.children.splice(j, 0, newWidget.getModel());
+				ctrl.childWidgets.splice(j, 0, newWidget);
+
+				// init the widget
+				newWidget.setEditable(ctrl.isEditable());
+			}
+			ctrl.fire('newchild', {
+				widgets: widgets
 			});
+		});
 	};
 
 	/**
@@ -5240,10 +5207,9 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
 		});
 
 		// add widget
-		return $q.all(jobs)//
-			.then(function() {
-				return widgets;
-			});
+		return $q.all(jobs).then(function() {
+			return widgets;
+		});
 	};
 
 	WbWidgetGroupCtrl.prototype.__cleanInsertIndex = function(index) {

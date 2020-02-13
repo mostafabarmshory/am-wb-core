@@ -117,14 +117,13 @@ describe('Widget div ', function() {
 				function runTest() {
 					return group.addChildModel(0, {
 						type: 'a'
-					})
-						.then(function() {
-							expect(group.getChildren().length).toBe(3);
-							expect(group.getChildren()[1].getType()).toBe('h1');
-							expect(group.getChildren()[2].getType()).toBe('p');
-							expect(group.getChildren()[0].getType()).toBe('a');
-							done();
-						});
+					}).then(function() {
+						expect(group.getChildren().length).toBe(3);
+						expect(group.getChildren()[1].getType()).toBe('h1');
+						expect(group.getChildren()[2].getType()).toBe('p');
+						expect(group.getChildren()[0].getType()).toBe('a');
+						done();
+					});
 				}
 				group.on('stateChanged', function() {
 					if (group.state == 'ready') {
@@ -543,7 +542,7 @@ describe('Widget div ', function() {
 		var model = {
 			type: 'div',
 			children: [{
-				type: 'Group',
+				type: 'div',
 				id: '1'
 			}, {
 				type: 'h2',
@@ -557,7 +556,7 @@ describe('Widget div ', function() {
 			.then(function(widget) {
 				group = widget;
 				function runTest() {
-					expect(group.getChildById('1').getType()).toBe('Group');
+					expect(group.getChildById('1').getType()).toBe('div');
 					var child = group.getChildById('1');
 					child.delete();
 					child = group.getChildById('1');
@@ -581,7 +580,7 @@ describe('Widget div ', function() {
 		var model = {
 			type: 'div',
 			children: [{
-				type: 'Group',
+				type: 'div',
 				id: '1'
 			}, {
 				type: 'h2',
@@ -595,7 +594,7 @@ describe('Widget div ', function() {
 			.then(function(widget) {
 				group = widget;
 				function runTest() {
-					expect(group.getChildById('1').getType()).toBe('Group');
+					expect(group.getChildById('1').getType()).toBe('div');
 					var child = group.getChildById('1');
 
 					child.setSelected(true);
