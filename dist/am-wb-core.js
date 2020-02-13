@@ -1822,27 +1822,29 @@ angular.module('am-wb-core').factory('WbProcessorAttribute', function(WbProcesso
 			// are handled by processors in edit mode
 			return;
 		}
-		if (key === 'style') {
+		if (key === 'style' || key === 'type' || key === 'version') {
 			return;
-		}
-		var $element = widget.getElement();
-		if (value) {
-			$element.attr(key, value);
-		} else {
-			$element.removeAttr(key);
 		}
 		// NOTE: html is special value
 		if (key === 'html') {
-			$element.html(value);
-		}
+			widget.html(value || '');
+		} else
 		if (key === 'text') {
-			$element.text(value);
-		}
+			if(widget.getType() === 'style'){
+				widget.setElementAttribute('type', 'text/css');	
+			}
+			widget.text(value || '');
+		} else
+		if (key === 'value') {
+			widget.val(value || '');
+		} else
 		if (key === 'inputType') {
 			widget.setElementAttribute('type', value);
-		}
-		if (key === 'value') {
-			$element.val(value);
+		} else
+		if (key === 'aType') {
+			widget.setElementAttribute('type', value);
+		} else {
+			widget.setElementAttribute(key, value);
 		}
 	}
 
@@ -1854,10 +1856,9 @@ angular.module('am-wb-core').factory('WbProcessorAttribute', function(WbProcesso
 			});
 			return;
 		}
-		for (var i = 0; i < elementAttributes.length; i++) {
-			var key = elementAttributes[i];
+		_.forEach(elementAttributes, function(key){
 			setWidgetElementAttribute(widget, key, widget.getProperty(key) || widget.getModelProperty(key));
-		}
+		});
 	}
 
 	function Processor() {
@@ -1866,7 +1867,7 @@ angular.module('am-wb-core').factory('WbProcessorAttribute', function(WbProcesso
 	Processor.prototype = new WbProcessorAbstract();
 
 	Processor.prototype.process = function(widget, event) {
-		if (event.type === 'modelChanged') {
+		if (event.type === 'stateChanged' && event.value === 'ready') {
 			setWidgetElementAttributes(widget);
 			loadStyle(widget);
 		} else if (event.type === 'modelUpdated') {
@@ -3754,7 +3755,7 @@ angular.module('am-wb-core').service('$widget', function(
 			try {
 				processor.process(widget, event);
 			} catch (ex) {
-				log.error({
+				$log.error({
 					message: 'Fail to run the processor',
 					exception: ex
 				});
@@ -5097,6 +5098,8 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
 			widget.destroy();
 		});
 		this.childWidgets = [];
+
+
 		var ctrl = this;
 		var loadState = function() {
 			ctrl.fire('loaded');
@@ -5111,26 +5114,15 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
 
 		// create child
 		var parentWidget = this;
-
-		var compilesJob = [];
-		this.model.children.forEach(function(item, index) {
-			var job = $widget.compile(item, parentWidget)//
-				.then(function(widget) {
-					parentWidget.childWidgets[index] = widget;
-				});
-			compilesJob.push(job);
-		});
-
-		return $q.all(compilesJob)//
-			.then(function() {
-				var $element = parentWidget.getElement();
-				$element.empty();
-				parentWidget.childWidgets.forEach(function(widget) {
-					widget.setEditable(ctrl.isEditable());
-					$element.append(widget.getElement());
-				});
-			})
-			.finally(loadState);
+		return this.__compileChildren(this.model.children).then(function(widgets) {
+			parentWidget.childWidgets = widgets;
+			var $element = parentWidget.getElement();
+			$element.empty();
+			_.forEach(parentWidget.childWidgets, function(widget) {
+				widget.setEditable(ctrl.isEditable());
+				$element.append(widget.getElement());
+			});
+		}).finally(loadState);
 	};
 
 
@@ -5140,31 +5132,8 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
 	 * @memberof WbWidgetGroupCtrl
 	 */
 	WbWidgetGroupCtrl.prototype.addChildModel = function(index, item) {
-		var model = this.getModel();
-		var ctrl = this;
-		index = this.__cleanInsertIndex(index);
-		// add widget
-		item = $wbUtil.clean(item);
-		return $widget.compile(item, this)//
-			.then(function(newWidget) {
-				if (index < ctrl.childWidgets.length) {
-					newWidget.getElement().insertBefore(ctrl.childWidgets[index].getElement());
-				} else {
-					ctrl.getElement().append(newWidget.getElement());
-				}
-				if (!angular.isArray(model.children)) {
-					model.children = [];
-				}
-				model.children.splice(index, 0, item);
-				ctrl.childWidgets.splice(index, 0, newWidget);
-
-				// init the widget
-				newWidget.setEditable(ctrl.isEditable());
-				ctrl.fire('newchild', {
-					widgets: [newWidget]
-				});
-				return newWidget;
-			});
+		var items = [item];
+		return this.addChildrenModel(index, items);
 	};
 
 	/**
@@ -5180,31 +5149,30 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
 		index = this.__cleanInsertIndex(index);
 
 		// compile all
-		return this.__compileChildren(children)
-			.then(function(widgets) {
-				for (var i = 0; i < widgets.length; i++) {
-					var newWidget = widgets[i];
+		return this.__compileChildren(children).then(function(widgets) {
+			for (var i = 0; i < widgets.length; i++) {
+				var newWidget = widgets[i];
 
-					var j = i + index;
+				var j = i + index;
 
-					if (j < ctrl.childWidgets.length) {
-						newWidget.getElement().insertBefore(ctrl.childWidgets[j].getElement());
-					} else {
-						ctrl.getElement().append(newWidget.getElement());
-					}
-					if (!angular.isArray(model.children)) {
-						model.children = [];
-					}
-					model.children.splice(j, 0, newWidget.getModel());
-					ctrl.childWidgets.splice(j, 0, newWidget);
-
-					// init the widget
-					newWidget.setEditable(ctrl.isEditable());
+				if (j < ctrl.childWidgets.length) {
+					newWidget.getElement().insertBefore(ctrl.childWidgets[j].getElement());
+				} else {
+					ctrl.getElement().append(newWidget.getElement());
 				}
-				ctrl.fire('newchild', {
-					widgets: widgets
-				});
+				if (!angular.isArray(model.children)) {
+					model.children = [];
+				}
+				model.children.splice(j, 0, newWidget.getModel());
+				ctrl.childWidgets.splice(j, 0, newWidget);
+
+				// init the widget
+				newWidget.setEditable(ctrl.isEditable());
+			}
+			ctrl.fire('newchild', {
+				widgets: widgets
 			});
+		});
 	};
 
 	/**
@@ -5239,10 +5207,9 @@ angular.module('am-wb-core').factory('WbWidgetContainer', function($wbUtil, $wid
 		});
 
 		// add widget
-		return $q.all(jobs)//
-			.then(function() {
-				return widgets;
-			});
+		return $q.all(jobs).then(function() {
+			return widgets;
+		});
 	};
 
 	WbWidgetGroupCtrl.prototype.__cleanInsertIndex = function(index) {
@@ -5385,7 +5352,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 	Widget.prototype.html = function() {
 		var value = arguments[0];
 		if (value) {
-			this.setElementAttribute('html', value);
+			this.setModelProperty('html', value);
 		}
 		var element = this.getElement();
 		return element.html.apply(element, arguments);
@@ -5399,7 +5366,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 	Widget.prototype.text = function() {
 		var value = arguments[0];
 		if (value) {
-			this.setElementAttribute('text', value);
+			this.setModelProperty('text', value);
 		}
 		var element = this.getElement();
 		return element.text.apply(element, arguments);
@@ -5413,7 +5380,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 	Widget.prototype.val = function() {
 		var value = arguments[0];
 		if (value) {
-			this.setElementAttribute('value', value);
+			this.setModelProperty('value', value);
 		}
 		var element = this.getElement();
 		return element.val.apply(element, arguments);

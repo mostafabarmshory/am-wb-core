@@ -79,7 +79,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 	Widget.prototype.html = function() {
 		var value = arguments[0];
 		if (value) {
-			this.setElementAttribute('html', value);
+			this.setModelProperty('html', value);
 		}
 		var element = this.getElement();
 		return element.html.apply(element, arguments);
@@ -93,7 +93,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 	Widget.prototype.text = function() {
 		var value = arguments[0];
 		if (value) {
-			this.setElementAttribute('text', value);
+			this.setModelProperty('text', value);
 		}
 		var element = this.getElement();
 		return element.text.apply(element, arguments);
@@ -107,7 +107,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 	Widget.prototype.val = function() {
 		var value = arguments[0];
 		if (value) {
-			this.setElementAttribute('value', value);
+			this.setModelProperty('value', value);
 		}
 		var element = this.getElement();
 		return element.val.apply(element, arguments);

@@ -60,7 +60,7 @@ describe('WbWidget a ', function () {
 		};
 		$widget.compile(model)
 		.then(function(widget){
-			expect(widget.getElementAttribute('html')).toBe(model.html);
+			expect(widget.getModelProperty('html')).toBe(model.html);
 			expect(widget.html()).toBe(model.html);
 			done();
 		});

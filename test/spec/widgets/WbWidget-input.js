@@ -47,7 +47,7 @@ describe('WbWidget input ', function () {
 		};
 		$widget.compile(model)
 		.then(function(widget){
-			expect(widget.getElementAttribute('inputType')).toBe(model.inputType);
+			expect(widget.getModelProperty('inputType')).toBe(model.inputType);
 			expect(widget.getElementAttribute('type')).toBe(model.inputType);
 			done();
 		});

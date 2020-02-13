@@ -438,7 +438,7 @@ angular.module('am-wb-core').service('$widget', function(
 			try {
 				processor.process(widget, event);
 			} catch (ex) {
-				log.error({
+				$log.error({
 					message: 'Fail to run the processor',
 					exception: ex
 				});
