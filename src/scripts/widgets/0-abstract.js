@@ -819,6 +819,15 @@ angular.module('am-wb-core').factory('WbWidget', function($widget, $window, $obj
 	};
 
 	/**
+	 * Gets the state of the widget
+	 * 
+	 * @memberof WbAbstractWidget
+	 */
+	WbWidget.prototype.getState = function() {
+		return this.state;
+	};
+
+	/**
 	 * Checks if the editable mode is enable
 	 * 
 	 * @memberof WbAbstractWidget

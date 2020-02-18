@@ -112,11 +112,26 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 		var element = this.getElement();
 		return element.val.apply(element, arguments);
 	};
+
+	Widget.prototype.attr = function() {
+		var element = this.getElement();
+		return element.attr.apply(element, arguments);
+	};
+
+	Widget.prototype.removeAttr = function() {
+		var element = this.getElement();
+		return element.removeAttr.apply(element, arguments);
+	};
+
+	Widget.prototype.prop = function() {
+		var element = this.getElement();
+		return element.prop.apply(element, arguments);
+	};
+
+	Widget.prototype.removeProp = function() {
+		var element = this.getElement();
+		return element.removeProp.apply(element, arguments);
+	};
 	
-	// TODO: support:
-	// .attr()
-	// .prop()
-	// .removeAttr()
-	// .removeProp()
 	return Widget;
 });
