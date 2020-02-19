@@ -3404,7 +3404,8 @@ angular.module('am-wb-core').service('$widget', function(
 	}
 
 	function _widget(model) {
-		return widgetDefinition[model.type || model] || notFoundWidget;
+		var type = _.isString(model) ? model : model.type;
+		return widgetDefinition[type] || notFoundWidget;
 	}
 	/**
 	 * Finds a widget related to the input model.
@@ -5901,34 +5902,6 @@ angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
 	 */
 	Widget.prototype.getState = function() {
 		return this._state || STATE_IDEAL;
-	};
-
-
-	/**
-	 * set acceptable widgets
-	 * 
-	 * $widget.setAcceptableChild('a', 'b');
-	 * 
-	 * @memberof WbWidgetGroupCtrl
-	 */
-	Widget.prototype.setAllowedTypes = function() {
-		this.allowedTypes = [];
-	};
-
-	/**
-	 * Set edit mode
-	 * 
-	 * @memberof WbAbstractWidget
-	 */
-	Widget.prototype.setEditable = function(editable) {
-		WbWidgetElement.prototype.setEditable.apply(this, arguments);
-		// propagate to child
-		var children = this.getChildren();
-		while (!_.isEmpty(children)) {
-			var widget = children.pop();
-			widget.setSilent(editable);
-			children = children.concat(widget.getChildren());
-		}
 	};
 
 	return Widget;
