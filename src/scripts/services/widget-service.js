@@ -196,7 +196,7 @@ angular.module('am-wb-core').service('$widget', function(
 		} else {
 			$element = angular.element('<' + model.type + '></' + model.type + '>');
 		}
-		var Widget = $injector.get(wd.controller || 'WbWidget');
+		var Widget = $injector.get(wd.controller || 'WbWidgetElement');
 		var widget = new Widget($element, $parent);
 		$element[0].$$wbController = widget;
 		return $q.resolve(widget.setModel(model));
