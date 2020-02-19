@@ -87,7 +87,8 @@ angular.module('am-wb-core').service('$widget', function(
 	}
 
 	function _widget(model) {
-		return widgetDefinition[model.type || model] || notFoundWidget;
+		var type = _.isString(model) ? model : model.type;
+		return widgetDefinition[type] || notFoundWidget;
 	}
 	/**
 	 * Finds a widget related to the input model.

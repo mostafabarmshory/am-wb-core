@@ -228,8 +228,7 @@ angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
 
 	function Widget($scope, $element, $parent) {
 		WbWidgetElement.apply(this, [$scope, $element, $parent]);
-		this.setAllowedTypes();
-		this.addElementAttributes('url', 'filters', 'sorts', 'query', 'properties', 'template');
+//		this.addElementAttributes('url', 'filters', 'sorts', 'query', 'properties', 'template');
 
 		this._lastResponse;
 		this._state = STATE_IDEAL;
@@ -460,34 +459,6 @@ angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
 	 */
 	Widget.prototype.getState = function() {
 		return this._state || STATE_IDEAL;
-	};
-
-
-	/**
-	 * set acceptable widgets
-	 * 
-	 * $widget.setAcceptableChild('a', 'b');
-	 * 
-	 * @memberof WbWidgetGroupCtrl
-	 */
-	Widget.prototype.setAllowedTypes = function() {
-		this.allowedTypes = [];
-	};
-
-	/**
-	 * Set edit mode
-	 * 
-	 * @memberof WbAbstractWidget
-	 */
-	Widget.prototype.setEditable = function(editable) {
-		WbWidgetElement.prototype.setEditable.apply(this, arguments);
-		// propagate to child
-		var children = this.getChildren();
-		while (!_.isEmpty(children)) {
-			var widget = children.pop();
-			widget.setSilent(editable);
-			children = children.concat(widget.getChildren());
-		}
 	};
 
 	return Widget;
