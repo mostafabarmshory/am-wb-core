@@ -4622,6 +4622,15 @@ angular.module('am-wb-core').factory('WbWidget', function($widget, $window, $obj
 	};
 
 	/**
+	 * Gets the state of the widget
+	 * 
+	 * @memberof WbAbstractWidget
+	 */
+	WbWidget.prototype.getState = function() {
+		return this.state;
+	};
+
+	/**
 	 * Checks if the editable mode is enable
 	 * 
 	 * @memberof WbAbstractWidget
@@ -5385,12 +5394,48 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 		var element = this.getElement();
 		return element.val.apply(element, arguments);
 	};
-	
-	// TODO: support:
-	// .attr()
-	// .prop()
-	// .removeAttr()
-	// .removeProp()
+
+	Widget.prototype.attr = function() {
+		var element = this.getElement();
+		return element.attr.apply(element, arguments);
+	};
+
+	Widget.prototype.removeAttr = function() {
+		var element = this.getElement();
+		return element.removeAttr.apply(element, arguments);
+	};
+
+	Widget.prototype.prop = function() {
+		var element = this.getElement();
+		return element.prop.apply(element, arguments);
+	};
+
+	Widget.prototype.removeProp = function() {
+		var element = this.getElement();
+		return element.removeProp.apply(element, arguments);
+	};
+
+	/**
+	 * Remove all child nodes of the set of matched elements from the DOM.
+	 * 
+	 * @memberof WbWidgetElement
+	 */
+	Widget.prototype.empty = function() {
+		var element = this.getElement();
+		this.removeChildren();
+		element.empty();
+		return this;
+	};
+
+	/**
+	 * Get the parent of each element in the current set of matched elements, optionally filtered by a selector.
+	 * 
+	 * @memberof WbWidgetElement
+	 */
+	Widget.prototype.parent = function() {
+		return this.getParent();
+	};
+
 	return Widget;
 });
 
@@ -5427,7 +5472,7 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
  * 
  */
 angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
-		/* am-wb-core */ WbWidgetContainer, $wbUtil,
+		/* am-wb-core */ WbWidgetElement, $wbUtil,
 		/* angularjs  */ $q, $http, $log) {
 
 
@@ -5573,7 +5618,8 @@ angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
 	 */
 	var STATE_BUSY = 'busy';
 	var STATE_IDEAL = 'ideal';
-	var collectionAttributes = ['url', 'filters', 'sorts', 'query', 'properties', 'template'];
+	var collectionDataAttributes = ['url', 'filters', 'sorts', 'query', 'properties'];
+	var collectionViewAttributes = ['template'];
 
 	// ------------------------------------------------------------------
 	// Utility
@@ -5622,7 +5668,7 @@ angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
 	 */
 
 	function Widget($scope, $element, $parent) {
-		WbWidgetContainer.apply(this, [$scope, $element, $parent]);
+		WbWidgetElement.apply(this, [$scope, $element, $parent]);
 		this.setAllowedTypes();
 		this.addElementAttributes('url', 'filters', 'sorts', 'query', 'properties', 'template');
 
@@ -5633,7 +5679,10 @@ angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
 		// watch model update
 		function doTask($event) {
 			// collection updated
-			if (_.includes(collectionAttributes, $event.key)) {
+			if (_.includes(collectionViewAttributes, $event.key)) {
+				ctrl.reloadView();
+			}
+			if (_.includes(collectionDataAttributes, $event.key)) {
 				ctrl.reloadPage();
 			}
 		}
@@ -5645,7 +5694,7 @@ angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
 		});
 	}
 
-	Widget.prototype = Object.create(WbWidgetContainer.prototype);
+	Widget.prototype = Object.create(WbWidgetElement.prototype);
 
 	/**
 	 * Gets collection from server, creates widgets, and forms the body of widget
@@ -5659,8 +5708,8 @@ angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
 				return ctrl.reloadPage();
 			});
 		}
-		this.removeChildren();
-		this.getElement().empty();
+		this.empty();
+		this._allLoadedData = [];
 		delete this._lastResponse;
 		this._reloading = this.loadNextPage(true)
 			.finally(function() {
@@ -5668,6 +5717,13 @@ angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
 			});
 	};
 
+	Widget.prototype.reloadView = function() {
+		var ctrl = this;
+		return createWidgets(ctrl._allLoadedData || [], ctrl.getTemplate())
+			.then(function(children) {
+				return ctrl.addChildren(0, children);
+			});
+	};
 
 	/**
 	 * Load next page 
@@ -5682,27 +5738,25 @@ angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
 				message: 'No more page!?'
 			});
 		}
-		var template = this.getTemplate();
 
 		var ctrl = this;
-		return this.getCollection()//
-			.then(function(res) {
-				ctrl._lastResponse = res.data;
-				return ctrl.fire('success', res) || res.data;
-			}, function(error) {
-				return ctrl.fire('error', error) || error;
-			})
-			.then(function(data) {
-				return createWidgets(data.items || [], template);
-			})//
-			.then(function(children) {
-				return ctrl.addChildren(ctrl.getChildren().length, children)
-					.then(function() {
-						return ctrl.fire('load', {
-							children: children
-						}) || children;
-					});
-			});
+		// Load new data
+		return this.getCollection().then(function(res) {
+			ctrl._lastResponse = res.data;
+			ctrl._allLoadedData = _.union(ctrl._allLoadedData || [], res.data.items);
+			return ctrl.fire('success', res) || res.data;
+		}, function(error) {
+			return ctrl.fire('error', error) || error;
+		}).then(function(data) {
+			return createWidgets(data.items || [], ctrl.getTemplate());
+		}).then(function(children) {
+			return ctrl.addChildren(ctrl.getChildren().length, children)
+				.then(function() {
+					return ctrl.fire('load', {
+						children: children
+					}) || children;
+				});
+		});
 	};
 
 	Widget.prototype.getTemplate = function() {
@@ -5864,11 +5918,10 @@ angular.module('am-wb-core').factory('AmWbSeenCollectionWidget', function(
 	/**
 	 * Set edit mode
 	 * 
-	 * 
 	 * @memberof WbAbstractWidget
 	 */
 	Widget.prototype.setEditable = function(editable) {
-		WbWidgetContainer.prototype.setEditable.apply(this, arguments);
+		WbWidgetElement.prototype.setEditable.apply(this, arguments);
 		// propagate to child
 		var children = this.getChildren();
 		while (!_.isEmpty(children)) {
