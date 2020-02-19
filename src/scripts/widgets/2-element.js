@@ -112,11 +112,47 @@ angular.module('am-wb-core').factory('WbWidgetElement', function(WbWidgetContain
 		var element = this.getElement();
 		return element.val.apply(element, arguments);
 	};
-	
-	// TODO: support:
-	// .attr()
-	// .prop()
-	// .removeAttr()
-	// .removeProp()
+
+	Widget.prototype.attr = function() {
+		var element = this.getElement();
+		return element.attr.apply(element, arguments);
+	};
+
+	Widget.prototype.removeAttr = function() {
+		var element = this.getElement();
+		return element.removeAttr.apply(element, arguments);
+	};
+
+	Widget.prototype.prop = function() {
+		var element = this.getElement();
+		return element.prop.apply(element, arguments);
+	};
+
+	Widget.prototype.removeProp = function() {
+		var element = this.getElement();
+		return element.removeProp.apply(element, arguments);
+	};
+
+	/**
+	 * Remove all child nodes of the set of matched elements from the DOM.
+	 * 
+	 * @memberof WbWidgetElement
+	 */
+	Widget.prototype.empty = function() {
+		var element = this.getElement();
+		this.removeChildren();
+		element.empty();
+		return this;
+	};
+
+	/**
+	 * Get the parent of each element in the current set of matched elements, optionally filtered by a selector.
+	 * 
+	 * @memberof WbWidgetElement
+	 */
+	Widget.prototype.parent = function() {
+		return this.getParent();
+	};
+
 	return Widget;
 });

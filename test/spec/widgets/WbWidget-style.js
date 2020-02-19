@@ -23,7 +23,7 @@
  */
 'use strict';
 
-describe('WbWidget pre ', function() {
+describe('WbWidget style ', function() {
 	// instantiate service
 	var $rootScope;
 	var $widget;
@@ -38,22 +38,20 @@ describe('WbWidget pre ', function() {
 	it('should set name from model', function(done) {
 		// Create new instance
 		var model = {
-			type: 'pre',
-			text: 'hi this is text',
+			type: 'style',
 		};
-		$widget.compile(model)
-			.then(function(widget) {
-				expect(widget.getType()).toBe('pre');
-				done();
-			});
+		$widget.compile(model).then(function(widget) {
+			expect(widget.getType()).toBe('style');
+			done();
+		});
 		$rootScope.$apply();
 	});
 
 	it('should set text from model', function(done) {
 		// Create new instance
 		var model = {
-			type: 'pre',
-			text: 'hi this is text',
+			type: 'style',
+			text: 'a{background: red;}',
 		};
 		$widget.compile(model).then(function(widget) {
 			expect(widget.text()).toBe(model.text);
