@@ -89,13 +89,13 @@ angular.module('am-wb-core').run(function($widget) {
 	/***********Normal********** */
 	_.forEach([
 		'address', 'audio', 'datalist', 'div', 'figure', 'footer', 'form', 'frameset', 'header', 'i',
-		'li', 'main',	 'map', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'output', 'picture', 'section',
+		'li', 'main', 'map', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'output', 'picture', 'section',
 		'select', 'span', 'template', 'ul', 'video', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
 		'button', 'figcaption', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'iframe', 'hr', 'img', 'kbd', 'label',
 		'legend', 'link', 'meta', 'meter', 'option', 'p', 'param', 'progress', 'q', 's', 'samp', 'small', 'source', 'summary',
 		'strong', 'svg', 'track', 'textarea', 'a', 'input',
 		'applet', 'area', 'article', 'aside', 'blockquote', 'canvas',
-		'dd', 'details', 'dialog', 'dl', 'dt', 'embed', 'fieldset', 'frame', 'input', 'pre', 'script'], function(type) {
+		'dd', 'details', 'dialog', 'dl', 'dt', 'embed', 'fieldset', 'frame', 'input', 'pre', 'script', 'style'], function(type) {
 			$widget.newWidget({
 				type: type,
 				controller: 'WbWidgetElement',
