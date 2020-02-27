@@ -1822,7 +1822,7 @@ angular.module('am-wb-core').factory('WbProcessorAttribute', function(WbProcesso
 			// are handled by processors in edit mode
 			return;
 		}
-		if (key === 'style' || key === 'type' || key === 'version') {
+		if (key === 'style' || key === 'type' || key === 'version' || key==='on' || key === 'children' || key === 'template') {
 			return;
 		}
 		// NOTE: html is special value
