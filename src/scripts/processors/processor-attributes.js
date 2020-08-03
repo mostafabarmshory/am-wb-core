@@ -50,7 +50,7 @@ angular.module('am-wb-core').factory('WbProcessorAttribute', function(WbProcesso
 			// are handled by processors in edit mode
 			return;
 		}
-		if (key === 'style' || key === 'type' || key === 'version') {
+		if (key === 'style' || key === 'type' || key === 'version' || key==='on' || key === 'children' || key === 'template') {
 			return;
 		}
 		// NOTE: html is special value
@@ -66,10 +66,7 @@ angular.module('am-wb-core').factory('WbProcessorAttribute', function(WbProcesso
 		if (key === 'value') {
 			widget.val(value || '');
 		} else
-		if (key === 'inputType') {
-			widget.setElementAttribute('type', value);
-		} else
-		if (key === 'aType') {
+		if (key === 'inputType' || key === 'aType' || key === 'scriptType') {
 			widget.setElementAttribute('type', value);
 		} else {
 			widget.setElementAttribute(key, value);

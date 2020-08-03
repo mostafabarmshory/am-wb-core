@@ -33,6 +33,8 @@
  * registered callback. - Callbacks can be deferred in whole or part until other
  * callbacks have been executed.
  * 
+
+@deprecated this will be removed in the next version
  */
 function WbDispatcher() {
     

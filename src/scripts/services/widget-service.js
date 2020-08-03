@@ -23,13 +23,12 @@
  */
 
 
-
 /**
- * @ngdoc Services
- * @name $widget
- * @description مدیریت ویجت‌های سیستم
- * 
- * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
+@ngdoc Services
+@name $widget
+@description مدیریت ویجت‌های سیستم
+
+این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 angular.module('am-wb-core').service('$widget', function(
         /* AngularJS */ $q, $injector, $log,
@@ -163,12 +162,6 @@ angular.module('am-wb-core').service('$widget', function(
 	 * @param model
 	 *            {object}
 	 *            <ul>
-	 *            <li>templateUrl - {string=}: The URL of a template that will
-	 *            be used as the content of the dialog.</li>
-	 *            <li>template- {string=}: HTML template to show in the dialog.
-	 *            This must be trusted HTML with respect to Angular's $sce
-	 *            service. This template should never be constructed with any
-	 *            kind of user input or user data.</li>
 	 *            <li>contentElement:</li>
 	 *            <li>scope - {object=}: the scope to link the template
 	 *            controller to. If none is specified, it will create a new
