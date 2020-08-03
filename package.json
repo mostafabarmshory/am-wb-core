@@ -2,6 +2,7 @@
 	"name": "am-wb",
 	"moduleName": "am-wb-core",
 	"license": "MIT",
+	"version": "4.1.6",
 	"authors": [
 		"Mostafa Barmshory <mostafa.barmshory@dpq.co.ir>",
 		"Hadi mansouri <mohammad.hadi.mansouri@dpq.co.ir>"
