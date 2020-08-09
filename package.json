@@ -2,7 +2,7 @@
 	"name": "am-wb",
 	"moduleName": "am-wb-core",
 	"license": "MIT",
-	"version": "4.1.6",
+	"version": "4.1.7",
 	"authors": [
 		"Mostafa Barmshory <mostafa.barmshory@dpq.co.ir>",
 		"Hadi mansouri <mohammad.hadi.mansouri@dpq.co.ir>"
@@ -30,7 +30,6 @@
 		"grunt-eslint": "^21.0.0",
 		"grunt-file-creator": "^0.1.3",
 		"grunt-filerev": "^2.1.2",
-		"grunt-google-cdn": "^0.4.3",
 		"grunt-injector": "^1.1.0",
 		"grunt-jsdoc": "^2.2.1",
 		"grunt-karma": "^2.0.0",
