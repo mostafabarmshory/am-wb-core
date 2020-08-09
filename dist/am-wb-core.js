@@ -1838,10 +1838,7 @@ angular.module('am-wb-core').factory('WbProcessorAttribute', function(WbProcesso
 		if (key === 'value') {
 			widget.val(value || '');
 		} else
-		if (key === 'inputType') {
-			widget.setElementAttribute('type', value);
-		} else
-		if (key === 'aType') {
+		if (key === 'inputType' || key === 'aType' || key === 'scriptType') {
 			widget.setElementAttribute('type', value);
 		} else {
 			widget.setElementAttribute(key, value);
@@ -2468,20 +2465,20 @@ angular.module('am-wb-core').run(function(
 angular.module('am-wb-core').run(function($widget) {
 
 	/***********Normal********** */
-//	_.forEach([
-//		'address', 'audio', 'datalist', 'div', 'figure', 'footer', 'form', 'frameset', 'header', 'i',
-//		'li', 'main', 'map', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'output', 'picture', 'section',
-//		'select', 'span', 'template', 'ul', 'video', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
-//		'button', 'figcaption', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'iframe', 'hr', 'img', 'kbd', 'label',
-//		'legend', 'link', 'meta', 'meter', 'option', 'p', 'param', 'progress', 'q', 's', 'samp', 'small', 'source', 'summary',
-//		'strong', 'svg', 'track', 'textarea', 'a', 'input',
-//		'applet', 'area', 'article', 'aside', 'blockquote', 'canvas',
-//		'dd', 'details', 'dialog', 'dl', 'dt', 'embed', 'fieldset', 'frame', 'input', 'pre', 'script', 'style'], function(type) {
-//			$widget.newWidget({
-//				type: type,
-//				controller: 'WbWidgetElement',
-//			});
-//		});
+	//	_.forEach([
+	//		'address', 'audio', 'datalist', 'div', 'figure', 'footer', 'form', 'frameset', 'header', 'i',
+	//		'li', 'main', 'map', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'output', 'picture', 'section',
+	//		'select', 'span', 'template', 'ul', 'video', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
+	//		'button', 'figcaption', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'iframe', 'hr', 'img', 'kbd', 'label',
+	//		'legend', 'link', 'meta', 'meter', 'option', 'p', 'param', 'progress', 'q', 's', 'samp', 'small', 'source', 'summary',
+	//		'strong', 'svg', 'track', 'textarea', 'a', 'input',
+	//		'applet', 'area', 'article', 'aside', 'blockquote', 'canvas',
+	//		'dd', 'details', 'dialog', 'dl', 'dt', 'embed', 'fieldset', 'frame', 'input', 'pre', 'script', 'style'], function(type) {
+	//			$widget.newWidget({
+	//				type: type,
+	//				controller: 'WbWidgetElement',
+	//			});
+	//		});
 
 	/***********Specials********** */
 	$widget.newWidget({
@@ -2495,6 +2492,7 @@ angular.module('am-wb-core').run(function($widget) {
 		controller: 'WbWidgetSeenImport'
 	});
 });
+
 
 /*
  * Copyright (c) 2015-2025 Phoinex Scholars Co. http://dpq.co.ir
@@ -2531,6 +2529,8 @@ angular.module('am-wb-core').run(function($widget) {
  * registered callback. - Callbacks can be deferred in whole or part until other
  * callbacks have been executed.
  * 
+
+@deprecated this will be removed in the next version
  */
 function WbDispatcher() {
     
@@ -2931,22 +2931,8 @@ angular.module('am-wb-core').service('$objectPath', function(){
 
 });
 
-angular.module('am-wb-core') //
-
-/**
- * @ngdoc Services
- * @name $dispatcher
- * @description a wrapper of FLUX
- * 
- * 
- * Dispatcher is used to broadcast payloads to registered callbacks. This is
- * different from generic pub-sub systems in two ways: - Callbacks are not
- * subscribed to particular events. Every payload is dispatched to every
- * registered callback. - Callbacks can be deferred in whole or part until other
- * callbacks have been executed.
- * 
- */
-.service('$wbStorage', function() {});
+// This will be removed in next major version
+angular.module('am-wb-core').service('$wbStorage', function() {});
 /* 
  * The MIT License (MIT)
  * 
@@ -3340,13 +3326,12 @@ angular.module('am-wb-core').service('$wbUtil', function(
  */
 
 
-
 /**
- * @ngdoc Services
- * @name $widget
- * @description مدیریت ویجت‌های سیستم
- * 
- * این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
+@ngdoc Services
+@name $widget
+@description مدیریت ویجت‌های سیستم
+
+این سرویس تمام ویجت‌های قابل استفاده در سیستم را تعیین می‌کند.
  */
 angular.module('am-wb-core').service('$widget', function(
         /* AngularJS */ $q, $injector, $log,
@@ -3480,12 +3465,6 @@ angular.module('am-wb-core').service('$widget', function(
 	 * @param model
 	 *            {object}
 	 *            <ul>
-	 *            <li>templateUrl - {string=}: The URL of a template that will
-	 *            be used as the content of the dialog.</li>
-	 *            <li>template- {string=}: HTML template to show in the dialog.
-	 *            This must be trusted HTML with respect to Angular's $sce
-	 *            service. This template should never be constructed with any
-	 *            kind of user input or user data.</li>
 	 *            <li>contentElement:</li>
 	 *            <li>scope - {object=}: the scope to link the template
 	 *            controller to. If none is specified, it will create a new
